@@ -144,3 +144,12 @@
     <iframe width="640" height="360" src="http://www.youtube.com/embed/C2OQ51tu7W4?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
+
+% if show_signup_immediately is not UNDEFINED:
+<script type="text/javascript">
+function dosignup(){
+    document.getElementById('signup').click();
+}
+$(window).load(dosignup);
+</script>
+% endif

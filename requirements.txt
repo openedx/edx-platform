@@ -8,6 +8,7 @@ lxml
 boto
 mako
 python-memcached
+python-openid 
 path.py
 django_debug_toolbar
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
@@ -37,6 +38,7 @@ django-jasmine
 django-keyedcache
 django-mako
 django-masquerade
+django-openid-auth 
 django-robots
 django-ses
 django-storages

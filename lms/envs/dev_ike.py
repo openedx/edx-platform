@@ -7,142 +7,110 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
-
-import socket
-
-if 'eecs1' in socket.gethostname():
-    MITX_ROOT_URL = '/mitx2'
-
 from .common import *
 from .logsettings import get_logger_config
-from .dev import *
-
-if 'eecs1' in socket.gethostname():
-    # MITX_ROOT_URL = '/mitx2'
-    MITX_ROOT_URL = 'https://eecs1.mit.edu/mitx2'
-
-#-----------------------------------------------------------------------------
-# edx4edx content server
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mit.edu'
-EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
-
-#EMAIL_BACKEND = 'django_ses.SESBackend'
-
-#-----------------------------------------------------------------------------
-# ichuang
 
 DEBUG = True
-ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = False		
+TEMPLATE_DEBUG = True
 
-MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]
+MITX_FEATURES['DISABLE_START_DATES'] = True
 
-#MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
-MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
-MITX_FEATURES['DISPLAY_EDIT_LINK'] = True
-MITX_FEATURES['DEBUG_LEVEL'] = 10				# 0 = lowest level, least verbose, 255 = max level, most verbose
+WIKI_ENABLED = True
 
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
-                                          'title'  :  'Circuits and Electronics',
-                                          'xmlpath': '/6002x-fall-2012/',
-                                          'active' : True,
-                                          'default_chapter' : 'Week_1',
-                                          'default_section' : 'Administrivia_and_Circuit_Elements',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          },
-                    '8.02_Spring_2013': {'number' : '8.02x',
-                                         'title'  : 'Electricity &amp; Magnetism',
-                                         'xmlpath': '/802x/',
-                                         'github_url': 'https://github.com/MITx/8.02x',
-                                         'active' : True,
-                                         'default_chapter' : 'Introduction',
-                                         'default_section' : 'Introduction_%28Lewin_2002%29',
-                                         },
-                    '6.189_Spring_2013': {'number' : '6.189x',
-                                         'title'  : 'IAP Python Programming',
-                                         'xmlpath': '/6.189x/',
-                                         'github_url': 'https://github.com/MITx/6.189x',
-                                         'active' : True,
-                                         'default_chapter' : 'Week_1',
-                                         'default_section' : 'Variables_and_Binding',
-                                         },
-                    '8.01_Fall_2012': {'number' : '8.01x',
-                                         'title'  : 'Mechanics',
-                                         'xmlpath': '/8.01x/',
-                                         'github_url': 'https://github.com/MITx/8.01x',
-                                         'active': True,
-                                         'default_chapter' : 'Mechanics_Online_Spring_2012',
-                                         'default_section' : 'Introduction_to_the_course',
-                                         'location': 'i4x://edx/6002xs12/course/8.01_Fall_2012',
-                                         },
-                    'edx4edx': {'number' : 'edX.01',
-                                    'title'  : 'edx4edx: edX Author Course',
-                                    'xmlpath': '/edx4edx/',
-                                    'github_url': 'https://github.com/MITx/edx4edx',
-                                    'active' : True,
-                                    'default_chapter' : 'Introduction',
-                                    'default_section' : 'edx4edx_Course',
-                                    'location': 'i4x://edx/6002xs12/course/edx4edx',
-                                    },
-                    '7.03x_Fall_2012': {'number' : '7.03x',
-                                    'title'  : 'Genetics',
-                                    'xmlpath': '/7.03x/',
-                                    'github_url': 'https://github.com/MITx/7.03x',
-                                    'active' : True,
-                                    'default_chapter' : 'Week_2',
-                                    'default_section' : 'ps1_question_1',
-                                    },
-                    '3.091x_Fall_2012': {'number' : '3.091x',
-                                    'title'  : 'Introduction to Solid State Chemistry',
-                                    'xmlpath': '/3.091x/',
-                                    'github_url': 'https://github.com/MITx/3.091x',
-                                    'active' : True,
-                                    'default_chapter' : 'Week_1',
-                                    'default_section' : 'Problem_Set_1',
-                                    },
-                    '18.06x_Linear_Algebra': {'number' : '18.06x',
-                                    'title'  : 'Linear Algebra',
-                                    'xmlpath': '/18.06x/',
-                                    'github_url': 'https://github.com/MITx/18.06x',
-                                    'default_chapter' : 'Unit_1',
-                                    'default_section' : 'Midterm_1',
-                                    'active' : True,
-                                    },
-                    '6.00x_Fall_2012': {'number' : '6.00x',
-                                    'title'  : 'Introduction to Computer Science and Programming',
-                                    'xmlpath': '/6.00x/',
-                                    'github_url': 'https://github.com/MITx/6.00x',
-                                    'active' : True,
-                                    'default_chapter' : 'Week_0',
-                                    'default_section' : 'Problem_Set_0',
-                                    'location': 'i4x://edx/6002xs12/course/6.00x_Fall_2012',
-                                    },
-                    '7.00x_Fall_2012': {'number' : '7.00x',
-                                    'title'  : 'Introduction to Biology',
-                                    'xmlpath': '/7.00x/',
-                                    'github_url': 'https://github.com/MITx/7.00x',
-                                    'active' : True,
-                                    'default_chapter' : 'Unit 1',
-                                    'default_section' : 'Introduction',
-                                    },
-                    }
+LOGGING = get_logger_config(ENV_ROOT / "log", 
+                            logging_env="dev",
+                            tracking_filename="tracking.log",
+                            debug=True)
 
-#-----------------------------------------------------------------------------
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "mitx.db",
+    }
+}
 
-MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
-    'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
-    )
+CACHES = {
+    # This is the cache used for most things. Askbot will not work without a 
+    # functioning cache -- it relies on caching to load its settings in places.
+    # In staging/prod envs, the sessions also live here.
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'mitx_loc_mem_cache',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
 
-AUTHENTICATION_BACKENDS = (
-    'ssl_auth.ssl_auth.SSLLoginBackend',
-    'django.contrib.auth.backends.ModelBackend',
-    )
+    # The general cache is what you get if you use our util.cache. It's used for
+    # things like caching the course.xml file for different A/B test groups.
+    # We set it to be a DummyCache to force reloading of course.xml in dev.
+    # In staging environments, we would grab VERSION from data uploaded by the
+    # push process.
+    'general': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'KEY_PREFIX': 'general',
+        'VERSION': 4,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    }
+}
 
-INSTALLED_APPS = INSTALLED_APPS + (
-    'ssl_auth',
-    )
+# Dummy secret key for dev
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
-LOGIN_URL = MITX_ROOT_URL + '/'
+################################ OpenID Auth #################################
+MITX_FEATURES['AUTH_USE_OPENID'] = True
+
+INSTALLED_APPS += ('external_auth',) 
+INSTALLED_APPS += ('django_openid_auth',)
+#INSTALLED_APPS += ('ssl_auth',)
+
+#MIDDLEWARE_CLASSES += (
+#    #'ssl_auth.ssl_auth.NginxProxyHeaderMiddleware',		# ssl authentication behind nginx proxy
+#    )
+
+#AUTHENTICATION_BACKENDS = (
+#    'django_openid_auth.auth.OpenIDBackend',
+#    'django.contrib.auth.backends.ModelBackend',
+#    )
+
+OPENID_CREATE_USERS = False
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
+OPENID_USE_AS_ADMIN_LOGIN = False
+#import external_auth.views as edXauth
+#OPENID_RENDER_FAILURE = edXauth.edXauth_openid
+
+################################ DEBUG TOOLBAR #################################
+INSTALLED_APPS += ('debug_toolbar',) 
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+INTERNAL_IPS = ('127.0.0.1',)
+
+DEBUG_TOOLBAR_PANELS = (
+   'debug_toolbar.panels.version.VersionDebugPanel',
+   'debug_toolbar.panels.timer.TimerDebugPanel',
+   'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+   'debug_toolbar.panels.headers.HeaderDebugPanel',
+   'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+   'debug_toolbar.panels.sql.SQLDebugPanel',
+   'debug_toolbar.panels.signals.SignalDebugPanel',
+   'debug_toolbar.panels.logger.LoggingPanel',
+
+#  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
+#  Django=1.3.1/1.4 where requests to views get duplicated (your method gets 
+#  hit twice). So you can uncomment when you need to diagnose performance 
+#  problems, but you shouldn't leave it on.
+#  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+)
+
+############################ FILE UPLOADS (ASKBOT) #############################
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = ENV_ROOT / "uploads"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
+
+########################### PIPELINE #################################
+
+PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)

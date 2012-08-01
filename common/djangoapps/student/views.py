@@ -61,6 +61,15 @@ def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    return main_index()
+
+def main_index(extra_context = {}):
+    '''
+    Render the edX main page.
+
+    extra_context is used to allow immediate display of certain modal windows, eg signup,
+    as used by external_auth.
+    '''
     feed_data = cache.get("students_index_rss_feed_data")
     if feed_data == None:
         if hasattr(settings, 'RSS_URL'):
@@ -81,8 +90,9 @@ def index(request):
     for course in courses:
         universities[course.org].append(course)
 
-    return render_to_response('index.html', {'universities': universities, 'entries': entries})
-
+    context = {'universities': universities, 'entries': entries}
+    context.update(extra_context)
+    return render_to_response('index.html', context)
 
 def course_from_id(id):
     course_loc = CourseDescriptor.id_to_location(id)
@@ -257,10 +267,25 @@ def change_setting(request):
 
 @ensure_csrf_cookie
 def create_account(request, post_override=None):
-    ''' JSON call to enroll in the course. '''
+    '''
+    JSON call to create new edX account.
+    Used by form in signup_modal.html, which is included into navigation.html
+    '''
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
+
+    # if doing signup for an external authorization, then get email, password, name from the eamap
+    # don't use the ones from the form, since the user could have hacked those
+    doExternalAuth = 'ExternalAuthMap' in request.session
+    if doExternalAuth:
+        eamap = request.session['ExternalAuthMap']
+        email = eamap.external_email
+        name = eamap.external_name
+        password = eamap.internal_password
+        post_vars = dict(post_vars.items())
+        post_vars.update(dict(email=email, name=name, password=password, username=post_vars['username']))
+        log.debug('extauth test: post_vars = %s' % post_vars)
 
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
@@ -356,8 +381,9 @@ def create_account(request, post_override=None):
          'key': r.activation_key,
          }
 
+    # composes activation email
     subject = render_to_string('emails/activation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
+    # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
@@ -381,6 +407,17 @@ def create_account(request, post_override=None):
     request.session.set_expiry(0)
 
     try_change_enrollment(request)
+
+    if doExternalAuth:
+        eamap.user = login_user
+        eamap.dtsignup = datetime.datetime.now()
+        eamap.save()
+        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
+
+        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+            log.debug('bypassing activation email')
+            login_user.is_active = True
+            login_user.save()
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
