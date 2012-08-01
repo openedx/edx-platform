@@ -24,7 +24,6 @@ div.wiki-wrapper {
       }
 
       p {
-        color: darken($cream, 55%);
         float: left;
         line-height: 46px;
         margin-bottom: 0;
@@ -40,14 +39,12 @@ div.wiki-wrapper {
 
           input[type="button"] {
             @extend .block-link;
-            background-color: darken($cream, 5%);
             background-position: 12px center;
             background-repeat: no-repeat;
             border: 0;
             border-left: 1px solid darken(#f6efd4, 20%);
             @include border-radius(0);
             @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
-            color: darken($cream, 80%);
             display: block;
             font-size: 12px;
             font-weight: normal;
