@@ -25,7 +25,7 @@ def dashboard(request):
 
     from django.db import connection
     cursor = connection.cursor()
-    results = dictfetchall(cursor.execute(query))
-    
+    cursor.execute(query)
+    results = dictfetchall(cursor)
 
     return HttpResponse(json.dumps(results, indent=4))
