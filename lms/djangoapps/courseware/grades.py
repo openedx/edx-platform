@@ -3,7 +3,6 @@ import logging
 
 from django.conf import settings
 
-from courseware.course_settings import course_settings
 from xmodule import graders
 from xmodule.graders import Score
 from models import StudentModule
@@ -11,7 +10,7 @@ from models import StudentModule
 _log = logging.getLogger("mitx.courseware")
 
 
-def grade_sheet(student, course, student_module_cache):
+def grade_sheet(student, course, grader, student_module_cache):
     """
     This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
 
@@ -78,7 +77,6 @@ def grade_sheet(student, course, student_module_cache):
                          'chapter': c.metadata.get('display_name'),
                          'sections': sections})
 
-    grader = course_settings.GRADER
     grade_summary = grader.grade(totaled_scores)
 
     return {'courseware_summary': chapters,
