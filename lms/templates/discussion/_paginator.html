@@ -1,7 +1,18 @@
+<%! from urllib import urlencode %>
+
+<% 
+  def merge(dic1, dic2):
+    return dict(dic1.items() + dic2.items())
+
+  def url_for_page(_page):
+    return base_url + '?' + urlencode(merge(query_params, {'page': _page}))
+%>
+
 <%def name="link_to_page(_page)">
+  
   % if _page != page:
     <div class="page-link">
-      <a href="${url_for_page(_page, per_page)}">${_page}</a>
+      <a href="${url_for_page(_page)}">${_page}</a>
     </div>
   % else:
     <div class="page-link">${_page}</div>
@@ -25,7 +36,7 @@
 <div class="discussion-${discussion_type}-paginator discussion-paginator">
   <div class="prev-page">
     % if page > 1:
-      <a href="${url_for_page(page - 1, per_page)}">&lt; Previous page</a>
+      <a href="${url_for_page(page - 1)}">&lt; Previous page</a>
     % else:
       &lt; Previous page
     % endif
@@ -44,7 +55,7 @@
   % endif
   <div class="next-page">
     % if page < num_pages:
-      <a href="${url_for_page(page + 1, per_page)}">Next page &gt;</a>
+      <a href="${url_for_page(page + 1)}">Next page &gt;</a>
     % else:
       Next page &gt;
     % endif
