@@ -91,11 +91,12 @@ $discussion_input_width: 90%;
     }
   }
   .discussion-votes {
-    margin-right: 4%;
+    margin-right: 2%;
     margin-top: 2%;
     text-align: center;
     height: flex-grid(3);
     float: left;
+    margin-left: 2%;
     .discussion-vote-count {
       font-size: $comment_body_size;
       @include discussion-font;
@@ -109,9 +110,9 @@ $discussion_input_width: 90%;
         margin-bottom: 3px;
       }
       &.discussion-vote-down {
-        margin-top: 3px;
+        margin-top: 5px;
       }
-      &.voted {
+      &.voted { 
         color: #1d9dd9;
       }
     }
@@ -202,9 +203,8 @@ $discussion_input_width: 90%;
         border: 1px solid #A5D24A;
         -moz-border-radius: 2px;
         -webkit-border-radius: 2px;
-        display: block;
         float: left;
-        padding: 5px;
+        padding: 5px 7px;
         text-decoration: none;
         background: #CDE69C;
         color: #638421;
@@ -267,10 +267,6 @@ $discussion_input_width: 90%;
           display: block;
           color: black;
         }
-      }
-      .discussion-votes {
-        margin-right: 6px;
-        margin-top: 6px;
       }
     }
   }
