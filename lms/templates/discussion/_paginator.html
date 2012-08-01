@@ -1,0 +1,52 @@
+<%def name="link_to_page(_page)">
+  % if _page != page:
+    <div class="page-link">
+      <a href="${url_for_page(_page, per_page)}">${_page}</a>
+    </div>
+  % else:
+    <div class="page-link">${_page}</div>
+  % endif
+</%def>
+
+<%def name="list_pages(*args)">
+  % for arg in args:
+    % if arg == 'dots':
+      <div class="page-dots">...</div>
+    % elif isinstance(arg, list):
+      % for _page in arg:
+        ${link_to_page(_page)}
+      % endfor
+    % else:
+      ${link_to_page(arg)}
+    % endif
+  % endfor
+</%def>
+
+<div class="discussion-${discussion_type}-paginator discussion-paginator">
+  <div class="prev-page">
+    % if page > 1:
+      <a href="${url_for_page(page - 1, per_page)}">&lt; Previous page</a>
+    % else:
+      &lt; Previous page
+    % endif
+  </div>
+
+  % if num_pages <= 2 * pages_nearby_delta + 2:
+    ${list_pages(range(1, num_pages + 1))}
+  % else:
+    % if page <= 2 * pages_nearby_delta:
+      ${list_pages(range(1, 2 * pages_nearby_delta + 2), 'dots', num_pages)}
+    % elif num_pages - page + 1 <= 2 * pages_nearby_delta:
+      ${list_pages(1, 'dots', range(num_pages - 2 * pages_nearby_delta, num_pages + 1))}
+    % else:
+      ${list_pages(1, 'dots', range(page - pages_nearby_delta, page + pages_nearby_delta + 1), 'dots', num_pages)}
+    % endif
+  % endif
+  <div class="next-page">
+    % if page < num_pages:
+      <a href="${url_for_page(page + 1, per_page)}">Next page &gt;</a>
+    % else:
+      Next page &gt;
+    % endif
+  </div>
+</div>
