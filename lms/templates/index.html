@@ -9,7 +9,7 @@
       <div class="title">
         <hgroup>
           <h1>The Future of Online Education</h1>
-          <h2>For anyone, anywhere, anytime.</h2>
+          <h2>For anyone, anywhere, anytime</h2>
         </hgroup>
 
         <section class="actions">
@@ -19,15 +19,15 @@
 
           <div class="secondary-actions">
             <div class="social-sharing">
-              <div class="sharing-message">Share with friends and family!</div>
-              <a href="#" class="share">
-                <img src="${static.url('images/twitter-sharing.png')}">
+              <div class="sharing-message">Stay up to date with all edX has to offer!</div>
+              <a href="https://twitter.com/edXOnline" class="share">
+                <img src="${static.url('images/social/twitter-sharing.png')}">
               </a>
-              <a href="#" class="share">
-                <img src="${static.url('images/facebook-sharing.png')}">
+              <a href="http://www.facebook.com/EdxOnline" class="share">
+                <img src="${static.url('images/social/facebook-sharing.png')}">
               </a>
-              <a href="#" class="share">
-                <img src="${static.url('images/email-sharing.png')}">
+              <a href="https://plus.google.com/108235383044095082735/posts" class="share">
+                <img src="${static.url('images/social/google-plus-sharing.png')}">
               </a>
             </div>
           </div>
@@ -36,7 +36,6 @@
 
         <a href="#video-modal" class="media" rel="leanModal">
           <div class="hero">
-            <img src="${static.url('images/courses/space3.jpg')}" />
             <div class="play-intro"></div>
           </div>
         </a>
@@ -46,13 +45,13 @@
 
   <section class="container">
     <section class="highlighted-courses">
-      <h2>Explore courses from <span class="lowercase">edX</span> universities</h2>
+      <h2>Explore free courses from <span class="edx">edX</span> universities</h2>
 
       <section class="university-partners">
         <ol class="partners">
           <li class="partner mit">
             <a href="${reverse('university_profile', args=['MITx'])}">
-              <img src="${static.url('images/mit.png')}" />
+              <img src="${static.url('images/university/mit/mit.png')}" />
               <div class="name">
                 <span>MITx</span>
               </div>
@@ -60,15 +59,15 @@
           </li>
           <li class="partner">
             <a href="${reverse('university_profile', args=['HarvardX'])}">
-              <img src="${static.url('images/harvard.png')}" />
+              <img src="${static.url('images/university/harvard/harvard.png')}" />
               <div class="name">
                 <span>HarvardX</span>
               </div>
             </a>
           </li>
-          <li class="partner">
+          <li class="partner last">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
-              <img src="${static.url('images/berkeley.png')}" />
+              <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
                 <span>BerkeleyX</span>
               </div>
@@ -88,7 +87,7 @@
             <%include file="course.html" args="course=course" />
           %endfor
         </section>
-        <section class='university-column'>
+        <section class='university-column last'>
           %for course in universities['BerkeleyX']:
             <%include file="course.html" args="course=course" />
           %endfor
@@ -100,28 +99,39 @@
   <section class="container">
     <section class="more-info">
       <header>
-        <h2>edX News & Announcements</h2>
-        <a href="${reverse('press')}">Read More &rarr;</a>
+        <h2><span class="edx">edX</span> News &amp; Announcements</h2>
       </header>
       <section class="news">
         <section class="blog-posts">
             %for entry in entries:
             <article>
                 %if entry.image:
-                    <a href="${entry.link}" class="post-graphics">
-                        <img src="${entry.image}" />
-                    </a>
+                    <a href="${entry.link}" class="post-graphics" target="_blank"><img src="${entry.image}" /></a>
                 %endif
                 <div class="post-name">
-                    <a href="${entry.link}">${entry.title}</a>
+                    <a href="${entry.link}" target="_blank">${entry.title}</a>
+                    %if entry.summary:
+                        <p>${entry.summary}</p>
+                    %endif
                     <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
                 </div>
             </article>
             %endfor
         </section>
         <section class="press-links">
-          <h3>Press Links:</h3>
-          <a href="${reverse('pressrelease')}">The edX Press Release</a>
+          <h3>edX in the News:</h3>
+          ##<a href="${reverse('press/mit-and-harvard-announce-edx')}">The edX Press Release</a>
+          <a target="_blank" href="http://www.nytimes.com/2012/07/20/education/edlife/anant-agarwal-discusses-free-online-courses-offered-by-a-harvard-mit-partnership.html">New York Times</a>,
+          <a target="_blank" href="http://www.bostonglobe.com/magazine/2012/07/14/anant-agarwal-believes-online-education-from-mit-and-harvard-should-available-all/Af0kX44dPqpBKRV2IOSjPP/story.html"target="_blank" >Boston Globe</a>,
+          <a target="_blank" href="http://www.huffingtonpost.co.uk/2012/06/20/harvard-and-mit-create-edx-free-university-courses_n_1612143.html?utm_hp_ref=uk">Huffington Post</a>,
+          <a target="_blank" href="http://gigaom.com/cloud/everybody-codes/">GigaOM</a>,
+          <a target="_blank" href="http://web.mit.edu/newsoffice/2012/mitx-edx-first-course-recap-0716.html">MIT News</a>,
+          ##<a target="_blank" href="http://spectrum.ieee.org/at-work/education/review-mitxs-online-circuit-design-and-analysis-course">IEEE Spectrum</a>,
+          <a target="_blank" href="http://harvardmagazine.com/2012/07/harvard-extended">Harvard Magazine</a>,
+          <a target="_blank" href="http://www.bloomberg.com/news/2012-07-24/berkeley-joins-harvard-mit-offering-free-online-classes.html">Bloomberg</a>
+          ## <a target="_blank" href="http://chronicle.com/blogs/wiredcampus/uc-berkeley-joins-edx-effort-to-offer-free-open-courses/37969">The Chronicle of Higher Education</a>
+
+          <a href="${reverse('press')}" class="read-more">Read More &rarr;</a>
         </section>
       </section>
     </section>
@@ -129,8 +139,8 @@
 
 </section>
 
-<section id="video-modal" class="modal home-page-video-modal">
+<section id="video-modal" class="modal home-page-video-modal video-modal">
   <div class="inner-wrapper">
-    <iframe width="640" height="360" src="http://www.youtube.com/embed/SA6ELdIRkRU" frameborder="0" allowfullscreen></iframe>
+    <iframe width="640" height="360" src="http://www.youtube.com/embed/C2OQ51tu7W4?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>

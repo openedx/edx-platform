@@ -2,14 +2,16 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="title"><title>Courses</title></%block>
+
 <section class="find-courses">
-  <header class="search" style="background: url('/static/images/homepage_interns_placeholder_2025x550.jpg')">
+  <header class="search" style="background: url('/static/images/homepage-bg.jpg')">
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">
           <img src="${static.url('images/edx_bw.png')}" />
         </div>
-        <h2>Explore courses from leading universities.</h2>
+        <h2>Explore free courses from leading universities.</h2>
       </hgroup>
     </div>
   </header>
@@ -28,7 +30,7 @@
           <%include file="course.html" args="course=course" />
         %endfor
       </section>
-      <section class='university-column'>
+      <section class='university-column last'>
         %for course in universities['BerkeleyX']:
           <%include file="course.html" args="course=course" />
         %endfor

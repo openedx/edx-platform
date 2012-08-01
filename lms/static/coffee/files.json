@@ -1,9 +1,9 @@
 {
   "js_files": [
-    "/static/js/jquery.min.js",
-    "/static/js/jquery-ui.min.js",
-    "/static/js/jquery.leanModal.js",
-    "/static/js/flot/jquery.flot.js"
+    "/static/js/vendor/jquery.min.js",
+    "/static/js/vendor/jquery-ui.min.js",
+    "/static/js/vendor/jquery.leanModal.min.js",
+    "/static/js/vendor/flot/jquery.flot.js"
   ],
   "static_files": [
     "js/application.js"

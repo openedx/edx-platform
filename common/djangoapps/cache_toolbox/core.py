@@ -13,6 +13,7 @@ from django.db import DEFAULT_DB_ALIAS
 
 from . import app_settings
 
+
 def get_instance(model, instance_or_pk, timeout=None, using=None):
     """
     Returns the ``model`` instance with a primary key of ``instance_or_pk``.
@@ -87,12 +88,14 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
 
     return instance
 
+
 def delete_instance(model, *instance_or_pk):
     """
     Purges the cache keys for the instances of this model.
     """
 
     cache.delete_many([instance_key(model, x) for x in instance_or_pk])
+
 
 def instance_key(model, instance_or_pk):
     """

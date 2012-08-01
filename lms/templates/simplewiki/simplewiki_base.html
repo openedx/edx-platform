@@ -3,13 +3,21 @@
 <%inherit file="../main.html"/>
 <%namespace name='static' file='../static_content.html'/>
 
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
 <%!
   from django.core.urlresolvers import reverse
   from simplewiki.views import wiki_reverse
 %>
 
-<%block name="headextra">
+<%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/simplewiki-AutoSuggest_c_2.0.js')}"></script>
+
+## TODO (cpennington): Remove this when we have a good way for modules to specify js to load on the page
+## and in the wiki
+<script type="text/javascript" src="${static.url('js/schematic.js')}"></script>
 
   <script type="text/javascript">
     function set_related_article_id(s) {
@@ -74,7 +82,7 @@
 <%include file="../course_navigation.html" args="active_page='wiki'" />
 %endif
 
-<section class="main-content">
+<section class="container">
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
     <div aria-label="Wiki Navigation" id="wiki_panel">
@@ -153,5 +161,4 @@
     </section>
   </div>
 </section>
-
 </%block>

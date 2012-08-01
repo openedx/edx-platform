@@ -2,7 +2,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
-<%block name="headextra">
+<%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
@@ -14,7 +14,7 @@
 </%block>
 
 <%include file="navigation.html" args="active_page=''" />
-<section class="main-content">
+<section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
     <h1>Gradebook</h1>

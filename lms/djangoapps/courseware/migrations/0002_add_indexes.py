@@ -4,10 +4,11 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding index on 'StudentModule', fields ['created']
         db.create_index('courseware_studentmodule', ['created'])
 
@@ -23,9 +24,8 @@ class Migration(SchemaMigration):
         # Adding index on 'StudentModule', fields ['module_id']
         db.create_index('courseware_studentmodule', ['module_id'])
 
-
     def backwards(self, orm):
-        
+
         # Removing index on 'StudentModule', fields ['module_id']
         db.delete_index('courseware_studentmodule', ['module_id'])
 
@@ -40,7 +40,6 @@ class Migration(SchemaMigration):
 
         # Removing index on 'StudentModule', fields ['created']
         db.delete_index('courseware_studentmodule', ['created'])
-
 
     models = {
         'auth.group': {

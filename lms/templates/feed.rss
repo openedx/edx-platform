@@ -1,25 +1,35 @@
+<%! from django.core.urlresolvers import reverse %>\
 <?xml version="1.0" encoding="UTF-8"?>
 <%namespace name='static' file='static_content.html'/>
 <feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
-  <id>tag:mitx.mit.edu,2012:/blog</id>
-  <link type="text/html" rel="alternate" href="http://mitx.mit.edu/blog"/>
-  <link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
-  <title>The GitHub Blog</title>
+  <id>tag:www.edx.org,2012:/blog</id>
+  <link type="text/html" rel="alternate" href="http://blog.edx.org/"/>
+  ##<link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
+  <title>EdX Blog</title>
   <updated>2012-07-16T14:08:12-07:00</updated>
   <entry>
-    <id>tag:mitx.mit.edu,2012:Post/3</id>
+    <id>tag:www.edx.org,2012:Post/3</id>
     <published>2012-07-16T14:08:12-07:00</published>
     <updated>2012-07-16T14:08:12-07:00</updated>
-    <link type="text/html" rel="alternate" href="#"/>
-    <title>Online Classes Cut Costs, But Do They Dilute Brands?</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/courses/space1.jpg')}&quot; /&gt;A Description</content>
+    <link type="text/html" rel="alternate" href="${reverse('press/uc-berkeley-joins-edx')}"/>
+    <title>UC Berkeley joins edX</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/edx.png')}&quot; /&gt; 
+      &lt;p&gt;edX broadens course offerings&lt;/p&gt;</content>
   </entry>
   <entry>
-    <id>tag:mitx.mit.edu,2012:Post/3</id>
+    <id>tag:www.edx.org,2012:Post/2</id>
     <published>2012-07-16T14:08:12-07:00</published>
     <updated>2012-07-16T14:08:12-07:00</updated>
-    <link type="text/html" rel="alternate" href="#"/>
-    <title>Online Classes Cut Costs, But Do They Dilute Brands?</title>
-    <content type="html">A Description</content>
+    <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589840852/opening-doors-for-exceptional-students-6-002x-in"/>
+    <title>Opening Doors For Exceptional Students: 6.002x in Mongolia</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_opening_doors_mongolia.jpg')}&quot; /&gt;</content>
+  </entry>
+  <entry>
+    <id>tag:www.edx.org,2012:Post/1</id>
+    <published>2012-07-16T14:08:12-07:00</published>
+    <updated>2012-07-16T14:08:12-07:00</updated>
+    <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589835076/beyond-the-circuits-a-students-experience-with-6-002x"/>
+    <title>Brazilian teen blogs about his 6.002x experience</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_brazilian_teen.jpg')}&quot; /&gt;</content>
   </entry>
 </feed>

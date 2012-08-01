@@ -1,0 +1,13 @@
+<problem><script type="loncapa/python">
+
+z = "A*x^2 + sqrt(y)"
+
+</script><startouttext/>
+Enter the algebraic expression \(A x^2 + \sqrt{y}\) in the box below.  The
+entry is case sensitive.  The product must be indicated with an
+asterisk, and the exponentation with a caret, so you must write 
+"A*x^2 + sqrt(y)".
+<endouttext/>
+<formularesponse type="cs" samples="A,x,y@1,1,1:3,3,3#10" answer="$z"><responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/><textline size="40"/></formularesponse>
+
+</problem>

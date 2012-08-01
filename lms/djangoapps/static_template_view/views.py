@@ -1,4 +1,4 @@
-# View for semi-static templatized content. 
+# View for semi-static templatized content.
 #
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
@@ -8,23 +8,20 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 
-from util.cache import cache_if_anonymous 
+from util.cache import cache_if_anonymous
 
 valid_templates = []
 
 if settings.STATIC_GRAB:
-    valid_templates = valid_templates+['server-down.html',
+    valid_templates = valid_templates + ['server-down.html',
                                        'server-error.html'
-                                       'server-overloaded.html', 
-                                       'mitx_global.html', 
-                                       'mitx-overview.html', 
-                                       '6002x-faq.html',
-                                       '6002x-press-release.html'
+                                       'server-overloaded.html',
                                        ]
 
-def index(request, template): 
+
+def index(request, template):
     if template in valid_templates:
-        return render_to_response('static_templates/' + template, {}) 
+        return render_to_response('static_templates/' + template, {})
     else:
         return redirect('/')
 
@@ -36,24 +33,16 @@ def render(request, template):
     This view function renders the template sent without checking that it
     exists. Do not expose template as a regex part of the url. The user should
     not be able to ender any arbitray template name. The correct usage would be:
-    
+
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
-    """    
+    """
     return render_to_response('static_templates/' + template, {})
+
 
 def render_404(request):
     return render_to_response('static_templates/404.html', {})
-    
+
+
 def render_500(request):
     return render_to_response('static_templates/server-error.html', {})
 
-valid_auth_templates=[]
-
-def auth_index(request, template):
-    if not request.user.is_authenticated():
-        return redirect('/')
-
-    if template in valid_auth_templates:
-        return render_to_response(template,{})
-    else:
-        return redirect('/')

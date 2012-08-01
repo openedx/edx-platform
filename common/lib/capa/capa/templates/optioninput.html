@@ -1,0 +1,25 @@
+<form class="option-input">
+  
+   <select name="input_${id}" id="input_${id}" >
+      <option value="option_${id}_dummy_default">  </option>
+      % for option_id, option_description in options:
+          <option value="${option_id}"
+          % if (option_id==value):
+        	selected="true"
+          % endif
+          > ${option_description}</option>
+      % endfor
+    </select>
+   
+  <span id="answer_${id}"></span>
+
+  % if state == 'unsubmitted':
+  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+  % elif state == 'correct': 
+  <span class="correct" id="status_${id}"></span>
+  % elif state == 'incorrect':
+  <span class="incorrect" id="status_${id}"></span>
+  % elif state == 'incomplete':
+  <span class="incorrect" id="status_${id}"></span>
+  % endif
+</form>

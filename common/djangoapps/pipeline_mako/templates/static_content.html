@@ -1,10 +1,25 @@
 <%!
 from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
-from static_replace import replace_urls
 %>
 
 <%def name='url(file)'>${staticfiles_storage.url(file)}</%def>
-<%def name='css(group)'>${compressed_css(group)}</%def>
-<%def name='js(group)'>${compressed_js(group)}</%def>
-<%def name='replace_urls(text)'>${replace_urls(text)}</%def>
+
+<%def name='css(group)'>
+  % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+    ${compressed_css(group)}
+  % else:
+    % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
+      <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}" type="text/css" media="all" / >
+    % endfor
+  %endif
+</%def>
+<%def name='js(group)'>
+  % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
+    ${compressed_js(group)}
+  % else:
+    % for filename in settings.PIPELINE_JS[group]['source_filenames']:
+      <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
+    % endfor
+  %endif
+</%def>

@@ -5,36 +5,77 @@ from django.conf import settings
 from fs.osfs import OSFS
 from git import Repo, PushInfo
 
-from contentstore import import_from_xml
-from xmodule.modulestore import Location
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
+from collections import namedtuple
 
-from .exceptions import GithubSyncError
+from .exceptions import GithubSyncError, InvalidRepo
 
 log = logging.getLogger(__name__)
 
+RepoSettings = namedtuple('RepoSettings', 'path branch origin')
 
-def import_from_github(repo_settings):
-    """
-    Imports data into the modulestore based on the XML stored on github
 
-    repo_settings is a dictionary with the following keys:
-        path: file system path to the local git repo
-        branch: name of the branch to track on github
+def sync_all_with_github():
     """
-    repo_path = repo_settings['path']
-    data_dir, course_dir = os.path.split(repo_path)
+    Sync all defined repositories from github
+    """
+    for repo_name in settings.REPOS:
+        sync_with_github(load_repo_settings(repo_name))
+
+
+def sync_with_github(repo_settings):
+    """
+    Sync specified repository from github
+
+    repo_settings: A RepoSettings defining which repo to sync
+    """
+    revision, course = import_from_github(repo_settings)
+    export_to_github(course, "Changes from cms import of revision %s" % revision, "CMS <cms@edx.org>")
+
+
+def setup_repo(repo_settings):
+    """
+    Reset the local github repo specified by repo_settings
+
+    repo_settings (RepoSettings): The settings for the repo to reset
+    """
+    course_dir = repo_settings.path
+    repo_path = settings.GITHUB_REPO_ROOT / course_dir
 
     if not os.path.isdir(repo_path):
-        Repo.clone_from(repo_settings['origin'], repo_path)
+        Repo.clone_from(repo_settings.origin, repo_path)
 
     git_repo = Repo(repo_path)
     origin = git_repo.remotes.origin
     origin.fetch()
 
     # Do a hard reset to the remote branch so that we have a clean import
-    git_repo.git.checkout(repo_settings['branch'])
-    git_repo.head.reset('origin/%s' % repo_settings['branch'], index=True, working_tree=True)
-    module_store = import_from_xml(data_dir, course_dirs=[course_dir])
+    git_repo.git.checkout(repo_settings.branch)
+
+    return git_repo
+
+
+def load_repo_settings(course_dir):
+    """
+    Returns the repo_settings for the course stored in course_dir
+    """
+    if course_dir not in settings.REPOS:
+        raise InvalidRepo(course_dir)
+
+    return RepoSettings(course_dir, **settings.REPOS[course_dir])
+
+
+def import_from_github(repo_settings):
+    """
+    Imports data into the modulestore based on the XML stored on github
+    """
+    course_dir = repo_settings.path
+    git_repo = setup_repo(repo_settings)
+    git_repo.head.reset('origin/%s' % repo_settings.branch, index=True, working_tree=True)
+
+    module_store = import_from_xml(modulestore(),
+                                   settings.GITHUB_REPO_ROOT, course_dirs=[course_dir])
     return git_repo.head.commit.hexsha, module_store.courses[course_dir]
 
 
@@ -44,21 +85,23 @@ def export_to_github(course, commit_message, author_str=None):
     and push to github (if MITX_FEATURES['GITHUB_PUSH'] is True).
     If author_str is specified, uses it in the commit.
     '''
-    repo_path = settings.DATA_DIR / course.metadata.get('course_dir', course.location.course)
-    fs = OSFS(repo_path)
+    course_dir = course.metadata.get('data_dir', course.location.course)
+    repo_settings = load_repo_settings(course_dir)
+    git_repo = setup_repo(repo_settings)
+
+    fs = OSFS(git_repo.working_dir)
     xml = course.export_to_xml(fs)
 
     with fs.open('course.xml', 'w') as course_xml:
         course_xml.write(xml)
 
-    git_repo = Repo(repo_path)
     if git_repo.is_dirty():
         git_repo.git.add(A=True)
         if author_str is not None:
             git_repo.git.commit(m=commit_message, author=author_str)
         else:
             git_repo.git.commit(m=commit_message)
-        
+
         origin = git_repo.remotes.origin
         if settings.MITX_FEATURES['GITHUB_PUSH']:
             push_infos = origin.push()

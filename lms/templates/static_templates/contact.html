@@ -3,6 +3,8 @@
 
 <%inherit file="../main.html" />
 
+<%block name="title"><title>Contact edX</title></%block>
+
 <section class="container about">
   <nav>
     <a href="${reverse('about_edx')}">Vision</a>
@@ -12,32 +14,24 @@
   </nav>
 
   <section class="contact">
-    <div class="map">
-      <img src="${static.url('images/edx-location.png')}">
+    <div class="photo">
+      <img src="${static.url('images/contact-page.jpg')}">
     </div>
     <div class="contacts">
-      <h2>Email Contacts</h2>
-      <ul>
-        <li><p>System-related questions: <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a></p></li>
-        <li><p>Content-related questions: <a href="mailto:content@mitx.mit.edu">content@mitx.mit.edu</a></p></li>
-        <li><p>Bug reports: <a href="mailto:bugs@mitx.mit.edu">bugs@mitx.mit.edu</a></p></li>
-        <li><p>Suggestions: <a href="mailto:suggestions@mitx.mit.edu">suggestions@mitx.mit.edu</a></p></li>
-      </ul>
-
       <h2>Class Feedback</h2>
-      <p>We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that class.</p>
+      <p>We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that&nbsp;class.</p>
 
-      <h2>General Inqueries and Feedback</h2>
-      <p>If you have a general question about edX please email <a href="mailto:info@edx.org">info@edx.org</a>. To see if your question has already been answered, visit our <a href="${reverse('faq_edx')}">FAQ page</a>. Though we may not have a chance to respond to every email, we take all feedback into consideration.</p>
+      <h2>General Inquiries and Feedback</h2>
+      <p>If you have a general question about edX please email <a href="mailto:info@edx.org">info@edx.org</a>. To see if your question has already been answered, visit our <a href="${reverse('faq_edx')}">FAQ page</a>. You can also join the discussion on our <a href="http://www.facebook.com/EdxOnline">Facebook page</a>. Though we may not have a chance to respond to every email, we take all feedback into consideration.</p>
 
-      <h2>Technical Inqueries and Feedback</h2>
+      <h2>Technical Inquiries and Feedback</h2>
       <p>If you have suggestions/feedback about the overall edX platform, or are facing general technical issues with the platform (e.g., issues with email addresses and passwords), you can reach us at <a href="mailto:technical@edx.org">technical@edx.org</a>. For technical questions, please make sure you are using a current version of Firefox or Chrome, and include browser and version in your e-mail, as well as screenshots or other pertinent details. If you find a bug or other issues, you can reach us at the following: <a href="mailto:bugs@edx.org">bugs@edx.org</a>.</p>
 
       <h2>Media</h2>
-      <p>Please visit our <a href="${reverse('faq_edx')}">media/press page</a> for more information.  For any media or press enquiries, please email <a href="mailto:press@edx.org">press@edx.org</a>.</p>
+      <p>Please visit our <a href="${reverse('press')}">media/press page</a> for more information. For any media or press enquiries, please email <a href="mailto:press@edx.org">press@edx.org</a>.</p>
 
       <h2>Universities</h2>
-      <p>If you are a university wishing to Collaborate or with questions about edX, please email <a href="mailto:university@edx.org">university@edx.org</a>.</p>
+      <p>If you are a university wishing to collaborate or with questions about edX, please email <a href="mailto:university@edx.org">university@edx.org</a>.</p>
 
     </div>
   </section>

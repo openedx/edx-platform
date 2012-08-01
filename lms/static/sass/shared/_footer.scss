@@ -15,7 +15,8 @@ footer {
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px 10px 0;
-    width: grid-width(12);
+    max-width: grid-width(12);
+    min-width: 760px;
 
     .top {
       border-bottom: 1px solid rgb(200,200,200);
@@ -110,8 +111,7 @@ footer {
           padding: 0;
 
           a {
-            opacity: 0.7;
-            padding: 0 0 0 10px;
+            opacity: 0.3;
             @include transition(all, 0.1s, linear);
 
             &:hover {

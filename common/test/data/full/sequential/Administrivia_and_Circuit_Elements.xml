@@ -1,0 +1,14 @@
+<sequential>
+  <vertical filename="vertical_58" slug="vertical_58" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_66" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <problem filename="S1E3_AC_power" slug="S1E3_AC_power" name="S1E3: AC power"/>
+    <customtag tag="S1E3" slug="discuss_67" impl="discuss"/>
+    <html slug="html_68"> S1E4 has been removed. </html>
+  </vertical>
+  <vertical filename="vertical_89" slug="vertical_89" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
+  <vertical slug="vertical_94" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
+    <video youtube="0.75:XNh13VZhThQ,1.0:XbDRmF6J0K0,1.25:JDty12WEQWk,1.50:wELKGj-5iyM" slug="What_s_next" name="What's next"/>
+    <html slug="html_95">Minor correction: Six elements (five resistors)</html>
+    <customtag tag="S1" slug="discuss_96" impl="discuss"/>
+  </vertical>
+</sequential>

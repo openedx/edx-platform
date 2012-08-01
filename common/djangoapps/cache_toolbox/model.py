@@ -58,6 +58,7 @@ from django.db.models.signals import post_save, post_delete
 
 from .core import get_instance, delete_instance
 
+
 def cache_model(model, timeout=None):
     if hasattr(model, 'get_cached'):
         # Already patched

@@ -3,6 +3,8 @@
 
 <%inherit file="../main.html" />
 
+<%block name="title"><title>FAQ</title></%block>
+
 <section class="container about">
   <nav>
     <a href="${reverse('about_edx')}">Vision</a>
@@ -10,119 +12,82 @@
     <a href="${reverse('press')}">Press</a>
     <a href="${reverse('contact')}">Contact</a>
   </nav>
-
   <section class="faq">
-
     <section class="responses">
       <section id="the-organization" class="category">
-        <h2>Category</h2>
-
+        <h2>Organization</h2>
         <article class="response">
-          <h3>What is edX?</h3>
-          <p>edX is a Cambridge-based not-for-profit, equally owned and governed by the Massachusetts Institute of Technology (MIT) and Harvard University to offer online learning to millions of people around the world. edX offers Harvard, MIT and Berkeley classes online for free. Through this partnership, with other partners to follow, the institutions aim to extend their collective reach to build a global community of online students.</p>
+            <h3>What is edX?</h3>
+            <p>EdX is a not-for-profit enterprise of its founding partners, the Massachusetts Institute of Technology (MIT) and Harvard University that offers online learning to on-campus students and to millions of people around the world. To do so, edX is building an open-source online learning platform and hosts an online web portal at <a href="http://www.edx.org">www.edx.org</a> for online education.</p>
+            <p>EdX currently offers HarvardX, <em>MITx</em> and BerkeleyX classes online for free. These institutions aim to extend their collective reach to build a global community of online students. Along with offering online courses, the three universities undertake research on how students learn and how technology can transform learning – both on-campus and online throughout the world.</p>
         </article>
-
         <article class="response">
-          <h3>Why was edX established?</h3>
-          <p>To transform learning and enhance education on campus and around the world:</p>
-          <ul>
-            <li><p>On campus, edX research will enhance our understanding of how students learn and how technologies can best be used as part of our larger efforts to improve teaching and learning.</p></li>
-            <li><p>Beyond our campuses, edX will expand access to education, allow for certificates of mastery to be earned by able learners.</p></li>
-          </ul>
+            <h3>What are "X Universities"?</h3>
+            <p>Harvard, MIT and UC Berkeley, as the first universities whose courses are delivered on the edX website, are "X Universities." The three institutions will work collaboratively to establish the "X University" Consortium, whose membership will expand to include additional "X Universities" as soon as possible. Each member of the consortium will offer courses on the edX platform as an "X University." The gathering of many universities’ educational content together on one site will enable learners worldwide to access the course content of any participating university from a single website, and to use a set of online educational tools shared by all participating universities. </p>
         </article>
-
         <article class="response">
-          <h3>What are MITx, HarvardX and BerkeleyX?</h3>
-          <p>Portfolios of MIT, Harvard and Berkeley online courses offered to learners around the world through edX.</p>
+            <h3>Why is UC Berkeley joining edX?</h3>
+            <p>Like Harvard and MIT, UC Berkeley seeks to transform education in quality, efficiency and scale through technology and research, for the benefit of campus-based students and the global community of online learners. </p>
+            <p>UC Berkeley also shares the edX commitment to the not-for-profit and open-platform model as a way to enhance human fulfillment worldwide. </p>
         </article>
-
         <article class="response">
-          <h3>What technology will edX use?</h3>
-          <p>An open-source online learning platform that will feature teaching designed specifically for the web. Features will include: self-paced learning, online discussion groups, wiki-based collaborative learning, assessment of learning as a student progresses through a course, and online laboratories. The platform will also serve as a laboratory from which data will be gathered to better understand how students learn. Because it is open source, the platform will be continuously improved.</p>
+            <h3>What will UC Berkeley's direct participation entail?</h3>
+            <p>UC Berkeley will begin by offering two courses on edX in Fall 2012, and will collaborate on the development of the technology platform. We will explore, experiment and innovate together.</p>
+            <p>UC Berkeley will also serve as the inaugural chair of the "X University" Consortium for an initial 5 year period.  As Chair, UC Berkeley will participate on the edX Board on behalf of the X Universities.</p>
         </article>
-
         <article class="response">
-          <h3>How is this different from what other universities are doing online?</h3>
-          <p>edX is a not-for-profit built by the shared educational missions of its founding partners, Harvard University and MIT. Also, a primary goal of edX is to improve teaching and learning on campus by supporting faculty in conducting significant research on how students learn.</p>
-        </article>
-
-        <article class="response">
-          <h3>Who will lead edX?</h3>
-          <p>edX is governed by a board made up by key leaders from Harvard and MIT.  MIT Professor Anant Agarwal, formerly Director of the Computer Science and Artificial Intelligence Laboratory at MIT, serves as the first president of edX.</p>
+            <h3>Why is edX only adding one X University?</h3>
+            <p>More than 120 universities from around the world have expressed interest in collaborating with edX since Harvard and MIT announced its creation in May.  EdX is focused above all on quality and developing the best non-profit model for online education.  In addition to providing online courses on the edX platform, the "X University" Consortium will be a forum in which members can share experiences around online learning. </p>
+            <p>EdX will actively explore the addition of other institutions from around the world to the edX platform, and we look forward to adding more "X Universities" as capacity increases. </p>
         </article>
       </section>
 
-      <section id="" class="category">
-        <h2>Category</h2>
-
+      <section id="students" class="category">
+        <h2>Students</h2>
         <article class="response">
-          <h3>Who can take edX courses? Will there be an admissions process?</h3>
-          <p>edX will be available to anyone in the world with an internet connection, and in general, there will not be an admissions process.</p>
+            <h3>Who can take edX courses? Will there be an admissions process?</h3>
+            <p>EdX will be available to anyone in the world with an internet connection, and in general, there will not be an admissions process.</p>
         </article>
-
         <article class="response">
-          <h3>Will certificates be awarded?</h3>
-          <p>Online learners who demonstrate mastery of subjects could earn a certificate of completion. Such certificates will be issued by edX under the name of the underlying X University from where the course originated,  i.e. HarvardX, MITx or BerkeleyX.</p>
+            <h3>Will certificates be awarded?</h3>
+            <p>Yes. Online learners who demonstrate mastery of subjects can earn a certificate of completion. Certificates will be issued by edX under the name of the underlying "X University" from where the course originated, i.e. HarvardX, <em>MITx</em> or BerkeleyX.  For the courses in Fall 2012, those certificates will be free.  There is a plan to charge a modest fee for certificates in the future.</p>
         </article>
-
         <article class="response">
-          <h3>What will the scope of the online courses be? How many? Which faculty?</h3>
-          <p>Our goal is to offer a wide variety of courses across disciplines. There are currently seven courses planned for the Fall 2012 [Link to courses page].</p>
+            <h3>What will the scope of the online courses be? How many? Which faculty?</h3>
+            <p>Our goal is to offer a wide variety of courses across disciplines. There are currently <a href="${reverse('courses')}">seven courses</a> offered for Fall 2012.</p>
         </article>
-
         <article class="response">
-          <h3>Will on-campus students at partner institutions be able to take these courses for credit?</h3>
-          <p>No. Courses will not be offered for credit at partner universities. The online content will be used to extend and enrich on campus courses. Do we need to keep this?</p>
+            <h3>Who is the learner? Domestic or international? Age range?</h3>
+            <p>Improving teaching and learning for students on our campuses is one of our primary goals. Beyond that, we don’t have a target group of potential learners, as the goal is to make these courses available to anyone in the world – from any demographic – who has interest in advancing their own knowledge. The only requirement is to have a computer with an internet connection. More than 150,000 students from over 160 countries registered for MITx's first course, 6.002x: Circuits and Electronics. The age range of students certified in this course was from 14 to 74 years-old.</p>
         </article>
-
         <article class="response">
-          <h3>Who is the learner? Domestic or international? Age range?</h3>
-          <p>Improving teaching and learning for students on our campuses is one of our primary goals. Beyond that, we don’t have a target group of potential learners, as the goal is to make these courses available to anyone in the world – from any demographic – who has interest in advancing their own knowledge. The only requirement is to have a computer with an internet connection. More than 150,000 students from over 160 countries registered for edX's first course, 6.002x: Circuits and Electronics. The age range of students certified in this course was from 14 to 74 years.</p>
+            <h3>Will participating universities’ standards apply to all courses offered on the edX platform?</h3>
+            <p>Yes: the reach changes exponentially, but the rigor remains the same.</p>
         </article>
-
         <article class="response">
-          <h3>Many institutions are partnering in this space. Will other institutions be able to collaborate with edX?</h3>
-          <p>In July of 2012 edX announced the addition of the University of California Berkeley to the edX educational space. The gathering (or consortium) of many universities’ educational content together on one site will enable learners worldwide to access the course content of any participating university from a single website, and to use a set of online educational tools shared by all participating universities. We plan to add many more institutions to this growing online initiative. </p>
+            <h3>How do you intend to test whether this approach is improving learning?</h3>
+            <p>Edx institutions have assembled faculty members who will collect and analyze data to assess results and the impact edX is having on learning.</p>
         </article>
-
         <article class="response">
-          <h3>Why is Berkeley joining edX? </h3>
-          <p>Like Harvard and MIT, Berkeley shares edX mission “to enhance human fulfillment worldwide through online learning, transforming education in quality, efficiency and scale through technology and research, for the benefit of campus-based students and the worldwide community of online learners”.</p>
-          <p>Berkeley shares edX commitment to the not-for-profit model as a way to transform learning and enhance education on campus and around the world.</p>
+            <h3>How may I apply to study with edX?</h3>
+            <p>Simply complete the online <a href="#signup-modal" rel="leanModal">signup form</a>.  Enrolling will create your unique student record in the edX database, allow you to register for classes, and to receive a certificate on successful completion.</p>
+        </article>
+        <article class="response">
+            <h3>How may another university participate in edX? </h3>
+            <p>If you are from a university interested in discussing edX, please email <a href="mailto:university@edx.org">university@edx.org</a></p>
         </article>
       </section>
 
       <section id="technology-platform" class="category">
-        <h2>Category</h2>
-
+        <h2>Technology Platform</h2>
         <article class="response">
-          <h3>What are the specific arrangements between Berkeley and edX? </h3>
-          <p>Berkeley will chair the to-be-formed X University consortium, which is the consortium of universities offering courses on the edX platform. As chair, Berkeley will also get a non-voting board seat on the edX board, currently comprised of the MIT and Harvard leaders, and the edX president. Berkeley will collaborate with the edX development team on the common edX platform, which will be released as open source.</p>
+            <h3>What technology will edX use?</h3>
+            <p>The edX open-source online learning platform will feature interactive learning designed specifically for the web. Features will include: self-paced learning, online discussion groups, wiki-based collaborative learning, assessment of learning as a student progresses through a course, and online laboratories and other interactive learning tools. The platform will also serve as a laboratory from which data will be gathered to better understand how students learn. Because it is open source, the platform will be continuously improved by a worldwide community of collaborators, with new features added as needs arise.</p>
+            <p>The first version of the technology was used in the first <em>MITx</em> course, 6.002x Circuits and Electronics, which launched in Spring, 2012.</p>
         </article>
-
         <article class="response">
-          <h3>What will Berkeley’s direct participation entail?</h3>
-          <p>Berkeley will offer two courses on edX in Fall 2012, and will be collaborating on the development of the technology platform. We will explore, experiment and innovate together.</p>
-        </article>
-
-        <article class="response">
-          <h3>Will the partner university’s standards apply to edX programming?</h3>
-          <p>The reach changes exponentially, but the rigor remains the same.</p>
-        </article>
-
-        <article class="response">
-          <h3>How do you intend to test whether this approach is improving learning?</h3>
-          <p>edx institutions have assembled faculty who will look at data collection and analytical tools to assess results and the impact edX is having on learning.</p>
-        </article>
-
-        <article class="response">
-          <h3>How may I apply to study with edX?</h3>
-          <p>Simply complete the online registration form here[link], or click on the "SIGN UP" tab at the top of this page).  Enrolling will create your unique student record in the edX database, allows you to enroll in classes, and to receive a certificate on successful completion.</p>
-        </article>
-
-        <article class="response">
-          <h3>How may another University participate in edX?</h3>
-          <p>If you are from a university interested in discussing edX, please email university@edx.org</p>
+            <h3>How is this different from what other universities are doing online?</h3>
+            <p>EdX is a not-for-profit enterprise built upon the shared educational missions of its founding partners, Harvard University and MIT. The edX platform will be available as open source. Also, a primary goal of edX is to improve teaching and learning on campus by experimenting with blended models of learning and by supporting faculty in conducting significant research on how students learn.</p>
         </article>
       </section>
 
@@ -130,11 +95,13 @@
 
     <nav class="categories">
       <a href="#organization">Organization</a>
-      <a href="#objectives">Objectives</a>
+      ##<a href="#objectives">Objectives</a>
       <a href="#students">Students</a>
       <a href="#technology-platform">Technology Platform</a>
     </nav>
   </section>
 </section>
 
-
+%if user.is_authenticated():
+  <%include file="../signup_modal.html" />
+%endif

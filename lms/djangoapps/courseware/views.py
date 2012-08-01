@@ -1,3 +1,5 @@
+from collections import defaultdict
+import json
 import logging
 import urllib
 import itertools
@@ -7,7 +9,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -17,17 +19,22 @@ from django.views.decorators.cache import cache_control
 from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
-from multicourse import multicourse_settings
+from xmodule.modulestore import Location
+from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
 from courseware.courses import check_course
-from xmodule.modulestore.django import modulestore
+
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
+
 
 def user_groups(user):
     if not user.is_authenticated():
@@ -48,28 +55,33 @@ def user_groups(user):
 
 
 def format_url_params(params):
-    return [urllib.quote(string.replace(' ', '_')) for string in params]
+    return [urllib.quote(string.replace(' ', '_'))
+            if string is not None else None
+            for string in params]
 
 
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    courses = modulestore().get_courses()
-    universities = dict()
-    for university, group in itertools.groupby(courses, lambda course: course.org):
-        universities.setdefault(university, [])
-        [universities[university].append(course) for course in group]
 
-    return render_to_response("courses.html", { 'universities': universities })
+    # filter out any courses that errored.
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
+    universities = defaultdict(list)
+    for course in courses:
+        universities[course.org].append(course)
+
+    return render_to_response("courses.html", {'universities': universities})
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
     course = check_course(course_id)
-    
-    
+
     student_objects = User.objects.all()[:100]
     student_info = []
 
@@ -104,8 +116,8 @@ def profile(request, course_id, student_id=None):
     user_info = UserProfile.objects.get(user=student)
 
     student_module_cache = StudentModuleCache(request.user, course)
-    course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
-
+    course_module, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
+    
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
@@ -115,7 +127,7 @@ def profile(request, course_id, student_id=None):
                'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
-    context.update(grades.grade_sheet(student, course, student_module_cache))
+    context.update(grades.grade_sheet(student, course_module, course.grader, student_module_cache))
 
     return render_to_response('profile.html', context)
 
@@ -167,7 +179,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
-    
+
     def clean(s):
         ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
         funny encoding characters and keep the URLs readable.  This undoes
@@ -178,90 +190,106 @@ def index(request, course_id, chapter=None, section=None,
     chapter = clean(chapter)
     section = clean(section)
 
-    if settings.ENABLE_MULTICOURSE:
-        settings.MODULESTORE['default']['OPTIONS']['data_dir'] = settings.DATA_DIR + multicourse_settings.get_course_xmlpath(course)
+    try:
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'accordion': render_accordion(request, course, chapter, section),
+            'COURSE_TITLE': course.title,
+            'course': course,
+            'init': '',
+            'content': ''
+            }
 
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section),
-        'COURSE_TITLE': course.title,
-        'course': course,
-        'init': '',
-        'content': ''
-    }
+        look_for_module = chapter is not None and section is not None
+        if look_for_module:
+            # TODO (cpennington): Pass the right course in here
 
-    look_for_module = chapter is not None and section is not None
-    if look_for_module:
-        # TODO (cpennington): Pass the right course in here
+            section_descriptor = get_section(course, chapter, section)
+            if section_descriptor is not None:
+                student_module_cache = StudentModuleCache(request.user,
+                                                          section_descriptor)
+                module, _, _, _ = get_module(request.user, request,
+                                             section_descriptor.location,
+                                             student_module_cache)
+                context['content'] = module.get_html()
+            else:
+                log.warning("Couldn't find a section descriptor for course_id '{0}',"
+                            "chapter '{1}', section '{2}'".format(
+                                course_id, chapter, section))
+        else:
+            if request.user.is_staff:
+                # Add a list of all the errors...
+                context['course_errors'] = modulestore().get_item_errors(course.location)
 
-        section = get_section(course, chapter, section)
-        student_module_cache = StudentModuleCache(request.user, section)
-        module, _, _, _ = get_module(request.user, request, section.location, student_module_cache)
-        context['content'] = module.get_html()
+        result = render_to_response('courseware.html', context)
+    except:
+        # In production, don't want to let a 500 out for any reason
+        if settings.DEBUG:
+            raise
+        else:
+            log.exception("Error in index view: user={user}, course={course},"
+                          " chapter={chapter} section={section}"
+                          "position={position}".format(
+                              user=request.user,
+                              course=course,
+                              chapter=chapter,
+                              section=section,
+                              position=position
+                              ))
+            try:
+                result = render_to_response('courseware-error.html', {})
+            except:
+                result = HttpResponse("There was an unrecoverable error")
 
-    result = render_to_response('courseware.html', context)
     return result
 
-
-def jump_to(request, probname=None):
+@ensure_csrf_cookie
+def jump_to(request, location):
     '''
-    Jump to viewing a specific problem.  The problem is specified by a
-    problem name - currently the filename (minus .xml) of the problem.
-    Maybe this should change to a more generic tag, eg "name" given as
-    an attribute in <problem>.
+    Show the page that contains a specific location.
 
-    We do the jump by (1) reading course.xml to find the first
-    instance of <problem> with the given filename, then (2) finding
-    the parent element of the problem, then (3) rendering that parent
-    element with a specific computed position value (if it is
-    <sequential>).
+    If the location is invalid, return a 404.
 
+    If the location is valid, but not present in a course, ?
+
+    If the location is valid, but in a course the current user isn't registered for, ?
+        TODO -- let the index view deal with it?
     '''
-    # get coursename if stored
-    coursename = multicourse_settings.get_coursename_from_request(request)
+    # Complain if the location isn't valid
+    try:
+        location = Location(location)
+    except InvalidLocationError:
+        raise Http404("Invalid location")
 
-    # begin by getting course.xml tree
-    xml = content_parser.course_file(request.user, coursename)
+    # Complain if there's not data for this location
+    try:
+        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
+    except ItemNotFoundError:
+        raise Http404("No data at this location: {0}".format(location))
+    except NoPathToItem:
+        raise Http404("This location is not in any class: {0}".format(location))
 
-    # look for problem of given name
-    pxml = xml.xpath('//problem[@filename="%s"]' % probname)
-    if pxml:
-        pxml = pxml[0]
 
-    # get the parent element
-    parent = pxml.getparent()
-
-    # figure out chapter and section names
-    chapter = None
-    section = None
-    branch = parent
-    for k in range(4):  # max depth of recursion
-        if branch.tag == 'section':
-            section = branch.get('name')
-        if branch.tag == 'chapter':
-            chapter = branch.get('name')
-        branch = branch.getparent()
-
-    position = None
-    if parent.tag == 'sequential':
-        position = parent.index(pxml) + 1  # position in sequence
-
-    return index(request,
-                 course=coursename, chapter=chapter,
-                 section=section, position=position)
-
+    return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
+    '''
+    Display the course's info.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    '''
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
 
+
 @ensure_csrf_cookie
+@cache_if_anonymous
 def course_about(request, course_id):
     def registered_for_course(course, user):
         if user.is_authenticated():
-            return CourseEnrollment.objects.filter(user = user, course_id=course.id).exists()
+            return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
         else:
             return False
     course = check_course(course_id, course_must_be_open=False)
@@ -269,28 +297,17 @@ def course_about(request, course_id):
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
 
 
-@login_required
 @ensure_csrf_cookie
-def enroll(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
-    user = request.user
-    
-    enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-    
-    return redirect(reverse('dashboard'))
-
-
+@cache_if_anonymous
 def university_profile(request, org_id):
-    all_courses = modulestore().get_courses()
+    all_courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
     valid_org_ids = set(c.org for c in all_courses)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses=[c for c in all_courses if c.org == org_id]
+    courses = [c for c in all_courses if c.org == org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
-
-

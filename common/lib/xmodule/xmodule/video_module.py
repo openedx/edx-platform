@@ -2,6 +2,7 @@ import json
 import logging
 
 from lxml import etree
+from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -12,6 +13,15 @@ log = logging.getLogger(__name__)
 class VideoModule(XModule):
     video_time = 0
     icon_class = 'video'
+
+    js = {'coffee':
+        [resource_string(__name__, 'js/src/time.coffee'),
+         resource_string(__name__, 'js/src/video/display.coffee')] +
+        [resource_string(__name__, 'js/src/video/display/' + filename)
+         for filename
+         in sorted(resource_listdir(__name__, 'js/src/video/display'))]}
+    css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
+    js_module_name = "Video"
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
@@ -36,7 +46,7 @@ class VideoModule(XModule):
         if dispatch == 'goto_position':
             self.position = int(float(get['position']))
             log.info(u"NEW POSITION {0}".format(self.position))
-            return json.dumps({'success':True})
+            return json.dumps({'success': True})
         raise Http404()
 
     def get_progress(self):
@@ -50,7 +60,7 @@ class VideoModule(XModule):
         return None
 
     def get_instance_state(self):
-        log.debug(u"STATE POSITION {0}".format(self.position))
+        #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
     def video_list(self):
@@ -62,6 +72,8 @@ class VideoModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'name': self.name,
+            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
+            'data_dir': self.metadata['data_dir'],
         })
 
 

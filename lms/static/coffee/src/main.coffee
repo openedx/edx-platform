@@ -1,8 +1,4 @@
-jQuery.postWithPrefix = (url, data, callback, type) ->
-  $.post("#{Courseware.prefix}#{url}", data, callback, type)
-
-jQuery.getWithPrefix = (url, data, callback, type) ->
-  $.get("#{Courseware.prefix}#{url}", data, callback, type)
+AjaxPrefix.addAjaxPrefix(jQuery, -> Courseware.prefix)
 
 $ ->
   $.ajaxSetup

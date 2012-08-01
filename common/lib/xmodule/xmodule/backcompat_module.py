@@ -5,6 +5,7 @@ from x_module import XModuleDescriptor
 from lxml import etree
 from functools import wraps
 import logging
+import traceback
 
 log = logging.getLogger(__name__)
 
@@ -12,8 +13,8 @@ log = logging.getLogger(__name__)
 def process_includes(fn):
     """
     Wraps a XModuleDescriptor.from_xml method, and modifies xml_data to replace
-    any immediate child <include> items with the contents of the file that they are
-    supposed to include
+    any immediate child <include> items with the contents of the file that they
+    are supposed to include
     """
     @wraps(fn)
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -21,23 +22,35 @@ def process_includes(fn):
         next_include = xml_object.find('include')
         while next_include is not None:
             file = next_include.get('file')
-            if file is not None:
-                try:
-                    ifp = system.resources_fs.open(file)
-                except Exception:
-                    log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
-                    log.exception('Cannot find file %s in %s' % (file, dir))
-                    raise
-                try:
-                    # read in and convert to XML
-                    incxml = etree.XML(ifp.read())
-                except Exception:
-                    log.exception('Error in problem xml include: %s' % (etree.tostring(next_include, pretty_print=True)))
-                    log.exception('Cannot parse XML in %s' % (file))
-                    raise
-                # insert  new XML into tree in place of inlcude
-                parent = next_include.getparent()
+            parent = next_include.getparent()
+
+            if file is None:
+                continue
+
+            try:
+                ifp = system.resources_fs.open(file)
+                # read in and convert to XML
+                incxml = etree.XML(ifp.read())
+
+                # insert  new XML into tree in place of include
                 parent.insert(parent.index(next_include), incxml)
+            except Exception:
+                # Log error
+                msg = "Error in problem xml include: %s" % (
+                    etree.tostring(next_include, pretty_print=True))
+                # tell the tracker
+                system.error_tracker(msg)
+
+                # work around
+                parent = next_include.getparent()
+                errorxml = etree.Element('error')
+                messagexml = etree.SubElement(errorxml, 'message')
+                messagexml.text = msg
+                stackxml = etree.SubElement(errorxml, 'stacktrace')
+                stackxml.text = traceback.format_exc()
+                # insert error XML in place of include
+                parent.insert(parent.index(next_include), errorxml)
+
             parent.remove(next_include)
 
             next_include = xml_object.find('include')
@@ -50,8 +63,8 @@ class SemanticSectionDescriptor(XModuleDescriptor):
     @process_includes
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
-        Removes sections single child elements in favor of just embedding the child element
-
+        Removes sections with single child elements in favor of just embedding
+        the child element
         """
         xml_object = etree.fromstring(xml_data)
 
@@ -76,7 +89,6 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
         xml_object = etree.fromstring(xml_data)
         tag = xml_object.tag
         xml_object.tag = 'customtag'
-        impl = etree.SubElement(xml_object, 'impl')
-        impl.text = tag
+        xml_object.attrib['impl'] = tag
 
         return system.process_xml(etree.tostring(xml_object))

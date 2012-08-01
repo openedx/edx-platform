@@ -4,17 +4,16 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
         db.execute("create unique index email on auth_user (email)")
         pass
 
-
     def backwards(self, orm):
         db.execute("drop index email on auth_user")
         pass
-
 
     models = {
         'auth.group': {

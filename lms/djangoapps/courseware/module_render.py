@@ -4,107 +4,30 @@ import logging
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-from functools import wraps
+from django.views.decorators.csrf import csrf_exempt
 
+from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
+from xmodule.exceptions import NotFoundError
+from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
-
-
-class I4xSystem(object):
-    '''
-    This is an abstraction such that x_modules can function independent
-    of the courseware (e.g. import into other types of courseware, LMS,
-    or if we want to have a sandbox server for user-contributed content)
-
-    I4xSystem objects are passed to x_modules to provide access to system
-    functionality.
-
-    Note that these functions can be closures over e.g. a django request
-    and user, or other environment-specific info.
-    '''
-    def __init__(self, ajax_url, track_function,
-                 get_module, render_template, replace_urls,
-                 user=None, filestore=None, xqueue_callback_url=None):
-        '''
-        Create a closure around the system environment.
-
-        ajax_url - the url where ajax calls to the encapsulating module go.
-        track_function - function of (event_type, event), intended for logging
-                         or otherwise tracking the event.
-                         TODO: Not used, and has inconsistent args in different
-                         files.  Update or remove.
-        get_module - function that takes (location) and returns a corresponding
-                          module instance object.
-        render_template - a function that takes (template_file, context), and returns
-                          rendered html.
-        user - The user to base the random number generator seed off of for this request
-        filestore - A filestore ojbect.  Defaults to an instance of OSFS based at
-                    settings.DATA_DIR.
-        replace_urls - TEMPORARY - A function like static_replace.replace_urls
-            that capa_module can use to fix up the static urls in ajax results.
-        '''
-        self.ajax_url = ajax_url
-        self.xqueue_callback_url = xqueue_callback_url
-        self.track_function = track_function
-        self.filestore = filestore
-        self.get_module = get_module
-        self.render_template = render_template
-        self.exception404 = Http404
-        self.DEBUG = settings.DEBUG
-        self.seed = user.id if user is not None else 0
-        self.replace_urls = replace_urls
-
-    def get(self, attr):
-        '''	provide uniform access to attributes (like etree).'''
-        return self.__dict__.get(attr)
-
-    def set(self, attr, val):
-        '''provide uniform access to attributes (like etree)'''
-        self.__dict__[attr] = val
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-    def __str__(self):
-        return str(self.__dict__)
 
 
 def make_track_function(request):
     '''
     Make a tracking function that logs what happened.
-    For use in I4xSystem.
+    For use in ModuleSystem.
     '''
     import track.views
 
     def f(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
     return f
-
-
-def grade_histogram(module_id):
-    ''' Print out a histogram of grades on a given problem.
-        Part of staff member debug info.
-    '''
-    from django.db import connection
-    cursor = connection.cursor()
-
-    q = """SELECT courseware_studentmodule.grade,
-                  COUNT(courseware_studentmodule.student_id)
-    FROM courseware_studentmodule
-    WHERE courseware_studentmodule.module_id=%s
-    GROUP BY courseware_studentmodule.grade"""
-    # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id])
-
-    grades = list(cursor.fetchall())
-    grades.sort(key=lambda x: x[0])          # Add ORDER BY to sql query?
-    if len(grades) == 1 and grades[0][0] is None:
-        return []
-    return grades
 
 
 def toc_for_course(user, request, course, active_chapter, active_section):
@@ -133,11 +56,13 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
             active = (chapter.metadata.get('display_name') == active_chapter and
                       section.metadata.get('display_name') == active_section)
+            hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
-            sections.append({'name': section.metadata.get('display_name'),
-                             'format': section.metadata.get('format', ''),
-                             'due': section.metadata.get('due', ''),
-                             'active': active})
+            if not hide_from_toc:
+                sections.append({'name': section.metadata.get('display_name'),
+                                 'format': section.metadata.get('format', ''),
+                                 'due': section.metadata.get('due', ''),
+                                 'active': active})
 
         chapters.append({'name': chapter.metadata.get('display_name'),
                          'sections': sections,
@@ -191,55 +116,76 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     Returns:
       - a tuple (xmodule instance, instance_module, shared_module, module category).
-        instance_module is a StudentModule specific to this module for this student
-        shared_module is a StudentModule specific to all modules with the same 'shared_state_key' attribute, or None if the module doesn't elect to share state
+        instance_module is a StudentModule specific to this module for this student,
+            or None if this is an anonymous user
+        shared_module is a StudentModule specific to all modules with the same
+            'shared_state_key' attribute, or None if the module does not elect to
+            share state
     '''
     descriptor = modulestore().get_item(location)
 
-    instance_module = student_module_cache.lookup(descriptor.category, descriptor.location.url())
+    instance_module = student_module_cache.lookup(descriptor.category,
+                                                  descriptor.location.url())
+
     shared_state_key = getattr(descriptor, 'shared_state_key', None)
     if shared_state_key is not None:
-        shared_module = student_module_cache.lookup(descriptor.category, shared_state_key)
+        shared_module = student_module_cache.lookup(descriptor.category,
+                                                    shared_state_key)
     else:
         shared_module = None
 
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
+    # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = settings.MITX_ROOT_URL + '/xqueue/' + user.username + '/' + descriptor.location.url() + '/'
+
+    # Fully qualified callback URL for external queueing system 
+    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL + 
+                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' + 
+                          'score_update')
+
+    # Default queuename is course-specific and is derived from the course that 
+    #   contains the current module.
+    # TODO: Queuename should be derived from 'course_settings.json' of each course
+    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     def _get_module(location):
-        (module, _, _, _) = get_module(user, request, location, student_module_cache, position)
+        (module, _, _, _) = get_module(user, request, location,
+                                       student_module_cache, position)
         return module
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
-    system = I4xSystem(track_function=make_track_function(request),
-                       render_template=render_to_string,
-                       ajax_url=ajax_url,
-                       xqueue_callback_url=xqueue_callback_url,
-                       # TODO (cpennington): Figure out how to share info between systems
-                       filestore=descriptor.system.resources_fs,
-                       get_module=_get_module,
-                       user=user,
-                       # TODO (cpennington): This should be removed when all html from
-                       # a module is coming through get_html and is therefore covered
-                       # by the replace_static_urls code below
-                       replace_urls=replace_urls,
-                       )
-    # pass position specified in URL to module through I4xSystem
+    system = ModuleSystem(track_function=make_track_function(request),
+                          render_template=render_to_string,
+                          ajax_url=ajax_url,
+                          xqueue_callback_url=xqueue_callback_url,
+                          xqueue_default_queuename=xqueue_default_queuename.replace(' ','_'),
+                          # TODO (cpennington): Figure out how to share info between systems
+                          filestore=descriptor.system.resources_fs,
+                          get_module=_get_module,
+                          user=user,
+                          # TODO (cpennington): This should be removed when all html from
+                          # a module is coming through get_html and is therefore covered
+                          # by the replace_static_urls code below
+                          replace_urls=replace_urls,
+                          is_staff=user.is_staff,
+                          )
+    # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
-    replace_prefix = module.metadata['data_dir']
-    module = replace_static_urls(module, replace_prefix)
+    module.get_html = replace_static_urls(
+        wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
+        module.metadata['data_dir']
+    )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module = add_histogram(module)
+        module.get_html = add_histogram(module.get_html, module)
 
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.
@@ -267,97 +213,38 @@ def get_module(user, request, location, student_module_cache, position=None):
     return (module, instance_module, shared_module, descriptor.category)
 
 
-def replace_static_urls(module, prefix):
-    """
-    Updates the supplied module with a new get_html function that wraps
-    the old get_html function and substitutes urls of the form /static/...
-    with urls that are /static/<prefix>/...
-    """
-    original_get_html = module.get_html
-    
-    @wraps(original_get_html)
-    def get_html():
-        return replace_urls(original_get_html(), staticfiles_prefix=prefix)
-
-    module.get_html = get_html
-    return module
-
-
-def add_histogram(module):
-    """
-    Updates the supplied module with a new get_html function that wraps
-    the output of the old get_html function with additional information
-    for admin users only, including a histogram of student answers and the
-    definition of the xmodule
-    """
-    original_get_html = module.get_html
-
-    @wraps(original_get_html)
-    def get_html():
-        module_id = module.id
-        histogram = grade_histogram(module_id)
-        render_histogram = len(histogram) > 0
-
-        # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
-        # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
-        if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
-            coursename = multicourse_settings.get_coursename_from_request(request)
-            github_url = multicourse_settings.get_course_github_url(coursename)
-            fn = module_xml.get('filename')
-            if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
-            edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
-            if module_xml.tag=='problem': edit_link += '.xml'	# grrr
-        else:
-            edit_link = False
-
-        # Cast module.definition and module.metadata to dicts so that json can dump them
-        # even though they are lazily loaded
-        staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
-                         'metadata': json.dumps(dict(module.metadata), indent=4),
-                         'element_id': module.location.html_id(),
-                         'edit_link': edit_link,
-                         'histogram': json.dumps(histogram),
-                         'render_histogram': render_histogram,
-                         'module_content': original_get_html()}
-        return render_to_string("staff_problem_info.html", staff_context)
-
-    module.get_html = get_html
-    return module
-
-# THK: TEMPORARY BYPASS OF AUTH!
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
 @csrf_exempt
-def xqueue_callback(request, username, id, dispatch):
+def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
-        header = json.loads(get.pop('xqueue_header')[0]) # 'dict'
+        header = json.loads(get['xqueue_header'])
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
-    
-    # Should proceed only when the request timestamp is more recent than problem timestamp
-    timestamp = header['timestamp']
 
     # Retrieve target StudentModule
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
-    
+
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
                   id, request.user)
         raise Http404
-    
+
     oldgrade = instance_module.grade
     old_instance_state = instance_module.state
+
+    # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
+    #   use the interface defined by 'handle_ajax'
+    get.update({'queuekey': header['lms_key']})
 
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'
     try:
-        ajax_return = instance.handle_ajax(dispatch, get) # Can ignore the "ajax" return in 'xqueue_callback'
+        ajax_return = instance.handle_ajax(dispatch, get)  # Can ignore the "ajax" return in 'xqueue_callback'
     except:
         log.exception("error processing ajax call")
         raise
@@ -370,6 +257,7 @@ def xqueue_callback(request, username, id, dispatch):
         instance_module.save()
 
     return HttpResponse("")
+
 
 def modx_dispatch(request, dispatch=None, id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
@@ -384,34 +272,33 @@ def modx_dispatch(request, dispatch=None, id=None):
     '''
     # ''' (fix emacs broken parsing)
 
-    # If there are arguments, get rid of them
-    dispatch, _, _ = dispatch.partition('?')
-
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
-    
-    if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'",
-                  id, request.user)
-        raise Http404
 
-    oldgrade = instance_module.grade
-    old_instance_state = instance_module.state
-    old_shared_state = shared_module.state if shared_module is not None else None
+    # Don't track state for anonymous users (who don't have student modules)
+    if instance_module is not None:
+        oldgrade = instance_module.grade
+        old_instance_state = instance_module.state
+        old_shared_state = shared_module.state if shared_module is not None else None
 
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+    except NotFoundError:
+        log.exception("Module indicating to user that request doesn't exist")
+        raise Http404
     except:
         log.exception("error processing ajax call")
         raise
 
     # Save the state back to the database
-    instance_module.state = instance.get_instance_state()
-    if instance.get_score():
-        instance_module.grade = instance.get_score()['score']
-    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
-        instance_module.save()
+    # Don't track state for anonymous users (who don't have student modules)
+    if instance_module is not None:
+        instance_module.state = instance.get_instance_state()
+        if instance.get_score():
+            instance_module.grade = instance.get_score()['score']
+        if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+            instance_module.save()
 
     if shared_module is not None:
         shared_module.state = instance.get_shared_state()

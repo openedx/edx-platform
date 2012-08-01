@@ -11,7 +11,6 @@ class Migration(SchemaMigration):
         # Deleting model 'CourseEnrollment'
         db.delete_table('student_courseenrollment')
 
-
     def backwards(self, orm):
         # Adding model 'CourseEnrollment'
         db.create_table('student_courseenrollment', (
@@ -20,7 +19,6 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
         ))
         db.send_create_signal('student', ['CourseEnrollment'])
-
 
     models = {
         'auth.group': {

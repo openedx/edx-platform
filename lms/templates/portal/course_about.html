@@ -3,15 +3,55 @@
   from courseware.courses import course_image_url, get_course_about_section
 %>
 <%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
 <%block name="js_extra">
+  % if not registered:
+    %if user.is_authenticated():
+      ## If the user is authenticated, clicking the enroll button just submits a form
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          $("#class_enroll_form").submit();
+        });
+    
+        $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
+          if(json.success) {
+            location.href="${reverse('dashboard')}";
+          }
+        });
+      })(this)
+      </script>
+    %else:
+      ## If the user is not authenticated, clicking the enroll button pops up the register
+      ## field. We also slip in the registration fields into the login/register fields so
+      ## the user is automatically registered after logging in / registering
+      <script type="text/javascript">
+      (function() {
+        $(".register").click(function() {
+          if ($(".login_form .enroll_fieldset").length === 0) {
+            $(".login_form").append( $(".enroll_fieldset").first().clone() );
+          }
+          if ($(".register_form .enroll_fieldset").length === 0) {
+            $(".register_form").append( $(".enroll_fieldset").first().clone() );
+          }
+        });
+      })(this)
+      </script>
+    %endif
+  %endif
+
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%inherit file="../main.html" />
+
+<%block name="title"><title>About ${course.number}</title></%block>
 
 <section class="course-info">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
+      <div class="table">
       <section class="intro">
         <hgroup>
           <h1>${course.number}: ${get_course_about_section(course, "title")}<a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h1>
@@ -22,10 +62,10 @@
             %if registered:
                 <span class="register disabled">You are registered for this course (${course.number}).</span>
             %else:
-                <a href="${reverse('enroll', args=[course.id])}" class="register">Register for ${course.number}</a>
+                <a href="#" class="register">Register for ${course.number}</a>
             %endif
           %else:
-            <a href="#signup-modal" class="register" rel="leanModal" data-notice="You must Sign Up in order to resigter">Register</a>
+            <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>
           %endif
         </div>
 
@@ -45,6 +85,7 @@
       </div>
       % endif
     </div>
+      </div>
   </header>
 
   <section class="container">
@@ -68,14 +109,13 @@
         <header>
           <div class="social-sharing">
             <div class="sharing-message">Share with friends and family!</div>
-            <a href="#" class="share">
-              <img src="${static.url('images/twitter-sharing.png')}">
+            <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
+              <img src="${static.url('images/social/twitter-sharing.png')}">
             </a>
-            <a href="#" class="share">
-              <img src="${static.url('images/facebook-sharing.png')}">
+            <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
             </a>
-            <a href="#" class="share">
-              <img src="${static.url('images/email-sharing.png')}">
+            <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
+              <img src="${static.url('images/social/email-sharing.png')}">
             </a>
           </div>
         </header>
@@ -104,5 +144,20 @@
 
   </section>
 </section>
+
+%if not registered:
+  <div style="display: none;">
+    <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <fieldset class="enroll_fieldset">
+        <input name="course_id" type="hidden" value="${course.id}">
+        <input name="enrollment_action" type="hidden" value="enroll">
+      </fieldset>
+      <div class="submit">
+        <input name="submit" type="submit" value="enroll">
+      </div>
+    </form>
+  </div>
+%endif
+
 
 <%include file="../video_modal.html" />

@@ -4,6 +4,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -16,11 +17,9 @@ class Migration(SchemaMigration):
             ALTER TABLE student_usertestgroup_users CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
             """)
 
-
     def backwards(self, orm):
         # Although this migration can't be undone, it is okay for it to be run backwards because it doesn't add/remove any fields
         pass
-
 
     models = {
         'auth.group': {

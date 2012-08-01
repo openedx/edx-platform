@@ -4,19 +4,18 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding field 'GeneratedCertificate.name'
         db.add_column('certificates_generatedcertificate', 'name', self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True), keep_default=False)
 
-
     def backwards(self, orm):
-        
+
         # Deleting field 'GeneratedCertificate.name'
         db.delete_column('certificates_generatedcertificate', 'name')
-
 
     models = {
         'auth.group': {

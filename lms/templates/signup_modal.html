@@ -3,49 +3,50 @@
 <%! from django_countries.countries import COUNTRIES %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
+<%! import calendar %>
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
-    <div id="enroll">
+    <div id="register">
       <header>
-        <h2>Sign Up for edX</h2>
+        <h2>Sign Up for <span class="edx">edX</span></h2>
         <hr>
       </header>
 
-      <form id="enroll_form" method="post" data-remote="true" action="/create_account">
+      <form id="register_form" class="register_form" method="post" data-remote="true" action="/create_account">
         <div class="notice"></div>
-        <div id="enroll_error" class="modal-form-error" name="enroll_error"></div>
-        <div id="enroll_error" name="enroll_error"></div>
+        <div id="register_error" class="modal-form-error" name="register_error"></div>
+        <div id="register_error" name="register_error"></div>
 
         <div class="input-group">
-          <label>E-mail</label>
-          <input name="email" type="email" placeholder="E-mail">
-          <label>Password</label>
-          <input name="password" type="password" placeholder="Password">
-          <label>Public Username</label>
-          <input name="username" type="text" placeholder="Public Username">
-          <label>Full Name</label>
-          <input name="name" type="text" placeholder="Full Name">
-          <label>Mailing address</label>
-          <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+          <label data-field="email">E-mail*</label>
+          <input name="email" type="email" placeholder="E-mail*">
+          <label data-field="password">Password*</label>
+          <input name="password" type="password" placeholder="Password*">
+          <label data-field="username">Public Username*</label>
+          <input name="username" type="text" placeholder="Public Username*">
+          <label data-field="name">Full Name</label>
+          <input name="name" type="text" placeholder="Full Name*">
         </div>
 
         <div class="input-group">
           <section class="citizenship">
-            <label>Country</label>
+            <label data-field="level_of_education">Ed. completed</label>
             <div class="input-wrapper">
-              <select name="country">
-                  %for country_code, country_name in COUNTRIES:
-                      <option value="${country_code}">${country_name}</option>
+              <select name="level_of_education">
+                  <option value="">--</option>
+                  %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                      <option value="${code}">${ed_level}</option>
                   %endfor
               </select>
             </div>
           </section>
 
           <section class="gender">
-            <label>Gender</label>
+            <label data-field="gender">Gender</label>
             <div class="input-wrapper">
               <select name="gender">
+                  <option value="">--</option>
                   %for code, gender in UserProfile.GENDER_CHOICES:
                       <option value="${code}">${gender}</option>
                   %endfor
@@ -54,44 +55,36 @@
           </section>
 
           <section class="date-of-birth">
-            <label>Date of birth</label>
+            <label data-field="date-of-birth">Year of birth</label>
             <div class="input-wrapper">
-              <select name='date_of_birth__month'>
-                  <option value="">month</option>
-                  %for month in range(1,13):
-                      <option value="${month}">${month}</option>
-                  %endfor
+              <select name="year_of_birth">
+                <option value="">--</option>
+                %for year in UserProfile.VALID_YEARS:
+                  <option value="${year}">${year}</option>
+                %endfor
               </select>
-
-              <select name='date_of_birth__day'>
-                  <option value="">day</option>
-                  %for day in range(1,32):
-                      <option value="${day}">${day}</option>
-                  %endfor
-              </select>
-
-              <select name='date_of_birth__year'>
-                  <option value="">year</option>
-                  %for year in range(date.today().year,1899,-1):
-                      <option value="${year}">${year}</option>
-                  %endfor
-              </select>
+              ##<input name="year_of_birth" type="text" placeholder="Year of birth">
             </div>
           </section>
+
+          <label data-field="mailing_address">Mailing address</label>
+          <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+          <label data-field="goals">Goals in signing up for edX</label>
+          <textarea name="goals" placeholder="Goals in signing up for edX"></textarea>
+
         </div>
 
         <div class="input-group">
-          <label class="terms-of-service">
+          <label data-field="terms_of_service" class="terms-of-service">
             <input name="terms_of_service" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('tos')}">Terms of Service</a>
+            <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
           </label>
 
-          <label class="honor-code">
+          <label data-field="honor_code" class="honor-code">
             <input name="honor_code" type="checkbox" value="true">
             I agree to the
-            <a href="${reverse('honor')}">Honor Code</a>
-            , sumarized below as:
+            <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
           </label>
         </div>
 
@@ -118,11 +111,13 @@
 
 <script type="text/javascript">
   (function() {
-   $(document).delegate('#enroll_form', 'ajax:success', function(data, json, xhr) {
+   $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
-       $('#enroll').html(json.value);
+       location.href="${reverse('dashboard')}";
      } else {
-       $('#enroll_error').html(json.value).stop().css("display", "block");
+       $(".field-error").removeClass('field-error');
+       $('#register_error').html(json.value).stop().css("display", "block");
+       $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
   })(this)

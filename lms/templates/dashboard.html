@@ -6,7 +6,38 @@
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="title"><title>Dashboard</title></%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+  (function() {
+
+    $(".unenroll").click(function(event) {
+      $("#unenroll_course_id").val( $(event.target).data("course-id") );
+      $("#unenroll_course_number").text( $(event.target).data("course-number") );
+
+    });
+    
+     $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+         location.href="${reverse('dashboard')}";
+       } else {
+         if($('#unenroll_error').length == 0) {
+           $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
+         }
+         $('#unenroll_error').text(json.error).stop().css("display", "block");
+       }
+     });
+  })(this)
+  </script>
+</%block>
+
 <section class="container dashboard">
+  
+  <section class="dashboard-banner">
+    ${message}
+    <br/>
+  </section>
 
   <section class="profile-sidebar">
     <header class="profile">
@@ -15,10 +46,10 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon email-icon"></div>Email</span><span class="data">${ user.email }</span>
+          <span class="title"><div class="icon name-icon"></div>Full Name</span><span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
-          <span class="title"><div class="icon location-icon"></div>Location</span><span class="data">${ user.profile.location }</span>
+          <span class="title"><div class="icon email-icon"></div>Email</span><span class="data">${ user.email | h }</span>
         </li>
       </ul>
     </section>
@@ -34,7 +65,7 @@
 
         <article class="my-course">
           <%
-          if course.has_started():
+          if course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']:
             course_target = reverse('info', args=[course.id])
           else:
             course_target = reverse('about_course', args=[course.id])
@@ -45,11 +76,11 @@
           </a>
           <section class="info">
             <hgroup>
-              <a href="#" class="university">${get_course_about_section(course, 'university')}</a>
-              <h3><a href="${course_target}">${get_course_about_section(course, "title")}</a></h3>
+              <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
+              <h3><a href="${course_target}">${course.number} ${course.title}</a></h3>
             </hgroup>
             <section class="course-status">
-              <p>Class Starts - <span>9/2/2012</span></div>
+              <p>Class Starts - <span>${course.start_date_text}</span></div>
             </section>
             <section class="meta">
               <div class="course-work-icon"></div>
@@ -59,11 +90,12 @@
                 </div>
               </div>
               <div class="complete">
-                <p><span class="completeness">60%</span> compleat</p>
+                ##<p><span class="completeness">60%</span> complete</p>
               </div>
             </section>
           </section>
         </article>
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
 
       % endfor
     % else:
@@ -75,3 +107,30 @@
 
   </section>
 </section>
+
+
+
+<section id="unenroll-modal" class="modal unenroll-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
+      <hr>
+    </header>
+
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="Unregister" />
+      </div>
+    </form>
+
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
