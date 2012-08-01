@@ -2,6 +2,7 @@ $fg-column: 70px;
 $fg-gutter: 26px;
 $fg-max-columns: 12;
 $body-font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+$sans-serif: "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
 $body-font-size: 14px;
 $body-line-height: 20px;
 
@@ -12,6 +13,7 @@ $orange: #f96e5b;
 $yellow: #fff8af;
 $cream: #F6EFD4;
 $mit-red: #933;
+$border-color: #ddd;
 
 @mixin hide-text {
   background-color: transparent;

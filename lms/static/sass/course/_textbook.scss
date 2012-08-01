@@ -62,7 +62,6 @@ div.book-wrapper {
         @extend .clearfix;
 
         li {
-          background-color: darken($cream, 4%);
 
           &.last {
             display: block;

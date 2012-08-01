@@ -181,16 +181,8 @@ div.course-wrapper {
       overflow: hidden;
 
       header#open_close_accordion {
-        padding: 0;
-        min-height: 47px;
-
         a {
           background-image: url('../images/slide-right-icon.png');
-        }
-
-        h2 {
-          visibility: hidden;
-          width: 10px;
         }
       }
 
