@@ -24,8 +24,13 @@ $discussion_input_width: 90%;
 }
 
 .discussion {
+  .search-wrapper-inline {
+    width: 80%;
+    display: inline-block;
+    margin-top: 2%;
+  }
   .discussion-search-form {
-    margin-bottom: flex-gutter(4);
+    margin-bottom: 1%;
     display: inline-block;
     width: flex-grid(12);
     .discussion-link {
@@ -47,24 +52,51 @@ $discussion_input_width: 90%;
       float: left;
       width: 72%;
     }
-    .search-within {
-      display: block;
-      margin-top: flex-gutter();
-    }
-    .discussion-search-within-board {
-      font-style: normal;
-      font: inherit;
-    }
+  }
+  .search-within {
+    display: block;
+    margin-bottom: 3%;
+  }
+  .discussion-search-within-board {
+    font-style: normal;
+    font: inherit;
   }
   .control-button {
     @include button;
     @include discussion-font;
+    display: inline-block;
+    margin-bottom: 3%;
     color: white;
     font-weight: bold;
     padding-top: 9px;
     font-size: inherit;
     width: inherit;
     text-decoration: none;
+    border: 1px solid #6F6F6F;
+    -webkit-box-shadow: inset 0 1px 0 #A2A2A2,0 0 3px #CCC;
+    -moz-box-shadow: inset 0 1px 0 #a2a2a2,0 0 3px #ccc;
+    box-shadow: inset 0 1px 0 #A2A2A2,0 0 3px #CCC;
+    background-color: #959595;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #959595),color-stop(100%, #7B7B7B));
+    background-image: -webkit-linear-gradient(top, #959595,#7B7B7B);
+    background-image: -moz-linear-gradient(top, #959595,#7B7B7B);
+    background-image: -ms-linear-gradient(top, #959595,#7B7B7B);
+    background-image: -o-linear-gradient(top, #959595,#7B7B7B);
+    background-image: linear-gradient(top, #959595,#7B7B7B);
+    text-shadow: none;
+    &:hover {
+      -webkit-box-shadow: inset 0 1px 0 #BBB,0 0 3px #CCC;
+      -moz-box-shadow: inset 0 1px 0 #bbb,0 0 3px #ccc;
+      box-shadow: inset 0 1px 0 #BBB,0 0 3px #CCC;
+      background-color: #A2A2A2;
+      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #A2A2A2),color-stop(100%, #7B7B7B));
+      background-image: -webkit-linear-gradient(top, #A2A2A2,#7B7B7B);
+      background-image: -moz-linear-gradient(top, #A2A2A2,#7B7B7B);
+      background-image: -ms-linear-gradient(top, #A2A2A2,#7B7B7B);
+      background-image: -o-linear-gradient(top, #A2A2A2,#7B7B7B);
+      background-image: linear-gradient(top, #A2A2A2,#7B7B7B);
+      border: 1px solid #555;
+    }
   }
   .discussion-title {
     @include discussion-font;
@@ -122,7 +154,7 @@ $discussion_input_width: 90%;
     float: left;
     width: 85%;
   }
-  .new-post-form, .discussion-thread-edit{
+  .new-post-form, .discussion-thread-edit {
     .title-input, .body-input {
       font-style: normal;
       font: inherit;
@@ -177,8 +209,6 @@ $discussion_input_width: 90%;
   }
   .thread {
     //display: none;
-    margin-top: 30px;
-    margin-bottom: 30px;
     .thread-title {
       @include discussion-font;
       @include discussion-clickable;
@@ -240,10 +270,9 @@ $discussion_input_width: 90%;
       }
     }
     .discussion-content {
-      margin-top: 10px;
       overflow: hidden;
       border-top: lightgray 1px solid;
-      padding-top: 20px;
+      padding: 3% 0;
       .discussion-reply-new {
         margin-left: $comment_margin_left;
         .reply-body {

@@ -8,8 +8,4 @@ def url_for_search():
 <form action="${url_for_search()}" method="get" class="discussion-search-form">
   <input class="search-input" type="text" value="${text}" id="keywords" autocomplete="off"/>
   <div class="discussion-link" href="javascript:void(0)">Search posts</div>
-  <div class="search-within">
-    <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
-    <label for="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board">Search within board</label>
-  </div>
 </form>

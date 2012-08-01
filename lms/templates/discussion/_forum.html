@@ -6,6 +6,11 @@
       <a class="discussion-title" href="javascript:void(0)">Discussion</a>
     </div>
     ${search_bar}
+    <div class="search-within">
+      <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
+      <label for="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board">Search within board</label>
+    </div>
+
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
   </div>
   % for thread in threads:
