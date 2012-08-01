@@ -123,12 +123,10 @@ $discussion_input_width: 90%;
     }
   }
   .discussion-votes {
-    margin-right: 2%;
-    margin-top: 2%;
     text-align: center;
     height: flex-grid(3);
     float: left;
-    margin-left: 2%;
+    margin: 1% 2%;
     .discussion-vote-count {
       font-size: $comment_body_size;
       @include discussion-font;
