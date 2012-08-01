@@ -23,7 +23,8 @@ section.course-index {
       }
 
       &:hover {
-        background: #eee;
+        background: #f6f6f6;
+        text-decoration: none;
       }
 
       &.ui-accordion-header {
@@ -49,7 +50,7 @@ section.course-index {
 
     ul.ui-accordion-content {
       @include border-radius(0);
-      background: #FFF;
+      background: transparent;
       border: none;
       font-size: 12px;
       margin: 0;
@@ -104,7 +105,7 @@ section.course-index {
             &:after {
               opacity: 1;
               right: 15px;
-              @include transition(all, 0.2s, linear);
+              @include transition();
             }
 
             > a p {
