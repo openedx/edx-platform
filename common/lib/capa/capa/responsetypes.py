@@ -810,7 +810,7 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url', "http://107.20.215.194/xqueue/submit/")  # FIXME -- hardcoded url
+        self.url = xml.get('url', "http://xqueue.edx.org/xqueue/submit/")  # FIXME -- hardcoded url
         self.queue_name = xml.get('queuename', self.system.xqueue_default_queuename)
 
         answer = xml.find('answer')
