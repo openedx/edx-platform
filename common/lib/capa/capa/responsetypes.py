@@ -888,7 +888,7 @@ class CodeResponse(LoncapaResponse):
             msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
             oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
         else:
-            log.debug('CodeResponse: queuekey %d does not match for answer_id=%s.' % (queuekey, self.answer_id))
+            log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
         return oldcmap
 
@@ -913,7 +913,7 @@ class CodeResponse(LoncapaResponse):
         h = hashlib.md5()
         h.update(str(self.system.seed))
         h.update(str(time.time()))
-        queuekey = int(h.hexdigest(), 16)
+        queuekey = h.hexdigest()
         header.update({'lms_key': queuekey})
 
         body = {'xml': xmlstr,
