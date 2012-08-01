@@ -3,18 +3,28 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import check_course
 
-import comment_client
-import dateutil
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
 
 from django_comment_client.utils import get_categorized_discussion_info
+from urllib import urlencode
 
 import json
+import comment_client
+import dateutil
+
+
+THREADS_PER_PAGE = 20
+PAGES_NEARBY_DELTA = 2
+
+class HtmlResponse(HttpResponse):
+    def __init__(self, html=''):
+        super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 def render_accordion(request, course, discussion_id):
 
@@ -29,29 +39,58 @@ def render_accordion(request, course, discussion_id):
 
     return render_to_string('discussion/_accordion.html', context)
 
-def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, search_text='', template='discussion/_inline.html'):
+def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, 
+                      search_text='', discussion_type='inline', page=1, num_pages=None, 
+                      per_page=THREADS_PER_PAGE):
+    template = {
+        'inline': 'discussion/_inline.html',
+        'forum': 'discussion/_forum.html',
+    }[discussion_type]
+
+    def _url_for_inline_page(page, per_page):
+        raw_url = reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])
+        return raw_url + '?' + urlencode({'page': page, 'per_page': per_page})
+
+    def _url_for_forum_page(page, per_page):
+        raw_url = reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])
+        return raw_url + '?' + urlencode({'page': page, 'per_page': per_page})
+
+    url_for_page = {
+        'inline': _url_for_inline_page,
+        'forum': _url_for_forum_page,
+    }[discussion_type]
+
+    
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
         'search_bar': '' if not with_search_bar \
                       else render_search_bar(request, course_id, discussion_id, text=search_text),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
-        'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
         'request': request,
+        'page': page,
+        'per_page': per_page,
+        'num_pages': num_pages,
+        'pages_nearby_delta': PAGES_NEARBY_DELTA,
+        'discussion_type': discussion_type,
+        'url_for_page': url_for_page,
     }
     return render_to_string(template, context)
 
 def render_inline_discussion(*args, **kwargs):
-    return render_discussion(template='discussion/_inline.html', *args, **kwargs)
+    
+    return render_discussion(discussion_type='inline', *args, **kwargs)
 
 def render_forum_discussion(*args, **kwargs):
-    return render_discussion(template='discussion/_forum.html', *args, **kwargs)
+    return render_discussion(discussion_type='forum', *args, **kwargs)
 
+# discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
-    threads = comment_client.get_threads(discussion_id, recursive=False)
-    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id)
-    return HttpResponse(html, content_type="text/plain")
+    page = request.GET.get('page', 1)
+    threads, page, per_page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
+    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id, num_pages=num_pages, page=page, per_page=per_page)
+    return HtmlResponse(html)
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
     if not discussion_id:
@@ -66,18 +105,29 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
 def forum_form_discussion(request, course_id, discussion_id):
 
     course = check_course(course_id)
-
     search_text = request.GET.get('text', '')
+    page = request.GET.get('page', 1)
 
     if len(search_text) > 0:
-        threads = comment_client.search_threads({'text': search_text, 'commentable_id': discussion_id})
+        threads, page, per_page, num_pages = comment_client.search_threads({
+            'text': search_text,
+            'commentable_id': discussion_id,
+            'course_id': course_id,
+            'page': page,
+            'per_page': THREADS_PER_PAGE,
+        })
     else:
-        threads = comment_client.get_threads(discussion_id, recursive=False)
+        threads, page, per_page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
 
     context = {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
-        'content': render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, search_text=search_text),
+        'content': render_forum_discussion(request, course_id, threads, 
+                                           discussion_id=discussion_id,
+                                           search_text=search_text,
+                                           num_pages=num_pages,
+                                           per_page=per_page,
+                                           page=page),
         'accordion': render_accordion(request, course, discussion_id),
     }
 
@@ -102,7 +152,6 @@ def render_single_thread(request, course_id, thread_id):
         'thread': thread,
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'annotated_content_info': json.dumps(get_annotated_content_info(thread=thread, user_id=request.user.id)),
-        'tags': comment_client.get_threads_tags(raw=True),
         'course_id': course_id,
         'request': request,
     }

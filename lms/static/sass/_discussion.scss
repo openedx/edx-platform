@@ -303,7 +303,12 @@ $discussion_input_width: 90%;
       }
     }
   }
-
+  .discussion-paginator {
+    margin-top: 40px;
+    div {
+      display: inline-block;
+    }
+  }
 }
 
 
