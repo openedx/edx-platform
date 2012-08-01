@@ -91,7 +91,9 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                     html = file.read()
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html):
-                        log.warning("Couldn't parse html in {0}.".format(filepath))
+                        msg = "Couldn't parse html in {0}.".format(filepath)
+                        log.warning(msg)
+                        system.error_tracker("Warning: " + msg)
                     return {'data' : html}
             except (ResourceNotFoundError) as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
