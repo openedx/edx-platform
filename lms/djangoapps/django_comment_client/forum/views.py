@@ -41,7 +41,7 @@ def render_accordion(request, course, discussion_id):
 
 def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, 
                       search_text='', discussion_type='inline', page=1, num_pages=None, 
-                      per_page=THREADS_PER_PAGE, url_for_page=None):
+                      per_page=THREADS_PER_PAGE):
     template = {
         'inline': 'discussion/_inline.html',
         'forum': 'discussion/_forum.html',
@@ -87,9 +87,9 @@ def render_forum_discussion(*args, **kwargs):
 
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
-    formpage = request.GET.get('page', 1)
-    threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
-    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id, num_pages=num_pages, page=page)
+    page = request.GET.get('page', 1)
+    threads, page, per_page, num_pages = comment_client.get_threads(discussion_id, recursive=False, page=page, per_page=THREADS_PER_PAGE)
+    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id, num_pages=num_pages, page=page, per_page=per_page)
     return HtmlResponse(html)
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
