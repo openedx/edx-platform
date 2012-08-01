@@ -15,9 +15,19 @@ class CommentClientUnknownError(CommentClientError):
 def delete_threads(commentable_id, *args, **kwargs):
     return _perform_request('delete', _url_for_commentable_threads(commentable_id), *args, **kwargs)
 
-def get_threads(commentable_id, recursive=False, page=1, per_page=20, *args, **kwargs):
-    response = _perform_request('get', _url_for_threads(commentable_id), {'recursive': recursive, 'page': page, 'per_page': per_page}, *args, **kwargs)
-    return response['collection'], response['page'], response['per_page'], response['num_pages']
+def get_threads(commentable_id, recursive=False, query_params={}, *args, **kwargs):
+    default_params = {'page': 1, 'per_page': 20}
+    attributes = dict(default_params.items() + query_params.items())
+    response = _perform_request('get', _url_for_threads(commentable_id), \
+            attributes, *args, **kwargs)
+    return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+
+def search_threads(course_id, recursive=False, query_params={}, *args, **kwargs):
+    default_params = {'page': 1, 'per_page': 20, 'course_id': course_id}
+    attributes = dict(default_params.items() + query_params.items())
+    response = _perform_request('get', _url_for_search_threads(), \
+            attributes, *args, **kwargs)
+    return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
 def get_threads_tags(*args, **kwargs):
     return _perform_request('get', _url_for_threads_tags(), {}, *args, **kwargs)
@@ -98,10 +108,7 @@ def unsubscribe_thread(user_id, thread_id, *args, **kwargs):
 def unsubscribe_commentable(user_id, commentable_id, *args, **kwargs):
     return unsubscribe(user_id, {'source_type': 'other', 'source_id': commentable_id})
 
-def search_threads(attributes, *args, **kwargs):
-    default_attributes = {'page': 1, 'per_page': 20}
-    attributes = dict(default_attributes.items() + attributes.items())
-    return _perform_request('get', _url_for_search_threads(), attributes, *args, **kwargs)
+
 
 def _perform_request(method, url, data_or_params=None, *args, **kwargs):
     if method in ['post', 'put', 'patch']:
