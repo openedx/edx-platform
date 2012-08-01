@@ -172,6 +172,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
+                          is_staff=user.is_staff,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
