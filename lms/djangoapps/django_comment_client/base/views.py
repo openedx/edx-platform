@@ -15,7 +15,7 @@ from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from django_comment_client.utils import JsonResponse, JsonError
+from django_comment_client.utils import JsonResponse, JsonError, extract
 
 def thread_author_only(fn):
     def verified_fn(request, *args, **kwargs):
@@ -45,8 +45,7 @@ def instructor_only(fn): #TODO add instructor verification
             return fn(request, *args, **kwargs)
     return verified_fn
 
-def extract(dic, keys):
-    return {k: dic[k] for k in keys}
+
 
 @login_required
 @require_POST
