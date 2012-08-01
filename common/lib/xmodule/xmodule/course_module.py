@@ -1,7 +1,9 @@
+from fs.errors import ResourceNotFoundError
 import time
 import dateutil.parser
 import logging
 
+from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 
@@ -14,6 +16,9 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
+        
+        self._grader = None
+        self._grade_cutoffs = None
 
         try:
             self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
@@ -27,7 +32,34 @@ class CourseDescriptor(SequenceDescriptor):
 
     def has_started(self):
         return time.gmtime() > self.start
-
+    
+    @property
+    def grader(self):
+        self.__load_grading_policy()
+        return self._grader
+    
+    @property
+    def grade_cutoffs(self):
+        self.__load_grading_policy()
+        return self._grade_cutoffs
+    
+    
+    def __load_grading_policy(self):
+        if not self._grader or not self._grade_cutoffs:
+            policy_string = ""
+            
+            try:
+                with self.system.resources_fs.open("grading_policy.json") as grading_policy_file:
+                    policy_string = grading_policy_file.read()
+            except (IOError, ResourceNotFoundError):
+                log.warning("Unable to load course settings file from grading_policy.json in course " + self.id)
+            
+            grading_policy = load_grading_policy(policy_string)
+            
+            self._grader = grading_policy['GRADER']
+            self._grade_cutoffs = grading_policy['GRADE_CUTOFFS']
+    
+    
     @staticmethod
     def id_to_location(course_id):
         '''Convert the given course_id (org/course/name) to a location object.
