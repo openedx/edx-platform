@@ -15,7 +15,7 @@ class DiscussionModule(XModule):
         context = {
             'discussion_id': self.discussion_id,
         }
-        return self.system.render_template('discussion/_show_discussion.html', context)
+        return self.system.render_template('discussion/_discussion_module.html', context)
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
