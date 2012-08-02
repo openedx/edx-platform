@@ -417,9 +417,7 @@ Discussion =
           success: (response, textStatus) ->
             if not $$annotated_content_info?
               window.$$annotated_content_info = {}
-            console.log response
             window.$$annotated_content_info = $.extend $$annotated_content_info, response['annotated_content_info']
-            console.log $$annotated_content_info
             $content.append(response['html'])
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
@@ -498,7 +496,6 @@ Discussion =
       , 'json'
 
     handleCancelNewPost = (elem) ->
-      console.log "canceling"
       $local(".new-post-form").hide()
       $local(".discussion-new-post").show()
 
@@ -529,6 +526,22 @@ Discussion =
         $local(".discussion-cancel-post").click ->
           handleCancelNewPost(this)
         $(elem).hide()
+
+
+    handleSort = (elem) ->
+      $elem = $(elem)
+      $discussionModule = $elem.parents(".discussion-module")
+      $discussion = $discussionModule.find(".discussion")
+      Discussion.safeAjax
+        $elem: $elem
+        url: $elem.attr("sort-url")
+        method: "GET"
+        success: (data, textStatus) ->
+          $discussion.replaceWith(data)
+          $discussion = $discussionModule.find(".discussion")
+          Discussion.initializeDiscussion($discussion)
+          Discussion.bindDiscussionEvents($discussion)
+        dataType: 'html'
     
     $local(".discussion-search-form").submit (event) ->
       event.preventDefault()
@@ -541,6 +554,9 @@ Discussion =
 
     $local(".discussion-search").click ->
       $local(".new-post-form").submit()
+
+    $discussion.children(".discussion-sort").find(".discussion-inline-sort-link").click ->
+      handleSort(this)
 
     $discussion.find(".thread").each (index, thread) ->
       Discussion.initializeContent(thread)
