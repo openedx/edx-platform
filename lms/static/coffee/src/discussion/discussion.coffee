@@ -128,8 +128,6 @@ initializeFollowThread = (index, thread) ->
 
         $(elem).hide()
 
-    handleUpdateDiscussionContent = ($elem, $discussion, url) ->
-
     handleAjaxSearch = (elem) ->
       handle
       $elem = $(elem)
