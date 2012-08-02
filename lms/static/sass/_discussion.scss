@@ -188,6 +188,9 @@ $discussion_input_width: 100%;
     font-size: $comment_body_size;
     float: right;
     margin-top: -2.5%;
+    .discussion-sort-link.sorted {
+      font-weight: bold;
+    }
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     .new-post-control, .edit-post-control {
