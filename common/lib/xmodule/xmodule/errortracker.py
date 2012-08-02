@@ -8,6 +8,12 @@ log = logging.getLogger(__name__)
 
 ErrorLog = namedtuple('ErrorLog', 'tracker errors')
 
+def exc_info_to_str(exc_info):
+    """Given some exception info, convert it into a string using
+    the traceback.format_exception() function.
+    """
+    return ''.join(traceback.format_exception(*exc_info))
+
 def in_exception_handler():
     '''Is there an active exception?'''
     return sys.exc_info() != (None, None, None)
@@ -27,7 +33,7 @@ def make_error_tracker():
         '''Log errors'''
         exc_str = ''
         if in_exception_handler():
-            exc_str = ''.join(traceback.format_exception(*sys.exc_info()))
+            exc_str = exc_info_to_str(sys.exc_info())
 
         errors.append((msg, exc_str))
 
