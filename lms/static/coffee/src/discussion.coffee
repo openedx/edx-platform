@@ -527,8 +527,25 @@ Discussion =
           handleCancelNewPost(this)
         $(elem).hide()
 
+    handleAjaxSearch = (elem) ->
+      console.log $(elem).attr("action")
+      $elem = $(elem)
+      $discussionModule = $elem.parents(".discussion-module")
+      $discussion = $discussionModule.find(".discussion")
+      Discussion.safeAjax
+        $elem: $elem
+        url: $elem.attr("action")
+        data:
+          text: $local(".search-input").val()
+        method: "GET"
+        success: (data, textStatus) ->
+          $discussion.replaceWith(data)
+          $discussion = $discussionModule.find(".discussion")
+          Discussion.initializeDiscussion($discussion)
+          Discussion.bindDiscussionEvents($discussion)
+        dataType: 'html'
 
-    handleSort = (elem) ->
+    handleAjaxSort = (elem) ->
       $elem = $(elem)
       $discussionModule = $elem.parents(".discussion-module")
       $discussion = $discussionModule.find(".discussion")
@@ -543,7 +560,7 @@ Discussion =
           Discussion.bindDiscussionEvents($discussion)
         dataType: 'html'
     
-    $local(".discussion-search-form").submit (event) ->
+    $local(".search-wrapper-forum > .discussion-search-form").submit (event) ->
       event.preventDefault()
       text = $local(".search-input").val()
       isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
@@ -552,11 +569,16 @@ Discussion =
     $local(".discussion-new-post").click ->
       handleNewPost(this)
 
-    $local(".discussion-search").click ->
-      $local(".new-post-form").submit()
+    $local(".discussion-search-link").click ->
+      handleAjaxSearch(this)
 
-    $discussion.children(".discussion-sort").find(".discussion-inline-sort-link").click ->
-      handleSort(this)
+    $local(".search-wrapper-inline > .discussion-search-form").submit (e)->
+      e.preventDefault()
+      handleAjaxSearch(this)
+
+    $local(".discussion-inline-sort-link").click ->
+      handleAjaxSort(this)
+
 
     $discussion.find(".thread").each (index, thread) ->
       Discussion.initializeContent(thread)
