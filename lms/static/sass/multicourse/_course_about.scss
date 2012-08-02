@@ -27,14 +27,17 @@
       max-width: 1200px;
       min-width: 760px;
       position: relative;
-      width: 100%;
       z-index: 2;
 
-
+      > div.table {
+        display: table;
+        width: 100%;
+      }
       .intro {
         @include box-sizing(border-box);
         @include clearfix;
-        float: left;
+        display: table-cell;
+        vertical-align: middle;
         padding: 20px 20px;
         position: relative;
         width: flex-grid(8) + flex-gutter();
@@ -130,9 +133,7 @@
       .media {
         background: transparent;
         @include box-sizing(border-box);
-        display: block;
-        float: right;
-        height: 180px;
+        display: table-cell;
         padding: 20px;
         position: relative;
         width: flex-grid(4);
@@ -270,6 +271,24 @@
               min-height: 100%;
               max-width: 100%;
             }
+          }
+        }
+      }
+      
+      .faq {
+        @include clearfix;
+
+        .responses {
+          float: left;
+        }
+
+        .response {
+          margin-bottom: 40px;
+
+          h3 {
+            font-family: $sans-serif;
+            font-weight: 700;
+            margin-bottom: 15px;
           }
         }
       }
