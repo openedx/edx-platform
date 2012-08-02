@@ -34,10 +34,11 @@
 
 <section class="container dashboard">
   
-  <section class="dashboard-banner">
-    ${message}
-    <br/>
-  </section>
+  %if message:
+    <section class="dashboard-banner">
+      ${message}
+    </section>
+  %endif
 
   <section class="profile-sidebar">
     <header class="profile">
