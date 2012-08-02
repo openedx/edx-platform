@@ -881,15 +881,15 @@ class CodeResponse(LoncapaResponse):
                     'edX_student_response': submission}
         
         # Submit request
-        success = xqueue_interface.send_to_queue(header=xheader,
-                                                 body=json.dumps(contents))
+        error = xqueue_interface.send_to_queue(header=xheader,
+                                               body=json.dumps(contents))
 
         cmap = CorrectMap() 
-        if success:
+        if error:
+            cmap.set(self.answer_id, msg='Unable to deliver your submission to grader! Please try again later')
+        else:
             # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
             cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader')
-        else:
-            cmap.set(self.answer_id, msg='Unable to deliver submission to grader! Please try again later')
 
         return cmap
 
