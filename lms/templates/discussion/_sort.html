@@ -3,16 +3,16 @@
 <%def name="link_to_sort(key, title)">
   % if key == sort_key:
     % if sort_order.lower() == 'desc':
-      ${_link_to_sort(key, 'asc', title + ' [v]')}
+      ${_link_to_sort(key, 'asc', title + ' [v]', 'sorted')}
     % else:
-      ${_link_to_sort(key, 'desc', title + ' [^]')}
+      ${_link_to_sort(key, 'desc', title + ' [^]', 'sorted')}
     % endif
   % else:
     ${_link_to_sort(key, 'desc', title)}
   % endif
 </%def>
 
-<%def name="_link_to_sort(key, order, title)">
+<%def name="_link_to_sort(key, order, title, cls='')">
   <% 
   def merge(dic1, dic2):
     return dict(dic1.items() + dic2.items())
@@ -21,9 +21,9 @@
     return base_url + '?' + urlencode(merge(query_params, {'page': 1, 'sort_key': key, 'sort_order': order}))
   %>
   % if discussion_type == 'inline':
-    <a class="discussion-sort-link discussion-inline-sort-link" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
+    <a class="discussion-sort-link discussion-inline-sort-link ${cls}" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
   % else:
-    <a class="discussion-sort-link" href="${url_for_sort(key, order)}">${title}</a>
+    <a class="discussion-sort-link ${cls}" href="${url_for_sort(key, order)}">${title}</a>
   % endif
 </%def>
     
