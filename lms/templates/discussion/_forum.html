@@ -5,14 +5,16 @@
     <div class="discussion-title-wrapper">
       <a class="discussion-title" href="javascript:void(0)">Discussion</a>
     </div>
-    ${search_bar}
+    <div class="search-wrapper-forum">
+      <%include file="_search_bar.html" />
+    </div>
     <div class="search-within">
       <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
       <label for="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board">Search within board</label>
     </div>
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
+    <%include file="_sort.html" />
   </div>
-  <%include file="_sort.html" />
   % for thread in threads:
     ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
   % endfor
