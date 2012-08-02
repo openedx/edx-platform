@@ -36,7 +36,7 @@
       <div class="discussion-right-wrapper clearfix">
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
-          <div class="content-body ${type}-body">${content['body'] | h}</div>
+          <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
           <div class="content-raw-body ${type}-raw-body" style="display: none">${content['body'] | h}</div>
           ${render_tags(content, type, **kwargs)}
           ${render_bottom_bar(content, type, **kwargs)}
@@ -47,15 +47,8 @@
 </%def>
 
 <%def name="render_title(content, type, **kwargs)">
-  <%
-    if type == "thread":
-      if kwargs.get('show_comments', False):
-        url_for_thread = ""
-      else:
-        url_for_thread = reverse('django_comment_client.forum.views.single_thread', args=[course_id, content['commentable_id'], content['id']])
-  %>
   % if type == "thread":
-    <a class="thread-title" name="${content['id']}" href="${url_for_thread}">${content['title'] | h}</a>
+    <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
   % endif
 </%def>
 
