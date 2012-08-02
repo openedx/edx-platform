@@ -280,14 +280,14 @@ def create_account(request, post_override=None):
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
-    doExternalAuth = 'ExternalAuthMap' in request.session
-    if doExternalAuth:
+    DoExternalAuth = 'ExternalAuthMap' in request.session
+    if DoExternalAuth:
         eamap = request.session['ExternalAuthMap']
         email = eamap.external_email
         name = eamap.external_name
         password = eamap.internal_password
         post_vars = dict(post_vars.items())
-        post_vars.update(dict(email=email, name=name, password=password, username=post_vars['username']))
+        post_vars.update(dict(email=email, name=name, password=password))
         log.debug('extauth test: post_vars = %s' % post_vars)
 
     # Confirm we have a properly formed request
@@ -411,7 +411,7 @@ def create_account(request, post_override=None):
 
     try_change_enrollment(request)
 
-    if doExternalAuth:
+    if DoExternalAuth:
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now()
         eamap.save()
