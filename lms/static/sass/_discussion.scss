@@ -195,7 +195,7 @@ $discussion_input_width: 100%;
       margin-top: 1%;
     }
     .reply-post-control {
-      margin-left: 72%;
+      margin-left: 73%;
     }
     .control-button {
       @include button;
@@ -203,7 +203,7 @@ $discussion_input_width: 100%;
       color: white;
       font-weight: bold;
       text-decoration: none;
-      margin-left: 10%;
+      margin-left: 5%;
       display: inline-block;
       padding-top: 9px;
       font-size: inherit;
@@ -213,6 +213,9 @@ $discussion_input_width: 100%;
   }
   .discussion-reply-new {
     margin: 10px 0 20px 0;
+    .discussion-auto-watch {
+      margin-left: 2%;
+    }
   }
   .thread {
     //display: none;
