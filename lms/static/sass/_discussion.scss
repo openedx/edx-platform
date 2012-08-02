@@ -185,6 +185,7 @@ $discussion_input_width: 100%;
     }
   }
   .discussion-sort {
+    font-size: $comment_body_size;
     float: right;
     margin-top: -2.5%;
   }
@@ -194,7 +195,7 @@ $discussion_input_width: 100%;
       margin-top: 1%;
     }
     .reply-post-control {
-      margin-left: 79%;
+      margin-left: 79.5%;
     }
     .control-button {
       @include button;
@@ -209,6 +210,9 @@ $discussion_input_width: 100%;
       width: inherit;
     }
     margin: 10px 0 40px 0;
+  }
+  .discussion-reply-new {
+    margin: 10px 0 20px 0;
   }
   .thread {
     //display: none;
