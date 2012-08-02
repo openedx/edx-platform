@@ -278,8 +278,8 @@ def modx_dispatch(request, dispatch=None, id=None):
     # Catch the use of FormData in xmodule frontend. After this block, the 'post' dict 
     #   is functionally equivalent before- and after- the use of FormData
     # TODO: A more elegant solution?
-    if request.POST.has_key('_answers_querystring'):
-        post = parse_qs(request.POST.get('_answers_querystring'))
+    if post.has_key('_answers_querystring'):
+        post = parse_qs(post.get('_answers_querystring'))
         for key in post.keys():
             post[key] = post[key][0] # parse_qs returns { key: list }
 
