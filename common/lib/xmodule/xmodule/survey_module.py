@@ -3,6 +3,7 @@ import logging
 
 from lxml import etree
 
+from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 
@@ -13,11 +14,11 @@ class SurveyModule(XModule):
     video_time = 0
     icon_class = 'video'
 
-    # js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
-    #       'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-    #              resource_string(__name__, 'js/src/capa/schematic.js')]}
-    # js_module_name = "Problem"
-    # css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/survey/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
+                 resource_string(__name__, 'js/src/capa/schematic.js')]}
+    js_module_name = "Survey"
+    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
@@ -33,12 +34,12 @@ class SurveyModule(XModule):
   # <section format="Video" name="Welcome">
   #     <video youtube="0.75:izygArpw-Qo,1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"/>
   # </section>  
-    def get_html(self):
-        return self.system.render_template('problem_ajax.html', {
-            'element_id': self.location.html_id(),
-            'id': self.id,
-            'ajax_url': self.system.ajax_url,
-        })
+    # def get_html(self):
+    #     return self.system.render_template('problem_ajax.html', {
+    #         'element_id': self.location.html_id(),
+    #         'id': self.id,
+    #         'ajax_url': self.system.ajax_url,
+    #     })
 
     def handle_ajax(self, dispatch, get):
                 
@@ -49,6 +50,18 @@ class SurveyModule(XModule):
         #     log.info(u"NEW POSITION {0}".format(self.position))
         #     return json.dumps({'success':True})
         # raise Http404()
+
+        handlers = {
+                    'problem_show': self.get_answer
+                    }
+
+        if dispatch not in handlers:
+            print 'Error poop'
+            return 'Error'
+
+        # return json.dumps(d, cls=ComplexEncoder)
+
+
         print "poop"
         print dispatch
         print get
@@ -70,7 +83,10 @@ class SurveyModule(XModule):
         return self.question_list
 #dirty test:
     def survey_context(self):
-        self.context = {'took_survey' : False,
+        self.context = {'element_id': self.location.html_id(),
+                        'id': self.id,
+                        'ajax_url': self.system.ajax_url,
+                        'took_survey' : False,
                         'survey_list' : self.survey_question_list(),
                         'survey_name' : self.name}
         return self.context
