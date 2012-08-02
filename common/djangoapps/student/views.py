@@ -60,6 +60,10 @@ def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
+        from external_auth.views import edXauth_ssl_login
+        return edXauth_ssl_login(request)
+
     return main_index()
 
 def main_index(extra_context = {}):
