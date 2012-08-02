@@ -11,7 +11,6 @@ $ ->
 
   $(".discussion-module").each (index, elem) ->
     Discussion.initializeDiscussionModule(elem)
-    
 
   $("section.discussion").each (index, discussion) ->
     Discussion.initializeDiscussion(discussion)
@@ -80,28 +79,29 @@ Discussion =
     </form>
   """
 
-  urlFor: (name, param) ->
+  urlFor: (name, param, param1) ->
     {
-      watch_commentable   : "/courses/#{$$course_id}/discussion/#{param}/watch"
-      unwatch_commentable : "/courses/#{$$course_id}/discussion/#{param}/unwatch"
-      create_thread       : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
-      update_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
-      create_comment      : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
-      delete_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
-      upvote_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
-      downvote_thread     : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
-      watch_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/watch"
-      unwatch_thread      : "/courses/#{$$course_id}/discussion/threads/#{param}/unwatch"
-      update_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
-      endorse_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
-      create_sub_comment  : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
-      delete_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
-      upvote_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
-      downvote_comment    : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
-      upload              : "/courses/#{$$course_id}/discussion/upload"
-      search              : "/courses/#{$$course_id}/discussion/forum/search"
-      tags_autocomplete   : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
-      retrieve_discussion : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
+      watch_commentable      : "/courses/#{$$course_id}/discussion/#{param}/watch"
+      unwatch_commentable    : "/courses/#{$$course_id}/discussion/#{param}/unwatch"
+      create_thread          : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
+      update_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
+      create_comment         : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
+      delete_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
+      upvote_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
+      downvote_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
+      watch_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/watch"
+      unwatch_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unwatch"
+      update_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
+      endorse_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
+      create_sub_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
+      delete_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
+      upvote_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
+      downvote_comment       : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
+      upload                 : "/courses/#{$$course_id}/discussion/upload"
+      search                 : "/courses/#{$$course_id}/discussion/forum/search"
+      tags_autocomplete      : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
+      retrieve_discussion    : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
+      retrieve_single_thread : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
     }[name]
 
   handleAnchorAndReload: (response) ->
@@ -119,7 +119,7 @@ Discussion =
         $elem.attr("disabled", "disabled")
         discussion_id = $elem.attr("discussion_id")
         url = Discussion.urlFor 'retrieve_discussion', discussion_id
-        $.ajax
+        $.ajax(
           url: url
           method: "GET"
           success: (data, textStatus, xhr) ->
@@ -127,11 +127,13 @@ Discussion =
             discussion = $local("section.discussion")
             Discussion.initializeDiscussion(discussion)
             Discussion.bindDiscussionEvents(discussion)
-            $elem.removeAttr("disabled")
             $elem.html("Hide Discussion")
             $elem.unbind('click').click ->
               handleHideDiscussion(this)
           dataType: 'html'
+        ).always ->
+          $elem.removeAttr("disabled")
+
       else
         $local("section.discussion").show()
         $elem.html("Hide Discussion")
@@ -184,8 +186,6 @@ Discussion =
         watchDiscussion = generateDiscussionLink("discussion-watch-discussion", "Watch", handleWatchDiscussion)
         $local(".discussion-title-wrapper").append(watchDiscussion)
 
-      
-
     initializeWatchThreads = (index, thread) ->
       $thread = $(thread)
       id = $thread.attr("_id")
@@ -219,16 +219,15 @@ Discussion =
       $local(".thread").each(initializeVote).each(initializeWatchThreads)
       initializeWatchDiscussion(discussion)
 
-    if $$tags?
-      $local(".new-post-tags").tagsInput
-        autocomplete_url: Discussion.urlFor('tags_autocomplete')
-        autocomplete:
-          remoteDataType: 'json'
-        interactive: true
-        defaultText: "Tag your post"
-        height: "30px"
-        width: "90%"
-        removeWithBackspace: true
+    $local(".new-post-tags").tagsInput
+      autocomplete_url: Discussion.urlFor('tags_autocomplete')
+      autocomplete:
+        remoteDataType: 'json'
+      interactive: true
+      defaultText: "Tag your post"
+      height: "30px"
+      width: "90%"
+      removeWithBackspace: true
 
   bindContentEvents: (content) ->
 
@@ -380,7 +379,48 @@ Discussion =
         # TODO error handling
         Discussion.handleAnchorAndReload(response)
       , 'json'
+
+    handleHideSingleThread = (elem) ->
+      $elem = $(elem)
+      $content.children(".comments").hide()
+      $elem.unbind('click').click ->
+        handleShowSingleThread(this)
+
+    handleShowSingleThread = (elem) ->
+      $elem = $(elem)
+      if $elem.attr("disabled")
+        return
+      if $content.children(".comments").length
+        $content.children(".comments").show()
+        $elem.unbind('click').click ->
+          handleHideSingleThread(this)
+      else
+        $elem.attr("disabled", "disabled")
+        discussion_id = $elem.parents(".discussion").attr("_id")
+        url = Discussion.urlFor('retrieve_single_thread', discussion_id, id)
+        console.log url
+        $.ajax(
+          url: url
+          method: "GET"
+          success: (response, textStatus) ->
+            if not $$annotated_content_info?
+              window.$$annotated_content_info = {}
+            console.log response
+            window.$$annotated_content_info = $.extend $$annotated_content_info, response['annotated_content_info']
+            console.log $$annotated_content_info
+            $content.append(response['html'])
+            $content.find(".comment").each (index, comment) ->
+              Discussion.initializeContent(comment)
+              Discussion.bindContentEvents(comment)
+            $elem.unbind('click').click ->
+              handleHideSingleThread(this)
+          dataType: 'json'
+        ).always ->
+          $elem.removeAttr("disabled")
       
+      
+    $local(".thread-title").click ->
+      handleShowSingleThread(this)
 
     $local(".discussion-reply").click ->
       handleReply(this)
@@ -402,20 +442,19 @@ Discussion =
         handleEditThread(this)
       else
         handleEditComment(this)
-      
 
   initializeContent: (content) ->
     $content = $(content)
     $local = generateLocal($content.children(".discussion-content"))
-    raw_text = $local(".content-body").html()
+    $contentBody = $local(".content-body")
+    raw_text = $contentBody.html()
     converter = Markdown.getMathCompatibleConverter()
-    $local(".content-body").html(converter.makeHtml(raw_text))
+    $contentBody.html(converter.makeHtml(raw_text))
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
     if $$annotated_content_info?
       if not ($$annotated_content_info[id] || [])['editable']
         $local(".discussion-edit").remove()
-
-    
 
   bindDiscussionEvents: (discussion) ->
     $discussion = $(discussion)
