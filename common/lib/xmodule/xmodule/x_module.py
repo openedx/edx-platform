@@ -358,6 +358,14 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         self._child_instances = None
         self._inherited_metadata = set()
 
+    @property
+    def own_metadata(self):
+        """
+        Return the metadata that is not inherited, but was defined on this module.
+        """
+        return dict((k,v) for k,v in self.metadata.items()
+                    if k not in self._inherited_metadata)
+
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.

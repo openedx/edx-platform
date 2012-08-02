@@ -53,14 +53,12 @@ def import_with_checks(course_dir, verbose=True):
     data_dir = course_dir.dirname()
     course_dirs = [course_dir.basename()]
 
-    (error_tracker, errors) = make_error_tracker()
     # No default class--want to complain if it doesn't find plugins for any
     # module.
     modulestore = XMLModuleStore(data_dir,
                    default_class=None,
                    eager=True,
-                   course_dirs=course_dirs,
-                   error_tracker=error_tracker)
+                   course_dirs=course_dirs)
 
     def str_of_err(tpl):
         (msg, exc_info) = tpl
@@ -71,6 +69,15 @@ def import_with_checks(course_dir, verbose=True):
         return '{msg}\n{exc}'.format(msg=msg, exc=exc_str)
 
     courses = modulestore.get_courses()
+
+    n = len(courses)
+    if n != 1:
+        print 'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(
+            n=n, lst=courses)
+        return (False, None)
+
+    course = courses[0]
+    errors = modulestore.get_item_errors(course.location)
     if len(errors) != 0:
         all_ok = False
         print '\n'
@@ -80,13 +87,6 @@ def import_with_checks(course_dir, verbose=True):
         print "=" * 40
         print '\n'
 
-    n = len(courses)
-    if n != 1:
-        print 'ERROR: Expect exactly 1 course.  Loaded {n}: {lst}'.format(
-            n=n, lst=courses)
-        return (False, None)
-
-    course = courses[0]
 
     #print course
     validators = (
