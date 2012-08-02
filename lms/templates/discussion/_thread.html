@@ -62,7 +62,7 @@
 <%def name="render_tags(content, type, **kwargs)">
   <%
     def url_for_tags(tags):
-      return reverse('django_comment_client.forum.views.search', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
+      return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
   %>
   % if type == "thread":
     <div class="thread-tags">
