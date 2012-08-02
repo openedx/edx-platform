@@ -1,36 +1,61 @@
 from path import path
 import unittest
+from fs.memoryfs import MemoryFS
 
 from lxml import etree
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
-from xmodule.errortracker import null_error_tracker
+from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+ORG = 'test_org'
+COURSE = 'test_course'
+
+class DummySystem(XMLParsingSystem):
+    def __init__(self):
+
+        self.modules = {}
+        self.resources_fs = MemoryFS()
+        self.errorlog = make_error_tracker()
+
+        def load_item(loc):
+            loc = Location(loc)
+            if loc in self.modules:
+                return self.modules[loc]
+
+            print "modules: "
+            print self.modules
+            raise ItemNotFoundError("Can't find item at loc: {0}".format(loc))
+
+        def process_xml(xml):
+            print "loading {0}".format(xml)
+            descriptor = XModuleDescriptor.load_from_xml(xml, self, ORG, COURSE, None)
+            # Need to save module so we can find it later
+            self.modules[descriptor.location] = descriptor
+
+            # always eager
+            descriptor.get_children()
+            return descriptor
+
+
+        XMLParsingSystem.__init__(self, load_item, self.resources_fs,
+                                  self.errorlog.tracker, process_xml)
+
+    def render_template(self, template, context):
+            raise Exception("Shouldn't be called")
+
+
+
 
 class ImportTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
 
+
     @staticmethod
     def get_system():
         '''Get a dummy system'''
-        # Shouldn't need any system params, because the initial parse should fail
-        def load_item(loc):
-            raise Exception("Shouldn't be called")
-
-        resources_fs = None
-
-        def process_xml(xml):
-            raise Exception("Shouldn't be called")
-
-
-        def render_template(template, context):
-            raise Exception("Shouldn't be called")
-
-        system = XMLParsingSystem(load_item, resources_fs,
-                                  null_error_tracker, process_xml)
-        system.render_template = render_template
-
-        return system
+        return DummySystem()
 
     def test_fallback(self):
         '''Make sure that malformed xml loads as an ErrorDescriptor.'''
@@ -85,3 +110,30 @@ class ImportTestCase(unittest.TestCase):
         xml_out = etree.fromstring(xml_str_out)
         self.assertEqual(xml_out.tag, 'sequential')
 
+    def test_metadata_inherit(self):
+        """Make sure metadata inherits properly"""
+        system = self.get_system()
+        v = "1 hour"
+        start_xml = '''<course graceperiod="{grace}" url_name="test1" display_name="myseq">
+                      <chapter url="hi" url_name="ch" display_name="CH">
+                       <html url_name="h" display_name="H">Two houses, ...</html></chapter>
+                   </course>'''.format(grace=v)
+        descriptor = XModuleDescriptor.load_from_xml(start_xml, system,
+                                                     'org', 'course')
+
+        print "Errors: {0}".format(system.errorlog.errors)
+        print descriptor, descriptor.metadata
+        self.assertEqual(descriptor.metadata['graceperiod'], v)
+
+        # Check that the child inherits correctly
+        child = descriptor.get_children()[0]
+        self.assertEqual(child.metadata['graceperiod'], v)
+
+        # Now export and see if the chapter tag has a graceperiod attribute
+        resource_fs = MemoryFS()
+        exported_xml = descriptor.export_to_xml(resource_fs)
+        print "Exported xml:", exported_xml
+        root = etree.fromstring(exported_xml)
+        chapter_tag = root[0]
+        self.assertEqual(chapter_tag.tag, 'chapter')
+        self.assertFalse('graceperiod' in chapter_tag.attrib)
