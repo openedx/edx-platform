@@ -5,7 +5,8 @@ import json
 import requests
 
 # TODO: Collection of parameters to be hooked into rest of edX system
-XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org/xqueue/submit/'
+XQUEUE_LMS_AUTH = ('LMS','PaloAltoCA') # (username, password)
+XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org'
 
 def upload_files_to_s3():
     print '  THK: xqueue_interface.upload_files_to_s3'
@@ -35,21 +36,42 @@ def send_to_queue(header, body, xqueue_url=None):
     body: Serialized data for the receipient behind the queueing service. The operation of
             xqueue is agnostic to the contents of 'body'
 
-    Returns a 'success' flag indicating successful submission
+    Returns an 'error' flag indicating error in xqueue transaction
     '''
     if xqueue_url is None:
         xqueue_url = XQUEUE_SUBMIT_URL
 
-    # Contact queue server
-    payload = {'xqueue_header': header,
-               'xqueue_body'  : body}
+    # First, we login with our credentials
+    #------------------------------------------------------------
+    s = requests.session()
     try:
-        r = requests.post(xqueue_url, data=payload)
+        r = s.post(xqueue_url+'/xqueue/login/', data={ 'username': XQUEUE_LMS_AUTH[0],
+                                                       'password': XQUEUE_LMS_AUTH[1] })
     except Exception as err:
         msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
         raise Exception(msg)
 
     # Xqueue responses are JSON-serialized dicts
     xreply = json.loads(r.text)
+    return_code = xreply['return_code']
+    if return_code: # Nonzero return code from xqueue indicates error
+        print '  Error in queue_interface.send_to_queue: %s' % xreply['content']
+        return 1 # Error
 
-    return xreply['return_code'] == 0 # return_code == 0 from xqueue indicates successful submission
+    # Next, we can make a queueing request
+    #------------------------------------------------------------
+    payload = {'xqueue_header': header,
+               'xqueue_body'  : body}
+    try:
+        # Send request
+        r = s.post(xqueue_url+'/xqueue/submit/', data=payload)
+    except Exception as err:
+        msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
+        raise Exception(msg)
+
+    xreply = json.loads(r.text)
+    return_code = xreply['return_code']
+    if return_code:
+        print '  Error in queue_interface.send_to_queue: %s' % xreply['content']
+
+    return return_code
