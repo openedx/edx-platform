@@ -3,11 +3,11 @@
 <section class="discussion inline-discussion" _id="${discussion_id}">
   <div class="discussion-non-content">
     <div class="search-wrapper-inline">
-      ${search_bar}
+      <%include file="_search_bar.html" />
     </div>
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
+    <%include file="_sort.html" />
   </div>
-  <%include file="_sort.html" />
   % for thread in threads:
     ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
   % endfor
