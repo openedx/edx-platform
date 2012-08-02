@@ -166,10 +166,6 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
         )
-    urlpatterns += (
-        url(r'^extauth/$', 'external_auth.views.edXauth_signup', name='extauth-signup'),
-        )
-    # urlpatterns += (url(r'^openid/', include('django_openid_auth.urls')),)
 
 urlpatterns = patterns(*urlpatterns)
 
