@@ -4,6 +4,7 @@ if not @Discussion?
 Discussion = @Discussion
 
 @Discussion = $.extend @Discussion,
+
   bindContentEvents: (content) ->
 
     $content = $(content)
@@ -33,8 +34,8 @@ Discussion = @Discussion
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
-        $local(".discussion-submit-post").click handleSubmitReply
-        $local(".discussion-cancel-post").click handleCancelReply
+        $local(".discussion-submit-post").click -> handleSubmitReply(this)
+        $local(".discussion-cancel-post").click -> handleCancelReply(this)
       $local(".discussion-link").hide()
       $discussionContent.attr("status", "reply")
 
@@ -204,6 +205,7 @@ Discussion = @Discussion
       
       
     $local(".thread-title").click handleShowSingleThread
+
     $local(".discussion-show-comments").click handleShowSingleThread
 
     $local(".discussion-reply-thread").click ->
