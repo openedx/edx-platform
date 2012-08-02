@@ -65,3 +65,20 @@ Discussion = @Discussion
     height: "30px"
     width: "100%"
     removeWithBackspace: true
+
+  isSubscribed: (id, type) ->
+    if type == "thread"
+      id in $$user_info.subscribed_thread_ids
+    else if type == "commentable" or type == "discussion"
+      id in $$user_info.subscribed_commentable_ids
+    else
+      id in $$user_info.subscribed_user_ids
+
+  formErrorHandler: (errorsField, success) ->
+    (response, textStatus, xhr) ->
+      if response.errors? and response.errors.length > 0
+        errorsField.empty()
+        for error in response.errors
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+      else
+        success(response, textStatus, xhr)
