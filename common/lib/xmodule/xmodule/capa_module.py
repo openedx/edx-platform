@@ -5,6 +5,7 @@ import json
 import logging
 import traceback
 import re
+import sys
 
 from datetime import timedelta
 from lxml import etree
@@ -91,7 +92,8 @@ class CapaModule(XModule):
         display_due_date_string = self.metadata.get('due', None)
         if display_due_date_string is not None:
             self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            #log.debug("Parsed " + display_due_date_string + " to " + str(self.display_due_date))
+            #log.debug("Parsed " + display_due_date_string +
+            #          " to " + str(self.display_due_date))
         else:
             self.display_due_date = None
 
@@ -99,7 +101,8 @@ class CapaModule(XModule):
         if grace_period_string is not None and self.display_due_date:
             self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
-            #log.debug("Then parsed " + grace_period_string + " to closing date" + str(self.close_date))
+            #log.debug("Then parsed " + grace_period_string +
+            #          " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
@@ -138,10 +141,16 @@ class CapaModule(XModule):
         try:
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
                                       instance_state, seed=seed, system=self.system)
-        except Exception:
-            msg = 'cannot create LoncapaProblem %s' % self.location.url()
-            log.exception(msg)
+        except Exception as err:
+            msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
+                loc=self.location.url(), err=err)
+            # TODO (vshnayder): do modules need error handlers too?
+            # We shouldn't be switching on DEBUG.
             if self.system.DEBUG:
+                log.error(msg)
+                # TODO (vshnayder): This logic should be general, not here--and may
+                # want to preserve the data instead of replacing it.
+                # e.g. in the CMS
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
@@ -152,7 +161,8 @@ class CapaModule(XModule):
                     problem_text, self.location.html_id(),
                     instance_state, seed=seed, system=self.system)
             else:
-                raise
+                # add extra info and raise
+                raise Exception(msg), None, sys.exc_info()[2]
 
     @property
     def rerandomize(self):
@@ -191,6 +201,7 @@ class CapaModule(XModule):
             try:
                 return Progress(score, total)
             except Exception as err:
+                # TODO (vshnayder): why is this still here? still needed?
                 if self.system.DEBUG:
                     return None
                 raise
@@ -210,6 +221,7 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
         except Exception, err:
+            # TODO (vshnayder): another switch on DEBUG.
             if self.system.DEBUG:
                 log.exception(err)
                 msg = (
@@ -561,6 +573,7 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+
     @classmethod
     def split_to_file(cls, xml_object):
         '''Problems always written in their own files'''
