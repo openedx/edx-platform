@@ -23,7 +23,8 @@ $discussion_input_width: 90%;
   .search-wrapper-inline {
     width: 80%;
     display: inline-block;
-    margin-top: 2%;
+    margin-top: 3%;
+    margin-bottom: 6%;
   }
   .discussion-search-form {
     margin-bottom: 1%;
@@ -56,6 +57,7 @@ $discussion_input_width: 90%;
   .discussion-search-within-board {
     font-style: normal;
     font: inherit;
+    font-size: $comment_body_size;
   }
   .control-button {
     @include button;
@@ -182,6 +184,10 @@ $discussion_input_width: 90%;
       -webkit-font-smoothing: antialiased;
     }
   }
+  .discussion-sort {
+    float: right;
+    margin-top: -2.5%;
+  }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     .new-post-control, .edit-post-control {
       margin-left: 70.5%;
@@ -193,7 +199,7 @@ $discussion_input_width: 90%;
       color: white;
       font-weight: bold;
       text-decoration: none;
-      margin-left: 3%;
+      margin-left: 5%;
       display: inline-block;
       padding-top: 9px;
       font-size: inherit;
