@@ -1,6 +1,7 @@
 $ ->
 
   Discussion = window.Discussion
+  console.log "here"
   if $('#accordion').length
     active = $('#accordion ul:has(li.active)').index('#accordion ul')
     $('#accordion').bind('accordionchange', @log).accordion
