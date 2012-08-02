@@ -80,17 +80,17 @@ def get_threads(request, course_id, discussion_id):
     query_params = {
         'page': request.GET.get('page', 1),
         'per_page': THREADS_PER_PAGE, #TODO maybe change this later
-        'sort_key': request.GET.get('sort_key', None),
-        'sort_order': request.GET.get('sort_order', None),
-        'text': request.GET.get('text', None), 
-        'tags': request.GET.get('tags', None),
+        'sort_key': request.GET.get('sort_key', ''),
+        'sort_order': request.GET.get('sort_order', ''),
+        'text': request.GET.get('text', ''), 
+        'tags': request.GET.get('tags', ''),
     }
 
     if query_params['text'] or query_params['tags']: #TODO do tags search without sunspot
         query_params['commentable_id'] = discussion_id
-        threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=query_params)
+        threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=strip_none(query_params))
     else:
-        threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=query_params)
+        threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=strip_none(query_params))
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages

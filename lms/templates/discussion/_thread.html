@@ -70,17 +70,17 @@
 <%def name="render_bottom_bar(content, type, **kwargs)">
   <div class="info">
     ${render_info(content)}
+    ${render_link("discussion-link discussion-reply", "Reply")}
     % if type == "thread" and kwargs['edit_thread'] or type == "comment":
-      ${render_link("discussion-link discussion-reply", "Reply")}
       ${render_link("discussion-link discussion-edit", "Edit")}
-      % if type == "comment" and request.user.is_staff:
-        % if content['endorsed']:
-          <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
-        % else:
-          <input type="checkbox" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
-        % endif
-        <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
+    % endif
+    % if type == "comment" and request.user.is_staff:
+      % if content['endorsed']:
+        <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
+      % else:
+        <input type="checkbox" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
       % endif
+      <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
     % endif
   </div>
 </%def>

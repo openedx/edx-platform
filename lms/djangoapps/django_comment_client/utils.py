@@ -17,7 +17,9 @@ def extract(dic, keys):
     return {k: dic[k] for k in keys}
 
 def strip_none(dic):
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    def _is_none(v):
+        return v is None or (isinstance(v, str) and len(v.strip()) == 0)
+    return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
 
 def get_full_modules():
     global _FULLMODULES
