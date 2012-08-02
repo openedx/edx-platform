@@ -14,6 +14,7 @@ class @Problem
     window.update_schematics()
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save

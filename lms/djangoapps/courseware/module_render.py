@@ -1,5 +1,6 @@
 import json
 import logging
+from urlparse import parse_qs
 
 from django.conf import settings
 from django.http import Http404
@@ -14,6 +15,7 @@ from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
+import xqueue_interface
 
 log = logging.getLogger("mitx.courseware")
 
@@ -270,16 +272,16 @@ def modx_dispatch(request, dispatch=None, id=None):
       - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
-    
-    print '  THK: module_render.modx_dispatch'
-    print dispatch
-    print request.POST.keys()
-    print request.FILES.keys()
-    if request.POST.has_key('answers'):
-        print request.POST['answers']
-    for filename in request.FILES.keys():
-        uploadedFile = request.FILES.get(filename)
-        print uploadedFile.read()
+
+    post = request.POST.copy() 
+
+    # Catch the use of FormData in xmodule frontend. After this block, the 'post' dict 
+    #   is functionally equivalent before- and after- the use of FormData
+    # TODO: A more elegant solution?
+    if request.POST.has_key('_answers_querystring'):
+        post = parse_qs(request.POST.get('_answers_querystring'))
+        for key in post.keys():
+            post[key] = post[key][0] # parse_qs returns { key: list }
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
@@ -292,7 +294,7 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     # Let the module handle the AJAX
     try:
-        ajax_return = instance.handle_ajax(dispatch, request.POST)
+        ajax_return = instance.handle_ajax(dispatch, post)
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
