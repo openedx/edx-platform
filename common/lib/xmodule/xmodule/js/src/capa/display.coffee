@@ -50,7 +50,7 @@ class @Problem
   #      querystring-based answers, in the 'problem_check' dispatch.
   #
   # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
-  #       perhaps preferrable to consolidate all dispatches to use FormData consistently
+  #       perhaps preferable to consolidate all dispatches to use FormData consistently
   ###
   check_fd: =>
     Logger.log 'problem_check', @answers
