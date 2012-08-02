@@ -339,6 +339,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
                     module
                 display_name: The name to use for displaying this module to the
                     user
+                url_name: The name to use for this module in urls and other places
+                    where a unique name is needed.
                 format: The format of this module ('Homework', 'Lab', etc)
                 graded (bool): Whether this module is should be graded or not
                 start (string): The date for which this module will be available
