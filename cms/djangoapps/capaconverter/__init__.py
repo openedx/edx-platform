@@ -106,18 +106,21 @@ class CapaXMLConverter(object):
                 {
                     'src': 'answer',
                     'dest': 'answer',
+                    'wrapper': self.replace_dollar_sign,
                 }
             ],
             'stringresponse': [
                 {
                     'src': 'answer',
                     'dest': 'answer',
+                    'wrapper': self.replace_dollar_sign,
                 },
             ],
             'schematicresponse': [
                 {
                     'src': 'answer',
                     'dest': 'answer',
+                    'wrapper': self.replace_dollar_sign,
                 }
             ],
             'responseparam': [
@@ -134,6 +137,11 @@ class CapaXMLConverter(object):
             ],
         }
         super(CapaXMLConverter, self).__init__()
+
+    def replace_dollar_sign(self, text):
+        if text.startswith("$"):
+            return "{" + text[1:] + "}"
+        return text
 
     def build_from_element(self, element):
         return self.copy_attribute(element, {'type': self.type_map[element.tag], '_tag_': element.tag})
