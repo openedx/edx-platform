@@ -126,6 +126,7 @@ Discussion =
         discussion_id = $elem.attr("discussion_id")
         url = Discussion.urlFor 'retrieve_discussion', discussion_id
         Discussion.safeAjax
+          $elem: $elem
           url: url
           method: "GET"
           success: (data, textStatus, xhr) ->
