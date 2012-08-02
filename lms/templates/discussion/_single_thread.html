@@ -13,5 +13,8 @@
 <script type="text/javascript">
   var $$user_info = JSON.parse('${user_info | escape_quotes}');
   var $$course_id = "${course_id}";
-  var $$annotated_content_info = JSON.parse("${annotated_content_info | escape_quotes}");
+  if (typeof $$annotated_content_info === undefined || $$annotated_content_info === null) {
+    var $$annotated_content_info = {};
+  }
+  $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escape_quotes}"));
 </script>

@@ -11,7 +11,9 @@ from courseware.courses import check_course
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
 
-from django_comment_client.utils import get_categorized_discussion_info, extract, strip_none
+from django_comment_client.utils import get_categorized_discussion_info, \
+                                        extract, strip_none, \
+                                        JsonResponse
 from urllib import urlencode
 
 import json
@@ -125,24 +127,28 @@ def forum_form_discussion(request, course_id, discussion_id):
     }
     return render_to_response('discussion/index.html', context)
 
-def render_single_thread(request, course_id, thread_id):
-    def get_annotated_content_info(thread, user_id):
-        infos = {}
-        def _annotate(content):
-            infos[str(content['id'])] = {
-                'editable': str(content['user_id']) == str(user_id), # TODO may relax this to instructors
-            }
-            for child in content['children']:
-                _annotate(child)
-        _annotate(thread)
-        return infos
+def get_annotated_content_info(thread, user_id):
+    infos = {}
+    def _annotate(content):
+        infos[str(content['id'])] = {
+            'editable': str(content['user_id']) == str(user_id), # TODO may relax this to instructors
+        }
+        for child in content['children']:
+            _annotate(child)
+    _annotate(thread)
+    return infos
 
+def render_single_thread(request, course_id, thread_id):
+    
     thread = comment_client.get_thread(thread_id, recursive=True)
+
+    annotated_content_info = get_annotated_content_info(thread=thread, \
+                                user_id=request.user.id)
 
     context = {
         'thread': thread,
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
-        'annotated_content_info': json.dumps(get_annotated_content_info(thread=thread, user_id=request.user.id)),
+        'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
     }
@@ -150,17 +156,31 @@ def render_single_thread(request, course_id, thread_id):
 
 def single_thread(request, course_id, discussion_id, thread_id):
 
-    course = check_course(course_id)
+    if request.is_ajax():
+        
+        thread = comment_client.get_thread(thread_id, recursive=True)
+        annotated_content_info = get_annotated_content_info(thread=thread, \
+                                user_id=request.user.id)
+        context = {'thread': thread}
+        html = render_to_string('discussion/_ajax_single_thread.html', context)
 
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'init': '',
-        'content': render_single_thread(request, course_id, thread_id),
-        'accordion': render_accordion(request, course, discussion_id),
-        'course': course,
-    }
+        return JsonResponse({
+            'html': html,
+            'annotated_content_info': annotated_content_info,
+        })
 
-    return render_to_response('discussion/index.html', context)
+    else:
+        course = check_course(course_id)
+
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'init': '',
+            'content': render_single_thread(request, course_id, thread_id),
+            'accordion': render_accordion(request, course, discussion_id),
+            'course': course,
+        }
+
+        return render_to_response('discussion/index.html', context)
 
 def search(request, course_id):
 
