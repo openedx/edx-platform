@@ -26,7 +26,7 @@ from util.cache import cache_if_anonymous
     
 from django_openid_auth import auth as openid_auth
 from openid.consumer.consumer import (Consumer, SUCCESS, CANCEL, FAILURE)
-import django_openid_auth
+import django_openid_auth.views as openid_views
 
 import student.views as student_views
 
@@ -56,7 +56,7 @@ def edXauth_openid_login_complete(request,  redirect_field_name=REDIRECT_FIELD_N
                      getattr(settings, 'OPENID_RENDER_FAILURE', None) or \
                      default_render_failure
                                                    
-    openid_response = django_openid_auth.views.parse_openid_response(request)
+    openid_response = openid_views.parse_openid_response(request)
     if not openid_response:
         return render_failure(request, 'This is an OpenID relying party endpoint.')
 
