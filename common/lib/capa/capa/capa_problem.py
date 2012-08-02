@@ -288,20 +288,30 @@ class LoncapaProblem(object):
                 try:
                     ifp = self.system.filestore.open(file)  # open using ModuleSystem OSFS filestore
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (err, etree.tostring(inc, pretty_print=True)))
-                    log.error('Cannot find file %s in %s' % (file, self.system.filestore))
-                    if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
+                    log.error('Error %s in problem xml include: %s' % (
+                            err, etree.tostring(inc, pretty_print=True)))
+                    log.error('Cannot find file %s in %s' % (
+                            file, self.system.filestore))
+                    # if debugging, don't fail - just log error
+                    # TODO (vshnayder): need real error handling, display to users
+                    if not self.system.get('DEBUG'):
                         raise
-                    else: continue
+                    else:
+                        continue
                 try:
                     incxml = etree.XML(ifp.read())		# read in and convert to XML
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (err, etree.tostring(inc, pretty_print=True)))
+                    log.error('Error %s in problem xml include: %s' % (
+                            err, etree.tostring(inc, pretty_print=True)))
                     log.error('Cannot parse XML in %s' % (file))
-                    if not self.system.get('DEBUG'):		# if debugging, don't fail - just log error
+                    # if debugging, don't fail - just log error
+                    # TODO (vshnayder): same as above
+                    if not self.system.get('DEBUG'):
                         raise
-                    else: continue
-                parent = inc.getparent()			# insert  new XML into tree in place of inlcude
+                    else:
+                        continue
+                # insert new XML into tree in place of inlcude
+                parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
                 log.debug('Included %s into %s' % (file, self.problem_id))
