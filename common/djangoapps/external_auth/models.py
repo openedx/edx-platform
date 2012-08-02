@@ -13,7 +13,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class ExternalAuthMap(models.Model):
-    external_id = models.CharField(max_length=255, db_index=True, unique=True)
+    class Meta:
+        unique_together = (('external_id', 'external_domain'), )
+    external_id = models.CharField(max_length=255, db_index=True)
     external_domain = models.CharField(max_length=255, db_index=True)
     external_credentials = models.TextField(blank=True)  # JSON dictionary 
     external_email = models.CharField(max_length=255, db_index=True)
