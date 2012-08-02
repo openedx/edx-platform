@@ -84,7 +84,9 @@ def edXauth_external_login_or_signup(request, external_id, external_domain, cred
                                      retfun=None):
     # see if we have a map from this external_id to an edX username
     try:
-        eamap = ExternalAuthMap.objects.get(external_id=external_id)
+        eamap = ExternalAuthMap.objects.get(external_id = external_id,
+                                            external_domain = external_domain,
+                                            )
         log.debug('Found eamap=%s' % eamap)
     except ExternalAuthMap.DoesNotExist:
         # go render form for creating edX user
