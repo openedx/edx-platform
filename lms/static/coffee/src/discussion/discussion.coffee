@@ -3,107 +3,79 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+initializeVote = (index, content) ->
+    $content = $(content)
+    $local = Discussion.generateLocal($content.children(".discussion-content"))
+    id = $content.attr("_id")
+    if id in $$user_info.upvoted_ids
+      $local(".discussion-vote-up").addClass("voted")
+    else if id in $$user_info.downvoted_ids
+      $local(".discussion-vote-down").addClass("voted")
+
+subscriptionLink = (type, id) ->
+
+  followLink = ->
+    Discussion.generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
+
+  unfollowLink = ->
+    Discussion.generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
+
+  handleFollow = (elem) ->
+    Discussion.safeAjax
+      $elem: $(elem)
+      url: Discussion.urlFor("follow_#{type}", id)
+      type: "POST"
+      success: (response, textStatus) ->
+        if textStatus == "success"
+          $(elem).replaceWith unfollowLink()
+      dataType: 'json'
+
+  handleUnfollow = (elem) ->
+    Discussion.safeAjax
+      $elem: $(elem)
+      url: Discussion.urlFor("unfollow_#{type}", id)
+      type: "POST"
+      success: (response, textStatus) ->
+        if textStatus == "success"
+          $(elem).replaceWith followLink()
+      dataType: 'json'
+
+  if type == 'discussion' and id in $$user_info.subscribed_commentable_ids \
+    or type == 'thread' and id in $$user_info.subscribed_thread_ids
+      unfollowLink()
+  else
+    followLink()
+
+initializeFollowDiscussion = (discussion) ->
+  $discussion = $(discussion)
+  id = $following.attr("_id")
+  $local = Discussion.generateLocal()
+  $discussion.children(".discussion-non-content")
+             .find(".discussion-title-wrapper")
+             .append(subscriptionLink('discussion', id))
+
+initializeFollowThread = (index, thread) ->
+  $thread = $(thread)
+  id = $thread.attr("_id")
+  $thread.children(".discussion-content")
+         .find(".info")
+         .append(subscriptionLink('thread', id))
+
 @Discussion = $.extend @Discussion,
 
   initializeDiscussion: (discussion) ->
-
-    initializeVote = (index, content) ->
-      $content = $(content)
-      $local = Discussion.generateLocal($content.children(".discussion-content"))
-      id = $content.attr("_id")
-      if id in $$user_info.upvoted_ids
-        $local(".discussion-vote-up").addClass("voted")
-      else if id in $$user_info.downvoted_ids
-        $local(".discussion-vote-down").addClass("voted")
-
-    initializeWatchDiscussion = (discussion) ->
-      $discussion = $(discussion)
-      id = $discussion.attr("_id")
-      $local = Discussion.generateLocal($discussion.children(".discussion-non-content"))
-
-      handleWatchDiscussion = (elem) ->
-        url = Discussion.urlFor('watch_commentable', id)
-        $.post url, {}, (response, textStatus) ->
-          if textStatus == "success"
-            Discussion.handleAnchorAndReload(response)
-        , 'json'
-
-      handleUnwatchDiscussion = (elem) ->
-        url = Discussion.urlFor('unwatch_commentable', id)
-        $.post url, {}, (response, textStatus) ->
-          if textStatus == "success"
-            Discussion.handleAnchorAndReload(response)
-        , 'json'
-
-      if id in $$user_info.subscribed_commentable_ids
-        unwatchDiscussion = Discussion.generateDiscussionLink("discussion-unwatch-discussion", "Unwatch", handleUnwatchDiscussion)
-        $local(".discussion-title-wrapper").append(unwatchDiscussion)
-      else
-        watchDiscussion = Discussion.generateDiscussionLink("discussion-watch-discussion", "Watch", handleWatchDiscussion)
-        $local(".discussion-title-wrapper").append(watchDiscussion)
-
-    initializeWatchThreads = (index, thread) ->
-      $thread = $(thread)
-      id = $thread.attr("_id")
-      $local = Discussion.generateLocal($thread.children(".discussion-content"))
-
-      handleWatchThread = (elem) ->
-        $elem = $(elem)
-        url = Discussion.urlFor('watch_thread', id)
-        Discussion.safeAjax
-          $elem: $elem
-          url: url
-          type: "POST"
-          success: (response, textStatus) ->
-            if textStatus == "success"
-              $elem.removeClass("discussion-watch-thread")
-                   .addClass("discussion-unwatch-thread")
-                   .html("Unfollow")
-                   .unbind('click').click ->
-                     handleUnwatchThread(this)
-          dataType: 'json'
-
-      handleUnwatchThread = (elem) ->
-        $elem = $(elem)
-        url = Discussion.urlFor('unwatch_thread', id)
-        Discussion.safeAjax
-          $elem: $elem
-          url: url
-          type: "POST"
-          success: (response, textStatus) ->
-            if textStatus == "success"
-              $elem.removeClass("discussion-unwatch-thread")
-                   .addClass("discussion-watch-thread")
-                   .html("Follow")
-                   .unbind('click').click ->
-                     handleWatchThread(this)
-          dataType: 'json'
-
-      if id in $$user_info.subscribed_thread_ids
-        unwatchThread = Discussion.generateDiscussionLink("discussion-unwatch-thread", "Unfollow", handleUnwatchThread)
-        $local(".info").append(unwatchThread)
-      else
-        watchThread = Discussion.generateDiscussionLink("discussion-watch-thread", "Follow", handleWatchThread)
-        $local(".info").append(watchThread)
 
     $local = Discussion.generateLocal(discussion)
 
     if $$user_info?
       $local(".comment").each(initializeVote)
-      $local(".thread").each(initializeVote).each(initializeWatchThreads)
-      #initializeWatchDiscussion(discussion) TODO move this somewhere else
+      $local(".thread").each(initializeVote).each(initializeFollowThread)
+      #initializeFollowDiscussion(discussion) TODO move this somewhere else
 
-    $local(".new-post-tags").tagsInput
-      autocomplete_url: Discussion.urlFor('tags_autocomplete')
-      autocomplete:
-        remoteDataType: 'json'
-      interactive: true
-      defaultText: "Tag your post"
-      height: "30px"
-      width: "90%"
-      removeWithBackspace: true
+    $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
   bindDiscussionEvents: (discussion) ->
+
     $discussion = $(discussion)
     $discussionNonContent = $discussion.children(".discussion-non-content")
     $local = Discussion.generateLocal($discussionNonContent)#(selector) -> $discussionNonContent.find(selector)
@@ -141,32 +113,25 @@ Discussion = @Discussion
         newPostForm.show()
         $(elem).hide()
       else
-        view = {
-          discussion_id: id
-        }
+        view = { discussion_id: id }
         $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
         newPostBody = $(discussion).find(".new-post-body")
         if newPostBody.length
           Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
-        $local(".new-post-tags").tagsInput
-          autocomplete_url: Discussion.urlFor('tags_autocomplete')
-          autocomplete:
-            remoteDataType: 'json'
-          interactive: true
-          defaultText: "Tag your post: press enter after each tag"
-          height: "30px"
-          width: "100%"
-          removeWithBackspace: true
+
+        $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
+
         $local(".discussion-submit-post").click ->
           handleSubmitNewPost(this)
         $local(".discussion-cancel-post").click ->
           handleCancelNewPost(this)
+
         $(elem).hide()
 
     handleAjaxSearch = (elem) ->
+      handle
       $elem = $(elem)
-      $discussionModule = $elem.parents(".discussion-module")
-      $discussion = $discussionModule.find(".discussion")
+      $discussion = $elem.parents(".discussion")
       Discussion.safeAjax
         $elem: $elem
         url: $elem.attr("action")
@@ -174,10 +139,10 @@ Discussion = @Discussion
           text: $local(".search-input").val()
         type: "GET"
         success: (data, textStatus) ->
-          $discussion.replaceWith(data)
-          $discussion = $discussionModule.find(".discussion")
-          Discussion.initializeDiscussion($discussion)
-          Discussion.bindDiscussionEvents($discussion)
+          $data = $(data)
+          $discussion.replaceWith($data)
+          Discussion.initializeDiscussion($data)
+          Discussion.bindDiscussionEvents($data)
         dataType: 'html'
 
     handleAjaxSort = (elem) ->
@@ -195,25 +160,26 @@ Discussion = @Discussion
           Discussion.bindDiscussionEvents($discussion)
         dataType: 'html'
     
-    $local(".search-wrapper-forum > .discussion-search-form").submit (event) ->
-      event.preventDefault()
-      text = $local(".search-input").val()
-      isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
-      handleSearch(text, isSearchWithinBoard)
+    Discussion.bindLocalEvents $local,
 
-    $local(".discussion-new-post").click ->
-      handleNewPost(this)
+      "submit .search-wrapper-forum>.discussion-search-form": (event) ->
+        event.preventDefault()
+        text = $local(".search-input").val()
+        isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
+        handleSearch(text, isSearchWithinBoard)
 
-    $local(".discussion-search-link").click ->
-      handleAjaxSearch(this)
+      "submit .search-wrapper-inline>.discussion-search-form": (event) ->
+        event.preventDefault()
+        handleAjaxSearch(this)
 
-    $local(".search-wrapper-inline > .discussion-search-form").submit (e)->
-      e.preventDefault()
-      handleAjaxSearch(this)
+      "click .discussion-new-post": ->
+        handleNewPost(this)
 
-    $local(".discussion-inline-sort-link").click ->
-      handleAjaxSort(this)
+      "click .discussion-search-link": ->
+        handleAjaxSearch(this)
 
+      "click .discussion-inline-sort-link": ->
+        handleAjaxSort(this)
 
     $discussion.find(".thread").each (index, thread) ->
       Discussion.initializeContent(thread)

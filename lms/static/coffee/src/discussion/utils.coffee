@@ -9,23 +9,23 @@ Discussion = @Discussion
     (selector) -> $(elem).find(selector)
 
   generateDiscussionLink: (cls, txt, handler) ->
-    $("<a>").addClass("discussion-link").
-             attr("href", "javascript:void(0)").
-             addClass(cls).html(txt).
-             click(-> handler(this))
-
+    $("<a>").addClass("discussion-link")
+            .attr("href", "javascript:void(0)")
+            .addClass(cls).html(txt)
+            .click -> handler(this)
+    
   urlFor: (name, param, param1) ->
     {
-      watch_commentable      : "/courses/#{$$course_id}/discussion/#{param}/watch"
-      unwatch_commentable    : "/courses/#{$$course_id}/discussion/#{param}/unwatch"
+      follow_discussion      : "/courses/#{$$course_id}/discussion/#{param}/follow"
+      unfollow_discussion    : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
       create_thread          : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
       update_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
       create_comment         : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
       delete_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
       upvote_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
-      watch_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/watch"
-      unwatch_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unwatch"
+      follow_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
+      unfollow_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
       update_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
       endorse_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
       create_sub_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
@@ -50,3 +50,35 @@ Discussion = @Discussion
   handleAnchorAndReload: (response) ->
     #window.location = window.location.pathname + "#" + response['id']
     window.location.reload()
+
+  bindLocalEvents: ($local, eventsHandler) ->
+    for eventSelector, handler of eventsHandler
+      [event, selector] = eventSelector.split(' ')
+      $local(selector)[event] handler
+
+  tagsInputOptions: ->
+    autocomplete_url: Discussion.urlFor('tags_autocomplete')
+    autocomplete:
+      remoteDataType: 'json'
+    interactive: true
+    defaultText: "Tag your post: press enter after each tag"
+    height: "30px"
+    width: "100%"
+    removeWithBackspace: true
+
+  isSubscribed: (id, type) ->
+    if type == "thread"
+      id in $$user_info.subscribed_thread_ids
+    else if type == "commentable" or type == "discussion"
+      id in $$user_info.subscribed_commentable_ids
+    else
+      id in $$user_info.subscribed_user_ids
+
+  formErrorHandler: (errorsField, success) ->
+    (response, textStatus, xhr) ->
+      if response.errors? and response.errors.length > 0
+        errorsField.empty()
+        for error in response.errors
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+      else
+        success(response, textStatus, xhr)
