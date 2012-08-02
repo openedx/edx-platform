@@ -1,9 +1,11 @@
 class @CapaDescriptor
     constructor: (@element) ->
+        @problem_text = ""
         @edit_box = $(".edit-box.capa-box", @element)
         @source_box = $(".edit-box.source-box", @element)
         @message_box = $(".parser-message-box", @element)
         @buildParser()
+        @throttledAutoSave = _.throttle(@autoSave, 0);
         @source_box.keyup =>
             @parse()
 
@@ -20,6 +22,19 @@ class @CapaDescriptor
             "Line " + e.line + ", column " + e.column + ": " + e.message
         else e.message
 
+    checkAutoSaveTimeout: ->
+        @auto_save_timer = null
+        @throttledAutoSave()
+
+    checkAutoSave: ->
+        callback = _.bind(@checkAutoSaveTimeout, this)
+        if @auto_save_timer
+            @auto_save_timer = window.clearTimeout(@auto_save_timer)
+        @auto_save_timer = window.setTimeout(callback, 1000)
+
+    autoSave: (event) ->
+        $(".save-update").click();
+
     parse: ->
         try
             source = @source_box.val() + "\n"
@@ -34,25 +49,27 @@ class @CapaDescriptor
 
     outputXML: (parsed) ->
         @edit_box.val @buildXML(parsed)
+        @checkAutoSave()
 
     dom2capa: (node) ->
-        capa = new XMLSerializer().serializeToString(node)
-        capa = capa + ""
-        return capa.replace(/<startouttext>/g, '<startouttext />')
-                   .replace(/<\/startouttext>/g, '<endouttext />')
+        serializer = new XMLSerializer()
+        capa = serializer.serializeToString(node)
 
     buildXML: (parsed) ->
         dom_parser = new DOMParser()
-        doc = dom_parser.parseFromString("<problem></problem>", "text/xml");
-        problem = $(doc.getElementsByTagName('problem')[0])
+        doc = dom_parser.parseFromString("<problem />", "text/xml");
+        problem = $(doc).find('problem')
 
         create_text_element = (content) ->
-            el = $(doc.createElement('startouttext'))
-            el.text content
+            el = $(doc.createElement('text'))
+            for line in content.split('\n')
+                el.append doc.createTextNode(line)
+                el.append doc.createElement('br')
+            el.children().last().remove()
             return el
 
         for section in parsed
-            if section.type == 'paragraph'
+            if section.type == 'text'
                 newel = create_text_element(section.text)
                 problem.append(newel)
 
@@ -103,6 +120,8 @@ class @CapaDescriptor
 
                 tolerance = $(doc.createElement('responseparam'))
                 tolerance.attr 'type', 'tolerance'
+                if section.tolerance == undefined
+                    section.tolerance = "5%"
                 tolerance.attr 'default', section.tolerance
                 tolerance.attr 'name', 'tol'
                 tolerance.attr 'description', 'Numerical Tolerance'
@@ -117,6 +136,27 @@ class @CapaDescriptor
                 newel.append doc.createElement('textline') 
                 problem.append(newel)
 
+            else if section.type == 'formula'
+                formularesponse = $(doc.createElement("formularesponse"))
+                formularesponse.attr 'samples', section.samples
+                formularesponse.attr 'answer', section.answer
+                formularesponse.attr 'type', 'cs'
+
+                tolerance = $(doc.createElement('responseparam'))
+                tolerance.attr 'type', 'tolerance'
+                if section.tolerance == undefined
+                    section.tolerance = "5%"
+                tolerance.attr 'default', section.tolerance
+                tolerance.attr 'name', 'tol'
+                tolerance.attr 'description', 'Numerical Tolerance'
+
+                formularesponse.append tolerance
+                formularesponse.append doc.createElement('textline')
+                problem.append(formularesponse)
+
+            else
+                throw new SyntaxError("unexpected section type " + section.type) 
+
+
         capa = @dom2capa(doc)
-        console.log capa
         return capa
