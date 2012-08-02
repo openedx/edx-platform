@@ -80,7 +80,8 @@ def edXauth_openid_login_complete(request,  redirect_field_name=REDIRECT_FIELD_N
 #-----------------------------------------------------------------------------
 # generic external auth login or signup
 
-def edXauth_external_login_or_signup(request, external_id, external_domain, credentials, email, fullname):
+def edXauth_external_login_or_signup(request, external_id, external_domain, credentials, email, fullname,
+                                     retfun=None):
     # see if we have a map from this external_id to an edX username
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id)
@@ -118,7 +119,10 @@ def edXauth_external_login_or_signup(request, external_id, external_domain, cred
     request.session.set_expiry(0)
     student_views.try_change_enrollment(request)
     log.info("Login success - {0} ({1})".format(user.username, user.email))
-    return redirect('/')
+    if retfun is None:
+        return redirect('/')
+    return retfun()
+        
     
 #-----------------------------------------------------------------------------
 # generic external auth signup
@@ -209,4 +213,5 @@ def edXauth_ssl_login(request):
                                             external_domain="ssl:MIT", 
                                             credentials=cert, 
                                             email=email,
-                                            fullname=fullname)
+                                            fullname=fullname,
+                                            retfun = student_views.main_index)
