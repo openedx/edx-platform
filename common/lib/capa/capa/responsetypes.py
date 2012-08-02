@@ -24,6 +24,7 @@ import abc
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from correctmap import CorrectMap
+from courseware import xqueue_interface
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
@@ -798,10 +799,10 @@ class SymbolicResponse(CustomResponse):
 
 class CodeResponse(LoncapaResponse):
     '''
-    Grade student code using an external server, called 'xqueue'
-    In contrast to ExternalResponse, CodeResponse has following behavior:
-        1) Goes through a queueing system
-        2) Does not do external request for 'get_answers'
+    Grade student code using an external queueing server, called 'xqueue'
+
+    External requests are only submitted for student submission grading 
+        (i.e. and not for getting reference answers)
     '''
 
     response_tag = 'coderesponse'
@@ -857,9 +858,33 @@ class CodeResponse(LoncapaResponse):
         self.context.update({'submission': submission})
         extra_payload = {'edX_student_response': submission}
 
-        r, queuekey = self._send_to_queue(extra_payload)  # TODO: Perform checks on the xqueue response
+        # Prepare xqueue request
+        #------------------------------------------------------------ 
 
-        # Non-null CorrectMap['queuekey'] indicates that the problem has been submitted
+        # Queuekey generation
+        h = hashlib.md5()
+        h.update(str(self.system.seed))
+        h.update(str(time.time()))
+        queuekey = h.hexdigest()
+
+        # Generate header
+        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue_callback_url,
+                                                lms_key=queuekey,
+                                                queue_name=self.queue_name)
+
+        # Generate body
+        #   NOTE: Currently specialized to 6.00x's pyxservers, which follows the ExternalResponse interface
+        contents = {'xml': etree.tostring(self.xml, pretty_print=True),
+                    'edX_cmd': 'get_score',
+                    'edX_tests': self.tests,
+                    'processor': self.code,
+                    'edX_student_response': submission}
+        
+        # Submit request
+        xqueue_interface.send_to_queue(header=xheader,
+                                       body=json.dumps(contents))
+
+        # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
         cmap = CorrectMap()
         cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to queue')
 
@@ -883,7 +908,7 @@ class CodeResponse(LoncapaResponse):
             self.context['correct'][0] = admap[ad]
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
-        #   If queuekey does not match, we keep waiting for the score_msg that will match
+        #   If queuekey does not match, we keep waiting for the score_msg whose key actually matchs
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
             msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
             oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
@@ -892,8 +917,6 @@ class CodeResponse(LoncapaResponse):
 
         return oldcmap
 
-    # CodeResponse differentiates from ExternalResponse in the behavior of 'get_answers'. CodeResponse.get_answers
-    #   does NOT require a queue submission, and the answer is computed (extracted from problem XML) locally.
     def get_answers(self):
         anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
         return {self.answer_id: anshtml}
@@ -901,41 +924,6 @@ class CodeResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
-    # CodeResponse._send_to_queue implements the same interface as defined for ExternalResponse's 'get_score'
-    def _send_to_queue(self, extra_payload):
-        # Prepare payload
-        xmlstr = etree.tostring(self.xml, pretty_print=True)
-        header = {'lms_callback_url': self.system.xqueue_callback_url,
-                  'queue_name': self.queue_name,
-                 }
-
-        # Queuekey generation
-        h = hashlib.md5()
-        h.update(str(self.system.seed))
-        h.update(str(time.time()))
-        queuekey = h.hexdigest()
-        header.update({'lms_key': queuekey})
-
-        body = {'xml': xmlstr,
-                'edX_cmd': 'get_score',
-                'edX_tests': self.tests,
-                'processor': self.code,
-                }
-        body.update(extra_payload)
-
-        payload = {'xqueue_header': json.dumps(header),
-                   'xqueue_body'  : json.dumps(body),
-                  }
-
-        # Contact queue server
-        try:
-            r = requests.post(self.url, data=payload)
-        except Exception as err:
-            msg = "Error in CodeResponse %s: cannot connect to queue server url=%s" % (err, self.url)
-            log.error(msg)
-            raise Exception(msg)
-
-        return r, queuekey
 
 #-----------------------------------------------------------------------------
 
