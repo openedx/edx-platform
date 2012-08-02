@@ -1,8 +1,7 @@
-# from pprint import pprint
-
 import json
 import logging
 import random
+import re
 import string
 
 from external_auth.models import ExternalAuthMap
@@ -25,7 +24,6 @@ except ImportError:
 from django_future.csrf import ensure_csrf_cookie
 from util.cache import cache_if_anonymous
     
-#from django_openid_auth import views as openid_views
 from django_openid_auth import auth as openid_auth
 from openid.consumer.consumer import (Consumer, SUCCESS, CANCEL, FAILURE)
 import django_openid_auth
@@ -42,6 +40,12 @@ def default_render_failure(request, message, status=403, template_name='extauth_
     print "in openid_failure: "
     data = render_to_string( template_name, dict(message=message, exception=exception))
     return HttpResponse(data, status=status)
+
+#-----------------------------------------------------------------------------
+# Openid
+
+def GenPasswd(length=12, chars=string.letters + string.digits):
+    return ''.join([random.choice(chars) for i in range(length)])
 
 @csrf_exempt
 def edXauth_openid_login_complete(request,  redirect_field_name=REDIRECT_FIELD_NAME, render_failure=None):
@@ -63,50 +67,62 @@ def edXauth_openid_login_complete(request,  redirect_field_name=REDIRECT_FIELD_N
 
         log.debug('openid success, details=%s' % details)
 
-        # see if we have a map from this external_id to an edX username
-        try:
-            eamap = ExternalAuthMap.objects.get(external_id=external_id)
-            log.debug('Found eamap=%s' % eamap)
-        except ExternalAuthMap.DoesNotExist:
-            # go render form for creating edX user
-            eamap = ExternalAuthMap(external_id = external_id,
-                                    external_domain = "openid:%s" % settings.OPENID_SSO_SERVER_URL,
-                                    external_credentials = json.dumps(details),
-                                    )
-            eamap.external_email = details.get('email','')
-            eamap.external_name = '%s %s' % (details.get('first_name',''),details.get('last_name',''))
-
-            def GenPasswd(length=12, chars=string.letters + string.digits):
-                return ''.join([random.choice(chars) for i in range(length)])
-            eamap.internal_password = GenPasswd()
-            log.debug('created eamap=%s' % eamap)
-
-            eamap.save()
-
-        internal_user = eamap.user
-        if internal_user is None:
-            log.debug('ExtAuth: no user for %s yet, doing signup' % eamap.external_email)
-            return edXauth_signup(request, eamap)
-        
-        uname = internal_user.username
-        user = authenticate(username=uname, password=eamap.internal_password)
-        if user is None:
-            log.warning("External Auth Login failed for %s / %s" % (uname,eamap.internal_password))
-            return edXauth_signup(request, eamap)
-
-        if not user.is_active:
-            log.warning("External Auth: user %s is not active" % (uname))
-            # TODO: improve error page
-            return render_failure(request, 'Account not yet activated: please look for link in your email')
-         
-        login(request, user)
-        request.session.set_expiry(0)
-        student_views.try_change_enrollment(request)
-        log.info("Login success - {0} ({1})".format(user.username, user.email))
-        return redirect('/')
-
+        return edXauth_external_login_or_signup(request,
+                                                external_id, 
+                                                "openid:%s" % settings.OPENID_SSO_SERVER_URL,
+                                                details,
+                                                details.get('email',''),
+                                                '%s %s' % (details.get('first_name',''),details.get('last_name',''))
+                                                )
+                                 
     return render_failure(request, 'Openid failure')
+
+#-----------------------------------------------------------------------------
+# generic external auth login or signup
+
+def edXauth_external_login_or_signup(request, external_id, external_domain, credentials, email, fullname):
+    # see if we have a map from this external_id to an edX username
+    try:
+        eamap = ExternalAuthMap.objects.get(external_id=external_id)
+        log.debug('Found eamap=%s' % eamap)
+    except ExternalAuthMap.DoesNotExist:
+        # go render form for creating edX user
+        eamap = ExternalAuthMap(external_id = external_id,
+                                external_domain = external_domain,
+                                external_credentials = json.dumps(credentials),
+                                )
+        eamap.external_email = email
+        eamap.external_name = fullname
+        eamap.internal_password = GenPasswd()
+        log.debug('created eamap=%s' % eamap)
+
+        eamap.save()
+
+    internal_user = eamap.user
+    if internal_user is None:
+        log.debug('ExtAuth: no user for %s yet, doing signup' % eamap.external_email)
+        return edXauth_signup(request, eamap)
     
+    uname = internal_user.username
+    user = authenticate(username=uname, password=eamap.internal_password)
+    if user is None:
+        log.warning("External Auth Login failed for %s / %s" % (uname,eamap.internal_password))
+        return edXauth_signup(request, eamap)
+
+    if not user.is_active:
+        log.warning("External Auth: user %s is not active" % (uname))
+        # TODO: improve error page
+        return render_failure(request, 'Account not yet activated: please look for link in your email')
+     
+    login(request, user)
+    request.session.set_expiry(0)
+    student_views.try_change_enrollment(request)
+    log.info("Login success - {0} ({1})".format(user.username, user.email))
+    return redirect('/')
+    
+#-----------------------------------------------------------------------------
+# generic external auth signup
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def edXauth_signup(request, eamap=None):
@@ -135,3 +151,59 @@ def edXauth_signup(request, eamap=None):
     log.debug('ExtAuth: doing signup for %s' % eamap.external_email)
 
     return student_views.main_index(extra_context=context)
+
+#-----------------------------------------------------------------------------
+# MIT SSL
+
+def ssl_dn_extract_info(dn):
+    '''
+    Extract username, email address (may be anyuser@anydomain.com) and full name
+    from the SSL DN string.  Return (user,email,fullname) if successful, and None
+    otherwise.
+    '''
+    ss = re.search('/emailAddress=(.*)@([^/]+)', dn)
+    if ss:
+        user = ss.group(1)
+        email = "%s@%s" % (user, ss.group(2))
+    else:
+        return None
+    ss = re.search('/CN=([^/]+)/', dn)
+    if ss:
+        fullname = ss.group(1)
+    else:
+        return None
+    return (user, email, fullname)
+
+@csrf_exempt
+def edXauth_ssl_login(request):
+    """
+    This is called by student.views.index when MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+
+    Used for MIT user authentication.  This presumes the web server (nginx) has been configured 
+    to require specific client certificates.
+
+    If the incoming protocol is HTTPS (SSL) then authenticate via client certificate.  
+    The certificate provides user email and fullname; this populates the ExternalAuthMap.
+    The user is nevertheless still asked to complete the edX signup.  
+
+    Else continues on with student.views.main_index, and no authentication.
+    """
+    certkey = "SSL_CLIENT_S_DN"	 # specify the request.META field to use
+    
+    cert = request.META.get(certkey,'')
+    if not cert:
+        cert = request.META.get('HTTP_'+certkey,'')
+    if not cert:
+        cert = request._req.subprocess_env.get(certkey,'')	 # try the direct apache2 SSL key
+    if not cert:
+        # no certificate information - go onward to main index
+        return student_views.main_index()
+
+    (user, email, fullname) = ssl_dn_extract_info(cert)
+    
+    return edXauth_external_login_or_signup(request, 
+                                            external_id=email, 
+                                            external_domain="ssl:MIT", 
+                                            credentials=cert, 
+                                            email=email,
+                                            fullname=fullname)
