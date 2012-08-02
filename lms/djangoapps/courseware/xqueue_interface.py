@@ -35,6 +35,7 @@ def send_to_queue(header, body, xqueue_url=None):
     body: Serialized data for the receipient behind the queueing service. The operation of
             xqueue is agnostic to the contents of 'body'
 
+    Returns a 'success' flag indicating successful submission
     '''
     if xqueue_url is None:
         xqueue_url = XQUEUE_SUBMIT_URL
@@ -48,4 +49,7 @@ def send_to_queue(header, body, xqueue_url=None):
         msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
         raise Exception(msg)
 
-    #print r.text
+    # Xqueue responses are JSON-serialized dicts
+    xreply = json.loads(r.text)
+
+    return xreply['return_code'] == 0 # return_code == 0 from xqueue indicates successful submission

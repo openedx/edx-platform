@@ -881,12 +881,15 @@ class CodeResponse(LoncapaResponse):
                     'edX_student_response': submission}
         
         # Submit request
-        xqueue_interface.send_to_queue(header=xheader,
-                                       body=json.dumps(contents))
+        success = xqueue_interface.send_to_queue(header=xheader,
+                                                 body=json.dumps(contents))
 
-        # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
-        cmap = CorrectMap()
-        cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to queue')
+        cmap = CorrectMap() 
+        if success:
+            # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
+            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader')
+        else:
+            cmap.set(self.answer_id, msg='Unable to deliver submission to grader! Please try again later')
 
         return cmap
 
@@ -908,7 +911,7 @@ class CodeResponse(LoncapaResponse):
             self.context['correct'][0] = admap[ad]
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
-        #   If queuekey does not match, we keep waiting for the score_msg whose key actually matchs
+        #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
             msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
             oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
