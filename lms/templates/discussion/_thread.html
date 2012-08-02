@@ -70,7 +70,7 @@
 <%def name="render_bottom_bar(content, type, **kwargs)">
   <div class="info">
     ${render_info(content)}
-    ${render_link("discussion-link discussion-reply", "Reply")}
+    ${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}
     % if type == "thread" and kwargs['edit_thread'] or type == "comment":
       ${render_link("discussion-link discussion-edit", "Edit")}
     % endif
@@ -93,7 +93,7 @@
     user No.${content['user_id']}
   % endif
   % if content.get('comments_count', -1) >= 0:
-    , ${content['comments_count']} comment(s)
+  , <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
   % endif
 </%def>
 

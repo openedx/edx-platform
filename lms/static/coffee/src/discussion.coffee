@@ -16,7 +16,6 @@ $ ->
     Discussion.initializeDiscussion(discussion)
     Discussion.bindDiscussionEvents(discussion)
 
-
 generateLocal = (elem) ->
   (selector) -> $(elem).find(selector)
 
@@ -106,6 +105,14 @@ Discussion =
       retrieve_single_thread : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
     }[name]
 
+  safeAjax: (params) ->
+    $elem = params.$elem
+    if $elem.attr("disabled")
+      return
+    $elem.attr("disabled", "disabled")
+    $.ajax(params).always ->
+      $elem.removeAttr("disabled")
+
   handleAnchorAndReload: (response) ->
     #window.location = window.location.pathname + "#" + response['id']
     window.location.reload()
@@ -115,13 +122,11 @@ Discussion =
     $local = generateLocal($discussionModule)
     handleShowDiscussion = (elem) ->
       $elem = $(elem)
-      if $elem.attr("disabled")
-        return
       if not $local("section.discussion").length
-        $elem.attr("disabled", "disabled")
         discussion_id = $elem.attr("discussion_id")
         url = Discussion.urlFor 'retrieve_discussion', discussion_id
-        $.ajax(
+        Discussion.safeAjax
+          $elem: $elem
           url: url
           method: "GET"
           success: (data, textStatus, xhr) ->
@@ -133,14 +138,12 @@ Discussion =
             $elem.unbind('click').click ->
               handleHideDiscussion(this)
           dataType: 'html'
-        ).always ->
-          $elem.removeAttr("disabled")
-
       else
         $local("section.discussion").show()
         $elem.html("Hide Discussion")
         $elem.unbind('click').click ->
           handleHideDiscussion(this)
+
     handleHideDiscussion = (elem) ->
       $local("section.discussion").hide()
       $elem = $(elem)
@@ -219,7 +222,7 @@ Discussion =
     if $$user_info?
       $local(".comment").each(initializeVote)
       $local(".thread").each(initializeVote).each(initializeWatchThreads)
-      initializeWatchDiscussion(discussion)
+      #initializeWatchDiscussion(discussion) TODO move this somewhere else
 
     $local(".new-post-tags").tagsInput
       autocomplete_url: Discussion.urlFor('tags_autocomplete')
@@ -260,8 +263,8 @@ Discussion =
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
-        $local(".discussion-submit-reply").click handleSubmitReply
-        $local(".discussion-cancel-reply").click handleCancelReply
+        $local(".discussion-submit-post").click handleSubmitReply
+        $local(".discussion-cancel-post").click handleCancelReply
       $local(".discussion-link").hide()
       $discussionContent.attr("status", "reply")
 
@@ -383,49 +386,54 @@ Discussion =
       , 'json'
 
     handleHideSingleThread = (elem) ->
-      $elem = $(elem)
+      $threadTitle = $local(".thread-title")
+      $showComments = $local(".discussion-show-comments")
       $content.children(".comments").hide()
-      $elem.unbind('click').click ->
-        handleShowSingleThread(this)
+      $threadTitle.unbind('click').click handleShowSingleThread
+      $showComments.unbind('click').click handleShowSingleThread
+      prevHtml = $showComments.html()
+      $showComments.html prevHtml.replace "Hide", "Show"
 
-    handleShowSingleThread = (elem) ->
-      $elem = $(elem)
-      if $elem.attr("disabled")
-        return
+    handleShowSingleThread = ->
+      $threadTitle = $local(".thread-title")
+      $showComments = $local(".discussion-show-comments")
+
+      rebindHideEvents = ->
+        $threadTitle.unbind('click').click handleHideSingleThread
+        $showComments.unbind('click').click handleHideSingleThread
+        prevHtml = $showComments.html()
+        $showComments.html prevHtml.replace "Show", "Hide"
+
       if $content.children(".comments").length
         $content.children(".comments").show()
-        $elem.unbind('click').click ->
-          handleHideSingleThread(this)
+        rebindHideEvents()
       else
-        $elem.attr("disabled", "disabled")
-        discussion_id = $elem.parents(".discussion").attr("_id")
+        discussion_id = $threadTitle.parents(".discussion").attr("_id")
         url = Discussion.urlFor('retrieve_single_thread', discussion_id, id)
-        console.log url
-        $.ajax(
+        Discussion.safeAjax
+          $elem: $.merge($threadTitle, $showComments)
           url: url
           method: "GET"
           success: (response, textStatus) ->
             if not $$annotated_content_info?
               window.$$annotated_content_info = {}
-            console.log response
             window.$$annotated_content_info = $.extend $$annotated_content_info, response['annotated_content_info']
-            console.log $$annotated_content_info
             $content.append(response['html'])
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
               Discussion.bindContentEvents(comment)
-            $elem.unbind('click').click ->
-              handleHideSingleThread(this)
+            rebindHideEvents()
           dataType: 'json'
-        ).always ->
-          $elem.removeAttr("disabled")
       
       
-    $local(".thread-title").click ->
-      handleShowSingleThread(this)
+    $local(".thread-title").click handleShowSingleThread
+    $local(".discussion-show-comments").click handleShowSingleThread
 
-    $local(".discussion-reply").click ->
+    $local(".discussion-reply-thread").click ->
       handleShowSingleThread($local(".thread-title"))
+      handleReply(this)
+
+    $local(".discussion-reply-comment").click ->
       handleReply(this)
 
     $local(".discussion-cancel-reply").click ->
@@ -518,6 +526,22 @@ Discussion =
         $local(".discussion-cancel-post").click ->
           handleCancelNewPost(this)
         $(elem).hide()
+
+
+    handleSort = (elem) ->
+      $elem = $(elem)
+      $discussionModule = $elem.parents(".discussion-module")
+      $discussion = $discussionModule.find(".discussion")
+      Discussion.safeAjax
+        $elem: $elem
+        url: $elem.attr("sort-url")
+        method: "GET"
+        success: (data, textStatus) ->
+          $discussion.replaceWith(data)
+          $discussion = $discussionModule.find(".discussion")
+          Discussion.initializeDiscussion($discussion)
+          Discussion.bindDiscussionEvents($discussion)
+        dataType: 'html'
     
     $local(".discussion-search-form").submit (event) ->
       event.preventDefault()
@@ -530,6 +554,9 @@ Discussion =
 
     $local(".discussion-search").click ->
       $local(".new-post-form").submit()
+
+    $discussion.children(".discussion-sort").find(".discussion-inline-sort-link").click ->
+      handleSort(this)
 
     $discussion.find(".thread").each (index, thread) ->
       Discussion.initializeContent(thread)
