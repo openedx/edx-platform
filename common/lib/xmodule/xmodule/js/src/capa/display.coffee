@@ -45,6 +45,11 @@ class @Problem
       $('head')[0].appendChild(s[0])
       $(placeholder).remove()
 
+  ###
+  'check_fd' uses FormData to allow file submissions through an AJAX call.
+  NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
+        can consolidate all dispatches to use FormData consistently
+  ###
   check_fd: =>
     Logger.log 'problem_check', @answers
 
