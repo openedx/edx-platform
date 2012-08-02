@@ -311,6 +311,7 @@ INSTALLED_APPS = (
     'contentstore',
     'github_sync',
     'student',  # misleading name due to sharing with lms
+    'capaconverter',
 
     # For asset pipelining
     'pipeline',

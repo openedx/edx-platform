@@ -1,0 +1,58 @@
+scripts:
+- type: 'script'
+  language: 'python'
+  code: 'print "Hello world!"'
+contents:
+- type: 'text'
+  text: 'This is a sample paragraph. The linebreaks here matter.\n\n'
+- type: 'multiple_choice'
+  randomize: true
+  choices:
+  - type: 'choice'
+    text: 'Choice A'
+    correct: true
+  - type: 'choice'
+    text: 'Choice B'
+    correct: false
+  - type: 'choice'
+    text: 'Choice C'
+    correct: true
+- type: 'true_false'
+  statements:
+  - type: 'statement'
+    text: 'Sun revolves around Earth. '
+    correct: false
+  - type: 'statement'
+    text: 'This is a true statement. '
+    correct: true
+- type: 'string'
+  answer: 'banana'
+- type: 'numerical'
+  tolerance: '5%'
+  answer: 6
+- type: 'formula'
+  answer: '-A*(RF/RS)'
+  samples: 10
+  tolerance: '5%'
+  variables:
+  - type: 'variable'
+    symbol: 'A'
+    range: '1-3'
+  - type: 'variable'
+    symbol: 'RF'
+    range: '1-3'
+  - type: 'variable'
+    symbol: 'RS'
+    range: '1-3'
+  - type: 'variable'
+    symbol: 'L'
+    range: '1-3'
+  - type: 'variable'
+    symbol: 'T'
+    range: '1-3'
+- type: 'custom'
+  script:
+  - type: 'script'
+    language: 'python'
+    code: 'correct = true'
+
