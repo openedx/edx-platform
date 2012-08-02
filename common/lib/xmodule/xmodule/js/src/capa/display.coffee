@@ -46,9 +46,11 @@ class @Problem
       $(placeholder).remove()
 
   ###
-  'check_fd' uses FormData to allow file submissions through an AJAX call.
-  NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
-        can consolidate all dispatches to use FormData consistently
+  # 'check_fd' uses FormData to allow file submissions, in addition to simple, 
+  #      querystring-based answers, in the 'problem_check' dispatch.
+  #
+  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
+  #       perhaps preferrable to consolidate all dispatches to use FormData consistently
   ###
   check_fd: =>
     Logger.log 'problem_check', @answers
@@ -66,20 +68,21 @@ class @Problem
 
     # Simple (non-file) answers,
     #   routed to Django 'request.POST'
-    fd.append('answers', @answers)
+    fd.append('_answers_querystring', @answers)
 
     settings = 
       type: "POST"
       data: fd
       processData: false
       contentType: false
-      success: (response) -> 
+      success: (response) => 
         switch response.success
           when 'incorrect', 'correct'
             @render(response.contents)
             @updateProgress response
           else
             alert(response.success)
+
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
