@@ -270,6 +270,16 @@ def modx_dispatch(request, dispatch=None, id=None):
       - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
+    
+    print '  THK: module_render.modx_dispatch'
+    print dispatch
+    print request.POST.keys()
+    print request.FILES.keys()
+    if request.POST.has_key('answers'):
+        print request.POST['answers']
+    for filename in request.FILES.keys():
+        uploadedFile = request.FILES.get(filename)
+        print uploadedFile.read()
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)

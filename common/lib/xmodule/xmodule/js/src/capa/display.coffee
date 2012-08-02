@@ -13,7 +13,7 @@ class @Problem
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
     window.update_schematics()
     @$('section.action input:button').click @refreshAnswers
-    @$('section.action input.check').click @check
+    @$('section.action input.check').click @check_fd
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
@@ -44,6 +44,38 @@ class @Problem
       # properly.
       $('head')[0].appendChild(s[0])
       $(placeholder).remove()
+
+  check_fd: =>
+    Logger.log 'problem_check', @answers
+
+    if not window.FormData
+      alert "Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support this feature."
+      return
+
+    fd = new FormData()
+
+    # For each file input, allow a single file submission,
+    #   routed to Django 'request.FILES'
+    @$('input:file').each (index, element) ->
+      fd.append(element.id, element.files[0])
+
+    # Simple (non-file) answers,
+    #   routed to Django 'request.POST'
+    fd.append('answers', @answers)
+
+    settings = 
+      type: "POST"
+      data: fd
+      processData: false
+      contentType: false
+      success: (response) -> 
+        switch response.success
+          when 'incorrect', 'correct'
+            @render(response.contents)
+            @updateProgress response
+          else
+            alert(response.success)
+    $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     Logger.log 'problem_check', @answers

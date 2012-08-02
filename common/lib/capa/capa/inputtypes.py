@@ -300,6 +300,19 @@ def textline_dynamath(element, value, status, render_template, msg=''):
 
 
 #-----------------------------------------------------------------------------
+@register_render_function
+def filesubmission(element, value, status, render_template, msg=''):
+    '''
+    Upload a single file (e.g. for programming assignments)
+    '''
+    eid = element.get('id')
+
+    context = {'id': eid, }
+    html = render_template("filesubmission.html", context)
+    return etree.XML(html) 
+
+
+#-----------------------------------------------------------------------------
 ## TODO: Make a wrapper for <codeinput>
 @register_render_function
 def textbox(element, value, status, render_template, msg=''):
