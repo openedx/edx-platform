@@ -176,7 +176,7 @@ def load_preview_state(request, preview_id, location):
 
 def save_preview_state(request, preview_id, location, instance_state, shared_state):
     """
-    Load the state of a preview module to the request
+    Save the state of a preview module to the request
 
     preview_id (str): An identifier specifying which preview this module is used for
     location: The Location of the module to dispatch to
