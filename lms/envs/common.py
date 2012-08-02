@@ -105,6 +105,7 @@ LIB_URL = '/static/js/'
 # BOOK_URL = '/static/book/'
 BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/' # For AWS deploys
 # RSS_URL = r'lms/templates/feed.rss'
+# PRESS_URL = r''
 RSS_TIMEOUT = 600
 
 # Configuration option for when we want to grab server error pages

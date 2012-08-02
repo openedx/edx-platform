@@ -13,6 +13,7 @@ if settings.DEBUG:
 urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
     
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
@@ -58,8 +59,7 @@ urlpatterns = ('',
         {'template': 'jobs.html'}, name="jobs"),
     url(r'^contact$', 'static_template_view.views.render', 
         {'template': 'contact.html'}, name="contact"),
-    url(r'^press$', 'static_template_view.views.render', 
-        {'template': 'press.html'}, name="press"),
+    url(r'^press$', 'student.views.press', name="press"),
     url(r'^faq$', 'static_template_view.views.render', 
         {'template': 'faq.html'}, name="faq_edx"),
     url(r'^help$', 'static_template_view.views.render', 
