@@ -210,7 +210,7 @@ class CapaXMLConverter(object):
                     continue
                 if img_el != None:
                     img = self.build_from_element(img_el)
-                    img['title'] = el
+                    img['title'] = el.replace('\n', '')
                     ret.append(img)
                     img_el = None
                 else:
@@ -254,13 +254,13 @@ class CapaXMLConverter(object):
                         # e.g. [x] = ['See the diagram below. \n', <center><img src="" /></center>, 'What's .. ?']
                         for x in self.split_element_on_tag(element, 'center'):
                             if isinstance(x, basestring):
-                                out["contents"].append({'type': 'text', 'text': x})
+                                out["contents"].append({'type': 'text', 'text': x.replace('\n', '')})
                             else:
                                 # self.picky_center_element_format returns a list of {'type': 'image', ...} if 
                                 # 
                                 ret = self.picky_center_element_format(x)
                                 if ret is None:
-                                    out["contents"].append({'type': 'text', 'text': etree.tostring(x)})
+                                    out["contents"].append({'type': 'text', 'text': etree.tostring(x).replace('\n', '')})
                                 else:
                                     for el in ret:
                                         out["contents"].append(el)
