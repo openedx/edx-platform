@@ -3,7 +3,7 @@ $discussion_title_size: 1.6em;
 $comment_title_size: 1.0em;
 $comment_body_size: 0.9em;
 $comment_info_size: 0.75em;
-$discussion_input_width: 90%;
+$discussion_input_width: 100%;
 
 @mixin discussion-font {
   font-family: inherit;
@@ -190,7 +190,7 @@ $discussion_input_width: 90%;
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     .new-post-control, .edit-post-control {
-      margin-left: 70.5%;
+      margin-left: 80%;
       margin-top: 1%;
     }
     .control-button {
@@ -199,13 +199,13 @@ $discussion_input_width: 90%;
       color: white;
       font-weight: bold;
       text-decoration: none;
-      margin-left: 5%;
+      margin-left: 10%;
       display: inline-block;
       padding-top: 9px;
       font-size: inherit;
       width: inherit;
     }
-    margin: 10px 0 10px 0;
+    margin: 10px 0 40px 0;
   }
   .thread {
     //display: none;

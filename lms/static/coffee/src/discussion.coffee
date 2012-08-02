@@ -327,7 +327,7 @@ Discussion =
           interactive: true
           defaultText: "Tag your post: press enter after each tag"
           height: "30px"
-          width: "90%"
+          width: "100%"
           removeWithBackspace: true
         $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
         $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
@@ -469,7 +469,7 @@ Discussion =
           interactive: true
           defaultText: "Tag your post: press enter after each tag"
           height: "30px"
-          width: "90%"
+          width: "100%"
           removeWithBackspace: true
         $local(".discussion-submit-post").click ->
           handleSubmitNewPost(this)
