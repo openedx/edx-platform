@@ -35,16 +35,16 @@ log = logging.getLogger("mitx.external_auth")
 @csrf_exempt
 def default_render_failure(request, message, status=403, template_name='extauth_failure.html', exception=None):
     """Render an Openid error page to the user."""
-
     message = "In openid_failure " + message
-    print "in openid_failure: "
+    log.debug(message)
     data = render_to_string( template_name, dict(message=message, exception=exception))
     return HttpResponse(data, status=status)
 
 #-----------------------------------------------------------------------------
 # Openid
 
-def GenPasswd(length=12, chars=string.letters + string.digits):
+def edXauth_generate_password(length=12, chars=string.letters + string.digits):
+    """Generate internal password for externally authenticated user"""
     return ''.join([random.choice(chars) for i in range(length)])
 
 @csrf_exempt
@@ -94,7 +94,7 @@ def edXauth_external_login_or_signup(request, external_id, external_domain, cred
                                 )
         eamap.external_email = email
         eamap.external_name = fullname
-        eamap.internal_password = GenPasswd()
+        eamap.internal_password = edXauth_generate_password()
         log.debug('created eamap=%s' % eamap)
 
         eamap.save()
