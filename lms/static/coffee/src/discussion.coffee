@@ -221,7 +221,7 @@ Discussion =
     if $$user_info?
       $local(".comment").each(initializeVote)
       $local(".thread").each(initializeVote).each(initializeWatchThreads)
-      initializeWatchDiscussion(discussion)
+      #initializeWatchDiscussion(discussion) TODO move this somewhere else
 
     $local(".new-post-tags").tagsInput
       autocomplete_url: Discussion.urlFor('tags_autocomplete')
@@ -262,8 +262,8 @@ Discussion =
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
-        $local(".discussion-submit-reply").click handleSubmitReply
-        $local(".discussion-cancel-reply").click handleCancelReply
+        $local(".discussion-submit-post").click handleSubmitReply
+        $local(".discussion-cancel-post").click handleCancelReply
       $local(".discussion-link").hide()
       $discussionContent.attr("status", "reply")
 
@@ -430,8 +430,11 @@ Discussion =
     $local(".thread-title").click handleShowSingleThread
     $local(".discussion-show-comments").click handleShowSingleThread
 
-    $local(".discussion-reply").click ->
+    $local(".discussion-reply-thread").click ->
       handleShowSingleThread($local(".thread-title"))
+      handleReply(this)
+
+    $local(".discussion-reply-comment").click ->
       handleReply(this)
 
     $local(".discussion-cancel-reply").click ->
@@ -494,6 +497,7 @@ Discussion =
       , 'json'
 
     handleCancelNewPost = (elem) ->
+      console.log "canceling"
       $local(".new-post-form").hide()
       $local(".discussion-new-post").show()
 

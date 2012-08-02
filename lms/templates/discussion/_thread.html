@@ -70,7 +70,7 @@
 <%def name="render_bottom_bar(content, type, **kwargs)">
   <div class="info">
     ${render_info(content)}
-    ${render_link("discussion-link discussion-reply", "Reply")}
+    ${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}
     % if type == "thread" and kwargs['edit_thread'] or type == "comment":
       ${render_link("discussion-link discussion-edit", "Edit")}
     % endif
