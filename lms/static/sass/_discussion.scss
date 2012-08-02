@@ -195,7 +195,7 @@ $discussion_input_width: 100%;
       margin-top: 1%;
     }
     .reply-post-control {
-      margin-left: 79.5%;
+      margin-left: 72%;
     }
     .control-button {
       @include button;
@@ -285,7 +285,7 @@ $discussion_input_width: 100%;
         margin-left: $comment_margin_left;
         .reply-body {
           @include discussion-font;
-          width: $discussion_input_width !important;
+          width: 95%;
           font-size: $comment_body_size;
           margin-top: 10px;
           display: block;
