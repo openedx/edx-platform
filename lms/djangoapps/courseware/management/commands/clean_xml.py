@@ -10,36 +10,16 @@ from lxml import etree
 from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.xml import XMLModuleStore
-
+from xmodule.errortracker import make_error_tracker
 
 def traverse_tree(course):
     '''Load every descriptor in course.  Return bool success value.'''
     queue = [course]
     while len(queue) > 0:
         node = queue.pop()
-#        print '{0}:'.format(node.location)
-#        if 'data' in node.definition:
-#            print '{0}'.format(node.definition['data'])
         queue.extend(node.get_children())
 
     return True
-
-def make_logging_error_handler():
-    '''Return a tuple (handler, error_list), where
-    the handler appends the message and any exc_info
-    to the error_list on every call.
-    '''
-    errors = []
-
-    def error_handler(msg, exc_info=None):
-        '''Log errors'''
-        if exc_info is None:
-            if sys.exc_info() != (None, None, None):
-                exc_info = sys.exc_info()
-
-        errors.append((msg, exc_info))
-
-    return (error_handler, errors)
 
 
 def export(course, export_dir):
@@ -73,14 +53,14 @@ def import_with_checks(course_dir, verbose=True):
     data_dir = course_dir.dirname()
     course_dirs = [course_dir.basename()]
 
-    (error_handler, errors) = make_logging_error_handler()
+    (error_tracker, errors) = make_error_tracker()
     # No default class--want to complain if it doesn't find plugins for any
     # module.
     modulestore = XMLModuleStore(data_dir,
                    default_class=None,
                    eager=True,
                    course_dirs=course_dirs,
-                   error_handler=error_handler)
+                   error_tracker=error_tracker)
 
     def str_of_err(tpl):
         (msg, exc_info) = tpl
@@ -143,6 +123,7 @@ def check_roundtrip(course_dir):
     # dircmp doesn't do recursive diffs.
     # diff = dircmp(course_dir, export_dir, ignore=[], hide=[])
     print "======== Roundtrip diff: ========="
+    sys.stdout.flush()  # needed to make diff appear in the right place
     os.system("diff -r {0} {1}".format(course_dir, export_dir))
     print "======== ideally there is no diff above this ======="
 

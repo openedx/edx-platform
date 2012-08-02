@@ -76,3 +76,6 @@ CACHES = {
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+# Make the keyedcache startup warnings go away
+CACHE_TIMEOUT = 0
