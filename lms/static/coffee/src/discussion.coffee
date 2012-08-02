@@ -51,8 +51,10 @@ Discussion =
       <label for="discussion-auto-watch-{{id}}">follow this thread</label>
       {{/showWatchCheckbox}}
       <br />
-      <a class="discussion-submit-reply control-button" href="javascript:void(0)">Submit</a>
-      <a class="discussion-cancel-reply control-button" href="javascript:void(0)">Cancel</a>
+      <div class = "reply-post-control">
+        <a class="discussion-cancel-post" href="javascript:void(0)">Cancel</a>
+        <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
+      </div>
     </form>
   """
 
