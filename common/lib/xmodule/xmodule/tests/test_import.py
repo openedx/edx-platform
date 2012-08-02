@@ -73,6 +73,7 @@ class ImportTestCase(unittest.TestCase):
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
 
+        self.maxDiff = None
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system()
         descriptor = XModuleDescriptor.load_from_xml(bad_xml, system, 'org', 'course',

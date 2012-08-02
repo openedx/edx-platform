@@ -89,8 +89,8 @@ def add_histogram(get_html, module):
         else:
             edit_link = False
 
-        staff_context = {'definition': dict(module.definition),
-                         'metadata': dict(module.metadata),
+        staff_context = {'definition': json.dumps(module.definition, indent=4),
+                         'metadata': json.dumps(module.metadata, indent=4),
                          'element_id': module.location.html_id(),
                          'edit_link': edit_link,
                          'histogram': json.dumps(histogram),
