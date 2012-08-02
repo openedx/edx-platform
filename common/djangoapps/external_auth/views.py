@@ -194,7 +194,10 @@ def edXauth_ssl_login(request):
     if not cert:
         cert = request.META.get('HTTP_'+certkey,'')
     if not cert:
-        cert = request._req.subprocess_env.get(certkey,'')	 # try the direct apache2 SSL key
+        try:
+            cert = request._req.subprocess_env.get(certkey,'')	 # try the direct apache2 SSL key
+        except Exception as err:
+            pass
     if not cert:
         # no certificate information - go onward to main index
         return student_views.main_index()
