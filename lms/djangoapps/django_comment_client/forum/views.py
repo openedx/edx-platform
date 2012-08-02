@@ -41,7 +41,7 @@ def render_accordion(request, course, discussion_id):
 
     return render_to_string('discussion/_accordion.html', context)
 
-def render_discussion(request, course_id, threads, discussion_id=None, with_search_bar=True, \
+def render_discussion(request, course_id, threads, discussion_id=None, \
                       discussion_type='inline', query_params={}):
 
     template = {
@@ -57,8 +57,6 @@ def render_discussion(request, course_id, threads, discussion_id=None, with_sear
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
-        'search_bar': '' if not with_search_bar \
-                      else render_search_bar(request, course_id, discussion_id, text=query_params.get('text', '')),
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'course_id': course_id,
         'request': request,
