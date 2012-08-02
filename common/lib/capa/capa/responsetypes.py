@@ -805,7 +805,7 @@ class CodeResponse(LoncapaResponse):
     '''
 
     response_tag = 'coderesponse'
-    allowed_inputfields = ['textline', 'textbox']
+    allowed_inputfields = ['textbox', 'filesubmission']
     max_inputfields = 1
 
     def setup_response(self):
