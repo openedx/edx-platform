@@ -423,6 +423,7 @@ Discussion =
       handleShowSingleThread(this)
 
     $local(".discussion-reply").click ->
+      handleShowSingleThread($local(".thread-title"))
       handleReply(this)
 
     $local(".discussion-cancel-reply").click ->
