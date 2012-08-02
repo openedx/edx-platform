@@ -1,0 +1,69 @@
+<problem>
+
+<startouttext />
+truefalseresponse section
+<endouttext />
+
+<truefalseresponse max="10" randomize="yes">
+    <choicegroup>
+        <choice location="random" correct="true" name="foil1">
+            <startouttext />This is foil One and this is true.<endouttext />
+        </choice>
+        <choice location="random" correct="true" name="foil2">
+            <startouttext />This is foil Two.<endouttext />
+        </choice>
+        <choice location="random" correct="false" name="foil3">
+            <startouttext />This is foil Three.<endouttext />
+        </choice>
+        <choice location="random" correct="false" name="foil4">
+            <startouttext />This is foil Four.<endouttext />
+        </choice>
+        <choice location="random" correct="false" name="foil5">
+            <startouttext />This is foil Five.<endouttext />
+        </choice>
+    </choicegroup>
+</truefalseresponse>
+
+<startouttext />
+<endouttext />
+
+<multiplechoiceresponse max="10" randomize="yes">
+    <choicegroup>
+        <choice location="random" correct="false" name="foil1">
+            <startouttext />This is foil One.<endouttext />
+        </choice>
+        <choice location="random" correct="flase" name="foil2">
+            <startouttext />This is foil Two.<endouttext />
+        </choice>
+        <choice location="random" correct="true" name="foil3">
+            <startouttext />This is foil Three.<endouttext />
+        </choice>
+        <choice location="random" correct="false" name="foil4">
+            <startouttext />This is foil Four.<endouttext />
+        </choice>
+        <choice location="random" correct="false" name="foil5">
+            <startouttext />This is foil Five.<endouttext />
+        </choice>
+    </choicegroup>
+</multiplechoiceresponse>
+
+<startouttext />
+This is sample choiceresponse question with only one correct answer.
+<br />
+<endouttext />
+<choiceresponse>
+    <radiogroup>
+        <choice correct="false">
+            <text>This is a wrong answer.</text>
+        </choice>
+        <choice correct="true">
+            <text>This is the right answer.</text>
+        </choice>
+        <choice correct="false">
+            <text>This is another wrong answer.</text>
+        </choice>
+    </radiogroup>
+</choiceresponse>
+
+</problem>
+
