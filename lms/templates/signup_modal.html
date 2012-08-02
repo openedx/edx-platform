@@ -30,15 +30,9 @@
           <input name="name" type="text" placeholder="Full Name*">
 	  % else:
 	  <p><i>Welcome</i> ${extauth_email}</p><br/>
-          <label data-field="email">E-mail*</label>
-          <input name="email" type="hidden" value="${extauth_email}" placeholder="E-mail*">
 	  <p><i>Enter a public username:</i></p>
           <label data-field="username">Public Username*</label>
           <input name="username" type="text" value="${extauth_username}" placeholder="Public Username*">
-          <label data-field="password">Password*</label>
-          <input name="password" type="hidden" value="DoExtAuth" placeholder="Password*">
-          <label data-field="name">Full Name</label>
-          <input name="name" type="hidden" value="${extauth_name}" placeholder="Full Name*">
 	  % endif
         </div>
 
