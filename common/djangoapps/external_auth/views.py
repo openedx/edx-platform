@@ -63,7 +63,7 @@ def edXauth_openid_login_complete(request,  redirect_field_name=REDIRECT_FIELD_N
     if openid_response.status == SUCCESS:
         external_id = openid_response.identity_url
         oid_backend =  openid_auth.OpenIDBackend()
-        details = oid_backened = oid_backend._extract_user_details(openid_response)
+        details = oid_backend._extract_user_details(openid_response)
 
         log.debug('openid success, details=%s' % details)
 
