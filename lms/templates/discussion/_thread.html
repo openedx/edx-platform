@@ -93,7 +93,7 @@
     user No.${content['user_id']}
   % endif
   % if content.get('comments_count', -1) >= 0:
-    , ${content['comments_count']} comment(s)
+  , <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
   % endif
 </%def>
 
