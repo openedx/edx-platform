@@ -4,13 +4,39 @@
 import json
 import requests
 
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+
 # TODO: Collection of parameters to be hooked into rest of edX system
 XQUEUE_LMS_AUTH = ('LMS','PaloAltoCA') # (username, password)
 XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org'
 
+AWS_ACCESS_KEY = 'AKIAIYY272VA3C5R4DSQ'
+AWS_SECRET_KEY = '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'
+
+AWS_BUCKET_NAME = 'XQUEUE'
+
 def upload_files_to_s3(submission_file):
-    print '  THK: xqueue_interface.upload_files_to_s3'
-    return ''
+    '''
+    Upload student file submissions to S3.
+
+    Returns the S3 key for accessing the file
+    '''
+    print type(submission_file)
+    print dir(submission_file)
+    print submission_file
+
+    conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+    bucket_name = AWS_ACCESS_KEY + AWS_BUCKET_NAME
+    bucket = conn.create_bucket(bucket_name.lower()) # Bucket names must be lowercase...
+
+    k = Key(bucket)
+    k.key = submission_file.name
+    k.set_contents_from_string(submission_file.read)
+
+    s3_identifier = k.generate_url(60)
+    print s3_identifier
+    return s3_identifier
 
 
 def make_xheader(lms_callback_url, lms_key, queue_name):
