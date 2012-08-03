@@ -35,7 +35,7 @@ Discussion = @Discussion
           showWatchCheckbox: not Discussion.isSubscribed(thread_id, "thread")
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
-        Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
+        Discussion.makeWmdEditor $content, $local, "reply-body"
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
       $local(".discussion-link").hide()
@@ -57,7 +57,7 @@ Discussion = @Discussion
       else
         return
 
-      body = $local("#wmd-input-reply-body-#{id}").val()
+      body = Discussion.getWmdContent $content, $local, "reply-body"
 
       anonymous = false || $local(".discussion-post-anonymously").is(":checked")
       autowatch = false || $local(".discussion-auto-watch").is(":checked")
@@ -70,8 +70,16 @@ Discussion = @Discussion
           body: body
           anonymous: anonymous
           autowatch: autowatch
-        success: Discussion.formErrorHandler $local(".discussion-errors"), (response, textStatus) ->
-          Discussion.handleAnchorAndReload(response)
+        success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
+          console.log response
+          $comment = $(response.html)
+          $content.children(".comments").prepend($comment)
+          Discussion.setWmdContent $content, $local, "reply-body", ""
+          Discussion.initializeContent($comment)
+          Discussion.bindContentEvents($comment)
+          $local(".discussion-reply-new").hide()
+          $discussionContent.attr("status", "normal")
+        )
         dataType: 'json'
 
     handleVote = (elem, value) ->
@@ -99,7 +107,7 @@ Discussion = @Discussion
           tags: $local(".thread-raw-tags").html()
         }
         $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
-        Markdown.makeWmdEditor $local(".thread-body-edit"), "-thread-body-edit-#{id}", Discussion.urlFor('update_thread', id)
+        Discussion.makeWmdEditor $content, $local, "thread-body-edit"
         $local(".thread-tags-edit").tagsInput
           autocomplete_url: Discussion.urlFor('tags_autocomplete')
           autocomplete:
@@ -115,7 +123,7 @@ Discussion = @Discussion
     handleSubmitEditThread = (elem) ->
       url = Discussion.urlFor('update_thread', id)
       title = $local(".thread-title-edit").val()
-      body = $local("#wmd-input-thread-body-edit-#{id}").val()
+      body = Discussion.getWmdContent $content, $local, "thread-body-edit"
       tags = $local(".thread-tags-edit").val()
       $.ajax
         url: url
@@ -133,13 +141,13 @@ Discussion = @Discussion
       else
         view = { id: id, body: $local(".comment-raw-body").html() }
         $discussionContent.append Mustache.render Discussion.editCommentTemplate, view
-        Markdown.makeWmdEditor $local(".comment-body-edit"), "-comment-body-edit-#{id}", Discussion.urlFor('update_comment', id)
+        Discussion.makeWmdEditor $content, $local, "comment-body-edit"
         $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditComment(this)
         $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
 
     handleSubmitEditComment= (elem) ->
       url = Discussion.urlFor('update_comment', id)
-      body = $local("#wmd-input-comment-body-edit-#{id}").val()
+      body = Discussion.getWmdContent $content, $local, "comment-body-edit"
       $.ajax
         url: url
         data: {body: body}
@@ -168,6 +176,9 @@ Discussion = @Discussion
     handleShowSingleThread = ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
+
+      if not $showComments.length or not $threadTitle.length
+        return
 
       rebindHideEvents = ->
         $threadTitle.unbind('click').click handleHideSingleThread

@@ -11,9 +11,7 @@ from courseware.courses import check_course
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
 
-from django_comment_client.utils import get_categorized_discussion_info, \
-                                        extract, strip_none, \
-                                        JsonResponse
+import django_comment_client.utils as utils
 from urllib import urlencode
 
 import json
@@ -24,13 +22,9 @@ import dateutil
 THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 
-class HtmlResponse(HttpResponse):
-    def __init__(self, html=''):
-        super(HtmlResponse, self).__init__(html, content_type='text/plain')
-
 def render_accordion(request, course, discussion_id):
 
-    discussion_info = get_categorized_discussion_info(request, course)
+    discussion_info = utils.get_categorized_discussion_info(request, course)
 
     context = {
         'course': course,
@@ -63,7 +57,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
         'base_url': base_url,
-        'query_params': strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
+        'query_params': utils.strip_none(utils.extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
     }
     context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
@@ -86,9 +80,9 @@ def get_threads(request, course_id, discussion_id):
 
     if query_params['text'] or query_params['tags']: #TODO do tags search without sunspot
         query_params['commentable_id'] = discussion_id
-        threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=strip_none(query_params))
+        threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
     else:
-        threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=strip_none(query_params))
+        threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=utils.strip_none(query_params))
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -162,7 +156,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         context = {'thread': thread}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 
-        return JsonResponse({
+        return utils.JsonResponse({
             'html': html,
             'annotated_content_info': annotated_content_info,
         })
