@@ -8,7 +8,8 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
 # TODO: Collection of parameters to be hooked into rest of edX system
-XQUEUE_LMS_AUTH = ('LMS','PaloAltoCA') # (username, password)
+XQUEUE_LMS_AUTH = { 'username': 'LMS',
+                    'password': 'PaloAltoCA' }
 XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org'
 
 AWS_ACCESS_KEY = 'AKIAIYY272VA3C5R4DSQ'
@@ -72,8 +73,8 @@ def send_to_queue(header, body, xqueue_url=None):
     #------------------------------------------------------------
     s = requests.session()
     try:
-        r = s.post(xqueue_url+'/xqueue/login/', data={ 'username': XQUEUE_LMS_AUTH[0],
-                                                       'password': XQUEUE_LMS_AUTH[1] })
+        r = s.post(xqueue_url+'/xqueue/login/', data={ 'username': XQUEUE_LMS_AUTH['username'],
+                                                       'password': XQUEUE_LMS_AUTH['password'] })
     except Exception as err:
         msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
         raise Exception(msg)
