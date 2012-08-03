@@ -11,6 +11,29 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
+def is_pointer_tag(xml_obj):
+    """
+    Check if xml_obj is a pointer tag: <blah url_name="something" />.
+    No children, one attribute named url_name.
+
+    Special case for course roots: the pointer is
+      <course url_name="something" org="myorg"  course="course">
+
+    xml_obj: an etree Element
+
+    Returns a bool.
+    """
+    if xml_obj.tag != "course":
+        expected_attr = set(['url_name'])
+    else:
+        expected_attr = set(['url_name', 'course', 'org'])
+
+    actual_attr = set(xml_obj.attrib.keys())
+    return len(xml_obj) == 0 and actual_attr == expected_attr
+
+
+
 _AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
 
 class AttrMap(_AttrMapBase):
@@ -41,16 +64,19 @@ class XmlDescriptor(XModuleDescriptor):
 
     # Note -- url_name isn't in this list because it's handled specially on
     # import and export.
+
+    # TODO (vshnayder): Do we need a list of metadata we actually
+    # understand?  And if we do, is this the place?
+    # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see 
         # VS[compat] Remove once unused.
         'name', 'slug')
 
-    # VS[compat] -- remove once everything is in the CMS
-    # We don't want url_name in the metadata--it's in the location, so avoid
-    # confusion and duplication.
-    metadata_to_strip = ('url_name', )
+    metadata_to_strip = ('data_dir',
+           # VS[compat] -- remove the below attrs once everything is in the CMS
+           'course', 'org', 'url_name')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
@@ -130,6 +156,8 @@ class XmlDescriptor(XModuleDescriptor):
         Subclasses should not need to override this except in special
         cases (e.g. html module)'''
 
+        # VS[compat] -- the filename tag should go away once everything is
+        # converted.  (note: make sure html files still work once this goes away)
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
@@ -198,13 +226,13 @@ class XmlDescriptor(XModuleDescriptor):
             url identifiers
         """
         xml_object = etree.fromstring(xml_data)
-        # VS[compat] -- just have the url_name lookup once translation is done
+        # VS[compat] -- just have the url_name lookup, once translation is done
         url_name = xml_object.get('url_name', xml_object.get('slug'))
         location = Location('i4x', org, course, xml_object.tag, url_name)
 
         # VS[compat] -- detect new-style each-in-a-file mode
-        if len(xml_object.attrib.keys()) == 1 and len(xml_object) == 0:
-            # new style: this is just a pointer.
+        if is_pointer_tag(xml_object):
+            # new style:
             # read the actual defition file--named using url_name
             filepath = cls._format_filepath(xml_object.tag, url_name)
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
@@ -258,18 +286,25 @@ class XmlDescriptor(XModuleDescriptor):
 
         # Add the non-inherited metadata
         for attr in self.own_metadata:
-            xml_object.set(attr, val_for_xml(attr))
+            # don't want e.g. data_dir
+            if attr not in self.metadata_to_strip:
+                xml_object.set(attr, val_for_xml(attr))
 
-        # Write the actual contents to a file
+        # Write the definition to a file
         filepath = self.__class__._format_filepath(self.category, self.url_name)
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
-
         with resource_fs.open(filepath, 'w') as file:
             file.write(etree.tostring(xml_object, pretty_print=True))
 
         # And return just a pointer with the category and filename.
         record_object = etree.Element(self.category)
         record_object.set('url_name', self.url_name)
+
+        # Special case for course pointers:
+        if self.category == 'course':
+            # add org and course attributes on the pointer tag
+            record_object.set('org', self.location.org)
+            record_object.set('course', self.location.course)
 
         return etree.tostring(record_object, pretty_print=True)
 

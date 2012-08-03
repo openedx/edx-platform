@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
-    metadata_attributes = SequenceDescriptor.metadata_attributes + ('org', 'course')
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)

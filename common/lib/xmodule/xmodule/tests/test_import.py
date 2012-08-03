@@ -5,6 +5,7 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
+from xmodule.xml_module import is_pointer_tag
 from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -117,15 +118,19 @@ class ImportTestCase(unittest.TestCase):
             - inherited metadata doesn't leak to children.
         """
         system = self.get_system()
-        v = "1 hour"
+        v = '1 hour'
+        org = 'foo'
+        course = 'bbhh'
+        url_name = 'test1'
         start_xml = '''
-        <course graceperiod="{grace}" url_name="test1" unicorn="purple">
+        <course org="{org}" course="{course}"
+                graceperiod="{grace}" url_name="{url_name}" unicorn="purple">
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
-        </course>'''.format(grace=v)
+        </course>'''.format(grace=v, org=org, course=course, url_name=url_name)
         descriptor = XModuleDescriptor.load_from_xml(start_xml, system,
-                                                     'org', 'course')
+                                                     org, course)
 
         print descriptor, descriptor.metadata
         self.assertEqual(descriptor.metadata['graceperiod'], v)
@@ -141,14 +146,24 @@ class ImportTestCase(unittest.TestCase):
         # Now export and check things
         resource_fs = MemoryFS()
         exported_xml = descriptor.export_to_xml(resource_fs)
+
+        # Check that the exported xml is just a pointer
         print "Exported xml:", exported_xml
+        pointer = etree.fromstring(exported_xml)
+        self.assertTrue(is_pointer_tag(pointer))
+        # but it's a special case course pointer
+        self.assertEqual(pointer.attrib['course'], course)
+        self.assertEqual(pointer.attrib['org'], org)
 
         # Does the course still have unicorns?
-        # hardcoded path to course
-        with resource_fs.open('course/test1.xml') as f:
+        with resource_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], 'purple')
+
+        # the course and org tags should be _only_ in the pointer
+        self.assertTrue('course' not in course_xml.attrib)
+        self.assertTrue('org' not in course_xml.attrib)
 
         # did we successfully strip the url_name from the definition contents?
         self.assertTrue('url_name' not in course_xml.attrib)
