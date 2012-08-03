@@ -140,42 +140,42 @@ def vote_for_thread(request, course_id, thread_id, value):
 
 @login_required
 @require_POST
-def watch_thread(request, course_id, thread_id):
+def follow_thread(request, course_id, thread_id):
     user_id = request.user.id
     response = comment_client.subscribe_thread(user_id, thread_id)
     return JsonResponse(response)
 
 @login_required
 @require_POST
-def watch_commentable(request, course_id, commentable_id):
+def follow_commentable(request, course_id, commentable_id):
     user_id = request.user.id
     response = comment_client.subscribe_commentable(user_id, commentable_id)
     return JsonResponse(response)
 
 @login_required
 @require_POST
-def follow(request, course_id, followed_user_id):
+def follow_user(request, course_id, followed_user_id):
     user_id = request.user.id
     response = comment_client.follow(user_id, followed_user_id)
     return JsonResponse(response)
 
 @login_required
 @require_POST
-def unwatch_thread(request, course_id, thread_id):
+def unfollow_thread(request, course_id, thread_id):
     user_id = request.user.id
     response = comment_client.unsubscribe_thread(user_id, thread_id)
     return JsonResponse(response)
 
 @login_required
 @require_POST
-def unwatch_commentable(request, course_id, commentable_id):
+def unfollow_commentable(request, course_id, commentable_id):
     user_id = request.user.id
     response = comment_client.unsubscribe_commentable(user_id, commentable_id)
     return JsonResponse(response)
 
 @login_required
 @require_POST
-def unfollow(request, course_id, followed_user_id):
+def unfollow_user(request, course_id, followed_user_id):
     user_id = request.user.id
     response = comment_client.unfollow(user_id, followed_user_id)
     return JsonResponse(response)
