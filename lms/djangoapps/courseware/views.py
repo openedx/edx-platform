@@ -131,7 +131,7 @@ def profile(request, course_id, student_id=None):
 
     student_module_cache = StudentModuleCache(request.user, course)
     course_module, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
-    
+
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
@@ -257,6 +257,7 @@ def index(request, course_id, chapter=None, section=None,
 
     return result
 
+
 @ensure_csrf_cookie
 def jump_to(request, location):
     '''
@@ -283,7 +284,7 @@ def jump_to(request, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
-
+    # Rely on index to do all error handling
     return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
