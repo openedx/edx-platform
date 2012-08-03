@@ -162,11 +162,17 @@ if settings.DEBUG:
     ## Jasmine
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
+if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+    urlpatterns += (
+        url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
+        url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
+        url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
+        )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
