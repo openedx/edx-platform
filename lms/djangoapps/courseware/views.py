@@ -38,9 +38,8 @@ template_imports = {'urllib': urllib}
 def test_grading(request, course_id):
     course = check_course(course_id)
     
-    sections = grades.get_graded_sections(course)
-    
-    student_module_cache = StudentModuleCache(request.user, course)
+    sections, all_descriptors = grades.get_graded_sections(course)
+    student_module_cache = StudentModuleCache(request.user, descriptors=all_descriptors)
     
     grade_result = grades.fast_grade(request.user, request, sections, course.grader, student_module_cache)
     
