@@ -37,7 +37,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     def has_started(self):
         return time.gmtime() > self.start
-    
+
     @property
     def grader(self):
         return self.__grading_policy['GRADER']
