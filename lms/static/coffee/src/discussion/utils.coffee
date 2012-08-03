@@ -132,3 +132,35 @@ wmdEditors = {}
     if not window.$$annotated_content_info?
       window.$$annotated_content_info = {}
     window.$$annotated_content_info = $.extend window.$$annotated_content_info, newInfos
+
+  subscriptionLink: (type, id) ->
+    followLink = ->
+      Discussion.generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
+
+    unfollowLink = ->
+      Discussion.generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
+
+    handleFollow = (elem) ->
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: Discussion.urlFor("follow_#{type}", id)
+        type: "POST"
+        success: (response, textStatus) ->
+          if textStatus == "success"
+            $(elem).replaceWith unfollowLink()
+        dataType: 'json'
+
+    handleUnfollow = (elem) ->
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: Discussion.urlFor("unfollow_#{type}", id)
+        type: "POST"
+        success: (response, textStatus) ->
+          if textStatus == "success"
+            $(elem).replaceWith followLink()
+        dataType: 'json'
+
+    if Discussion.isSubscribed(id, type)
+        unfollowLink()
+    else
+      followLink()

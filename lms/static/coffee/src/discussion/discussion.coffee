@@ -3,74 +3,26 @@ if not @Discussion?
 
 Discussion = @Discussion
 
-initializeVote = (index, content) ->
-  $content = $(content)
-  $local = Discussion.generateLocal($content.children(".discussion-content"))
-  id = $content.attr("_id")
-  if Discussion.isUpvoted id
-    $local(".discussion-vote-up").addClass("voted")
-  else if Discussion.isDownvoted id
-    $local(".discussion-vote-down").addClass("voted")
-
-subscriptionLink = (type, id) ->
-
-  followLink = ->
-    Discussion.generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
-
-  unfollowLink = ->
-    Discussion.generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
-
-  handleFollow = (elem) ->
-    Discussion.safeAjax
-      $elem: $(elem)
-      url: Discussion.urlFor("follow_#{type}", id)
-      type: "POST"
-      success: (response, textStatus) ->
-        if textStatus == "success"
-          $(elem).replaceWith unfollowLink()
-      dataType: 'json'
-
-  handleUnfollow = (elem) ->
-    Discussion.safeAjax
-      $elem: $(elem)
-      url: Discussion.urlFor("unfollow_#{type}", id)
-      type: "POST"
-      success: (response, textStatus) ->
-        if textStatus == "success"
-          $(elem).replaceWith followLink()
-      dataType: 'json'
-
-  if Discussion.isSubscribed(id, type)
-      unfollowLink()
-  else
-    followLink()
-
 initializeFollowDiscussion = (discussion) ->
   $discussion = $(discussion)
   id = $following.attr("_id")
   $local = Discussion.generateLocal()
   $discussion.children(".discussion-non-content")
              .find(".discussion-title-wrapper")
-             .append(subscriptionLink('discussion', id))
-
-initializeFollowThread = (index, thread) ->
-  $thread = $(thread)
-  id = $thread.attr("_id")
-  $thread.children(".discussion-content")
-         .find(".follow-wrapper")
-         .append(subscriptionLink('thread', id))
+             .append(Discussion.subscriptionLink('discussion', id))
 
 @Discussion = $.extend @Discussion,
 
   initializeDiscussion: (discussion) ->
+    $discussion = $(discussion)
+    $discussion.find(".thread").each (index, thread) ->
+      Discussion.initializeContent(thread)
+      Discussion.bindContentEvents(thread)
+    $discussion.find(".comment").each (index, comment) ->
+      Discussion.initializeContent(comment)
+      Discussion.bindContentEvents(comment)
 
-    $local = Discussion.generateLocal(discussion)
-
-    $local(".comment").each(initializeVote)
-    $local(".thread").each(initializeVote).each(initializeFollowThread)
     #initializeFollowDiscussion(discussion) TODO move this somewhere else
-
-    $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
   bindDiscussionEvents: (discussion) ->
 
@@ -189,11 +141,3 @@ initializeFollowThread = (index, thread) ->
 
       "click .discussion-inline-sort-link": ->
         handleAjaxSort(this)
-
-    $discussion.find(".thread").each (index, thread) ->
-      Discussion.initializeContent(thread)
-      Discussion.bindContentEvents(thread)
-
-    $discussion.find(".comment").each (index, comment) ->
-      Discussion.initializeContent(comment)
-      Discussion.bindContentEvents(comment)

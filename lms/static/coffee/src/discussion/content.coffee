@@ -3,6 +3,22 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+initializeVote = (content) ->
+  $content = $(content)
+  $local = Discussion.generateLocal($content.children(".discussion-content"))
+  id = $content.attr("_id")
+  if Discussion.isUpvoted id
+    $local(".discussion-vote-up").addClass("voted")
+  else if Discussion.isDownvoted id
+    $local(".discussion-vote-down").addClass("voted")
+
+initializeFollowThread = (thread) ->
+  $thread = $(thread)
+  id = $thread.attr("_id")
+  $thread.children(".discussion-content")
+         .find(".follow-wrapper")
+         .append(Discussion.subscriptionLink('thread', id))
+
 @Discussion = $.extend @Discussion,
 
   bindContentEvents: (content) ->
@@ -265,6 +281,9 @@ Discussion = @Discussion
 
   initializeContent: (content) ->
     $content = $(content)
+    initializeVote $content
+    if $content.hasClass("thread")
+      initializeFollowThread $content
     $local = Discussion.generateLocal($content.children(".discussion-content"))
     $contentBody = $local(".content-body")
     raw_text = $contentBody.html()
