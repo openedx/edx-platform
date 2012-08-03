@@ -1,11 +1,14 @@
+import sys
+import logging
+
 from pkg_resources import resource_string
 from lxml import etree
 from xmodule.x_module import XModule
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.editing_module import EditingDescriptor
+from xmodule.errortracker import exc_info_to_str
 
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -14,14 +17,11 @@ class ErrorModule(XModule):
         '''Show an error.
         TODO (vshnayder): proper style, divs, etc.
         '''
-        if not self.system.is_staff:
-            return self.system.render_template('module-error.html', {})
-
         # staff get to see all the details
-        return self.system.render_template('module-error-staff.html', {
-            'data' : self.definition['data'],
-            # TODO (vshnayder): need to get non-syntax errors in here somehow
-            'error' : self.definition.get('error', 'Error not available')
+        return self.system.render_template('module-error.html', {
+            'data' : self.definition['data']['contents'],
+            'error' : self.definition['data']['error_msg'],
+            'is_staff' : self.system.is_staff,
             })
 
 class ErrorDescriptor(EditingDescriptor):
@@ -31,29 +31,36 @@ class ErrorDescriptor(EditingDescriptor):
     module_class = ErrorModule
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None, err=None):
+    def from_xml(cls, xml_data, system, org=None, course=None,
+                 error_msg='Error not available'):
         '''Create an instance of this descriptor from the supplied data.
 
         Does not try to parse the data--just stores it.
 
         Takes an extra, optional, parameter--the error that caused an
-        issue.
+        issue.  (should be a string, or convert usefully into one).
         '''
-
-        definition = {}
-        if err is not None:
-            definition['error'] = err
+        # Use a nested inner dictionary because 'data' is hardcoded
+        inner = {}
+        definition = {'data': inner}
+        inner['error_msg'] = str(error_msg)
 
         try:
             # If this is already an error tag, don't want to re-wrap it.
             xml_obj = etree.fromstring(xml_data)
             if xml_obj.tag == 'error':
                 xml_data = xml_obj.text
-        except etree.XMLSyntaxError as err:
-            # Save the error to display later--overrides other problems
-            definition['error'] = err
+                error_node = xml_obj.find('error_msg')
+                if error_node is not None:
+                    inner['error_msg'] = error_node.text
+                else:
+                    inner['error_msg'] = 'Error not available'
 
-        definition['data'] = xml_data
+        except etree.XMLSyntaxError:
+            # Save the error to display later--overrides other problems
+            inner['error_msg'] = exc_info_to_str(sys.exc_info())
+
+        inner['contents'] = xml_data
         # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
         # 64-bit num?
         location = ['i4x', org, course, 'error', 'slug']
@@ -71,10 +78,12 @@ class ErrorDescriptor(EditingDescriptor):
         files, etc.  That would just get re-wrapped on import.
         '''
         try:
-           xml = etree.fromstring(self.definition['data'])
+           xml = etree.fromstring(self.definition['data']['contents'])
            return etree.tostring(xml)
         except etree.XMLSyntaxError:
             # still not valid.
             root = etree.Element('error')
-            root.text = self.definition['data']
+            root.text = self.definition['data']['contents']
+            err_node = etree.SubElement(root, 'error_msg')
+            err_node.text = self.definition['data']['error_msg']
             return etree.tostring(root)

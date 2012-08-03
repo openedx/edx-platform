@@ -1,12 +1,14 @@
-from lxml import etree
-from lxml.etree import XMLSyntaxError
-import pkg_resources
 import logging
+import pkg_resources
+import sys
+
 from fs.errors import ResourceNotFoundError
 from functools import partial
+from lxml import etree
+from lxml.etree import XMLSyntaxError
 
 from xmodule.modulestore import Location
-
+from xmodule.errortracker import exc_info_to_str
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -471,7 +473,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             msg = "Error loading from xml."
             log.exception(msg)
             system.error_tracker(msg)
-            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course, err)
+            err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
+            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
+                                                  err_msg)
 
         return descriptor
 

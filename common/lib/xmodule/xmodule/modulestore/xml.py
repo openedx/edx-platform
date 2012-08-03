@@ -12,7 +12,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from cStringIO import StringIO
 
-from . import ModuleStore, Location
+from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
 
 etree.set_default_parser(
@@ -98,7 +98,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                                   error_tracker, process_xml, **kwargs)
 
 
-class XMLModuleStore(ModuleStore):
+class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
@@ -118,13 +118,12 @@ class XMLModuleStore(ModuleStore):
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
+        ModuleStoreBase.__init__(self)
 
         self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = {}  # location -> XModuleDescriptor
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
-        self.location_errors = {}    # location -> ErrorLog
-
 
         if default_class is None:
             self.default_class = None
@@ -148,12 +147,14 @@ class XMLModuleStore(ModuleStore):
 
         for course_dir in course_dirs:
             try:
-                # make a tracker, then stick in the right place once the course loads
-                # and we know its location
+                # Special-case code here, since we don't have a location for the
+                # course before it loads.
+                # So, make a tracker to track load-time errors, then put in the right
+                # place after the course loads and we have its location
                 errorlog = make_error_tracker()
                 course_descriptor = self.load_course(course_dir, errorlog.tracker)
                 self.courses[course_dir] = course_descriptor
-                self.location_errors[course_descriptor.location] = errorlog
+                self._location_errors[course_descriptor.location] = errorlog
             except:
                 msg = "Failed to load course '%s'" % course_dir
                 log.exception(msg)
@@ -221,23 +222,6 @@ class XMLModuleStore(ModuleStore):
             raise ItemNotFoundError(location)
 
 
-    def get_item_errors(self, location):
-        """
-        Return list of errors for this location, if any.  Raise the same
-        errors as get_item if location isn't present.
-
-        NOTE: This only actually works for courses in the xml datastore--
-        will return an empty list for all other modules.
-        """
-        location = Location(location)
-        # check that item is present
-        self.get_item(location)
-
-        # now look up errors
-        if location in self.location_errors:
-            return self.location_errors[location].errors
-        return []
-
     def get_courses(self, depth=0):
         """
         Returns a list of course descriptors.  If there were errors on loading,
@@ -245,8 +229,10 @@ class XMLModuleStore(ModuleStore):
         """
         return self.courses.values()
 
+
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")
+
 
     def update_item(self, location, data):
         """
@@ -258,6 +244,7 @@ class XMLModuleStore(ModuleStore):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
+
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
@@ -267,6 +254,7 @@ class XMLModuleStore(ModuleStore):
         children: A list of child item identifiers
         """
         raise NotImplementedError("XMLModuleStores are read-only")
+
 
     def update_metadata(self, location, metadata):
         """

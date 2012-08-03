@@ -91,17 +91,28 @@ initializeFollowThread = (index, thread) ->
 
     handleSubmitNewPost = (elem) ->
       title = $local(".new-post-title").val()
-      body = $local("#wmd-input-new-post-body-#{id}").val()
+      body = Discussion.getWmdContent $discussion, $local, "new-post-body"
       tags = $local(".new-post-tags").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
-      $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
-        if response.errors
-          errorsField = $local(".discussion-errors").empty()
-          for error in response.errors
-            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-        else
-          Discussion.handleAnchorAndReload(response)
-      , 'json'
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: 'json'
+        data:
+          title: title
+          body: body
+          tags: tags
+        success: Discussion.formErrorHandler($local(".new-post-form-error"), (response, textStatus) ->
+          console.log response
+          $thread = $(response.html)
+          $discussion.children(".threads").prepend($thread)
+          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
+          Discussion.initializeContent($thread)
+          Discussion.bindContentEvents($thread)
+          $(".new-post-form").hide()
+          $local(".discussion-new-post").show()
+        )
 
     handleCancelNewPost = (elem) ->
       $local(".new-post-form").hide()
@@ -115,9 +126,9 @@ initializeFollowThread = (index, thread) ->
       else
         view = { discussion_id: id }
         $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
-        newPostBody = $(discussion).find(".new-post-body")
+        newPostBody = $discussion.find(".new-post-body")
         if newPostBody.length
-          Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
+          Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
         $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
@@ -127,8 +138,6 @@ initializeFollowThread = (index, thread) ->
           handleCancelNewPost(this)
 
         $(elem).hide()
-
-    handleUpdateDiscussionContent = ($elem, $discussion, url) ->
 
     handleAjaxSearch = (elem) ->
       handle

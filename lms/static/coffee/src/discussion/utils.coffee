@@ -3,6 +3,8 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+wmdEditors = {}
+
 @Discussion = $.extend @Discussion,
 
   generateLocal: (elem) ->
@@ -65,3 +67,45 @@ Discussion = @Discussion
     height: "30px"
     width: "100%"
     removeWithBackspace: true
+
+  isSubscribed: (id, type) ->
+    if type == "thread"
+      id in $$user_info.subscribed_thread_ids
+    else if type == "commentable" or type == "discussion"
+      id in $$user_info.subscribed_commentable_ids
+    else
+      id in $$user_info.subscribed_user_ids
+
+  formErrorHandler: (errorsField, success) ->
+    (response, textStatus, xhr) ->
+      if response.errors? and response.errors.length > 0
+        errorsField.empty()
+        for error in response.errors
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+      else
+        success(response, textStatus, xhr)
+
+  makeWmdEditor: ($content, $local, cls_identifier) ->
+    elem = $local(".#{cls_identifier}")
+    id = $content.attr("_id")
+    appended_id = "-#{cls_identifier}-#{id}"
+    imageUploadUrl = Discussion.urlFor('upload')
+    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl
+    wmdEditors["#{cls_identifier}-#{id}"] = editor
+    console.log wmdEditors
+    editor
+
+  getWmdEditor: ($content, $local, cls_identifier) ->
+    id = $content.attr("_id")
+    wmdEditors["#{cls_identifier}-#{id}"]
+
+  getWmdContent: ($content, $local, cls_identifier) ->
+    id = $content.attr("_id")
+    $local("#wmd-input-#{cls_identifier}-#{id}").val()
+
+  setWmdContent: ($content, $local, cls_identifier, text) ->
+    id = $content.attr("_id")
+    $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
+    console.log wmdEditors
+    console.log "#{cls_identifier}-#{id}"
+    wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()

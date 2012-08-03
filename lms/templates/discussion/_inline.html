@@ -8,9 +8,11 @@
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
     <%include file="_sort.html" />
   </div>
-  % for thread in threads:
-    ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
-  % endfor
+  <div class="threads">
+    % for thread in threads:
+      ${renderer.render_thread(course_id, thread, edit_thread=False, show_comments=False)}
+    % endfor
+  </div>
   <%include file="_paginator.html" />
 </section>
 
