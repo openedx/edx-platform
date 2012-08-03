@@ -155,6 +155,10 @@ $discussion_input_width: 100%;
       color: black;
       font-weight: bold;
       font-size: 15px;
+      &:hover {
+        text-decoration: none;
+        color: #1C71DD;
+      }
       &.discussion-vote-up {
         margin-bottom: 3px;
       }
@@ -162,7 +166,7 @@ $discussion_input_width: 100%;
         margin-top: 5px;
       }
       &.voted { 
-        color: #1d9dd9;
+        color: #1C71DD;
       }
     }
   }
@@ -209,8 +213,15 @@ $discussion_input_width: 100%;
     font-size: $comment_body_size;
     float: right;
     margin-top: -2.5%;
+    .discussion-sort-link {
+      &:hover {
+        text-decoration: none;
+        color: #1C71DD;
+      }
+    }
     .discussion-sort-link.sorted {
       font-weight: bold;
+      color: #1C71DD; 
     }
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
