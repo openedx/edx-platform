@@ -1,17 +1,17 @@
 <%namespace name="survey_fields" file="survey_fields.html"/>
 
 <h2 class="survey-header">
-Survey Form
+  ${ survey_name } 
 </h2>
 
-<section id="problem_${element_id}" class="surveys-wrapper" data-problem-id="${id}" data-url="${ajax_url}">
-	<section class="problem">
-	  <section class="action">
-	    <input type="hidden" name="problem_id" value="test_survey">
-		${ form.as_p() }
-		<input class="save" type="button" value="Submit Survey">
-	  </section>
-	</section>
+<section id="problem_${element_id}" class="surveys-wrapper" data-problem-id="${id}" data-url="${ajax_url}">  
+
+	    %if not took_survey:             
+	      ${survey_fields.body(survey_list)}    
+	    %else:
+	      <p>Thank you for your help! You can only take the survey once, and we already have your submission.</p>
+	    %endif
+  <section class="action">	    
+	    <input type="submit" id="" value="Submit Survey" />
+  </section>
 </section>
-
-

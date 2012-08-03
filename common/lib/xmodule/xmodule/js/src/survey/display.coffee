@@ -1,11 +1,11 @@
 class @Survey
   constructor: (element) ->
+    alert ("Im in ur coffee scripts!")
+    alert (@element_id)
     @el = $(element).find('.surveys-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
-    alert ("Im in ur coffee scripts!")
-    alert (@element_id)
 
   $: (selector) ->
     $(selector, @el)
