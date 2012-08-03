@@ -51,8 +51,6 @@ class DummySystem(XMLParsingSystem):
 
 class ImportTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
-
-
     @staticmethod
     def get_system():
         '''Get a dummy system'''

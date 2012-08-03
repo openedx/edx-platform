@@ -76,7 +76,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_strip = ('data_dir',
            # VS[compat] -- remove the below attrs once everything is in the CMS
-           'course', 'org', 'url_name')
+           'course', 'org', 'url_name', 'filename')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them

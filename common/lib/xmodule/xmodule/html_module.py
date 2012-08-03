@@ -36,7 +36,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     # are being edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
-        origpath = path
         if path.endswith('.html.xml'):
             path = path[:-9] + '.html'  #backcompat--look for html instead of xml
         candidates = []
@@ -45,9 +44,11 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             _, _, path = path.partition(os.sep)
 
         # also look for .html versions instead of .xml
-        if origpath.endswith('.xml'):
-            candidates.append(origpath[:-4] + '.html')
-        return candidates
+        nc = []
+        for candidate in candidates:
+            if candidate.endswith('.xml'):
+                nc.append(candidate[:-4] + '.html')
+        return candidates + nc
 
     # NOTE: html descriptors are special.  We do not want to parse and
     # export them ourselves, because that can break things (e.g. lxml
@@ -80,7 +81,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
+                log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
