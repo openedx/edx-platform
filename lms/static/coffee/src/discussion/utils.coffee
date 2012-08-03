@@ -69,12 +69,20 @@ wmdEditors = {}
     removeWithBackspace: true
 
   isSubscribed: (id, type) ->
-    if type == "thread"
-      id in $$user_info.subscribed_thread_ids
-    else if type == "commentable" or type == "discussion"
-      id in $$user_info.subscribed_commentable_ids
-    else
-      id in $$user_info.subscribed_user_ids
+    $$user_info? and (
+      if type == "thread"
+        id in $$user_info.subscribed_thread_ids
+      else if type == "commentable" or type == "discussion"
+        id in $$user_info.subscribed_commentable_ids
+      else
+        id in $$user_info.subscribed_user_ids
+    )
+
+  isUpvoted: (id) ->
+    $$user_info? and (id in $$user_info.upvoted_ids)
+
+  isDownvoted: (id) ->
+    $$user_info? and (id in $$user_info.downvoted_ids)
 
   formErrorHandler: (errorsField, success) ->
     (response, textStatus, xhr) ->

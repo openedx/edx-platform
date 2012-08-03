@@ -7,9 +7,9 @@ initializeVote = (index, content) ->
     $content = $(content)
     $local = Discussion.generateLocal($content.children(".discussion-content"))
     id = $content.attr("_id")
-    if id in $$user_info.upvoted_ids
+    if Discussion.isUpvoted id
       $local(".discussion-vote-up").addClass("voted")
-    else if id in $$user_info.downvoted_ids
+    else if Discussion.isDownvoted id
       $local(".discussion-vote-down").addClass("voted")
 
 subscriptionLink = (type, id) ->
@@ -40,8 +40,7 @@ subscriptionLink = (type, id) ->
           $(elem).replaceWith followLink()
       dataType: 'json'
 
-  if type == 'discussion' and id in $$user_info.subscribed_commentable_ids \
-    or type == 'thread' and id in $$user_info.subscribed_thread_ids
+  if Discussion.isSubscribed(id, type)
       unfollowLink()
   else
     followLink()
@@ -67,10 +66,9 @@ initializeFollowThread = (index, thread) ->
 
     $local = Discussion.generateLocal(discussion)
 
-    if $$user_info?
-      $local(".comment").each(initializeVote)
-      $local(".thread").each(initializeVote).each(initializeFollowThread)
-      #initializeFollowDiscussion(discussion) TODO move this somewhere else
+    $local(".comment").each(initializeVote)
+    $local(".thread").each(initializeVote).each(initializeFollowThread)
+    #initializeFollowDiscussion(discussion) TODO move this somewhere else
 
     $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 

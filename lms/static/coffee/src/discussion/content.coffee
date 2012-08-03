@@ -19,23 +19,22 @@ Discussion = @Discussion
         $replyView.show()
       else
         thread_id = $discussionContent.parents(".thread").attr("_id")
-        view = {
+        view =
           id: id
           showWatchCheckbox: not Discussion.isSubscribed(thread_id, "thread")
-        }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Discussion.makeWmdEditor $content, $local, "reply-body"
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
       $local(".discussion-reply").hide()
+      $local(".discussion-edit").hide()
 
     handleCancelReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
       if $replyView.length
         $replyView.hide()
-      #reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
-      #$(elem).replaceWith(reply)
       $local(".discussion-reply").show()
+      $local(".discussion-edit").show()
 
     handleSubmitReply = (elem) ->
       if $content.hasClass("thread")
@@ -68,6 +67,7 @@ Discussion = @Discussion
           Discussion.bindContentEvents($comment)
           $local(".discussion-reply-new").hide()
           $local(".discussion-reply").show()
+          $local(".discussion-edit").show()
           $discussionContent.attr("status", "normal")
         )
 
@@ -97,15 +97,7 @@ Discussion = @Discussion
         }
         $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
         Discussion.makeWmdEditor $content, $local, "thread-body-edit"
-        $local(".thread-tags-edit").tagsInput
-          autocomplete_url: Discussion.urlFor('tags_autocomplete')
-          autocomplete:
-            remoteDataType: 'json'
-          interactive: true
-          defaultText: "Tag your post: press enter after each tag"
-          height: "30px"
-          width: "100%"
-          removeWithBackspace: true
+        $local(".thread-tags-edit").tagsInput Discussion.tagsInputOptions()
         $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
         $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
 
@@ -114,13 +106,16 @@ Discussion = @Discussion
       title = $local(".thread-title-edit").val()
       body = Discussion.getWmdContent $content, $local, "thread-body-edit"
       tags = $local(".thread-tags-edit").val()
-      $.ajax
+      Discussion.safeAjax
+        $elem: $(elem)
         url: url
         type: "POST"
         dataType: 'json'
         data: {title: title, body: body, tags: tags},
         success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
-          Discussion.handleAnchorAndReload(response)
+          $discussionContent.replaceWith(response.html)
+          Discussion.initializeContent($content)
+          Discussion.bindContentEvents($content)
         )
 
     handleEditComment = (elem) ->
@@ -138,13 +133,16 @@ Discussion = @Discussion
     handleSubmitEditComment= (elem) ->
       url = Discussion.urlFor('update_comment', id)
       body = Discussion.getWmdContent $content, $local, "comment-body-edit"
-      $.ajax
+      Discussion.safeAjax
+        $elem: $(elem)
         url: url
         type: "POST"
         dataType: "json"
         data: {body: body}
         success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
-          Discussion.handleAnchorAndReload(response)
+          $discussionContent.replaceWith(response.html)
+          Discussion.initializeContent($content)
+          Discussion.bindContentEvents($content)
         )
 
     handleEndorse = (elem) ->

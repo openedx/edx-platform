@@ -3,9 +3,9 @@
 <%! from dateutil.parser import parse %>
 <%! import urllib %>
 
-<%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
+<%def name="render_thread(course_id, thread, show_comments=False)">
   <div class="thread" _id="${thread['id']}">
-    ${render_content(thread, "thread", edit_thread=edit_thread, show_comments=show_comments)}
+    ${render_content(thread, "thread", show_comments=show_comments)}
     % if show_comments:
       ${render_comments(thread.get('children', []))}
     % endif
@@ -77,9 +77,7 @@
   <div class="info">
     ${render_info(content)}
     ${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}
-    % if type == "thread" and kwargs['edit_thread'] or type == "comment":
-      ${render_link("discussion-link discussion-edit", "Edit")}
-    % endif
+    ${render_link("discussion-link discussion-edit", "Edit")}
     % if type == "comment" and request.user.is_staff:
       % if content['endorsed']:
         <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
