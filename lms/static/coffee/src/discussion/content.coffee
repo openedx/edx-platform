@@ -15,13 +15,14 @@ Discussion = @Discussion
 
     discussionContentHoverIn = ->
       status = $discussionContent.attr("status") || "normal"
-      if status == "normal"
-        $local(".discussion-link").show()
+      $local(".discussion-link").show()
+      if status == "reply"
+        $local(".discussion-reply").hide()
 
     discussionContentHoverOut = ->
       $local(".discussion-link").hide()
 
-    $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
+    $discussionContent.children(".discussion-content-wrapper").hover(discussionContentHoverIn, discussionContentHoverOut)
 
     handleReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
@@ -44,8 +45,8 @@ Discussion = @Discussion
       $replyView = $local(".discussion-reply-new")
       if $replyView.length
         $replyView.hide()
-      reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
-      $(elem).replaceWith(reply)
+      #reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
+      #$(elem).replaceWith(reply)
       $discussionContent.attr("status", "normal")
 
     handleSubmitReply = (elem) ->
