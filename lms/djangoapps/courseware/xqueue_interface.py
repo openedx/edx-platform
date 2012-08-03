@@ -8,8 +8,9 @@ import requests
 XQUEUE_LMS_AUTH = ('LMS','PaloAltoCA') # (username, password)
 XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org'
 
-def upload_files_to_s3():
+def upload_files_to_s3(submission_file):
     print '  THK: xqueue_interface.upload_files_to_s3'
+    return ''
 
 
 def make_xheader(lms_callback_url, lms_key, queue_name):

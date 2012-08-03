@@ -285,12 +285,12 @@ def modx_dispatch(request, dispatch=None, id=None):
             qsdict[key] = qsdict[key][0] # parse_qs returns { key: list }
         post.update(qsdict)
 
-    # Check for submitted files
+    # Check for submitted files, send it to S3 immediately. LMS/xqueue manipulates only the
+    #   pointer, which is saved as the student "submission"
     if request.FILES:
-        print 'Got files!'
-
-    print post.keys()
-    print request.FILES.keys()
+        for inputfile_id in request.FILES.keys(): 
+            s3_identifier = xqueue_interface.upload_files_to_s3(request.FILES[inputfile_id])
+            post.update({inputfile_id: s3_identifier})
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
