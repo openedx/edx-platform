@@ -66,6 +66,7 @@ Discussion = @Discussion
         $elem: $(elem)
         url: url
         type: "POST"
+        dataType: 'json'
         data:
           body: body
           anonymous: anonymous
@@ -80,7 +81,6 @@ Discussion = @Discussion
           $local(".discussion-reply-new").hide()
           $discussionContent.attr("status", "normal")
         )
-        dataType: 'json'
 
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
@@ -128,10 +128,11 @@ Discussion = @Discussion
       $.ajax
         url: url
         type: "POST"
-        data: {title: title, body: body, tags: tags},
-        success: Discussion.formErrorHandler $local(".discussion-update-errors"), (response, textStatus) ->
-          Discussion.handleAnchorAndReload(response)
         dataType: 'json'
+        data: {title: title, body: body, tags: tags},
+        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+          Discussion.handleAnchorAndReload(response)
+        )
 
     handleEditComment = (elem) ->
       $local(".discussion-content-wrapper").hide()
@@ -150,11 +151,12 @@ Discussion = @Discussion
       body = Discussion.getWmdContent $content, $local, "comment-body-edit"
       $.ajax
         url: url
-        data: {body: body}
         type: "POST"
-        success: Discussion.formErrorHandler $local(".discussion-update-errors"), (response, textStatus) ->
-          Discussion.handleAnchorAndReload(response)
         dataType: "json"
+        data: {body: body}
+        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+          Discussion.handleAnchorAndReload(response)
+        )
 
     handleEndorse = (elem) ->
       url = Discussion.urlFor('endorse_comment', id)
@@ -196,6 +198,7 @@ Discussion = @Discussion
           $elem: $.merge($threadTitle, $showComments)
           url: url
           type: "GET"
+          dataType: 'json'
           success: (response, textStatus) ->
             if not $$annotated_content_info?
               window.$$annotated_content_info = {}
@@ -205,7 +208,6 @@ Discussion = @Discussion
               Discussion.initializeContent(comment)
               Discussion.bindContentEvents(comment)
             rebindHideEvents()
-          dataType: 'json'
       
     Discussion.bindLocalEvents $local,
 

@@ -94,14 +94,25 @@ initializeFollowThread = (index, thread) ->
       body = Discussion.getWmdContent $discussion, $local, "new-post-body"
       tags = $local(".new-post-tags").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
-      $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
-        if response.errors
-          errorsField = $local(".discussion-errors").empty()
-          for error in response.errors
-            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-        else
-          Discussion.handleAnchorAndReload(response)
-      , 'json'
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: 'json'
+        data:
+          title: title
+          body: body
+          tags: tags
+        success: Discussion.formErrorHandler($local(".new-post-form-error"), (response, textStatus) ->
+          console.log response
+          $thread = $(response.html)
+          $discussion.children(".threads").prepend($thread)
+          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
+          Discussion.initializeContent($thread)
+          Discussion.bindContentEvents($thread)
+          $(".new-post-form").hide()
+          $local(".discussion-new-post").show()
+        )
 
     handleCancelNewPost = (elem) ->
       $local(".new-post-form").hide()
