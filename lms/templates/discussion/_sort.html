@@ -3,9 +3,9 @@
 <%def name="link_to_sort(key, title)">
   % if key == sort_key:
     % if sort_order.lower() == 'desc':
-      ${_link_to_sort(key, 'asc', title + ' [v]', 'sorted')}
+      ${_link_to_sort(key, 'asc', title + ' &#x25BC;', 'sorted')}
     % else:
-      ${_link_to_sort(key, 'desc', title + ' [^]', 'sorted')}
+      ${_link_to_sort(key, 'desc', title + ' &#x25B2;', 'sorted')}
     % endif
   % else:
     ${_link_to_sort(key, 'desc', title)}
