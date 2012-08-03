@@ -89,37 +89,36 @@ initializeFollowDiscussion = (discussion) ->
 
         $(elem).hide()
 
-    handleAjaxSearch = (elem) ->
-      handle
+    handleAjaxReloadDiscussion = (elem, url) ->
       $elem = $(elem)
       $discussion = $elem.parents(".discussion")
+      console.log url
+      console.log $elem
       Discussion.safeAjax
         $elem: $elem
-        url: $elem.attr("action")
-        data:
-          text: $local(".search-input").val()
+        url: url
         type: "GET"
+        dataType: 'html'
         success: (data, textStatus) ->
           $data = $(data)
           $discussion.replaceWith($data)
           Discussion.initializeDiscussion($data)
           Discussion.bindDiscussionEvents($data)
-        dataType: 'html'
+
+    handleAjaxSearch = (elem) ->
+      $elem = $(elem)
+      url = URI($elem.attr("action")).addSearch({text: $local(".search-input").val()})
+      handleAjaxReloadDiscussion($elem, url)
 
     handleAjaxSort = (elem) ->
       $elem = $(elem)
-      $discussionModule = $elem.parents(".discussion-module")
-      $discussion = $discussionModule.find(".discussion")
-      Discussion.safeAjax
-        $elem: $elem
-        url: $elem.attr("sort-url")
-        type: "GET"
-        success: (data, textStatus) ->
-          $discussion.replaceWith(data)
-          $discussion = $discussionModule.find(".discussion")
-          Discussion.initializeDiscussion($discussion)
-          Discussion.bindDiscussionEvents($discussion)
-        dataType: 'html'
+      url = $elem.attr("sort-url")
+      handleAjaxReloadDiscussion($elem, url)
+
+    handleAjaxPage = (elem) ->
+      $elem = $(elem)
+      url = $elem.attr("page-url")
+      handleAjaxReloadDiscussion($elem, url)
     
     Discussion.bindLocalEvents $local,
 
@@ -141,3 +140,6 @@ initializeFollowDiscussion = (discussion) ->
 
       "click .discussion-inline-sort-link": ->
         handleAjaxSort(this)
+
+    $discussion.children(".discussion-paginator").find(".discussion-inline-page-link").click ->
+      handleAjaxPage(this)
