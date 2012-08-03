@@ -848,12 +848,13 @@ class CodeResponse(LoncapaResponse):
 
     def get_score(self, student_answers):
         try:
-            submission = student_answers[self.answer_id]
+            submission = student_answers[self.answer_id] # Note that submission can be a file
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
+            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' %
+                (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
-        self.context.update({'submission': unicode(submission)}) # Submission could be a file
+        self.context.update({'submission': unicode(submission)})
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
@@ -873,8 +874,13 @@ class CodeResponse(LoncapaResponse):
                     'edX_student_response': unicode(submission)}
         
         # Submit request
-        error = xqueue_interface.send_to_queue(header=xheader,
-                                               body=json.dumps(contents))
+        if hasattr(submission, 'read'): # Test for whether submission is a file
+            error = xqueue_interface.send_to_queue(header=xheader,
+                                                   body=json.dumps(contents),
+                                                   file_to_upload=submission)
+        else:
+            error = xqueue_interface.send_to_queue(header=xheader,
+                                                   body=json.dumps(contents))
 
         cmap = CorrectMap() 
         if error:
