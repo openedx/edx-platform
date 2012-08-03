@@ -25,10 +25,9 @@ Discussion = @Discussion
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Discussion.makeWmdEditor $content, $local, "reply-body"
+        $local(".discussion-reply").hide()
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
-      $local(".discussion-link").hide()
-      $discussionContent.attr("status", "reply")
 
     handleCancelReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
@@ -36,7 +35,7 @@ Discussion = @Discussion
         $replyView.hide()
       #reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
       #$(elem).replaceWith(reply)
-      $discussionContent.attr("status", "normal")
+      $local(".discussion-reply").show()
 
     handleSubmitReply = (elem) ->
       if $content.hasClass("thread")
@@ -61,13 +60,14 @@ Discussion = @Discussion
           anonymous: anonymous
           autowatch: autowatch
         success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
-          console.log response
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
+          Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
           $local(".discussion-reply-new").hide()
+          $local(".discussion-reply").show()
           $discussionContent.attr("status", "normal")
         )
 
@@ -189,9 +189,7 @@ Discussion = @Discussion
           type: "GET"
           dataType: 'json'
           success: (response, textStatus) ->
-            if not $$annotated_content_info?
-              window.$$annotated_content_info = {}
-            window.$$annotated_content_info = $.extend $$annotated_content_info, response['annotated_content_info']
+            Discussion.bulkExtendContentInfo response['annotated_content_info']
             $content.append(response['html'])
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
@@ -240,6 +238,5 @@ Discussion = @Discussion
     $contentBody.html(converter.makeHtml(raw_text))
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
-    if $$annotated_content_info?
-      if not ($$annotated_content_info[id] || [])['editable']
-        $local(".discussion-edit").remove()
+    if not Discussion.getContentInfo id, 'editable'
+      $local(".discussion-edit").remove()

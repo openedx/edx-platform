@@ -19,7 +19,7 @@ import comment_client
 import dateutil
 
 
-THREADS_PER_PAGE = 20
+THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
 def render_accordion(request, course, discussion_id):
