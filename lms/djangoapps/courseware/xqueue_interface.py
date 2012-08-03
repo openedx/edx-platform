@@ -1,8 +1,10 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
+import hashlib
 import json
 import requests
+import time
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -39,6 +41,15 @@ def upload_files_to_s3(submission_file):
     print s3_identifier
     return s3_identifier
 
+def make_hashkey(seed=None):
+    '''
+    Generate a string key by hashing 
+    '''
+    h = hashlib.md5()
+    if seed is not None:
+        h.update(str(seed))
+    h.update(str(time.time()))
+    return h.hexdigest()
 
 def make_xheader(lms_callback_url, lms_key, queue_name):
     '''
