@@ -394,7 +394,7 @@ class LoncapaProblem(object):
             response_id += 1
 
             answer_id = 1
-            inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x for x in (entry_types + solution_types)]),
+            inputfields = response.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x for x in (entry_types + solution_types)]),
                                     id=response_id_str)
             for entry in inputfields:			                # assign one answer_id for each entry_type or solution_type
                 entry.attrib['response_id'] = str(response_id)
@@ -407,7 +407,7 @@ class LoncapaProblem(object):
 
         # get responder answers (do this only once, since there may be a performance cost, eg with externalresponse)
         self.responder_answers = {}
-        for response in self.responders.keys():
+        for (response,responder) in self.responders.items():
             try:
                 self.responder_answers[response] = responder.get_answers()
             except:
