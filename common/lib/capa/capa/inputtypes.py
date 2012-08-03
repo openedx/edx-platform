@@ -13,6 +13,7 @@ Module containing the problem elements which render into input objects
 - checkboxgroup
 - imageinput  (for clickable image)
 - optioninput (for option list)
+- filesubmission (upload a file)
 
 These are matched by *.html files templates/*.html which are mako templates with the actual html.
 
@@ -306,8 +307,7 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
-
-    context = {'id': eid, }
+    context = { 'id': eid, 'state': status, 'msg': msg, }
     html = render_template("filesubmission.html", context)
     return etree.XML(html) 
 
