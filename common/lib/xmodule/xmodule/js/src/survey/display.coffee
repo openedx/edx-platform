@@ -1,10 +1,11 @@
-class @Problem
+class @Survey
   constructor: (element) ->
-    @el = $(element).find('.problems-wrapper')
+    @el = $(element).find('.surveys-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
-    @render()
+    alert ("Im in ur coffee scripts!")
+    alert (@element_id)
 
   $: (selector) ->
     $(selector, @el)
@@ -23,16 +24,6 @@ class @Problem
     if response.progress_changed
         @el.attr progress: response.progress_status
         @el.trigger('progressChanged')
-
-  render: (content) ->
-    if content
-      @el.html(content)
-      @bind()
-    else
-      $.postWithPrefix "#{@url}/problem_get", (response) =>
-        @el.html(response.html)
-        @executeProblemScripts()
-        @bind()
 
   executeProblemScripts: ->
     @el.find(".script_placeholder").each (index, placeholder) ->
