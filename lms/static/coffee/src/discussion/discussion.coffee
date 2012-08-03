@@ -108,6 +108,7 @@ initializeFollowThread = (index, thread) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
           Discussion.setWmdContent $discussion, $local, "new-post-body", ""
+          Discussion.setContentInfo id, 'editable', true
           Discussion.initializeContent($thread)
           Discussion.bindContentEvents($thread)
           $(".new-post-form").hide()

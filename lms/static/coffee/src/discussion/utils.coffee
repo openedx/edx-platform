@@ -109,3 +109,19 @@ wmdEditors = {}
     console.log wmdEditors
     console.log "#{cls_identifier}-#{id}"
     wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
+
+  getContentInfo: (id, attr) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    (window.$$annotated_content_info[id] || {})[attr]
+
+  setContentInfo: (id, attr, value) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info[id] ||= {}
+    window.$$annotated_content_info[id][attr] = value
+
+  bulkExtendContentInfo: (newInfos) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info = $.extend window.$$annotated_content_info, newInfos
