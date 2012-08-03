@@ -54,7 +54,9 @@ Discussion = @Discussion
     <form class="discussion-content-edit discussion-comment-edit" _id="{{id}}">
       <ul class="discussion-errors discussion-update-errors"></ul>    
       <div class="comment-body-edit body-input">{{body}}</div>
-      <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
-      <a class="discussion-cancel-update control-button" href="javascript:void(0)">Cancel</a>
+      <div class = "edit-post-control">
+        <a class="discussion-cancel-update" href="javascript:void(0)">Cancel</a>
+        <a class="discussion-submit-update control-button" href="javascript:void(0)">Update</a>
+      </div>
     </form>
   """

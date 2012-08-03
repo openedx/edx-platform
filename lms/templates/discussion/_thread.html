@@ -36,6 +36,8 @@
 <%def name="render_content(content, type, **kwargs)">
   <div class="discussion-content">
     <div class="discussion-content-wrapper clearfix">
+      <div class="follow-wrapper">
+      </div>
       ${render_vote(content)}
       <div class="discussion-right-wrapper clearfix">
         ${render_title(content, type, **kwargs)}
