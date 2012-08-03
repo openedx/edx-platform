@@ -93,7 +93,7 @@ def gradebook(request, course_id):
 
     for student in student_objects:
         student_module_cache = StudentModuleCache(student, course)
-        course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
+        course = get_module(request.user, request, course.location, student_module_cache)
         student_info.append({
             'username': student.username,
             'id': student.id,
@@ -122,7 +122,7 @@ def profile(request, course_id, student_id=None):
     user_info = UserProfile.objects.get(user=student)
 
     student_module_cache = StudentModuleCache(request.user, course)
-    course_module, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
+    course_module = get_module(request.user, request, course.location, student_module_cache)
     
     context = {'name': user_info.name,
                'username': student.username,
@@ -213,7 +213,7 @@ def index(request, course_id, chapter=None, section=None,
         if section_descriptor is not None:
             student_module_cache = StudentModuleCache(request.user,
                                                       section_descriptor)
-            module, _, _, _ = get_module(request.user, request,
+            module = get_module(request.user, request,
                                          section_descriptor.location,
                                          student_module_cache)
             context['content'] = module.get_html()

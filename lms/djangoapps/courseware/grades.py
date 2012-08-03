@@ -3,16 +3,12 @@ import logging
 
 from django.conf import settings
 
-from module_render import get_module
+from module_render import get_module, get_instance_module
 from xmodule import graders
 from xmodule.graders import Score
 from models import StudentModule
 
 _log = logging.getLogger("mitx.courseware")
-
-
-
-
 
 def get_graded_sections(course_descriptor):
     """
@@ -71,7 +67,7 @@ def fast_grade(student, request, course_graded_sections, grader, student_module_
             
             if should_grade_section:
                 scores = []
-                (section_module, _, _, _) = get_module(student, request, section_descriptor.location, student_module_cache)
+                section_module = get_module(student, request, section_descriptor.location, student_module_cache)
                 
                 for module in yield_descriptor_descendents(section_module):
                     (correct, total) = get_score(student, module, student_module_cache)
@@ -175,7 +171,7 @@ def grade_sheet(student, course, grader, student_module_cache):
             'grade_summary': grade_summary}
 
 
-def get_score(user, problem, cache):
+def get_score(user, problem, student_module_cache):
     """
     Return the score for a user on a problem
 
@@ -186,17 +182,18 @@ def get_score(user, problem, cache):
     correct = 0.0
 
     # If the ID is not in the cache, add the item
-    instance_module = cache.lookup(problem.category, problem.id)
-    if instance_module is None:
-        instance_module = StudentModule(module_type=problem.category,
-                                        module_state_key=problem.id,
-                                        student=user,
-                                        state=None,
-                                        grade=0,
-                                        max_grade=problem.max_score(),
-                                        done='i')
-        cache.append(instance_module)
-        instance_module.save()
+    instance_module = get_instance_module(user, problem, student_module_cache)
+    # instance_module = student_module_cache.lookup(problem.category, problem.id)
+    # if instance_module is None:
+    #     instance_module = StudentModule(module_type=problem.category,
+    #                                     module_state_key=problem.id,
+    #                                     student=user,
+    #                                     state=None,
+    #                                     grade=0,
+    #                                     max_grade=problem.max_score(),
+    #                                     done='i')
+    #     cache.append(instance_module)
+    #     instance_module.save()
 
     # If this problem is ungraded/ungradable, bail
     if instance_module.max_grade is None:
