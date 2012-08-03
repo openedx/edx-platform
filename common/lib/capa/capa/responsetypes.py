@@ -8,7 +8,6 @@ Used by capa_problem.py
 '''
 
 # standard library imports
-import hashlib
 import inspect
 import json
 import logging
@@ -17,7 +16,6 @@ import numpy
 import random
 import re
 import requests
-import time
 import traceback
 import abc
 
@@ -856,18 +854,12 @@ class CodeResponse(LoncapaResponse):
             raise Exception(err)
 
         self.context.update({'submission': submission})
-        extra_payload = {'edX_student_response': submission}
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
 
-        # Queuekey generation
-        h = hashlib.md5()
-        h.update(str(self.system.seed))
-        h.update(str(time.time()))
-        queuekey = h.hexdigest()
-
         # Generate header
+        queuekey = xqueue_interface.make_hashkey(self.system.seed)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue_callback_url,
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
@@ -886,7 +878,7 @@ class CodeResponse(LoncapaResponse):
 
         cmap = CorrectMap() 
         if error:
-            cmap.set(self.answer_id, msg='Unable to deliver your submission to grader! Please try again later')
+            cmap.set(self.answer_id, queuekey=None, msg='Unable to deliver your submission to grader! Please try again later')
         else:
             # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
             cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader')
