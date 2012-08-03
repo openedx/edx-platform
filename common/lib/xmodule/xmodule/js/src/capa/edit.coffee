@@ -68,6 +68,10 @@ class @CapaDescriptor
             el.children().last().remove()
             return el
 
+        variable_name_wrapper = (expression) ->
+            match = /^\{(.+)\}$/.exec(expression)
+            return if match then "$" + match[1] else expression
+
         for section in parsed
             if section.type == 'text'
                 newel = create_text_element(section.text)
@@ -116,7 +120,7 @@ class @CapaDescriptor
 
             else if section.type == 'numerical'
                 newel = $(doc.createElement('numericalresponse'))
-                newel.attr 'answer', section.answer
+                newel.attr 'answer', variable_name_wrapper(section.answer)
 
                 tolerance = $(doc.createElement('responseparam'))
                 tolerance.attr 'type', 'tolerance'
@@ -131,7 +135,7 @@ class @CapaDescriptor
 
             else if section.type == 'string'
                 newel = $(doc.createElement('stringresponse'))
-                newel.attr 'answer', section.answer
+                newel.attr 'answer', variable_name_wrapper(section.answer)
 
                 newel.append doc.createElement('textline') 
                 problem.append(newel)
@@ -139,7 +143,7 @@ class @CapaDescriptor
             else if section.type == 'formula'
                 formularesponse = $(doc.createElement("formularesponse"))
                 formularesponse.attr 'samples', section.samples
-                formularesponse.attr 'answer', section.answer
+                formularesponse.attr 'answer', variable_name_wrapper(section.answer)
                 formularesponse.attr 'type', 'cs'
 
                 tolerance = $(doc.createElement('responseparam'))

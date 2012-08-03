@@ -22,7 +22,7 @@ KeyValueString
     }
 
 KeyValuePair
-  = key:KeyValueString _ ':' _ value:KeyValueString
+  = key:KeyValueString ' '* ':' ' '* value:KeyValueString
     {
       return {'key': key, 'value': value};
     } 
@@ -70,7 +70,7 @@ ImageTitle
     }
 
 Image
-  = ImageIdentifier title:ImageTitle? _ '(' _ url:ImageLink ')' ' '* Linebreak
+  = ImageIdentifier title:ImageTitle? ' '* '(' ' '* url:ImageLink ')' ' '* Linebreak
     {
       return {'type': 'image', 'url': url, 'title': title};
     }
@@ -91,14 +91,24 @@ CorrectAnswerIdentifier
 
 /* StringResponse */
 
+QuotedVariableName
+  = '"' name:VariableName '"'    { return name; }
+  / '\'' name:VariableName '\''    { return name; }
+
+VariableName
+  = '{' chars:([a-zA-Z0-9_]+) '}'
+    {
+      return '{' + chars.join("") + '}'
+    }
+
 StringResponse
-  = CorrectAnswerIdentifier _ !'(' value:(QuotedString / Text) Linebreak
+  = CorrectAnswerIdentifier ' '* !'(' value:(QuotedString / QuotedVariableName / Text) Linebreak
     {
       return {'type': 'string', 'answer': $.trim(value)};
     }
 
 NumericalOrStringResponse
-  = CorrectAnswerIdentifier _ value:NumericalValue _ tolerance:NumericalTolerance? _ Linebreak
+  = CorrectAnswerIdentifier ' '* value:NumericalValue ' '* tolerance:NumericalTolerance? ' '* Linebreak
     {
       if (tolerance == "")
         tolerance = "5%"
@@ -117,7 +127,7 @@ ChoiceTextLine
 Choice
   = correct:ChoiceIdentifier lines:(ChoiceTextLine)+
     {
-      return {'type': 'choice', 'correct' : correct, 'text': lines.join("")};
+      return {'type': 'choice', 'correct' : correct, 'text': lines.join("").replace(/[\n\r]$/,"")};
     }
 
 MultipleChoice
@@ -155,12 +165,6 @@ Text
     {
       return chars.join("");
     }
-
-_AndLines
-  = (' ' / '\n' / '\t')*
-
-_
-  = (' ' / '\t')*
 
 Linebreak
   = ('\n')
@@ -308,13 +312,13 @@ NumericalToleranceValueType
   = decimal / percentage / integer
 
 NumericalTolerance
-  = '+-' _ value:NumericalToleranceValueType _
+  = '+-' ' '* value:NumericalToleranceValueType ' '*
     {
       return value;
     }
 
 NumericalResponse
-  = CorrectAnswerIdentifier _ '(' _ value:NumericalValue _ tolerance:NumericalTolerance? ')' _ Linebreak
+  = CorrectAnswerIdentifier ' '* '(' ' '* value:NumericalValue ' '* tolerance:NumericalTolerance? ')' ' '* Linebreak
     {
       if (tolerance == "")
         tolerance = "5%"
@@ -323,6 +327,7 @@ NumericalResponse
 
 NumericalValue
   = additive
+  / VariableName
 
 /* Mathematical rules */
 
