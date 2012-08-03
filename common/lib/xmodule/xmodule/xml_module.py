@@ -11,22 +11,21 @@ import sys
 
 log = logging.getLogger(__name__)
 
-_AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
+_AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
 
 class AttrMap(_AttrMapBase):
     """
-    A class that specifies a metadata_key, and two functions:
+    A class that specifies two functions:
 
-        to_metadata: convert value from the xml representation into
+        from_xml: convert value from the xml representation into
             an internal python representation
 
-        from_metadata: convert the internal python representation into
+        to_xml: convert the internal python representation into
             the value to store in the xml.
     """
-    def __new__(_cls, metadata_key,
-                to_metadata=lambda x: x,
-                from_metadata=lambda x: x):
-        return _AttrMapBase.__new__(_cls, metadata_key, to_metadata, from_metadata)
+    def __new__(_cls, from_xml=lambda x: x,
+                to_xml=lambda x: x):
+        return _AttrMapBase.__new__(_cls, from_xml, to_xml)
 
 
 class XmlDescriptor(XModuleDescriptor):
@@ -39,6 +38,9 @@ class XmlDescriptor(XModuleDescriptor):
 
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
+
+    # Note -- url_name isn't in this list because it's handled specially on
+    # import and export.
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see 
@@ -50,8 +52,7 @@ class XmlDescriptor(XModuleDescriptor):
     # to import and export them
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
-        'graded': AttrMap('graded',
-                          lambda val: val == 'true',
+        'graded': AttrMap(lambda val: val == 'true',
                           lambda val: str(val).lower()),
     }
 
@@ -102,6 +103,24 @@ class XmlDescriptor(XModuleDescriptor):
         return etree.parse(file_object).getroot()
 
     @classmethod
+    def load_file(cls, filepath, fs, location):
+        '''
+        Open the specified file in fs, and call cls.file_to_xml on it,
+        returning the lxml object.
+
+        Add details and reraise on error.
+        '''
+        try:
+            with fs.open(filepath) as file:
+                return cls.file_to_xml(file)
+        except Exception as err:
+            # Add info about where we are, but keep the traceback
+            msg = 'Unable to load file contents at path %s for item %s: %s ' % (
+                filepath, location.url(), str(err))
+            raise Exception, msg, sys.exc_info()[2]
+
+
+    @classmethod
     def load_definition(cls, xml_object, system, location):
         '''Load a descriptor definition from the specified xml_object.
         Subclasses should not need to override this except in special
@@ -128,14 +147,7 @@ class XmlDescriptor(XModuleDescriptor):
                         filepath = candidate
                         break
 
-            try:
-                with system.resources_fs.open(filepath) as file:
-                    definition_xml = cls.file_to_xml(file)
-            except Exception:
-                msg = 'Unable to load file contents at path %s for item %s' % (
-                    filepath, location.url())
-                # Add info about where we are, but keep the traceback
-                raise Exception, msg, sys.exc_info()[2]
+            definition_xml = cls.load_file(filepath, system.resources_fs, location)
 
         cls.clean_metadata_from_xml(definition_xml)
         definition = cls.definition_from_xml(definition_xml, system)
@@ -145,6 +157,24 @@ class XmlDescriptor(XModuleDescriptor):
         definition['filename'] = [ filepath, filename ]
 
         return definition
+
+    @classmethod
+    def load_metadata(cls, xml_object):
+        """
+        Read the metadata attributes from this xml_object.
+
+        Returns a dictionary {key: value}.
+        """
+        metadata = {}
+        for attr in cls.metadata_attributes:
+            val = xml_object.get(attr)
+            if val is not None:
+                # VS[compat].  Remove after all key translations done
+                attr = cls._translate(attr)
+
+                attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+                metadata[attr] = attr_map.from_xml(val)
+        return metadata
 
 
     @classmethod
@@ -161,25 +191,20 @@ class XmlDescriptor(XModuleDescriptor):
         """
         xml_object = etree.fromstring(xml_data)
         # VS[compat] -- just have the url_name lookup once translation is done
-        slug = xml_object.get('url_name', xml_object.get('slug'))
-        location = Location('i4x', org, course, xml_object.tag, slug)
+        url_name = xml_object.get('url_name', xml_object.get('slug'))
+        location = Location('i4x', org, course, xml_object.tag, url_name)
 
-        def load_metadata():
-            metadata = {}
-            for attr in cls.metadata_attributes:
-                val = xml_object.get(attr)
-                if val is not None:
-                    # VS[compat].  Remove after all key translations done
-                    attr = cls._translate(attr)
+        # VS[compat] -- detect new-style each-in-a-file mode
+        if len(xml_object.attrib.keys()) == 1 and len(xml_object) == 0:
+            # new style: this is just a pointer.
+            # read the actual defition file--named using url_name
+            filepath = cls._format_filepath(xml_object.tag, url_name)
+            definition_xml = cls.load_file(filepath, system.resources_fs, location)
+        else:
+            definition_xml = xml_object
 
-                    attr_map = cls.xml_attribute_map.get(attr, AttrMap(attr))
-                    metadata[attr_map.metadata_key] = attr_map.to_metadata(val)
-            return metadata
-
-        definition = cls.load_definition(xml_object, system, location)
-        metadata = load_metadata()
-        # VS[compat] -- just have the url_name lookup once translation is done
-        slug = xml_object.get('url_name', xml_object.get('slug'))
+        definition = cls.load_definition(definition_xml, system, location)
+        metadata = cls.load_metadata(definition_xml)
         return cls(
             system,
             definition,
@@ -192,20 +217,6 @@ class XmlDescriptor(XModuleDescriptor):
         return u'{category}/{name}.{ext}'.format(category=category,
                                                  name=name,
                                                  ext=cls.filename_extension)
-
-    @classmethod
-    def split_to_file(cls, xml_object):
-        '''
-        Decide whether to write this object to a separate file or not.
-
-        xml_object: an xml definition of an instance of cls.
-
-        This default implementation will split if this has more than 7
-        descendant tags.
-
-        Can be overridden by subclasses.
-        '''
-        return len(list(xml_object.iter())) > 7
 
     def export_to_xml(self, resource_fs):
         """
@@ -227,42 +238,39 @@ class XmlDescriptor(XModuleDescriptor):
         xml_object = self.definition_to_xml(resource_fs)
         self.__class__.clean_metadata_from_xml(xml_object)
 
-        # Set the tag first, so it's right if writing to a file
+        # Set the tag so we get the file path right
         xml_object.tag = self.category
 
-        # Write it to a file if necessary
-        if self.split_to_file(xml_object):
-            # Put this object in its own file
-            filepath = self.__class__._format_filepath(self.category, self.url_name)
-            resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
-            with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True))
-            # ...and remove all of its children here
-            for child in xml_object:
-                xml_object.remove(child)
-            # also need to remove the text of this object.
-            xml_object.text = ''
-            # and the tail for good measure...
-            xml_object.tail = ''
+        def val_for_xml(attr):
+            """Get the value for this attribute that we want to store.
+            (Possible format conversion through an AttrMap).
+             """
+            attr_map = self.xml_attribute_map.get(attr, AttrMap())
+            return attr_map.to_xml(self.own_metadata[attr])
 
-
-            xml_object.set('filename', self.url_name)
-
-        # Add the metadata
-        xml_object.set('url_name', self.url_name)
-        for attr in self.metadata_attributes:
-            attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
-            metadata_key = attr_map.metadata_key
-
-            if (metadata_key not in self.metadata or
-                metadata_key in self._inherited_metadata):
+        # Add the non-inherited metadata
+        for attr in self.own_metadata:
+            if attr not in self.metadata_attributes:
+                log.warning("Unexpected metadata '{attr}' on element '{url}'."
+                            " Not exporting.".format(attr=attr,
+                                                     url=self.location.url()))
                 continue
 
-            val = attr_map.from_metadata(self.metadata[metadata_key])
-            xml_object.set(attr, val)
+            xml_object.set(attr, val_for_xml(attr))
 
-        # Now we just have to make it beautiful
-        return etree.tostring(xml_object, pretty_print=True)
+
+        # Write the actual contents to a file
+        filepath = self.__class__._format_filepath(self.category, self.url_name)
+        resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+
+        with resource_fs.open(filepath, 'w') as file:
+            file.write(etree.tostring(xml_object, pretty_print=True))
+
+        # And return just a pointer with the category and filename.
+        record_object = etree.Element(self.category)
+        record_object.set('url_name', self.url_name)
+
+        return etree.tostring(record_object, pretty_print=True)
 
     def definition_to_xml(self, resource_fs):
         """

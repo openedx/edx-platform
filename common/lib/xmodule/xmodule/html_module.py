@@ -109,17 +109,11 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                 # add more info and re-raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
-    @classmethod
-    def split_to_file(cls, xml_object):
-        '''Never include inline html'''
-        return True
-
-
     # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):
         '''If the contents are valid xml, write them to filename.xml.  Otherwise,
-        write just the <html filename=""> tag to filename.xml, and the html
+        write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
         string to filename.html.
         '''
         try:

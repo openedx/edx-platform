@@ -134,7 +134,8 @@ class ImportTestCase(unittest.TestCase):
         resource_fs = MemoryFS()
         exported_xml = descriptor.export_to_xml(resource_fs)
         print "Exported xml:", exported_xml
-        root = etree.fromstring(exported_xml)
-        chapter_tag = root[0]
-        self.assertEqual(chapter_tag.tag, 'chapter')
-        self.assertFalse('graceperiod' in chapter_tag.attrib)
+        # hardcode path to child
+        with resource_fs.open('chapter/ch.xml') as f:
+            chapter_xml = etree.fromstring(f.read())
+        self.assertEqual(chapter_xml.tag, 'chapter')
+        self.assertFalse('graceperiod' in chapter_xml.attrib)
