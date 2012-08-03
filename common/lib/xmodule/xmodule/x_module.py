@@ -191,10 +191,19 @@ class XModule(HTMLSnippet):
         self.instance_state = instance_state
         self.shared_state = shared_state
         self.id = self.location.url()
-        self.name = self.location.name
+        self.url_name = self.location.name
         self.category = self.location.category
         self.metadata = kwargs.get('metadata', {})
         self._loaded_children = None
+
+    @property
+    def display_name(self):
+        '''
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        '''
+        return self.metadata.get('display_name',
+                                 self.url_name.replace('_', ' '))
 
     def get_children(self):
         '''
@@ -355,12 +364,21 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         self.metadata = kwargs.get('metadata', {})
         self.definition = definition if definition is not None else {}
         self.location = Location(kwargs.get('location'))
-        self.name = self.location.name
+        self.url_name = self.location.name
         self.category = self.location.category
         self.shared_state_key = kwargs.get('shared_state_key')
 
         self._child_instances = None
         self._inherited_metadata = set()
+
+    @property
+    def display_name(self):
+        '''
+        Return a display name for the module: use display_name if defined in
+        metadata, otherwise convert the url name.
+        '''
+        return self.metadata.get('display_name',
+                                 self.url_name.replace('_', ' '))
 
     @property
     def own_metadata(self):
