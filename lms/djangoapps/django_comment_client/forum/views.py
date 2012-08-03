@@ -94,7 +94,7 @@ def inline_discussion(request, course_id, discussion_id):
     threads, query_params = get_threads(request, course_id, discussion_id)
     html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
                                                                  query_params=query_params)
-    return HtmlResponse(html)
+    return utils.HtmlResponse(html)
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
     if not discussion_id:

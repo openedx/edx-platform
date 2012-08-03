@@ -25,9 +25,9 @@ Discussion = @Discussion
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Discussion.makeWmdEditor $content, $local, "reply-body"
-        $local(".discussion-reply").hide()
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
+      $local(".discussion-reply").hide()
 
     handleCancelReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
