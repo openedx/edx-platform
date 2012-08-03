@@ -25,9 +25,9 @@ Discussion = @Discussion
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
         Discussion.makeWmdEditor $content, $local, "reply-body"
+        $local(".discussion-reply").hide()
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
-      $discussionContent.attr("status", "reply")
 
     handleCancelReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
@@ -35,7 +35,7 @@ Discussion = @Discussion
         $replyView.hide()
       #reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
       #$(elem).replaceWith(reply)
-      $discussionContent.attr("status", "normal")
+      $local(".discussion-reply").show()
 
     handleSubmitReply = (elem) ->
       if $content.hasClass("thread")
@@ -63,10 +63,11 @@ Discussion = @Discussion
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
-          Discussion.setContentInfo id, 'editable', true
+          Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
           $local(".discussion-reply-new").hide()
+          $local(".discussion-reply").show()
           $discussionContent.attr("status", "normal")
         )
 
