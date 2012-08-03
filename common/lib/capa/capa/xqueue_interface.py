@@ -37,7 +37,7 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
                         'queue_name': queue_name })
 
 
-def send_to_queue(header, body, xqueue_url=None):
+def send_to_queue(header, body, file_to_upload=None, xqueue_url=None):
     '''
     Submit a request to xqueue.
     
@@ -45,6 +45,8 @@ def send_to_queue(header, body, xqueue_url=None):
 
     body: Serialized data for the receipient behind the queueing service. The operation of
             xqueue is agnostic to the contents of 'body'
+
+    file_to_upload: File object to be uploaded to xqueue along with queue request
 
     Returns an 'error' flag indicating error in xqueue transaction
     '''
@@ -72,9 +74,13 @@ def send_to_queue(header, body, xqueue_url=None):
     #------------------------------------------------------------
     payload = {'xqueue_header': header,
                'xqueue_body'  : body}
+
+    files = None
+    if file_to_upload is not None:
+        files = { file_to_upload.name: file_to_upload }
+
     try:
-        # Send request
-        r = s.post(xqueue_url+'/xqueue/submit/', data=payload)
+        r = s.post(xqueue_url+'/xqueue/submit/', data=payload, files=files)
     except Exception as err:
         msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
         raise Exception(msg)
