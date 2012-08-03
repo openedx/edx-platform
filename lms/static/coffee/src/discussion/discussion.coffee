@@ -91,7 +91,7 @@ initializeFollowThread = (index, thread) ->
 
     handleSubmitNewPost = (elem) ->
       title = $local(".new-post-title").val()
-      body = $local("#wmd-input-new-post-body-#{id}").val()
+      body = Discussion.getWmdContent $discussion, $local, "new-post-body"
       tags = $local(".new-post-tags").val()
       url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
       $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
@@ -115,9 +115,9 @@ initializeFollowThread = (index, thread) ->
       else
         view = { discussion_id: id }
         $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
-        newPostBody = $(discussion).find(".new-post-body")
+        newPostBody = $discussion.find(".new-post-body")
         if newPostBody.length
-          Markdown.makeWmdEditor newPostBody, "-new-post-body-#{$(discussion).attr('_id')}", Discussion.urlFor('upload')
+          Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
         $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 

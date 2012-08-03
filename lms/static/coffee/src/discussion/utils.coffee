@@ -3,6 +3,8 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+wmdEditors = {}
+
 @Discussion = $.extend @Discussion,
 
   generateLocal: (elem) ->
@@ -82,3 +84,28 @@ Discussion = @Discussion
           errorsField.append($("<li>").addClass("new-post-form-error").html(error))
       else
         success(response, textStatus, xhr)
+
+  makeWmdEditor: ($content, $local, cls_identifier) ->
+    elem = $local(".#{cls_identifier}")
+    id = $content.attr("_id")
+    appended_id = "-#{cls_identifier}-#{id}"
+    imageUploadUrl = Discussion.urlFor('upload')
+    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl
+    wmdEditors["#{cls_identifier}-#{id}"] = editor
+    console.log wmdEditors
+    editor
+
+  getWmdEditor: ($content, $local, cls_identifier) ->
+    id = $content.attr("_id")
+    wmdEditors["#{cls_identifier}-#{id}"]
+
+  getWmdContent: ($content, $local, cls_identifier) ->
+    id = $content.attr("_id")
+    $local("#wmd-input-#{cls_identifier}-#{id}").val()
+
+  setWmdContent: ($content, $local, cls_identifier, text) ->
+    id = $content.attr("_id")
+    $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
+    console.log wmdEditors
+    console.log "#{cls_identifier}-#{id}"
+    wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
