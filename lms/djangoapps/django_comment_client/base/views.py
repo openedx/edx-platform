@@ -76,16 +76,18 @@ def create_thread(request, course_id, commentable_id):
 def update_thread(request, course_id, thread_id):
     attributes = extract(request.POST, ['body', 'title', 'tags'])
     response = comment_client.update_thread(thread_id, attributes)
-    if response.is_ajax():
+    if request.is_ajax():
         context = {
             'thread': response,
+            'course_id': course_id,
         }
         html = render_to_string('discussion/ajax_update_thread.html', context)
         return JsonResponse({
             'html': html,
             'content': response,
         })
-    return JsonResponse(response)
+    else:
+        return JsonResponse(response)
 
 def _create_comment(request, course_id, _response_from_attributes):
     attributes = extract(request.POST, ['body'])
@@ -128,16 +130,18 @@ def delete_thread(request, course_id, thread_id):
 def update_comment(request, course_id, comment_id):
     attributes = extract(request.POST, ['body'])
     response = comment_client.update_comment(comment_id, attributes)
-    if response.is_ajax():
+    if request.is_ajax():
         context = {
             'comment': response,
+            'course_id': course_id,
         }
         html = render_to_string('discussion/ajax_update_comment.html', context)
         return JsonResponse({
             'html': html,
             'content': response,
         })
-    return JsonResponse(response)
+    else:
+        return JsonResponse(response)
 
 @instructor_only
 @login_required
