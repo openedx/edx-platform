@@ -225,7 +225,7 @@ class XmlDescriptor(XModuleDescriptor):
         # Write it to a file if necessary
         if self.split_to_file(xml_object):
             # Put this object in its own file
-            filepath = self.__class__._format_filepath(self.category, self.name)
+            filepath = self.__class__._format_filepath(self.category, self.url_name)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
@@ -238,10 +238,10 @@ class XmlDescriptor(XModuleDescriptor):
             xml_object.tail = ''
 
 
-            xml_object.set('filename', self.name)
+            xml_object.set('filename', self.url_name)
 
         # Add the metadata
-        xml_object.set('url_name', self.name)
+        xml_object.set('url_name', self.url_name)
         for attr in self.metadata_attributes:
             attr_map = self.xml_attribute_map.get(attr, AttrMap(attr))
             metadata_key = attr_map.metadata_key
