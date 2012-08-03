@@ -276,7 +276,7 @@ def modx_dispatch(request, dispatch=None, id=None):
     post = request.POST.copy() 
 
     # Catch the use of FormData in xmodule frontend for 'problem_check'. After this block,
-    #   the 'post' dict is functionally equivalent before- and after- the use of FormData
+    #   the 'post' dict is functionally equivalent before and after the use of FormData
     # TODO: A more elegant solution?
     if post.has_key('__answers_querystring'):
         qs = post.pop('__answers_querystring')[0]

@@ -47,11 +47,11 @@ class @Problem
       $(placeholder).remove()
 
   ###
-  # 'check_fd' uses FormData to allow file submissions, in addition to simple, 
-  #      querystring-based answers, in the 'problem_check' dispatch.
+  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
+  #      in addition to simple querystring-based answers
   #
   # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
-  #       perhaps preferable to consolidate all dispatches to use FormData consistently
+  #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
     Logger.log 'problem_check', @answers
@@ -63,15 +63,14 @@ class @Problem
     fd = new FormData()
 
     # For each file input, allow a single file submission,
-    #   routed to Django 'request.FILES'
+    #   which is routed to Django 'request.FILES'
     @$('input:file').each (index, element) ->
       if element.files[0] instanceof File
         fd.append(element.id, element.files[0])
       else
         fd.append(element.id, '')  # Even if no file selected, need to include input id
 
-    # Simple (non-file) answers,
-    #   routed to Django 'request.POST'
+    # Simple (non-file) answers, which is routed to Django 'request.POST'
     fd.append('__answers_querystring', @answers)
 
     settings = 
