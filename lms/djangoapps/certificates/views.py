@@ -52,6 +52,7 @@ def certificate_request(request):
             return return_error(survey_response['error'])
 
         grade = None
+        # TODO: (bridger) Update this to use the faster grade instead of grade_sheet
         student_gradesheet = grades.grade_sheet(request.user)
         grade = student_gradesheet['grade']
 
@@ -65,6 +66,7 @@ def certificate_request(request):
     else:
         #This is not a POST, we should render the page with the form
 
+        # TODO: (bridger) Update this to use the faster grade instead of grade_sheet
         grade_sheet = grades.grade_sheet(request.user)
         certificate_state = certificate_state_for_student(request.user, grade_sheet['grade'])
 
