@@ -234,7 +234,7 @@ $discussion_input_width: 100%;
     }
     .edit-post-control {
       margin-left: 79%;
-      margin-top: -1%;
+      margin-top: 1%;
     }
     .control-button {
       @include button;
@@ -248,10 +248,12 @@ $discussion_input_width: 100%;
       font-size: inherit;
       width: inherit;
     }
+    margin: 10px 0 10px 0;
+  }
+  .new-post-form {
     margin: 10px 0 40px 0;
   }
   .discussion-reply-new {
-    margin: 10px 0 20px 0;
     .discussion-auto-watch {
       margin-left: 2%;
     }
