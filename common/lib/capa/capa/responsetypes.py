@@ -22,10 +22,10 @@ import abc
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from correctmap import CorrectMap
-from courseware import xqueue_interface
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
+import xqueue_interface
 
 log = logging.getLogger('mitx.' + __name__)
 
