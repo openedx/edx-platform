@@ -56,8 +56,13 @@ class @Problem
   check_fd: =>
     Logger.log 'problem_check', @answers
 
+    # If there are no file inputs in the problem, we can fall back on @check
+    if $('input:file').length == 0 
+      @check()
+      return
+
     if not window.FormData
-      alert "Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support this feature."
+      alert "Sorry, your browser does not support file uploads. Your submit request could not be fulfilled. If you can, please use Chrome or Safari which have been verified to support file uploads."
       return
 
     fd = new FormData()
