@@ -15,7 +15,6 @@ from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
-import xqueue_interface
 
 log = logging.getLogger("mitx.courseware")
 
