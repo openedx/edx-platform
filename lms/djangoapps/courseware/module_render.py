@@ -273,24 +273,23 @@ def modx_dispatch(request, dispatch=None, id=None):
     '''
     # ''' (fix emacs broken parsing)
 
-    post = request.POST.copy() 
+    # Check for submitted files
+    post = dict()
+    if request.FILES:
+        for inputfile_id in request.FILES.keys():
+            post[inputfile_id] = request.FILES[inputfile_id]
 
     # Catch the use of FormData in xmodule frontend for 'problem_check'. After this block,
     #   the 'post' dict is functionally equivalent before and after the use of FormData
     # TODO: A more elegant solution?
-    if post.has_key('__answers_querystring'):
-        qs = post.pop('__answers_querystring')[0]
-        qsdict = parse_qs(qs, keep_blank_values=True)
-        for key in qsdict.keys():
-            qsdict[key] = qsdict[key][0] # parse_qs returns { key: list }
-        post.update(qsdict)
-
-    # Check for submitted files, send it to S3 immediately. LMS/xqueue manipulates only the
-    #   pointer, which is saved as the student "submission"
-    if request.FILES:
-        for inputfile_id in request.FILES.keys(): 
-            s3_identifier = xqueue_interface.upload_files_to_s3(request.FILES[inputfile_id])
-            post.update({inputfile_id: s3_identifier})
+    for key in request.POST.keys():
+        if key == '__answers_querystring':
+            qs = request.POST.get(key)
+            qsdict = parse_qs(qs, keep_blank_values=True)
+            for qskey in qsdict.keys():
+                post[qskey] = qsdict[qskey][0] # parse_qs returns {key: list}
+        else:
+            post[key] = request.POST.get(key)
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
