@@ -20,6 +20,7 @@ def get_graded_sections(course_descriptor):
             "section_descriptor" : The section descriptor
             "xmoduledescriptors" : An array of xmoduledescriptors that could possibly be in the section, for any student
     """
+    all_descriptors = []
     
     graded_sections = {}
     for c in course_descriptor.get_children():
@@ -35,8 +36,11 @@ def get_graded_sections(course_descriptor):
                 
                 section_format = s.metadata.get('format', "")
                 graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
+                
+                all_descriptors.extend(xmoduledescriptors) 
+                all_descriptors.append(s)
     
-    return graded_sections
+    return graded_sections, all_descriptors
 
 def yield_descriptor_descendents(module_descriptor):
     for child in module_descriptor.get_children():

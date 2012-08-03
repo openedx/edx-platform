@@ -67,17 +67,30 @@ class StudentModuleCache(object):
     """
     A cache of StudentModules for a specific student
     """
-    def __init__(self, user, descriptor, depth=None):
+    def __init__(self, user, descriptor=None, depth=None, descriptors=None, descriptor_filter=lambda descriptor: True):
         '''
         Find any StudentModule objects that are needed by any child modules of the
-        supplied descriptor. Avoids making multiple queries to the database
-
-        descriptor: An XModuleDescriptor
-        depth is the number of levels of descendent modules to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendent StudentModules
+        supplied descriptor, or caches only the StudentModule objects specifically
+        for every descriptor in descriptors. Avoids making multiple queries to the 
+        database.
+        
+        There are two ways to init:
+            descriptor: An XModuleDescriptor
+            depth is the number of levels of descendent modules to load StudentModules for, in addition to
+                the supplied descriptor. If depth is None, load all descendent StudentModules
+        OR
+            descriptors: An array of XModuleDescriptors.
+        
+        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule 
+            should be cached
         '''
         if user.is_authenticated():
-            module_ids = self._get_module_state_keys(descriptor, depth)
+            if not (descriptor == None) != (descriptors == None): #An xor on the descriptor and descriptors parameters.
+                raise ValueError("Either the descriptor or descriptors must be supplied to StudentModuleCache.") 
+            
+            if descriptor != None:
+                descriptors = self._get_child_descriptors(descriptor, depth)
+            module_ids = self._get_module_state_keys(descriptors, descriptor_filter) 
 
             # This works around a limitation in sqlite3 on the number of parameters
             # that can be put into a single query
@@ -91,27 +104,39 @@ class StudentModuleCache(object):
 
         else:
             self.cache = []
-
-    def _get_module_state_keys(self, descriptor, depth):
-        '''
-        Get a list of the state_keys needed for StudentModules
-        required for this module descriptor
-
+            
+    def _get_child_descriptors(self, descriptor, depth):
+        """
         descriptor: An XModuleDescriptor
         depth is the number of levels of descendent modules to load StudentModules for, in addition to
             the supplied descriptor. If depth is None, load all descendent StudentModules
-        '''
-        keys = [descriptor.location.url()]
-
-        shared_state_key = getattr(descriptor, 'shared_state_key', None)
-        if shared_state_key is not None:
-            keys.append(shared_state_key)
-
+        """
+        descriptors = [descriptor]
+         
         if depth is None or depth > 0:
             new_depth = depth - 1 if depth is not None else depth
 
             for child in descriptor.get_children():
-                keys.extend(self._get_module_state_keys(child, new_depth))
+                descriptors.extend(self._get_child_descriptors(child, new_depth))
+                
+        return descriptors
+    
+    def _get_module_state_keys(self, descriptors, descriptor_filter):
+        '''
+        Get a list of the state_keys needed for StudentModules
+        required for this module descriptor
+        
+        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule 
+            should be cached
+        '''
+        keys = []
+        for descriptor in descriptors:
+            if descriptor_filter(descriptor):
+                keys.append(descriptor.location.url())
+                
+                shared_state_key = getattr(descriptor, 'shared_state_key', None)
+                if shared_state_key is not None:
+                    keys.append(shared_state_key)
 
         return keys
 

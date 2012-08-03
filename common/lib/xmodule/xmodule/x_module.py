@@ -501,11 +501,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
                 all(getattr(self, attr, None) == getattr(other, attr, None)
                     for attr in self.equality_attributes))
 
-        if not eq:
-            for attr in self.equality_attributes:
-                print(getattr(self, attr, None),
-                      getattr(other, attr, None),
-                      getattr(self, attr, None) == getattr(other, attr, None))
+        # if not eq:
+        #     for attr in self.equality_attributes:
+        #         print(getattr(self, attr, None),
+        #               getattr(other, attr, None),
+        #               getattr(self, attr, None) == getattr(other, attr, None))
 
         return eq
 
