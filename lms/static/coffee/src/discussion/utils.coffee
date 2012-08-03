@@ -92,7 +92,6 @@ wmdEditors = {}
     imageUploadUrl = Discussion.urlFor('upload')
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl
     wmdEditors["#{cls_identifier}-#{id}"] = editor
-    console.log wmdEditors
     editor
 
   getWmdEditor: ($content, $local, cls_identifier) ->
@@ -106,8 +105,6 @@ wmdEditors = {}
   setWmdContent: ($content, $local, cls_identifier, text) ->
     id = $content.attr("_id")
     $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
-    console.log wmdEditors
-    console.log "#{cls_identifier}-#{id}"
     wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
 
   getContentInfo: (id, attr) ->

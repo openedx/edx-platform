@@ -27,7 +27,6 @@ Discussion = @Discussion
         Discussion.makeWmdEditor $content, $local, "reply-body"
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
-      $local(".discussion-link").hide()
       $discussionContent.attr("status", "reply")
 
     handleCancelReply = (elem) ->
@@ -61,7 +60,6 @@ Discussion = @Discussion
           anonymous: anonymous
           autowatch: autowatch
         success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
-          console.log response
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
