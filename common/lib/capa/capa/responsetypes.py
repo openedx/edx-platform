@@ -161,7 +161,7 @@ class LoncapaResponse(object):
         Returns the new CorrectMap, with (correctness,msg,hint,hintmode) for each answer_id.
         '''
         new_cmap = self.get_score(student_answers)
-        self.get_hints(student_answers, new_cmap, old_cmap)
+        self.get_hints(convert_files_to_filenames(student_answers), new_cmap, old_cmap)
         # log.debug('new_cmap = %s' % new_cmap)
         return new_cmap
 
