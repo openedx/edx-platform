@@ -4,13 +4,13 @@ if not @Discussion?
 Discussion = @Discussion
 
 initializeVote = (index, content) ->
-    $content = $(content)
-    $local = Discussion.generateLocal($content.children(".discussion-content"))
-    id = $content.attr("_id")
-    if Discussion.isUpvoted id
-      $local(".discussion-vote-up").addClass("voted")
-    else if Discussion.isDownvoted id
-      $local(".discussion-vote-down").addClass("voted")
+  $content = $(content)
+  $local = Discussion.generateLocal($content.children(".discussion-content"))
+  id = $content.attr("_id")
+  if Discussion.isUpvoted id
+    $local(".discussion-vote-up").addClass("voted")
+  else if Discussion.isDownvoted id
+    $local(".discussion-vote-down").addClass("voted")
 
 subscriptionLink = (type, id) ->
 

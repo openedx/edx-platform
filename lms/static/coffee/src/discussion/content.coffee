@@ -166,13 +166,20 @@ Discussion = @Discussion
           Discussion.bindContentEvents($content)
         )
 
-    handleEndorse = (elem) ->
+    handleEndorse = (elem, endorsed) ->
       url = Discussion.urlFor('endorse_comment', id)
-      endorsed = $local(".discussion-endorse").is(":checked")
-      $.post url, {endorsed: endorsed}, (response, textStatus) ->
-        # TODO error handling
-        Discussion.handleAnchorAndReload(response)
-      , 'json'
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {endorsed: endorsed}
+        success: (response, textStatus) ->
+          if textStatus == "success"
+            if endorsed
+              $(content).addClass("endorsed")
+            else
+              $(content).removeClass("endorsed")
 
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
@@ -248,7 +255,7 @@ Discussion = @Discussion
           handleVote($elem, "down")
 
       "click .discussion-endorse": ->
-        handleEndorse(this)
+        handleEndorse(this, $(this).is(":checked"))
 
       "click .discussion-edit": ->
         if $content.hasClass("thread")
