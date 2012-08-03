@@ -111,30 +111,50 @@ class ImportTestCase(unittest.TestCase):
         xml_out = etree.fromstring(xml_str_out)
         self.assertEqual(xml_out.tag, 'sequential')
 
-    def test_metadata_inherit(self):
-        """Make sure metadata inherits properly"""
+    def test_metadata_import_export(self):
+        """Two checks:
+            - unknown metadata is preserved across import-export
+            - inherited metadata doesn't leak to children.
+        """
         system = self.get_system()
         v = "1 hour"
-        start_xml = '''<course graceperiod="{grace}" url_name="test1" display_name="myseq">
-                      <chapter url="hi" url_name="ch" display_name="CH">
-                       <html url_name="h" display_name="H">Two houses, ...</html></chapter>
-                   </course>'''.format(grace=v)
+        start_xml = '''
+        <course graceperiod="{grace}" url_name="test1" unicorn="purple">
+            <chapter url="hi" url_name="ch" display_name="CH">
+                <html url_name="h" display_name="H">Two houses, ...</html>
+            </chapter>
+        </course>'''.format(grace=v)
         descriptor = XModuleDescriptor.load_from_xml(start_xml, system,
                                                      'org', 'course')
 
-        print "Errors: {0}".format(system.errorlog.errors)
         print descriptor, descriptor.metadata
         self.assertEqual(descriptor.metadata['graceperiod'], v)
+        self.assertEqual(descriptor.metadata['unicorn'], 'purple')
 
-        # Check that the child inherits correctly
+        # Check that the child inherits graceperiod correctly
         child = descriptor.get_children()[0]
         self.assertEqual(child.metadata['graceperiod'], v)
 
-        # Now export and see if the chapter tag has a graceperiod attribute
+        # check that the child does _not_ inherit any unicorns
+        self.assertTrue('unicorn' not in child.metadata)
+
+        # Now export and check things
         resource_fs = MemoryFS()
         exported_xml = descriptor.export_to_xml(resource_fs)
         print "Exported xml:", exported_xml
-        # hardcode path to child
+
+        # Does the course still have unicorns?
+        # hardcoded path to course
+        with resource_fs.open('course/test1.xml') as f:
+            course_xml = etree.fromstring(f.read())
+
+        self.assertEqual(course_xml.attrib['unicorn'], 'purple')
+
+        # did we successfully strip the url_name from the definition contents?
+        self.assertTrue('url_name' not in course_xml.attrib)
+
+        # Does the chapter tag now have a graceperiod attribute?
+        # hardcoded path to child
         with resource_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')

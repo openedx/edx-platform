@@ -47,6 +47,10 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] Remove once unused.
         'name', 'slug')
 
+    # VS[compat] -- remove once everything is in the CMS
+    # We don't want url_name in the metadata--it's in the location, so avoid
+    # confusion and duplication.
+    metadata_to_strip = ('url_name', )
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
@@ -166,11 +170,15 @@ class XmlDescriptor(XModuleDescriptor):
         Returns a dictionary {key: value}.
         """
         metadata = {}
-        for attr in cls.metadata_attributes:
+        for attr in xml_object.attrib:
             val = xml_object.get(attr)
             if val is not None:
                 # VS[compat].  Remove after all key translations done
                 attr = cls._translate(attr)
+
+                if attr in cls.metadata_to_strip:
+                    # don't load these
+                    continue
 
                 attr_map = cls.xml_attribute_map.get(attr, AttrMap())
                 metadata[attr] = attr_map.from_xml(val)
@@ -250,14 +258,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         # Add the non-inherited metadata
         for attr in self.own_metadata:
-            if attr not in self.metadata_attributes:
-                log.warning("Unexpected metadata '{attr}' on element '{url}'."
-                            " Not exporting.".format(attr=attr,
-                                                     url=self.location.url()))
-                continue
-
             xml_object.set(attr, val_for_xml(attr))
-
 
         # Write the actual contents to a file
         filepath = self.__class__._format_filepath(self.category, self.url_name)
