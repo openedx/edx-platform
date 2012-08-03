@@ -4,12 +4,21 @@ class @CapaDescriptor
         @edit_box = $(".edit-box.capa-box", @element)
         @source_box = $(".edit-box.source-box", @element)
         @message_box = $(".parser-message-box", @element)
+        @loadSource()
         @buildParser()
         @throttledAutoSave = _.throttle(@autoSave, 0);
         @source_box.keyup =>
             @parse()
 
     save: -> @edit_box.val()
+
+    loadSource: ->
+        parser = new DOMParser()
+        doc = parser.parseFromString @edit_box.val(), "text/xml"
+        nodes = doc.childNodes
+        for node in nodes
+            if node.nodeType == 8  # nodeType = 8 --> #comment
+                @source_box.val node.nodeValue
 
     buildParser: ->
         $.get "/static/grammars/main.jspeg", (data) =>
@@ -40,22 +49,22 @@ class @CapaDescriptor
             source = @source_box.val() + "\n"
             result = @parser.parse (source)
             console.log result
-            @outputXML(result)
+            @outputXML(result, source)
             @message_box.css {"display":"none"}
         catch e 
             console.log @buildErrorMessage(e)
             @message_box.html @buildErrorMessage(e)
             @message_box.css {"display":"block"}
 
-    outputXML: (parsed) ->
-        @edit_box.val @buildXML(parsed)
+    outputXML: (parsed, source) ->
+        @edit_box.val @buildXML(parsed, source)
         @checkAutoSave()
 
     dom2capa: (node) ->
         serializer = new XMLSerializer()
         capa = serializer.serializeToString(node)
 
-    buildXML: (parsed) ->
+    buildXML: (parsed, source) ->
         dom_parser = new DOMParser()
         doc = dom_parser.parseFromString("<problem />", "text/xml");
         problem = $(doc).find('problem')
@@ -161,6 +170,7 @@ class @CapaDescriptor
             else
                 throw new SyntaxError("unexpected section type " + section.type) 
 
+        doc.appendChild doc.createComment(source)
 
         capa = @dom2capa(doc)
         return capa
