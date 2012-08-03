@@ -18,12 +18,13 @@ Discussion = @Discussion
       if $replyView.length
         $replyView.show()
       else
+        thread_id = $discussionContent.parents(".thread").attr("_id")
         view = {
           id: id
-          showWatchCheckbox: $discussionContent.parents(".thread").attr("_id") not in $$user_info.subscribed_thread_ids
+          showWatchCheckbox: not Discussion.isSubscribed(thread_id, "thread")
         }
         $discussionContent.append Mustache.render Discussion.replyTemplate, view
-        Markdown.makeWmdEditor $local(".reply-body"), "-reply-body-#{id}", Discussion.urlFor('upload')
+        Discussion.makeWmdEditor $content, $local, "reply-body"
         $local(".discussion-submit-post").click -> handleSubmitReply(this)
         $local(".discussion-cancel-post").click -> handleCancelReply(this)
       $local(".discussion-link").hide()
@@ -33,8 +34,8 @@ Discussion = @Discussion
       $replyView = $local(".discussion-reply-new")
       if $replyView.length
         $replyView.hide()
-      reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
-      $(elem).replaceWith(reply)
+      #reply = Discussion.generateDiscussionLink("discussion-reply", "Reply", handleReply)
+      #$(elem).replaceWith(reply)
       $discussionContent.attr("status", "normal")
 
     handleSubmitReply = (elem) ->
@@ -45,26 +46,30 @@ Discussion = @Discussion
       else
         return
 
-      body = $local("#wmd-input-reply-body-#{id}").val()
+      body = Discussion.getWmdContent $content, $local, "reply-body"
 
       anonymous = false || $local(".discussion-post-anonymously").is(":checked")
       autowatch = false || $local(".discussion-auto-watch").is(":checked")
 
       Discussion.safeAjax
+        $elem: $(elem)
         url: url
         type: "POST"
+        dataType: 'json'
         data:
           body: body
           anonymous: anonymous
           autowatch: autowatch
-        success: (response, textStatus) ->
-          if response.errors? and response.errors.length > 0
-            errorsField = $local(".discussion-errors").empty()
-            for error in response.errors
-              errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-          else
-            Discussion.handleAnchorAndReload(response)
-        dataType: 'json'
+        success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
+          console.log response
+          $comment = $(response.html)
+          $content.children(".comments").prepend($comment)
+          Discussion.setWmdContent $content, $local, "reply-body", ""
+          Discussion.initializeContent($comment)
+          Discussion.bindContentEvents($comment)
+          $local(".discussion-reply-new").hide()
+          $discussionContent.attr("status", "normal")
+        )
 
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
@@ -91,7 +96,7 @@ Discussion = @Discussion
           tags: $local(".thread-raw-tags").html()
         }
         $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
-        Markdown.makeWmdEditor $local(".thread-body-edit"), "-thread-body-edit-#{id}", Discussion.urlFor('update_thread', id)
+        Discussion.makeWmdEditor $content, $local, "thread-body-edit"
         $local(".thread-tags-edit").tagsInput
           autocomplete_url: Discussion.urlFor('tags_autocomplete')
           autocomplete:
@@ -107,16 +112,16 @@ Discussion = @Discussion
     handleSubmitEditThread = (elem) ->
       url = Discussion.urlFor('update_thread', id)
       title = $local(".thread-title-edit").val()
-      body = $local("#wmd-input-thread-body-edit-#{id}").val()
+      body = Discussion.getWmdContent $content, $local, "thread-body-edit"
       tags = $local(".thread-tags-edit").val()
-      $.post url, {title: title, body: body, tags: tags}, (response, textStatus) ->
-        if response.errors
-          errorsField = $local(".discussion-update-errors").empty()
-          for error in response.errors
-            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-        else
+      $.ajax
+        url: url
+        type: "POST"
+        dataType: 'json'
+        data: {title: title, body: body, tags: tags},
+        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
           Discussion.handleAnchorAndReload(response)
-      , 'json'
+        )
 
     handleEditComment = (elem) ->
       $local(".discussion-content-wrapper").hide()
@@ -124,26 +129,23 @@ Discussion = @Discussion
       if $editView.length
         $editView.show()
       else
-        view = {
-          id: id
-          body: $local(".comment-raw-body").html()
-        }
+        view = { id: id, body: $local(".comment-raw-body").html() }
         $discussionContent.append Mustache.render Discussion.editCommentTemplate, view
-        Markdown.makeWmdEditor $local(".comment-body-edit"), "-comment-body-edit-#{id}", Discussion.urlFor('update_comment', id)
+        Discussion.makeWmdEditor $content, $local, "comment-body-edit"
         $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditComment(this)
         $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
 
     handleSubmitEditComment= (elem) ->
       url = Discussion.urlFor('update_comment', id)
-      body = $local("#wmd-input-comment-body-edit-#{id}").val()
-      $.post url, {body: body}, (response, textStatus) ->
-        if response.errors
-          errorsField = $local(".discussion-update-errors").empty()
-          for error in response.errors
-            errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-        else
+      body = Discussion.getWmdContent $content, $local, "comment-body-edit"
+      $.ajax
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {body: body}
+        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
           Discussion.handleAnchorAndReload(response)
-      , 'json'
+        )
 
     handleEndorse = (elem) ->
       url = Discussion.urlFor('endorse_comment', id)
@@ -166,6 +168,9 @@ Discussion = @Discussion
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
 
+      if not $showComments.length or not $threadTitle.length
+        return
+
       rebindHideEvents = ->
         $threadTitle.unbind('click').click handleHideSingleThread
         $showComments.unbind('click').click handleHideSingleThread
@@ -182,6 +187,7 @@ Discussion = @Discussion
           $elem: $.merge($threadTitle, $showComments)
           url: url
           type: "GET"
+          dataType: 'json'
           success: (response, textStatus) ->
             if not $$annotated_content_info?
               window.$$annotated_content_info = {}
@@ -191,37 +197,39 @@ Discussion = @Discussion
               Discussion.initializeContent(comment)
               Discussion.bindContentEvents(comment)
             rebindHideEvents()
-          dataType: 'json'
       
-      
-    $local(".thread-title").click handleShowSingleThread
+    Discussion.bindLocalEvents $local,
 
-    $local(".discussion-show-comments").click handleShowSingleThread
+      "click .thread-title": ->
+        handleShowSingleThread(this)
 
-    $local(".discussion-reply-thread").click ->
-      handleShowSingleThread($local(".thread-title"))
-      handleReply(this)
+      "click .discussion-show-comments": ->
+        handleShowSingleThread(this)
 
-    $local(".discussion-reply-comment").click ->
-      handleReply(this)
+      "click .discussion-reply-thread": ->
+        handleShowSingleThread($local(".thread-title"))
+        handleReply(this)
 
-    $local(".discussion-cancel-reply").click ->
-      handleCancelReply(this)
+      "click .discussion-reply-comment": ->
+        handleReply(this)
 
-    $local(".discussion-vote-up").click ->
-      handleVote(this, "up")
+      "click .discussion-cancel-reply": ->
+        handleCancelReply(this)
 
-    $local(".discussion-vote-down").click ->
-      handleVote(this, "down")
+      "click .discussion-vote-up": ->
+        handleVote(this, "up")
 
-    $local(".discussion-endorse").click ->
-      handleEndorse(this)
+      "click .discussion-vote-down": ->
+        handleVote(this, "down")
 
-    $local(".discussion-edit").click ->
-      if $content.hasClass("thread")
-        handleEditThread(this)
-      else
-        handleEditComment(this)
+      "click .discussion-endorse": ->
+        handleEndorse(this)
+
+      "click .discussion-edit": ->
+        if $content.hasClass("thread")
+          handleEditThread(this)
+        else
+          handleEditComment(this)
 
   initializeContent: (content) ->
     $content = $(content)

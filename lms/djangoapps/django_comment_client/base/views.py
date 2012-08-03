@@ -15,6 +15,7 @@ from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+from mitxmako.shortcuts import render_to_response, render_to_string
 from django_comment_client.utils import JsonResponse, JsonError, extract
 
 def thread_author_only(fn):
@@ -58,7 +59,17 @@ def create_thread(request, course_id, commentable_id):
     if request.POST.get('autowatch', 'false').lower() == 'true':
         attributes['auto_subscribe'] = True
     response = comment_client.create_thread(commentable_id, attributes)
-    return JsonResponse(response)
+    if request.is_ajax():
+        context = {
+            'course_id': course_id,
+            'thread': response,
+        }
+        html = render_to_string('discussion/ajax_thread_only.html', context)
+        return JsonResponse({
+            'html': html,
+        })
+    else:
+        return JsonResponse(response)
 
 @thread_author_only
 @login_required
@@ -68,9 +79,7 @@ def update_thread(request, course_id, thread_id):
     response = comment_client.update_thread(thread_id, attributes)
     return JsonResponse(response)
 
-@login_required
-@require_POST
-def create_comment(request, course_id, thread_id):
+def _create_comment(request, course_id, _response_from_attributes):
     attributes = extract(request.POST, ['body'])
     attributes['user_id'] = request.user.id
     attributes['course_id'] = course_id
@@ -78,8 +87,24 @@ def create_comment(request, course_id, thread_id):
         attributes['anonymous'] = True
     if request.POST.get('autowatch', 'false').lower() == 'true':
         attributes['auto_subscribe'] = True
-    response = comment_client.create_comment(thread_id, attributes)
-    return JsonResponse(response)
+    response = _response_from_attributes(attributes)
+    if request.is_ajax():
+        context = {
+            'comment': response,
+        }
+        html = render_to_string('discussion/ajax_comment_only.html', context)
+        return JsonResponse({
+            'html': html,
+        })
+    else:
+        return JsonResponse(response)
+
+@login_required
+@require_POST
+def create_comment(request, course_id, thread_id):
+    def _response_from_attributes(attributes):
+        return comment_client.create_comment(thread_id, attributes)
+    return _create_comment(request, course_id, _response_from_attributes)
 
 @thread_author_only
 @login_required
@@ -107,15 +132,9 @@ def endorse_comment(request, course_id, comment_id):
 @login_required
 @require_POST
 def create_sub_comment(request, course_id, comment_id):
-    attributes = extract(request.POST, ['body'])
-    attributes['user_id'] = request.user.id
-    attributes['course_id'] = course_id
-    if request.POST.get('anonymous', 'false').lower() == 'true':
-        attributes['anonymous'] = True
-    if request.POST.get('autowatch', 'false').lower() == 'true':
-        attributes['auto_subscribe'] = True
-    response = comment_client.create_sub_comment(comment_id, attributes)
-    return JsonResponse(response)
+    def _response_from_attributes(attributes):
+        return comment_client.create_sub_comment(comment_id, attributes)
+    return _create_comment(request, course_id, _response_from_attributes)
 
 @comment_author_only
 @login_required

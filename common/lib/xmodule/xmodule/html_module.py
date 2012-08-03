@@ -5,11 +5,11 @@ import os
 import sys
 from lxml import etree
 
-from xmodule.x_module import XModule
-from xmodule.xml_module import XmlDescriptor
-from xmodule.editing_module import EditingDescriptor
-from stringify import stringify_children
-from html_checker import check_html
+from .x_module import XModule
+from .xml_module import XmlDescriptor
+from .editing_module import EditingDescriptor
+from .stringify import stringify_children
+from .html_checker import check_html
 
 log = logging.getLogger("mitx.courseware")
 

@@ -7,24 +7,28 @@
   <div class="thread" _id="${thread['id']}">
     ${render_content(thread, "thread", edit_thread=edit_thread, show_comments=show_comments)}
     % if show_comments:
-      ${render_comments(thread['children'])}
+      ${render_comments(thread.get('children', []))}
     % endif
+  </div>
+</%def>
+
+<%def name="render_comment(comment)">
+  % if comment['endorsed']:
+  <div class="comment endorsed" _id="${comment['id']}">
+  % else:
+  <div class="comment" _id="${comment['id']}">
+  % endif
+    ${render_content(comment, "comment")}
+    <div class="comments">
+      ${render_comments(comment.get('children', []))}
+    </div>
   </div>
 </%def>
 
 <%def name="render_comments(comments)">
   <div class="comments">
     % for comment in comments:
-      % if comment['endorsed']:
-      <div class="comment endorsed" _id="${comment['id']}">
-      % else:
-      <div class="comment" _id="${comment['id']}">
-      % endif
-        ${render_content(comment, "comment")}
-        <div class="comments">
-          ${render_comments(comment['children'])}
-        </div>
-      </div>
+      ${render_comment(comment)}
     % endfor
   </div>
 </%def>

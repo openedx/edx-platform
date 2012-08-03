@@ -108,7 +108,7 @@ $ ->
       (text) -> _this.replaceMath(text)
 
   if Markdown?
-
+    
     Markdown.getMathCompatibleConverter = ->
         converter = Markdown.getSanitizingConverter()
         processor = new MathJaxProcessor()
@@ -174,3 +174,4 @@ $ ->
           text: text
           previewSetter: previewSet
       editor.run()
+      editor

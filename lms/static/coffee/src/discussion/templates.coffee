@@ -3,7 +3,9 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+
 @Discussion = $.extend @Discussion,
+
   newPostTemplate: """
     <form class="new-post-form" _id="{{discussion_id}}">
       <ul class="discussion-errors"></ul>    
