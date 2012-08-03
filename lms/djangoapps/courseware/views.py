@@ -86,18 +86,20 @@ def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
     course = check_course(course_id)
-
+    
+    sections, all_descriptors = grades.get_graded_sections(course)
+    
     student_objects = User.objects.all()[:100]
     student_info = []
-
+    
     for student in student_objects:
-        student_module_cache = StudentModuleCache(student, course)
-        course = get_module(request.user, request, course.location, student_module_cache)
+        student_module_cache = StudentModuleCache(student, descriptors=all_descriptors)
+        
         student_info.append({
             'username': student.username,
             'id': student.id,
             'email': student.email,
-            'grade_info': grades.grade_sheet(student, course, student_module_cache),
+            'grade_summary': grades.fast_grade(student, request, sections, course.grader, student_module_cache),
             'realname': UserProfile.objects.get(user=student).name
         })
 
@@ -123,16 +125,21 @@ def profile(request, course_id, student_id=None):
     student_module_cache = StudentModuleCache(request.user, course)
     course_module = get_module(request.user, request, course.location, student_module_cache)
     
+    courseware_summary = grades.grade_sheet(student, course_module, course.grader, student_module_cache)
+    sections, _ = grades.get_graded_sections(course)
+    grade_summary = grades.fast_grade(request.user, request, sections, course.grader, student_module_cache)
+    
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
                'language': user_info.language,
                'email': student.email,
                'course': course,
-               'format_url_params': format_url_params,
-               'csrf': csrf(request)['csrf_token']
+               'csrf': csrf(request)['csrf_token'],
+               'courseware_summary' : courseware_summary,
+               'grade_summary' : grade_summary
                }
-    context.update(grades.grade_sheet(student, course_module, course.grader, student_module_cache))
+    context.update()
 
     return render_to_response('profile.html', context)
 
@@ -157,6 +164,7 @@ def render_accordion(request, course, chapter, section):
                     ('toc', toc),
                     ('course_name', course.title),
                     ('course_id', course.id),
+                    #TODO: Do we need format_url_params anymore? What is a better way to create the reversed links?
                     ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)

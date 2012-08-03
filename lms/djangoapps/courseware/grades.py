@@ -30,6 +30,7 @@ def get_graded_sections(course_descriptor):
                 
                 xmoduledescriptors = []
                 for module in yield_descriptor_descendents(s):
+                    # TODO: Only include modules that have a score here
                     xmoduledescriptors.append(module)
                     
                 section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
@@ -73,19 +74,20 @@ def fast_grade(student, request, course_graded_sections, grader, student_module_
                 scores = []
                 section_module = get_module(student, request, section_descriptor.location, student_module_cache)
                 
-                for module in yield_descriptor_descendents(section_module):
+                # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
+                # Then, we may not need to instatiate any problems if they are already in the database
+                for module in yield_module_descendents(section_module):                    
                     (correct, total) = get_score(student, module, student_module_cache)
-                    graded = module.metadata.get("graded", False)
-
                     if correct is None and total is None:
                         continue
-
+                    
                     if settings.GENERATE_PROFILE_SCORES:
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
                             correct = total
-
+                    
+                    graded = module.metadata.get("graded", False)
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
@@ -110,20 +112,18 @@ def fast_grade(student, request, course_graded_sections, grader, student_module_
 
 def grade_sheet(student, course, grader, student_module_cache):
     """
-    This pulls a summary of all problems in the course. It returns a dictionary with two datastructures:
+    This pulls a summary of all problems in the course.
 
+    Returns
     - courseware_summary is a summary of all sections with problems in the course. It is organized as an array of chapters,
     each containing an array of sections, each containing an array of scores. This contains information for graded and ungraded
     problems, and is good for displaying a course summary with due dates, etc.
-
-    - grade_summary is the output from the course grader. More information on the format is in the docstring for CourseGrader.
-
+    
     Arguments:
         student: A User object for the student to grade
         course: An XModule containing the course to grade
         student_module_cache: A StudentModuleCache initialized with all instance_modules for the student
     """
-    totaled_scores = {}
     chapters = []
     for c in course.get_children():
         sections = []
@@ -132,30 +132,13 @@ def grade_sheet(student, course, grader, student_module_cache):
             scores = []
             for module in yield_module_descendents(s):
                 (correct, total) = get_score(student, module, student_module_cache)
-
                 if correct is None and total is None:
                     continue
-
-                if settings.GENERATE_PROFILE_SCORES:
-                    if total > 1:
-                        correct = random.randrange(max(total - 2, 1), total + 1)
-                    else:
-                        correct = total
-
-                if not total > 0:
-                    #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
-                    graded = False
 
                 scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
 
             section_total, graded_total = graders.aggregate_scores(scores, s.metadata.get('display_name'))
-            #Add the graded total to totaled_scores
             format = s.metadata.get('format', "")
-            if format and graded_total.possible > 0:
-                format_scores = totaled_scores.get(format, [])
-                format_scores.append(graded_total)
-                totaled_scores[format] = format_scores
-
             sections.append({
                 'section': s.metadata.get('display_name'),
                 'scores': scores,
@@ -169,10 +152,7 @@ def grade_sheet(student, course, grader, student_module_cache):
                          'chapter': c.metadata.get('display_name'),
                          'sections': sections})
 
-    grade_summary = grader.grade(totaled_scores)
-
-    return {'courseware_summary': chapters,
-            'grade_summary': grade_summary}
+    return chapters
 
 
 def get_score(user, problem, student_module_cache):
