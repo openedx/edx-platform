@@ -108,7 +108,7 @@
 <%def name="render_vote(content)">
   <div class="discussion-votes">
     ${render_link("discussion-vote discussion-vote-up", "&#x2C4;")}
-    ${content['votes']['point']}
+    <div class="discussion-votes-point">${content['votes']['point']}</div>
     ${render_link("discussion-vote discussion-vote-down", "&#x2C5;")}
   </div>
 </%def>

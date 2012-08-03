@@ -66,13 +66,13 @@ def vote_for_comment(comment_id, user_id, value, *args, **kwargs):
     return _perform_request('put', _url_for_vote_comment(comment_id), {'user_id': user_id, 'value': value}, *args, **kwargs)
 
 def undo_vote_for_comment(comment_id, user_id, *args, **kwargs):
-    return _perform_request('delete', _url_for_vote_comment(comment_id), *args, **kwargs)
+    return _perform_request('delete', _url_for_vote_comment(comment_id), {'user_id': user_id}, *args, **kwargs)
 
 def vote_for_thread(thread_id, user_id, value, *args, **kwargs):
     return _perform_request('put', _url_for_vote_thread(thread_id), {'user_id': user_id, 'value': value}, *args, **kwargs)
 
 def undo_vote_for_thread(thread_id, user_id, *args, **kwargs):
-    return _perform_request('delete', _url_for_vote_thread(thread_id), *args, **kwargs)
+    return _perform_request('delete', _url_for_vote_thread(thread_id), {'user_id': user_id}, *args, **kwargs)
 
 def get_notifications(user_id, *args, **kwargs):
     return _perform_request('get', _url_for_notifications(user_id), *args, **kwargs)
@@ -107,8 +107,6 @@ def unsubscribe_thread(user_id, thread_id, *args, **kwargs):
 
 def unsubscribe_commentable(user_id, commentable_id, *args, **kwargs):
     return unsubscribe(user_id, {'source_type': 'other', 'source_id': commentable_id})
-
-
 
 def _perform_request(method, url, data_or_params=None, *args, **kwargs):
     if method in ['post', 'put', 'patch']:

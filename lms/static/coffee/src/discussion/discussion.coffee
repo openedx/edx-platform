@@ -76,7 +76,7 @@ initializeFollowThread = (index, thread) ->
 
     $discussion = $(discussion)
     $discussionNonContent = $discussion.children(".discussion-non-content")
-    $local = Discussion.generateLocal($discussionNonContent)#(selector) -> $discussionNonContent.find(selector)
+    $local = Discussion.generateLocal($discussionNonContent)
 
     id = $discussion.attr("_id")
 

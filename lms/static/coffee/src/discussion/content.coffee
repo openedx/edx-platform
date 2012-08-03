@@ -71,13 +71,34 @@ Discussion = @Discussion
           $discussionContent.attr("status", "normal")
         )
 
+    handleUnvote = (elem) ->
+
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
       url = Discussion.urlFor("#{value}vote_#{contentType}", id)
-      $.post url, {}, (response, textStatus) ->
-        if textStatus == "success"
-          Discussion.handleAnchorAndReload(response)
-      , 'json'
+      Discussion.safeAjax
+        $elem: $local(".discussion-vote")
+        url: url
+        type: "POST"
+        dataType: "json"
+        success: (response, textStatus) ->
+          if textStatus == "success"
+            $local(".discussion-vote").removeClass("voted")
+            $local(".discussion-vote-#{value}").addClass("voted")
+            $local(".discussion-votes-point").html response.votes.point
+
+    handleUnvote = (elem, value) ->
+      contentType = if $content.hasClass("thread") then "thread" else "comment"
+      url = Discussion.urlFor("undo_vote_for_#{contentType}", id)
+      Discussion.safeAjax
+        $elem: $local(".discussion-vote")
+        url: url
+        type: "POST"
+        dataType: "json"
+        success: (response, textStatus) ->
+          if textStatus == "success"
+            $local(".discussion-vote").removeClass("voted")
+            $local(".discussion-votes-point").html response.votes.point
 
     handleCancelEdit = (elem) ->
       $local(".discussion-content-edit").hide()
@@ -213,10 +234,18 @@ Discussion = @Discussion
         handleCancelReply(this)
 
       "click .discussion-vote-up": ->
-        handleVote(this, "up")
+        $elem = $(this)
+        if $elem.hasClass("voted")
+          handleUnvote($elem)
+        else
+          handleVote($elem, "up")
 
       "click .discussion-vote-down": ->
-        handleVote(this, "down")
+        $elem = $(this)
+        if $elem.hasClass("voted")
+          handleUnvote($elem)
+        else
+          handleVote($elem, "down")
 
       "click .discussion-endorse": ->
         handleEndorse(this)

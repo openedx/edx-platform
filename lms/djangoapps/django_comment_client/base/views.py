@@ -174,9 +174,23 @@ def vote_for_comment(request, course_id, comment_id, value):
 
 @login_required
 @require_POST
+def undo_vote_for_comment(request, course_id, comment_id):
+    user_id = request.user.id
+    response = comment_client.undo_vote_for_comment(comment_id, user_id)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
 def vote_for_thread(request, course_id, thread_id, value):
     user_id = request.user.id
     response = comment_client.vote_for_thread(thread_id, user_id, value)
+    return JsonResponse(response)
+
+@login_required
+@require_POST
+def undo_vote_for_thread(request, course_id, thread_id):
+    user_id = request.user.id
+    response = comment_client.undo_vote_for_thread(thread_id, user_id)
     return JsonResponse(response)
 
 @login_required
