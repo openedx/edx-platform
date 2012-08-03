@@ -65,7 +65,9 @@ def create_thread(request, course_id, commentable_id):
             'thread': response,
         }
         html = render_to_string('discussion/ajax_thread_only.html', context)
-        return HtmlResponse(html)
+        return JsonResponse({
+            'html': html,
+        })
     else:
         return JsonResponse(response)
 
