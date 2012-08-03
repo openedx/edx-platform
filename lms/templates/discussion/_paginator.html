@@ -9,11 +9,7 @@
 %>
 
 <%def name="link_to_page(_page, text)">
-  % if discussion_type == 'inline':
-    <a class="discussion-page-link discussion-inline-page-link" href="javascript:void(0)" page-url="${url_for_page(_page)}">${text}</a>
-  % else:
-    <a class="discussion-page-link" href="${url_for_page(_page)}">${text}</a>
-  % endif
+  <a class="discussion-page-link discussion-inline-page-link" href="javascript:void(0)" page-url="${url_for_page(_page)}">${text}</a>
 </%def>
 
 <%def name="div_page(_page)">

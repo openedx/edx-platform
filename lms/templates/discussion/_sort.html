@@ -20,11 +20,7 @@
   def url_for_sort(key, order):
     return base_url + '?' + urlencode(merge(query_params, {'page': 1, 'sort_key': key, 'sort_order': order}))
   %>
-  % if discussion_type == 'inline':
-    <a class="discussion-sort-link discussion-inline-sort-link ${cls}" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
-  % else:
-    <a class="discussion-sort-link ${cls}" href="${url_for_sort(key, order)}">${title}</a>
-  % endif
+  <a class="discussion-sort-link discussion-inline-sort-link ${cls}" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
 </%def>
     
 <div class="discussion-sort">
