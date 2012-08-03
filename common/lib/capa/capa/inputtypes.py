@@ -307,7 +307,7 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
-    context = { 'id': eid, 'state': status, 'msg': msg, }
+    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, }
     html = render_template("filesubmission.html", context)
     return etree.XML(html) 
 
