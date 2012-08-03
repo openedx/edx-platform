@@ -56,21 +56,21 @@ def toc_for_course(user, request, course, active_chapter, active_section):
         sections = list()
         for section in chapter.get_display_items():
 
-            active = (chapter.metadata.get('display_name') == active_chapter and
-                      section.metadata.get('display_name') == active_section)
+            active = (chapter.display_name == active_chapter and
+                      section.display_name == active_section)
             hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
             if not hide_from_toc:
-                sections.append({'display_name': section.metadata.get('display_name'),
-                                 'url_name': section.metadata.get('url_name'),
+                sections.append({'display_name': section.display_name,
+                                 'url_name': section.url_name,
                                  'format': section.metadata.get('format', ''),
                                  'due': section.metadata.get('due', ''),
                                  'active': active})
 
-        chapters.append({'display_name': chapter.metadata.get('display_name'),
-                         'url_name': chapter.metadata.get('url_name'),
+        chapters.append({'display_name': chapter.display_name,
+                         'url_name': chapter.url_name,
                          'sections': sections,
-                         'active': chapter.metadata.get('display_name') == active_chapter})
+                         'active': chapter.display_name == active_chapter})
     return chapters
 
 
@@ -89,7 +89,7 @@ def get_section(course_module, chapter, section):
 
     chapter_module = None
     for _chapter in course_module.get_children():
-        if _chapter.metadata.get('url_name') == chapter:
+        if _chapter.url_name == chapter:
             chapter_module = _chapter
             break
 
@@ -98,7 +98,7 @@ def get_section(course_module, chapter, section):
 
     section_module = None
     for _section in chapter_module.get_children():
-        if _section.metadata.get('url_name') == section:
+        if _section.url_name == section:
             section_module = _section
             break
 

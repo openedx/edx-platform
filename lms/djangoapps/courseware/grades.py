@@ -74,8 +74,8 @@ def grade_sheet(student, course, grader, student_module_cache):
                 totaled_scores[format] = format_scores
 
             sections.append({
-                'display_name': s.metadata.get('display_name'),
-                'url_name': s.metadata.get('url_name'),
+                'display_name': s.display_name,
+                'url_name': s.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
@@ -83,9 +83,9 @@ def grade_sheet(student, course, grader, student_module_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.metadata.get('display_name'),
-                         'display_name': c.metadata.get('display_name'),
-                         'url_name': c.metadata.get('url_name'),
+        chapters.append({'course': course.display_name,
+                         'display_name': c.display_name,
+                         'url_name': c.url_name,
                          'sections': sections})
 
     grade_summary = grader.grade(totaled_scores)
