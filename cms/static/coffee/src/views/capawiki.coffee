@@ -1,4 +1,4 @@
-class CMS.Views.ModuleEdit extends Backbone.View
+class CMS.Views.CapawikiEdit extends Backbone.View
   tagName: 'section'
   className: 'edit-pane'
 
@@ -6,13 +6,49 @@ class CMS.Views.ModuleEdit extends Backbone.View
     'click .cancel': 'cancel'
     'click .module-edit': 'editSubmodule'
     'click .save-update': 'save'
+    'keyup .wiki-box': 'checkAutoSave'
 
   initialize: ->
     @$el.load @model.editUrl(), =>
-      @model.loadModule(@el)
-
-      # Load preview modules
+      @descriptor = XModule.loadModule($(@el).find('.xmodule_edit'))
+      @capa_box = $(".capa-box", @el)
+      @wiki_box = $(".wiki-box", @el)
+      @model.module = @descriptor
+      @throttledAutoSave = _.throttle(@autoSave, 0);
       XModule.loadModules('display')
+
+  checkAutoSaveTimeout: ->
+    @auto_save_timer = null
+    @throttledAutoSave()
+
+  checkAutoSave: =>
+    callback = _.bind(@checkAutoSaveTimeout, this)
+    if @auto_save_timer
+      @auto_save_timer = window.clearTimeout(@auto_save_timer)
+    @auto_save_timer = window.setTimeout(callback, 1000)
+
+  hideMessage: ->
+    @message_box.css {"display":"none"}
+
+  showMessage: (message) ->
+    @message_box.css {"display":"block"}
+    @message_box.text message
+
+  showError: (message) ->
+    @showMessage(message)
+
+  autoSave: ->
+    @model.save().done((previews) =>
+      @hideMessage()
+      previews_section = @$el.find('.previews').empty()
+      $.each(previews, (idx, preview) =>
+        preview_wrapper = $('<section/>', class: 'preview').append preview
+        previews_section.append preview_wrapper
+      )
+      XModule.loadModules('display')
+    ).fail(->
+      @showMessage("There was an error saving your changes. Please try again.")
+    )
 
   save: (event) ->
     event.preventDefault()
@@ -28,7 +64,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     ).fail(->
       alert("There was an error saving your changes. Please try again.")
     )
-  
+
   cancel: (event) ->
     event.preventDefault()
     CMS.popView()

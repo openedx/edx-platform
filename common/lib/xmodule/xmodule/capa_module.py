@@ -565,9 +565,6 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
-    mako_template = "widgets/capa-edit.html"
-    js_module_name = "CapaDescriptor"
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/edit.coffee')]}
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

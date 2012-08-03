@@ -2,6 +2,8 @@ import logging
 
 from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
+import re
+
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +34,14 @@ def import_from_xml(store, data_dir, course_dirs=None, eager=True,
             log.exception('Item already exists at %s' % module.location.url())
             pass
         if 'data' in module.definition:
-            store.update_item(module.location, module.definition['data'])
+            if module.location.category == "problem":
+                data = {
+                    'capa': module.definition['data'],
+                    'wiki': '',
+                }
+                store.update_item(module.location, data)
+            else:
+                store.update_item(module.location, module.definition['data'])
         if 'children' in module.definition:
             store.update_children(module.location, module.definition['children'])
         # NOTE: It's important to use own_metadata here to avoid writing
