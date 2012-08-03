@@ -3,7 +3,83 @@ if not @Discussion?
 
 Discussion = @Discussion
 
+
+###
+titleTemplate = """
+  <a class="thread-title" name="{{id}}" href="javascript:void(0)">{{title}}</a>
+"""
+
+threadTemplate: """
+  <div class="thread" _id="{{id}}">
+    {{content}}
+    <div class="comments">
+    </div>
+  </div>
+"""
+
+commentTemplate: """
+  <div class="comment" _id="{{id}}">
+    {{content}}
+    <div class="comments">
+    </div>
+  </div>
+"""
+
+contentTemplate: """
+  <div class="discussion-content"> 
+    <div class="discussion-content-wrapper clearfix">
+      {{vote}}
+      <div class="discussion-right-wrapper clearfix">
+        {{title}}
+        <div class="discussion-content-view">
+          <div class="content-body {{type}}-body" id="content-body-{{id}}">{{body}}</div>
+          <div class="content-raw-body {{type}}-raw-body" style="display: none">{{body}}</div>
+          {{tags}}
+          {{bottom_bar}}
+        </div>
+      </div>
+    </div>
+  </div>
+"""
+
+tagsTemplate = """
+  <div class="thread-tags">
+
+  </div>
+  <div class="thread-raw-tags" style="display: none">
+
+"""
+###
+
 @Discussion = $.extend @Discussion,
+
+###
+  renderThread: (thread) ->
+    rendered_title = Mustache.render titleTemplate, thread
+
+    content_view =
+      tags: rendered_tags
+      rendered_bottom_bar: rendered_bottom_bar
+      rendered_title: rendered_title
+      rendered_vote: rendered_vote
+
+    rendered_content = Mustache.render contentTemplate, $.extend(thread, contentView)
+        
+    Mustache.render threadTemplate, {rendered_content: rendered_content}
+
+  renderComment: (comment) ->
+  
+    
+
+  
+
+  commentTemplate: """
+
+
+  """
+###
+
+
   newPostTemplate: """
     <form class="new-post-form" _id="{{discussion_id}}">
       <ul class="discussion-errors"></ul>    
