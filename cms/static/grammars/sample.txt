@@ -44,3 +44,8 @@ small-signal gain \(\frac{v_o}{v_i}\) in terms of \(R_L\), \(R_S\),
 and \(d\).  (Be careful, algebraic expressions can be case sensitive!)
 
 = type:formula samples:"RL,RS,d@1,1,1:3,3,3#10" answer:"-RL/RS"
+
+Let's introduct a multiple choice question with multiple correct answers. 
+(x) Choice A. This is correct.  
+(x) Choice B. This is also correct. 
+( ) Choice C. This is wrong. 
