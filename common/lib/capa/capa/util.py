@@ -39,5 +39,5 @@ def convert_files_to_filenames(answers):
     '''
     new_answers = dict()
     for answer_id in answers.keys():
-        new_answers[answer_id] = str(answers[answer_id])
+        new_answers[answer_id] = unicode(answers[answer_id])
     return new_answers
