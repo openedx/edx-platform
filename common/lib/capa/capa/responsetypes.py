@@ -853,7 +853,7 @@ class CodeResponse(LoncapaResponse):
             log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_id, student_answers))
             raise Exception(err)
 
-        self.context.update({'submission': submission})
+        self.context.update({'submission': unicode(submission)}) # Submission could be a file
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
@@ -870,7 +870,7 @@ class CodeResponse(LoncapaResponse):
                     'edX_cmd': 'get_score',
                     'edX_tests': self.tests,
                     'processor': self.code,
-                    'edX_student_response': submission}
+                    'edX_student_response': unicode(submission)}
         
         # Submit request
         error = xqueue_interface.send_to_queue(header=xheader,
