@@ -124,18 +124,19 @@ $discussion_input_width: 100%;
       font-size: $comment_info_size;
       padding: 5px 8px;
       text-decoration: none;
-      border: 1px solid #BEBEBE;
+      border: none;
       -webkit-box-shadow: none; 
       -moz-box-shadow: none; 
       box-shadow: none; 
-      background-color: #BEBEBE;
+      background-color: #AAA;
       background-image: none;
       text-shadow: none;
       &:hover {
+        border: none;
         -webkit-box-shadow: none; 
         -moz-box-shadow: none; 
         box-shadow: none; 
-        background-color: #AAA;
+        background-color: #BEBEBE;
         background-image: none; 
       }
     }
@@ -298,7 +299,6 @@ $discussion_input_width: 100%;
         color: #1d9dd9;
         display: inline;
       }
-      
     }
     .discussion-content {
       overflow: hidden;
@@ -306,7 +306,7 @@ $discussion_input_width: 100%;
       padding: 2% 0;
       .discussion-reply-new {
         @include discussion-font;
-        margin-left: $comment_margin_left;
+        margin-left: 5%;
         .reply-body {
           @include discussion-font;
           width: 95%;
@@ -344,16 +344,23 @@ $discussion_input_width: 100%;
     text-align: center;
     div {
       display: inline-block;
-    }
-    div a {
-      -webkit-border-radius: 3px;
-      -moz-border-radius: 3px;
-      -ms-border-radius: 3px;
-      -o-border-radius: 3px;
-      border-radius: 3px;
-      background: #EEE;
+      font-weight: bold;
       margin: 0 5px;
-      padding: 4px 10px;
+      a {
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        border-radius: 3px;
+        padding: 4px 10px;
+        background: #EEE;
+        font-weight: normal;
+        color: black;
+        text-decoration: none;
+        &:hover {
+          background: #DDD;
+        }
+      }
     }
   }
 }
