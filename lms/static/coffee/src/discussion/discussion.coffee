@@ -58,7 +58,7 @@ initializeFollowThread = (index, thread) ->
   $thread = $(thread)
   id = $thread.attr("_id")
   $thread.children(".discussion-content")
-         .find(".info")
+         .find(".follow-wrapper")
          .append(subscriptionLink('thread', id))
 
 @Discussion = $.extend @Discussion,
