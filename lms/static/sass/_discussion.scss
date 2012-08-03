@@ -155,6 +155,10 @@ $discussion_input_width: 100%;
       color: black;
       font-weight: bold;
       font-size: 15px;
+      &:hover {
+        text-decoration: none;
+        color: #1C71DD;
+      }
       &.discussion-vote-up {
         margin-bottom: 3px;
       }
@@ -162,7 +166,7 @@ $discussion_input_width: 100%;
         margin-top: 5px;
       }
       &.voted { 
-        color: #1d9dd9;
+        color: #1C71DD;
       }
     }
   }
