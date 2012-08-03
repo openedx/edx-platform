@@ -230,11 +230,16 @@ class LoncapaProblem(object):
         '''
         
         self.student_answers = convert_files_to_filenames(answers)
+        
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
         # log.debug('Responders: %s' % self.responders)
-        for responder in self.responders.values():
-            results = responder.evaluate_answers(answers, oldcmap)      # call the responsetype instance to do the actual grading
+        for responder in self.responders.values():                  # Call each responsetype instance to do actual grading
+            if 'filesubmission' in responder.allowed_inputfields:   # File objects are passed only if responsetype 
+                                                                    #   explicitly allows for file submissions
+                results = responder.evaluate_answers(answers, oldcmap)
+            else:
+                results = responder.evaluate_answers(convert_files_to_filenames(answers), oldcmap)
             newcmap.update(results)
         self.correct_map = newcmap
         # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
