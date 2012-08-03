@@ -91,7 +91,7 @@ initializeFollowDiscussion = (discussion) ->
 
     handleAjaxReloadDiscussion = (elem, url) ->
       $elem = $(elem)
-      $discussion = $elem.parents(".discussion")
+      $discussion = $elem.parents("section.discussion")
       console.log url
       console.log $elem
       Discussion.safeAjax

@@ -69,7 +69,7 @@ def render_inline_discussion(*args, **kwargs):
     return render_discussion(discussion_type='inline', *args, **kwargs)
 
 def render_forum_discussion(*args, **kwargs):
-    return render_discussion(discussion_type='forum', *args, **kwargs)
+    return render_discussion(discussion_type='inline', *args, **kwargs) # make everything inline for now
 
 def get_threads(request, course_id, discussion_id):
     query_params = {
