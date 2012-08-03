@@ -3,10 +3,13 @@ This module provides an abstraction for working with XModuleDescriptors
 that are stored in a database an accessible using their Location as an identifier
 """
 
-import re
-from collections import namedtuple
-from .exceptions import InvalidLocationError, InsufficientSpecificationError
 import logging
+import re
+
+from collections import namedtuple
+
+from .exceptions import InvalidLocationError, InsufficientSpecificationError
+from xmodule.errortracker import ErrorLog, make_error_tracker
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
@@ -290,3 +293,38 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
+
+class ModuleStoreBase(ModuleStore):
+    '''
+    Implement interface functionality that can be shared.
+    '''
+    def __init__(self):
+        '''
+        Set up the error-tracking logic.
+        '''
+        self._location_errors = {}    # location -> ErrorLog
+
+    def _get_errorlog(self, location):
+        """
+        If we already have an errorlog for this location, return it.  Otherwise,
+        create one.
+        """
+        location = Location(location)
+        if location not in self._location_errors:
+            self._location_errors[location] = make_error_tracker()
+        return self._location_errors[location]
+
+    def get_item_errors(self, location):
+        """
+        Return list of errors for this location, if any.  Raise the same
+        errors as get_item if location isn't present.
+
+        NOTE: For now, the only items that track errors are CourseDescriptors in
+        the xml datastore.  This will return an empty list for all other items
+        and datastores.
+        """
+        # check that item is present and raise the promised exceptions if needed
+        self.get_item(location)
+
+        errorlog = self._get_errorlog(location)
+        return errorlog.errors

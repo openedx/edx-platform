@@ -20,5 +20,10 @@ class EditingDescriptor(MakoModuleDescriptor):
     def get_context(self):
         return {
             'module': self,
-            'data': self.definition['data'],
+            'data': self.definition.get('data', ''),
+    # TODO (vshnayder): allow children and metadata to be edited.
+    #'children' : self.definition.get('children, ''),
+
+    # TODO: show both own metadata and inherited?
+    #'metadata' : self.own_metadata,
         }

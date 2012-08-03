@@ -11,7 +11,7 @@ from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from mitxmako.shortcuts import render_to_string
 
-from . import ModuleStore, Location
+from . import ModuleStoreBase, Location
 from .exceptions import (ItemNotFoundError,
                          NoPathToItem, DuplicateItemError)
 
@@ -38,7 +38,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
         resources_fs: a filesystem, as per MakoDescriptorSystem
 
-        error_tracker:
+        error_tracker: a function that logs errors for later display to users
 
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
@@ -73,7 +73,7 @@ def location_to_query(location):
     return query
 
 
-class MongoModuleStore(ModuleStore):
+class MongoModuleStore(ModuleStoreBase):
     """
     A Mongodb backed ModuleStore
     """
@@ -81,6 +81,9 @@ class MongoModuleStore(ModuleStore):
     # TODO (cpennington): Enable non-filesystem filestores
     def __init__(self, host, db, collection, fs_root, port=27017, default_class=None,
                  error_tracker=null_error_tracker):
+
+        ModuleStoreBase.__init__(self)
+
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port
