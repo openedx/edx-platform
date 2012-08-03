@@ -124,18 +124,18 @@ $discussion_input_width: 100%;
       font-size: $comment_info_size;
       padding: 5px 8px;
       text-decoration: none;
-      border: 1px solid #6F6F6F;
+      border: 1px solid #BEBEBE;
       -webkit-box-shadow: none; 
       -moz-box-shadow: none; 
       box-shadow: none; 
-      background-color: #959595;
+      background-color: #BEBEBE;
       background-image: none;
       text-shadow: none;
       &:hover {
         -webkit-box-shadow: none; 
         -moz-box-shadow: none; 
         box-shadow: none; 
-        background-color: #888;
+        background-color: #AAA;
         background-image: none; 
       }
     }
