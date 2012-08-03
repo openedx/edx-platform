@@ -104,10 +104,10 @@ initializeFollowThread = (index, thread) ->
           body: body
           tags: tags
         success: Discussion.formErrorHandler($local(".new-post-form-error"), (response, textStatus) ->
-          console.log response
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
           Discussion.setWmdContent $discussion, $local, "new-post-body", ""
+          Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($thread)
           Discussion.bindContentEvents($thread)
           $(".new-post-form").hide()

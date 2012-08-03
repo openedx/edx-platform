@@ -26,8 +26,8 @@ wmdEditors = {}
       delete_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
       upvote_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
-      follow_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
-      unfollow_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
+      follow_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
+      unfollow_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
       update_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
       endorse_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
       create_sub_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
@@ -92,7 +92,6 @@ wmdEditors = {}
     imageUploadUrl = Discussion.urlFor('upload')
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl
     wmdEditors["#{cls_identifier}-#{id}"] = editor
-    console.log wmdEditors
     editor
 
   getWmdEditor: ($content, $local, cls_identifier) ->
@@ -106,6 +105,20 @@ wmdEditors = {}
   setWmdContent: ($content, $local, cls_identifier, text) ->
     id = $content.attr("_id")
     $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
-    console.log wmdEditors
-    console.log "#{cls_identifier}-#{id}"
     wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
+
+  getContentInfo: (id, attr) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    (window.$$annotated_content_info[id] || {})[attr]
+
+  setContentInfo: (id, attr, value) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info[id] ||= {}
+    window.$$annotated_content_info[id][attr] = value
+
+  bulkExtendContentInfo: (newInfos) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info = $.extend window.$$annotated_content_info, newInfos
