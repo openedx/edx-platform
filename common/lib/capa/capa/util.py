@@ -30,3 +30,14 @@ def contextualize_text(text, context):  # private
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
         text = text.replace('$' + key, str(context[key]))
     return text
+
+
+def convert_files_to_filenames(answers):
+    '''
+    Check for File objects in the dict of submitted answers,
+        convert File objects to their filename (string)
+    '''
+    new_answers = dict()
+    for answer_id in answers.keys():
+        new_answers[answer_id] = str(answers[answer_id])
+    return new_answers
