@@ -31,7 +31,7 @@ import calc
 from correctmap import CorrectMap
 import eia
 import inputtypes
-from util import contextualize_text
+from util import contextualize_text, convert_files_to_filenames
 
 # to be replaced with auto-registering
 import responsetypes
@@ -228,7 +228,8 @@ class LoncapaProblem(object):
 
         Calls the Response for each question in this problem, to do the actual grading.
         '''
-        self.student_answers = answers
+        
+        self.student_answers = convert_files_to_filenames(answers)
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
         # log.debug('Responders: %s' % self.responders)
