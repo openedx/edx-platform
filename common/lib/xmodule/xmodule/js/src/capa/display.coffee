@@ -65,11 +65,14 @@ class @Problem
     # For each file input, allow a single file submission,
     #   routed to Django 'request.FILES'
     @$('input:file').each (index, element) ->
-      fd.append(element.id, element.files[0])
+      if element.files[0] instanceof File
+        fd.append(element.id, element.files[0])
+      else
+        fd.append(element.id, '')  # Even if no file selected, need to include input id
 
     # Simple (non-file) answers,
     #   routed to Django 'request.POST'
-    fd.append('_answers_querystring', @answers)
+    fd.append('__answers_querystring', @answers)
 
     settings = 
       type: "POST"

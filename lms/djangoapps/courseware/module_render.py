@@ -275,13 +275,22 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     post = request.POST.copy() 
 
-    # Catch the use of FormData in xmodule frontend. After this block, the 'post' dict 
-    #   is functionally equivalent before- and after- the use of FormData
+    # Catch the use of FormData in xmodule frontend for 'problem_check'. After this block,
+    #   the 'post' dict is functionally equivalent before- and after- the use of FormData
     # TODO: A more elegant solution?
-    if post.has_key('_answers_querystring'):
-        post = parse_qs(post.get('_answers_querystring'))
-        for key in post.keys():
-            post[key] = post[key][0] # parse_qs returns { key: list }
+    if post.has_key('__answers_querystring'):
+        qs = post.pop('__answers_querystring')[0]
+        qsdict = parse_qs(qs, keep_blank_values=True)
+        for key in qsdict.keys():
+            qsdict[key] = qsdict[key][0] # parse_qs returns { key: list }
+        post.update(qsdict)
+
+    # Check for submitted files
+    if request.FILES:
+        print 'Got files!'
+
+    print post.keys()
+    print request.FILES.keys()
 
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
