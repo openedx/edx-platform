@@ -13,16 +13,6 @@ Discussion = @Discussion
 
     id = $content.attr("_id")
 
-    discussionContentHoverIn = ->
-      status = $discussionContent.attr("status") || "normal"
-      if status == "normal"
-        $local(".discussion-link").show()
-
-    discussionContentHoverOut = ->
-      $local(".discussion-link").hide()
-
-    $discussionContent.hover(discussionContentHoverIn, discussionContentHoverOut)
-
     handleReply = (elem) ->
       $replyView = $local(".discussion-reply-new")
       if $replyView.length

@@ -120,6 +120,14 @@ $discussion_input_width: 100%;
       }
     }
   }
+  .follow-wrapper {
+    float: right;
+    margin-top: -1.5%;
+    .discussion-link {
+      display: inline;
+      font-size: $comment_info_size;
+    }
+  }
   .discussion-votes {
     text-align: center;
     height: flex-grid(3);
@@ -193,12 +201,16 @@ $discussion_input_width: 100%;
     }
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
-    .new-post-control, .edit-post-control {
+    .new-post-control {
       margin-left: 80%;
       margin-top: 1%;
     }
     .reply-post-control {
       margin-left: 73%;
+    }
+    .edit-post-control {
+      margin-left: 79%;
+      margin-top: -1%;
     }
     .control-button {
       @include button;
@@ -271,9 +283,8 @@ $discussion_input_width: 100%;
       .discussion-link {
         @include discussion-font;
         margin-left: 2px;
-        display: inline-block;
         color: #1d9dd9;
-        display: none;
+        display: inline;
       }
       
     }
