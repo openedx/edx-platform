@@ -5,6 +5,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   events:
     'click .cancel': 'cancel'
     'click .module-edit': 'editSubmodule'
+    'click .silent-save-update': 'silentSave'
     'click .save-update': 'save'
 
   initialize: ->
@@ -29,6 +30,17 @@ class CMS.Views.ModuleEdit extends Backbone.View
       alert("There was an error saving your changes. Please try again.")
     )
 
+  silentSave: (event) -> 
+    event.preventDefault()
+    @model.save().done((previews) =>
+      previews_section = @$el.find('.previews').empty()
+      $.each(previews, (idx, preview) =>
+        preview_wrapper = $('<section/>', class: 'preview').append preview
+        previews_section.append preview_wrapper
+      )
+      XModule.loadModules('display')
+    )
+  
   cancel: (event) ->
     event.preventDefault()
     CMS.popView()

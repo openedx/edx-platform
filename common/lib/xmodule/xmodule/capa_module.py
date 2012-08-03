@@ -75,7 +75,9 @@ class CapaModule(XModule):
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js')]}
+                 resource_string(__name__, 'js/src/capa/schematic.js'),
+                 resource_string(__name__, 'js/src/capa/peg-0.7.0.min.js'),
+                 resource_string(__name__, 'js/src/capa/xml-validator.js')]}
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
@@ -446,8 +448,6 @@ class CapaModule(XModule):
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
-            import pdb
-            pdb.set_trace()
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?

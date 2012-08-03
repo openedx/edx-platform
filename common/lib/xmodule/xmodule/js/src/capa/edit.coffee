@@ -33,7 +33,7 @@ class @CapaDescriptor
         @auto_save_timer = window.setTimeout(callback, 1000)
 
     autoSave: (event) ->
-        $(".save-update").click();
+        $(".silent-save-update").click();
 
     parse: ->
         try

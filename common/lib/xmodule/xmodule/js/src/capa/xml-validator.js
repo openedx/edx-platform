@@ -42,10 +42,9 @@ function validateXML(txt) {
         if (xmlDoc.parseError.errorCode != 0) {
             txt = "Error Code: " + xmlDoc.parseError.errorCode + "\n";
             txt = txt + "Error Reason: " + xmlDoc.parseError.reason;
-            txt = txt + "Error Line: " + xmlDoc.parseError.line;
-            return false;
+            return txt;
         } else {
-            return true;
+            return xmlDoc;
         }
     }
     // code for Mozilla, Firefox, Opera, etc.
@@ -55,9 +54,9 @@ function validateXML(txt) {
 
         if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
             checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
-            return false;
+            return xt;
         } else {
-            return true;
+            return xmlDoc;
         }
     } else {
     }
