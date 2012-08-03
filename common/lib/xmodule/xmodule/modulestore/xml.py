@@ -188,21 +188,26 @@ class XMLModuleStore(ModuleStoreBase):
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
             course_data = etree.parse(course_file).getroot()
+
             org = course_data.get('org')
 
             if org is None:
-                log.error("No 'org' attribute set for course in {dir}. "
+                msg = ("No 'org' attribute set for course in {dir}. "
                           "Using default 'edx'".format(dir=course_dir))
+                log.error(msg)
+                tracker(msg)
                 org = 'edx'
 
             course = course_data.get('course')
 
             if course is None:
-                log.error("No 'course' attribute set for course in {dir}."
+                msg = ("No 'course' attribute set for course in {dir}."
                           " Using default '{default}'".format(
                         dir=course_dir,
                         default=course_dir
                         ))
+                log.error(msg)
+                tracker(msg)
                 course = course_dir
 
             system = ImportSystem(self, org, course, course_dir, tracker)

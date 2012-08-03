@@ -6,6 +6,7 @@ from fs.errors import ResourceNotFoundError
 from functools import partial
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+from pprint import pprint
 
 from xmodule.modulestore import Location
 from xmodule.errortracker import exc_info_to_str
@@ -550,9 +551,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
         if not eq:
             for attr in self.equality_attributes:
-                print(getattr(self, attr, None),
-                      getattr(other, attr, None),
-                      getattr(self, attr, None) == getattr(other, attr, None))
+                pprint((getattr(self, attr, None),
+                       getattr(other, attr, None),
+                       getattr(self, attr, None) == getattr(other, attr, None)))
 
         return eq
 
