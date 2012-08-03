@@ -1,0 +1,49 @@
+# A pointer just has a url_name
+pointer = element chapter |
+                  sequential |
+                  vertical |
+                  customtag |
+                  error |
+                  problemset |
+                  problem.... {
+    attribute url_name { text }
+}
+
+# Course pointers are special--they aren't allowed inside other
+# structures  (e.g. no courses inside a sequence)
+course_ptr = element course {
+    attribute url_name { text }
+}
+    
+# Standard metadata for all elements    
+metadata = {
+    attribute display_name { text }?,
+    attribute graceperiod { text }?,
+    attribute start { text }?,
+    attribute due { xsd:date }?,  # is there an xsd:date?
+    ...
+}
+
+course_meta = {
+    attribute org { text },
+    attribute course { text }
+}
+
+element course {
+    metadata,
+    course_meta,
+    pointer+  # at least one, please
+}
+
+element sequential | videosequence | problem {
+    metadata,
+    pointer+
+}
+
+element customtag {
+    metadata &
+    attribute impl { text } &
+    attribute * { text }*
+}
+
+# Problem should be on its own somewhere else.
