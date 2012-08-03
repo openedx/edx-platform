@@ -873,7 +873,7 @@ class CodeResponse(LoncapaResponse):
                                                 queue_name=self.queue_name)
 
         # Generate body
-        #   NOTE: Currently specialized to 6.00x's pyxservers, which follows the ExternalResponse interface
+        #   NOTE: Currently specialized to 6.00x's pyxserver, which follows the ExternalResponse interface
         contents = {'xml': etree.tostring(self.xml, pretty_print=True),
                     'edX_cmd': 'get_score',
                     'edX_tests': self.tests,
