@@ -43,10 +43,12 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'forum': 'discussion/_forum.html',
     }[discussion_type]
 
-    base_url = {
+    """base_url = {
         'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
         'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])),
-    }[discussion_type]()
+    }[discussion_type]()"""
+
+    base_url = reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])
 
     annotated_content_info = {thread['id']: get_annotated_content_info(thread, request.user.id) for thread in threads}
 
@@ -69,7 +71,7 @@ def render_inline_discussion(*args, **kwargs):
     return render_discussion(discussion_type='inline', *args, **kwargs)
 
 def render_forum_discussion(*args, **kwargs):
-    return render_discussion(discussion_type='inline', *args, **kwargs) # make everything inline for now
+    return render_discussion(discussion_type='forum', *args, **kwargs)
 
 def get_threads(request, course_id, discussion_id):
     query_params = {
