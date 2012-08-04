@@ -1,3 +1,4 @@
+from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
@@ -123,6 +124,8 @@ def has_staff_access_to_course(user,course):
     Returns True if the given user has staff access to the course.
     This means that user is in the staff_* group, or is an overall admin.
     '''
+    if user is None or (not user.is_authenticated()) or course is None:
+        return False
     if user.is_staff:
         return True
     user_groups = [x[1] for x in user.groups.values_list()]	# note this is the Auth group, not UserTestGroup
@@ -132,5 +135,23 @@ def has_staff_access_to_course(user,course):
         return True
     return False
 
-    
+def get_courses_by_university(user):
+    '''
+    Returns dict of lists of courses available, keyed by course.org (ie university).
+    Courses are sorted by course.number.
+
+    if ACCESS_REQUIRE_STAFF_FOR_COURSE then list only includes those accessible to user.
+    '''
+    # TODO: Clean up how 'error' is done.
+    # filter out any courses that errored.
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
+    universities = defaultdict(list)
+    for course in courses:
+        if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+            if not has_staff_access_to_course(user,course):
+                continue
+        universities[course.org].append(course)
+    return universities
     

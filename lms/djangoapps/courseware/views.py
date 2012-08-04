@@ -1,4 +1,3 @@
-from collections import defaultdict
 import json
 import logging
 import urllib
@@ -28,7 +27,7 @@ from xmodule.course_module import CourseDescriptor
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import check_course
+from courseware.courses import check_course, get_courses_by_university
 
 
 log = logging.getLogger("mitx.courseware")
@@ -58,18 +57,11 @@ def user_groups(user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
-    # TODO: Clean up how 'error' is done.
-
-    # filter out any courses that errored.
-    courses = [c for c in modulestore().get_courses()
-               if isinstance(c, CourseDescriptor)]
-    courses = sorted(courses, key=lambda course: course.number)
-    universities = defaultdict(list)
-    for course in courses:
-        universities[course.org].append(course)
-
+    '''
+    Render "find courses" page.  The course selection work is done in courseware.courses.
+    '''
+    universities = get_courses_by_university(request.user)
     return render_to_response("courses.html", {'universities': universities})
-
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
