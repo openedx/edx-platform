@@ -169,6 +169,12 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
         )
 
+if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+    urlpatterns += (
+        url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:

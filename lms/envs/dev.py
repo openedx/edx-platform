@@ -58,6 +58,11 @@ CACHE_TIMEOUT = 0
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+################################ LMS Migration #################################
+MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
+
+LMS_MIGRATION_ALLOWED_IPS = ['any']
+
 ################################ OpenID Auth #################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
