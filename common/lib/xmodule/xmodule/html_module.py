@@ -94,7 +94,15 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                         msg = "Couldn't parse html in {0}.".format(filepath)
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
-                    return {'data' : html}
+
+                    definition = {'data' : html}
+
+                    # TODO (ichuang): remove this after migration
+                    # for Fall 2012 LMS migration: keep filename
+                    definition['filename'] = filepath
+
+                    return definition
+
             except (ResourceNotFoundError) as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)

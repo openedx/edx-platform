@@ -1,11 +1,11 @@
 ${module_content}
-<div class="staff_info">
-definition = ${definition | h}
-metadata = ${metadata | h}
-</div>
 %if edit_link:
 <div><a href="${edit_link}">Edit</a></div>
 % endif
+<div class="staff_info">
+definition = <pre>${definition | h}</pre>
+metadata = ${metadata | h}
+</div>
 %if render_histogram:
 <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
 %endif
