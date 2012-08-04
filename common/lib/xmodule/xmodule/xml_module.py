@@ -9,7 +9,7 @@ from fs.errors import ResourceNotFoundError
 import os
 import sys
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('mitx.' + __name__)
 
 _AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
 
@@ -110,6 +110,7 @@ class XmlDescriptor(XModuleDescriptor):
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
+            filepath = ''
         else:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
@@ -137,7 +138,13 @@ class XmlDescriptor(XModuleDescriptor):
                 raise Exception, msg, sys.exc_info()[2]
 
         cls.clean_metadata_from_xml(definition_xml)
-        return cls.definition_from_xml(definition_xml, system)
+        definition = cls.definition_from_xml(definition_xml, system)
+
+        # TODO (ichuang): remove this after migration
+        # for Fall 2012 LMS migration: keep filename
+        definition['filename'] = filepath
+
+        return definition
 
 
     @classmethod

@@ -117,7 +117,13 @@ def get_course_info_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 def course_staff_group_name(course):
-    coursename = course.metadata.get('course','')
+    '''
+    course should be either a CourseDescriptor instance, or a string (the .course entry of a Location)
+    '''
+    if type(course)==str:
+        coursename = course
+    else:
+        coursename = course.metadata.get('course','')
     if not coursename:					# Fall 2012: not all course.xml have metadata correct yet
         coursename = course.metadata.get('data_dir','UnknownCourseName')
     return 'staff_%s' % coursename
