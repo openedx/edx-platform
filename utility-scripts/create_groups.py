@@ -10,7 +10,12 @@ import os, sys, string, re
 
 sys.path.append(os.path.abspath('.'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
-from lms.envs.dev import *
+
+try:
+    from lms.envs.dev import *
+except Exception as err:
+    print "Run this script from the top-level mitx directory (mitx_all/mitx), not a subdirectory."
+    sys.exit(-1)
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
