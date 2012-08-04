@@ -117,7 +117,10 @@ def get_course_info_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 def course_staff_group_name(course):
-    return 'staff_%s' % course.metadata['course']
+    coursename = course.metadata.get('course','')
+    if not coursename:					# Fall 2012: not all course.xml have metadata correct yet
+        coursename = course.metadata.get('data_dir','UnknownCourseName')
+    return 'staff_%s' % coursename
 
 def has_staff_access_to_course(user,course):
     '''
