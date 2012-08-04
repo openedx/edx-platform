@@ -19,6 +19,8 @@
         $(document).delegate('#class_enroll_form', 'ajax:success', function(data, json, xhr) {
           if(json.success) {
             location.href="${reverse('dashboard')}";
+          }else{
+            document.getElementById('register_message').innerHTML = "<p><font color='red'>" + json.error + "</font></p>";
           }
         });
       })(this)
@@ -63,6 +65,7 @@
                 <span class="register disabled">You are registered for this course (${course.number}).</span>
             %else:
                 <a href="#" class="register">Register for ${course.number}</a>
+	        <div id="register_message"></div>
             %endif
           %else:
             <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>

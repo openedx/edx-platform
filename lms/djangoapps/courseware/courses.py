@@ -114,3 +114,23 @@ def get_course_info_section(course, section_key):
             return "! Info section missing !"
 
     raise KeyError("Invalid about key " + str(section_key))
+
+def course_staff_group_name(course):
+    return 'staff_%s' % course.metadata['course']
+
+def has_staff_access_to_course(user,course):
+    '''
+    Returns True if the given user has staff access to the course.
+    This means that user is in the staff_* group, or is an overall admin.
+    '''
+    if user.is_staff:
+        return True
+    user_groups = [x[1] for x in user.groups.values_list()]	# note this is the Auth group, not UserTestGroup
+    log.debug('user is in groups %s' % user_groups)
+    staff_group = course_staff_group_name(course)
+    if staff_group in user_groups:
+        return True
+    return False
+
+    
+    
