@@ -3,9 +3,9 @@
 <%! from dateutil.parser import parse %>
 <%! import urllib %>
 
-<%def name="render_thread(course_id, thread, edit_thread=False, show_comments=False)">
+<%def name="render_thread(course_id, thread, show_comments=False)">
   <div class="thread" _id="${thread['id']}">
-    ${render_content(thread, "thread", edit_thread=edit_thread, show_comments=show_comments)}
+    ${render_content(thread, "thread", show_comments=show_comments)}
     % if show_comments:
       ${render_comments(thread['children'])}
     % endif
