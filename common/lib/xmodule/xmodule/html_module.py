@@ -121,13 +121,13 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         # Not proper format.  Write html to file, return an empty tag
         filepath = u'{category}/{name}.html'.format(category=self.category,
-                                                    name=self.name)
+                                                    name=self.url_name)
 
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
             file.write(self.definition['data'])
 
         elt = etree.Element('html')
-        elt.set("filename", self.name)
+        elt.set("filename", self.url_name)
         return elt
 

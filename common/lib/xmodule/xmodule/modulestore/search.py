@@ -87,6 +87,7 @@ def path_to_location(modulestore, location, course_name=None):
 
     n = len(path)
     course_id = CourseDescriptor.location_to_id(path[0])
+    # pull out the location names
     chapter = path[1].name if n > 1 else None
     section = path[2].name if n > 2 else None
 

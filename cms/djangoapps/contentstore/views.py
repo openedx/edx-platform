@@ -108,7 +108,7 @@ def edit_item(request):
         'contents': item.get_html(),
         'js_module': item.js_module_name,
         'category': item.category,
-        'name': item.name,
+        'url_name': item.url_name,
         'previews': get_module_previews(request, item),
     })
 
