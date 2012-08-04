@@ -77,8 +77,8 @@ def get_threads(request, course_id, discussion_id):
     query_params = {
         'page': request.GET.get('page', 1),
         'per_page': THREADS_PER_PAGE, #TODO maybe change this later
-        'sort_key': request.GET.get('sort_key', ''),
-        'sort_order': request.GET.get('sort_order', ''),
+        'sort_key': request.GET.get('sort_key', 'date'),
+        'sort_order': request.GET.get('sort_order', 'desc'),
         'text': request.GET.get('text', ''), 
         'tags': request.GET.get('tags', ''),
     }

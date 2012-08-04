@@ -102,6 +102,7 @@ $ ->
     replaceMath: (text) ->
       text = text.replace /@@(\d+)@@/g, ($0, $1) => @math[$1]
       @math = null
+      console.log text
       text
 
     @replaceMathWrapper: (_this) ->
@@ -110,11 +111,11 @@ $ ->
   if Markdown?
     
     Markdown.getMathCompatibleConverter = ->
-        converter = Markdown.getSanitizingConverter()
-        processor = new MathJaxProcessor()
-        converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)#processor.removeMath
-        converter.hooks.chain "postConversion", MathJaxProcessor.replaceMathWrapper(processor)#.replaceMath
-        converter
+      converter = Markdown.getSanitizingConverter()
+      processor = new MathJaxProcessor()
+      converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)
+      converter.hooks.chain "postConversion", MathJaxProcessor.replaceMathWrapper(processor)
+      converter
 
     Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl) ->
       $elem = $(elem)
