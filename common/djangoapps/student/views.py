@@ -8,7 +8,6 @@ import uuid
 import feedparser
 import urllib
 import itertools
-from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -37,7 +36,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from datetime import date
 from collections import namedtuple
-from courseware.courses import course_staff_group_name, has_staff_access_to_course
+from courseware.courses import course_staff_group_name, has_staff_access_to_course, get_courses_by_university
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -65,9 +64,9 @@ def index(request):
         from external_auth.views import edXauth_ssl_login
         return edXauth_ssl_login(request)
 
-    return main_index()
+    return main_index(user=request.user)
 
-def main_index(extra_context = {}):
+def main_index(extra_context = {}, user=None):
     '''
     Render the edX main page.
 
@@ -89,11 +88,8 @@ def main_index(extra_context = {}):
         entry.image = soup.img['src'] if soup.img else None
         entry.summary = soup.getText()
 
-    universities = defaultdict(list)
-    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
-    for course in courses:
-        universities[course.org].append(course)
-
+    # The course selection work is done in courseware.courses.
+    universities = get_courses_by_university(None)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
