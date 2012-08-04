@@ -41,6 +41,7 @@ class XmlDescriptor(XModuleDescriptor):
     # to definition_from_xml, and from the xml returned by definition_to_xml
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+        'ispublic', 	# if True, then course is listed for all users; see 
         # VS[compat] Remove once unused.
         'name', 'slug')
 

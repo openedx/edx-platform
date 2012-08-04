@@ -289,7 +289,7 @@ def university_profile(request, org_id):
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses = [c for c in all_courses if c.org == org_id]
+    courses = get_courses_by_university(request.user)[org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
