@@ -1179,10 +1179,10 @@ class FormulaResponse(LoncapaResponse):
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
-            log.debug('formula: instructor_vars=%s, expected=%s' % (instructor_variables,expected))
+            #log.debug('formula: instructor_vars=%s, expected=%s' % (instructor_variables,expected))
             instructor_result = evaluator(instructor_variables, dict(), expected, cs=self.case_sensitive)
             try:
-                log.debug('formula: student_vars=%s, given=%s' % (student_variables,given))
+                #log.debug('formula: student_vars=%s, given=%s' % (student_variables,given))
                 student_result = evaluator(student_variables,
                                            dict(),
                                            given,

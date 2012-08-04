@@ -12,6 +12,11 @@ log = logging.getLogger(__name__)
 
 
 class CapawikiModule(CapaModule):
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
+                 resource_string(__name__, 'js/src/capa/schematic.js'),
+                 resource_string(__name__, 'js/src/capawiki/peg-0.7.0.min.js')]}
+
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         # self._definition = {'capa': '<problem />', 'wiki': ''}
         self._definition = definition

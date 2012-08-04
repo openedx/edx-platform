@@ -1,6 +1,6 @@
 class @CapawikiDescriptor
   constructor: (@element) ->
-    @loadParser("/static/grammars/main.jspeg")
+    @loadParser("/static/peg/capawiki.jspeg")
     @capa_box = $(".capa-box", @element)
     @wiki_box = $(".wiki-box", @element)
 

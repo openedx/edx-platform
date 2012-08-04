@@ -3,7 +3,6 @@ import logging
 from .xml import XMLModuleStore
 from xmodule.x_module import Location
 from .exceptions import DuplicateItemError
-import re
 
 
 log = logging.getLogger(__name__)
@@ -60,7 +59,7 @@ def import_from_xml_capawiki(store, data_dir, course_dirs=None, eager=True,
     return module_store
 
 
-def import_from_xml_original(store, data_dir, course_dirs=None, eager=True,
+def import_from_xml(store, data_dir, course_dirs=None, eager=True,
                     default_class='xmodule.raw_module.RawDescriptor'):
     """
     Import the specified xml data_dir into the "store" modulestore,
@@ -95,5 +94,3 @@ def import_from_xml_original(store, data_dir, course_dirs=None, eager=True,
 
     return module_store
 
-
-import_from_xml = import_from_xml_capawiki

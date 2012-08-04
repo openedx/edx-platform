@@ -75,9 +75,7 @@ class CapaModule(XModule):
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js'),
-                 resource_string(__name__, 'js/src/capa/peg-0.7.0.min.js'),
-                 resource_string(__name__, 'js/src/capa/xml-validator.js')]}
+                 resource_string(__name__, 'js/src/capa/schematic.js')]}
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
