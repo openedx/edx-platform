@@ -38,11 +38,16 @@ def manage_modulestores(request,reload_dir=None):
     
     if LOCAL_DEBUG:
         html += '<h3>IP address: %s ' % ip
+        log.debug('request from ip=%s' % ip)
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
-        html += 'Permission denied'
-        html += "</body></html>"
-        return HttpResponse(html)    
+        if request.user and request.user.is_staff:
+            log.debug('request allowed because user=%s is staff' % request.user)
+        else:
+            html += 'Permission denied'
+            html += "</body></html>"
+            log.debug('request denied, ALLOWED_IPS=%s' % ALLOWED_IPS)
+            return HttpResponse(html)    
 
     #----------------------------------------
     # reload course if specified
