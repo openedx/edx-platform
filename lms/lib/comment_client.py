@@ -29,6 +29,12 @@ def search_threads(course_id, recursive=False, query_params={}, *args, **kwargs)
             attributes, *args, **kwargs)
     return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
+def create_user(attributes, *args, **kwargs):
+    return _perform_request('post', _url_for_users(), attributes, *args, **kwargs)
+
+def update_user(user_id, attributes, *args, **kwargs):
+    return _perform_request('put', _url_for_user(user_id), attributes, *args, **kwargs)
+
 def get_threads_tags(*args, **kwargs):
     return _perform_request('get', _url_for_threads_tags(), {}, *args, **kwargs)
 
@@ -158,3 +164,6 @@ def _url_for_threads_tags():
 
 def _url_for_threads_tags_autocomplete():
     return "{prefix}/threads/tags/autocomplete".format(prefix=PREFIX)
+
+def _url_for_users():
+    return "{prefix}/users".format(prefix=PREFIX)
