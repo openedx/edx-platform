@@ -38,7 +38,8 @@ def manage_modulestores(request,reload_dir=None):
     
     if LOCAL_DEBUG:
         html += '<h3>IP address: %s ' % ip
-        log.debug('request from ip=%s' % ip)
+        html += '<h3>User: %s ' % request.user
+        log.debug('request from ip=%s, user=%s' % (ip,request.user))
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
         if request.user and request.user.is_staff:
