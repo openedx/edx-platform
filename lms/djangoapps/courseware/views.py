@@ -150,6 +150,7 @@ def render_accordion(request, course, chapter, section):
     return render_to_string('accordion.html', context)
 
 
+@login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
@@ -172,6 +173,10 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
+    registered = registered_for_course(course, request.user)
+    if not registered:
+        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        return redirect('/')
 
     try:
         context = {
@@ -266,14 +271,18 @@ def course_info(request, course_id):
     return render_to_response('info.html', {'course': course})
 
 
+def registered_for_course(course, user):
+    '''Return CourseEnrollment if user is registered for course, else False'''
+    if user is None:
+        return False
+    if user.is_authenticated():
+        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+    else:
+        return False
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    def registered_for_course(course, user):
-        if user.is_authenticated():
-            return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
-        else:
-            return False
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
