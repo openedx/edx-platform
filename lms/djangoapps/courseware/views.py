@@ -68,11 +68,6 @@ def user_groups(user):
     return group_names
 
 
-def format_url_params(params):
-    return [urllib.quote(string.replace(' ', '_'))
-            if string is not None else None
-            for string in params]
-
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -138,7 +133,6 @@ def profile(request, course_id, student_id=None):
                'language': user_info.language,
                'email': student.email,
                'course': course,
-               'format_url_params': format_url_params,
                'csrf': csrf(request)['csrf_token']
                }
     context.update(grades.grade_sheet(student, course_module, course.grader, student_module_cache))
@@ -152,9 +146,9 @@ def render_accordion(request, course, chapter, section):
 
         If chapter and section are '' or None, renders a default accordion.
 
-        Returns (initialization_javascript, content)'''
+        Returns the html string'''
 
-    # TODO (cpennington): do the right thing with courses
+    # grab the table of contents
     toc = toc_for_course(request.user, request, course, chapter, section)
 
     active_chapter = 1
@@ -166,7 +160,6 @@ def render_accordion(request, course, chapter, section):
                     ('toc', toc),
                     ('course_name', course.title),
                     ('course_id', course.id),
-                    ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
 
@@ -183,9 +176,9 @@ def index(request, course_id, chapter=None, section=None,
     Arguments:
 
      - request    : HTTP request
-     - course     : coursename (str)
-     - chapter    : chapter name (str)
-     - section    : section name (str)
+     - course_id  : course id (str: ORG/course/URL_NAME)
+     - chapter    : chapter url_name (str)
+     - section    : section url_name (str)
      - position   : position in module, eg of <sequential> module (str)
 
     Returns:
@@ -193,16 +186,6 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
-
-    def clean(s):
-        ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
-        funny encoding characters and keep the URLs readable.  This undoes
-        that transformation.
-        '''
-        return s.replace('_', ' ') if s is not None else None
-
-    chapter = clean(chapter)
-    section = clean(section)
 
     try:
         context = {
@@ -216,8 +199,6 @@ def index(request, course_id, chapter=None, section=None,
 
         look_for_module = chapter is not None and section is not None
         if look_for_module:
-            # TODO (cpennington): Pass the right course in here
-
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
                 student_module_cache = StudentModuleCache(request.user,

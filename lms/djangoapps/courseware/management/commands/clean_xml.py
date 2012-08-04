@@ -61,11 +61,7 @@ def import_with_checks(course_dir, verbose=True):
                    course_dirs=course_dirs)
 
     def str_of_err(tpl):
-        (msg, exc_info) = tpl
-        if exc_info is None:
-            return msg
-
-        exc_str = '\n'.join(traceback.format_exception(*exc_info))
+        (msg, exc_str) = tpl
         return '{msg}\n{exc}'.format(msg=msg, exc=exc_str)
 
     courses = modulestore.get_courses()
@@ -83,7 +79,7 @@ def import_with_checks(course_dir, verbose=True):
         print '\n'
         print "=" * 40
         print 'ERRORs during import:'
-        print '\n'.join(map(str_of_err,errors))
+        print '\n'.join(map(str_of_err, errors))
         print "=" * 40
         print '\n'
 
