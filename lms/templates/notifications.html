@@ -20,6 +20,11 @@ def discussion_title(discussion_id):
   return get_discussion_title(discussion_id=discussion_id)
 %>
 
+<%
+def url_for_user(user_id): #TODO
+  return "javascript:void(0)"
+%>
+
 
 <div class="notifications">
   % for notification in notifications:
@@ -27,21 +32,47 @@ def discussion_title(discussion_id):
   % endfor
 </div>
 
+<%def name="render_user_link(notification)">
+  <% info = notification['info'] %>
+  % if notification.get('actor_id', None):
+    <a href="${url_for_user(notification['actor_id'])}">${info['actor_username']}</a>
+  % else:
+    Anonymous
+  % endif
+</%def>
+
+<%def name="render_thread_link(notification)">
+  <% info = notification['info'] %>
+  <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
+</%def>
+
+<%def name="render_comment_link(notification)">
+  <% info = notification['info'] %>
+  <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">comment</a>
+</%def>
+
+<%def name="render_discussion_link(notification)">
+  <% info = notification['info'] %>
+  <a href="${url_for_discussion(info['commentable_id'])}">${discussion_title(info['commentable_id'])}</a>
+</%def>
+
 <%def name="render_notification(notification)">
   <div class="notification">
-    <% info = notification['info'] %>
     % if notification['notification_type'] == 'post_reply':
-      User No.${notification['actor_id']} posted a
-      <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">comment</a>
-      to the thread
-      <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
-      in discussion
-      <a href="${url_for_discussion(info['commentable_id'])}">${discussion_title(info['commentable_id'])}</a>
+      ${render_user_link(notification)} posted a ${render_comment_link(notification)} 
+      to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
     % elif notification['notification_type'] == 'post_topic':
-      User No.${notification['actor_id']} posted a new thread
-      <a href="${url_for_thread(info['commentable_id'], info['thread_id'])}">${info['thread_title']}</a>
-      in discussion
-      <a href="${url_for_discussion(info['commentable_id'])}">${discussion_title(info['commentable_id'])}</a>
+      ${render_user_link(notification)} posted a new thread ${render_thread_link(notification)}
+      in discussion ${render_discussion_link(notification)}
+    % elif notification['notification_type'] == 'at_user':
+      ${render_user(info)} mentioned you in 
+      % if notification['info']['content_type'] == 'thread':
+        the thread ${render_thread_link(notification)}
+        in discussion ${render_discussion_link(notification)}
+      % else:
+        ${render_comment_link(notification)} 
+        to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
+      % endif
     % endif
   </div>
 
