@@ -37,8 +37,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
     event.preventDefault()
     previewType = $(event.target).data('preview-type')
     moduleType = $(event.target).data('type')
-    if moduleType == "CapawikiDescriptor"
-      CMS.pushView new CMS.Views.CapawikiEdit
+    if moduleType == "CapaWikiDescriptor"
+      CMS.pushView new CMS.Views.CapaWikiEdit
           model: new CMS.Models.Module
               id: $(event.target).data('id')
               type: if moduleType == 'None' then null else moduleType

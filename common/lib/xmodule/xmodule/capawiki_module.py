@@ -11,7 +11,7 @@ from xmodule.capa_module import CapaModule, CapaDescriptor
 log = logging.getLogger(__name__)
 
 
-class CapawikiModule(CapaModule):
+class CapaWikiModule(CapaModule):
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js'),
@@ -22,11 +22,11 @@ class CapawikiModule(CapaModule):
         self._definition = definition
         assert isinstance(definition['data'], dict) and 'capa' in definition['data']
         self.capa_definition = {'data': definition['data']['capa']}
-        super(CapawikiModule, self).__init__(system, location, self.capa_definition, instance_state,
+        super(CapaWikiModule, self).__init__(system, location, self.capa_definition, instance_state,
                          shared_state, **kwargs)
 
 
-class CapawikiDescriptor(CapaDescriptor):
-    js_module_name = "CapawikiDescriptor"
-    module_class = CapawikiModule
+class CapaWikiDescriptor(CapaDescriptor):
+    js_module_name = "CapaWikiDescriptor"
+    module_class = CapaWikiModule
     mako_template = "widgets/capawiki-edit.html"

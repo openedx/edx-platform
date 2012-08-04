@@ -8,7 +8,7 @@ start
               GeneralResponse / 
               NumericalOrStringResponse / 
               NumericalResponse / 
-              MultipleChoice / 
+              MultipleChoiceResponse / 
               Paragraph
               )+
 
@@ -116,7 +116,7 @@ NumericalOrStringResponse
     }
   / StringResponse
 
-/* MultipleChoice */
+/* MultipleChoiceResponse */
 
 ChoiceTextLine
   = !ChoiceIdentifier line:Line
@@ -130,7 +130,7 @@ Choice
       return {'type': 'choice', 'correct' : correct, 'text': lines.join("").replace(/[\n\r]$/,"")};
     }
 
-MultipleChoice
+MultipleChoiceResponse
   = choices:Choice+
     {
       return {'type': 'multiple_choice', 'choices': choices};
@@ -196,9 +196,35 @@ AlphanumericalText
     return chars.join("");
   }
 
-/* JSON */
+
+/* NumericalResponse */
+
+NumericalToleranceValueType
+  = decimal / percentage / integer
+
+NumericalTolerance
+  = '+-' ' '* value:NumericalToleranceValueType ' '*
+    {
+      return value;
+    }
+
+NumericalResponse
+  = CorrectAnswerIdentifier ' '* '(' ' '* value:NumericalValue ' '* tolerance:NumericalTolerance? ')' ' '* Linebreak
+    {
+      if (tolerance == "")
+        tolerance = "5%"
+      return {'type': 'numerical', 'answer': value, 'tolerance': tolerance};
+    }
+
+NumericalValue
+  = additive
+  / VariableName
+
 
 /* JSON parser based on the grammar described at http://json.org/. */
+/* https://github.com/Contra/pegjs/blob/c9af3e4fb50a5e93bfb542a4298bb64735e9978e/examples/json.pegjs */
+
+/* TODO: add prefixes to JSON and arithmetrics rules */
 
 JSONDictionary
   = _ o:object { return o; }
@@ -306,31 +332,10 @@ whitespace
   = [ \t\n\r]
 
 
-/* NumericalResponse */
-
-NumericalToleranceValueType
-  = decimal / percentage / integer
-
-NumericalTolerance
-  = '+-' ' '* value:NumericalToleranceValueType ' '*
-    {
-      return value;
-    }
-
-NumericalResponse
-  = CorrectAnswerIdentifier ' '* '(' ' '* value:NumericalValue ' '* tolerance:NumericalTolerance? ')' ' '* Linebreak
-    {
-      if (tolerance == "")
-        tolerance = "5%"
-      return {'type': 'numerical', 'answer': value, 'tolerance': tolerance};
-    }
-
-NumericalValue
-  = additive
-  / VariableName
-
 /* Mathematical rules */
-
+/* Based on JSPEG's arithmetrics example at 
+     https://raw.github.com/dmajda/pegjs/master/examples/arithmetics.pegjs
+ */
 additive
   = left:multiplicative "+" right:additive { return left + right; }
   / left:multiplicative "-" right:additive { return left - right; }

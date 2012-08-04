@@ -1,11 +1,11 @@
-class @CapawikiDescriptor
+class @CapaWikiDescriptor
   constructor: (@element) ->
     @loadParser("/static/peg/capawiki.jspeg")
-    @capa_box = $(".capa-box", @element)
-    @wiki_box = $(".wiki-box", @element)
+    @capaBox = $(".capa-box", @element)
+    @wikiBox = $(".wiki-box", @element)
 
   save: ->
-    {'capa': @capa_box.val(), 'wiki': @wiki_box.val()}
+    {'capa': @capaBox.val(), 'wiki': @wikiBox.val()}
 
   debug: (msg) ->
     # console.log msg
@@ -23,16 +23,18 @@ class @CapawikiDescriptor
       "Line " + e.line + ", column " + e.column + ": " + e.message
     else e.message
 
-  dom2capa: (node) ->
+  serializeDomToCapaXML: (node) ->
+    # serializes a Capa XML document and make changes if needed 
+    # e.g. replace <text> into <startouttext />
     serializer = new XMLSerializer()
     capa = serializer.serializeToString(node)
 
   buildXML: (parsed) ->
-    dom_parser = new DOMParser()
-    doc = dom_parser.parseFromString("<problem />", "text/xml");
+    domParser = new DOMParser()
+    doc = domParser.parseFromString("<problem />", "text/xml");
     problem = $(doc).find('problem')
 
-    create_text_element = (content) ->
+    createTextElement = (content) ->
       el = $(doc.createElement('text'))
       for line in content.split('\n')
         el.append doc.createTextNode(line)
@@ -40,13 +42,13 @@ class @CapawikiDescriptor
       el.children().last().remove()
       return el
 
-    variable_name_wrapper = (expression) ->
+    replaceVariableNameWrapper = (expression) ->
       match = /^\{(.+)\}$/.exec(expression)
       return if match then "$" + match[1] else expression
 
     for section in parsed
       if section.type == 'text'
-        newel = create_text_element(section.text)
+        newel = createTextElement(section.text)
         problem.append(newel)
 
       else if section.type == 'image'
@@ -55,7 +57,7 @@ class @CapawikiDescriptor
         img.attr 'src', section.url
         center.append img
         if section.title
-          title = create_text_element(section.title)
+          title = createTextElement(section.title)
           center.append doc.createElement('br')
           center.append title
         problem.append center
@@ -78,14 +80,14 @@ class @CapawikiDescriptor
         for choice_def in section.choices
           choice = $(doc.createElement('choice'))
           choice.attr 'correct', choice_def.correct
-          choice.append create_text_element(choice_def.text)
+          choice.append createTextElement(choice_def.text)
           group.append(choice)
 
         problem.append(newel)
 
       else if section.type == 'numerical'
         newel = $(doc.createElement('numericalresponse'))
-        newel.attr 'answer', variable_name_wrapper(section.answer)
+        newel.attr 'answer', replaceVariableNameWrapper(section.answer)
 
         tolerance = $(doc.createElement('responseparam'))
         tolerance.attr 'type', 'tolerance'
@@ -100,7 +102,7 @@ class @CapawikiDescriptor
 
       else if section.type == 'string'
         newel = $(doc.createElement('stringresponse'))
-        newel.attr 'answer', variable_name_wrapper(section.answer)
+        newel.attr 'answer', replaceVariableNameWrapper(section.answer)
 
         newel.append doc.createElement('textline') 
         problem.append(newel)
@@ -108,7 +110,7 @@ class @CapawikiDescriptor
       else if section.type == 'formula'
         formularesponse = $(doc.createElement("formularesponse"))
         formularesponse.attr 'samples', section.samples
-        formularesponse.attr 'answer', variable_name_wrapper(section.answer)
+        formularesponse.attr 'answer', replaceVariableNameWrapper(section.answer)
         formularesponse.attr 'type', 'cs'
 
         tolerance = $(doc.createElement('responseparam'))
@@ -126,7 +128,7 @@ class @CapawikiDescriptor
       else
         throw new SyntaxError("unexpected section type " + section.type) 
 
-    capa = @dom2capa(doc)
+    capa = @serializeDomToCapaXML(doc)
     return capa
 
   parse: (source) ->
@@ -144,5 +146,4 @@ class @CapawikiDescriptor
     catch e
       message = @buildParserErrorMessage e
       return {'message': message, 'status': 'error'}
-    return done(xml)
     

@@ -7,10 +7,13 @@ from .exceptions import DuplicateItemError
 
 log = logging.getLogger(__name__)
 
-
+# TODO: added a command to invoke import_from_xml_capawiki
 def import_from_xml_capawiki(store, data_dir, course_dirs=None, eager=True,
                     default_class='xmodule.raw_module.RawDescriptor'):
     """
+    import_from_xml_CapaWiki imports xml files from data_dir, converts
+    each problem into a CapaWiki problem.
+
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
 
