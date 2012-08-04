@@ -87,8 +87,6 @@ initializeFollowThread = (thread) ->
           $discussionContent.attr("status", "normal")
         )
 
-    handleUnvote = (elem) ->
-
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
       url = Discussion.urlFor("#{value}vote_#{contentType}", id)

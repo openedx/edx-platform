@@ -7,10 +7,10 @@
     MathJax.Hub.Config({
       tex2jax: {
         inlineMath: [
-          ["$","$"],
+          ["\\(","\\)"],
         ],
         displayMath: [
-          ["$$","$$"],
+          ["\\[","\\]"],
         ]
       }
     });
@@ -19,6 +19,7 @@
   ## This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
   ## It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of MathJax extension libraries
   <script type="text/javascript" src="/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
+  <!---<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js"> </script>-->
   <script type="text/javascript" src="${static.url('js/split.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.ajaxfileupload.js')}"></script>
   <script type="text/javascript" src="${static.url('js/Markdown.Converter.js')}"></script>
