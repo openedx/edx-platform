@@ -135,6 +135,11 @@ def has_staff_access_to_course(user,course):
         return True
     return False
 
+def has_access_to_course(user,course):
+    if course.metadata.get('ispublic'):
+        return True
+    return has_staff_access_to_course(user,course)
+
 def get_courses_by_university(user):
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).
@@ -150,7 +155,7 @@ def get_courses_by_university(user):
     universities = defaultdict(list)
     for course in courses:
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            if not has_staff_access_to_course(user,course):
+            if not has_access_to_course(user,course):
                 continue
         universities[course.org].append(course)
     return universities
