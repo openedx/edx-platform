@@ -8,7 +8,7 @@ class @CapawikiDescriptor
     {'capa': @capa_box.val(), 'wiki': @wiki_box.val()}
 
   debug: (msg) ->
-    console.log msg
+    # console.log msg
 
   loadParser: (url) ->
     @debug "Retrieving grammar rules from " + url
@@ -22,6 +22,10 @@ class @CapawikiDescriptor
     if e.line != undefined && e.column != undefined
       "Line " + e.line + ", column " + e.column + ": " + e.message
     else e.message
+
+  dom2capa: (node) ->
+    serializer = new XMLSerializer()
+    capa = serializer.serializeToString(node)
 
   buildXML: (parsed) ->
     dom_parser = new DOMParser()
@@ -55,13 +59,6 @@ class @CapawikiDescriptor
           center.append doc.createElement('br')
           center.append title
         problem.append center
-
-      else if section.type == 'linebreaks'
-        text = create_text_element('')
-        for i in [0..section.count] by 1
-          br = doc.createElement('br')
-          text.append(br)
-        problem.append(text)
 
       else if section.type == 'multiple_choice'
         newel = $(doc.createElement('choiceresponse'))
@@ -129,19 +126,23 @@ class @CapawikiDescriptor
       else
         throw new SyntaxError("unexpected section type " + section.type) 
 
-  parse: (source, done, fail) ->
+    capa = @dom2capa(doc)
+    return capa
+
+  parse: (source) ->
     try
-      result = @parser.parse source
+      result = @parser.parse (source + '\n')
+      return {'result': result, 'status': 'success'}
     catch e
       message = @buildParserErrorMessage e
-      return fail(result)
-    return done(result)
+      return {'message': message, 'status': 'error'}
 
-  convert: (parsed, done, fail) ->
+  convert: (parsed) ->
     try
       xml = @buildXML parsed
+      return {'xml': xml, 'status': 'success'}
     catch e
       message = @buildParserErrorMessage e
-      return fail(result)
+      return {'message': message, 'status': 'error'}
     return done(xml)
     

@@ -15,10 +15,8 @@ class CapawikiModule(CapaModule):
     def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
         # self._definition = {'capa': '<problem />', 'wiki': ''}
         self._definition = definition
-        if isinstance(definition['data'], dict) and 'capa' in definition['data']:
-            self.capa_definition = {'data': definition['data']['capa']}
-        else:
-            self.capa_definition = definition
+        assert isinstance(definition['data'], dict) and 'capa' in definition['data']
+        self.capa_definition = {'data': definition['data']['capa']}
         super(CapawikiModule, self).__init__(system, location, self.capa_definition, instance_state,
                          shared_state, **kwargs)
 

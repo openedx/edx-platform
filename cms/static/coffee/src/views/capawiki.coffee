@@ -6,16 +6,22 @@ class CMS.Views.CapawikiEdit extends Backbone.View
     'click .cancel': 'cancel'
     'click .module-edit': 'editSubmodule'
     'click .save-update': 'save'
-    'keyup .wiki-box': 'checkAutoSave'
+    'keyup .capa-box': 'checkAutoSave'
+    'keyup .wiki-box': 'runParser'
+    'change .wiki-box': 'runParser'
 
   initialize: ->
     @$el.load @model.editUrl(), =>
       @descriptor = XModule.loadModule($(@el).find('.xmodule_edit'))
       @capa_box = $(".capa-box", @el)
       @wiki_box = $(".wiki-box", @el)
+      @message_box = $(".message-box", @el)
       @model.module = @descriptor
       @throttledAutoSave = _.throttle(@autoSave, 0);
       XModule.loadModules('display')
+
+  debug: (msg) ->
+    # console.log msg
 
   checkAutoSaveTimeout: ->
     @auto_save_timer = null
@@ -28,18 +34,26 @@ class CMS.Views.CapawikiEdit extends Backbone.View
     @auto_save_timer = window.setTimeout(callback, 1000)
 
   hideMessage: ->
-    @message_box.css {"display":"none"}
+    @message_box.text ""
 
   showMessage: (message) ->
-    @message_box.css {"display":"block"}
     @message_box.text message
 
   showError: (message) ->
     @showMessage(message)
 
+  runParser: ->
+    out = @descriptor.parse @wiki_box.val()
+    if out.status == "success"
+      out = @descriptor.convert out.result
+      if out.status == "success"
+        @capa_box.val out.xml
+        @checkAutoSave()
+        @hideMessage()
+    @showMessage(out.message)
+
   autoSave: ->
     @model.save().done((previews) =>
-      @hideMessage()
       previews_section = @$el.find('.previews').empty()
       $.each(previews, (idx, preview) =>
         preview_wrapper = $('<section/>', class: 'preview').append preview
