@@ -62,7 +62,20 @@
         <div class="main-cta">
           %if user.is_authenticated():
             %if registered:
+   	        <%
+                  if course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']:
+                      course_target = reverse('info', args=[course.id])
+                  else:
+                      course_target = reverse('about_course', args=[course.id])
+                  show_link = settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION')
+                %>
+	        %if show_link:
+                <a href="${course_target}">
+                %endif
                 <span class="register disabled">You are registered for this course (${course.number}).</span>
+	        %if show_link:
+                </a>
+                %endif
             %else:
                 <a href="#" class="register">Register for ${course.number}</a>
 	        <div id="register_message"></div>
