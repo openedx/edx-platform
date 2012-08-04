@@ -16,6 +16,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django_countries import CountryField
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from functools import partial
+
+import comment_client
+
+import logging
+
+
 #from cache_toolbox import cache_model, cache_relation
 
 
@@ -203,3 +213,20 @@ def add_user_to_default_group(user, group):
         utg.save()
     utg.users.add(User.objects.get(username=user))
     utg.save()
+
+@receiver(post_save, sender=User)
+def update_user_information(sender, instance, created, **kwargs):
+    if created:
+        func = comment_client.create_user
+    else:
+        func = partial(comment_client.update_user, user_id=instance.id)
+    try:
+        func(attributes={
+            'id': instance.id,
+            'username': instance.username,
+            'email': instance.email,
+        })
+    except Exception as e:
+        log = logging.getLogger("mitx.discussion")
+        log.error(unicode(e))
+        log.error("update user info to discussion failed for user with id: " + str(instance.id))
