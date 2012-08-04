@@ -2,6 +2,9 @@
 
 $ ->
 
+  if not MathJax?
+    return
+
   HUB = MathJax.Hub
 
   class MathJaxProcessor
