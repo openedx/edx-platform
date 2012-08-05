@@ -92,8 +92,6 @@ initializeFollowDiscussion = (discussion) ->
     handleAjaxReloadDiscussion = (elem, url) ->
       $elem = $(elem)
       $discussion = $elem.parents("section.discussion")
-      console.log url
-      console.log $elem
       Discussion.safeAjax
         $elem: $elem
         url: url
@@ -130,7 +128,7 @@ initializeFollowDiscussion = (discussion) ->
         handleNewPost(this)
 
       "click .discussion-search-link": ->
-        handleAjaxSearch(this)
+        handleAjaxSearch($local(".search-wrapper>.discussion-search-form"))
 
       "click .discussion-sort-link": ->
         handleAjaxSort(this)
