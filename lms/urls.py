@@ -175,6 +175,11 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
         )
 
+if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+    urlpatterns += (
+        url(r'^event_logs$', 'track.views.view_tracking_log'),
+        )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
