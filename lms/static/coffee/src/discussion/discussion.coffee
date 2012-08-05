@@ -32,13 +32,6 @@ initializeFollowDiscussion = (discussion) ->
 
     id = $discussion.attr("_id")
 
-    handleSearch = (text, isSearchWithinBoard) ->
-      if text.length
-        if $local(".discussion-search-within-board").is(":checked")
-          window.location = window.location.pathname + '?text=' + encodeURI(text)
-        else
-          window.location = Discussion.urlFor('search') + '?text=' + encodeURI(text)
-
     handleSubmitNewPost = (elem) ->
       title = $local(".new-post-title").val()
       body = Discussion.getWmdContent $discussion, $local, "new-post-body"
