@@ -68,7 +68,8 @@ initializeFollowDiscussion = (discussion) ->
         $(elem).hide()
       else
         view = { discussion_id: id }
-        $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
+        $newPostButton = $local(".discussion-new-post")
+        $newPostButton.after Mustache.render Discussion.newPostTemplate, view
         newPostBody = $discussion.find(".new-post-body")
         if newPostBody.length
           Discussion.makeWmdEditor $discussion, $local, "new-post-body"
