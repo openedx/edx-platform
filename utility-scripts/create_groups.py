@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #
 # File:   create_groups.py
-# Date:   04-Aug-12
-# Author: I. Chuang <ichuang@mit.edu>
 #
 # Create all staff_* groups for classes in data directory.
 
