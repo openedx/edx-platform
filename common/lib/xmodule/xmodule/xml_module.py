@@ -141,8 +141,8 @@ class XmlDescriptor(XModuleDescriptor):
         definition = cls.definition_from_xml(definition_xml, system)
 
         # TODO (ichuang): remove this after migration
-        # for Fall 2012 LMS migration: keep filename
-        definition['filename'] = filepath
+        # for Fall 2012 LMS migration: keep filename (and unmangled filename)
+        definition['filename'] = [ filepath, filename ]
 
         return definition
 
