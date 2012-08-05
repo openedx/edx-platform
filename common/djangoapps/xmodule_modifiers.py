@@ -90,9 +90,12 @@ def add_histogram(get_html, module):
 
         # TODO (ichuang): Remove after fall 2012 LMS migration done
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            filename = module.definition.get('filename','')
-            data_dir = module.system.filestore.root_path.rsplit('/')[-1]
-            edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filename)
+            [filepath, filename] = module.definition.get('filename','')
+            osfs = module.system.filestore
+            if osfs.exists(filename):
+                filepath = filename	# if original, unmangled filename exists then use it (github doesn't like symlinks)
+            data_dir = osfs.root_path.rsplit('/')[-1]
+            edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filepath)
         else:
             edit_link = False
 
