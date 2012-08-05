@@ -60,13 +60,13 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
-MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True
+MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
-MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True	# require that user be in the staff_* group to be able to enroll
+MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 
 INSTALLED_APPS += ('external_auth',) 
 INSTALLED_APPS += ('django_openid_auth',)
