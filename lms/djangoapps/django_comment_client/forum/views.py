@@ -43,12 +43,10 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'forum': 'discussion/_forum.html',
     }[discussion_type]
 
-    """base_url = {
+    base_url = {
         'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
         'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])),
-    }[discussion_type]()"""
-
-    base_url = reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])
+    }[discussion_type]()
 
     annotated_content_info = {thread['id']: get_annotated_content_info(thread, request.user.id) for thread in threads}
 
@@ -116,13 +114,17 @@ def forum_form_discussion(request, course_id, discussion_id):
     threads, query_params = get_threads(request, course_id, discussion_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'course': course,
-        'content': content,
-        'accordion': render_accordion(request, course, discussion_id),
-    }
-    return render_to_response('discussion/index.html', context)
+
+    if request.is_ajax():
+        return utils.HtmlResponse(content)
+    else:
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            'content': content,
+            'accordion': render_accordion(request, course, discussion_id),
+        }
+        return render_to_response('discussion/index.html', context)
 
 
 def get_annotated_content_info(content, user_id):
