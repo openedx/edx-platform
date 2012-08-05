@@ -122,13 +122,7 @@ initializeFollowDiscussion = (discussion) ->
     
     Discussion.bindLocalEvents $local,
 
-      "submit .search-wrapper-forum>.discussion-search-form": (event) ->
-        event.preventDefault()
-        text = $local(".search-input").val()
-        isSearchWithinBoard = $local(".discussion-search-within-board").is(":checked")
-        handleSearch(text, isSearchWithinBoard)
-
-      "submit .search-wrapper-inline>.discussion-search-form": (event) ->
+      "submit .search-wrapper>.discussion-search-form": (event) ->
         event.preventDefault()
         handleAjaxSearch(this)
 
@@ -138,7 +132,7 @@ initializeFollowDiscussion = (discussion) ->
       "click .discussion-search-link": ->
         handleAjaxSearch(this)
 
-      "click .discussion-inline-sort-link": ->
+      "click .discussion-sort-link": ->
         handleAjaxSort(this)
 
     $discussion.children(".discussion-paginator").find(".discussion-inline-page-link").click ->
