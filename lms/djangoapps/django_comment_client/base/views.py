@@ -46,8 +46,8 @@ def instructor_only(fn):
             return fn(request, *args, **kwargs)
     return verified_fn
 
-@login_required
 @require_POST
+@login_required
 def create_thread(request, course_id, commentable_id):
     attributes = extract(request.POST, ['body', 'title', 'tags'])
     attributes['user_id'] = request.user.id
@@ -70,9 +70,9 @@ def create_thread(request, course_id, commentable_id):
     else:
         return JsonResponse(response)
 
-@thread_author_only
-@login_required
 @require_POST
+@login_required
+@thread_author_only
 def update_thread(request, course_id, thread_id):
     attributes = extract(request.POST, ['body', 'title', 'tags'])
     response = comment_client.update_thread(thread_id, attributes)
@@ -110,23 +110,23 @@ def _create_comment(request, course_id, _response_from_attributes):
     else:
         return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def create_comment(request, course_id, thread_id):
     def _response_from_attributes(attributes):
         return comment_client.create_comment(thread_id, attributes)
     return _create_comment(request, course_id, _response_from_attributes)
 
-@thread_author_only
-@login_required
 @require_POST
+@login_required
+@thread_author_only
 def delete_thread(request, course_id, thread_id):
     response = comment_client.delete_thread(thread_id)
     return JsonResponse(response)
 
-@comment_author_only
-@login_required
 @require_POST
+@login_required
+@comment_author_only
 def update_comment(request, course_id, comment_id):
     attributes = extract(request.POST, ['body'])
     response = comment_client.update_comment(comment_id, attributes)
@@ -143,93 +143,93 @@ def update_comment(request, course_id, comment_id):
     else:
         return JsonResponse(response)
 
-@instructor_only
-@login_required
 @require_POST
+@login_required
+@instructor_only
 def endorse_comment(request, course_id, comment_id):
     attributes = extract(request.POST, ['endorsed'])
     response = comment_client.update_comment(comment_id, attributes)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def create_sub_comment(request, course_id, comment_id):
     def _response_from_attributes(attributes):
         return comment_client.create_sub_comment(comment_id, attributes)
     return _create_comment(request, course_id, _response_from_attributes)
 
-@comment_author_only
-@login_required
 @require_POST
+@login_required
+@comment_author_only
 def delete_comment(request, course_id, comment_id):
     response = comment_client.delete_comment(comment_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def vote_for_comment(request, course_id, comment_id, value):
     user_id = request.user.id
     response = comment_client.vote_for_comment(comment_id, user_id, value)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def undo_vote_for_comment(request, course_id, comment_id):
     user_id = request.user.id
     response = comment_client.undo_vote_for_comment(comment_id, user_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def vote_for_thread(request, course_id, thread_id, value):
     user_id = request.user.id
     response = comment_client.vote_for_thread(thread_id, user_id, value)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def undo_vote_for_thread(request, course_id, thread_id):
     user_id = request.user.id
     response = comment_client.undo_vote_for_thread(thread_id, user_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def follow_thread(request, course_id, thread_id):
     user_id = request.user.id
     response = comment_client.subscribe_thread(user_id, thread_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def follow_commentable(request, course_id, commentable_id):
     user_id = request.user.id
     response = comment_client.subscribe_commentable(user_id, commentable_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def follow_user(request, course_id, followed_user_id):
     user_id = request.user.id
     response = comment_client.follow(user_id, followed_user_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def unfollow_thread(request, course_id, thread_id):
     user_id = request.user.id
     response = comment_client.unsubscribe_thread(user_id, thread_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def unfollow_commentable(request, course_id, commentable_id):
     user_id = request.user.id
     response = comment_client.unsubscribe_commentable(user_id, commentable_id)
     return JsonResponse(response)
 
-@login_required
 @require_POST
+@login_required
 def unfollow_user(request, course_id, followed_user_id):
     user_id = request.user.id
     response = comment_client.unfollow(user_id, followed_user_id)
@@ -255,9 +255,9 @@ def tags_autocomplete(request, course_id):
         results = comment_client.tags_autocomplete(value)
     return JsonResponse(results)
 
-@csrf.csrf_exempt
-@login_required
 @require_POST
+@login_required
+@csrf.csrf_exempt
 def upload(request, course_id):#ajax upload file to a question or answer 
     """view that handles file upload via Ajax
     """
