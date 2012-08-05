@@ -56,17 +56,9 @@ while True:
     else:
         break
 
-while True:
-    email = raw_input('email: ')
-    if User.objects.filter(email=email):
-        print "email %s already taken" % email
-    else:
-        break
-    
-name = raw_input('Full name: ')
-
 make_eamap = False
 if raw_input('Create MIT ExternalAuth? [n] ').lower()=='y':
+    email = '%s@MIT.EDU' % uname
     if not email.endswith('@MIT.EDU'):
         print "Failed - email must be @MIT.EDU"
         sys.exit(-1)
@@ -76,6 +68,13 @@ if raw_input('Create MIT ExternalAuth? [n] ').lower()=='y':
         sys.exit(-1)
     make_eamap = True
     password = GenPasswd(12)
+    
+    # get name from kerberos
+    kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
+    name = raw_input('Full name: [%s] ' % kname).strip()
+    if name=='':
+        name = kname
+    print "name = %s" % name
 else:
     while True:
         password = getpass()
@@ -84,6 +83,16 @@ else:
             break
         print "Oops, passwords do not match, please retry"
 
+    while True:
+        email = raw_input('email: ')
+        if User.objects.filter(email=email):
+            print "email %s already taken" % email
+        else:
+            break
+        
+    name = raw_input('Full name: ')
+
+        
 user = User(username=uname, email=email, is_active=True)
 user.set_password(password)
 try:
