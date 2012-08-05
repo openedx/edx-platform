@@ -74,10 +74,10 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                          'default_chapter' : 'Week_1',
                                          'default_section' : 'Variables_and_Binding',
                                          },
-                    '8.01_Fall_2012': {'number' : '8.01x',
-                                         'title'  : 'Mechanics',
-                                         'xmlpath': '/8.01x/',
-                                         'github_url': 'https://github.com/MITx/8.01x',
+                    'Classical_Mechanics_Online': {'number' : '8.011x',
+                                         'title'  : 'Classical Mechanics Online',
+                                         'xmlpath': '/content-mit-8011x/',
+                                         'github_url': 'https://github.com/MITx/content-mit-8011x',
                                          'active': True,
                                          'default_chapter' : 'Mechanics_Online_Spring_2012',
                                          'default_section' : 'Introduction_to_the_course',
@@ -157,3 +157,6 @@ INSTALLED_APPS = INSTALLED_APPS + (
 
 LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
 LOGIN_URL = MITX_ROOT_URL + '/'
+
+#-----------------------------------------------------------------------------
+SESSION_COOKIE_NAME = "stable_edx4edx"
