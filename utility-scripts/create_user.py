@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #
 # File:   create_user.py
-# Date:   04-Aug-12
-# Author: I. Chuang <ichuang@mit.edu>
 #
 # Create user.  Prompt for groups and ExternalAuthMap
 
