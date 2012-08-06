@@ -285,7 +285,7 @@ class XmlDescriptor(XModuleDescriptor):
             return attr_map.to_xml(self.own_metadata[attr])
 
         # Add the non-inherited metadata
-        for attr in self.own_metadata:
+        for attr in sorted(self.own_metadata):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip:
                 xml_object.set(attr, val_for_xml(attr))
