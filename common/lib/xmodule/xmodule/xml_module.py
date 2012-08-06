@@ -70,7 +70,7 @@ class XmlDescriptor(XModuleDescriptor):
     # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-        'ispublic', 	# if True, then course is listed for all users; see 
+        'ispublic', 	# if True, then course is listed for all users; see
         # VS[compat] Remove once unused.
         'name', 'slug')
 
@@ -171,8 +171,7 @@ class XmlDescriptor(XModuleDescriptor):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(
-                    cls,
-                    'backcompat_paths'):
+                    cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -233,13 +232,19 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] -- detect new-style each-in-a-file mode
         if is_pointer_tag(xml_object):
             # new style:
-            # read the actual defition file--named using url_name
+            # read the actual definition file--named using url_name
             filepath = cls._format_filepath(xml_object.tag, url_name)
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
             definition_xml = xml_object
 
         definition = cls.load_definition(definition_xml, system, location)
+        # VS[compat] -- make Ike's github preview links work in both old and
+        # new file layouts
+        if is_pointer_tag(xml_object):
+            # new style -- contents actually at filepath
+            definition['filename'] = [filepath, filepath]
+
         metadata = cls.load_metadata(definition_xml)
         return cls(
             system,

@@ -26,12 +26,14 @@ def strip_metadata(descriptor, key):
     for d in descriptor.get_children():
         strip_metadata(d, key)
 
-def check_gone(descriptor, key):
-    '''Make sure that the metadata of this descriptor or any
-    descendants does not include key'''
-    assert_true(key not in descriptor.metadata)
+def strip_filenames(descriptor):
+    """
+    Recursively strips 'filename' from all children's definitions.
+    """
+    print "strip filename from {desc}".format(desc=descriptor.location.url())
+    descriptor.definition.pop('filename', None)
     for d in descriptor.get_children():
-        check_gone(d, key)
+        strip_filenames(d)
 
 
 
@@ -69,6 +71,11 @@ class RoundTripTestCase(unittest.TestCase):
         # aren't real metadata, and depend on paths. Remove them.
         strip_metadata(initial_course, 'data_dir')
         strip_metadata(exported_course, 'data_dir')
+
+        # HACK: filenames change when changing file formats
+        # during imports from old-style courses.  Ignore them.
+        strip_filenames(initial_course)
+        strip_filenames(exported_course)
 
         self.assertEquals(initial_course, exported_course)
 
