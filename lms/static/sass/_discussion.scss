@@ -264,6 +264,11 @@ $discussion_input_width: 100%;
   //THREAD STYLES
   .thread {
     //display: none;
+    .search-highlight {
+      display: inline;
+      font-weight: bold;
+      background-color: lightyellow;
+    }
     .thread-title {
       @include discussion-font;
       @include discussion-clickable;

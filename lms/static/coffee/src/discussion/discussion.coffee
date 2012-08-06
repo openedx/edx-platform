@@ -27,7 +27,7 @@ initializeFollowDiscussion = (discussion) ->
   bindDiscussionEvents: (discussion) ->
 
     $discussion = $(discussion)
-    $discussionNonContent = $discussion.children(".discussion-non-content")
+    $discussionNonContent = $discussion.children(".discussion-local")
     $local = Discussion.generateLocal($discussionNonContent)
 
     id = $discussion.attr("_id")
@@ -127,5 +127,5 @@ initializeFollowDiscussion = (discussion) ->
       "click .discussion-sort-link": ->
         handleAjaxSort(this)
 
-    $discussion.children(".discussion-paginator").find(".discussion-inline-page-link").click ->
+    $discussion.children(".discussion-paginator").find(".discussion-page-link").click ->
       handleAjaxPage(this)
