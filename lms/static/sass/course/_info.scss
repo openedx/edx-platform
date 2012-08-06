@@ -92,7 +92,7 @@ div.info-wrapper {
         @include box-sizing(border-box);
         padding: em(7) lh(.75);
         position: relative;
-        font-size: $body-font-size;
+        font-size: 1em;
 
         &.expandable,
         &.collapsable {
@@ -111,7 +111,6 @@ div.info-wrapper {
             border-bottom: 0;
             border-top: 1px solid $border-color;
             @include box-shadow(inset 0 1px 0 #eee);
-            padding-left: lh(1.5);
             font-size: 1em;
           }
         }
@@ -149,14 +148,12 @@ div.info-wrapper {
         }
 
         p {
-          font: 1em $sans-serif;
           letter-spacing: 0;
           margin: 0;
           text-transform: none;
 
           a {
             padding-right: 8px;
-            font-family: $sans-serif;
 
             &:before {
               color: #ccc;
@@ -175,14 +172,8 @@ div.info-wrapper {
         }
 
         a {
-          color: lighten($text-color, 10%);
           @include inline-block();
-          text-decoration: none;
-          @include transition();
-
-          &:hover {
-            color: $mit-red;
-          }
+          line-height: lh();
         }
       }
     }
