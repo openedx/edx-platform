@@ -78,6 +78,7 @@ initializeFollowThread = (thread) ->
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
+          Discussion.setContentInfo response.content['id'], 'can_reply', true
           Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
@@ -321,3 +322,5 @@ initializeFollowThread = (thread) ->
     id = $content.attr("_id")
     if not Discussion.getContentInfo id, 'editable'
       $local(".discussion-edit").remove()
+    if not Discussion.getContentInfo id, 'can_reply'
+      $local(".discussion-reply").remove()
