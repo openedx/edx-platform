@@ -1,9 +1,8 @@
 nav.course-material {
-  background: rgb(210,210,210);
   @include clearfix;
   @include box-sizing(border-box);
-  @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.05));
-  border-bottom: 1px solid rgb(190,190,190);
+  background: #f6f6f6;
+  border-bottom: 1px solid rgb(200,200,200);
   margin: 0px auto 0px;
   padding: 0px;
   width: 100%;
@@ -24,12 +23,14 @@ nav.course-material {
       list-style: none;
 
       a {
-        color: $lighter-base-font-color;
+        color: darken($lighter-base-font-color, 20%);
         display: block;
         text-align: center;
-        padding: 5px 13px;
+        padding: 8px 13px 12px;
+        font-size: 14px;
+        font-weight: 400;
         text-decoration: none;
-        text-shadow: 0 1px rgba(255,255,255, 0.4);
+        text-shadow: 0 1px rgb(255,255,255);
 
         &:hover {
           color: $base-font-color;
@@ -41,7 +42,7 @@ nav.course-material {
           border-bottom: 0px;
           @include border-top-radius(4px);
           @include box-shadow(0 2px 0 0 rgba(255,255,255, 1));
-          color: $base-font-color;
+          color: $blue;
         }
       }
     }

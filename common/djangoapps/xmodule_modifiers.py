@@ -76,8 +76,9 @@ def add_histogram(get_html, module):
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
 
-        # TODO: fixme - no filename in module.xml in general (this code block for edx4edx)
-        # the following if block is for summer 2012 edX course development; it will change when the CMS comes online
+        # TODO: fixme - no filename in module.xml in general (this code block
+        # for edx4edx) the following if block is for summer 2012 edX course
+        # development; it will change when the CMS comes online
         if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
             coursename = multicourse_settings.get_coursename_from_request(request)
             github_url = multicourse_settings.get_course_github_url(coursename)
@@ -88,10 +89,8 @@ def add_histogram(get_html, module):
         else:
             edit_link = False
 
-        # Cast module.definition and module.metadata to dicts so that json can dump them
-        # even though they are lazily loaded
-        staff_context = {'definition': json.dumps(dict(module.definition), indent=4),
-                         'metadata': json.dumps(dict(module.metadata), indent=4),
+        staff_context = {'definition': json.dumps(module.definition, indent=4),
+                         'metadata': json.dumps(module.metadata, indent=4),
                          'element_id': module.location.html_id(),
                          'edit_link': edit_link,
                          'histogram': json.dumps(histogram),

@@ -11,33 +11,33 @@ class PostReceiveTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    @patch('github_sync.views.sync_with_github')
-    def test_non_branch(self, sync_with_github):
+    @patch('github_sync.views.import_from_github')
+    def test_non_branch(self, import_from_github):
         self.client.post('/github_service_hook', {'payload': json.dumps({
             'ref': 'refs/tags/foo'})
         })
-        self.assertFalse(sync_with_github.called)
+        self.assertFalse(import_from_github.called)
 
-    @patch('github_sync.views.sync_with_github')
-    def test_non_watched_repo(self, sync_with_github):
+    @patch('github_sync.views.import_from_github')
+    def test_non_watched_repo(self, import_from_github):
         self.client.post('/github_service_hook', {'payload': json.dumps({
             'ref': 'refs/heads/branch',
             'repository': {'name': 'bad_repo'}})
         })
-        self.assertFalse(sync_with_github.called)
+        self.assertFalse(import_from_github.called)
 
-    @patch('github_sync.views.sync_with_github')
-    def test_non_tracked_branch(self, sync_with_github):
+    @patch('github_sync.views.import_from_github')
+    def test_non_tracked_branch(self, import_from_github):
         self.client.post('/github_service_hook', {'payload': json.dumps({
             'ref': 'refs/heads/non_branch',
             'repository': {'name': 'repo'}})
         })
-        self.assertFalse(sync_with_github.called)
+        self.assertFalse(import_from_github.called)
 
-    @patch('github_sync.views.sync_with_github')
-    def test_tracked_branch(self, sync_with_github):
+    @patch('github_sync.views.import_from_github')
+    def test_tracked_branch(self, import_from_github):
         self.client.post('/github_service_hook', {'payload': json.dumps({
             'ref': 'refs/heads/branch',
             'repository': {'name': 'repo'}})
         })
-        sync_with_github.assert_called_with(load_repo_settings('repo'))
+        import_from_github.assert_called_with(load_repo_settings('repo'))

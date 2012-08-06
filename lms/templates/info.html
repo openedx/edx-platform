@@ -20,23 +20,25 @@ $(document).ready(function(){
 </%block>
 
 <section class="container">
-  <section class="courseware">
-    <div class="info-wrapper">
-      % if user.is_authenticated():
-      <section class="updates">
-        ${get_course_info_section(course, 'updates')}
-      </section>
-      <section aria-label="Handout Navigation" class="handouts">
-        ${get_course_info_section(course, 'handouts')}
-      </section>
-      % else:
-      <section class="updates">
-        ${get_course_info_section(course, 'guest_updates')}
-      </section>
-      <section aria-label="Handout Navigation" class="handouts">
-        ${get_course_info_section(course, 'guest_handouts')}
-      </section>
-      % endif
-    </div>
-  </section>
+  <div class="info-wrapper">
+    % if user.is_authenticated():
+    <section class="updates">
+      <h1>Course Updates &amp; News</h1>
+      ${get_course_info_section(course, 'updates')}
+    </section>
+    <section aria-label="Handout Navigation" class="handouts">
+      <h1>Course Handouts</h1>
+      ${get_course_info_section(course, 'handouts')}
+    </section>
+    % else:
+    <section class="updates">
+      <h1>Course Updates &amp; News</h1>
+      ${get_course_info_section(course, 'guest_updates')}
+    </section>
+    <section aria-label="Handout Navigation" class="handouts">
+      <h1>Course Handouts</h1>
+      ${get_course_info_section(course, 'guest_handouts')}
+    </section>
+    % endif
+  </div>
 </section>

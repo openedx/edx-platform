@@ -115,14 +115,17 @@ def grade_sheet(student, course, grader, student_module_cache):
     This pulls a summary of all problems in the course.
 
     Returns
-    - courseware_summary is a summary of all sections with problems in the course. It is organized as an array of chapters,
-    each containing an array of sections, each containing an array of scores. This contains information for graded and ungraded
-    problems, and is good for displaying a course summary with due dates, etc.
-    
+    - courseware_summary is a summary of all sections with problems in the course. 
+    It is organized as an array of chapters, each containing an array of sections, 
+    each containing an array of scores. This contains information for graded and 
+    ungraded problems, and is good for displaying a course summary with due dates, 
+    etc.
+
     Arguments:
         student: A User object for the student to grade
         course: An XModule containing the course to grade
-        student_module_cache: A StudentModuleCache initialized with all instance_modules for the student
+        student_module_cache: A StudentModuleCache initialized with all
+             instance_modules for the student
     """
     chapters = []
     for c in course.get_children():
@@ -135,12 +138,16 @@ def grade_sheet(student, course, grader, student_module_cache):
                 if correct is None and total is None:
                     continue
 
-                scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
+                scores.append(Score(correct, total, graded, 
+                    module.metadata.get('display_name')))
 
-            section_total, graded_total = graders.aggregate_scores(scores, s.metadata.get('display_name'))
+            section_total, graded_total = graders.aggregate_scores(
+                scores, s.metadata.get('display_name'))
+
             format = s.metadata.get('format', "")
             sections.append({
-                'section': s.metadata.get('display_name'),
+                'display_name': s.display_name,
+                'url_name': s.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
@@ -148,8 +155,9 @@ def grade_sheet(student, course, grader, student_module_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.metadata.get('display_name'),
-                         'chapter': c.metadata.get('display_name'),
+        chapters.append({'course': course.display_name,
+                         'display_name': c.display_name,
+                         'url_name': c.url_name,
                          'sections': sections})
 
     return chapters

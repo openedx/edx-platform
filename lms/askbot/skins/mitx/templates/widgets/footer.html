@@ -1,26 +1,38 @@
 <!-- template footer.html -->
-  <footer>
-    <!-- Template based on a design from http://www.dotemplate.com/ - Donated $10 (pmitros) so we don't need to include credit. -->
-    <p> Copyright &copy; 2012. MIT. <a href="/t/copyright.html">Some rights reserved.</a>
-</p>
-      <nav>
-      <ul class="social">
-        <li class="linkedin">
-          <a href="http://www.linkedin.com/groups/Friends-Alumni-MITx-4316538">Linked In</a>
-        </li>
-        <li class="twitter">
-          <a href="https://twitter.com/#!/MyMITx">Twitter</a>
-        </li>
-        <li class="facebook">
-          <a href="http://www.facebook.com/pages/MITx/378592442151504">Facebook</a>
-        </li>
-      </ul>
-    <ul>
+<footer>
+  <nav>
+    <section class="top">
+      <section class="primary">
+        <a href="${reverse('root')}" class="logo"></a>
+        <a href="${reverse('courses')}">Find Courses</a>
+        <a href="${reverse('about_edx')}">About</a>
+        <a href="http://edxonline.tumblr.com/">Blog</a>
+        <a href="${reverse('jobs')}">Jobs</a>
+        <a href="${reverse('contact')}">Contact</a>
+      </section>
 
-      <li><a href="/s/help.html">Help</a></li>
-      <li><a href="/logout">Log out</a></li>
-    </ul>
-      </nav>
-  </footer>
+      <section class="social">
+        <a href="http://youtube.com/user/edxonline"><img src="${static.url('images/social/youtube-sharing.png')}" /></a>
+        <a href="https://plus.google.com/108235383044095082735"><img src="${static.url('images/social/google-plus-sharing.png')}" /></a>
+        <a href="http://www.facebook.com/EdxOnline"><img src="${static.url('images/social/facebook-sharing.png')}" /></a>
+        <a href="https://twitter.com/edXOnline"><img src="${static.url('images/social/twitter-sharing.png')}" /></a>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <section class="copyright">
+        <p style="float:left;">&copy; 2012 edX, some rights reserved.</p>
+      </section>
+
+      <section class="secondary">
+        <a href="${reverse('tos')}">Terms of Service</a>
+        <a href="${reverse('privacy_edx')}">Privacy Policy</a>
+        <a href="${reverse('honor')}">Honor Code</a>
+        <a href="${reverse('help_edx')}">Help</a>
+      </section>
+    </section>
+
+  </nav>
+</footer>
 
 <!-- end template footer.html -->

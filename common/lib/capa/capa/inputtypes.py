@@ -313,14 +313,20 @@ def textbox(element, value, status, render_template, msg=''):
     size = element.get('size')
     rows = element.get('rows') or '30'
     cols = element.get('cols') or '80'
-    mode = element.get('mode')	or 'python' 	# mode for CodeMirror, eg "python" or "xml"
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
-    linenumbers = element.get('linenumbers','true')	 # for CodeMirror
+
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
+
+    # For CodeMirror
+    mode = element.get('mode')	or 'python' # mode, eg "python" or "xml"
+    linenumbers = element.get('linenumbers','true')	 # for CodeMirror
+    tabsize = element.get('tabsize','4')
+    tabsize = int(tabsize)
+
     context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg,
                'mode': mode, 'linenumbers': linenumbers,
                'rows': rows, 'cols': cols,
-               'hidden': hidden,
+               'hidden': hidden, 'tabsize': tabsize,
                }
     html = render_template("textbox.html", context)
     try:

@@ -17,7 +17,7 @@ MITX_FEATURES['DISABLE_START_DATES'] = True
 
 WIKI_ENABLED = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log", 
+LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             debug=True)
@@ -30,7 +30,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
+    # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {
@@ -52,11 +52,29 @@ CACHES = {
     }
 }
 
+# Make the keyedcache startup warnings go away
+CACHE_TIMEOUT = 0
+
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+################################ OpenID Auth #################################
+MITX_FEATURES['AUTH_USE_OPENID'] = True
+MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
+
+INSTALLED_APPS += ('external_auth',) 
+INSTALLED_APPS += ('django_openid_auth',)
+
+OPENID_CREATE_USERS = False
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
+OPENID_USE_AS_ADMIN_LOGIN = False
+
+################################ MIT Certificates SSL Auth #################################
+MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+
 ################################ DEBUG TOOLBAR #################################
-INSTALLED_APPS += ('debug_toolbar',) 
+INSTALLED_APPS += ('debug_toolbar',)
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -71,8 +89,8 @@ DEBUG_TOOLBAR_PANELS = (
    'debug_toolbar.panels.logger.LoggingPanel',
 
 #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
-#  Django=1.3.1/1.4 where requests to views get duplicated (your method gets 
-#  hit twice). So you can uncomment when you need to diagnose performance 
+#  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
+#  hit twice). So you can uncomment when you need to diagnose performance
 #  problems, but you shouldn't leave it on.
 #  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )

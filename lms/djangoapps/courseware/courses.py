@@ -33,6 +33,7 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
         try:
             course_loc = CourseDescriptor.id_to_location(course_id)
             course = modulestore().get_item(course_loc)
+
         except (KeyError, ItemNotFoundError):
             raise Http404("Course not found.")
 
@@ -82,7 +83,7 @@ def get_course_about_section(course, section_key):
             log.warning("Missing about section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return None
     elif section_key == "title":
-        return course.metadata.get('display_name', course.name)
+        return course.metadata.get('display_name', course.url_name)
     elif section_key == "university":
         return course.location.org
     elif section_key == "number":

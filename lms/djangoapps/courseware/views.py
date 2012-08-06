@@ -20,6 +20,7 @@ from module_render import toc_for_course, get_module, get_section
 from models import StudentModuleCache
 from student.models import UserProfile
 from xmodule.modulestore import Location
+from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -54,15 +55,16 @@ def user_groups(user):
     return group_names
 
 
-def format_url_params(params):
-    return [urllib.quote(string.replace(' ', '_')) for string in params]
-
 
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
     # TODO: Clean up how 'error' is done.
-    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+
+    # filter out any courses that errored.
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
     universities = defaultdict(list)
     for course in courses:
         universities[course.org].append(course)
@@ -140,9 +142,9 @@ def render_accordion(request, course, chapter, section):
 
         If chapter and section are '' or None, renders a default accordion.
 
-        Returns (initialization_javascript, content)'''
+        Returns the html string'''
 
-    # TODO (cpennington): do the right thing with courses
+    # grab the table of contents
     toc = toc_for_course(request.user, request, course, chapter, section)
 
     active_chapter = 1
@@ -154,8 +156,6 @@ def render_accordion(request, course, chapter, section):
                     ('toc', toc),
                     ('course_name', course.title),
                     ('course_id', course.id),
-                    #TODO: Do we need format_url_params anymore? What is a better way to create the reversed links?
-                    ('format_url_params', format_url_params),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
 
@@ -172,9 +172,9 @@ def index(request, course_id, chapter=None, section=None,
     Arguments:
 
      - request    : HTTP request
-     - course     : coursename (str)
-     - chapter    : chapter name (str)
-     - section    : section name (str)
+     - course_id  : course id (str: ORG/course/URL_NAME)
+     - chapter    : chapter url_name (str)
+     - section    : section url_name (str)
      - position   : position in module, eg of <sequential> module (str)
 
     Returns:
@@ -182,46 +182,57 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
+    try:
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'accordion': render_accordion(request, course, chapter, section),
+            'COURSE_TITLE': course.title,
+            'course': course,
+            'init': '',
+            'content': ''
+            }
 
-    def clean(s):
-        ''' Fixes URLs -- we convert spaces to _ in URLs to prevent
-        funny encoding characters and keep the URLs readable.  This undoes
-        that transformation.
-        '''
-        return s.replace('_', ' ') if s is not None else None
-
-    chapter = clean(chapter)
-    section = clean(section)
-
-    context = {
-        'csrf': csrf(request)['csrf_token'],
-        'accordion': render_accordion(request, course, chapter, section),
-        'COURSE_TITLE': course.title,
-        'course': course,
-        'init': '',
-        'content': ''
-    }
-
-    look_for_module = chapter is not None and section is not None
-    if look_for_module:
-        # TODO (cpennington): Pass the right course in here
-
-        section_descriptor = get_section(course, chapter, section)
-        if section_descriptor is not None:
-            student_module_cache = StudentModuleCache(request.user,
-                                                      section_descriptor)
-            module = get_module(request.user, request,
-                                         section_descriptor.location,
-                                         student_module_cache)
-            context['content'] = module.get_html()
+        look_for_module = chapter is not None and section is not None
+        if look_for_module:
+            section_descriptor = get_section(course, chapter, section)
+            if section_descriptor is not None:
+                student_module_cache = StudentModuleCache(request.user,
+                                                          section_descriptor)
+                module, _, _, _ = get_module(request.user, request,
+                                             section_descriptor.location,
+                                             student_module_cache)
+                context['content'] = module.get_html()
+            else:
+                log.warning("Couldn't find a section descriptor for course_id '{0}',"
+                            "chapter '{1}', section '{2}'".format(
+                                course_id, chapter, section))
         else:
-            log.warning("Couldn't find a section descriptor for course_id '{0}',"
-                        "chapter '{1}', section '{2}'".format(
-                        course_id, chapter, section))
+            if request.user.is_staff:
+                # Add a list of all the errors...
+                context['course_errors'] = modulestore().get_item_errors(course.location)
 
+        result = render_to_response('courseware.html', context)
+    except:
+        # In production, don't want to let a 500 out for any reason
+        if settings.DEBUG:
+            raise
+        else:
+            log.exception("Error in index view: user={user}, course={course},"
+                          " chapter={chapter} section={section}"
+                          "position={position}".format(
+                              user=request.user,
+                              course=course,
+                              chapter=chapter,
+                              section=section,
+                              position=position
+                              ))
+            try:
+                result = render_to_response('courseware-error.html', {})
+            except:
+                result = HttpResponse("There was an unrecoverable error")
 
-    result = render_to_response('courseware.html', context)
     return result
+
 
 @ensure_csrf_cookie
 def jump_to(request, location):
@@ -243,13 +254,13 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = modulestore().path_to_location(location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
-
+    # Rely on index to do all error handling
     return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
