@@ -306,7 +306,7 @@ $discussion_input_width: 100%;
       color: gray;
       font-size: $comment_info_size;
       font-style: italic;
-      margin-top: 1%;
+      margin-top: 2%;
       .comment-time {
         display: inline;
         float: right;
@@ -328,7 +328,7 @@ $discussion_input_width: 100%;
     .discussion-content {
       border-top: lightgray 1px solid;
       overflow: hidden;
-      padding: 2% 0;
+      padding: 1.5% 0;
       .discussion-reply-new {
         @include discussion-font;
         margin-left: 5%;
