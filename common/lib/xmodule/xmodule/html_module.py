@@ -13,6 +13,7 @@ from .html_checker import check_html
 
 log = logging.getLogger("mitx.courseware")
 
+
 class HtmlModule(XModule):
     def get_html(self):
         return self.html
@@ -37,7 +38,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     @classmethod
     def backcompat_paths(cls, path):
         if path.endswith('.html.xml'):
-            path = path[:-9] + '.html'  #backcompat--look for html instead of xml
+            path = path[:-9] + '.html'  # backcompat--look for html instead of xml
         candidates = []
         while os.sep in path:
             candidates.append(path)
@@ -70,7 +71,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
             cls.clean_metadata_from_xml(definition_xml)
-            return {'data' : stringify_children(definition_xml)}
+            return {'data': stringify_children(definition_xml)}
         else:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
@@ -96,7 +97,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
-                    definition = {'data' : html}
+                    definition = {'data': html}
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
@@ -133,4 +134,3 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", self.url_name)
         return elt
-
