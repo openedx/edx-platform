@@ -279,6 +279,12 @@ def modx_dispatch(request, dispatch=None, id=None):
     '''
     # ''' (fix emacs broken parsing)
 
+    # Check for submitted files
+    p = request.POST.copy()
+    if request.FILES:
+        for inputfile_id in request.FILES.keys():
+            p[inputfile_id] = request.FILES[inputfile_id]
+
     student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
     instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
 
@@ -290,7 +296,7 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     # Let the module handle the AJAX
     try:
-        ajax_return = instance.handle_ajax(dispatch, request.POST)
+        ajax_return = instance.handle_ajax(dispatch, p)
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
