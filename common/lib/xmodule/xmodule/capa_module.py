@@ -17,6 +17,7 @@ from xmodule.exceptions import NotFoundError
 from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
+from capa.util import convert_files_to_filenames
 
 log = logging.getLogger("mitx.courseware")
 
@@ -425,10 +426,9 @@ class CapaModule(XModule):
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
-
+         
         answers = self.make_dict_of_responses(get)
-
-        event_info['answers'] = answers
+        event_info['answers'] = convert_files_to_filenames(answers)
 
         # Too late. Cannot submit
         if self.closed():
@@ -436,8 +436,7 @@ class CapaModule(XModule):
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
-        # Problem submitted. Student should reset before checking
-        # again.
+        # Problem submitted. Student should reset before checking again
         if self.lcp.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
