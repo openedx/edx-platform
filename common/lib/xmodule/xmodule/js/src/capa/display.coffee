@@ -12,6 +12,7 @@ class @Problem
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
     window.update_schematics()
+    @inputs = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]")
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     #@$('section.action input.check').click @check
@@ -66,8 +67,8 @@ class @Problem
       return
 
     fd = new FormData()
-
-    @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").each (index, element) ->
+    
+    @inputs.each (index, element) ->
       if element.type is 'file'
         if element.files[0] instanceof File
           fd.append(element.id, element.files[0])
@@ -155,4 +156,4 @@ class @Problem
       element.schematic.update_value()
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
-    @answers = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").serialize()
+    @answers = @inputs.serialize()
