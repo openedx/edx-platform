@@ -23,7 +23,7 @@ def log_event(event):
     log.info(event_str[:settings.TRACK_MAX_EVENT])
     if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         event['time'] = dateutil.parser.parse(event['time'])
-        tldat = TrackingLog(**dict([(x,event[x]) for x in LOGFIELDS]))
+        tldat = TrackingLog(**dict( (x,event[x]) for x in LOGFIELDS ))
         try:
             tldat.save()
         except Exception as err:
