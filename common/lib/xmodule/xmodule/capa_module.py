@@ -119,9 +119,9 @@ class CapaModule(XModule):
         if self.show_answer == "":
             self.show_answer = "closed"
 
-        if instance_state != None:
+        if instance_state is not None:
             instance_state = json.loads(instance_state)
-        if instance_state != None and 'attempts' in instance_state:
+        if instance_state is not None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
         self.name = only_one(dom2.xpath('/problem/@name'))
@@ -238,7 +238,7 @@ class CapaModule(XModule):
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
-                  }
+                   }
 
         # We using strings as truthy values, because the terminology of the
         # check button is context-specific.
