@@ -8,6 +8,7 @@
 </%block>
 
 <%block name="headextra">
+  <%static:css group='course'/>
   
   <style type="text/css">
   .grade_a {color:green;}
@@ -19,7 +20,8 @@
   
 </%block>
 
-<%include file="navigation.html" args="active_page=''" />
+<%include file="course_navigation.html" args="active_page=''" />
+
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
