@@ -105,7 +105,6 @@ $ ->
     replaceMath: (text) ->
       text = text.replace /@@(\d+)@@/g, ($0, $1) => @math[$1]
       @math = null
-      console.log text
       text
 
     @replaceMathWrapper: (_this) ->
@@ -163,7 +162,6 @@ $ ->
               $('#file-upload').unbind('change').change(startUploadHandler)
               
       imageUploadHandler = (elem, input) ->
-        console.log "here"
         ajaxFileUpload(imageUploadUrl, input, imageUploadHandler)
 
       editor = new Markdown.Editor(

@@ -278,15 +278,36 @@ initializeFollowThread = (thread) ->
           handleEditComment(this)
 
   initializeContent: (content) ->
+
+    unescapeHighlightTag = (text) ->
+      text.replace(/\&lt\;highlight\&gt\;/g, "<span class='search-highlight'>")
+          .replace(/\&lt\;\/highlight\&gt\;/g, "</span>")
+
+    stripLatexHighlight = (text) ->
+      text
+
+    markdownWithHighlight = (text) ->
+      converter = Markdown.getMathCompatibleConverter()
+      unescapeHighlightTag stripLatexHighlight converter.makeHtml text
+
     $content = $(content)
     initializeVote $content
     if $content.hasClass("thread")
       initializeFollowThread $content
     $local = Discussion.generateLocal($content.children(".discussion-content"))
+
+    $contentTitle = $local(".thread-title")
+
+    if $contentTitle.length
+      $contentTitle.html unescapeHighlightTag stripLatexHighlight $contentTitle.html()
+
     $contentBody = $local(".content-body")
-    raw_text = $contentBody.html()
-    converter = Markdown.getMathCompatibleConverter()
-    $contentBody.html(converter.makeHtml(raw_text))
+
+    console.log "raw html:"
+    console.log $contentBody.html()
+    
+    $contentBody.html markdownWithHighlight $contentBody.html()
+
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
     if not Discussion.getContentInfo id, 'editable'

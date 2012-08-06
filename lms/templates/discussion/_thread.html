@@ -42,7 +42,11 @@
       <div class="discussion-right-wrapper clearfix">
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
-          <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
+          % if content.get('highlighted_body', None):
+            <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['highlighted_body'] | h}</div>
+          % else:
+            <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
+          % endif
           <div class="content-raw-body ${type}-raw-body" style="display: none">${content['body'] | h}</div>
           ${render_tags(content, type, **kwargs)}
           ${render_bottom_bar(content, type, **kwargs)}
@@ -54,7 +58,11 @@
 
 <%def name="render_title(content, type, **kwargs)">
   % if type == "thread":
-    <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
+    % if content.get('highlighted_title', None):
+      <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['highlighted_title'] | h}</a>
+    % else:
+      <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
+    % endif
   % endif
 </%def>
 
