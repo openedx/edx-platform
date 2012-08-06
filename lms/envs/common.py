@@ -157,6 +157,9 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                           }
                     }
 
+# IP addresses that are allowed to reload the course, etc.
+# TODO (vshnayder): Will probably need to change as we get real access control in.
+LMS_MIGRATION_ALLOWED_IPS = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
