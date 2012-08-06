@@ -9,7 +9,7 @@ from fs.errors import ResourceNotFoundError
 import os
 import sys
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 _AttrMapBase = namedtuple('_AttrMap', 'metadata_key to_metadata from_metadata')
 
