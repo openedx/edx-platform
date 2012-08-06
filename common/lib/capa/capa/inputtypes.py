@@ -13,6 +13,7 @@ Module containing the problem elements which render into input objects
 - checkboxgroup
 - imageinput  (for clickable image)
 - optioninput (for option list)
+- filesubmission (upload a file)
 
 These are matched by *.html files templates/*.html which are mako templates with the actual html.
 
@@ -297,6 +298,18 @@ def textline_dynamath(element, value, status, render_template, msg=''):
                }
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
+
+
+#-----------------------------------------------------------------------------
+@register_render_function
+def filesubmission(element, value, status, render_template, msg=''):
+    '''
+    Upload a single file (e.g. for programming assignments)
+    '''
+    eid = element.get('id')
+    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, }
+    html = render_template("filesubmission.html", context)
+    return etree.XML(html) 
 
 
 #-----------------------------------------------------------------------------
