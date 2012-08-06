@@ -44,15 +44,15 @@
       
       <%def name="percent_data(percentage)">
         <%
-          data_class = "grade_none"
-          if percentage > .87:
-            data_class = "grade_a"
-          elif percentage > .70:
-            data_class = "grade_b"
-          elif percentage > .6:
-            data_class = "grade_c"
-          elif percentage > 0:
-              data_class = "grade_f"
+          letter_grade = 'None'
+          if percentage > 0:
+            letter_grade = 'F'
+            for grade in ['A', 'B', 'C']:
+              if percentage >= course.grade_cutoffs[grade]:
+                letter_grade = grade
+                break
+          
+          data_class = "grade_" + letter_grade
         %>
         <td class="${data_class}">${ "{0:.0%}".format( percentage ) }</td>
       </%def>

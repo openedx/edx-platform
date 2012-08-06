@@ -19,9 +19,18 @@ def yield_module_descendents(module):
    
 def grade(student, request, course, student_module_cache=None):
     """
-    This grades a student as quickly as possible. It reutns the 
-    output from the course grader. More information on the format
-    is in the docstring for CourseGrader.
+    This grades a student as quickly as possible. It retuns the 
+    output from the course grader, augmented with the final letter
+    grade. The keys in the output are:
+    
+    - grade : A final letter grade.
+    - percent : The final percent for the class (rounded up).
+    - section_breakdown : A breakdown of each section that makes
+        up the grade. (For display)
+    - grade_breakdown : A breakdown of the major components that
+        make up the final grade. (For display)
+    
+    More information on the format is in the docstring for CourseGrader.
     """
     
     grading_context = course.grading_context
@@ -84,8 +93,33 @@ def grade(student, request, course, student_module_cache=None):
         totaled_scores[section_format] = format_scores
     
     grade_summary = course.grader.grade(totaled_scores)
-    return grade_summary
     
+    # We round the grade here, to make sure that the grade is an whole percentage and
+    # doesn't get displayed differently than it gets grades
+    grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
+    
+    letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
+    grade_summary['grade'] = letter_grade
+    
+    return grade_summary
+
+def grade_for_percentage(grade_cutoffs, percentage):
+    """
+    Returns a letter grade 'A' 'B' 'C' or None.
+    
+    Arguments
+    - grade_cutoffs is a dictionary mapping a grade to the lowest
+        possible percentage to earn that grade.
+    - percentage is the final percent across all problems in a course
+    """
+    
+    letter_grade = None
+    for possible_grade in ['A', 'B', 'C']:
+        if percentage >= grade_cutoffs[possible_grade]:
+            letter_grade = possible_grade
+            break
+    
+    return letter_grade  
 
 def progress_summary(student, course, grader, student_module_cache):
     """
