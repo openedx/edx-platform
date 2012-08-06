@@ -9,7 +9,7 @@ import time
 # TODO: Collection of parameters to be hooked into rest of edX system
 XQUEUE_LMS_AUTH = { 'username': 'LMS',
                     'password': 'PaloAltoCA' }
-XQUEUE_SUBMIT_URL = 'http://xqueue.edx.org'
+XQUEUE_URL = 'http://xqueue.edx.org'
 
 def make_hashkey(seed=None):
     '''
@@ -37,7 +37,7 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
                         'queue_name': queue_name })
 
 
-def send_to_queue(header, body, file_to_upload=None, xqueue_url=None):
+def send_to_queue(header, body, file_to_upload=None, xqueue_url=XQUEUE_URL):
     '''
     Submit a request to xqueue.
     
@@ -50,8 +50,6 @@ def send_to_queue(header, body, file_to_upload=None, xqueue_url=None):
 
     Returns an 'error' flag indicating error in xqueue transaction
     '''
-    if xqueue_url is None:
-        xqueue_url = XQUEUE_SUBMIT_URL
 
     # First, we login with our credentials
     #------------------------------------------------------------
@@ -64,10 +62,9 @@ def send_to_queue(header, body, file_to_upload=None, xqueue_url=None):
         raise Exception(msg)
 
     # Xqueue responses are JSON-serialized dicts
-    xreply = json.loads(r.text)
-    return_code = xreply['return_code']
+    (return_code, msg) = parse_xreply(r.text)
     if return_code: # Nonzero return code from xqueue indicates error
-        print '  Error in queue_interface.send_to_queue: %s' % xreply['content']
+        print '  Error in queue_interface.send_to_queue: %s' % msg
         return 1 # Error
 
     # Next, we can make a queueing request
@@ -85,9 +82,20 @@ def send_to_queue(header, body, file_to_upload=None, xqueue_url=None):
         msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
         raise Exception(msg)
 
-    xreply = json.loads(r.text)
-    return_code = xreply['return_code']
+    (return_code, msg) = parse_xreply(r.text)
     if return_code:
-        print '  Error in queue_interface.send_to_queue: %s' % xreply['content']
+        print '  Error in queue_interface.send_to_queue: %s' % msg
 
     return return_code
+
+def parse_xreply(xreply):
+    '''
+    Parse the reply from xqueue. Messages are JSON-serialized dict:
+        { 'return_code': 0 (success), 1 (fail),
+          'content': Message from xqueue (string)
+        }
+    '''
+    xreply = json.loads(xreply)
+    return_code = xreply['return_code']
+    content = xreply['content']
+    return (return_code, content)
