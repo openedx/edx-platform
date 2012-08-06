@@ -67,7 +67,6 @@ class XqueueInterface:
         self.url  = url
         self.auth = auth
         self.session = requests.session()
-        self._login()
         
     def send_to_queue(self, header, body, file_to_upload=None):
         '''
