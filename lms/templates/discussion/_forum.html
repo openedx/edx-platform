@@ -2,17 +2,9 @@
 
 <section class="discussion inline-discussion" _id="${discussion_id}">
   <div class="discussion-non-content">
-    <div class="discussion-title-wrapper">
-      <a class="discussion-title" href="javascript:void(0)">Discussion</a>
-    </div>
     <div class="search-wrapper">
       <%include file="_search_bar.html" />
-    </div>
-    <div class="search-within">
-      <input type="checkbox" id="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board" checked/>
-      <label for="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board">Search within board</label>
-    </div>
-    <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
+    </div>    
   </div>
   <%include file="_sort.html" />
   <div class="threads">
