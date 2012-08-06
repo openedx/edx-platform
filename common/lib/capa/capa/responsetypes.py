@@ -31,7 +31,6 @@ import xqueue_interface
 
 log = logging.getLogger('mitx.' + __name__)
 
-qinterface = xqueue_interface.XqueueInterface()
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -981,7 +980,7 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.queue_name = xml.get('queuename', self.system.xqueue_default_queuename)
+        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
         answer = xml.find('answer')
         if answer is not None:
@@ -1029,10 +1028,11 @@ class CodeResponse(LoncapaResponse):
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
+        qinterface = self.system.xqueue['interface']
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(self.system.seed)
-        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue_callback_url,
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed)+self.answer_id)
+        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
 
@@ -1061,7 +1061,7 @@ class CodeResponse(LoncapaResponse):
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
             # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
-            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader')
+            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader. (Queue length: %s)' % msg)
 
         return cmap
 

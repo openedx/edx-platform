@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
+from capa.xqueue_interface import qinterface
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
@@ -157,6 +158,10 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO: Queuename should be derived from 'course_settings.json' of each course
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
+    xqueue = { 'interface': qinterface,
+               'callback_url': xqueue_callback_url,
+               'default_queuename': xqueue_default_queuename.replace(' ','_') }
+
     def _get_module(location):
         (module, _, _, _) = get_module(user, request, location,
                                        student_module_cache, position)
@@ -168,8 +173,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     system = ModuleSystem(track_function=make_track_function(request),
                           render_template=render_to_string,
                           ajax_url=ajax_url,
-                          xqueue_callback_url=xqueue_callback_url,
-                          xqueue_default_queuename=xqueue_default_queuename.replace(' ','_'),
+                          xqueue=xqueue,
                           # TODO (cpennington): Figure out how to share info between systems
                           filestore=descriptor.system.resources_fs,
                           get_module=_get_module,
@@ -222,6 +226,9 @@ def get_module(user, request, location, student_module_cache, position=None):
 
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
+    '''
+    Entry point for graded results from the queueing system. 
+    '''
     # Parse xqueue response
     get = request.POST.copy()
     try:

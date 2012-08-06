@@ -92,7 +92,7 @@ def add_histogram(get_html, module):
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
             [filepath, filename] = module.definition.get('filename','')
             osfs = module.system.filestore
-            if osfs.exists(filename):
+            if filename is not None and osfs.exists(filename):
                 filepath = filename	# if original, unmangled filename exists then use it (github doesn't like symlinks)
             data_dir = osfs.root_path.rsplit('/')[-1]
             edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filepath)
