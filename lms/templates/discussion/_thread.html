@@ -98,15 +98,19 @@
 </%def>
 
 <%def name="render_info(content)">
-  ${time_ago_in_words(parse(content['updated_at']))} ago by
-  % if content['anonymous']:
-    anonymous
-  % else:
-    user No.${content['user_id']}
-  % endif
-  % if content.get('comments_count', -1) >= 0:
-  , <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
-  % endif
+  <div class="comment-time">
+    ${time_ago_in_words(parse(content['updated_at']))} ago by
+    % if content['anonymous']:
+      anonymous
+    % else:
+      user No.${content['user_id']}
+    % endif
+  </div>
+  <div class="comment-count">
+    % if content.get('comments_count', -1) >= 0:
+     <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
+    % endif
+  </div>
 </%def>
 
 <%def name="render_link(cls, html)">
