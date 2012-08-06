@@ -292,8 +292,7 @@ $discussion_input_width: 100%;
         color: #638421;
         float: left;
         font-size: 13px;
-        margin-right: 7px;
-        margin-bottom: 4px;
+        margin: 5px 7px 5px 0;
         padding: 5px 7px;
         text-decoration: none;
         &:hover {
@@ -307,6 +306,7 @@ $discussion_input_width: 100%;
       color: gray;
       font-size: $comment_info_size;
       font-style: italic;
+      margin-top: 1%;
       .comment-time {
         display: inline;
         float: right;
