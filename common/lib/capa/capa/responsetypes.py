@@ -867,11 +867,13 @@ class CodeResponse(LoncapaResponse):
 
         # Generate body
         #   NOTE: Currently specialized to 6.00x's pyxserver, which follows the ExternalResponse interface
+        #         We should define a common interface for external code graders to CodeResponse
         contents = {'xml': etree.tostring(self.xml, pretty_print=True),
                     'edX_cmd': 'get_score',
                     'edX_tests': self.tests,
                     'processor': self.code,
-                    'edX_student_response': unicode(submission)}
+                    'edX_student_response': unicode(submission), # unicode on File object returns its filename
+                    }
         
         # Submit request
         if hasattr(submission, 'read'): # Test for whether submission is a file
