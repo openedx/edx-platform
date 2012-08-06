@@ -27,7 +27,7 @@ def grade(student, request, course, student_module_cache=None):
     grading_context = course.grading_context
     
     if student_module_cache == None:
-        student_module_cache = StudentModuleCache(student, descriptors=grading_context['all_descriptors'])
+        student_module_cache = StudentModuleCache(student, grading_context['all_descriptors'])
     
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is

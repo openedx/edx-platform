@@ -69,7 +69,7 @@ class CourseDescriptor(SequenceDescriptor):
         
         The grading context has two keys:    
         graded_sections - This contains the sections that are graded, as
-            well as all possible children modules that can effect the
+            well as all possible children modules that can affect the
             grading. This allows some sections to be skipped if the student
             hasn't seen any part of it.
             
@@ -101,10 +101,8 @@ class CourseDescriptor(SequenceDescriptor):
             for s in c.get_children():
                 if s.metadata.get('graded', False):
                 
-                    xmoduledescriptors = []
-                    for module in yield_descriptor_descendents(s):
-                        # TODO: Only include modules that have a score here
-                        xmoduledescriptors.append(module)
+                    # TODO: Only include modules that have a score here
+                    xmoduledescriptors = [s for s in yield_descriptor_descendents(s)]
                     
                     section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
                 

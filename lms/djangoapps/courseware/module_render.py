@@ -48,7 +48,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     chapters with name 'hidden' are skipped.
     '''
     
-    student_module_cache = StudentModuleCache(user, course, depth=2)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
     course = get_module(user, request, course.location, student_module_cache)
 
     chapters = list()
@@ -259,7 +259,7 @@ def xqueue_callback(request, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache)
     
     instance_module = get_instance_module(request.user, instance, student_module_cache)
@@ -307,7 +307,7 @@ def modx_dispatch(request, dispatch=None, id=None):
     '''
     # ''' (fix emacs broken parsing)
 
-    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache)
     
     instance_module = get_instance_module(request.user, instance, student_module_cache)
