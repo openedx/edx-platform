@@ -47,8 +47,6 @@ class DummySystem(XMLParsingSystem):
             raise Exception("Shouldn't be called")
 
 
-
-
 class ImportTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
@@ -57,10 +55,9 @@ class ImportTestCase(unittest.TestCase):
         return DummySystem()
 
     def test_fallback(self):
-        '''Make sure that malformed xml loads as an ErrorDescriptor.'''
+        '''Check that malformed xml loads as an ErrorDescriptor.'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
-
         system = self.get_system()
 
         descriptor = XModuleDescriptor.load_from_xml(bad_xml, system, 'org', 'course',
@@ -68,6 +65,22 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
+
+
+    def test_unique_url_names(self):
+        '''Check that each error gets its very own url_name'''
+        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
+        bad_xml2 = '''<sequential url_name="oops"><video url="hi"></sequential>'''
+        system = self.get_system()
+
+        descriptor1 = XModuleDescriptor.load_from_xml(bad_xml, system, 'org',
+                                                      'course', None)
+
+        descriptor2 = XModuleDescriptor.load_from_xml(bad_xml2, system, 'org',
+                                                      'course', None)
+
+        self.assertNotEqual(descriptor1.location, descriptor2.location)
+
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
