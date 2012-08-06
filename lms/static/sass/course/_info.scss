@@ -106,12 +106,13 @@ div.info-wrapper {
         @include box-sizing(border-box);
         padding: em(7) lh(.75);
         position: relative;
+        font-size: $body-font-size;
 
         &.expandable,
         &.collapsable {
           h4 {
-            font-style: $body-font-size;
             font-weight: normal;
+            font-size: 1em;
             padding-left: 18px;
           }
         }
@@ -125,11 +126,8 @@ div.info-wrapper {
             border-top: 1px solid #d3d3d3;
             @include box-shadow(inset 0 1px 0 #eee);
             padding-left: lh(1.5);
+            font-size: 1em;
           }
-        }
-
-        &:hover {
-          background-color: #e9e9e9;
         }
 
         div.hitarea {
@@ -159,20 +157,20 @@ div.info-wrapper {
         h3 {
           border-bottom: 0;
           @include box-shadow(none);
-          color: #999;
-          font-size: $body-font-size;
-          font-weight: bold;
-          text-transform: uppercase;
+          color: #aaa;
+          font-size: 1em;
+          margin-bottom: em(6);
         }
 
         p {
-          font-size: $body-font-size;
+          font: 1em $sans-serif;
           letter-spacing: 0;
           margin: 0;
           text-transform: none;
 
           a {
             padding-right: 8px;
+            font-family: $sans-serif;
 
             &:before {
               color: #ccc;
