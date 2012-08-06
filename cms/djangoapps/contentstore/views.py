@@ -108,7 +108,7 @@ def edit_item(request):
         'contents': item.get_html(),
         'js_module': item.js_module_name,
         'category': item.category,
-        'name': item.name,
+        'url_name': item.url_name,
         'previews': get_module_previews(request, item),
     })
 
@@ -176,7 +176,7 @@ def load_preview_state(request, preview_id, location):
 
 def save_preview_state(request, preview_id, location, instance_state, shared_state):
     """
-    Load the state of a preview module to the request
+    Save the state of a preview module to the request
 
     preview_id (str): An identifier specifying which preview this module is used for
     location: The Location of the module to dispatch to
@@ -214,7 +214,10 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=replace_urls
+        replace_urls=replace_urls,
+        # TODO (vshnayder): All CMS users get staff view by default
+        # is that what we want?
+        is_staff=True,
     )
 
 

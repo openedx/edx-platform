@@ -1,3 +1,4 @@
+from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
@@ -33,6 +34,7 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
         try:
             course_loc = CourseDescriptor.id_to_location(course_id)
             course = modulestore().get_item(course_loc)
+
         except (KeyError, ItemNotFoundError):
             raise Http404("Course not found.")
 
@@ -82,7 +84,7 @@ def get_course_about_section(course, section_key):
             log.warning("Missing about section {key} in course {url}".format(key=section_key, url=course.location.url()))
             return None
     elif section_key == "title":
-        return course.metadata.get('display_name', course.name)
+        return course.metadata.get('display_name', course.url_name)
     elif section_key == "university":
         return course.location.org
     elif section_key == "number":
@@ -113,3 +115,57 @@ def get_course_info_section(course, section_key):
             return "! Info section missing !"
 
     raise KeyError("Invalid about key " + str(section_key))
+
+def course_staff_group_name(course):
+    '''
+    course should be either a CourseDescriptor instance, or a string (the .course entry of a Location)
+    '''
+    if isinstance(course,str):
+        coursename = course
+    else:
+        coursename = course.metadata.get('data_dir','UnknownCourseName')
+    if not coursename:					# Fall 2012: not all course.xml have metadata correct yet
+        coursename = course.metadata.get('course','')
+    return 'staff_%s' % coursename
+
+def has_staff_access_to_course(user,course):
+    '''
+    Returns True if the given user has staff access to the course.
+    This means that user is in the staff_* group, or is an overall admin.
+    '''
+    if user is None or (not user.is_authenticated()) or course is None:
+        return False
+    if user.is_staff:
+        return True
+    user_groups = [x[1] for x in user.groups.values_list()]	# note this is the Auth group, not UserTestGroup
+    staff_group = course_staff_group_name(course)
+    log.debug('course %s user %s groups %s' % (staff_group, user, user_groups))
+    if staff_group in user_groups:
+        return True
+    return False
+
+def has_access_to_course(user,course):
+    if course.metadata.get('ispublic'):
+        return True
+    return has_staff_access_to_course(user,course)
+
+def get_courses_by_university(user):
+    '''
+    Returns dict of lists of courses available, keyed by course.org (ie university).
+    Courses are sorted by course.number.
+
+    if ACCESS_REQUIRE_STAFF_FOR_COURSE then list only includes those accessible to user.
+    '''
+    # TODO: Clean up how 'error' is done.
+    # filter out any courses that errored.
+    courses = [c for c in modulestore().get_courses()
+               if isinstance(c, CourseDescriptor)]
+    courses = sorted(courses, key=lambda course: course.number)
+    universities = defaultdict(list)
+    for course in courses:
+        if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+            if not has_access_to_course(user,course):
+                continue
+        universities[course.org].append(course)
+    return universities
+    

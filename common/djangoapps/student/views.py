@@ -8,7 +8,6 @@ import uuid
 import feedparser
 import urllib
 import itertools
-from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -23,7 +22,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.core.urlresolvers import reverse
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie
@@ -37,6 +36,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from datetime import date
 from collections import namedtuple
+from courseware.courses import course_staff_group_name, has_staff_access_to_course, get_courses_by_university
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -60,6 +60,19 @@ def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
+        from external_auth.views import edXauth_ssl_login
+        return edXauth_ssl_login(request)
+
+    return main_index(user=request.user)
+
+def main_index(extra_context = {}, user=None):
+    '''
+    Render the edX main page.
+
+    extra_context is used to allow immediate display of certain modal windows, eg signup,
+    as used by external_auth.
+    '''
     feed_data = cache.get("students_index_rss_feed_data")
     if feed_data == None:
         if hasattr(settings, 'RSS_URL'):
@@ -75,13 +88,11 @@ def index(request):
         entry.image = soup.img['src'] if soup.img else None
         entry.summary = soup.getText()
 
-    universities = defaultdict(list)
-    courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
-    for course in courses:
-        universities[course.org].append(course)
-
-    return render_to_response('index.html', {'universities': universities, 'entries': entries})
-
+    # The course selection work is done in courseware.courses.
+    universities = get_courses_by_university(None)
+    context = {'universities': universities, 'entries': entries}
+    context.update(extra_context)
+    return render_to_response('index.html', context)
 
 def course_from_id(id):
     course_loc = CourseDescriptor.id_to_location(id)
@@ -170,6 +181,14 @@ def change_enrollment(request):
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
+        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
+            # require that user be in the staff_* group (or be an overall admin) to be able to enroll
+            # eg staff_6.002x or staff_6.00x
+            if not has_staff_access_to_course(user,course):
+                staff_group = course_staff_group_name(course)
+                log.debug('user %s denied enrollment to %s ; not in %s' % (user,course.location.url(),staff_group))
+                return {'success': False, 'error' : '%s membership required to access course.' % staff_group}
+
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
 
@@ -256,10 +275,25 @@ def change_setting(request):
 
 @ensure_csrf_cookie
 def create_account(request, post_override=None):
-    ''' JSON call to enroll in the course. '''
+    '''
+    JSON call to create new edX account.
+    Used by form in signup_modal.html, which is included into navigation.html
+    '''
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
+
+    # if doing signup for an external authorization, then get email, password, name from the eamap
+    # don't use the ones from the form, since the user could have hacked those
+    DoExternalAuth = 'ExternalAuthMap' in request.session
+    if DoExternalAuth:
+        eamap = request.session['ExternalAuthMap']
+        email = eamap.external_email
+        name = eamap.external_name
+        password = eamap.internal_password
+        post_vars = dict(post_vars.items())
+        post_vars.update(dict(email=email, name=name, password=password))
+        log.debug('extauth test: post_vars = %s' % post_vars)
 
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
@@ -355,8 +389,9 @@ def create_account(request, post_override=None):
          'key': r.activation_key,
          }
 
+    # composes activation email
     subject = render_to_string('emails/activation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
+    # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', d)
 
@@ -380,6 +415,17 @@ def create_account(request, post_override=None):
     request.session.set_expiry(0)
 
     try_change_enrollment(request)
+
+    if DoExternalAuth:
+        eamap.user = login_user
+        eamap.dtsignup = datetime.datetime.now()
+        eamap.save()
+        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
+
+        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+            log.debug('bypassing activation email')
+            login_user.is_active = True
+            login_user.save()
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
