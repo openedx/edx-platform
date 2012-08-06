@@ -4,6 +4,7 @@
 <%block name="headextra">
   <%static:css group='course'/>
 </%block>
+
 <%namespace name="profile_graphs" file="profile_graphs.js"/>
 
 <%block name="title"><title>Profile - edX 6.002x</title></%block>
@@ -71,7 +72,7 @@ $(function() {
       var new_email = $('#new_email_field').val();
       var new_password = $('#new_email_password').val();
 
-      postJSON('/change_email',{"new_email":new_email, 
+      postJSON('/change_email',{"new_email":new_email,
                                 "password":new_password},
                function(data){
           if(data.success){
@@ -80,7 +81,7 @@ $(function() {
             $("#change_email_error").html(data.error);
           }
        });
-       log_event("profile", {"type":"email_change_request", 
+       log_event("profile", {"type":"email_change_request",
                                "old_email":"${email}",
                                "new_email":new_email});
        return false;
@@ -90,7 +91,7 @@ $(function() {
       var new_name = $('#new_name_field').val();
       var rationale = $('#name_rationale_field').val();
 
-      postJSON('/change_name',{"new_name":new_name, 
+      postJSON('/change_name',{"new_name":new_name,
                                 "rationale":rationale},
                function(data){
           if(data.success){
@@ -99,7 +100,7 @@ $(function() {
             $("#change_name_error").html(data.error);
           }
        });
-       log_event("profile", {"type":"name_change_request", 
+       log_event("profile", {"type":"name_change_request",
                                "new_name":new_name,
                                "rationale":rationale});
        return false;
@@ -110,9 +111,9 @@ $(function() {
 </%block>
 
 
-<%include file="navigation.html" args="active_page='profile'" />
+<%include file="course_navigation.html" args="active_page='profile'" />
 
-<section class="main-content">
+<section class="container">
   <div class="profile-wrapper">
 
     <section class="course-info">
@@ -124,10 +125,9 @@ $(function() {
 
       <ol class="chapters">
         %for chapter in courseware_summary:
-        %if not chapter['chapter'] == "hidden":
+        %if not chapter['display_name'] == "hidden":
         <li>
-          <h2><a href="${reverse('courseware_chapter', args=format_url_params([chapter['course'], chapter['chapter']])) }">
-          ${ chapter['chapter'] }</a></h2>
+          <h2>${ chapter['display_name'] }</h2>
 
           <ol class="sections">
             %for section in chapter['sections']:
@@ -137,14 +137,14 @@ $(function() {
               total = section['section_total'].possible
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
-              
-              <h3><a href="${reverse('courseware_section', args=format_url_params([chapter['course'], chapter['chapter'], section['section']])) }">
-                ${ section['section'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
+
+              <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['url_name'], 'section' : section['url_name']})}">
+                ${ section['display_name'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
               ${section['format']}
               %if 'due' in section and section['due']!="":
                 due ${section['due']}
               %endif
-              
+
               %if len(section['scores']) > 0:
                 <ol class="scores">
                   ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
@@ -153,7 +153,7 @@ $(function() {
                   %endfor
                 </ol>
               %endif
-              
+
             </li> <!--End section-->
             %endfor
           </ol> <!--End sections-->
@@ -181,7 +181,7 @@ $(function() {
         </li>
 
         <li>
-          Forum name: <strong>${username}</strong> 
+          Forum name: <strong>${username}</strong>
         </li>
 
         <li>
@@ -215,7 +215,7 @@ $(function() {
   <form id="change_name_form">
     <div id="change_name_error"> </div>
     <fieldset>
-      <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p> 
+      <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p>
       <ul>
         <li>
           <label>Enter your desired full name, as it will appear on the <span class="edx">edX</span> Certificate: </label>
@@ -234,7 +234,7 @@ $(function() {
 </div>
 
 <div id="change_email" class="leanModal_box">
-  <h1>Change e-mail</h1> 
+  <h1>Change e-mail</h1>
   <div id="apply_name_change_error"></div>
   <form id="change_email_form">
     <div id="change_email_error"> </div>

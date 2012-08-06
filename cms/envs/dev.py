@@ -2,13 +2,18 @@
 This config file runs the simplest dev environment"""
 
 from .common import *
+from .logsettings import get_logger_config
 
 import logging
 import sys
-logging.basicConfig(stream=sys.stdout, )
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+LOGGING = get_logger_config(ENV_ROOT / "log",
+                            logging_env="dev",
+                            tracking_filename="tracking.log",
+                            debug=True)
+
 
 MODULESTORE = {
     'default': {
@@ -37,7 +42,8 @@ REPOS = {
     },
     'content-mit-6002x': {
         'branch': 'master',
-        'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        #'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        'origin': 'git@github.com:MITx/content-mit-6002x.git',
     },
     '6.00x': {
         'branch': 'master',
@@ -75,3 +81,6 @@ CACHES = {
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+# Make the keyedcache startup warnings go away
+CACHE_TIMEOUT = 0

@@ -13,44 +13,51 @@ section.course-index {
   div#accordion {
 
     h3 {
-      @include box-shadow(inset 0 1px 0 0 #eee);
-      border-top: 1px solid #d3d3d3;
-      overflow: hidden;
+      @include border-radius(0);
+      border-top: 1px solid #e3e3e3;
       margin: 0;
+      overflow: hidden;
 
       &:first-child {
         border: none;
       }
 
       &:hover {
-        @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
+        background: #f6f6f6;
+        text-decoration: none;
       }
 
       &.ui-accordion-header {
         color: #000;
 
         a {
-          font-size: $body-font-size;
+          @include border-radius(0);
+          @include box-shadow(none);
           color: lighten($text-color, 10%);
+          font-size: $body-font-size;
         }
 
         &.ui-state-active {
-          @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
           @extend .active;
-          border-bottom: 1px solid #d3d3d3;
+          border-bottom: none;
+
+          &:hover {
+            background: none;
+          }
         }
       }
     }
 
     ul.ui-accordion-content {
       @include border-radius(0);
-      @include box-shadow(inset -1px 0 0 #e6e6e6);
+      background: transparent;
       border: none;
       font-size: 12px;
       margin: 0;
       padding: 1em 1.5em;
 
       li {
+        @include border-radius(0);
         margin-bottom: lh(.5);
 
         a {
@@ -98,7 +105,7 @@ section.course-index {
             &:after {
               opacity: 1;
               right: 15px;
-              @include transition(all, 0.2s, linear);
+              @include transition();
             }
 
             > a p {
@@ -120,8 +127,6 @@ section.course-index {
           font-weight: bold;
 
           > a {
-            background: rgb(240,240,240);
-            @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(230,230,230)));
             border-color: rgb(200,200,200);
 
             &:after {

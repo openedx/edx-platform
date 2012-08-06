@@ -14,6 +14,8 @@ urlpatterns = ('',
     url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
+    url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
+    
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -160,11 +162,28 @@ if settings.DEBUG:
     ## Jasmine
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
+if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+    urlpatterns += (
+        url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
+        url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
+        url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
+        )
+
+if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+    urlpatterns += (
+        url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        )
+
+if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+    urlpatterns += (
+        url(r'^event_logs$', 'track.views.view_tracking_log'),
+        )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'

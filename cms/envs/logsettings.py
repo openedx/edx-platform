@@ -3,19 +3,19 @@ import os.path
 import platform
 import sys
 
-def get_logger_config(log_dir, 
-                      logging_env="no_env", 
+def get_logger_config(log_dir,
+                      logging_env="no_env",
                       tracking_filename=None,
                       syslog_addr=None,
                       debug=False):
     """Return the appropriate logging config dictionary. You should assign the
-    result of this to the LOGGING var in your settings. The reason it's done 
+    result of this to the LOGGING var in your settings. The reason it's done
     this way instead of registering directly is because I didn't want to worry
-    about resetting the logging state if this is called multiple times when 
+    about resetting the logging state if this is called multiple times when
     settings are extended."""
 
     # If we're given an explicit place to put tracking logs, we do that (say for
-    # debugging). However, logging is not safe for multiple processes hitting 
+    # debugging). However, logging is not safe for multiple processes hitting
     # the same file. So if it's left blank, we dynamically create the filename
     # based on the PID of this worker process.
     if tracking_filename:
@@ -33,6 +33,7 @@ def get_logger_config(log_dir,
 
     return {
         'version': 1,
+        'disable_existing_loggers': False,
         'formatters' : {
             'standard' : {
                 'format' : '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
