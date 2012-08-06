@@ -116,10 +116,6 @@ if settings.COURSEWARE_ENABLED:
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
-
-        # TODO: Important. Remove this after testing!
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade$',
-            'courseware.views.test_grading', name="info"),
         
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',

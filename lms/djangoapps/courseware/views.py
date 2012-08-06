@@ -34,19 +34,6 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
-
-def test_grading(request, course_id):
-    course = check_course(course_id)
-    
-    sections, all_descriptors = grades.get_graded_sections(course)
-    student_module_cache = StudentModuleCache(request.user, descriptors=all_descriptors)
-    
-    grade_result = grades.fast_grade(request.user, request, sections, course.grader, student_module_cache)
-    
-    return HttpResponse("<html><head></head><body>" + json.dumps(grade_result) + "</body></html>")    
-    
-    
-
 def user_groups(user):
     if not user.is_authenticated():
         return []
@@ -92,6 +79,7 @@ def gradebook(request, course_id):
     student_objects = User.objects.all()[:100]
     student_info = []
     
+    #TODO: Only select students who are in the course
     for student in student_objects:
         student_module_cache = StudentModuleCache(student, descriptors=all_descriptors)
         
