@@ -587,7 +587,7 @@ class ModuleSystem(object):
     def __init__(self, ajax_url, track_function,
                  get_module, render_template, replace_urls,
                  user=None, filestore=None, debug=False,
-                 xqueue_callback_url=None, xqueue_default_queuename="null"):
+                 xqueue=None):
         '''
         Create a closure around the system environment.
 
@@ -615,8 +615,7 @@ class ModuleSystem(object):
                          ajax results.
         '''
         self.ajax_url = ajax_url
-        self.xqueue_callback_url = xqueue_callback_url
-        self.xqueue_default_queuename = xqueue_default_queuename
+        self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module

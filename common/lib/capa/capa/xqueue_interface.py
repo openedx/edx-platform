@@ -112,3 +112,5 @@ class XqueueInterface:
             return (1, 'cannot connect to server') 
 
         return parse_xreply(r.text)
+
+qinterface = XqueueInterface()
