@@ -168,7 +168,7 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, request.user)
     if not registered:
         log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
-        return redirect('/')
+        return redirect(reverse('about_course', args=[course.id]))
 
     try:
         context = {
