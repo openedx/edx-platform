@@ -123,9 +123,9 @@ def course_staff_group_name(course):
     if type(course)==str:
         coursename = course
     else:
-        coursename = course.metadata.get('course','')
-    if not coursename:					# Fall 2012: not all course.xml have metadata correct yet
         coursename = course.metadata.get('data_dir','UnknownCourseName')
+    if not coursename:					# Fall 2012: not all course.xml have metadata correct yet
+        coursename = course.metadata.get('course','')
     return 'staff_%s' % coursename
 
 def has_staff_access_to_course(user,course):
@@ -138,8 +138,8 @@ def has_staff_access_to_course(user,course):
     if user.is_staff:
         return True
     user_groups = [x[1] for x in user.groups.values_list()]	# note this is the Auth group, not UserTestGroup
-    log.debug('user is in groups %s' % user_groups)
     staff_group = course_staff_group_name(course)
+    log.debug('course %s user %s groups %s' % (staff_group, user, user_groups))
     if staff_group in user_groups:
         return True
     return False
