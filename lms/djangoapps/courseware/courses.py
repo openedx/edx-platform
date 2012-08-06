@@ -120,7 +120,7 @@ def course_staff_group_name(course):
     '''
     course should be either a CourseDescriptor instance, or a string (the .course entry of a Location)
     '''
-    if type(course)==str:
+    if isinstance(course,str):
         coursename = course
     else:
         coursename = course.metadata.get('data_dir','UnknownCourseName')
