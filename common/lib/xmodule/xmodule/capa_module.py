@@ -563,6 +563,11 @@ class CapaDescriptor(RawDescriptor):
 
     module_class = CapaModule
 
+    # Capa modules have some additional metadata:
+    # TODO (vshnayder): do problems have any other metadata?  Do they
+    # actually use type and points?
+    metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
