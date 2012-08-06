@@ -42,7 +42,11 @@
       <div class="discussion-right-wrapper clearfix">
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
-          <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
+          % if content.get('highlighted_body', None):
+            <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['highlighted_body'] | h}</div>
+          % else:
+            <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
+          % endif
           <div class="content-raw-body ${type}-raw-body" style="display: none">${content['body'] | h}</div>
           ${render_tags(content, type, **kwargs)}
           ${render_bottom_bar(content, type, **kwargs)}
@@ -54,7 +58,11 @@
 
 <%def name="render_title(content, type, **kwargs)">
   % if type == "thread":
-    <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
+    % if content.get('highlighted_title', None):
+      <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['highlighted_title'] | h}</a>
+    % else:
+      <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
+    % endif
   % endif
 </%def>
 
@@ -102,15 +110,19 @@
 </%def>
 
 <%def name="render_info(content)">
-  ${time_ago_in_words(parse(content['updated_at']))} ago by
-  % if content['anonymous']:
-    anonymous
-  % else:
-    user No.${content['user_id']}
-  % endif
-  % if content.get('comments_count', -1) >= 0:
-  , <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
-  % endif
+  <div class="comment-time">
+    ${time_ago_in_words(parse(content['updated_at']))} ago by
+    % if content['anonymous']:
+      anonymous
+    % else:
+      user No.${content['user_id']}
+    % endif
+  </div>
+  <div class="comment-count">
+    % if content.get('comments_count', -1) >= 0:
+     <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
+    % endif
+  </div>
 </%def>
 
 <%def name="render_link(cls, html)">
