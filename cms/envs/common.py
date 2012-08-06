@@ -116,6 +116,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ############################ SIGNAL HANDLERS ################################
+# This is imported to register the exception signal handling that logs exceptions
 import monitoring.exceptions  # noqa
 
 ############################ DJANGO_BUILTINS ################################
