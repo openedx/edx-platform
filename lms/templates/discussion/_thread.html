@@ -42,6 +42,7 @@
       <div class="discussion-right-wrapper clearfix">
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
+          <a name="${content['id']}"></a>
           % if content.get('highlighted_body', None):
             <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['highlighted_body'] | h}</div>
           % else:
@@ -89,6 +90,8 @@
 
     % if type == "thread":
       <a class="discussion-link discussion-permanent-link" href="${reverse('django_comment_client.forum.views.single_thread', kwargs={'discussion_id':discussion_id, 'thread_id':content['id'], 'course_id':course_id})}">Permanent Link</a>
+    % else:
+      <a class="discussion-link discussion-permanent-link" href="${reverse('django_comment_client.forum.views.single_thread', kwargs={'discussion_id':discussion_id, 'thread_id':content['thread_id'], 'course_id':course_id})}#${content['id']}">Permanent Link</a>
     % endif
 
     <span class="discussion-endorse-control">
