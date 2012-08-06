@@ -120,3 +120,7 @@ class JsonError(HttpResponse):
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
+
+class ViewNameMiddleware(object):  
+    def process_view(self, request, view_func, view_args, view_kwargs):  
+        request.view_name = view_func.__name__
