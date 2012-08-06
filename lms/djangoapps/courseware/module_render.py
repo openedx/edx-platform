@@ -15,6 +15,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
+from courseware.courses import has_staff_access_to_course
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -188,8 +190,9 @@ def get_module(user, request, location, student_module_cache, position=None):
         module.metadata['data_dir']
     )
 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module.get_html = add_histogram(module.get_html, module)
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+        if has_staff_access_to_course(user, module.location.course):
+            module.get_html = add_histogram(module.get_html, module)
 
     return module
 
@@ -306,10 +309,15 @@ def modx_dispatch(request, dispatch=None, id=None):
       - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
+    # Check for submitted files
+    p = request.POST.copy()
+    if request.FILES:
+        for inputfile_id in request.FILES.keys():
+            p[inputfile_id] = request.FILES[inputfile_id]
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache)
-    
+
     instance_module = get_instance_module(request.user, instance, student_module_cache)
     shared_module = get_shared_instance_module(request.user, instance, student_module_cache)
     
@@ -321,7 +329,7 @@ def modx_dispatch(request, dispatch=None, id=None):
 
     # Let the module handle the AJAX
     try:
-        ajax_return = instance.handle_ajax(dispatch, request.POST)
+        ajax_return = instance.handle_ajax(dispatch, p)
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
