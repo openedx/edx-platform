@@ -110,7 +110,7 @@ def profile(request, course_id, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    student_module_cache = StudentModuleCache(request.user, course)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
     course_module = get_module(request.user, request, course.location, student_module_cache)
     
     courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
@@ -191,11 +191,12 @@ def index(request, course_id, chapter=None, section=None,
         if look_for_module:
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
-                student_module_cache = StudentModuleCache(request.user,
+                student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+                                                          request.user,
                                                           section_descriptor)
-                module, _, _, _ = get_module(request.user, request,
-                                             section_descriptor.location,
-                                             student_module_cache)
+                module = get_module(request.user, request,
+                                    section_descriptor.location,
+                                    student_module_cache)
                 context['content'] = module.get_html()
             else:
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"
