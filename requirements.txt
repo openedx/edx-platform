@@ -12,7 +12,7 @@ python-openid
 path.py
 django_debug_toolbar
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
-django-staticfiles>=1.2.1
+-e git://github.com/MITx/django-staticfiles.git@develop#egg=django-staticfiles
 fs
 beautifulsoup 
 beautifulsoup4
