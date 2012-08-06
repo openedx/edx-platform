@@ -195,6 +195,33 @@ initializeFollowThread = (thread) ->
             else
               $(content).removeClass("endorsed")
 
+    handleOpenClose = (elem, text) ->
+      url = Discussion.urlFor('openclose_thread', id)
+      closed = undefined
+      if text.match(/Close/)
+        closed = true
+      else if text.match(/[Oo]pen/)
+        closed = false
+      else
+        return console.log "Unexpected text " + text + "for open/close thread."
+
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {closed: closed}
+        success: (response, textStatus) =>
+          if textStatus == "success"
+            if closed
+              $(content).addClass("closed")
+              $(elem).text "Re-open Thread"
+            else
+              $(content).removeClass("closed")
+              $(elem).text "Close Thread"
+        error: (response, textStatus, e) ->
+          console.log e
+
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
@@ -270,6 +297,9 @@ initializeFollowThread = (thread) ->
 
       "click .discussion-endorse": ->
         handleEndorse(this, $(this).is(":checked"))
+
+      "click .discussion-openclose": ->
+        handleOpenClose(this, $(this).text())
 
       "click .discussion-edit": ->
         if $content.hasClass("thread")

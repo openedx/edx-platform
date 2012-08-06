@@ -86,6 +86,13 @@
       % endif
       <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
     % endif
+    % if type == "thread" and request.user.is_staff:
+      % if content['closed']:
+        <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Re-open thread</a>
+      % else:
+        <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Close thread</a>
+      % endif
+    % endif
   </div>
 </%def>
 
