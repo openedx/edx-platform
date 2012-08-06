@@ -18,6 +18,8 @@ import re
 import requests
 import traceback
 import abc
+import os
+import xml.sax.saxutils as saxutils
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -273,9 +275,172 @@ class LoncapaResponse(object):
 
 
 #-----------------------------------------------------------------------------
+
+class JavascriptResponse(LoncapaResponse):
+    '''
+    This response type is used when the student's answer is graded via
+    Javascript using Node.js.
+    '''
+
+    response_tag = 'javascriptresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['javascriptinput']
+
+    def setup_response(self):
+
+        # Sets up generator, grader, display, and their dependencies.
+        self.parse_xml()
+
+        self.compile_display_javascript()
+
+        self.params = self.extract_params()
+
+        if self.generator:
+            self.problem_state = self.generate_problem_state()
+            print self.problem_state
+        else:
+            self.problem_state = None
+        
+        self.solution = None
+
+        self.prepare_inputfield()
+    
+    def compile_display_javascript(self):
+
+        latestTimestamp = 0
+        basepath = self.system.filestore.root_path + '/js/'
+        for filename in (self.display_dependencies + [self.display]):
+            filepath = basepath + filename
+            timestamp = os.stat(filepath).st_mtime
+            if timestamp > latestTimestamp:
+                latestTimestamp = timestamp
+        
+        h = hashlib.md5()
+        h.update(self.answer_id + str(self.display_dependencies))
+        compiled_filename = 'compiled/' + h.hexdigest() + '.js'
+        compiled_filepath = basepath + compiled_filename
+
+        if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
+            outfile = open(compiled_filepath, 'w')
+            for filename in (self.display_dependencies + [self.display]):
+                filepath = basepath + filename
+                infile = open(filepath, 'r')
+                outfile.write(infile.read())
+                outfile.write(';\n')
+                infile.close()
+            outfile.close()
+
+        self.display_filename = compiled_filename
+
+    def parse_xml(self):
+        self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
+                                            id=self.xml.get('id'))[0]
+
+        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader', 
+                                         id=self.xml.get('id'))[0]
+
+        self.display_xml = self.xml.xpath('//*[@id=$id]//display', 
+                                         id=self.xml.get('id'))[0]
+
+        self.xml.remove(self.generator_xml)
+        self.xml.remove(self.grader_xml)
+        self.xml.remove(self.display_xml)
+
+        self.generator = self.generator_xml.get("src")
+        self.grader = self.grader_xml.get("src")
+        self.display = self.display_xml.get("src")
+
+        if self.generator_xml.get("dependencies"):
+            self.generator_dependencies = self.generator_xml.get("dependencies").split()
+
+        if self.grader_xml.get("dependencies"):
+            self.grader_dependencies = self.grader_xml.get("dependencies").split()
+
+        if self.display_xml.get("dependencies"):
+            self.display_dependencies = self.display_xml.get("dependencies").split()
+
+        self.display_class = self.display_xml.get("class")
+    
+    def generate_problem_state(self):
+
+        js_dir = os.path.join(self.system.filestore.root_path, 'js')
+        node_path = os.path.normpath(js_dir)
+        generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
+        command = "NODE_PATH=%s node %s %s '%s' '%s'" % (node_path, generator_file, self.generator, json.dumps(self.system.seed), json.dumps(self.params))
+        node_process = os.popen(command)
+        output = node_process.readline().strip()
+        node_process.close()
+        return json.loads(output)
+
+    def extract_params(self):
+
+        params = {}
+    
+        for param in self.xml.xpath('//*[@id=$id]//responseparam', 
+                                        id=self.xml.get('id')):
+
+            params[param.get("name")] = json.loads(param.get("value"))
+        
+        return params
+
+    def prepare_inputfield(self):
+
+        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput', 
+                                        id=self.xml.get('id')):
+
+            escapedict = {'"': '&quot;'}
+
+            encoded_params = json.dumps(self.params)
+            encoded_params = saxutils.escape(encoded_params, escapedict)
+            inputfield.set("params", encoded_params)
+
+            encoded_problem_state = json.dumps(self.problem_state)
+            encoded_problem_state = saxutils.escape(encoded_problem_state,
+                                                    escapedict)
+            inputfield.set("problem_state", encoded_problem_state)
+
+            inputfield.set("display_file",  self.display_filename)
+            inputfield.set("display_class", self.display_class)
+
+    def get_score(self, student_answers):
+        json_submission = student_answers[self.answer_id]
+        (all_correct, evaluation, solution) = self.run_grader(json_submission)
+        self.solution = solution
+        correctness = 'correct' if all_correct else 'incorrect'
+        return CorrectMap(self.answer_id, correctness, msg=evaluation)
+    
+    def run_grader(self, submission):
+        if submission is None or submission == '':
+            submission = json.dumps(None)
+        js_dir = os.path.join(self.system.filestore.root_path, 'js')
+        node_path = os.path.normpath(js_dir)
+        grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
+        command = "NODE_PATH=%s node %s %s '%s' '%s' '%s'" % (node_path, 
+                                                              grader_file, 
+                                                              self.grader, 
+                                                              submission, 
+                                                              json.dumps(self.problem_state), 
+                                                              json.dumps(self.params))
+        node_process = os.popen(command)
+        all_correct = json.loads(node_process.readline().strip())
+        evaluation = node_process.readline().strip()
+        solution = node_process.readline().strip()
+        node_process.close()
+        return (all_correct, evaluation, solution)
+    
+    def get_answers(self):
+        if self.solution is None:
+            (_, _, self.solution) = self.run_grader(None)
+
+        return {self.answer_id: self.solution}
+
+            
+
+#-----------------------------------------------------------------------------
+
 class ChoiceResponse(LoncapaResponse):
     '''
-    This Response type is used when the student chooses from a discrete set of
+    This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
     supplied by the student, and no extraneous choices may be included.
 
@@ -313,6 +478,11 @@ class ChoiceResponse(LoncapaResponse):
 
     In the above example, radiogroup can be replaced with checkboxgroup to allow
     the student to select more than one choice.
+
+    TODO: In order for the inputtypes to render properly, this response type
+    must run setup_response prior to the input type rendering. Specifically, the
+    choices must be given names. This behavior seems like a leaky abstraction,
+    and it'd be nice to change this at some point.
 
     '''
 
@@ -1314,4 +1484,4 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse]
+__all__ = [CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse, JavascriptResponse]

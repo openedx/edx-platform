@@ -11,6 +11,7 @@ Module containing the problem elements which render into input objects
 - choicegroup
 - radiogroup
 - checkboxgroup
+- javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
@@ -245,6 +246,34 @@ def checkboxgroup(element, value, status, render_template, msg=''):
 
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
+
+@register_render_function
+def javascriptinput(element, value, status, render_template, msg='null'):
+    '''
+    Hidden field for javascript to communicate via; also loads the required
+    scripts for rendering the problem and passes data to the problem.
+    '''
+    eid = element.get('id')
+    params = element.get('params')
+    problem_state = element.get('problem_state')
+    display_class = element.get('display_class')
+    display_file = element.get('display_file')
+    
+    # Need to provide a value that JSON can parse if there is no
+    # student-supplied value yet.
+    if value == "":
+        value = 'null'
+    
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value, escapedict)
+    msg   = saxutils.escape(msg, escapedict)
+    context = {'id': eid, 'params': params, 'display_file': display_file, 
+               'display_class': display_class, 'problem_state': problem_state, 
+               'value': value, 'evaluation': msg,
+               }
+    html = render_template("javascriptinput.html", context)
+    return etree.XML(html)
+
 
 
 @register_render_function
