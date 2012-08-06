@@ -27,7 +27,7 @@ def log_event(event):
         try:
             tldat.save()
         except Exception as err:
-            log.debug(err)
+            log.exception(err)
 
 def user_track(request):
     try:  # TODO: Do the same for many of the optional META parameters
