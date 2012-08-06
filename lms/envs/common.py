@@ -457,6 +457,7 @@ if os.path.isdir(DATA_DIR):
                     js_timestamp     = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
+                os.system("rm %s" % (js_dir / new_filename))
                 os.system("coffee -c %s" % (js_dir / filename))
 
 PIPELINE_COMPILERS = [
