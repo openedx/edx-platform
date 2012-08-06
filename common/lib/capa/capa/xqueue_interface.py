@@ -47,7 +47,12 @@ def parse_xreply(xreply):
           'content': Message from xqueue (string)
         }
     '''
-    xreply = json.loads(xreply)
+    try:
+        xreply = json.loads(xreply)
+    except ValueError, err:
+        log.error(err)
+        return (1, 'unexpected reply from server')
+
     return_code = xreply['return_code']
     content = xreply['content']
     return (return_code, content)
