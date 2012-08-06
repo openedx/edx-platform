@@ -1,7 +1,7 @@
 <%namespace name="renderer" file="_thread.html"/>
 
 <section class="discussion inline-discussion" _id="${discussion_id}">
-  <div class="discussion-non-content">
+  <div class="discussion-non-content discussion-local">
     <div class="discussion-title-wrapper">
       <a class="discussion-title" href="javascript:void(0)">Discussion</a>
     </div>
@@ -13,8 +13,8 @@
       <label for="discussion-search-within-board-${discussion_id}" class="discussion-search-within-board">Search within board</label>
     </div>
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
-    <%include file="_sort.html" />
   </div>
+  <%include file="_sort.html" />
   <div class="threads">
     % for thread in threads:
       ${renderer.render_thread(course_id, thread, show_comments=False)}
