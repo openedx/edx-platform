@@ -3,6 +3,7 @@
 #
 import hashlib
 import json
+import logging
 import requests
 import time
 
@@ -10,6 +11,8 @@ import time
 XQUEUE_LMS_AUTH = { 'username': 'LMS',
                     'password': 'PaloAltoCA' }
 XQUEUE_URL = 'http://xqueue.edx.org'
+
+log = logging.getLogger('mitx.' + __name__)
 
 def make_hashkey(seed=None):
     '''
@@ -37,61 +40,10 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
                         'queue_name': queue_name })
 
 
-def send_to_queue(header, body, file_to_upload=None, xqueue_url=XQUEUE_URL):
-    '''
-    Submit a request to xqueue.
-    
-    header: JSON-serialized dict in the format described in 'xqueue_interface.make_xheader'
-
-    body: Serialized data for the receipient behind the queueing service. The operation of
-            xqueue is agnostic to the contents of 'body'
-
-    file_to_upload: File object to be uploaded to xqueue along with queue request
-
-    Returns an 'error' flag indicating error in xqueue transaction
-    '''
-
-    # First, we login with our credentials
-    #------------------------------------------------------------
-    s = requests.session()
-    try:
-        r = s.post(xqueue_url+'/xqueue/login/', data={ 'username': XQUEUE_LMS_AUTH['username'],
-                                                       'password': XQUEUE_LMS_AUTH['password'] })
-    except Exception as err:
-        msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
-        raise Exception(msg)
-
-    # Xqueue responses are JSON-serialized dicts
-    (return_code, msg) = parse_xreply(r.text)
-    if return_code: # Nonzero return code from xqueue indicates error
-        print '  Error in queue_interface.send_to_queue: %s' % msg
-        return 1 # Error
-
-    # Next, we can make a queueing request
-    #------------------------------------------------------------
-    payload = {'xqueue_header': header,
-               'xqueue_body'  : body}
-
-    files = None
-    if file_to_upload is not None:
-        files = { file_to_upload.name: file_to_upload }
-
-    try:
-        r = s.post(xqueue_url+'/xqueue/submit/', data=payload, files=files)
-    except Exception as err:
-        msg = 'Error in xqueue_interface.send_to_queue %s: Cannot connect to server url=%s' % (err, xqueue_url)
-        raise Exception(msg)
-
-    (return_code, msg) = parse_xreply(r.text)
-    if return_code:
-        print '  Error in queue_interface.send_to_queue: %s' % msg
-
-    return return_code
-
 def parse_xreply(xreply):
     '''
     Parse the reply from xqueue. Messages are JSON-serialized dict:
-        { 'return_code': 0 (success), 1 (fail),
+        { 'return_code': 0 (success), 1 (fail)
           'content': Message from xqueue (string)
         }
     '''
@@ -99,3 +51,64 @@ def parse_xreply(xreply):
     return_code = xreply['return_code']
     content = xreply['content']
     return (return_code, content)
+
+
+class XqueueInterface:
+    '''
+    Interface to the external grading system
+    '''
+
+    def __init__(self, url=XQUEUE_URL, auth=XQUEUE_LMS_AUTH):
+        self.url  = url
+        self.auth = auth
+        self.s = requests.session()
+        self._login()
+        
+    def send_to_queue(self, header, body, file_to_upload=None):
+        '''
+        Submit a request to xqueue.
+        
+        header: JSON-serialized dict in the format described in 'xqueue_interface.make_xheader'
+
+        body: Serialized data for the receipient behind the queueing service. The operation of
+                xqueue is agnostic to the contents of 'body'
+
+        file_to_upload: File object to be uploaded to xqueue along with queue request
+
+        Returns (error_code, msg) where error_code != 0 indicates an error
+        '''
+        # Attempt to send to queue
+        (error, msg) = self._send_to_queue(header, body, file_to_upload)
+
+        if error and (msg == 'login_required'): # Log in, then try again
+            self._login()
+            (error, msg) = self._send_to_queue(header, body, file_to_upload)
+
+        return (error, msg)
+
+    def _login(self):
+        try:
+            r = self.s.post(self.url+'/xqueue/login/', data={ 'username': self.auth['username'],
+                                                              'password': self.auth['password'] })
+        except requests.exceptions.ConnectionError, err:
+            log.error(err)
+            return (1, 'cannot connect to server') 
+
+        return parse_xreply(r.text)
+
+    def _send_to_queue(self, header, body, file_to_upload=None):
+
+        payload = {'xqueue_header': header,
+                   'xqueue_body'  : body}
+
+        files = None
+        if file_to_upload is not None:
+            files = { file_to_upload.name: file_to_upload }
+
+        try:
+            r = self.s.post(self.url+'/xqueue/submit/', data=payload, files=files)
+        except requests.exceptions.ConnectionError, err:
+            log.error(err)
+            return (1, 'cannot connect to server') 
+
+        return parse_xreply(r.text)
