@@ -93,6 +93,8 @@ class RoundTripTestCase(unittest.TestCase):
     def test_toy_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "toy")
 
+    def test_simple_roundtrip(self):
+        self.check_export_roundtrip(DATA_DIR, "simple")
 
     def test_full_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "full")
