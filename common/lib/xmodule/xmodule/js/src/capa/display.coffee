@@ -67,16 +67,14 @@ class @Problem
 
     fd = new FormData()
 
-    # For each file input, allow a single file submission,
-    #   which is routed to Django 'request.FILES'
-    @$('input:file').each (index, element) ->
-      if element.files[0] instanceof File
-        fd.append(element.id, element.files[0])
+    @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").each (index, element) ->
+      if element.type is 'file'
+        if element.files[0] instanceof File
+          fd.append(element.id, element.files[0])
+        else
+          fd.append(element.id, '')
       else
-        fd.append(element.id, '')  # Even if no file selected, need to include input id
-
-    # Simple (non-file) answers, which is routed to Django 'request.POST'
-    fd.append('__answers_querystring', @answers)
+        fd.append(element.id, element.value)
 
     settings = 
       type: "POST"
