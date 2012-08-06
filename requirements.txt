@@ -2,19 +2,20 @@ django<1.4
 pip
 numpy
 scipy
-matplotlib
 markdown
 pygments
 lxml
 boto
 mako
 python-memcached
+python-openid 
 path.py
 django_debug_toolbar
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 django-staticfiles>=1.2.1
 fs
-beautifulsoup
+beautifulsoup 
+beautifulsoup4
 feedparser
 requests
 sympy
@@ -37,6 +38,7 @@ django-jasmine
 django-keyedcache
 django-mako
 django-masquerade
+django-openid-auth 
 django-robots
 django-ses
 django-storages

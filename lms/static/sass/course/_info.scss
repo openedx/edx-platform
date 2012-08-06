@@ -3,6 +3,7 @@ div.info-wrapper {
 
   section.updates {
     @extend .content;
+    line-height: lh();
 
     > h1 {
       @extend .top-header;
@@ -15,30 +16,35 @@ div.info-wrapper {
     > ol {
       list-style: none;
       padding-left: 0;
+      margin-bottom: lh();
 
       > li {
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
-        margin-bottom: lh(.5);
+        margin-bottom: lh();
         padding-bottom: lh(.5);
         list-style-type: disk;
 
         &:first-child {
-          background: $cream;
-          border-bottom: 1px solid darken($cream, 10%);
           margin: 0 (-(lh(.5))) lh();
           padding: lh(.5);
         }
 
         ol, ul {
-          margin: lh() 0 0 lh();
-          list-style-type: circle;
+          margin: 0;
+          list-style-type: disk;
+
+          ol,ul {
+            list-style-type: circle;
+          }
         }
 
         h2 {
           float: left;
           margin: 0 flex-gutter() 0 0;
           width: flex-grid(2, 9);
+          font-size: $body-font-size;
+          font-weight: bold;
         }
 
         section.update-description {
@@ -64,16 +70,20 @@ div.info-wrapper {
     @extend .sidebar;
     border-left: 1px solid #d3d3d3;
     @include border-radius(0 4px 4px 0);
+    @include box-shadow(none);
     border-right: 0;
 
-    header {
+    h1 {
       @extend .bottom-border;
-      padding: lh(.5) lh(.75);
+      padding: lh(.5) lh(.5);
+    }
 
-      h1 {
-        font-size: 18px;
-        margin: 0 ;
-      }
+    header {
+
+      // h1 {
+      //   font-weight: 100;
+      //   font-style: italic;
+      // }
 
       p {
          color: #666;
@@ -94,7 +104,7 @@ div.info-wrapper {
         border-bottom: 1px solid #d3d3d3;
         @include box-shadow(0 1px 0 #eee);
         @include box-sizing(border-box);
-        padding: 7px lh(.75);
+        padding: em(7) lh(.75);
         position: relative;
 
         &.expandable,
@@ -108,13 +118,13 @@ div.info-wrapper {
 
         ul {
           background: none;
-          margin: 7px (-(lh(.75))) 0;
+          margin: em(7) (-(lh(.75))) 0;
 
           li {
             border-bottom: 0;
             border-top: 1px solid #d3d3d3;
             @include box-shadow(inset 0 1px 0 #eee);
-            padding-left: 18px + lh(.75);
+            padding-left: lh(1.5);
           }
         }
 
@@ -150,7 +160,7 @@ div.info-wrapper {
           border-bottom: 0;
           @include box-shadow(none);
           color: #999;
-          font-size: 12px;
+          font-size: $body-font-size;
           font-weight: bold;
           text-transform: uppercase;
         }

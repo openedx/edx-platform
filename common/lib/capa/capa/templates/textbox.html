@@ -35,15 +35,20 @@
         lineNumbers: true,
         % endif
         mode: "${mode}",
-        tabsize: 4,
+        matchBrackets: true,
+        lineWrapping: true,
+        indentUnit: "${tabsize}",
+        tabSize: "${tabsize}",
+        smartIndent: false
       });
     });
   </script>
   <style type="text/css">
     .CodeMirror {
-        border: 2px solid black;
+        border: 1px solid black;
         font-size: 14px;
         line-height: 18px;
+        resize: vertical;
     }
   </style>
 </section>

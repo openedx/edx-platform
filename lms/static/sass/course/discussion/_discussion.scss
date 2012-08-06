@@ -1,8 +1,6 @@
 // Generic layout styles for the discussion forums
-
 body.askbot {
-
-  section.main-content {
+  section.container {
     div.discussion-wrapper {
       @extend .table-wrapper;
 

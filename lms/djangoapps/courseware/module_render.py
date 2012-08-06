@@ -35,10 +35,12 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     Create a table of contents from the module store
 
     Return format:
-    [ {'name': name, 'sections': SECTIONS, 'active': bool}, ... ]
+    [ {'display_name': name, 'url_name': url_name,
+       'sections': SECTIONS, 'active': bool}, ... ]
 
     where SECTIONS is a list
-    [ {'name': name, 'format': format, 'due': due, 'active' : bool}, ...]
+    [ {'display_name': name, 'url_name': url_name,
+       'format': format, 'due': due, 'active' : bool}, ...]
 
     active is set for the section and chapter corresponding to the passed
     parameters.  Everything else comes from the xml, or defaults to "".
@@ -54,19 +56,21 @@ def toc_for_course(user, request, course, active_chapter, active_section):
         sections = list()
         for section in chapter.get_display_items():
 
-            active = (chapter.metadata.get('display_name') == active_chapter and
-                      section.metadata.get('display_name') == active_section)
+            active = (chapter.display_name == active_chapter and
+                      section.display_name == active_section)
             hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
             if not hide_from_toc:
-                sections.append({'name': section.metadata.get('display_name'),
+                sections.append({'display_name': section.display_name,
+                                 'url_name': section.url_name,
                                  'format': section.metadata.get('format', ''),
                                  'due': section.metadata.get('due', ''),
                                  'active': active})
 
-        chapters.append({'name': chapter.metadata.get('display_name'),
+        chapters.append({'display_name': chapter.display_name,
+                         'url_name': chapter.url_name,
                          'sections': sections,
-                         'active': chapter.metadata.get('display_name') == active_chapter})
+                         'active': chapter.display_name == active_chapter})
     return chapters
 
 
@@ -76,8 +80,8 @@ def get_section(course_module, chapter, section):
     or None if this doesn't specify a valid section
 
     course: Course url
-    chapter: Chapter name
-    section: Section name
+    chapter: Chapter url_name
+    section: Section url_name
     """
 
     if course_module is None:
@@ -85,7 +89,7 @@ def get_section(course_module, chapter, section):
 
     chapter_module = None
     for _chapter in course_module.get_children():
-        if _chapter.metadata.get('display_name') == chapter:
+        if _chapter.url_name == chapter:
             chapter_module = _chapter
             break
 
@@ -94,7 +98,7 @@ def get_section(course_module, chapter, section):
 
     section_module = None
     for _section in chapter_module.get_children():
-        if _section.metadata.get('display_name') == section:
+        if _section.url_name == section:
             section_module = _section
             break
 
@@ -141,8 +145,16 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
     ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
-    xqueue_callback_url = (settings.MITX_ROOT_URL + '/xqueue/' +
-                           str(user.id) + '/' + descriptor.location.url() + '/')
+
+    # Fully qualified callback URL for external queueing system
+    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL +
+                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' +
+                          'score_update')
+
+    # Default queuename is course-specific and is derived from the course that
+    #   contains the current module.
+    # TODO: Queuename should be derived from 'course_settings.json' of each course
+    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
     def _get_module(location):
         return get_module(user, request, location,
@@ -155,6 +167,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           render_template=render_to_string,
                           ajax_url=ajax_url,
                           xqueue_callback_url=xqueue_callback_url,
+                          xqueue_default_queuename=xqueue_default_queuename.replace(' ','_'),
                           # TODO (cpennington): Figure out how to share info between systems
                           filestore=descriptor.system.resources_fs,
                           get_module=_get_module,
@@ -163,6 +176,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
+                          is_staff=user.is_staff,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -175,7 +189,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module.get_html = add_histogram(module.get_html)
+        module.get_html = add_histogram(module.get_html, module)
 
     return module
 
@@ -232,13 +246,12 @@ def get_shared_instance_module(user, module, student_module_cache):
         return None
 
 
-# TODO: TEMPORARY BYPASS OF AUTH!
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     # Parse xqueue response
     get = request.POST.copy()
     try:
-        header = json.loads(get.pop('xqueue_header')[0])  # 'dict'
+        header = json.loads(get['xqueue_header'])
     except Exception as err:
         msg = "Error in xqueue_callback %s: Invalid return format" % err
         raise Exception(msg)
@@ -261,7 +274,7 @@ def xqueue_callback(request, userid, id, dispatch):
 
     # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
     #   use the interface defined by 'handle_ajax'
-    get.update({'queuekey': header['queuekey']})
+    get.update({'queuekey': header['lms_key']})
 
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'

@@ -23,11 +23,12 @@ class VideoModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition,
+                 instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition,
+                         instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
         self.youtube = xmltree.get('youtube')
-        self.name = xmltree.get('name')
         self.position = 0
 
         if instance_state is not None:
@@ -71,7 +72,7 @@ class VideoModule(XModule):
             'streams': self.video_list(),
             'id': self.location.html_id(),
             'position': self.position,
-            'name': self.name,
+            'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],
         })

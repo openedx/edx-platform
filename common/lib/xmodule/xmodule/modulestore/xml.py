@@ -1,16 +1,18 @@
 import logging
+import os
+import re
+
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
-from xmodule.errorhandlers import logging_error_handler
+from xmodule.errortracker import ErrorLog, make_error_tracker
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from cStringIO import StringIO
-import os
-import re
 
-from . import ModuleStore, Location
+from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
 
 etree.set_default_parser(
@@ -18,7 +20,6 @@ etree.set_default_parser(
                     remove_comments=True, remove_blank_text=True))
 
 log = logging.getLogger('mitx.' + __name__)
-
 
 # VS[compat]
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
@@ -29,7 +30,7 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir, error_handler):
+    def __init__(self, xmlstore, org, course, course_dir, error_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -40,6 +41,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.used_slugs = set()
 
         def process_xml(xml):
+            """Takes an xml string, and returns a XModuleDescriptor created from
+            that xml.
+            """
             try:
                 # VS[compat]
                 # TODO (cpennington): Remove this once all fall 2012 courses
@@ -70,37 +74,36 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # log.debug('-> slug=%s' % slug)
                 xml_data.set('url_name', slug)
 
-            module = XModuleDescriptor.load_from_xml(
+            descriptor = XModuleDescriptor.load_from_xml(
                 etree.tostring(xml_data), self, org,
                 course, xmlstore.default_class)
 
-            #log.debug('==> importing module location %s' % repr(module.location))
-            module.metadata['data_dir'] = course_dir
+            #log.debug('==> importing descriptor location %s' %
+            #          repr(descriptor.location))
+            descriptor.metadata['data_dir'] = course_dir
 
-            xmlstore.modules[module.location] = module
+            xmlstore.modules[descriptor.location] = descriptor
 
             if xmlstore.eager:
-                module.get_children()
-            return module
+                descriptor.get_children()
+            return descriptor
 
         render_template = lambda: ''
         load_item = xmlstore.get_item
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
         MakoDescriptorSystem.__init__(self, load_item, resources_fs,
-                                      error_handler, render_template)
+                                      error_tracker, render_template, **kwargs)
         XMLParsingSystem.__init__(self, load_item, resources_fs,
-                                  error_handler, process_xml)
+                                  error_tracker, process_xml, **kwargs)
 
 
-
-class XMLModuleStore(ModuleStore):
+class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
     def __init__(self, data_dir, default_class=None, eager=False,
-                 course_dirs=None,
-                 error_handler=logging_error_handler):
+                 course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -114,17 +117,13 @@ class XMLModuleStore(ModuleStore):
 
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
-
-        error_handler: The error handler used here and in the underlying
-                DescriptorSystem.  By default, raise exceptions for all errors.
-                See the comments in x_module.py:DescriptorSystem
         """
+        ModuleStoreBase.__init__(self)
 
         self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = {}  # location -> XModuleDescriptor
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
-        self.error_handler = error_handler
 
         if default_class is None:
             self.default_class = None
@@ -148,15 +147,20 @@ class XMLModuleStore(ModuleStore):
 
         for course_dir in course_dirs:
             try:
-                course_descriptor = self.load_course(course_dir)
+                # Special-case code here, since we don't have a location for the
+                # course before it loads.
+                # So, make a tracker to track load-time errors, then put in the right
+                # place after the course loads and we have its location
+                errorlog = make_error_tracker()
+                course_descriptor = self.load_course(course_dir, errorlog.tracker)
                 self.courses[course_dir] = course_descriptor
+                self._location_errors[course_descriptor.location] = errorlog
             except:
                 msg = "Failed to load course '%s'" % course_dir
                 log.exception(msg)
-                error_handler(msg)
 
 
-    def load_course(self, course_dir):
+    def load_course(self, course_dir, tracker):
         """
         Load a course into this module store
         course_path: Course directory name
@@ -190,12 +194,12 @@ class XMLModuleStore(ModuleStore):
                         ))
                 course = course_dir
 
-            system = ImportSystem(self, org, course, course_dir,
-                                  self.error_handler)
+            system = ImportSystem(self, org, course, course_dir, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
+
 
     def get_item(self, location, depth=0):
         """
@@ -217,14 +221,18 @@ class XMLModuleStore(ModuleStore):
         except KeyError:
             raise ItemNotFoundError(location)
 
+
     def get_courses(self, depth=0):
         """
-        Returns a list of course descriptors
+        Returns a list of course descriptors.  If there were errors on loading,
+        some of these may be ErrorDescriptors instead.
         """
         return self.courses.values()
 
+
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")
+
 
     def update_item(self, location, data):
         """
@@ -236,6 +244,7 @@ class XMLModuleStore(ModuleStore):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
+
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
@@ -245,6 +254,7 @@ class XMLModuleStore(ModuleStore):
         children: A list of child item identifiers
         """
         raise NotImplementedError("XMLModuleStores are read-only")
+
 
     def update_metadata(self, location, metadata):
         """
