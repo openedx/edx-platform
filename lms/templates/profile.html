@@ -139,19 +139,27 @@ $(function() {
               %>
 
               <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['url_name'], 'section' : section['url_name']})}">
-                ${ section['display_name'] }</a> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</h3>
-              ${section['format']}
-              %if 'due' in section and section['due']!="":
-                due ${section['due']}
-              %endif
+                ${ section['display_name'] }</a><span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span></h3>
+              <p>
+                ${section['format']}
+
+                %if 'due' in section and section['due']!="":
+                  <em>
+                  due ${section['due']}
+                  </em>
+                %endif
+              </p>
+
 
               %if len(section['scores']) > 0:
-                <ol class="scores">
-                  ${ "Problem Scores: " if section['graded'] else "Practice Scores: "}
-                  %for score in section['scores']:
-                    <li class="score">${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
-                  %endfor
-                </ol>
+                <section class="scores">
+                  <h3> ${ "Problem Scores: " if section['graded'] else "Practice Scores: "} </h3>
+                  <ol>
+                    %for score in section['scores']:
+                    <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
+                    %endfor
+                  </ol>
+                </section>
               %endif
 
             </li> <!--End section-->
