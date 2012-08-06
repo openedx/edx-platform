@@ -237,6 +237,12 @@ form label {
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
+    a {
+      &:hover {
+        color: #1C71DD;
+        text-decoration: none;
+      };
+    }
     .new-post-control {
       margin-left: 80%;
       margin-top: 1%;
@@ -259,6 +265,9 @@ form label {
       padding-top: 9px;
       text-decoration: none;
       width: inherit;
+      &:hover {
+        color: white;
+      }
     }
   }
   .new-post-form {
@@ -320,6 +329,12 @@ form label {
       font-size: $comment_info_size;
       font-style: italic;
       margin-top: 2%;
+      a {
+        &:hover {
+        text-decoration: none;
+        color: #1C71DD;
+        }
+      }
       .comment-time {
         display: inline;
         float: right;
@@ -336,6 +351,10 @@ form label {
         color: #1d9dd9;
         display: inline;
         margin-left: 2px;
+        &:hover {
+          text-decoration: none;
+          color: #1C71DD;
+        }
       }
     }
     .discussion-content {
