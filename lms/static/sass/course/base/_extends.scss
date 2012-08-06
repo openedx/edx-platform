@@ -51,7 +51,6 @@ h1.top-header {
 
 .sidebar {
   border-right: 1px solid #C8C8C8;
-  @include box-shadow(inset -1px 0 0 #e6e6e6);
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
