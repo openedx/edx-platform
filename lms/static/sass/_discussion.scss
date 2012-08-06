@@ -187,13 +187,20 @@ $tag_text_color: #5b614f;
   //VOTES
   .discussion-votes {
     float: left;
-    height: flex-grid(3);
-    margin: 1% 2%;
+    width: flex-grid(1);
     text-align: center;
+    // height: flex-grid(3);
+    // margin: 1% 2%;
+    
 
     .discussion-vote-count {
       @include discussion-font;
       font-size: $comment_body_size;
+    }
+
+    .discussion-votes-point {
+      font-size: 1em;
+      font-weight: bold;
     }
 
     a.discussion-vote {
