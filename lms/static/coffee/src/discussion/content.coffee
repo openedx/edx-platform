@@ -324,3 +324,5 @@ initializeFollowThread = (thread) ->
       $local(".discussion-edit").remove()
     if not Discussion.getContentInfo id, 'can_reply'
       $local(".discussion-reply").remove()
+    if not Discussion.getContentInfo id, 'can_endorse'
+      $local(".discussion-endorse-control").remove()
