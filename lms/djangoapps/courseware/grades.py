@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 
+from models import StudentModuleCache
 from module_render import get_module, get_instance_module
 from xmodule import graders
 from xmodule.graders import Score
@@ -10,54 +11,28 @@ from models import StudentModule
 
 _log = logging.getLogger("mitx.courseware")
 
-def get_graded_sections(course_descriptor):
-    """
-    Arguments:
-        course_descriptor: a CourseDescriptor object for the course to be graded
-        
-    Returns:
-        A dictionary keyed by section-type. The values are arrays of dictionaries containing
-            "section_descriptor" : The section descriptor
-            "xmoduledescriptors" : An array of xmoduledescriptors that could possibly be in the section, for any student
-    """
-    all_descriptors = []
-    
-    graded_sections = {}
-    for c in course_descriptor.get_children():
-        sections = []
-        for s in c.get_children():
-            if s.metadata.get('graded', False):
-                
-                xmoduledescriptors = []
-                for module in yield_descriptor_descendents(s):
-                    # TODO: Only include modules that have a score here
-                    xmoduledescriptors.append(module)
-                    
-                section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
-                
-                section_format = s.metadata.get('format', "")
-                graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
-                
-                all_descriptors.extend(xmoduledescriptors) 
-                all_descriptors.append(s)
-    
-    return graded_sections, all_descriptors
-
-def yield_descriptor_descendents(module_descriptor):
-    for child in module_descriptor.get_children():
-        yield child
-        for module_descriptor in yield_descriptor_descendents(child):
-            yield module_descriptor
-
 def yield_module_descendents(module):
     for child in module.get_display_items():
         yield child
         for module in yield_module_descendents(child):
             yield module
    
-def fast_grade(student, request, course_graded_sections, grader, student_module_cache):
+def grade(student, request, course, student_module_cache=None):
+    """
+    This grades a student as quickly as possible. It reutns the 
+    output from the course grader. More information on the format
+    is in the docstring for CourseGrader.
+    """
+    
+    grading_context = course.grading_context
+    
+    if student_module_cache == None:
+        student_module_cache = StudentModuleCache(student, descriptors=grading_context['all_descriptors'])
+    
     totaled_scores = {}
-    for section_format, sections in course_graded_sections.iteritems():
+    # This next complicated loop is just to collect the totaled_scores, which is
+    # passed to the grader
+    for section_format, sections in grading_context['graded_sections'].iteritems():
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
@@ -72,6 +47,8 @@ def fast_grade(student, request, course_graded_sections, grader, student_module_
             
             if should_grade_section:
                 scores = []
+                # TODO: We need the request to pass into here. If we could forgo that, our arguments
+                # would be simpler
                 section_module = get_module(student, request, section_descriptor.location, student_module_cache)
                 
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
@@ -106,11 +83,11 @@ def fast_grade(student, request, course_graded_sections, grader, student_module_
         
         totaled_scores[section_format] = format_scores
     
-    grade_summary = grade_summary = grader.grade(totaled_scores)
+    grade_summary = course.grader.grade(totaled_scores)
     return grade_summary
     
 
-def grade_sheet(student, course, grader, student_module_cache):
+def progress_summary(student, course, grader, student_module_cache):
     """
     This pulls a summary of all problems in the course.
 

@@ -3,6 +3,7 @@ import time
 import dateutil.parser
 import logging
 
+from util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
@@ -16,9 +17,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        
-        self._grader = None
-        self._grade_cutoffs = None
 
         msg = None
         try:
@@ -42,29 +40,82 @@ class CourseDescriptor(SequenceDescriptor):
     
     @property
     def grader(self):
-        self.__load_grading_policy()
-        return self._grader
+        return self.__grading_policy['GRADER']
     
     @property
     def grade_cutoffs(self):
-        self.__load_grading_policy()
-        return self._grade_cutoffs
+        return self.__grading_policy['GRADE_CUTOFFS']
+    
+    @lazyproperty
+    def __grading_policy(self):
+        policy_string = ""
+            
+        try:
+            with self.system.resources_fs.open("grading_policy.json") as grading_policy_file:
+                policy_string = grading_policy_file.read()
+        except (IOError, ResourceNotFoundError):
+            log.warning("Unable to load course settings file from grading_policy.json in course " + self.id)
+            
+        grading_policy = load_grading_policy(policy_string)
+            
+        return grading_policy
     
     
-    def __load_grading_policy(self):
-        if not self._grader or not self._grade_cutoffs:
-            policy_string = ""
+    @lazyproperty
+    def grading_context(self):
+        """
+        This returns a dictionary with keys necessary for quickly grading
+        a student. They are used by grades.grade()
+        
+        The grading context has two keys:    
+        graded_sections - This contains the sections that are graded, as
+            well as all possible children modules that can effect the
+            grading. This allows some sections to be skipped if the student
+            hasn't seen any part of it.
             
-            try:
-                with self.system.resources_fs.open("grading_policy.json") as grading_policy_file:
-                    policy_string = grading_policy_file.read()
-            except (IOError, ResourceNotFoundError):
-                log.warning("Unable to load course settings file from grading_policy.json in course " + self.id)
+            The format is a dictionary keyed by section-type. The values are
+            arrays of dictionaries containing
+                "section_descriptor" : The section descriptor
+                "xmoduledescriptors" : An array of xmoduledescriptors that 
+                    could possibly be in the section, for any student
+        
+        all_descriptors - This contains a list of all xmodules that can
+            effect grading a student. This is used to efficiently fetch
+            all the xmodule state for a StudentModuleCache without walking
+            the descriptor tree again.
             
-            grading_policy = load_grading_policy(policy_string)
-            
-            self._grader = grading_policy['GRADER']
-            self._grade_cutoffs = grading_policy['GRADE_CUTOFFS']
+        
+        """
+        
+        all_descriptors = []
+        graded_sections = {}
+        
+        def yield_descriptor_descendents(module_descriptor):
+            for child in module_descriptor.get_children():
+                yield child
+                for module_descriptor in yield_descriptor_descendents(child):
+                    yield module_descriptor
+        
+        for c in self.get_children():
+            sections = []
+            for s in c.get_children():
+                if s.metadata.get('graded', False):
+                
+                    xmoduledescriptors = []
+                    for module in yield_descriptor_descendents(s):
+                        # TODO: Only include modules that have a score here
+                        xmoduledescriptors.append(module)
+                    
+                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
+                
+                    section_format = s.metadata.get('format', "")
+                    graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
+                
+                    all_descriptors.extend(xmoduledescriptors) 
+                    all_descriptors.append(s)
+        
+        return { 'graded_sections' : graded_sections,
+                 'all_descriptors' : all_descriptors,}
     
     
     @staticmethod
