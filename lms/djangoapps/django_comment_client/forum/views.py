@@ -136,16 +136,16 @@ def get_annotated_content_info(content, user, is_thread):
         'can_delete': check_permissions_by_view(user, content, "delete_thread" if is_thread else "delete_comment"),
     }
 
-def get_annotated_content_infos(thread, user):
+def get_annotated_content_infos(thread, user, is_thread=True):
     infos = {}
-    def _annotate(content, is_thread=True):
+    def _annotate(content, is_thread=is_thread):
         infos[str(content['id'])] = get_annotated_content_info(content, user, is_thread)
         for child in content.get('children', []):
             _annotate(child, is_thread=False)
     _annotate(thread)
     return infos
 
-def render_single_thread(request, course_id, thread_id):
+def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = comment_client.get_thread(thread_id, recursive=True)
 
@@ -153,6 +153,7 @@ def render_single_thread(request, course_id, thread_id):
                                 user=request.user, is_thread=True)
 
     context = {
+        'discussion_id': discussion_id,
         'thread': thread,
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'annotated_content_info': json.dumps(annotated_content_info),
@@ -179,9 +180,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
         course = check_course(course_id)
 
         context = {
+            'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',
-            'content': render_single_thread(request, course_id, thread_id),
+            'content': render_single_thread(request, discussion_id, course_id, thread_id),
             'accordion': render_accordion(request, course, discussion_id),
             'course': course,
         }
