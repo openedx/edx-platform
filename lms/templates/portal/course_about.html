@@ -63,6 +63,7 @@
           %if user.is_authenticated():
             %if registered:
    	        <%
+		  ## TODO: move this logic into a view
                   if course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']:
                       course_target = reverse('info', args=[course.id])
                   else:
