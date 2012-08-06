@@ -47,7 +47,12 @@ def parse_xreply(xreply):
           'content': Message from xqueue (string)
         }
     '''
-    xreply = json.loads(xreply)
+    try:
+        xreply = json.loads(xreply)
+    except ValueError, err:
+        log.error(err)
+        return (1, 'unexpected reply from server')
+
     return_code = xreply['return_code']
     content = xreply['content']
     return (return_code, content)
@@ -61,7 +66,7 @@ class XqueueInterface:
     def __init__(self, url=XQUEUE_URL, auth=XQUEUE_LMS_AUTH):
         self.url  = url
         self.auth = auth
-        self.s = requests.session()
+        self.session = requests.session()
         self._login()
         
     def send_to_queue(self, header, body, file_to_upload=None):
@@ -86,29 +91,32 @@ class XqueueInterface:
 
         return (error, msg)
 
-    def _login(self):
-        try:
-            r = self.s.post(self.url+'/xqueue/login/', data={ 'username': self.auth['username'],
-                                                              'password': self.auth['password'] })
-        except requests.exceptions.ConnectionError, err:
-            log.error(err)
-            return (1, 'cannot connect to server') 
 
-        return parse_xreply(r.text)
+    def _login(self):
+        payload = { 'username': self.auth['username'],
+                    'password': self.auth['password'] }
+        return self._http_post(self.url+'/xqueue/login/', payload)
+
 
     def _send_to_queue(self, header, body, file_to_upload=None):
-
         payload = {'xqueue_header': header,
                    'xqueue_body'  : body}
-
         files = None
         if file_to_upload is not None:
             files = { file_to_upload.name: file_to_upload }
+        return self._http_post(self.url+'/xqueue/submit/', payload, files)
 
+
+    def _http_post(self, url, data, files=None):
         try:
-            r = self.s.post(self.url+'/xqueue/submit/', data=payload, files=files)
+            r = self.session.post(url, data=data, files=files)
         except requests.exceptions.ConnectionError, err:
             log.error(err)
-            return (1, 'cannot connect to server') 
+            return (1, 'cannot connect to server')
+        
+        if r.status_code not in [200]:
+            return (1, 'unexpected HTTP status code [%d]' % r.status_code)
 
         return parse_xreply(r.text)
+
+qinterface = XqueueInterface()

@@ -643,8 +643,7 @@ class ModuleSystem(object):
                  user=None,
                  filestore=None,
                  debug=False,
-                 xqueue_callback_url=None,
-                 xqueue_default_queuename="null",
+                 xqueue = None,
                  is_staff=False):
         '''
         Create a closure around the system environment.
@@ -668,6 +667,9 @@ class ModuleSystem(object):
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
 
+        xqueue - Dict containing XqueueInterface object, as well as parameters 
+                    for the specific StudentModule
+
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
@@ -676,8 +678,7 @@ class ModuleSystem(object):
              TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
-        self.xqueue_callback_url = xqueue_callback_url
-        self.xqueue_default_queuename = xqueue_default_queuename
+        self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
