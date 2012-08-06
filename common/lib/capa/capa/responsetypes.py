@@ -891,7 +891,7 @@ class CodeResponse(LoncapaResponse):
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
             # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
-            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader.')
+            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader. (Queue length: %s)' % msg)
 
         return cmap
 
