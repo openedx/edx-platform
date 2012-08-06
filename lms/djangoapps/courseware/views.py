@@ -44,6 +44,8 @@ def user_groups(user):
 
     # Kill caching on dev machines -- we switch groups a lot
     group_names = cache.get(key)
+    if settings.DEBUG:
+        group_names = None
 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
