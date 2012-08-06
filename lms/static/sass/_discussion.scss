@@ -20,33 +20,67 @@ $discussion_input_width: 100%;
   .discussion-non-content {
     margin-left: flex-gutter();
   }
-  .search-wrapper-inline {
-    width: 80%;
+  //TITLE
+  .discussion-title {
+    @include discussion-font;
+    @include discussion-clickable;
+    font-size: $discussion_title_size;
+    font-weight: bold;
+    margin-bottom: flex-gutter(6);
     display: inline-block;
-    margin-top: 3%;
+  }
+  .discussion-title-wrapper {
+    .discussion-watch-discussion, .discussion-unwatch-discussion {
+      display: none;
+      @include discussion-font;
+      margin-left: 5px;
+      font-size: $comment_info_size;
+    }
+  }
+  //SORTING
+  .discussion-sort {
+    font-size: $comment_body_size;
+    float: right;
+    margin-top: -2.5%;
+    .discussion-sort-link {
+      &:hover {
+        text-decoration: none;
+        color: #1C71DD;
+      }
+    }
+    .discussion-sort-link.sorted {
+      font-weight: bold;
+      color: #1C71DD; 
+    }
+  }
+  //SEARCH
+  .search-wrapper-inline {
+    display: inline-block;
     margin-bottom: 6%;
+    margin-top: 3%;
+    width: 80%;
   }
   .discussion-search-form {
-    margin-bottom: 1%;
     display: inline-block;
+    margin-bottom: 1%;
     width: flex-grid(12);
     .discussion-link {
       @include button;
-      display: inline-block;
-      margin-left: 1%;
       color: white;
-      font-weight: bold;
-      text-decoration: none;
-      padding-top: 9px;
+      display: inline-block;
       font-size: inherit;
+      font-weight: bold;
+      margin-left: 1%;
+      padding-top: 9px;
+      text-decoration: none;
     }
     .discussion-search-text {
       @include discussion-font;
     }
     .search-input {
+      float: left;
       font: inherit;
       font-style: normal;
-      float: left;
       width: 72%;
     }
   }
@@ -59,6 +93,7 @@ $discussion_input_width: 100%;
     font: inherit;
     font-size: $comment_body_size;
   }
+  //BASIC BUTTON STYLES
   .control-button {
     @include button;
     @include discussion-font;
@@ -96,22 +131,7 @@ $discussion_input_width: 100%;
       border: 1px solid #555;
     }
   }
-  .discussion-title {
-    @include discussion-font;
-    @include discussion-clickable;
-    font-size: $discussion_title_size;
-    font-weight: bold;
-    margin-bottom: flex-gutter(6);
-    display: inline-block;
-  }
-  .discussion-title-wrapper {
-    .discussion-watch-discussion, .discussion-unwatch-discussion {
-      display: none;
-      @include discussion-font;
-      margin-left: 5px;
-      font-size: $comment_info_size;
-    }
-  }
+  //FOLLOW BUTTON
   .follow-wrapper {
     float: right;
     .discussion-link {
@@ -138,6 +158,7 @@ $discussion_input_width: 100%;
       }
     }
   }
+  //VOTES
   .discussion-votes {
     text-align: center;
     height: flex-grid(3);
@@ -167,6 +188,7 @@ $discussion_input_width: 100%;
       }
     }
   }
+  //CONTAINERS FOR NEW AND EDITED POSTS
   .discussion-right-wrapper {
     min-height: 40px;
     float: left;
@@ -206,21 +228,6 @@ $discussion_input_width: 100%;
       -webkit-font-smoothing: antialiased;
     }
   }
-  .discussion-sort {
-    font-size: $comment_body_size;
-    float: right;
-    margin-top: -2.5%;
-    .discussion-sort-link {
-      &:hover {
-        text-decoration: none;
-        color: #1C71DD;
-      }
-    }
-    .discussion-sort-link.sorted {
-      font-weight: bold;
-      color: #1C71DD; 
-    }
-  }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     .new-post-control {
       margin-left: 80%;
@@ -255,6 +262,7 @@ $discussion_input_width: 100%;
       margin-left: 2%;
     }
   }
+  //THREAD STYLES
   .thread {
     //display: none;
     .thread-title {
@@ -326,6 +334,7 @@ $discussion_input_width: 100%;
         }
       }
     }
+    //COMMENT STYLES
     .comments {
       //display: none;
       margin-left: $comment_margin_left;
@@ -347,6 +356,7 @@ $discussion_input_width: 100%;
       }
     }
   }
+  //PAGES
   .discussion-paginator {
     margin-top: 20px;
     margin-bottom: 10px;
@@ -375,7 +385,7 @@ $discussion_input_width: 100%;
   }
 }
 
-//editor styles
+//EDITOR STYLES
 
 .wmd-panel
 {
