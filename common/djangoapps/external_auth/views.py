@@ -150,7 +150,7 @@ def edXauth_signup(request, eamap=None):
     context = {'has_extauth_info': True,
                'show_signup_immediately' : True,
                'extauth_email': eamap.external_email,
-               'extauth_username' : eamap.external_name.split(' ')[0],
+               'extauth_username' : eamap.external_name.replace(' ',''), # default - conjoin name, no spaces
                'extauth_name': eamap.external_name,
                }
     
