@@ -15,6 +15,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
+from courseware.courses import has_staff_access_to_course
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -188,8 +190,9 @@ def get_module(user, request, location, student_module_cache, position=None):
         module.metadata['data_dir']
     )
 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF') and user.is_staff:
-        module.get_html = add_histogram(module.get_html, module)
+    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+        if has_staff_access_to_course(user, module.location.course):
+            module.get_html = add_histogram(module.get_html, module)
 
     # If StudentModule for this instance wasn't already in the database,
     # and this isn't a guest user, create it.

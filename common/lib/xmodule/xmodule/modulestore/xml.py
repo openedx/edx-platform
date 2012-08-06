@@ -146,19 +146,30 @@ class XMLModuleStore(ModuleStoreBase):
                            os.path.exists(self.data_dir / d / "course.xml")]
 
         for course_dir in course_dirs:
-            try:
-                # Special-case code here, since we don't have a location for the
-                # course before it loads.
-                # So, make a tracker to track load-time errors, then put in the right
-                # place after the course loads and we have its location
-                errorlog = make_error_tracker()
-                course_descriptor = self.load_course(course_dir, errorlog.tracker)
-                self.courses[course_dir] = course_descriptor
-                self._location_errors[course_descriptor.location] = errorlog
-            except:
-                msg = "Failed to load course '%s'" % course_dir
-                log.exception(msg)
+            self.try_load_course(course_dir)
 
+    def try_load_course(self,course_dir):
+        '''
+        Load a course, keeping track of errors as we go along.
+        '''
+        try:
+            # Special-case code here, since we don't have a location for the
+            # course before it loads.
+            # So, make a tracker to track load-time errors, then put in the right
+            # place after the course loads and we have its location
+            errorlog = make_error_tracker()
+            course_descriptor = self.load_course(course_dir, errorlog.tracker)
+            self.courses[course_dir] = course_descriptor
+            self._location_errors[course_descriptor.location] = errorlog
+        except:
+            msg = "Failed to load course '%s'" % course_dir
+            log.exception(msg)
+
+    def __unicode__(self):
+        '''
+        String representation - for debugging
+        '''
+        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (self.data_dir,len(self.courses),len(self.modules))
 
     def load_course(self, course_dir, tracker):
         """
