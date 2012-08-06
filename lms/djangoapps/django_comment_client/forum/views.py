@@ -133,6 +133,7 @@ def get_annotated_content_info(content, user, is_thread):
         'editable': check_permissions_by_view(user, content, "update_thread" if is_thread else "update_comment"),
         'can_reply': check_permissions_by_view(user, content, "create_comment" if is_thread else "create_sub_comment"),
         'can_endorse': check_permissions_by_view(user, content, "endorse_comment") if not is_thread else False,
+        'can_delete': check_permissions_by_view(user, content, "delete_thread" if is_thread else "delete_comment"),
     }
 
 def get_annotated_content_infos(thread, user):

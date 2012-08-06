@@ -223,6 +223,24 @@ initializeFollowThread = (thread) ->
         error: (response, textStatus, e) ->
           console.log e
 
+    handleDelete = (elem) ->
+      if $content.hasClass("thread")
+        url = Discussion.urlFor('delete_thread', id)
+      else
+        url = Discussion.urlFor('delete_comment', id)
+
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {}
+        success: (response, textStatus) =>
+          if textStatus == "success"
+            $(content).remove()
+        error: (response, textStatus, e) ->
+          console.log e
+
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
@@ -308,6 +326,9 @@ initializeFollowThread = (thread) ->
         else
           handleEditComment(this)
 
+      "click .discussion-delete": ->
+        handleDelete(this)
+
   initializeContent: (content) ->
     $content = $(content)
     initializeVote $content
@@ -326,3 +347,5 @@ initializeFollowThread = (thread) ->
       $local(".discussion-reply").remove()
     if not Discussion.getContentInfo id, 'can_endorse'
       $local(".discussion-endorse-control").remove()
+    if not Discussion.getContentInfo id, 'can_delete'
+      $local(".discussion-delete").remove()
