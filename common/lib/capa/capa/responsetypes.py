@@ -29,6 +29,8 @@ import xqueue_interface
 
 log = logging.getLogger('mitx.' + __name__)
 
+qinterface = xqueue_interface.XqueueInterface()
+
 #-----------------------------------------------------------------------------
 # Exceptions
 
@@ -809,7 +811,6 @@ class CodeResponse(LoncapaResponse):
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url')
         self.queue_name = xml.get('queuename', self.system.xqueue_default_queuename)
 
         answer = xml.find('answer')
@@ -877,16 +878,17 @@ class CodeResponse(LoncapaResponse):
         
         # Submit request
         if hasattr(submission, 'read'): # Test for whether submission is a file
-            error = xqueue_interface.send_to_queue(header=xheader,
-                                                   body=json.dumps(contents),
-                                                   file_to_upload=submission)
+            (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                    body=json.dumps(contents),
+                                                    file_to_upload=submission)
         else:
-            error = xqueue_interface.send_to_queue(header=xheader,
-                                                   body=json.dumps(contents))
+            (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                    body=json.dumps(contents))
 
         cmap = CorrectMap() 
         if error:
-            cmap.set(self.answer_id, queuekey=None, msg='Unable to deliver your submission to grader! Please try again later')
+            cmap.set(self.answer_id, queuekey=None,
+                     msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
             # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
             cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader')
