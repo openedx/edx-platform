@@ -102,7 +102,7 @@ $discussion_input_width: 100%;
     font-size: $discussion_title_size;
     font-weight: bold;
     margin-bottom: flex-gutter(6);
-    display: block;
+    display: inline-block;
   }
   .discussion-title-wrapper {
     .discussion-watch-discussion, .discussion-unwatch-discussion {
@@ -110,9 +110,6 @@ $discussion_input_width: 100%;
       @include discussion-font;
       margin-left: 5px;
       font-size: $comment_info_size;
-    }
-    .discussion-title {
-      display: inline-block;
     }
   }
   .follow-wrapper {
@@ -302,8 +299,8 @@ $discussion_input_width: 100%;
       @include discussion-font;
       font-size: $comment_info_size;
       font-style: italic;
-      color: gray;      
-      .discussion-reply {
+      color: gray;
+     .discussion-reply {
         margin-left: 4px;
       }
       .discussion-link {
@@ -378,6 +375,7 @@ $discussion_input_width: 100%;
   }
 }
 
+//editor styles
 
 .wmd-panel
 {
