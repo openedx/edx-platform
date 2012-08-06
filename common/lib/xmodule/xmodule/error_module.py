@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import random
 import string
@@ -48,13 +49,12 @@ class ErrorDescriptor(EditingDescriptor):
         definition = {'data': inner}
         inner['error_msg'] = str(error_msg)
 
-        # Pick a unique (random) url_name.
+        # Pick a unique url_name -- the sha1 hash of the xml_data.
         # NOTE: We could try to pull out the url_name of the errored descriptor,
         # but url_names aren't guaranteed to be unique between descriptor types,
         # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
         # it will be written out with the original url_name.
-        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
-        url_name = ''.join(random.choice(chars) for i in range(16))
+        url_name = hashlib.sha1(xml_data).hexdigest()
 
         try:
             # If this is already an error tag, don't want to re-wrap it.
