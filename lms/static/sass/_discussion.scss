@@ -307,7 +307,15 @@ $discussion_input_width: 100%;
       color: gray;
       font-size: $comment_info_size;
       font-style: italic;
-     .discussion-reply {
+      .comment-time {
+        display: inline;
+        float: right;
+        margin-right: -4%;
+      }
+      .comment-count {
+        display: inline;
+      }
+      .discussion-reply {
         margin-left: 4px;
       }
       .discussion-link {
