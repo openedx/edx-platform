@@ -74,7 +74,7 @@ h1.top-header {
   }
 
   .bottom-border {
-    border-bottom: 1px solid #d3d3d3;
+    border-bottom: 1px solid $border-color;
   }
 
   @media print {
