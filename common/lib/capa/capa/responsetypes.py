@@ -17,6 +17,7 @@ import random
 import re
 import requests
 import traceback
+import hashlib
 import abc
 import os
 import xml.sax.saxutils as saxutils
