@@ -252,7 +252,6 @@ def get_shared_instance_module(user, module, student_module_cache):
     else:
         return None
 
-from datetime import datetime
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     '''
