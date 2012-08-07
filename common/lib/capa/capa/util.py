@@ -39,5 +39,10 @@ def convert_files_to_filenames(answers):
     '''
     new_answers = dict()
     for answer_id in answers.keys():
-        new_answers[answer_id] = unicode(answers[answer_id])
+        # TODO This should be done more cleanly; however, this fixes bugs
+        # that were introduced with this function.
+        if isinstance(answers[answer_id], list):
+            new_answers[answer_id] = answers[answer_id]
+        else:
+            new_answers[answer_id] = unicode(answers[answer_id])
     return new_answers
