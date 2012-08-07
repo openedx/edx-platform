@@ -24,6 +24,20 @@ form label {
   text-shadow: none;
 }
 
+div.recent-activity {
+  font-size: $comment_body_size;
+  margin: 4%;
+  font-weight: bold;
+  a.recent-active-post {
+    margin-bottom: 2px;
+    &:hover {
+      color: #1C71DD;
+      text-decoration: none;
+      font-weight: normal;
+    }
+  }
+}
+
 .discussion {
   
   .discussion-non-content {
