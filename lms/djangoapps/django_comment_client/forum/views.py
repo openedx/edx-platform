@@ -22,6 +22,11 @@ import dateutil
 THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
+def _should_perform_search(request):
+    return bool(request.GET.get('text', False) or \
+            request.GET.get('tags', False))
+        
+
 def render_accordion(request, course, discussion_id):
 
     discussion_info = utils.get_categorized_discussion_info(request, course)
@@ -56,6 +61,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'course_id': course_id,
         'request': request,
+        'performed_search': _should_perform_search(request),
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
         'base_url': base_url,
@@ -81,7 +87,7 @@ def get_threads(request, course_id, discussion_id):
         'tags': request.GET.get('tags', ''),
     }
 
-    if query_params['text'] or query_params['tags']: #TODO do tags search without sunspot
+    if _should_perform_search(request):
         query_params['commentable_id'] = discussion_id
         threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
     else:
