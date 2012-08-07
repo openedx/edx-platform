@@ -352,12 +352,18 @@ class JavascriptResponse(LoncapaResponse):
 
         if self.generator_xml.get("dependencies"):
             self.generator_dependencies = self.generator_xml.get("dependencies").split()
+        else:
+            self.generator_dependencies = []
 
         if self.grader_xml.get("dependencies"):
             self.grader_dependencies = self.grader_xml.get("dependencies").split()
+        else:
+            self.grader_dependencies = []
 
         if self.display_xml.get("dependencies"):
             self.display_dependencies = self.display_xml.get("dependencies").split()
+        else:
+            self.display_dependencies = []
 
         self.display_class = self.display_xml.get("class")
     
@@ -366,7 +372,12 @@ class JavascriptResponse(LoncapaResponse):
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
         node_path = os.path.normpath(js_dir)
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
-        command = "NODE_PATH=%s node %s %s '%s' '%s'" % (node_path, generator_file, self.generator, json.dumps(self.system.seed), json.dumps(self.params))
+        command = "NODE_PATH=$NODE_PATH:%s node %s %s '%s' '%s' '%s'" % (node_path, 
+                                                                    generator_file, 
+                                                                    self.generator, 
+                                                                    json.dumps(self.generator_dependencies),
+                                                                    json.dumps(self.system.seed), 
+                                                                    json.dumps(self.params))
         node_process = os.popen(command)
         output = node_process.readline().strip()
         node_process.close()
@@ -415,12 +426,14 @@ class JavascriptResponse(LoncapaResponse):
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
         node_path = os.path.normpath(js_dir)
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
-        command = "NODE_PATH=%s node %s %s '%s' '%s' '%s'" % (node_path, 
+        command = "NODE_PATH=$NODE_PATH:%s node %s '%s' '%s' '%s' '%s' '%s'" % (node_path, 
                                                               grader_file, 
                                                               self.grader, 
+                                                              json.dumps(self.grader_dependencies),
                                                               submission, 
                                                               json.dumps(self.problem_state), 
                                                               json.dumps(self.params))
+        print command
         node_process = os.popen(command)
         all_correct = json.loads(node_process.readline().strip())
         evaluation = node_process.readline().strip()

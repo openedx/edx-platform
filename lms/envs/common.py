@@ -86,6 +86,15 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+# For Node.js
+node_paths = [PROJECT_ROOT / "lib/node_modules", 
+              PROJECT_ROOT / "static/js", 
+              PROJECT_ROOT / "static/coffee/src", 
+              PROJECT_ROOT / "static/coffee/src/modules"]
+node_path = ':'.join(node_paths)
+                          
+os.environ["NODE_PATH"] = node_path
+
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -329,7 +338,7 @@ PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/cour
 courseware_only_js = [
     PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
     for pth
-    in ['courseware', 'histogram', 'navigation', 'time', ]
+    in ['courseware', 'histogram', 'navigation', 'time']
 ]
 courseware_only_js += [
     pth for pth

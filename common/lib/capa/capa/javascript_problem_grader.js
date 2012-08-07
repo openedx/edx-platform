@@ -1,3 +1,4 @@
+require('coffee-script');
 var importAll = function (modulePath) {
   module = require(modulePath);
   for(key in module){
@@ -6,12 +7,16 @@ var importAll = function (modulePath) {
 }
 
 importAll("xproblem");
-importAll("minimax.js");
 
 graderModulePath    = process.argv[2];
-submission          = JSON.parse(process.argv[3]);
-problemState        = JSON.parse(process.argv[4]);
-params              = JSON.parse(process.argv[5]);
+dependencies        = JSON.parse(process.argv[3]);
+submission          = JSON.parse(process.argv[4]);
+problemState        = JSON.parse(process.argv[5]);
+params              = JSON.parse(process.argv[6]);
+
+for(var i = 0; i < dependencies.length; i++){
+    importAll(dependencies[i]);
+}
 
 graderModule = require(graderModulePath);
 graderClass  = graderModule.graderClass;

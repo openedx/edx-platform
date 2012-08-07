@@ -1,3 +1,4 @@
+require('coffee-script');
 var importAll = function (modulePath) {
   module = require(modulePath);
   for(key in module){
@@ -9,13 +10,18 @@ importAll("mersenne-twister-min");
 importAll("xproblem");
 
 generatorModulePath = process.argv[2];
-seed                = process.argv[3];
-params              = JSON.parse(process.argv[4]);
+dependencies        = JSON.parse(process.argv[3]);
+seed                = process.argv[4];
+params              = JSON.parse(process.argv[5]);
 
 if(seed==null){
     seed = 4;
 }else{
     seed = parseInt(seed);
+}
+
+for(var i = 0; i < dependencies.length; i++){
+    importAll(dependencies[i]);
 }
 
 generatorModule = require(generatorModulePath);
