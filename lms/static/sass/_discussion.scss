@@ -216,11 +216,17 @@ form label {
       display: block;
       margin-left: -5%;
     }
+    .new-post-similar-posts-wrapper {
+      font-size: $comment_body_size;
+      line-height: 150%;
+      padding: 1%;
+    }
     .new-post-similar-posts {
+      font: inherit;
       .similar-post {
         display: block;
+        line-height: 150%;
       }
-
     }
     .new-post-body {
       margin-top: flex-gutter();

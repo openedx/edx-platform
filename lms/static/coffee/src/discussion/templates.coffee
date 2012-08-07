@@ -11,7 +11,7 @@ Discussion = @Discussion
       <ul class="discussion-errors"></ul>    
       <input type="text" class="new-post-title title-input" placeholder="Title"/>
       <div class="new-post-similar-posts-wrapper" style="display: none">
-        Do you mean...
+        Similar Posts: 
         <div class="new-post-similar-posts"></div>
       </div>
       <div class="new-post-body body-input"></div>
