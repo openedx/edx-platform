@@ -644,7 +644,8 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue = None,
-                 is_staff=False):
+                 is_staff=False,
+                 node_path=""):
         '''
         Create a closure around the system environment.
 
@@ -687,6 +688,7 @@ class ModuleSystem(object):
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.is_staff = is_staff
+        self.node_path = node_path
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

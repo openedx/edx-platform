@@ -371,7 +371,7 @@ class JavascriptResponse(LoncapaResponse):
 
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
         tmp_env = os.environ.copy()
-        node_path = tmp_env["NODE_PATH"] + ":" + os.path.normpath(js_dir)
+        node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
         return tmp_env
 
