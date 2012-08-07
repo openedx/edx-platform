@@ -34,6 +34,16 @@ def search_similar_threads(course_id, recursive=False, query_params={}, *args, *
     attributes = dict(default_params.items() + query_params.items())
     return _perform_request('get', _url_for_search_similar_threads(), attributes, *args, **kwargs)
 
+def search_recent_active_threads(course_id, recursive=False, query_params={}, *args, **kwargs):
+    default_params = {'course_id': course_id, 'recursive': recursive}
+    attributes = dict(default_params.items() + query_params.items())
+    return _perform_request('get', _url_for_search_recent_active_threads(), attributes, *args, **kwargs)
+
+def search_trending_tags(course_id, query_params={}, *args, **kwargs):
+    default_params = {'course_id': course_id}
+    attributes = dict(default_params.items() + query_params.items())
+    return _perform_request('get', _url_for_search_trending_tags(), attributes, *args, **kwargs)
+
 def create_user(attributes, *args, **kwargs):
     return _perform_request('post', _url_for_users(), attributes, *args, **kwargs)
 
@@ -166,6 +176,12 @@ def _url_for_search_threads():
 
 def _url_for_search_similar_threads():
     return "{prefix}/search/threads/more_like_this".format(prefix=PREFIX)
+
+def _url_for_search_recent_active_threads():
+    return "{prefix}/search/threads/recent_active".format(prefix=PREFIX)
+
+def _url_for_search_trending_tags():
+    return "{prefix}/search/tags/trending".format(prefix=PREFIX)
 
 def _url_for_threads_tags():
     return "{prefix}/threads/tags".format(prefix=PREFIX)
