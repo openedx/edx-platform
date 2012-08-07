@@ -1,8 +1,9 @@
 $comment_margin_left: 30px;
 $discussion_title_size: 1.6em;
 $comment_title_size: 1.0em;
-$comment_body_size: 0.9em;
+$post_font_size: 0.9em;
 $comment_info_size: 0.75em;
+$comment_font_size: 0.8em;
 $discussion_input_width: 100%;
 
 $tag_background_color: #e7ecdd;
@@ -49,9 +50,22 @@ $tag_text_color: #5b614f;
   //SORTING
   .discussion-sort {
     float: right;
-    font-size: $comment_body_size;
-    margin-top: -2.5%;
+    font-size: 0.8em;
+    margin-top: -36px;
+
+    .discussion-label {
+      display: block;
+      float: left;
+      padding: 0 14px;
+      line-height: 34px;
+    }
+
     .discussion-sort-link {
+      display: block;
+      float: left;
+      padding: 0 14px;
+      line-height: 34px;
+
       &:hover {
         color: #1C71DD;
         text-decoration: none;
@@ -59,8 +73,8 @@ $tag_text_color: #5b614f;
     }
 
     .discussion-sort-link.sorted {
-      color: #1C71DD; 
-      font-weight: bold;
+      color: #000;
+      border-bottom: 2px solid #000;
     }
   }
 
@@ -113,7 +127,7 @@ $tag_text_color: #5b614f;
 
   .discussion-search-within-board {
     font: inherit;
-    font-size: $comment_body_size;
+    font-size: $post_font_size;
     font-style: normal;
   }
 
@@ -188,12 +202,13 @@ $tag_text_color: #5b614f;
   .discussion-votes {
     float: left;
     width: flex-grid(1);
+    margin-top: 18px;
     text-align: center;
 
     .discussion-vote {      
       display: block;      
       width: 50px;
-      height: 19px;
+      height: 17px;
       margin: auto;
       background: url(../images/vote-arrows.png) no-repeat;
       font-size: 15px;
@@ -204,23 +219,23 @@ $tag_text_color: #5b614f;
     }
 
     .discussion-vote-up {
-      margin-bottom: 3px;
-      background-position: -50px -1px;      
+      margin-bottom: 5px;
+      background-position: -50px -3px;      
 
       &:hover {
-        background-position: -50px -3px;
+        background-position: -50px -5px;
         @include transition-duration(0.05s);
       }
 
       &.voted {
-        background-position: 0 -1px;
+        background-position: 0 -3px;
         color: #1C71DD;
         @include transition-duration(0);
       }
     }
 
     .discussion-vote-down {
-      margin-top: 5px;
+      margin-top: 7px;
       background-position: -50px -30px;
 
       &:hover {
@@ -233,25 +248,25 @@ $tag_text_color: #5b614f;
         color: #1C71DD;
         @include transition-duration(0);
       }
-    }
-    
+    }   
 
     .discussion-vote-count {
       @include discussion-font;
-      font-size: $comment_body_size;
+      font-size: $post_font_size;
     }
 
     .discussion-votes-point {
-      font-size: 1em;
+      font-size: 1.1em;
       font-weight: bold;
+      color: #9a9a9a;
     }
   }
   //CREATE NEW AND EDIT POSTS
   .discussion-right-wrapper {
     float: left;
     min-height: 40px;
-    // width: 90%;
     width: flex-grid(11);
+    margin: 24px 0;
   }
 
   .new-post-form, .discussion-thread-edit {
@@ -344,11 +359,12 @@ $tag_text_color: #5b614f;
       margin-bottom: $body-line-height;
       font-size: $comment_title_size;
       font-weight: bold;
+      line-height: 1.4em;
     }
 
     .thread-body, .content-body {
       @include discussion-font;
-      font-size: $comment_body_size;
+      font-size: $post_font_size;
       margin-bottom: 4px;
       margin-top: 3px;
 
@@ -387,14 +403,29 @@ $tag_text_color: #5b614f;
       font-style: italic;
       margin-top: 2%;
 
+      a:hover {
+        text-decoration: none;
+        color: #1C71DD;
+      }
+
       .comment-time {
         display: inline;
         float: right;
-        margin-right: -4%;
       }
 
-      .comment-count {
+      .comment-count {        
         display: inline;
+      }
+
+      .discussion-actions {        
+        display: inline;
+        margin: 0;
+        padding: 0;
+
+        li {
+          display: inline;
+          margin-left: 20px;
+        }
       }
 
       .discussion-reply {
@@ -412,7 +443,7 @@ $tag_text_color: #5b614f;
     .discussion-content {
       border-top: lightgray 1px solid;
       overflow: hidden;
-      padding: 1.5% 0;
+      // padding: 1.5% 0;
 
       .discussion-reply-new {
         @include discussion-font;
@@ -421,7 +452,7 @@ $tag_text_color: #5b614f;
         .reply-body {
           @include discussion-font;
           display: block;
-          font-size: $comment_body_size;
+          font-size: $post_font_size;
           margin-top: 10px;
           width: 95%;
         }
@@ -431,21 +462,26 @@ $tag_text_color: #5b614f;
     //COMMENT STYLES
     .comments {
       //display: none;
-      margin-left: $comment_margin_left;
+      // margin-left: $comment_margin_left;
+      margin-left: flex-grid(1);
       overflow: hidden;
+
+      .discussion-right-wrapper {
+        margin: 10px 0;
+      }
 
       .comment {
         .comment-body, .content-body {
           @include discussion-font;
           color: black;
           display: block;
-          font-size: $comment_body_size;
+          font-size: $comment_font_size;
           margin-top: 3px;
         }
 
         &.endorsed {
           > .discussion-content {
-            background-color: lightyellow;
+            background-color: #fcfcea;
           }
         }
       }
@@ -454,7 +490,7 @@ $tag_text_color: #5b614f;
 
   //PAGES
   .discussion-paginator {
-    font-size: $comment_body_size;
+    font-size: $post_font_size;
     margin-bottom: 10px;
     margin-top: 20px;
     text-align: center;
