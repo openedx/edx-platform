@@ -87,14 +87,17 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
-node_paths = [COMMON_ROOT / "lib/node_modules", 
-              COMMON_ROOT / "static/js/vendor", 
-              COMMON_ROOT / "static/coffee/src", 
-              ]
-node_path = ':'.join(node_paths)
-                          
-os.environ["NODE_PATH"] = node_path
 
+system_node_path = os.environ.get("NODE_PATH", None)
+if system_node_path is None:
+    system_node_path = "/usr/local/lib/node_modules"
+
+node_paths = [COMMON_ROOT / "static/js/vendor", 
+              COMMON_ROOT / "static/coffee/src",
+              system_node_path
+              ]
+NODE_PATH = ':'.join(node_paths)
+                          
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates

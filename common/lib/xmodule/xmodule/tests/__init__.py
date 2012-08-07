@@ -33,7 +33,8 @@ i4xs = ModuleSystem(
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
     xqueue=None,
-    is_staff=False
+    is_staff=False,
+    node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
 
 
@@ -360,7 +361,6 @@ class ChoiceResponseTest(unittest.TestCase):
 class JavascriptResponseTest(unittest.TestCase):
 
     def test_jr_grade(self):
-        os.environ["NODE_PATH"] = ""
         problem_file = os.path.dirname(__file__) + "/test_files/javascriptresponse.xml"
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
         os.system("coffee -c %s" % (coffee_file_path))
