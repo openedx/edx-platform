@@ -24,11 +24,28 @@ form label {
   text-shadow: none;
 }
 
+div.recent-activity {
+  font-size: $comment_body_size;
+  margin: 4%;
+  font-weight: bold;
+  a.recent-active-post {
+    margin-bottom: 2px;
+    &:hover {
+      color: #1C71DD;
+      text-decoration: none;
+      font-weight: normal;
+    }
+  }
+}
+
 .discussion {
+  
   .discussion-non-content {
     margin-left: flex-gutter();
   }
+  
   //TITLE
+  
   .discussion-title {
     @include discussion-font;
     @include discussion-clickable;
@@ -37,6 +54,7 @@ form label {
     font-weight: bold;
     margin-bottom: flex-gutter(6);
   }
+  
   .discussion-title-wrapper {
     .discussion-watch-discussion, .discussion-unwatch-discussion {
       @include discussion-font;
@@ -45,36 +63,46 @@ form label {
       margin-left: 5px;
     }
   }
+  
   .blank {
     margin: 2%;
   }
+  
   //SORTING
+  
   .discussion-sort {
     float: right;
     font-size: $comment_body_size;
     margin-top: -2.5%;
+    
     .discussion-sort-link {
+      
       &:hover {
         color: #1C71DD;
         text-decoration: none;
       }
     }
+    
     .discussion-sort-link.sorted {
       color: #1C71DD; 
       font-weight: bold;
     }
   }
+  
   //SEARCH
+  
   .search-wrapper-inline {
     display: inline-block;
     margin-bottom: 6%;
     margin-top: 3%;
     width: 80%;
   }
+  
   .discussion-search-form {
     display: inline-block;
     margin-bottom: 1%;
     width: flex-grid(12);
+    
     .discussion-link {
       @include button;
       color: white;
@@ -85,9 +113,11 @@ form label {
       padding-top: 9px;
       text-decoration: none;
     }
+    
     .discussion-search-text {
       @include discussion-font;
     }
+    
     .search-input {
       float: left;
       font: inherit;
@@ -95,16 +125,20 @@ form label {
       width: 72%;
     }
   }
+  
   .search-within {
     display: block;
     margin-bottom: 3%;
   }
+  
   .discussion-search-within-board {
     font: inherit;
     font-size: $comment_body_size;
     font-style: normal;
   }
+  
   //BASIC BUTTON STYLES
+  
   .control-button {
     @include button;
     @include discussion-font;
@@ -128,6 +162,7 @@ form label {
     width: inherit;
     text-decoration: none;
     text-shadow: none;
+    
     &:hover {
       background-color: #A2A2A2;
       background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #A2A2A2),color-stop(100%, #7B7B7B));
@@ -142,9 +177,12 @@ form label {
       box-shadow: inset 0 1px 0 #BBB,0 0 3px #CCC;
     }
   }
+  
   //FOLLOW BUTTON
+  
   .follow-wrapper {
     float: right;
+    
     .discussion-link {
       @include button;
       background-color: #BEBEBE;
@@ -158,6 +196,7 @@ form label {
       padding: 5px 8px;
       text-decoration: none;
       text-shadow: none;
+      
       &:hover {
         background-color: #AAA;
         background-image: none;
@@ -168,54 +207,62 @@ form label {
       }
     }
   }
+
   //VOTES
+  
   .discussion-votes {
     float: left;
     height: flex-grid(3);
     margin: 1% 2%;
     text-align: center;
+    
     .discussion-vote-count {
       @include discussion-font;
       font-size: $comment_body_size;
     }
+    
     a.discussion-vote {
       color: black;
       display: block;
       font-size: 15px;
       font-weight: bold;
+      
       &:hover {
         color: #1C71DD;
         text-decoration: none;
       }
+      
       &.discussion-vote-up {
         margin-bottom: 3px;
       }
+      
       &.discussion-vote-down {
         margin-top: 5px;
       }
+      
       &.voted {
         color: #1C71DD;
       }
     }
   }
+
   //CREATE NEW AND EDIT POSTS
+  
   .discussion-right-wrapper {
     float: left;
     min-height: 40px;
     width: 90%;
   }
+  
   .new-post-form, .discussion-thread-edit {
+    
     .title-input, .body-input {
       display: block !important;
       font: inherit;
       font-style: normal;
       width: $discussion_input_width !important;
     }
-    .discussion-errors {
-      color: #8F0E0E;
-      display: block;
-      margin-left: -5%;
-    }
+    
     .new-post-similar-posts-wrapper {
       @include border-radius(3px);
       border: 1px solid #EEE;
@@ -224,6 +271,11 @@ form label {
       margin-top: 1%;
       padding: 1% 1.5%;
     }
+    
+    .hide-similar-posts {
+      float: right;
+    }
+    
     .new-post-similar-posts {
       font: inherit;
       .similar-post {
@@ -231,9 +283,11 @@ form label {
         line-height: 150%;
       }
     }
+    
     .new-post-body {
       margin-top: flex-gutter();
     }
+    
     .tagsinput {
       background: #FAFAFA;
       border: 1px solid #C8C8C8;
@@ -253,23 +307,39 @@ form label {
       -webkit-font-smoothing: antialiased;
     }
   }
+
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
+    
+    .discussion-errors {
+      color: #8F0E0E;
+      display: block;
+      font: inherit;
+      font-size: $comment_body_size;
+      list-style: none;
+      margin-left: -3%;
+      padding-left: 2em;
+    }
+    
     a:hover {
       color: #1C71DD;
       text-decoration: none;
     };
+    
     .new-post-control {
       margin-left: 80%;
       margin-top: 1%;
     }
+    
     .reply-post-control {
       margin-left: 73%;
     }
+    
     .edit-post-control {
       margin-left: 79%;
       margin-top: 1%;
     }
+    
     .control-button {
       @include button;
       @include discussion-font;
@@ -281,27 +351,35 @@ form label {
       padding-top: 9px;
       text-decoration: none;
       width: inherit;
+      
       &:hover {
         color: white;
       }
     }
   }
+
   .new-post-form {
     margin: 10px 0 40px 0;
   }
+  
   .discussion-reply-new {
+    
     .discussion-auto-watch {
       margin-left: 2%;
     }
   }
+
   //THREAD STYLES
+  
   .thread {
     //display: none;
+    
     .search-highlight {
       display: inline;
       font-weight: bold;
       background-color: lightyellow;
     }
+    
     .thread-title {
       @include discussion-font;
       @include discussion-clickable;
@@ -309,18 +387,23 @@ form label {
       font-size: $comment_title_size;
       font-weight: bold;
     }
+    
     .thread-body, .content-body {
       @include discussion-font;
       font-size: $comment_body_size;
       margin-bottom: 4px;
       margin-top: 3px;
+      min-height: 35px;
+      
       p {
         @include discussion-font;
         margin: 0;
       }
     }
+
     .thread-tags {
       display: inline-block;
+
       .thread-tag {
         @include discussion-font;
         background: #CDE69C;
@@ -333,53 +416,65 @@ form label {
         margin: 5px 7px 5px 0;
         padding: 5px 7px;
         text-decoration: none;
+        
         &:hover {
           border-color: #1E4612;
           color: #1E4612;
         }
       }
     }
+
     .info {
       @include discussion-font;
       color: gray;
       font-size: $comment_info_size;
       font-style: italic;
       margin-top: 2%;
+      
       a {
+        
         &:hover {
         text-decoration: none;
         color: #1C71DD;
         }
       }
+
       .comment-time {
         display: inline;
         float: right;
         margin-right: -4%;
       }
+      
       .comment-count {
         display: inline;
       }
+      
       .discussion-reply {
         margin-left: 4px;
       }
+      
       .discussion-link {
         @include discussion-font;
         color: #1d9dd9;
         display: inline;
         margin-left: 2px;
+        
         &:hover {
           text-decoration: none;
           color: #1C71DD;
         }
       }
     }
+    
     .discussion-content {
       border-top: lightgray 1px solid;
       overflow: hidden;
       padding: 1.5% 0;
+    
       .discussion-reply-new {
         @include discussion-font;
         margin-left: 5%;
+      
         .reply-body {
           @include discussion-font;
           display: block;
@@ -389,12 +484,16 @@ form label {
         }
       }
     }
+    
     //COMMENT STYLES
+    
     .comments {
       //display: none;
       margin-left: $comment_margin_left;
       overflow: hidden;
+    
       .comment {
+      
         .comment-body, .content-body {
           @include discussion-font;
           color: black;
@@ -402,7 +501,9 @@ form label {
           font-size: $comment_body_size;
           margin-top: 3px;
         }
+        
         &.endorsed {
+        
           > .discussion-content {
             background-color: lightyellow;
           }
@@ -410,16 +511,20 @@ form label {
       }
     }
   }
+  
   //PAGES
+  
   .discussion-paginator {
     font-size: $comment_body_size;
     margin-bottom: 10px;
     margin-top: 20px;
     text-align: center;
+  
     div {
       display: inline-block;
       font-weight: bold;
       margin: 0 5px;
+    
       a {
         background: #EEE;
         -webkit-border-radius: 3px;
@@ -431,6 +536,7 @@ form label {
         font-weight: normal;
         padding: 4px 10px;
         text-decoration: none;
+      
         &:hover {
           background: #DDD;
         }
