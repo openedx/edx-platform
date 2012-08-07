@@ -12,10 +12,12 @@ from models import StudentModule
 log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
-    for child in module.get_display_items():
-        yield child
-        for module in yield_module_descendents(child):
-            yield module
+    stack = module.get_display_items()
+    
+    while len(stack) > 0:
+        next_module = stack.pop()
+        stack.extend( next_module.get_display_items() )
+        yield next_module
    
 def grade(student, request, course, student_module_cache=None):
     """
