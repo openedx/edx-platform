@@ -378,7 +378,7 @@ class JavascriptResponse(LoncapaResponse):
                                           generator_file, 
                                           self.generator, 
                                           json.dumps(self.generator_dependencies),
-                                          json.dumps(self.system.seed), 
+                                          json.dumps(str(self.system.seed)), 
                                           json.dumps(self.params)
                                           ],
                                           env=tmp_env).strip()
