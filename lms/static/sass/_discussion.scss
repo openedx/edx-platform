@@ -211,13 +211,6 @@ form label {
       font-style: normal;
       width: $discussion_input_width !important;
     }
-    .discussion-errors {
-      color: #8F0E0E;
-      display: block;
-      font: inherit;
-      font-size: $comment_body_size;
-      margin-left: -3%;
-    }
     .new-post-similar-posts-wrapper {
       @include border-radius(3px);
       border: 1px solid #EEE;
@@ -265,7 +258,9 @@ form label {
       display: block;
       font: inherit;
       font-size: $comment_body_size;
+      list-style: none;
       margin-left: -3%;
+      padding-left: 2em;
     }
     a:hover {
       color: #1C71DD;
