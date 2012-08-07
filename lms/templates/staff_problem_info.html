@@ -3,12 +3,8 @@ ${module_content}
 <div><a href="${edit_link}">Edit</a></div>
 % endif
 
-<script type="text/javascript"> 
-$('#${element_id}_showhide').click(function(){$('#${element_id}_debug').toggle(); })
-</script> 
-
 <div class="staff_info">
-<input type="submit" id="${element_id}_showhide" value="Staff Debug Info"/>
+<a href="javascript:void(0)" onclick="javascript:$('#${element_id}_debug').toggle()">Staff Debug Info</a>
 <span style="display:none" id="${element_id}_debug">
 definition = <pre>${definition | h}</pre>
 metadata = ${metadata | h}
