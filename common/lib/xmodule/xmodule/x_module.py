@@ -643,7 +643,7 @@ class ModuleSystem(object):
                  user=None,
                  filestore=None,
                  debug=False,
-                 xqueue = None,
+                 xqueue=None,
                  is_staff=False):
         '''
         Create a closure around the system environment.
@@ -678,7 +678,10 @@ class ModuleSystem(object):
              TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
-        self.xqueue = xqueue
+        if xqueue is None:
+            self.xqueue = {'interface':None, 'callback_url':'/', 'default_queuename':'null'}
+        else:
+            self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module

@@ -39,10 +39,18 @@ def convert_files_to_filenames(answers):
     '''
     new_answers = dict()
     for answer_id in answers.keys():
-        # TODO This should be done more cleanly; however, this fixes bugs
-        # that were introduced with this function.
-        if isinstance(answers[answer_id], list):
-            new_answers[answer_id] = answers[answer_id]
+        if is_uploaded_file(answers[answer_id]):
+            new_answers[answer_id] = answers[answer_id].name
         else:
-            new_answers[answer_id] = unicode(answers[answer_id])
+            new_answers[answer_id] = answers[answer_id]
     return new_answers
+
+def is_uploaded_file(file_to_test):
+    '''
+    Duck typing to check if 'file_to_test' is a File object
+    '''
+    is_file = True
+    for method in ['read', 'name']:
+        if not hasattr(file_to_test, method):
+            is_file = False
+    return is_file 
