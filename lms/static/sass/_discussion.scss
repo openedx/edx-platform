@@ -313,6 +313,13 @@ $tag_text_color: #5b614f;
       text-decoration: none;
       width: inherit;
     }
+
+    label {
+      font-family: $sans-serif;
+      font-size: .8em;
+      font-style: normal;
+      font-weight: 400;
+    }
   }
 
   .new-post-form {
@@ -531,7 +538,8 @@ $tag_text_color: #5b614f;
   border: 1px solid #c8c8c8;
   font-family: Monaco, 'Lucida Console', monospace;
   font-style: normal;
-  font-size: 12px;
+  font-size: 0.8em;
+  line-height: 1.6em;
   @include border-radius(3px 3px 0 0);
   @include box-shadow(none);
 }
@@ -540,6 +548,7 @@ $tag_text_color: #5b614f;
   position: relative;
   font-family: $sans-serif;
   padding: 25px 20px 10px 20px;
+  margin-bottom: 5px;
   box-sizing: border-box;
   border: 1px solid #c8c8c8;
   border-top-width: 0;
