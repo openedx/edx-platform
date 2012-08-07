@@ -213,12 +213,12 @@ wmdEditors = {}
         break
 
     text = processedText
-    text = text.replace(new RegExp(ESCAPED_DOLLAR), '\\$')
+    text = text.replace(new RegExp(ESCAPED_DOLLAR, 'g'), '\\$')
 
     text = text.replace /\\\\\\\\/g, ESCAPED_BACKSLASH
     text = text.replace /\\begin\{([a-z]*\*?)\}([\s\S]*?)\\end\{\1\}/img, ($0, $1, $2) ->
       processor("\\begin{#{$1}}" + $2 + "\\end{#{$1}}")
-    text = text.replace(new RegExp(ESCAPED_BACKSLASH), '\\\\\\\\')
+    text = text.replace(new RegExp(ESCAPED_BACKSLASH, 'g'), '\\\\\\\\')
 
     $div = $("<div>").html(text)
     cnt = 0
@@ -226,5 +226,6 @@ wmdEditors = {}
       $(code).html(processor(codeArchive[cnt], 'code'))
       cnt += 1
 
-    $div.html()
+    text = $div.html()
 
+    text
