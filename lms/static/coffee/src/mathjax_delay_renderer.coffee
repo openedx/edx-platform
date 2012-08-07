@@ -8,11 +8,14 @@ class @MathJaxDelayRenderer
   elapsedTime: 0
   mathjaxDelay: 0
   mathjaxTimeout: undefined
-  bufferId: "mathjax_delay_buffer"
+  bufferId = "mathjax_delay_buffer"
+  numBuffers = 0
 
   constructor: (params) ->
     params = params || {}
     @maxDelay = params["maxDelay"] || @maxDelay
+    @bufferId = params["bufferId"] || (bufferId + numBuffers)
+    numBuffers += 1
     @$buffer = $("<div>").attr("id", @bufferId).css("display", "none").appendTo($("body"))
 
   # render: (params) ->
