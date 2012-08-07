@@ -15,6 +15,7 @@ import xmodule
 import capa.calc as calc
 import capa.capa_problem as lcp
 from capa.correctmap import CorrectMap
+from capa.util import convert_files_to_filenames
 from xmodule import graders, x_module
 from xmodule.x_module import ModuleSystem
 from xmodule.graders import Score, aggregate_scores
@@ -278,7 +279,6 @@ class StringResponseWithHintTest(unittest.TestCase):
 class CodeResponseTest(unittest.TestCase):
     '''
     Test CodeResponse
-
     '''
     def test_update_score(self):
         problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
@@ -327,7 +327,18 @@ class CodeResponseTest(unittest.TestCase):
                         self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be dequeued, message delivered
                     else:
                         self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be queued, message undelivered
-
+    
+    def test_convert_files_to_filenames(self):
+        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        fp = open(problem_file)
+        answers_with_file = {'1_2_1': 'String-based answer',
+                             '1_3_1': ['answer1', 'answer2', 'answer3'],
+                             '1_4_1': fp}
+        answers_converted = convert_files_to_filenames(answers_with_file)
+        self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
+        self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
+        self.assertEquals(answers_converted['1_4_1'], fp.name)
+        
 
 class ChoiceResponseTest(unittest.TestCase):
 
