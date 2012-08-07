@@ -283,8 +283,13 @@ initializeFollowThread = (thread) ->
       text.replace(/\&lt\;highlight\&gt\;/g, "<span class='search-highlight'>")
           .replace(/\&lt\;\/highlight\&gt\;/g, "</span>")
 
+    stripHighlight = (text, type) ->
+      text.replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, "")
+          .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, "")
+
+
     stripLatexHighlight = (text) ->
-      text
+      Discussion.processEachMathAndCode text, stripHighlight
 
     markdownWithHighlight = (text) ->
       converter = Markdown.getMathCompatibleConverter()
@@ -303,10 +308,7 @@ initializeFollowThread = (thread) ->
 
     $contentBody = $local(".content-body")
 
-    console.log "raw html:"
-    console.log $contentBody.html()
-    
-    $contentBody.html markdownWithHighlight $contentBody.html()
+    $contentBody.html Discussion.postMathJaxProcessor markdownWithHighlight $contentBody.html()
 
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")

@@ -95,12 +95,25 @@ wmdEditors = {}
       else
         success(response, textStatus, xhr)
 
+  postMathJaxProcessor: (text) ->
+    RE_INLINEMATH = /^\$([^\$]*)\$/g
+    RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g
+    Discussion.processEachMathAndCode text, (s, type) ->
+      if type == 'display'
+        s.replace RE_DISPLAYMATH, ($0, $1) ->
+          "\\[" + $1 + "\\]"
+      else if type == 'inline'
+        s.replace RE_INLINEMATH, ($0, $1) ->
+          "\\(" + $1 + "\\)"
+      else
+        s
+
   makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
     id = $content.attr("_id")
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = Discussion.urlFor('upload')
-    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl
+    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, Discussion.postMathJaxProcessor
     wmdEditors["#{cls_identifier}-#{id}"] = editor
     editor
 
@@ -164,3 +177,54 @@ wmdEditors = {}
         unfollowLink()
     else
       followLink()
+    
+  processEachMathAndCode: (text, processor) ->
+  
+    codeArchive = []
+
+    RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$].+?)\$\$(.*)$/m
+    RE_INLINEMATH = /^([^\$]*?)\$([^\$]+?)\$(.*)$/m
+
+    ESCAPED_DOLLAR = '@@ESCAPED_D@@'
+    ESCAPED_BACKSLASH = '@@ESCAPED_B@@'
+
+    processedText = ""
+
+    $div = $("<div>").html(text)
+
+    $div.find("code").each (index, code) ->
+      codeArchive.push $(code).html()
+      $(code).html(codeArchive.length - 1)
+
+    text = $div.html()
+    text = text.replace /\\\$/g, ESCAPED_DOLLAR
+
+    while true
+      if RE_INLINEMATH.test(text)
+        text = text.replace RE_INLINEMATH, ($0, $1, $2, $3) ->
+          processedText += $1 + processor("$" + $2 + "$", 'inline')
+          $3
+      else if RE_DISPLAYMATH.test(text)
+        text = text.replace RE_DISPLAYMATH, ($0, $1, $2, $3) ->
+          processedText += $1 + processor("$$" + $2 + "$$", 'display')
+          $3
+      else
+        processedText += text
+        break
+
+    text = processedText
+    text = text.replace(new RegExp(ESCAPED_DOLLAR), '\\$')
+
+    text = text.replace /\\\\\\\\/g, ESCAPED_BACKSLASH
+    text = text.replace /\\begin\{([a-z]*\*?)\}([\s\S]*?)\\end\{\1\}/img, ($0, $1, $2) ->
+      processor("\\begin{#{$1}}" + $2 + "\\end{#{$1}}")
+    text = text.replace(new RegExp(ESCAPED_BACKSLASH), '\\\\\\\\')
+
+    $div = $("<div>").html(text)
+    cnt = 0
+    $div.find("code").each (index, code) ->
+      $(code).html(processor(codeArchive[cnt], 'code'))
+      cnt += 1
+
+    $div.html()
+
