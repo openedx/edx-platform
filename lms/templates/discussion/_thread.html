@@ -39,8 +39,7 @@
       
       ${render_vote(content)}
       <div class="discussion-right-wrapper clearfix">
-        <div class="follow-wrapper">
-        </div>
+        
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
           <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
@@ -79,6 +78,7 @@
       ${render_info(content)}
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
+      <li><div class="follow-wrapper"></div></li>
       <li>${render_link("discussion-link discussion-edit", "Edit")}</li>
       <li>
       % if type == "comment" and request.user.is_staff:
@@ -105,7 +105,13 @@
   </div>
   <div class="comment-count">
     % if content.get('comments_count', -1) >= 0:
-     <a href="javascript:void(0)" class="discussion-show-comments"> Show ${content['comments_count']} comment(s)</a>
+      <a href="javascript:void(0)" class="discussion-show-comments"> 
+      % if content.get('comments_count', -1) >= 2:
+        Show ${content['comments_count']} comments
+      % else:
+        Show ${content['comments_count']} comment
+      % endif
+      </a>
     % endif
   </div>
 </%def>

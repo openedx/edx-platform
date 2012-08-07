@@ -170,38 +170,16 @@ $tag_text_color: #5b614f;
       box-shadow: inset 0 1px 0 #BBB,0 0 3px #CCC;
     }
   }
+
   //FOLLOW BUTTON
   .follow-wrapper {
-    float: right;
-
-    .discussion-link {
-      @include button;
-      background-color: #BEBEBE;
-      background-image: none;
-      border: none;
-      -webkit-box-shadow: none;
-      -moz-box-shadow: none;
-      box-shadow: none;
-      display: inline-block;
-      font-size: $comment_info_size;
-      padding: 5px 8px;
-      text-decoration: none;
-      text-shadow: none;
-
-      &:hover {
-        background-color: #AAA;
-        background-image: none;
-        border: none;
-        -webkit-box-shadow: none;
-        -moz-box-shadow: none;
-        box-shadow: none;
-      }
-    }
+    display: inline;
   }
+
   //VOTES
   .discussion-votes {
     float: left;
-    width: flex-grid(1);
+    width: 60px;
     margin-top: 18px;
     text-align: center;
 
@@ -263,10 +241,9 @@ $tag_text_color: #5b614f;
   }
   //CREATE NEW AND EDIT POSTS
   .discussion-right-wrapper {
-    float: left;
     min-height: 40px;
-    width: flex-grid(11);
-    margin: 24px 0;
+    // width: flex-grid(11);
+    margin: 24px 0 24px 68px;
   }
 
   .new-post-form, .discussion-thread-edit {
@@ -415,6 +392,7 @@ $tag_text_color: #5b614f;
 
       .comment-count {        
         display: inline;
+        margin-right: 20px;
       }
 
       .discussion-actions {        
@@ -424,19 +402,18 @@ $tag_text_color: #5b614f;
 
         li {
           display: inline;
-          margin-left: 20px;
+          margin-right: 20px;
         }
-      }
-
-      .discussion-reply {
-        margin-left: 4px;
       }
 
       .discussion-link {
         @include discussion-font;
         color: #1d9dd9;
         display: inline;
-        margin-left: 2px;
+
+        &.discussion-unfollow-thread {
+          color: #dea03e;
+        }
       }
     }
 
@@ -463,11 +440,16 @@ $tag_text_color: #5b614f;
     .comments {
       //display: none;
       // margin-left: $comment_margin_left;
-      margin-left: flex-grid(1);
+      // margin-left: flex-grid(1);
+      margin-left: 68px;
       overflow: hidden;
 
+      .discussion-votes {
+        margin-top: 8px;
+      }
+
       .discussion-right-wrapper {
-        margin: 10px 0;
+        margin: 10px 0 10px 68px;
       }
 
       .comment {
