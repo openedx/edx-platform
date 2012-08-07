@@ -87,7 +87,7 @@ $tag_text_color: #5b614f;
   }
 
   .search-wrapper {
-    height: 100px;
+    height: 110px;
   }
 
   .discussion-search-form {
@@ -287,13 +287,30 @@ $tag_text_color: #5b614f;
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
 
+    &.collapsed {
+      .wmd-button-row {
+        height: 0;
+      }
+
+      .wmd-input {
+        height: 100px;
+        @include border-radius(3px);
+      }
+
+      .wmd-preview {
+        height: 0;
+        padding: 0;
+        border-width: 0;
+      }
+    }
+
     .new-post-control {
       margin-left: 80%;
       margin-top: 1%;
     }
 
     .reply-post-control {
-      margin-left: 73%;
+      // margin-left: 73%;
     }
 
     .edit-post-control {
@@ -541,7 +558,7 @@ $tag_text_color: #5b614f;
   font-size: 0.8em;
   line-height: 1.6em;
   @include border-radius(3px 3px 0 0);
-  @include box-shadow(none);
+  // @include box-shadow(none);
 }
 
 .wmd-preview {
@@ -553,6 +570,8 @@ $tag_text_color: #5b614f;
   border: 1px solid #c8c8c8;
   border-top-width: 0;
   @include border-radius(0 0 3px 3px);
+  overflow: hidden;
+  @include transition(all, .1s, easeOut);
 
   &:before {
     content: 'PREVIEW';
@@ -578,6 +597,8 @@ $tag_text_color: #5b614f;
   margin-top: 10px;
   padding: 0px;  
   height: 20px;
+  overflow: hidden;
+  @include transition(all, .1s, easeOut);
 }
 
 .wmd-spacer
