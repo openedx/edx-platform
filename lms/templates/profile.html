@@ -25,91 +25,90 @@ ${profile_graphs.body(grade_summary, "grade-detail-graph")}
 var loc=true; // Activate on clicks? Not if already clicked.
 var lang=true;
 $(function() {
-      $("#change_location").click(function() {
-         $(this).hide();
+    $("#change_location").click(function() {
+       $(this).hide();
 
-         log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
+       log_event("profile", {"type":"location_show", "old":$("#location_sub").text()});
 
-         if(loc) {
-           $("#description").html('<div>'+
-                                  "Preferred format is city, state, country (so for us, "+
-                                  "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
-                                  "as much or as little detail as you want. </div>");
+       if(loc) {
+         $("#description").html('<div>'+
+                                "Preferred format is city, state, country (so for us, "+
+                                "&quot;Cambridge, Massachusetts, USA&quot;), but give "+
+                                "as much or as little detail as you want. </div>");
 
-           loc=false;
+         loc=false;
 
-           $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
-             '<input type="submit" id="change_loc_button" value="Save" />'+'</form>');
+         $("#location_sub").html('<form>'+'<input id="id_loc_text" type="text" name="loc_text" />'+
+           '<input type="submit" id="change_loc_button" value="Save" />'+'</form>');
 
-           $("#change_loc_button").click(function() {
-             $("#change_location").show();
+         $("#change_loc_button").click(function() {
+           $("#change_location").show();
 
-              postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
-                $("#location_sub").text(json.location);
-                loc=true;
-                $("#description").html("");
-               log_event("profile", {"type":"location_change", "new":json.location});
-              });
-           });
-         }
-      });
-
-      $('#change_password').click(function(){
-        $('.modal').trigger('click');
-        log_event("profile", {"type":"password_show"});
-      });
-
-    $('#pwd_reset_button').click(function() {
-      $.postWithPrefix('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
-                    "email"  : $('#id_email').val()}, function(data){
-         $("#password_reset_complete_link").click();
-         log_event("profile", {"type":"password_send"});
-      });
+            postJSON('/change_setting', {'location':$("#id_loc_text").attr("value")}, function(json) {
+              $("#location_sub").text(json.location);
+              loc=true;
+              $("#description").html("");
+             log_event("profile", {"type":"location_change", "new":json.location});
+            });
+         });
+       }
     });
 
-
-    $("#change_email_form").submit(function(){
-      var new_email = $('#new_email_field').val();
-      var new_password = $('#new_email_password').val();
-
-      postJSON('/change_email',{"new_email":new_email,
-                                "password":new_password},
-               function(data){
-          if(data.success){
-          $("#change_email").html("<h1>Please verify your new email</h1><p>You'll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.</p>");
-          } else {
-            $("#change_email_error").html(data.error);
-          }
-       });
-       log_event("profile", {"type":"email_change_request",
-                               "old_email":"${email}",
-                               "new_email":new_email});
-       return false;
+    $('#change_password').click(function(){
+      $('.modal').trigger('click');
+      log_event("profile", {"type":"password_show"});
     });
 
-    $("#change_name_form").submit(function(){
-      var new_name = $('#new_name_field').val();
-      var rationale = $('#name_rationale_field').val();
-
-      postJSON('/change_name',{"new_name":new_name,
-                                "rationale":rationale},
-               function(data){
-          if(data.success){
-          $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
-          } else {
-            $("#change_name_error").html(data.error);
-          }
-       });
-       log_event("profile", {"type":"name_change_request",
-                               "new_name":new_name,
-                               "rationale":rationale});
-       return false;
+  $('#pwd_reset_button').click(function() {
+    $.postWithPrefix('/password_reset/',{ "csrfmiddlewaretoken" : "${ csrf }",
+                  "email"  : $('#id_email').val()}, function(data){
+       $("#password_reset_complete_link").click();
+       log_event("profile", {"type":"password_send"});
     });
+  });
+
+
+  $("#change_email_form").submit(function(){
+    var new_email = $('#new_email_field').val();
+    var new_password = $('#new_email_password').val();
+
+    postJSON('/change_email',{"new_email":new_email,
+                              "password":new_password},
+             function(data){
+        if(data.success){
+        $("#change_email").html("<h1>Please verify your new email</h1><p>You'll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.</p>");
+        } else {
+          $("#change_email_error").html(data.error);
+        }
+     });
+     log_event("profile", {"type":"email_change_request",
+                             "old_email":"${email}",
+                             "new_email":new_email});
+     return false;
+  });
+
+  $("#change_name_form").submit(function(){
+    var new_name = $('#new_name_field').val();
+    var rationale = $('#name_rationale_field').val();
+
+    postJSON('/change_name',{"new_name":new_name,
+                              "rationale":rationale},
+             function(data){
+        if(data.success){
+        $("#apply_name_change").html("<h1>Your request has been submitted.</h1><p>We'll send you an e-mail when approve the change or need further information. Please allow for up to a week for us to process your request.</p>");
+        } else {
+          $("#change_name_error").html(data.error);
+        }
+     });
+     log_event("profile", {"type":"name_change_request",
+                             "new_name":new_name,
+                             "rationale":rationale});
+     return false;
+  });
 
 });
 </script>
 </%block>
-
 
 <%include file="course_navigation.html" args="active_page='profile'" />
 
@@ -149,7 +148,6 @@ $(function() {
                   </em>
                 %endif
               </p>
-
 
               %if len(section['scores']) > 0:
                 <section class="scores">
@@ -210,7 +208,7 @@ $(function() {
   </div>
 </section>
 
-<div id="password_reset_complete" class="leanModal_box">
+<div id="password_reset_complete" class="modal">
   <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
   <h1>Password Reset Email Sent</h1>
   <p>
@@ -218,83 +216,78 @@ $(function() {
   </p>
 </div>
 
-<div id="apply_name_change" class="leanModal_box">
-  <h1>Apply to change your name</h1>
-  <form id="change_name_form">
-    <div id="change_name_error"> </div>
-    <fieldset>
-      <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p>
-      <ul>
-        <li>
-          <label>Enter your desired full name, as it will appear on the <span class="edx">edX</span> Certificate: </label>
-          <input id="new_name_field" value="" type="text" />
-        </li>
-        <li>
-          <label>Reason for name change:</label>
-          <textarea id="name_rationale_field" value=""></textarea>
-        </li>
-        <li>
-          <input type="submit" id="submit">
-        </li>
-      </ul>
-    </fieldset>
-  </form>
+<div id="apply_name_change" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Apply to change your name</h2>
+      <hr />
+    </header>
+    <form id="change_name_form">
+      <div id="change_name_error"> </div>
+      <fieldset>
+        <p>To uphold the credibility of <span class="edx">edX</span> certificates, name changes must go through an approval process. A member of the course staff will review your request, and if approved, update your information. Please allow up to a week for your request to be processed. Thank you.</p>
+        <label>Enter your desired full name, as it will appear on the <span class="edx">edX</span> Certificate: </label>
+        <input id="new_name_field" value="" type="text" />
+        <label>Reason for name change:</label>
+        <textarea id="name_rationale_field" value=""></textarea>
+        <input type="submit" id="submit">
+      </fieldset>
+    </form>
+  </div>
 </div>
 
-<div id="change_email" class="leanModal_box">
-  <h1>Change e-mail</h1>
+<div id="change_email" class="modal">
+  <div class="inner-wrapper">
+  <header>
+    <h2>Change e-mail</h2>
+    <hr />
+  </header>
   <div id="apply_name_change_error"></div>
   <form id="change_email_form">
     <div id="change_email_error"> </div>
     <fieldset>
-      <ul>
-        <li>
-          <label> Please enter your new email address: </label>
-          <input id="new_email_field" type="email" value="" />
-        </li>
+      <label> Please enter your new email address: </label>
+      <input id="new_email_field" type="email" value="" />
+      <label> Please confirm your password: </label>
+      <input id="new_email_password" value="" type="password" />
+      <p>We will send a confirmation to both ${email} and your new e-mail as part of the process.</p>
+      <input type="submit" id="submit_email_change" />
+    </fieldset>
+  </form>
+  </div>
+</div>
 
-        <li>
-          <label> Please confirm your password: </label>
-          <input id="new_email_password" value="" type="password" />
-        </li>
-        <li>
-          <p>We will send a confirmation to both ${email} and your new e-mail as part of the process.</p>
-          <input type="submit" id="submit_email_change" />
-        </li>
-      </ul>
+<div id="deactivate-account" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Deactivate <span class="edx">edX</span> Account</h2>
+      <hr />
+    </header>
+    <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
+    <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
+
+    <form id="unenroll_form">
+      <div id="unenroll_error"> </div>
+      <fieldset>
+        <input type="submit" id="" value="Yes, I don't want an edX account or hear about any new classes or updates to edX" />
       </fieldset>
     </form>
+  </div>
 </div>
 
-<div id="deactivate-account" class="leanModal_box">
-  <h1>Deactivate <span class="edx">edX</span> Account</h1>
-  <p>Once you deactivate you&rsquo;re MIT<em>x</em> account you will no longer recieve updates and new class announcements from MIT<em>x</em>.</p>
-  <p>If you&rsquo;d like to still get updates and new class announcements you can just <a href="#unenroll" rel="leanModal">unenroll</a> and keep your account active.</p>
+<div id="unenroll" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Unenroll from 6.002x</h2>
+      <hr />
+    </header>
+    <p>Please note: you will still receive updates and new class announcements from ed<em>X</em>. If you don&rsquo;t wish to receive any more updates or announcements <a href="#deactivate-account" rel="leanModal">deactivate your account</a>.</p>
 
-  <form id="unenroll_form">
-    <div id="unenroll_error"> </div>
-    <fieldset>
-      <ul>
-        <li>
-          <input type="submit" id="" value="Yes, I don't want an edX account or hear about any new classes or updates to edX" />
-        </li>
-      </ul>
-    </fieldset>
-  </form>
-</div>
-
-<div id="unenroll" class="leanModal_box">
-  <h1>Unenroll from 6.002x</h1>
-  <p>Please note: you will still receive updates and new class announcements from ed<em>X</em>. If you don&rsquo;t wish to receive any more updates or announcements <a href="#deactivate-account" rel="leanModal">deactivate your account</a>.</p>
-
-  <form id="unenroll_form">
-    <div id="unenroll_error"> </div>
-    <fieldset>
-      <ul>
-        <li>
-          <input type="submit" id="" value="Yes, I want to unenroll from 6.002x but still hear about any new classes or updates to edX" />
-        </li>
-      </ul>
-    </fieldset>
-  </form>
+    <form id="unenroll_form">
+      <div id="unenroll_error"> </div>
+      <fieldset>
+        <input type="submit" id="" value="Yes, I want to unenroll from 6.002x but still hear about any new classes or updates to edX" />
+      </fieldset>
+    </form>
+  </div>
 </div>

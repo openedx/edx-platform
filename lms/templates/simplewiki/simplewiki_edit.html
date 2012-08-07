@@ -65,12 +65,10 @@ ${"Edit " + wiki_title + " - " if wiki_title is not UNDEFINED else ""}MITx 6.002
   </div>
   ${wiki_form}
   %if create_article:
-  <input type="submit" id="submit_edit" value="Create article" /></td>
+  <input type="submit" id="submit_edit" value="Create article" />
   %else:
   <input type="submit" id="submit_edit" name="edit" value="Save Changes" />
   <input type="submit" id="submit_delete" name="delete" value="Delete article" />
-  %endif
-</form>
 
 <%include file="simplewiki_instructions.html"/>
 
