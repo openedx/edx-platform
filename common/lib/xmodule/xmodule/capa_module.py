@@ -562,6 +562,8 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
+    
+    stores_state = True
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

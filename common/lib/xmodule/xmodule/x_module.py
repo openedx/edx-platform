@@ -303,6 +303,10 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
+    
+    # Attributes for inpsection of the descriptor
+    stores_state = False # Indicates wether the xmodule state should be 
+    # stored in a database (independent of shared state)
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (

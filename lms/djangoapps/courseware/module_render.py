@@ -127,19 +127,18 @@ def get_module(user, request, location, student_module_cache, position=None):
     descriptor = modulestore().get_item(location)
     
     #TODO Only check the cache if this module can possibly have state
+    instance_module = None
+    shared_module = None
     if user.is_authenticated():
-        instance_module = student_module_cache.lookup(descriptor.category,
-                                              descriptor.location.url())
+        if descriptor.stores_state:
+            instance_module = student_module_cache.lookup(descriptor.category,
+                                                  descriptor.location.url())
         
         shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
-        else:
-            shared_module = None
-    else:
-        instance_module = None
-        shared_module = None
+        
         
 
     instance_state = instance_module.state if instance_module is not None else None
@@ -206,6 +205,11 @@ def get_instance_module(user, module, student_module_cache):
         or None if this is an anonymous user
     """
     if user.is_authenticated():
+        if not module.descriptor.stores_state:
+            log.exception("Attempted to get the instance_module for a module " 
+                          + str(module.id) + " which does not store state.")
+            return None
+        
         instance_module = student_module_cache.lookup(module.category,
                                               module.location.url())
         

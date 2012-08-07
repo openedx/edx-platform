@@ -107,6 +107,8 @@ class SequenceModule(XModule):
 class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    
+    stores_state = True # For remembering where in the sequence the student is
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
