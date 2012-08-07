@@ -43,6 +43,8 @@ def replace_static_urls(get_html, prefix, module):
 
     @wraps(get_html)
     def _get_html():
+        if type(module) in [SequenceModule, VerticalModule]:	# TODO: make this more general, eg use an XModule attribute instead
+            return get_html()
         return replace_urls(get_html(), staticfiles_prefix=prefix)
     return _get_html
 
