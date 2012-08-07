@@ -189,8 +189,51 @@ $tag_text_color: #5b614f;
     float: left;
     width: flex-grid(1);
     text-align: center;
-    // height: flex-grid(3);
-    // margin: 1% 2%;
+
+    .discussion-vote {      
+      display: block;      
+      width: 50px;
+      height: 19px;
+      margin: auto;
+      background: url(../images/vote-arrows.png) no-repeat;
+      font-size: 15px;
+      font-weight: bold;
+      color: black;
+      @include hide-text;
+      @include transition(all, 0, easeOut);
+    }
+
+    .discussion-vote-up {
+      margin-bottom: 3px;
+      background-position: -50px -1px;      
+
+      &:hover {
+        background-position: -50px -3px;
+        @include transition-duration(0.05s);
+      }
+
+      &.voted {
+        background-position: 0 -1px;
+        color: #1C71DD;
+        @include transition-duration(0);
+      }
+    }
+
+    .discussion-vote-down {
+      margin-top: 5px;
+      background-position: -50px -30px;
+
+      &:hover {
+        background-position: -50px -28px;
+        @include transition-duration(0.05s);
+      }
+
+      &.voted {
+        background-position: 0 -30px;
+        color: #1C71DD;
+        @include transition-duration(0);
+      }
+    }
     
 
     .discussion-vote-count {
@@ -202,36 +245,13 @@ $tag_text_color: #5b614f;
       font-size: 1em;
       font-weight: bold;
     }
-
-    a.discussion-vote {
-      color: black;
-      display: block;
-      font-size: 15px;
-      font-weight: bold;
-
-      &:hover {
-        color: #1C71DD;
-        text-decoration: none;
-      }
-
-      &.discussion-vote-up {
-        margin-bottom: 3px;
-      }
-
-      &.discussion-vote-down {
-        margin-top: 5px;
-      }
-
-      &.voted {
-        color: #1C71DD;
-      }
-    }
   }
   //CREATE NEW AND EDIT POSTS
   .discussion-right-wrapper {
     float: left;
     min-height: 40px;
-    width: 90%;
+    // width: 90%;
+    width: flex-grid(11);
   }
 
   .new-post-form, .discussion-thread-edit {
