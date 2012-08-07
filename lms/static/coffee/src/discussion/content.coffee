@@ -78,6 +78,7 @@ initializeFollowThread = (thread) ->
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
+          Discussion.setContentInfo response.content['id'], 'can_reply', true
           Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
@@ -195,6 +196,51 @@ initializeFollowThread = (thread) ->
             else
               $(content).removeClass("endorsed")
 
+    handleOpenClose = (elem, text) ->
+      url = Discussion.urlFor('openclose_thread', id)
+      closed = undefined
+      if text.match(/Close/)
+        closed = true
+      else if text.match(/[Oo]pen/)
+        closed = false
+      else
+        return console.log "Unexpected text " + text + "for open/close thread."
+
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {closed: closed}
+        success: (response, textStatus) =>
+          if textStatus == "success"
+            if closed
+              $(content).addClass("closed")
+              $(elem).text "Re-open Thread"
+            else
+              $(content).removeClass("closed")
+              $(elem).text "Close Thread"
+        error: (response, textStatus, e) ->
+          console.log e
+
+    handleDelete = (elem) ->
+      if $content.hasClass("thread")
+        url = Discussion.urlFor('delete_thread', id)
+      else
+        url = Discussion.urlFor('delete_comment', id)
+
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: "json"
+        data: {}
+        success: (response, textStatus) =>
+          if textStatus == "success"
+            $(content).remove()
+        error: (response, textStatus, e) ->
+          console.log e
+
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
@@ -271,11 +317,17 @@ initializeFollowThread = (thread) ->
       "click .discussion-endorse": ->
         handleEndorse(this, $(this).is(":checked"))
 
+      "click .discussion-openclose": ->
+        handleOpenClose(this, $(this).text())
+
       "click .discussion-edit": ->
         if $content.hasClass("thread")
           handleEditThread(this)
         else
           handleEditComment(this)
+
+      "click .discussion-delete": ->
+        handleDelete(this)
 
   initializeContent: (content) ->
 
@@ -314,3 +366,9 @@ initializeFollowThread = (thread) ->
     id = $content.attr("_id")
     if not Discussion.getContentInfo id, 'editable'
       $local(".discussion-edit").remove()
+    if not Discussion.getContentInfo id, 'can_reply'
+      $local(".discussion-reply").remove()
+    if not Discussion.getContentInfo id, 'can_endorse'
+      $local(".discussion-endorse-control").remove()
+    if not Discussion.getContentInfo id, 'can_delete'
+      $local(".discussion-delete").remove()
