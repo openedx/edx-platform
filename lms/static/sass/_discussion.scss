@@ -217,9 +217,12 @@ form label {
       margin-left: -5%;
     }
     .new-post-similar-posts-wrapper {
+      @include border-radius(3px);
+      border: 1px solid #EEE;
       font-size: $comment_body_size;
       line-height: 150%;
-      padding: 1%;
+      margin-top: 1%;
+      padding: 1% 1.5%;
     }
     .new-post-similar-posts {
       font: inherit;
