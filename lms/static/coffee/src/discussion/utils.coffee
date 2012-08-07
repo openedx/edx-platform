@@ -182,7 +182,7 @@ wmdEditors = {}
   
     codeArchive = []
 
-    RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$].+?)\$\$(.*)$/m
+    RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]+?)\$\$(.*)$/m
     RE_INLINEMATH = /^([^\$]*?)\$([^\$]+?)\$(.*)$/m
 
     ESCAPED_DOLLAR = '@@ESCAPED_D@@'
