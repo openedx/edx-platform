@@ -15,7 +15,7 @@ from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
 from capa.util import convert_files_to_filenames
 from progress import Progress
-from util.decorators import lazyproperty
+from xmodule.util.decorators import lazyproperty
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
