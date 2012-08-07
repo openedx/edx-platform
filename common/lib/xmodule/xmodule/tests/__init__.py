@@ -32,7 +32,7 @@ i4xs = ModuleSystem(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))),
     debug=True,
-    xqueue=None,
+    xqueue={'interface':None, 'callback_url':'/', 'default_queuename':'null'},
     is_staff=False
 )
 
