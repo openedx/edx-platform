@@ -214,7 +214,9 @@ form label {
     .discussion-errors {
       color: #8F0E0E;
       display: block;
-      margin-left: -5%;
+      font: inherit;
+      font-size: $comment_body_size;
+      margin-left: -3%;
     }
     .new-post-similar-posts-wrapper {
       @include border-radius(3px);
@@ -223,6 +225,9 @@ form label {
       line-height: 150%;
       margin-top: 1%;
       padding: 1% 1.5%;
+    }
+    .hide-similar-posts {
+      float: right;
     }
     .new-post-similar-posts {
       font: inherit;
@@ -255,6 +260,13 @@ form label {
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
+    .discussion-errors {
+      color: #8F0E0E;
+      display: block;
+      font: inherit;
+      font-size: $comment_body_size;
+      margin-left: -3%;
+    }
     a:hover {
       color: #1C71DD;
       text-decoration: none;
