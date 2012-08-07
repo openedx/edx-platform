@@ -15,11 +15,16 @@
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
   </div>
   <%include file="_sort.html" />
-  <div class="threads">
-    % for thread in threads:
-      ${renderer.render_thread(course_id, thread, show_comments=False)}
-    % endfor
-  </div>
+  % if len(threads) == 0:
+    <%include file="_blank_slate.html" />
+    <div class="threads"></div>
+  % else:
+    <div class="threads">
+      % for thread in threads:
+        ${renderer.render_thread(course_id, thread, show_comments=False)}
+      % endfor
+    </div>
+  % endif
   <%include file="_paginator.html" />
 </section>
 
