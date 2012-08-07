@@ -216,6 +216,12 @@ form label {
       display: block;
       margin-left: -5%;
     }
+    .new-post-similar-posts {
+      .similar-post {
+        display: block;
+      }
+
+    }
     .new-post-body {
       margin-top: flex-gutter();
     }
