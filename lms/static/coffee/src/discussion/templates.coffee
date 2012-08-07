@@ -11,7 +11,7 @@ Discussion = @Discussion
       <ul class="discussion-errors"></ul>    
       <input type="text" class="new-post-title title-input" placeholder="Title"/>
       <div class="new-post-similar-posts-wrapper" style="display: none">
-        Do you mean... <a class="hide-similar-posts" href="javascript:void(0)">No you got it wrong lol</a>
+        Similar Posts: <a class="hide-similar-posts" href="javascript:void(0)">These are not what I want</a>
         <div class="new-post-similar-posts"></div>
       </div>
       <div class="new-post-body body-input"></div>
