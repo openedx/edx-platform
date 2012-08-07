@@ -23,8 +23,8 @@ urlpatterns = patterns('django_comment_client.base.views',
     url(r'comments/(?P<comment_id>[\w\-]+)/unvote$', 'undo_vote_for_comment', name='undo_vote_for_comment'),
     
     url(r'(?P<commentable_id>[\w\-]+)/threads/create$', 'create_thread', name='create_thread'),
+    # TODO should we search within the board?
+    url(r'(?P<commentable_id>[\w\-]+)/threads/search_similar$', 'search_similar_threads', name='search_similar_threads'),
     url(r'(?P<commentable_id>[\w\-]+)/follow$', 'follow_commentable', name='follow_commentable'),
     url(r'(?P<commentable_id>[\w\-]+)/unfollow$', 'unfollow_commentable', name='unfollow_commentable'),
-
-    url(r'search$', 'search', name='search'),
 )
