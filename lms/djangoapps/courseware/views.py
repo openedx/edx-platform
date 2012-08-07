@@ -48,7 +48,6 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
-
 def user_groups(user):
     if not user.is_authenticated():
         return []
@@ -59,6 +58,8 @@ def user_groups(user):
 
     # Kill caching on dev machines -- we switch groups a lot
     group_names = cache.get(key)
+    if settings.DEBUG:
+        group_names = None
 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
@@ -82,18 +83,17 @@ def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
     course = check_course(course_id)
-
+        
     student_objects = User.objects.all()[:100]
     student_info = []
-
-    for student in student_objects:
-        student_module_cache = StudentModuleCache(student, course)
-        course, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
+    
+    #TODO: Only select students who are in the course
+    for student in student_objects:        
         student_info.append({
             'username': student.username,
             'id': student.id,
             'email': student.email,
-            'grade_info': grades.grade_sheet(student, course, student_module_cache),
+            'grade_summary': grades.grade(student, request, course),
             'realname': UserProfile.objects.get(user=student).name
         })
 
@@ -116,18 +116,23 @@ def profile(request, course_id, student_id=None):
 
     user_info = UserProfile.objects.get(user=student)
 
-    student_module_cache = StudentModuleCache(request.user, course)
-    course_module, _, _, _ = get_module(request.user, request, course.location, student_module_cache)
-
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
+    course_module = get_module(request.user, request, course.location, student_module_cache)
+    
+    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    grade_summary = grades.grade(request.user, request, course, student_module_cache)
+    
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
                'language': user_info.language,
                'email': student.email,
                'course': course,
-               'csrf': csrf(request)['csrf_token']
+               'csrf': csrf(request)['csrf_token'],
+               'courseware_summary' : courseware_summary,
+               'grade_summary' : grade_summary
                }
-    context.update(grades.grade_sheet(student, course_module, course.grader, student_module_cache))
+    context.update()
 
     return render_to_response('profile.html', context)
 
@@ -198,11 +203,12 @@ def index(request, course_id, chapter=None, section=None,
         if look_for_module:
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
-                student_module_cache = StudentModuleCache(request.user,
+                student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+                                                          request.user,
                                                           section_descriptor)
-                module, _, _, _ = get_module(request.user, request,
-                                             section_descriptor.location,
-                                             student_module_cache)
+                module = get_module(request.user, request,
+                                    section_descriptor.location,
+                                    student_module_cache)
                 context['content'] = module.get_html()
             else:
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"

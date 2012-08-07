@@ -26,9 +26,9 @@
   <%include file="navigation.html" />
   <section class="content-wrapper">
     ${self.body()}
+    <%block name="bodyextra"/>
   </section>
 
-  <%block name="bodyextra"/>
   <%include file="footer.html" />
 
   <%static:js group='application'/>
