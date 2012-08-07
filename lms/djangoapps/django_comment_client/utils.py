@@ -65,7 +65,7 @@ def initialize_discussion_info(request, course):
 
     def _get_module(module_descriptor):
         print module_descriptor
-        module = get_module(user, request, module_descriptor.location, student_module_cache)[0]
+        module = get_module(user, request, module_descriptor.location, student_module_cache)
         return module
 
     def _extract_info(module):
@@ -82,7 +82,7 @@ def initialize_discussion_info(request, course):
                                         filter(_is_course_discussion,
                                                get_full_modules().items()))
 
-    student_module_cache = StudentModuleCache(user, course)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course)
 
     discussion_info = map(_extract_info, map(_get_module, discussion_module_descriptors))
 
