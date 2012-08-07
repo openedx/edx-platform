@@ -16,6 +16,14 @@ $discussion_input_width: 100%;
   }
 }
 
+form label {
+  @include discussion-font;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  text-shadow: none;
+}
+
 .discussion {
   .discussion-non-content {
     margin-left: flex-gutter();
