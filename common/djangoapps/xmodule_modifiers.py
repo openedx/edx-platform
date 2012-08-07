@@ -34,7 +34,7 @@ def wrap_xmodule(get_html, module, template):
     return _get_html
 
 
-def replace_static_urls(get_html, prefix):
+def replace_static_urls(get_html, prefix, module):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -43,6 +43,8 @@ def replace_static_urls(get_html, prefix):
 
     @wraps(get_html)
     def _get_html():
+        if type(module) in [SequenceModule, VerticalModule]:	# TODO: make this more general, eg use an XModule attribute instead
+            return get_html()
         return replace_urls(get_html(), staticfiles_prefix=prefix)
     return _get_html
 

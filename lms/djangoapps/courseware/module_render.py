@@ -191,7 +191,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
-        module.metadata['data_dir']
+        module.metadata['data_dir'], module
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
