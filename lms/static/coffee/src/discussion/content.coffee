@@ -126,7 +126,7 @@ initializeFollowThread = (thread) ->
       else
         view = {
           id: id
-          title: $local(".thread-title").html()
+          title: $local(".thread-raw-title").html()
           body: $local(".thread-raw-body").html()
           tags: $local(".thread-raw-tags").html()
         }
