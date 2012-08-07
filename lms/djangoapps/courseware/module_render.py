@@ -256,7 +256,6 @@ def get_shared_instance_module(user, module, student_module_cache):
     else:
         return None
 
-
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
     '''
@@ -274,13 +273,12 @@ def xqueue_callback(request, userid, id, dispatch):
     user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, modulestore().get_item(id))
-    instance = get_module(request.user, request, id, student_module_cache)
-    
-    instance_module = get_instance_module(request.user, instance, student_module_cache)
+    instance = get_module(user, request, id, student_module_cache)
+    instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
-                  id, request.user)
+                  id, user)
         raise Http404
 
     oldgrade = instance_module.grade
