@@ -2,9 +2,17 @@ ${module_content}
 %if edit_link:
 <div><a href="${edit_link}">Edit</a></div>
 % endif
+
+<script type="text/javascript"> 
+$('#${element_id}_showhide').click(function(){$('#${element_id}_debug').toggle(); })
+</script> 
+
 <div class="staff_info">
+<input type="submit" id="${element_id}_showhide" value="Staff Debug Info"/>
+<span style="display:none" id="${element_id}_debug">
 definition = <pre>${definition | h}</pre>
 metadata = ${metadata | h}
+</span>
 </div>
 %if render_histogram:
 <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
