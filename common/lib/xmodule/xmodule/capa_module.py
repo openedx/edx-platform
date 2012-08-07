@@ -564,6 +564,7 @@ class CapaDescriptor(RawDescriptor):
     module_class = CapaModule
     
     stores_state = True
+    has_score = True
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they

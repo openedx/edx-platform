@@ -183,8 +183,8 @@ def get_score(user, problem, student_module_cache):
     problem: an XModule
     cache: A StudentModuleCache
     """
-    if not problem.descriptor.stores_state:
-        # These are not problems, and do not store state
+    if not problem.descriptor.stores_state or not problem.descriptor.has_score:
+        # These are not problems, and do not have a score
         return (None, None)
     
     correct = 0.0
