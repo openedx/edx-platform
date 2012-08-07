@@ -18,7 +18,7 @@
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
 <script>
-${profile_graphs.body(grade_summary, "grade-detail-graph")}
+${profile_graphs.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")}
 </script>
 
 <script>
