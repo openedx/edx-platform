@@ -20,6 +20,7 @@ import traceback
 import hashlib
 import abc
 import os
+import subprocess
 import xml.sax.saxutils as saxutils
 
 # specific library imports
@@ -297,7 +298,6 @@ class JavascriptResponse(LoncapaResponse):
 
         if self.generator:
             self.problem_state = self.generate_problem_state()
-            print self.problem_state
         else:
             self.problem_state = None
         
@@ -370,17 +370,19 @@ class JavascriptResponse(LoncapaResponse):
     def generate_problem_state(self):
 
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
-        node_path = os.path.normpath(js_dir)
+        tmp_env = os.environ.copy()
+        node_path = tmp_env["NODE_PATH"] + ":" + os.path.normpath(js_dir)
+        tmp_env["NODE_PATH"] = node_path
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
-        command = "NODE_PATH=$NODE_PATH:%s node %s %s '%s' '%s' '%s'" % (node_path, 
-                                                                    generator_file, 
-                                                                    self.generator, 
-                                                                    json.dumps(self.generator_dependencies),
-                                                                    json.dumps(self.system.seed), 
-                                                                    json.dumps(self.params))
-        node_process = os.popen(command)
-        output = node_process.readline().strip()
-        node_process.close()
+        output = subprocess.check_output(["node",
+                                          generator_file, 
+                                          self.generator, 
+                                          json.dumps(self.generator_dependencies),
+                                          json.dumps(self.system.seed), 
+                                          json.dumps(self.params)
+                                          ],
+                                          env=tmp_env).strip()
+
         return json.loads(output)
 
     def extract_params(self):
@@ -423,22 +425,25 @@ class JavascriptResponse(LoncapaResponse):
     def run_grader(self, submission):
         if submission is None or submission == '':
             submission = json.dumps(None)
+
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
-        node_path = os.path.normpath(js_dir)
+        tmp_env = os.environ.copy()
+        node_path = tmp_env["NODE_PATH"] + ":" + os.path.normpath(js_dir)
+        tmp_env["NODE_PATH"] = node_path
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
-        command = "NODE_PATH=$NODE_PATH:%s node %s '%s' '%s' '%s' '%s' '%s'" % (node_path, 
-                                                              grader_file, 
-                                                              self.grader, 
-                                                              json.dumps(self.grader_dependencies),
-                                                              submission, 
-                                                              json.dumps(self.problem_state), 
-                                                              json.dumps(self.params))
-        print command
-        node_process = os.popen(command)
-        all_correct = json.loads(node_process.readline().strip())
-        evaluation = node_process.readline().strip()
-        solution = node_process.readline().strip()
-        node_process.close()
+        outputs = subprocess.check_output(["node",
+                                           grader_file, 
+                                           self.grader, 
+                                           json.dumps(self.grader_dependencies),
+                                           submission, 
+                                           json.dumps(self.problem_state), 
+                                           json.dumps(self.params)
+                                          ],
+                                          env=tmp_env).split('\n')
+
+        all_correct = json.loads(outputs[0].strip())
+        evaluation  = outputs[1].strip()
+        solution    = outputs[2].strip()
         return (all_correct, evaluation, solution)
     
     def get_answers(self):
