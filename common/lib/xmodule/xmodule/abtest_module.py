@@ -103,7 +103,9 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         experiment = xml_object.get('experiment')
 
         if experiment is None:
-            raise InvalidDefinitionError("ABTests must specify an experiment. Not found in:\n{xml}".format(xml=etree.tostring(xml_object, pretty_print=True)))
+            raise InvalidDefinitionError(
+                "ABTests must specify an experiment. Not found in:\n{xml}"
+                .format(xml=etree.tostring(xml_object, pretty_print=True)))
 
         definition = {
             'data': {
@@ -127,7 +129,9 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)
 
-        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'].items())
+        default_portion = 1 - sum(
+            portion for (name, portion) in definition['data']['group_portions'].items())
+
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 

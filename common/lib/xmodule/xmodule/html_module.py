@@ -13,6 +13,7 @@ from .html_checker import check_html
 
 log = logging.getLogger("mitx.courseware")
 
+
 class HtmlModule(XModule):
     def get_html(self):
         return self.html
@@ -36,18 +37,19 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     # are being edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
-        origpath = path
         if path.endswith('.html.xml'):
-            path = path[:-9] + '.html'  #backcompat--look for html instead of xml
+            path = path[:-9] + '.html'  # backcompat--look for html instead of xml
         candidates = []
         while os.sep in path:
             candidates.append(path)
             _, _, path = path.partition(os.sep)
 
         # also look for .html versions instead of .xml
-        if origpath.endswith('.xml'):
-            candidates.append(origpath[:-4] + '.html')
-        return candidates
+        nc = []
+        for candidate in candidates:
+            if candidate.endswith('.xml'):
+                nc.append(candidate[:-4] + '.html')
+        return candidates + nc
 
     # NOTE: html descriptors are special.  We do not want to parse and
     # export them ourselves, because that can break things (e.g. lxml
@@ -69,7 +71,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
             cls.clean_metadata_from_xml(definition_xml)
-            return {'data' : stringify_children(definition_xml)}
+            return {'data': stringify_children(definition_xml)}
         else:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
@@ -80,7 +82,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
+                log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
@@ -95,7 +97,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                         log.warning(msg)
                         system.error_tracker("Warning: " + msg)
 
-                    definition = {'data' : html}
+                    definition = {'data': html}
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
@@ -109,17 +111,11 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                 # add more info and re-raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
-    @classmethod
-    def split_to_file(cls, xml_object):
-        '''Never include inline html'''
-        return True
-
-
     # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):
         '''If the contents are valid xml, write them to filename.xml.  Otherwise,
-        write just the <html filename=""> tag to filename.xml, and the html
+        write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
         string to filename.html.
         '''
         try:
@@ -138,4 +134,3 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", self.url_name)
         return elt
-
