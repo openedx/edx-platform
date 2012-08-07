@@ -679,10 +679,7 @@ class ModuleSystem(object):
              TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
-        if xqueue is None:
-            self.xqueue = {'interface':None, 'callback_url':'/', 'default_queuename':'null'}
-        else:
-            self.xqueue = xqueue
+        self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
