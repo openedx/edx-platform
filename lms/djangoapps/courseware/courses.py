@@ -182,7 +182,7 @@ def get_courses_by_university(user):
     courses = sorted(courses, key=lambda course: course.number)
     universities = defaultdict(list)
     for course in courses:
-        if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             if not has_access_to_course(user,course):
                 continue
         universities[course.org].append(course)
