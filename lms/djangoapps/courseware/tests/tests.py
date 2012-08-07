@@ -135,9 +135,24 @@ class ActivateLoginTestCase(TestCase):
 class PageLoader(ActivateLoginTestCase):
     ''' Base class that adds a function to load all pages in a modulestore '''
 
+
+    def enroll(self, course):
+        resp = self.client.post('/change_enrollment', {
+            'enrollment_action': 'enroll',
+            'course_id': course.id,
+            })
+        data = parse_json(resp)
+        self.assertTrue(data['success'])
+
     def check_pages_load(self, course_name, data_dir, modstore):
         print "Checking course {0} in {1}".format(course_name, data_dir)
         import_from_xml(modstore, data_dir, [course_name])
+
+        # enroll in the course before trying to access pages
+        courses = modstore.get_courses()
+        self.assertEqual(len(courses), 1)
+        course = courses[0]
+        self.enroll(course)
 
         n = 0
         num_bad = 0

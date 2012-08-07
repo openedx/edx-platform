@@ -2,9 +2,13 @@ ${module_content}
 %if edit_link:
 <div><a href="${edit_link}">Edit</a></div>
 % endif
+
 <div class="staff_info">
+<a href="javascript:void(0)" onclick="javascript:$('#${element_id}_debug').toggle()">Staff Debug Info</a>
+<span style="display:none" id="${element_id}_debug">
 definition = <pre>${definition | h}</pre>
 metadata = ${metadata | h}
+</span>
 </div>
 %if render_histogram:
 <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>

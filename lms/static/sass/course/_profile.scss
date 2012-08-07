@@ -10,38 +10,26 @@ div.profile-wrapper {
 
     header {
       @extend .bottom-border;
-      margin: 0 ;
-      padding: lh(.5) lh();
+      margin: 0;
+      padding: lh(.5);
 
       h1 {
-        font-size: 18px;
         margin: 0;
         padding-right: 30px;
-      }
-
-      a {
-        color: #999;
-        font-size: 12px;
-        position: absolute;
-        right: lh(.5);
-        text-transform: uppercase;
-        top: 13px;
-
-        &:hover {
-          color: #555;
-        }
       }
     }
 
     ul {
       list-style: none;
+      padding: 0;
+      margin: 0;
 
       li {
         border-bottom: 1px solid #d3d3d3;
         @include box-shadow(0 1px 0 #eee);
         color: lighten($text-color, 10%);
         display: block;
-        padding: 7px lh();
+        padding: lh(.5) 0 lh(.5) lh(.5);
         position: relative;
         text-decoration: none;
         @include transition();
@@ -144,11 +132,14 @@ div.profile-wrapper {
     @extend .content;
 
     header {
-      @extend h1.top-header;
       @extend .clearfix;
+      @extend h1.top-header;
+      margin-bottom: lh();
 
       h1 {
         float: left;
+        font-size: 1em;
+        font-weight: 100;
         margin: 0;
       }
     }
@@ -162,6 +153,7 @@ div.profile-wrapper {
       border-top: 1px solid #e3e3e3;
       list-style: none;
       margin-top: lh();
+      padding-left: 0;
 
       > li {
         @extend .clearfix;
@@ -178,9 +170,11 @@ div.profile-wrapper {
           border-right: 1px dashed #ddd;
           @include box-sizing(border-box);
           display: table-cell;
+          letter-spacing: 0;
           margin: 0;
           padding: 0;
           padding-right: flex-gutter(9);
+          text-transform: none;
           width: flex-grid(2, 9);
         }
 
@@ -203,14 +197,39 @@ div.profile-wrapper {
 
             h3 {
               color: #666;
+
+              span {
+                color: #999;
+                font-size: em(14);
+                font-weight: 100;
+              }
             }
 
-            ol {
-              list-style: none;
+            p {
+              color: #999;
+              font-size: em(14);
+            }
 
-              li {
-                display: inline-block;
-                padding-right: 1em;
+            section.scores {
+              margin: lh(.5) 0;
+
+              h3 {
+                font-size: em(14);
+                @include inline-block;
+              }
+
+              ol {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                @include inline-block;
+
+                li {
+                  @include inline-block;
+                  font-size: em(14);
+                  font-weight: normal;
+                  padding-right: 1em;
+                }
               }
             }
           }
