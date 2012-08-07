@@ -87,10 +87,10 @@ sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
-node_paths = [PROJECT_ROOT / "lib/node_modules", 
-              PROJECT_ROOT / "static/js", 
-              PROJECT_ROOT / "static/coffee/src", 
-              PROJECT_ROOT / "static/coffee/src/modules"]
+node_paths = [COMMON_ROOT / "lib/node_modules", 
+              COMMON_ROOT / "static/js/vendor", 
+              COMMON_ROOT / "static/coffee/src", 
+              ]
 node_path = ':'.join(node_paths)
                           
 os.environ["NODE_PATH"] = node_path
