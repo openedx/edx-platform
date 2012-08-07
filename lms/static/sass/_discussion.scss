@@ -424,7 +424,7 @@ $tag_text_color: #5b614f;
 
       .discussion-reply-new {
         @include discussion-font;
-        margin-left: 5%;
+        margin-left: 68px;
 
         .reply-body {
           @include discussion-font;
@@ -500,6 +500,14 @@ $tag_text_color: #5b614f;
       }
     }
   }
+
+  &.inline-discussion {
+    .discussion-new-post-inline {
+      textarea {
+
+      }
+    }
+  }
 }
 
 //EDITOR STYLES
@@ -516,22 +524,44 @@ $tag_text_color: #5b614f;
   background-color: Silver; 
 }
 
-.wmd-input 
-{ 
+.wmd-input {
   height: 150px;
   width: 100%;
-  background-color: Gainsboro;
-  border: 1px solid DarkGray;
-  font: inherit;
+  background-color: #e9e9e9;
+  border: 1px solid #c8c8c8;
+  font-family: Monaco, 'Lucida Console', monospace;
+  font-style: normal;
+  font-size: 12px;
+  @include border-radius(3px 3px 0 0);
+  @include box-shadow(none);
 }
 
-.wmd-preview 
-{ 
-  background-color: #c0e0ff;
+.wmd-preview {
+  position: relative;
+  font-family: $sans-serif;
+  padding: 25px 20px 10px 20px;
+  box-sizing: border-box;
+  border: 1px solid #c8c8c8;
+  border-top-width: 0;
+  @include border-radius(0 0 3px 3px);
+
+  &:before {
+    content: 'PREVIEW';
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    font-size: 11px;
+    color: #bbb;
+  }
+  
+
+  p {
+    font-family: $sans-serif;
+  }
+  background-color: #fafafa;
 }
 
-.wmd-button-row 
-{
+.wmd-button-row {
   position: relative; 
   margin-left: 5px;
   margin-right: 5px;
