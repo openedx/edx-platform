@@ -83,13 +83,20 @@ end
     task :pylint => "pylint_#{system}"
 end
 
+$failed_tests = 0
 
-def run_tests(system, report_dir)
+def run_tests(system, report_dir, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
-    sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each))
+    sh(django_admin(system, :test, 'test', *Dir["#{system}/djangoapps/*"].each)) do |ok, res|
+        if !ok and stop_on_failure
+            abort "Test failed!"
+        end
+        $failed_tests += 1 unless ok
+    end
 end
 
+TEST_TASKS = []
 
 [:lms, :cms].each do |system|
     report_dir = File.join(REPORT_DIR, system.to_s)
@@ -97,15 +104,16 @@ end
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}" => ["clean_test_files", "#{system}:collectstatic:test", "fasttest_#{system}"]
+    task "test_#{system}", [:stop_on_failure] => ["clean_test_files", "#{system}:collectstatic:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}" => [report_dir, :predjango] do
-        run_tests(system, report_dir)
+    task "fasttest_#{system}", [:stop_on_failure] => [report_dir, :predjango] do |t, args|
+        args.with_defaults(:stop_on_failure => 'true')
+        run_tests(system, report_dir, args.stop_on_failure)
     end
 
-    task :test => "test_#{system}"
+    TEST_TASKS << "test_#{system}"
 
     desc <<-desc
         Start the #{system} locally with the specified environment (defaults to dev).
@@ -142,7 +150,17 @@ Dir["common/lib/*"].each do |lib|
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
-    task :test => task_name
+    TEST_TASKS << task_name
+end
+
+task :test do
+    TEST_TASKS.each do |task|
+        Rake::Task[task].invoke(false)
+    end
+
+    if $failed_tests > 0
+        abort "Tests failed!"
+    end
 end
 
 task :runserver => :lms
