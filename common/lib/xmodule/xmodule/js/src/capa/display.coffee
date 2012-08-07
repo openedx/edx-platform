@@ -214,11 +214,11 @@ class @Problem
 
       data = $(element).find(".javascriptinput_data")
 
-      params        = JSON.parse(data.attr("data-params"))
-      submission    = JSON.parse(data.attr("data-submission"))
-      evaluation    = JSON.parse(data.attr("data-evaluation"))
-      problemState  = JSON.parse(data.attr("data-problem_state"))
-      displayClass  = eval(data.attr("data-display_class"))
+      params        = data.data("params")
+      submission    = data.data("submission")
+      evaluation    = data.data("evaluation")
+      problemState  = data.data("problem_state")
+      displayClass  = window[data.data('display_class')]
 
       container = $(element).find(".javascriptinput_container")
       submissionField = $(element).find(".javascriptinput_input")
