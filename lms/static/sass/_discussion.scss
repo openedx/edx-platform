@@ -34,8 +34,8 @@ div.recent-activity {
   a.recent-active-post {
     display: block;
     font-size: $comment_body_size;
-    line-height: 150%;
-    margin-top: 5px;
+    line-height: 120%;
+    margin-top: 8px;
 
     &:hover {
       color: #1C71DD;
