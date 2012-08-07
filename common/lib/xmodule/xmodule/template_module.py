@@ -2,6 +2,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
+from util.decorators import lazyproperty
 
 
 class CustomTagModule(XModule):
@@ -33,21 +34,26 @@ class CustomTagModule(XModule):
 
         xmltree = etree.fromstring(self.definition['data'])
         if 'impl' in xmltree.attrib:
-            template_name = xmltree.attrib['impl']
+            self._template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
             child_impl = xmltree.find('impl')
             if child_impl is not None:
-                template_name = child_impl.text
+                self._template_name = child_impl.text
             else:
                 # TODO (vshnayder): better exception type
                 raise Exception("Could not find impl attribute in customtag {0}"
                                 .format(location))
+        
+        self._params = dict(xmltree.items())
 
-        params = dict(xmltree.items())
+
+    @lazyproperty
+    def html(self):
         with self.system.filestore.open(
-                'custom_tags/{name}'.format(name=template_name)) as template:
-            self.html = Template(template.read()).render(**params)
+                'custom_tags/{name}'.format(name=self._template_name)) as template:
+            return Template(template.read()).render(**self._params)
+        
 
     def get_html(self):
         return self.html
