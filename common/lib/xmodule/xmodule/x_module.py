@@ -142,7 +142,7 @@ class XModule(HTMLSnippet):
     # in the module
     icon_class = 'other'
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         '''
         Construct a new xmodule
@@ -188,6 +188,7 @@ class XModule(HTMLSnippet):
         self.system = system
         self.location = Location(location)
         self.definition = definition
+        self.descriptor = descriptor
         self.instance_state = instance_state
         self.shared_state = shared_state
         self.id = self.location.url()
@@ -426,6 +427,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             system,
             self.location,
             self.definition,
+            self,
             metadata=self.metadata
         )
 

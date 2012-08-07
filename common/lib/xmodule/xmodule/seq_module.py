@@ -25,9 +25,9 @@ class SequenceModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    def __init__(self, system, location, definition, instance_state=None,
+    def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.position = 1
 

@@ -80,9 +80,9 @@ class CapaModule(XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, definition, instance_state=None,
+    def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state,
+        XModule.__init__(self, system, location, definition, descriptor, instance_state,
                          shared_state, **kwargs)
 
         self.attempts = 0
