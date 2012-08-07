@@ -1,0 +1,8 @@
+<div class="recent-activity">
+  Recent Activity:
+
+<div class="recent-active-posts">
+  % for thread in recent_active_threads:
+    <a class="recent-active-post" href="javascript:void(0)">${thread['title']}</a>
+  % endfor
+</div>
