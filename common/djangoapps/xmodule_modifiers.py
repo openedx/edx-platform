@@ -1,9 +1,15 @@
+import re
 import json
+import logging
+
 from django.conf import settings
 from functools import wraps
 from static_replace import replace_urls
 from mitxmako.shortcuts import render_to_string
+from xmodule.seq_module import SequenceModule
+from xmodule.vertical_module import VerticalModule
 
+log = logging.getLogger("mitx.xmodule_modifiers")
 
 def wrap_xmodule(get_html, module, template):
     """
@@ -69,27 +75,31 @@ def add_histogram(get_html, module):
     the output of the old get_html function with additional information
     for admin users only, including a histogram of student answers and the
     definition of the xmodule
+
+    Does nothing if module is a SequenceModule
     """
     @wraps(get_html)
     def _get_html():
+
+        if type(module) in [SequenceModule, VerticalModule]:	# TODO: make this more general, eg use an XModule attribute instead
+            return get_html()
+
         module_id = module.id
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
 
-        # TODO: fixme - no filename in module.xml in general (this code block
-        # for edx4edx) the following if block is for summer 2012 edX course
-        # development; it will change when the CMS comes online
-        if settings.MITX_FEATURES.get('DISPLAY_EDIT_LINK') and settings.DEBUG and module_xml.get('filename') is not None:
-            coursename = multicourse_settings.get_coursename_from_request(request)
-            github_url = multicourse_settings.get_course_github_url(coursename)
-            fn = module_xml.get('filename')
-            if module_xml.tag=='problem': fn = 'problems/' + fn	# grrr
-            edit_link = (github_url + '/tree/master/' + fn) if github_url is not None else None
-            if module_xml.tag=='problem': edit_link += '.xml'	# grrr
+        # TODO (ichuang): Remove after fall 2012 LMS migration done
+        if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+            [filepath, filename] = module.definition.get('filename','')
+            osfs = module.system.filestore
+            if filename is not None and osfs.exists(filename):
+                filepath = filename	# if original, unmangled filename exists then use it (github doesn't like symlinks)
+            data_dir = osfs.root_path.rsplit('/')[-1]
+            edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filepath)
         else:
             edit_link = False
 
-        staff_context = {'definition': json.dumps(module.definition, indent=4),
+        staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'element_id': module.location.html_id(),
                          'edit_link': edit_link,
@@ -99,3 +109,4 @@ def add_histogram(get_html, module):
         return render_to_string("staff_problem_info.html", staff_context)
 
     return _get_html
+

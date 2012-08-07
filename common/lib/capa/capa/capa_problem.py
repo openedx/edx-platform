@@ -31,7 +31,7 @@ import calc
 from correctmap import CorrectMap
 import eia
 import inputtypes
-from util import contextualize_text
+from util import contextualize_text, convert_files_to_filenames
 
 # to be replaced with auto-registering
 import responsetypes
@@ -39,7 +39,7 @@ import responsetypes
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
-entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup']
+entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup', 'filesubmission']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
 response_properties = ["responseparam", "answer"]    	# these get captured as student responses
 
@@ -228,12 +228,18 @@ class LoncapaProblem(object):
 
         Calls the Response for each question in this problem, to do the actual grading.
         '''
-        self.student_answers = answers
+        
+        self.student_answers = convert_files_to_filenames(answers)
+        
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
         # log.debug('Responders: %s' % self.responders)
-        for responder in self.responders.values():
-            results = responder.evaluate_answers(answers, oldcmap)      # call the responsetype instance to do the actual grading
+        for responder in self.responders.values():                  # Call each responsetype instance to do actual grading
+            if 'filesubmission' in responder.allowed_inputfields:   # File objects are passed only if responsetype 
+                                                                    #   explicitly allows for file submissions
+                results = responder.evaluate_answers(answers, oldcmap)
+            else:
+                results = responder.evaluate_answers(convert_files_to_filenames(answers), oldcmap)
             newcmap.update(results)
         self.correct_map = newcmap
         # log.debug('%s: in grade_answers, answers=%s, cmap=%s' % (self,answers,newcmap))
