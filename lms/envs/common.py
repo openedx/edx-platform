@@ -305,6 +305,8 @@ MIDDLEWARE_CLASSES = (
     'askbot.middleware.spaceless.SpacelessMiddleware',
     # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'django_comment_client.utils.ViewNameMiddleware',
 )
 
 ############################### Pipeline #######################################
