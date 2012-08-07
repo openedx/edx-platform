@@ -367,12 +367,17 @@ class JavascriptResponse(LoncapaResponse):
 
         self.display_class = self.display_xml.get("class")
     
-    def generate_problem_state(self):
+    def get_node_env(self):
 
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
         tmp_env = os.environ.copy()
         node_path = tmp_env["NODE_PATH"] + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
+        return tmp_env
+
+
+    def generate_problem_state(self):
+
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
         output = subprocess.check_output(["node",
                                           generator_file, 
@@ -381,7 +386,7 @@ class JavascriptResponse(LoncapaResponse):
                                           json.dumps(str(self.system.seed)), 
                                           json.dumps(self.params)
                                           ],
-                                          env=tmp_env).strip()
+                                          env=self.get_node_env()).strip()
 
         return json.loads(output)
 
@@ -426,10 +431,6 @@ class JavascriptResponse(LoncapaResponse):
         if submission is None or submission == '':
             submission = json.dumps(None)
 
-        js_dir = os.path.join(self.system.filestore.root_path, 'js')
-        tmp_env = os.environ.copy()
-        node_path = tmp_env["NODE_PATH"] + ":" + os.path.normpath(js_dir)
-        tmp_env["NODE_PATH"] = node_path
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
         outputs = subprocess.check_output(["node",
                                            grader_file, 
@@ -439,7 +440,7 @@ class JavascriptResponse(LoncapaResponse):
                                            json.dumps(self.problem_state), 
                                            json.dumps(self.params)
                                           ],
-                                          env=tmp_env).split('\n')
+                                          env=self.get_node_env()).split('\n')
 
         all_correct = json.loads(outputs[0].strip())
         evaluation  = outputs[1].strip()
