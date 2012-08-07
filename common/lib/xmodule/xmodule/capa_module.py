@@ -141,7 +141,7 @@ class CapaModule(XModule):
     def lcp(self):
         if self.rerandomize == 'never':
             seed = 1
-        elif self.rerandomize == "per_student" and hasattr(system, 'id'):
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
             seed = system.id
         else:
             seed = None
@@ -167,7 +167,7 @@ class CapaModule(XModule):
                                 (self.location.url(), msg))
                 return LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    instance_state, seed=seed, system=self.system)
+                    self._instance_state, seed=seed, system=self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
