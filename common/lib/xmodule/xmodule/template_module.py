@@ -26,9 +26,9 @@ class CustomTagModule(XModule):
         More information given in <a href="/book/234">the text</a>
     """
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
 
         xmltree = etree.fromstring(self.definition['data'])
