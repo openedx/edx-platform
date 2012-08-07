@@ -45,6 +45,9 @@ form label {
       margin-left: 5px;
     }
   }
+  .blank {
+    margin: 2%;
+  }
   //SORTING
   .discussion-sort {
     float: right;
@@ -237,12 +240,10 @@ form label {
   }
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
-    a {
-      &:hover {
-        color: #1C71DD;
-        text-decoration: none;
-      };
-    }
+    a:hover {
+      color: #1C71DD;
+      text-decoration: none;
+    };
     .new-post-control {
       margin-left: 80%;
       margin-top: 1%;
