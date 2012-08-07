@@ -2,7 +2,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
-from util.decorators import lazyproperty
+from xmodule.util.decorators import lazyproperty
 
 
 class CustomTagModule(XModule):
