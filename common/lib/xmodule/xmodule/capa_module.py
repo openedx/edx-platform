@@ -139,6 +139,13 @@ class CapaModule(XModule):
 
     @lazyproperty
     def lcp(self):
+        """
+        Loading the problem can be fairly expensive, so we do this lazily.
+        
+        This can throw errors. Always be sure to use try/catch before
+        displaying modules to a user.
+        """
+        
         if self.rerandomize == 'never':
             seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
