@@ -77,7 +77,7 @@ initializeFollowDiscussion = (discussion) ->
             $wrapper.show()
             for thread in response
               #singleThreadUrl = Discussion.urlFor 'retrieve_single_thread 
-              $similarPost = $("<a>").addClass("simialr-post")
+              $similarPost = $("<a>").addClass("similar-post")
                                      .html(thread["title"])
                                      .attr("href", "javascript:void(0)") #TODO
                                      .appendTo($similarPosts)
