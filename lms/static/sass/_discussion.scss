@@ -326,6 +326,7 @@ form label {
       font-size: $comment_body_size;
       margin-bottom: 4px;
       margin-top: 3px;
+      min-height: 35px;
       p {
         @include discussion-font;
         margin: 0;
