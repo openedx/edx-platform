@@ -130,7 +130,7 @@ class CapaModule(XModule):
         if weight_string:
             self.weight = float(weight_string)
         else:
-            self.weight = 1
+            self.weight = None
 
         if self.rerandomize == 'never':
             seed = 1

@@ -9,7 +9,7 @@ from xmodule import graders
 from xmodule.graders import Score
 from models import StudentModule
 
-_log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
     for child in module.get_display_items():
@@ -83,12 +83,13 @@ def grade(student, request, course, student_module_cache=None):
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
             else:
                 section_total = Score(0.0, 1.0, False, section_name)
-                graded_possible = 1.0 #if s.metadata.get("graded", False) else 0.0
-                graded_total = Score(0.0, graded_possible, True, section_name)
+                graded_total = Score(0.0, 1.0, True, section_name)
                 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
+            else:
+                log.exception("Unable to grade a section with a total possible score of zero. " + str(section_descriptor.id))
         
         totaled_scores[section_format] = format_scores
     
@@ -207,8 +208,11 @@ def get_score(user, problem, student_module_cache):
 
     if correct is not None and total is not None:
         #Now we re-weight the problem, if specified
-        weight = getattr(problem, 'weight', 1)
-        if weight != 1:
+        weight = getattr(problem, 'weight', None)
+        if weight is not None:
+            if total == 0:
+                log.exception("Cannot reweight a problem with zero weight. Problem: " + str(instance_module))
+                return (correct, total)
             correct = correct * weight / total
             total = weight
 
