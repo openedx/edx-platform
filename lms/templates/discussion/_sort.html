@@ -3,9 +3,9 @@
 <%def name="link_to_sort(key, title)">
   % if key == sort_key:
     % if sort_order.lower() == 'desc':
-      ${_link_to_sort(key, 'asc', title + ' &#x25BC;', 'sorted')}
+      ${_link_to_sort(key, 'asc', title + '', 'sorted')}
     % else:
-      ${_link_to_sort(key, 'desc', title + ' &#x25B2;', 'sorted')}
+      ${_link_to_sort(key, 'desc', title + '', 'sorted')}
     % endif
   % else:
     ${_link_to_sort(key, 'desc', title)}
@@ -24,12 +24,12 @@
 </%def>
     
 <div class="discussion-sort">
-  Sort by:
+  <span class="discussion-label">Sort by:</span>
   ${link_to_sort('top', 'top')}
-  |
+  
   ${link_to_sort('date', 'date')}
-  |
+  
   ${link_to_sort('votes', 'votes')}
-  |
+  
   ${link_to_sort('comments', 'comments')}
 </div>
