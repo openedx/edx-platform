@@ -77,7 +77,7 @@ VIEW_PERMISSIONS = {
     'openclose_thread'  :       ('openclose_thread'),
     'create_sub_comment':       (['create_sub_comment', 'open']),
     'delete_comment'    :       ('delete_comment'),
-    'vote_for_commend'  :       (['vote', 'open']),
+    'vote_for_comment'  :       (['vote', 'open']),
     'undo_vote_for_comment':    (['unvote', 'open']),
     'vote_for_thread'   :       (['vote', 'open']),
     'undo_vote_for_thread':     (['unvote', 'open']),
