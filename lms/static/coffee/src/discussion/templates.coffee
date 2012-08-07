@@ -10,6 +10,10 @@ Discussion = @Discussion
     <form class="new-post-form" _id="{{discussion_id}}">
       <ul class="discussion-errors"></ul>    
       <input type="text" class="new-post-title title-input" placeholder="Title"/>
+      <div class="new-post-similar-posts-wrapper" style="display: none">
+        Do you mean...
+        <div class="new-post-similar-posts"></div>
+      </div>
       <div class="new-post-body body-input"></div>
       <input class="new-post-tags" placeholder="Tags"/>
       <div class = "new-post-control">
