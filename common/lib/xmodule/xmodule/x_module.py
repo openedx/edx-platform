@@ -308,6 +308,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     # Attributes for inpsection of the descriptor
     stores_state = False # Indicates wether the xmodule state should be 
     # stored in a database (independent of shared state)
+    has_score = False # This indicates whether the xmodule is a problem-type.
+    # It should respond to max_score() and grade(). It can be graded or ungraded
+    # (like a practice problem).
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
