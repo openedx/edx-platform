@@ -39,13 +39,13 @@ def convert_files_to_filenames(answers):
     '''
     new_answers = dict()
     for answer_id in answers.keys():
-        if is_uploaded_file(answers[answer_id]):
+        if is_file(answers[answer_id]):
             new_answers[answer_id] = answers[answer_id].name
         else:
             new_answers[answer_id] = answers[answer_id]
     return new_answers
 
-def is_uploaded_file(file_to_test):
+def is_file(file_to_test):
     '''
     Duck typing to check if 'file_to_test' is a File object
     '''
