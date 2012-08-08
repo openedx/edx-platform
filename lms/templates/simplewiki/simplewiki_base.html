@@ -71,9 +71,9 @@
 
   });
   </script>
-  
+
   <%block name="wiki_head"/>
-  
+
 </%block>
 
 <%block name="bodyextra">
@@ -86,7 +86,7 @@
   <div class="wiki-wrapper">
     <%block name="wiki_panel">
     <div aria-label="Wiki Navigation" id="wiki_panel">
-    <h2>Course Wiki</h2>
+      <h2>Course Wiki</h2>
       <ul class="action">
         <li>
           <h3>
@@ -101,12 +101,12 @@
 
           <div id="wiki_create_form">
             <%
-              baseURL = wiki_reverse("wiki_create", course=course, kwargs={"article_path" : namespace + "/" })
+            baseURL = wiki_reverse("wiki_create", course=course, kwargs={"article_path" : namespace + "/" })
             %>
             <form method="GET" onsubmit="this.action='${baseURL}' + this.wiki_article_name.value.replace(/([^a-zA-Z0-9\-])/g, '');">
               <div>
                 <label for="id_wiki_article_name">Title of article</label>
-                <input type="text" name="wiki_article_name" id="id_wiki_article_name" /><br/>
+                <input type="text" name="wiki_article_name" id="id_wiki_article_name" />
               </div>
               <ul>
                 <li>
@@ -130,31 +130,31 @@
     </%block>
 
     <section class="wiki-body">
-        %if wiki_article is not UNDEFINED:
-        <header>
-          %if wiki_article.locked:
-          <p><strong>This article has been locked</strong></p>
-          %endif
-          <p>Last modified: ${wiki_article.modified_on.strftime("%b %d, %Y, %I:%M %p")}</p>
-          %endif
-
-          %if wiki_article is not UNDEFINED:
-          <ul>
-
-            <li>
-              <a href="${ wiki_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
-            </li>
-
-            <li>
-              <a href="${ wiki_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
-            </li>
-
-            <li>
-              <a href="${ wiki_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
-            </li>
-          </ul>
-        </header>
+      %if wiki_article is not UNDEFINED:
+      <header>
+        %if wiki_article.locked:
+        <p><strong>This article has been locked</strong></p>
         %endif
+        <p>Last modified: ${wiki_article.modified_on.strftime("%b %d, %Y, %I:%M %p")}</p>
+        %endif
+
+        %if wiki_article is not UNDEFINED:
+        <ul>
+
+          <li>
+            <a href="${ wiki_reverse('wiki_view', wiki_article, course)}" class="view">View</a>
+          </li>
+
+          <li>
+            <a href="${ wiki_reverse('wiki_edit', wiki_article, course)}" class="edit">Edit</a>
+          </li>
+
+          <li>
+            <a href="${ wiki_reverse('wiki_history', wiki_article, course)}" class="history">History</a>
+          </li>
+        </ul>
+      </header>
+      %endif
 
       <%block name="wiki_page_title"/>
       <%block name="wiki_body"/>

@@ -1,6 +1,7 @@
-<%page args="grade_summary, graph_div_id, **kwargs"/>
+<%page args="grade_summary, grade_cutoffs, graph_div_id, **kwargs"/>
 <%!
   import json
+  import math
 %>
 
 $(function () {
@@ -89,8 +90,16 @@ $(function () {
   ticks += [ [overviewBarX, "Total"] ]
   tickIndex += 1 + sectionSpacer
   
-  totalScore = grade_summary['percent']
+  totalScore = math.floor(grade_summary['percent'] * 100) / 100 #We floor it to the nearest percent, 80.9 won't show up like a 90 (an A)
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
+  
+  
+  ## ----------------------------- Grade cutoffs ------------------------- ##
+  
+  grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
+  for grade in ['A', 'B', 'C']:
+      percent = grade_cutoffs[grade]
+      grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
   %>
   
   var series = ${ json.dumps( series ) };
@@ -98,6 +107,7 @@ $(function () {
   var bottomTicks = ${ json.dumps(bottomTicks) };
   var detail_tooltips = ${ json.dumps(detail_tooltips) };
   var droppedScores = ${ json.dumps(droppedScores) };
+  var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
   //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
@@ -107,10 +117,10 @@ $(function () {
               lines: {show: false, steps: false },
               bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
-    yaxis: {ticks: [[1, "100%"], [0.87, "A 87%"], [0.7, "B 70%"], [0.6, "C 60%"], [0, "0%"]], min: 0.0, max: 1.0, labelWidth: 50},
+    yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 50},
     grid: { hoverable: true, clickable: true, borderWidth: 1,
-      markings: [ {yaxis: {from: 0.87, to: 1 }, color: "#ddd"}, {yaxis: {from: 0.7, to: 0.87 }, color: "#e9e9e9"}, 
-                  {yaxis: {from: 0.6, to: 0.7 }, color: "#f3f3f3"}, ] },
+      markings: [ {yaxis: {from: ${grade_cutoffs['A']}, to: 1 }, color: "#ddd"}, {yaxis: {from: ${grade_cutoffs['B']}, to: ${grade_cutoffs['A']} }, color: "#e9e9e9"}, 
+                  {yaxis: {from: ${grade_cutoffs['C']}, to: ${grade_cutoffs['B']} }, color: "#f3f3f3"}, ] },
     legend: {show: false},
   };
   

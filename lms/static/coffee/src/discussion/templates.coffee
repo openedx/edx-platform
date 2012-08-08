@@ -8,10 +8,11 @@ Discussion = @Discussion
 
   newPostTemplate: """
     <form class="new-post-form" _id="{{discussion_id}}">
-      <ul class="discussion-errors"></ul>    
+      <ul class="discussion-errors new-post-form-error"></ul>    
       <input type="text" class="new-post-title title-input" placeholder="Title"/>
       <div class="new-post-similar-posts-wrapper" style="display: none">
-        Do you mean...
+        Similar Posts: 
+        <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
         <div class="new-post-similar-posts"></div>
       </div>
       <div class="new-post-body body-input"></div>
