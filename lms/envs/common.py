@@ -49,6 +49,17 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+
+    'ENABLE_TEXTBOOK' : True,
+    'ENABLE_DISCUSSION' : True,
+
+    'ENABLE_SQL_TRACKING_LOGS': False,
+    'ENABLE_LMS_MIGRATION': False,
+
+    # extrernal access methods
+    'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
+    'AUTH_USE_OPENID': False,
+    'AUTH_USE_MIT_CERTIFICATES' : False,
 }
 
 # Used for A/B testing

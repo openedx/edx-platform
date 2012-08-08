@@ -64,6 +64,7 @@
     % else:
       <a class="thread-title" name="${content['id']}" href="javascript:void(0)">${content['title'] | h}</a>
     % endif
+    <div class="thread-raw-title" style="display: none">${content['title']}</div>
   % endif
 </%def>
 
@@ -116,7 +117,7 @@
     % if content['anonymous']:
       anonymous
     % else:
-      user No.${content['user_id']}
+      ${content['username']} <!---# TODO add link to user-->
     % endif
   </div>
   <div class="comment-count">

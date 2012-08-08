@@ -12,8 +12,10 @@ class @Problem
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
     window.update_schematics()
+    @inputs = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]")
     @$('section.action input:button').click @refreshAnswers
-    @$('section.action input.check').click @check
+    @$('section.action input.check').click @check_fd
+    #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
@@ -44,6 +46,51 @@ class @Problem
       # properly.
       $('head')[0].appendChild(s[0])
       $(placeholder).remove()
+
+  ###
+  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
+  #      in addition to simple querystring-based answers
+  #
+  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
+  #       maybe preferable to consolidate all dispatches to use FormData
+  ###
+  check_fd: =>
+    Logger.log 'problem_check', @answers
+
+    # If there are no file inputs in the problem, we can fall back on @check
+    if $('input:file').length == 0 
+      @check()
+      return
+
+    if not window.FormData
+      alert "Sorry, your browser does not support file uploads. Your submit request could not be fulfilled. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      return
+
+    fd = new FormData()
+    
+    @inputs.each (index, element) ->
+      if element.type is 'file'
+        if element.files[0] instanceof File
+          fd.append(element.id, element.files[0])
+        else
+          fd.append(element.id, '')
+      else
+        fd.append(element.id, element.value)
+
+    settings = 
+      type: "POST"
+      data: fd
+      processData: false
+      contentType: false
+      success: (response) => 
+        switch response.success
+          when 'incorrect', 'correct'
+            @render(response.contents)
+            @updateProgress response
+          else
+            alert(response.success)
+
+    $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     Logger.log 'problem_check', @answers
@@ -109,4 +156,4 @@ class @Problem
       element.schematic.update_value()
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
-    @answers = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]").serialize()
+    @answers = @inputs.serialize()

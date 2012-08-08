@@ -1,4 +1,3 @@
-from collections import defaultdict
 import json
 import logging
 import urllib
@@ -37,7 +36,7 @@ from xmodule.course_module import CourseDescriptor
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import check_course
+from courseware.courses import check_course, get_courses_by_university
 
 
 import comment_client
@@ -72,18 +71,11 @@ def user_groups(user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
-    # TODO: Clean up how 'error' is done.
-
-    # filter out any courses that errored.
-    courses = [c for c in modulestore().get_courses()
-               if isinstance(c, CourseDescriptor)]
-    courses = sorted(courses, key=lambda course: course.number)
-    universities = defaultdict(list)
-    for course in courses:
-        universities[course.org].append(course)
-
+    '''
+    Render "find courses" page.  The course selection work is done in courseware.courses.
+    '''
+    universities = get_courses_by_university(request.user)
     return render_to_response("courses.html", {'universities': universities})
-
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
@@ -164,6 +156,7 @@ def render_accordion(request, course, chapter, section):
     return render_to_string('accordion.html', context)
 
 
+@login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
@@ -186,6 +179,10 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     '''
     course = check_course(course_id)
+    registered = registered_for_course(course, request.user)
+    if not registered:
+        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        return redirect(reverse('about_course', args=[course.id]))
 
     try:
         context = {
@@ -279,14 +276,19 @@ def course_info(request, course_id):
 
     return render_to_response('info.html', {'course': course})
 
+
+def registered_for_course(course, user):
+    '''Return CourseEnrollment if user is registered for course, else False'''
+    if user is None:
+        return False
+    if user.is_authenticated():
+        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+    else:
+        return False
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    def registered_for_course(course, user):
-        if user.is_authenticated():
-            return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
-        else:
-            return False
     course = check_course(course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
@@ -301,7 +303,7 @@ def university_profile(request, org_id):
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses = [c for c in all_courses if c.org == org_id]
+    courses = get_courses_by_university(request.user)[org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
