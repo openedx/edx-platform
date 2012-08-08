@@ -173,6 +173,9 @@ MODULESTORE = {
     }
 }
 
+############################ SIGNAL HANDLERS ################################
+# This is imported to register the exception signal handling that logs exceptions
+import monitoring.exceptions  # noqa
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -285,7 +288,6 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'util.middleware.ExceptionLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
