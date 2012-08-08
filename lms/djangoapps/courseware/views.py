@@ -27,7 +27,8 @@ from xmodule.course_module import CourseDescriptor
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import check_course, get_courses_by_university
+from courseware.courses import (check_course, get_courses_by_university,
+                                has_staff_access_to_course)
 
 
 log = logging.getLogger("mitx.courseware")
@@ -70,18 +71,18 @@ def gradebook(request, course_id):
         raise Http404
     course = check_course(course_id)
 
-    student_objects = User.objects.all()[:100]
-    student_info = []
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
-    #TODO: Only select students who are in the course
-    for student in student_objects:
-        student_info.append({
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': grades.grade(student, request, course),
-            'realname': UserProfile.objects.get(user=student).name
-        })
+    # TODO (vshnayder): implement pagination.
+    enrolled_students = enrolled_students[:1000]   # HACK!
+
+    student_info = [{'username': student.username,
+                     'id': student.id,
+                     'email': student.email,
+                     'grade_summary': grades.grade(student, request, course),
+                     'realname': UserProfile.objects.get(user=student).name
+                     }
+                     for student in enrolled_students]
 
     return render_to_response('gradebook.html', {'students': student_info, 'course': course})
 
