@@ -156,8 +156,6 @@ def has_staff_access_to_course(user, course):
     # note this is the Auth group, not UserTestGroup
     user_groups = [x[1] for x in user.groups.values_list()]
     staff_group = course_staff_group_name(course)
-    log.debug('course %s, staff_group %s, user %s, groups %s' % (
-        course, staff_group, user, user_groups))
     if staff_group in user_groups:
         return True
     return False
