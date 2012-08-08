@@ -119,9 +119,9 @@ class CapaModule(XModule):
         if self.show_answer == "":
             self.show_answer = "closed"
 
-        if instance_state != None:
+        if instance_state is not None:
             instance_state = json.loads(instance_state)
-        if instance_state != None and 'attempts' in instance_state:
+        if instance_state is not None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
         self.name = only_one(dom2.xpath('/problem/@name'))
@@ -130,7 +130,7 @@ class CapaModule(XModule):
         if weight_string:
             self.weight = float(weight_string)
         else:
-            self.weight = 1
+            self.weight = None
 
         if self.rerandomize == 'never':
             seed = 1
@@ -238,7 +238,7 @@ class CapaModule(XModule):
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
-                  }
+                   }
 
         # We using strings as truthy values, because the terminology of the
         # check button is context-specific.
@@ -563,6 +563,11 @@ class CapaDescriptor(RawDescriptor):
 
     module_class = CapaModule
 
+    # Capa modules have some additional metadata:
+    # TODO (vshnayder): do problems have any other metadata?  Do they
+    # actually use type and points?
+    metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
@@ -572,8 +577,3 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-
-    @classmethod
-    def split_to_file(cls, xml_object):
-        '''Problems always written in their own files'''
-        return True

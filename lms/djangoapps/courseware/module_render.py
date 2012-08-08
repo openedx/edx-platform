@@ -50,9 +50,9 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     chapters with name 'hidden' are skipped.
     '''
-
-    student_module_cache = StudentModuleCache(user, course, depth=2)
-    (course, _, _, _) = get_module(user, request, course.location, student_module_cache)
+    
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
+    course = get_module(user, request, course.location, student_module_cache)
 
     chapters = list()
     for chapter in course.get_display_items():
@@ -121,25 +121,26 @@ def get_module(user, request, location, student_module_cache, position=None):
       - position              : extra information from URL for user-specified
                                 position within module
 
-    Returns:
-      - a tuple (xmodule instance, instance_module, shared_module, module category).
-        instance_module is a StudentModule specific to this module for this student,
-            or None if this is an anonymous user
-        shared_module is a StudentModule specific to all modules with the same
-            'shared_state_key' attribute, or None if the module does not elect to
-            share state
+    Returns: xmodule instance
+    
     '''
     descriptor = modulestore().get_item(location)
-
-    instance_module = student_module_cache.lookup(descriptor.category,
-                                                  descriptor.location.url())
-
-    shared_state_key = getattr(descriptor, 'shared_state_key', None)
-    if shared_state_key is not None:
-        shared_module = student_module_cache.lookup(descriptor.category,
-                                                    shared_state_key)
+    
+    #TODO Only check the cache if this module can possibly have state
+    if user.is_authenticated():
+        instance_module = student_module_cache.lookup(descriptor.category,
+                                              descriptor.location.url())
+        
+        shared_state_key = getattr(descriptor, 'shared_state_key', None)
+        if shared_state_key is not None:
+            shared_module = student_module_cache.lookup(descriptor.category,
+                                                        shared_state_key)
+        else:
+            shared_module = None
     else:
+        instance_module = None
         shared_module = None
+        
 
     instance_state = instance_module.state if instance_module is not None else {}
     shared_state = shared_module.state if shared_module is not None else None
@@ -163,9 +164,8 @@ def get_module(user, request, location, student_module_cache, position=None):
                'default_queuename': xqueue_default_queuename.replace(' ','_') }
 
     def _get_module(location):
-        (module, _, _, _) = get_module(user, request, location,
+        return get_module(user, request, location,
                                        student_module_cache, position)
-        return module
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -198,31 +198,59 @@ def get_module(user, request, location, student_module_cache, position=None):
         if has_staff_access_to_course(user, module.location.course):
             module.get_html = add_histogram(module.get_html, module)
 
-    # If StudentModule for this instance wasn't already in the database,
-    # and this isn't a guest user, create it.
+    return module
+
+def get_instance_module(user, module, student_module_cache):
+    """
+    Returns instance_module is a StudentModule specific to this module for this student,
+        or None if this is an anonymous user
+    """
     if user.is_authenticated():
+        instance_module = student_module_cache.lookup(module.category,
+                                              module.location.url())
+        
         if not instance_module:
             instance_module = StudentModule(
                 student=user,
-                module_type=descriptor.category,
+                module_type=module.category,
                 module_state_key=module.id,
                 state=module.get_instance_state(),
                 max_grade=module.max_score())
             instance_module.save()
-            # Add to cache. The caller and the system context have references
-            # to it, so the change persists past the return
             student_module_cache.append(instance_module)
-        if not shared_module and shared_state_key is not None:
-            shared_module = StudentModule(
-                student=user,
-                module_type=descriptor.category,
-                module_state_key=shared_state_key,
-                state=module.get_shared_state())
-            shared_module.save()
-            student_module_cache.append(shared_module)
-
-    return (module, instance_module, shared_module, descriptor.category)
-
+            
+        return instance_module
+    else:
+        return None
+    
+def get_shared_instance_module(user, module, student_module_cache):
+    """
+    Return shared_module is a StudentModule specific to all modules with the same
+        'shared_state_key' attribute, or None if the module does not elect to
+        share state
+    """
+    if user.is_authenticated():
+        # To get the shared_state_key, we need to descriptor
+        descriptor = modulestore().get_item(module.location)
+        
+        shared_state_key = getattr(module, 'shared_state_key', None)
+        if shared_state_key is not None:
+            shared_module = student_module_cache.lookup(module.category,
+                                                        shared_state_key)
+            if not shared_module:
+                shared_module = StudentModule(
+                    student=user,
+                    module_type=descriptor.category,
+                    module_state_key=shared_state_key,
+                    state=module.get_shared_state())
+                shared_module.save()
+                student_module_cache.append(shared_module)
+        else:
+            shared_module = None
+        
+        return shared_module
+    else:
+        return None
 
 @csrf_exempt
 def xqueue_callback(request, userid, id, dispatch):
@@ -240,12 +268,13 @@ def xqueue_callback(request, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache(user, modulestore().get_item(id))
-    instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, modulestore().get_item(id))
+    instance = get_module(user, request, id, student_module_cache)
+    instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
         log.debug("Couldn't find module '%s' for user '%s'",
-                  id, request.user)
+                  id, user)
         raise Http404
 
     oldgrade = instance_module.grade
@@ -285,16 +314,18 @@ def modx_dispatch(request, dispatch=None, id=None):
       - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
-
     # Check for submitted files
     p = request.POST.copy()
     if request.FILES:
         for inputfile_id in request.FILES.keys():
             p[inputfile_id] = request.FILES[inputfile_id]
 
-    student_module_cache = StudentModuleCache(request.user, modulestore().get_item(id))
-    instance, instance_module, shared_module, module_type = get_module(request.user, request, id, student_module_cache)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
+    instance = get_module(request.user, request, id, student_module_cache)
 
+    instance_module = get_instance_module(request.user, instance, student_module_cache)
+    shared_module = get_shared_instance_module(request.user, instance, student_module_cache)
+    
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         oldgrade = instance_module.grade

@@ -8,6 +8,7 @@
 </%block>
 
 <%block name="headextra">
+  <%static:css group='course'/>
   
   <style type="text/css">
   .grade_a {color:green;}
@@ -19,7 +20,8 @@
   
 </%block>
 
-<%include file="navigation.html" args="active_page=''" />
+<%include file="course_navigation.html" args="active_page=''" />
+
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
@@ -28,7 +30,7 @@
     %if len(students) > 0:
     <table>
       <%
-      templateSummary = students[0]['grade_info']['grade_summary']
+      templateSummary = students[0]['grade_summary']
       %>
       
       
@@ -42,15 +44,15 @@
       
       <%def name="percent_data(percentage)">
         <%
-          data_class = "grade_none"
-          if percentage > .87:
-            data_class = "grade_a"
-          elif percentage > .70:
-            data_class = "grade_b"
-          elif percentage > .6:
-            data_class = "grade_c"
-          elif percentage > 0:
-              data_class = "grade_f"
+          letter_grade = 'None'
+          if percentage > 0:
+            letter_grade = 'F'
+            for grade in ['A', 'B', 'C']:
+              if percentage >= course.grade_cutoffs[grade]:
+                letter_grade = grade
+                break
+          
+          data_class = "grade_" + letter_grade
         %>
         <td class="${data_class}">${ "{0:.0%}".format( percentage ) }</td>
       </%def>
@@ -58,10 +60,10 @@
       %for student in students:
       <tr>
         <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
-        %for section in student['grade_info']['grade_summary']['section_breakdown']:
+        %for section in student['grade_summary']['section_breakdown']:
           ${percent_data( section['percent'] )}
         %endfor
-        <th>${percent_data( student['grade_info']['grade_summary']['percent'])}</th>
+        <th>${percent_data( student['grade_summary']['percent'])}</th>
       </tr>
       %endfor
     </table>
