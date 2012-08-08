@@ -3,9 +3,9 @@ nav.sequence-nav {
   // import from external sources.
   @extend .topbar;
   border-bottom: 1px solid $border-color;
+  @include border-top-right-radius(4px);
   margin: (-(lh())) (-(lh())) lh() (-(lh()));
   position: relative;
-  @include border-top-right-radius(4px);
 
   ol {
     @include box-sizing(border-box);
@@ -242,9 +242,11 @@ nav.sequence-bottom {
     border: 1px solid $border-color;
     @include border-radius(3px);
     @include inline-block();
+    width: 100px;
 
     li {
       float: left;
+      width: 50%;
 
       &.prev, &.next {
         margin-bottom: 0;
@@ -252,12 +254,11 @@ nav.sequence-bottom {
         a {
           background-position: center center;
           background-repeat: no-repeat;
-          border-bottom: none;
+          border: none;
           display: block;
           padding: lh(.5) 4px;
           text-indent: -9999px;
           @include transition(all, .2s, $ease-in-out-quad);
-          width: 45px;
 
           &:hover {
             background-color: #ddd;
@@ -275,7 +276,7 @@ nav.sequence-bottom {
       &.prev {
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
-          border-right: 1px solid lighten($border-color, 10%);
+          border-right: 1px solid lighten(#c6c6c6, 10%);
 
           &:hover {
             background-color: none;

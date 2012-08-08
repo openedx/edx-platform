@@ -21,3 +21,8 @@ form {
     display: block;
   }
 }
+
+::selection, ::-moz-selection, ::-webkit-selection {
+  background:#444;
+  color:#fff;
+}
