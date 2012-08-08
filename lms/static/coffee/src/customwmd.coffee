@@ -112,14 +112,16 @@ $ ->
 
   if Markdown?
     
-    Markdown.getMathCompatibleConverter = ->
+    Markdown.getMathCompatibleConverter = (postProcessor) ->
+      postProcessor ||= ((text) -> text)
       converter = Markdown.getSanitizingConverter()
       processor = new MathJaxProcessor()
       converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)
-      converter.hooks.chain "postConversion", MathJaxProcessor.replaceMathWrapper(processor)
+      converter.hooks.chain "postConversion", (text) ->
+        postProcessor(MathJaxProcessor.replaceMathWrapper(processor)(text))
       converter
 
-    Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl) ->
+    Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl, postProcessor) ->
       $elem = $(elem)
 
       if not $elem.length
@@ -136,7 +138,7 @@ $ ->
                    .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
         $elem.append($wmdPanel)
 
-      converter = Markdown.getMathCompatibleConverter()
+      converter = Markdown.getMathCompatibleConverter(postProcessor)
 
       ajaxFileUpload = (imageUploadUrl, input, startUploadHandler) ->
         $("#loading").ajaxStart(-> $(this).show()).ajaxComplete(-> $(this).hide())

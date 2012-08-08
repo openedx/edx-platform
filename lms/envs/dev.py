@@ -14,6 +14,7 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
+MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 
 WIKI_ENABLED = True
 
@@ -57,6 +58,12 @@ CACHE_TIMEOUT = 0
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+################################ LMS Migration #################################
+MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
+MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
+
+LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True

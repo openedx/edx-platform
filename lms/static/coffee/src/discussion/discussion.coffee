@@ -61,6 +61,40 @@ initializeFollowDiscussion = (discussion) ->
       $local(".new-post-form").hide()
       $local(".discussion-new-post").show()
 
+    handleSimilarPost = (elem) ->
+      $title = $local(".new-post-title")
+      $wrapper = $local(".new-post-similar-posts-wrapper")
+      $similarPosts = $local(".new-post-similar-posts")
+      prevText = $title.attr("prev-text")
+      text = $title.val()
+      if text == prevText
+        if $local(".similar-post").length
+          $wrapper.show()
+      else if $.trim(text).length
+        Discussion.safeAjax
+          $elem: $(elem)
+          url: Discussion.urlFor 'search_similar_threads', id
+          type: "GET"
+          dateType: 'json'
+          data:
+            text: $local(".new-post-title").val()
+          success: (response, textStatus) ->
+            console.log "request"
+            $similarPosts.empty()
+            if $.type(response) == "array" and response.length
+              $wrapper.show()
+              for thread in response
+                #singleThreadUrl = Discussion.urlFor 'retrieve_single_thread 
+                $similarPost = $("<a>").addClass("similar-post")
+                                       .html(thread["title"])
+                                       .attr("href", "javascript:void(0)") #TODO
+                                       .appendTo($similarPosts)
+            else
+              $wrapper.hide()
+      else
+        $wrapper.hide()
+      $title.attr("prev-text", text)
+
     handleNewPost = (elem) ->
       newPostForm = $local(".new-post-form")
       if newPostForm.length
@@ -75,6 +109,12 @@ initializeFollowDiscussion = (discussion) ->
           Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
         $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
+
+        $local(".new-post-title").blur ->
+          handleSimilarPost(this)
+
+        $local(".hide-similar-posts").click ->
+          $local(".new-post-similar-posts-wrapper").hide()
 
         $local(".discussion-submit-post").click ->
           handleSubmitNewPost(this)

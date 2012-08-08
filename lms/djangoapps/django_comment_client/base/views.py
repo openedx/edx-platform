@@ -279,17 +279,28 @@ def unfollow_user(request, course_id, followed_user_id):
     response = comment_client.unfollow(user_id, followed_user_id)
     return JsonResponse(response)
 
-@require_GET
-def search(request, course_id):
-    text = request.GET.get('text', None)
-    commentable_id = request.GET.get('commentable_id', None)
-    tags = request.GET.get('tags', None)
-    response = comment_client.search_threads({
-        'text': text,
-        'commentable_id': commentable_id,
-        'tags': tags,
-    })
+@require_POST
+@login_required
+def unfollow_user(request, course_id, followed_user_id):
+    user_id = request.user.id
+    response = comment_client.unfollow(user_id, followed_user_id)
     return JsonResponse(response)
+
+@require_GET
+def search_similar_threads(request, course_id, commentable_id):
+    text = request.GET.get('text', None)
+    if text:
+        return JsonResponse(
+                comment_client.search_similar_threads(
+                    course_id,
+                    recursive=False,
+                    query_params={
+                        'text': text,
+                        'commentable_id': commentable_id,
+                    },
+                ))
+    else:
+        return JsonResponse([])
 
 @require_GET
 def tags_autocomplete(request, course_id):

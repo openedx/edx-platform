@@ -6,14 +6,21 @@
       <%include file="_search_bar.html" />
     </div>
     <div class="discussion-new-post control-button" href="javascript:void(0)">New Post</div>
+  </div>
+  % if len(threads) == 0:
+    <div class="blank">
+      <%include file="_blank_slate.html" />
+    </div>
+    <div class="threads"></div>
+  % else:
     <%include file="_sort.html" />
-  </div>
-  <div class="threads">
-    % for thread in threads:
-      ${renderer.render_thread(course_id, thread, show_comments=False)}
-    % endfor
-  </div>
-  <%include file="_paginator.html" />
+    <div class="threads">
+      % for thread in threads:
+        ${renderer.render_thread(course_id, thread, show_comments=False)}
+      % endfor
+    </div>
+    <%include file="_paginator.html" />
+  % endif
 </section>
 
 <%!

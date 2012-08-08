@@ -41,6 +41,7 @@ class XmlDescriptor(XModuleDescriptor):
     # to definition_from_xml, and from the xml returned by definition_to_xml
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+        'ispublic', 	# if True, then course is listed for all users; see 
         # VS[compat] Remove once unused.
         'name', 'slug')
 
@@ -109,6 +110,7 @@ class XmlDescriptor(XModuleDescriptor):
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
+            filepath = ''
         else:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
@@ -136,7 +138,13 @@ class XmlDescriptor(XModuleDescriptor):
                 raise Exception, msg, sys.exc_info()[2]
 
         cls.clean_metadata_from_xml(definition_xml)
-        return cls.definition_from_xml(definition_xml, system)
+        definition = cls.definition_from_xml(definition_xml, system)
+
+        # TODO (ichuang): remove this after migration
+        # for Fall 2012 LMS migration: keep filename (and unmangled filename)
+        definition['filename'] = [ filepath, filename ]
+
+        return definition
 
 
     @classmethod

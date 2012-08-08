@@ -23,6 +23,11 @@ from django_comment_client.permissions import check_permissions_by_view
 THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
+def _should_perform_search(request):
+    return bool(request.GET.get('text', False) or \
+            request.GET.get('tags', False))
+        
+
 def render_accordion(request, course, discussion_id):
 
     discussion_info = utils.get_categorized_discussion_info(request, course)
@@ -57,6 +62,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'user_info': comment_client.get_user_info(request.user.id, raw=True),
         'course_id': course_id,
         'request': request,
+        'performed_search': _should_perform_search(request),
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
         'base_url': base_url,
@@ -82,7 +88,7 @@ def get_threads(request, course_id, discussion_id):
         'tags': request.GET.get('tags', ''),
     }
 
-    if query_params['text'] or query_params['tags']: #TODO do tags search without sunspot
+    if _should_perform_search(request):
         query_params['commentable_id'] = discussion_id
         threads, page, num_pages = comment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
     else:
@@ -116,6 +122,18 @@ def forum_form_discussion(request, course_id, discussion_id):
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
 
+    recent_active_threads = comment_client.search_recent_active_threads(
+        course_id,
+        recursive=False,
+        query_params={'follower_id': request.user.id,
+                      'commentable_id': discussion_id},
+    )
+
+    trending_tags = comment_client.search_trending_tags(
+        course_id,
+        query_params={'commentable_id': discussion_id},
+    )
+
     if request.is_ajax():
         return utils.HtmlResponse(content)
     else:
@@ -124,6 +142,8 @@ def forum_form_discussion(request, course_id, discussion_id):
             'course': course,
             'content': content,
             'accordion': render_accordion(request, course, discussion_id),
+            'recent_active_threads': recent_active_threads,
+            'trending_tags': trending_tags,
         }
         return render_to_response('discussion/index.html', context)
 
