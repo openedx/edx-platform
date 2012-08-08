@@ -366,7 +366,8 @@ def textbox(element, value, status, render_template, msg=''):
     rows = element.get('rows') or '30'
     cols = element.get('cols') or '80'
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
-
+    linenumbers = element.get('linenumbers')	 # for CodeMirror
+    if linenumbers is None: linenumbers = 'true'
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
 
     # Check if problem has been queued
