@@ -4,6 +4,7 @@
 
 <%block name="headextra">
 <%static:css group='course'/>
+<%static:js group='courseware'/>
 </%block>
 
 <%block name="js_extra">
@@ -71,7 +72,24 @@ $("#open_close_accordion a").click(function(){
       </header>
 
       <ul id="booknav" class="treeview-booknav">
-        <%include file="book_toc.html" />
+          <%def name="print_entry(entry)">
+              <li>
+                  <a href="javascript:goto_page(${entry.get('page')})">
+                      ${' '.join(entry.get(attribute, '') for attribute in ['chapter', 'name', 'page_label'])}
+                  </a>
+                  % if len(entry) > 0:
+                      <ul>
+                          % for child in entry:
+                              ${print_entry(child)}
+                          % endfor
+                      </ul>
+                  % endif
+              </li>
+          </%def>
+
+          % for entry in table_of_contents:
+            ${print_entry(entry)}
+          % endfor
       </ul>
     </section>
 
