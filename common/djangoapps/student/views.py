@@ -278,6 +278,58 @@ def change_setting(request):
     return HttpResponse(json.dumps({'success': True,
                                     'location': up.location, }))
 
+def _do_create_account(post_vars):
+    """
+    Given cleaned post variables, create the User and UserProfile objects, as well as the
+    registration for this user.
+
+    Returns a tuple (User, UserProfile, Registration).
+
+    Note: this function is also used for creating test users.
+    """
+    u = User(username=post_vars['username'],
+             email=post_vars['email'],
+             is_active=False)
+    u.set_password(post_vars['password'])
+    r = Registration()
+    # TODO: Rearrange so that if part of the process fails, the whole process fails.
+    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
+    try:
+        u.save()
+    except IntegrityError:
+        # Figure out the cause of the integrity error
+        if len(User.objects.filter(username=post_vars['username'])) > 0:
+            js['value'] = "An account with this username already exists."
+            js['field'] = 'username'
+            return HttpResponse(json.dumps(js))
+
+        if len(User.objects.filter(email=post_vars['email'])) > 0:
+            js['value'] = "An account with this e-mail already exists."
+            js['field'] = 'email'
+            return HttpResponse(json.dumps(js))
+
+        raise
+
+    r.register(u)
+
+    up = UserProfile(user=u)
+    up.name = post_vars['name']
+    up.level_of_education = post_vars.get('level_of_education')
+    up.gender = post_vars.get('gender')
+    up.mailing_address = post_vars.get('mailing_address')
+    up.goals = post_vars.get('goals')
+
+    try:
+        up.year_of_birth = int(post_vars['year_of_birth'])
+    except (ValueError, KeyError):
+        up.year_of_birth = None  # If they give us garbage, just ignore it instead
+                                # of asking them to put an integer.
+    try:
+        up.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {0}.".format(u.id))
+    return (u, up, r)
+
 
 @ensure_csrf_cookie
 def create_account(request, post_override=None):
@@ -349,47 +401,8 @@ def create_account(request, post_override=None):
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
-    u = User(username=post_vars['username'],
-             email=post_vars['email'],
-             is_active=False)
-    u.set_password(post_vars['password'])
-    r = Registration()
-    # TODO: Rearrange so that if part of the process fails, the whole process fails.
-    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
-    try:
-        u.save()
-    except IntegrityError:
-        # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
-            js['field'] = 'username'
-            return HttpResponse(json.dumps(js))
-
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
-            js['field'] = 'email'
-            return HttpResponse(json.dumps(js))
-
-        raise
-
-    r.register(u)
-
-    up = UserProfile(user=u)
-    up.name = post_vars['name']
-    up.level_of_education = post_vars.get('level_of_education')
-    up.gender = post_vars.get('gender')
-    up.mailing_address = post_vars.get('mailing_address')
-    up.goals = post_vars.get('goals')
-
-    try:
-        up.year_of_birth = int(post_vars['year_of_birth'])
-    except (ValueError, KeyError):
-        up.year_of_birth = None  # If they give us garbage, just ignore it instead
-                                # of asking them to put an integer.
-    try:
-        up.save()
-    except Exception:
-        log.exception("UserProfile creation failed for user {0}.".format(u.id))
+    # Ok, looks like everything is legit.  Create the account.
+    (u, up, r) = _do_create_account(post_vars)
 
     d = {'name': post_vars['name'],
          'key': r.activation_key,
@@ -437,24 +450,30 @@ def create_account(request, post_override=None):
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 
-def create_random_account(create_account_function):
-
+def get_random_post_override():
+    """
+    Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
+    of create_account, with random user info.
+    """
     def id_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
-    def inner_create_random_account(request):
-        post_override = {'username': "random_" + id_generator(),
-                            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
-                            'password': id_generator(),
-                            'location': id_generator(size=5, chars=string.ascii_uppercase),
-                            'name': id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
-                            'honor_code': u'true',
-                            'terms_of_service': u'true', }
+    return {'username': "random_" + id_generator(),
+            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
+            'password': id_generator(),
+            'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
+                     id_generator(size=7, chars=string.ascii_lowercase)),
+                     'honor_code': u'true',
+                     'terms_of_service': u'true', }
 
-        return create_account_function(request, post_override=post_override)
+
+def create_random_account(create_account_function):
+    def inner_create_random_account(request):
+        return create_account_function(request, post_override=get_random_post_override())
 
     return inner_create_random_account
 
+# TODO (vshnayder): do we need GENERATE_RANDOM_USER_CREDENTIALS for anything?
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
