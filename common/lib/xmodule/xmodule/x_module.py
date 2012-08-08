@@ -306,7 +306,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     module_class = XModule
     
     # Attributes for inpsection of the descriptor
-    stores_state = False # Indicates wether the xmodule state should be 
+    stores_state = False # Indicates whether the xmodule state should be 
     # stored in a database (independent of shared state)
     has_score = False # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
