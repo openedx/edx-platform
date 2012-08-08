@@ -372,3 +372,5 @@ initializeFollowThread = (thread) ->
       $local(".discussion-endorse-control").remove()
     if not Discussion.getContentInfo id, 'can_delete'
       $local(".discussion-delete").remove()
+    if not Discussion.getContentInfo id, 'can_openclose'
+      $local(".discussion-openclose").remove()

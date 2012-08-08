@@ -98,7 +98,7 @@
       <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
     </span>
 
-    % if type == "thread" and request.user.is_staff:
+    % if type == "thread":
       % if content['closed']:
         <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Re-open thread</a>
       % else:

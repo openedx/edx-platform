@@ -149,12 +149,14 @@ def forum_form_discussion(request, course_id, discussion_id):
 
 
 def get_annotated_content_info(course_id, content, user, is_thread):
-    return {
+    permissions = {
         'editable': check_permissions_by_view(user, course_id, content, "update_thread" if is_thread else "update_comment"),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if is_thread else "create_sub_comment"),
         'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if not is_thread else False,
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if is_thread else "delete_comment"),
+        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if is_thread else False,
     }
+    return permissions
 
 def get_annotated_content_infos(course_id, thread, user, is_thread=True):
     infos = {}
