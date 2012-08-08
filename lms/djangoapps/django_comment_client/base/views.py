@@ -34,7 +34,7 @@ def permitted(fn):
                 content = None
             return content
 
-        if check_permissions_by_view(request.user, fetch_content(), request.view_name):
+        if check_permissions_by_view(request.user, kwargs['course_id'], fetch_content(), request.view_name):
             return fn(request, *args, **kwargs)
         else:
             return JsonError("unauthorized")

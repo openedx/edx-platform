@@ -10,7 +10,9 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Role'
         db.create_table('django_comment_client_role', (
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=255, blank=True)),
         ))
         db.send_create_signal('django_comment_client', ['Role'])
 
@@ -27,14 +29,6 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=30, primary_key=True)),
         ))
         db.send_create_signal('django_comment_client', ['Permission'])
-
-        # Adding M2M table for field users on 'Permission'
-        db.create_table('django_comment_client_permission_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('permission', models.ForeignKey(orm['django_comment_client.permission'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('django_comment_client_permission_users', ['permission_id', 'user_id'])
 
         # Adding M2M table for field roles on 'Permission'
         db.create_table('django_comment_client_permission_roles', (
@@ -54,9 +48,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Permission'
         db.delete_table('django_comment_client_permission')
-
-        # Removing M2M table for field users on 'Permission'
-        db.delete_table('django_comment_client_permission_users')
 
         # Removing M2M table for field roles on 'Permission'
         db.delete_table('django_comment_client_permission_roles')
@@ -127,12 +118,13 @@ class Migration(SchemaMigration):
         'django_comment_client.permission': {
             'Meta': {'object_name': 'Permission'},
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
-            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'permissions'", 'symmetrical': 'False', 'to': "orm['django_comment_client.Role']"}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'permissions'", 'symmetrical': 'False', 'to': "orm['auth.User']"})
+            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'permissions'", 'symmetrical': 'False', 'to': "orm['django_comment_client.Role']"})
         },
         'django_comment_client.role': {
             'Meta': {'object_name': 'Role'},
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'primary_key': 'True'}),
+            'course_id': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'roles'", 'symmetrical': 'False', 'to': "orm['auth.User']"})
         }
     }
