@@ -122,6 +122,18 @@ def forum_form_discussion(request, course_id, discussion_id):
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
 
+    recent_active_threads = comment_client.search_recent_active_threads(
+        course_id,
+        recursive=False,
+        query_params={'follower_id': request.user.id,
+                      'commentable_id': discussion_id},
+    )
+
+    trending_tags = comment_client.search_trending_tags(
+        course_id,
+        query_params={'commentable_id': discussion_id},
+    )
+
     if request.is_ajax():
         return utils.HtmlResponse(content)
     else:
@@ -130,6 +142,8 @@ def forum_form_discussion(request, course_id, discussion_id):
             'course': course,
             'content': content,
             'accordion': render_accordion(request, course, discussion_id),
+            'recent_active_threads': recent_active_threads,
+            'trending_tags': trending_tags,
         }
         return render_to_response('discussion/index.html', context)
 

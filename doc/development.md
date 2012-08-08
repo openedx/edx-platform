@@ -28,3 +28,18 @@ Check out the course data directories that you want to work with into the
 Replace `../data` with your `GITHUB_REPO_ROOT` if it's not the default value.
 
 This will import all courses in your data directory into mongodb
+
+## Unit tests
+
+This runs all the tests (long, uses collectstatic):
+
+    rake test
+    
+xmodule can be tested independently, with this:
+
+    rake test_common/lib/xmodule
+    
+To see all available rake commands, do this:
+
+    rake -T
+    

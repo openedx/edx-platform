@@ -207,7 +207,7 @@ div.video {
             h3 {
               color: #999;
               float: left;
-              font-size: 12px;
+              font-size: em(14);
               font-weight: normal;
               letter-spacing: 1px;
               padding: 0 lh(.25) 0 lh(.5);
@@ -221,6 +221,7 @@ div.video {
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
               line-height: 46px;
+              color: #fff;
             }
 
             &:hover, &:active, &:focus {

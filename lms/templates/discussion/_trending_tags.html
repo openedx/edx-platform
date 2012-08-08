@@ -1,0 +1,11 @@
+<div class="trending-tags">
+Trending tags:
+
+  % for tag, count in trending_tags:
+    <div class="trending-tag">
+      <a class="trending-tag-link" href="javascript:void(0)">${tag}</a>
+      &times;
+      <span class="trending-tag-count">${count}</span>
+    </div>
+  % endfor
+</div>

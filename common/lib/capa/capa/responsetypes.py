@@ -800,6 +800,12 @@ class CodeResponse(LoncapaResponse):
     '''
     Grade student code using an external queueing server, called 'xqueue'
 
+    Expects 'xqueue' dict in ModuleSystem with the following keys:
+        system.xqueue = { 'interface': XqueueInterface object,
+                          'callback_url': Per-StudentModule callback URL where results are posted (string),
+                          'default_queuename': Default queuename to submit request (string)
+                        }
+
     External requests are only submitted for student submission grading 
         (i.e. and not for getting reference answers)
     '''
@@ -873,15 +879,16 @@ class CodeResponse(LoncapaResponse):
                     'edX_cmd': 'get_score',
                     'edX_tests': self.tests,
                     'processor': self.code,
-                    'edX_student_response': unicode(submission), # unicode on File object returns its filename
                     }
         
         # Submit request
-        if hasattr(submission, 'read'): # Test for whether submission is a file
+        if is_file(submission):
+            contents.update({'edX_student_response': submission.name})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
                                                     file_to_upload=submission)
         else:
+            contents.update({'edX_student_response': submission})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 
