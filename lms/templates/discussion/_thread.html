@@ -88,9 +88,6 @@
     ${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}
     ${render_link("discussion-link discussion-edit", "Edit")}
 
-    % if type == 'thread':
-      <a class="discussion-link discussion-permanent-link" href="${reverse('django_comment_client.forum.views.single_thread', kwargs={'discussion_id':discussion_id, 'thread_id':content['id'], 'course_id':course_id})}">Permanent Link</a>
-    % endif
     <span class="discussion-endorse-control">
       % if content.get('endorsed', False):
         <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}" />
