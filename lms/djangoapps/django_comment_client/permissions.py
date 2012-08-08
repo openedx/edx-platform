@@ -67,11 +67,10 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
 
 
 VIEW_PERMISSIONS = {
-    'update_thread'     :       ['edit_content', ['update_thread', 'is_open', 'author']],
-    # 'create_comment'    :       [["create_comment", "is_open"]],
-    'create_comment'    :       ["create_comment"],
+    'update_thread'     :       ['edit_content', ['update_thread', 'is_open', 'is_author']],
+    'create_comment'    :       [["create_comment", "is_open"]],
     'delete_thread'     :       ['delete_thread'],
-    'update_comment'    :       ['edit_content', ['update_comment', 'is_open', 'author']],
+    'update_comment'    :       ['edit_content', ['update_comment', 'is_open', 'is_author']],
     'endorse_comment'   :       ['endorse_comment'],
     'openclose_thread'  :       ['openclose_thread'],
     'create_sub_comment':       [['create_sub_comment', 'is_open']],
