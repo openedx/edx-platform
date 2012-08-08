@@ -122,16 +122,3 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
 
-    @classmethod
-    def split_to_file(cls, xml_object):
-        # Note: if we end up needing subclasses, can port this logic there.
-        yes = ('chapter',)
-        no = ('course',)
-
-        if xml_object.tag in yes:
-            return True
-        elif xml_object.tag in no:
-            return False
-
-        # otherwise maybe--delegate to superclass.
-        return XmlDescriptor.split_to_file(xml_object)
