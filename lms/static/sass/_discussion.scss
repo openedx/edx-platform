@@ -32,6 +32,14 @@ $tag_text_color: #5b614f;
 }
 
 .discussion {
+  p {
+    margin-bottom: 1em !important;
+  }
+
+  p + p, ul + p, ol + p {
+    margin-top: 0;
+  }
+
   #open_close_accordion {
     display: none;
   }
@@ -473,7 +481,7 @@ $tag_text_color: #5b614f;
       @include discussion-font;
       @include discussion-clickable;
       display: block;
-      margin-bottom: $body-line-height;
+      margin-bottom: 1em;
       font-size: $comment_title_size;
       font-weight: bold;
       line-height: 1.4em;
@@ -499,7 +507,7 @@ $tag_text_color: #5b614f;
       color: gray;
       font-size: $comment_info_size;
       font-style: italic;
-      margin-top: 2%;
+      margin-top: 1em;
 
       a:hover {
         text-decoration: none;
@@ -557,12 +565,12 @@ $tag_text_color: #5b614f;
       }
     }
 
+    .comment > .comments {
+      margin-left: 68px;
+    }
+
     //COMMENT STYLES
     .comments {
-      //display: none;
-      // margin-left: $comment_margin_left;
-      // margin-left: flex-grid(1);
-      margin-left: 68px;
       overflow: hidden;
 
       .discussion-votes {
@@ -629,6 +637,10 @@ $tag_text_color: #5b614f;
       .post-options {
         margin: 8px 0 16px 0;
         overflow: hidden;
+
+        label {
+          margin-right: 15px;
+        }
       }
 
       .reply-post-control {
