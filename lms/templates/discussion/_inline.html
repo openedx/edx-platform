@@ -1,16 +1,36 @@
 <%namespace name="renderer" file="_thread.html"/>
 
+
+<script type="text/javascript">
+  $('#wmd-input-reply-body').bind('focus', function(e) {
+    $('.new-post-form').removeClass('collapsed');
+  });
+</script>
+
+
 <section class="discussion inline-discussion" _id="${discussion_id}">
   <div class="discussion-non-content">
-    <div class="discussion-new-post-inline">
-      
-    </div>
+    <form class="new-post-form collapsed" id="new-post-form" style="display: block; ">
+      <ul class="discussion-errors"></ul>
+      <div class="reply-body"><div class="wmd-panel"><div id="wmd-button-bar-reply-body-502021ba30e78e7d4d00031d"><ul id="wmd-button-row-reply-body-502021ba30e78e7d4d00031d" class="wmd-button-row"><li class="wmd-button" style="left: 0px; " id="wmd-bold-button-reply-body-502021ba30e78e7d4d00031d" title="Strong &lt;strong&gt; Ctrl+B"><span style="background-position: 0px 0px; "></span></li><li class="wmd-button" style="left: 25px; " id="wmd-italic-button-reply-body-502021ba30e78e7d4d00031d" title="Emphasis &lt;em&gt; Ctrl+I"><span style="background-position: -20px 0px; "></span></li><li class="wmd-spacer wmd-spacer1" id="wmd-spacer1-reply-body-502021ba30e78e7d4d00031d"></li><li class="wmd-button" style="left: 75px; " id="wmd-link-button-reply-body-502021ba30e78e7d4d00031d" title="Hyperlink &lt;a&gt; Ctrl+L"><span style="background-position: -40px 0px; "></span></li><li class="wmd-button" style="left: 100px; " id="wmd-quote-button-reply-body-502021ba30e78e7d4d00031d" title="Blockquote &lt;blockquote&gt; Ctrl+Q"><span style="background-position: -60px 0px; "></span></li><li class="wmd-button" style="left: 125px; " id="wmd-code-button-reply-body-502021ba30e78e7d4d00031d" title="Code Sample &lt;pre&gt;&lt;code&gt; Ctrl+K"><span style="background-position: -80px 0px; "></span></li><li class="wmd-button" style="left: 150px; " id="wmd-image-button-reply-body-502021ba30e78e7d4d00031d" title="Image &lt;img&gt; Ctrl+G"><span style="background-position: -100px 0px; "></span></li><li class="wmd-spacer wmd-spacer2" id="wmd-spacer2-reply-body-502021ba30e78e7d4d00031d"></li><li class="wmd-button" style="left: 200px; " id="wmd-olist-button-reply-body-502021ba30e78e7d4d00031d" title="Numbered List &lt;ol&gt; Ctrl+O"><span style="background-position: -120px 0px; "></span></li><li class="wmd-button" style="left: 225px; " id="wmd-ulist-button-reply-body-502021ba30e78e7d4d00031d" title="Bulleted List &lt;ul&gt; Ctrl+U"><span style="background-position: -140px 0px; "></span></li><li class="wmd-button" style="left: 250px; " id="wmd-heading-button-reply-body-502021ba30e78e7d4d00031d" title="Heading &lt;h1&gt;/&lt;h2&gt; Ctrl+H"><span style="background-position: -160px 0px; "></span></li><li class="wmd-button" style="left: 275px; " id="wmd-hr-button-reply-body-502021ba30e78e7d4d00031d" title="Horizontal Rule &lt;hr&gt; Ctrl+R"><span style="background-position: -180px 0px; "></span></li><li class="wmd-spacer wmd-spacer3" id="wmd-spacer3-reply-body-502021ba30e78e7d4d00031d"></li><li class="wmd-button" style="left: 325px; " id="wmd-undo-button-reply-body-502021ba30e78e7d4d00031d" title="Undo - Ctrl+Z"><span style="background-position: -200px -20px; "></span></li><li class="wmd-button" style="left: 350px; " id="wmd-redo-button-reply-body-502021ba30e78e7d4d00031d" title="Redo - Ctrl+Shift+Z"><span style="background-position: -220px -20px; "></span></li></ul></div><textarea class="wmd-input" id="wmd-input-reply-body" placeholder="Post a question or comment…"></textarea><div id="wmd-preview-reply-body-502021ba30e78e7d4d00031d" class="wmd-panel wmd-preview"></div></div></div>
+      <div class="post-options">
+        <input type="checkbox" class="discussion-post-anonymously" id="discussion-post-anonymously-502021ba30e78e7d4d00031d">
+        <label for="discussion-post-anonymously-502021ba30e78e7d4d00031d">post anonymously</label>
+        <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-502021ba30e78e7d4d00031d" checked="">
+        <label for="discussion-auto-watch-502021ba30e78e7d4d00031d">follow this thread</label>
+      </div>
+      <div class="reply-post-control">        
+        <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
+      </div>
+    </form>
   </div>
+
   <div class="threads">
     % for thread in threads:
       ${renderer.render_thread(course_id, thread, show_comments=False)}
     % endfor
   </div>
+
   <%include file="_paginator.html" />
 </section>
 
@@ -27,3 +47,5 @@
   }
   $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escape_quotes}"));
 </script>
+
+

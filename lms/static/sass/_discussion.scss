@@ -23,7 +23,95 @@ $tag_text_color: #5b614f;
   }
 }
 
+@mixin standard-discussion-link {
+  text-decoration: none;
+  &:hover {
+    color: #1C71DD;
+    text-decoration: none;
+  }
+}
+
 .discussion {
+  #open_close_accordion {
+    display: none;
+  }
+
+  .sidebar-module {    
+    @include clearfix;
+    padding: 0 24px 24px 0;
+    margin-bottom: 24px;    
+    border-bottom: 1px solid #d3d3d3;
+    font-size: 0.8em;
+
+    header {
+      margin-bottom: 14px;
+      @include clearfix;
+    }
+
+    h4 {
+      float: left;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+
+    .sidebar-new-post-button {
+      @include button;
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      margin: 20px 0;
+      padding: 11px;
+      font-size: 1.1em;
+      text-align: center;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .sidebar-view-all {
+      float: right;
+      font-size: 0.9em;
+      line-height: 1.6em;
+      @include standard-discussion-link;
+    }
+
+    .discussion-sidebar-following-list {
+      li {
+        @include clearfix;
+        margin-bottom: 8px;
+      }
+
+      a {        
+        @include standard-discussion-link;
+      }
+    }
+
+    .discussion-sidebar-tags-list li {
+      @include clearfix;
+    }
+
+    .sidebar-tag-count {
+      color: #9a9a9a;
+      font-size: .85em;
+      line-height: 3em;
+    }
+
+    .sidebar-following-name {
+      float: left;
+      width: 80%;
+    }
+
+    .sidebar-vote-count {
+      float: right;
+      width: 20%;
+      text-align: right;
+      color: #9a9a9a;
+    }
+
+
+  }
+
   .discussion-non-content {
     margin-left: flex-gutter();
   }
@@ -239,6 +327,7 @@ $tag_text_color: #5b614f;
       color: #9a9a9a;
     }
   }
+
   //CREATE NEW AND EDIT POSTS
   .discussion-right-wrapper {
     min-height: 40px;
@@ -302,6 +391,14 @@ $tag_text_color: #5b614f;
         padding: 0;
         border-width: 0;
       }
+
+      .post-options {
+        height: 0;
+      }
+
+      .reply-post-control {
+        height: 0;
+      }
     }
 
     .new-post-control {
@@ -321,12 +418,12 @@ $tag_text_color: #5b614f;
     .control-button {
       @include button;
       @include discussion-font;
+      margin-right: 16px;
+      padding-top: 9px;
       color: white;
       display: inline-block;
       font-size: inherit;
       font-weight: bold;
-      margin-left: 5%;
-      padding-top: 9px;
       text-decoration: none;
       width: inherit;
     }
@@ -346,6 +443,25 @@ $tag_text_color: #5b614f;
   .discussion-reply-new {
     .discussion-auto-watch {
       margin-left: 2%;
+    }
+  }
+
+  .thread-tag {
+    background: $tag_background_color;
+    border: 1px solid $tag_border_color;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    color: $tag_text_color;
+    float: left;
+    font-size: 13px;
+    margin: 5px 7px 5px 0;
+    padding: 5px 7px;
+    text-decoration: none;
+
+    &:hover {
+      border-color: #7b8761;
+      color: #2f381c;
+      text-decoration: none;
     }
   }
 
@@ -376,25 +492,6 @@ $tag_text_color: #5b614f;
 
     .thread-tags {
       display: inline-block;
-
-      .thread-tag {
-        @include discussion-font;
-        background: $tag_background_color;
-        border: 1px solid $tag_border_color;
-        -moz-border-radius: 2px;
-        -webkit-border-radius: 2px;
-        color: $tag_text_color;
-        float: left;
-        font-size: 13px;
-        margin: 5px 7px 5px 0;
-        padding: 5px 7px;
-        text-decoration: none;
-
-        &:hover {
-          border-color: #7b8761;
-          color: #2f381c;
-        }
-      }
     }
 
     .info {
@@ -526,9 +623,16 @@ $tag_text_color: #5b614f;
   }
 
   &.inline-discussion {
-    .discussion-new-post-inline {
-      textarea {
+    .new-post-form {
+      margin: 24px 60px;
 
+      .post-options {
+        margin: 8px 0 16px 0;
+        overflow: hidden;
+      }
+
+      .reply-post-control {
+        overflow: hidden;
       }
     }
   }
@@ -558,7 +662,6 @@ $tag_text_color: #5b614f;
   font-size: 0.8em;
   line-height: 1.6em;
   @include border-radius(3px 3px 0 0);
-  // @include box-shadow(none);
 }
 
 .wmd-preview {
@@ -571,7 +674,7 @@ $tag_text_color: #5b614f;
   border-top-width: 0;
   @include border-radius(0 0 3px 3px);
   overflow: hidden;
-  @include transition(all, .1s, easeOut);
+  @include transition(all, .2s, easeOut);
 
   &:before {
     content: 'PREVIEW';
@@ -581,7 +684,6 @@ $tag_text_color: #5b614f;
     font-size: 11px;
     color: #bbb;
   }
-  
 
   p {
     font-family: $sans-serif;
@@ -598,7 +700,7 @@ $tag_text_color: #5b614f;
   padding: 0px;  
   height: 20px;
   overflow: hidden;
-  @include transition(all, .1s, easeOut);
+  @include transition(all, .2s, easeOut);
 }
 
 .wmd-spacer
