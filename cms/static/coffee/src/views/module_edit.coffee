@@ -13,6 +13,16 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
       # Load preview modules
       XModule.loadModules('display')
+      @enableDrag()
+
+  enableDrag: ->
+      # Enable dragging things in the #sortable div (if there is one)
+      if $("#sortable").length > 0
+        $("#sortable").sortable({
+          placeholder: "ui-state-highlight"
+          })
+        $("#sortable").disableSelection();
+
 
   save: (event) ->
     event.preventDefault()
@@ -32,6 +42,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   cancel: (event) ->
     event.preventDefault()
     CMS.popView()
+    @enableDrag()
 
   editSubmodule: (event) ->
     event.preventDefault()
@@ -42,3 +53,4 @@ class CMS.Views.ModuleEdit extends Backbone.View
             id: $(event.target).data('id')
             type: if moduleType == 'None' then null else moduleType
             previewType: if previewType == 'None' then null else previewType
+    @enableDrag()
