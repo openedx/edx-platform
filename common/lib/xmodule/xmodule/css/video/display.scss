@@ -16,7 +16,6 @@ div.video {
       height: 0;
       overflow: hidden;
       padding-bottom: 56.25%;
-      padding-top: 30px;
       position: relative;
 
       object, iframe {
@@ -463,7 +462,8 @@ div.video {
     }
 
     ol.subtitles {
-      width: 0px;
+      width: 0;
+      height: 0;
     }
   }
 
