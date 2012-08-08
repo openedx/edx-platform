@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -125,7 +126,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     
     '''
     descriptor = modulestore().get_item(location)
-    
+
     #TODO Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
@@ -146,7 +147,14 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
-    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
+
+    ajax_url = reverse('modx_dispatch', 
+                       kwargs=dict(course_id=descriptor.location.course_id,
+                                   id=descriptor.location.url(),
+                                   dispatch=''),
+                       )
+
+    # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL +
@@ -308,7 +316,7 @@ def xqueue_callback(request, userid, id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch=None, id=None):
+def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
