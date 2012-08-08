@@ -83,7 +83,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.auth',  # this is required for admin
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
 
