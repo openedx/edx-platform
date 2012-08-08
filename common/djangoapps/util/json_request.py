@@ -9,7 +9,7 @@ def expect_json(view_function):
         if request.META['CONTENT_TYPE'] == "application/json":
             cloned_request = copy.copy(request)
             cloned_request.POST = cloned_request.POST.copy()
-            cloned_request.POST.update(json.loads(request.raw_post_data))
+            cloned_request.POST.update(json.loads(request.body))
             return view_function(cloned_request, *args, **kwargs)
         else:
             return view_function(request, *args, **kwargs)
