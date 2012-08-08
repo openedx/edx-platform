@@ -226,9 +226,12 @@ initializeFollowThread = (thread) ->
     handleDelete = (elem) ->
       if $content.hasClass("thread")
         url = Discussion.urlFor('delete_thread', id)
+        c = confirm "Are you sure to delete thread \"" + $content.find("a.thread-title").text() + "\"?"
       else
         url = Discussion.urlFor('delete_comment', id)
-
+        c = confirm "Are you sure to delete this comment? "
+      if c != true
+        return
       Discussion.safeAjax
         $elem: $(elem)
         url: url
