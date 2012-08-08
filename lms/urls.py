@@ -137,7 +137,7 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.profile', name="profile"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
-            'courseware.views.profile'),
+            'courseware.views.profile', name="student_profile"),
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',

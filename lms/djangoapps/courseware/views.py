@@ -84,7 +84,8 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
+    return render_to_response('gradebook.html', {'students': student_info,
+                                                 'course': course, 'course_id': course_id})
 
 
 @login_required
