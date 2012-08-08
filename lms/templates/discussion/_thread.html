@@ -39,7 +39,12 @@
       
       ${render_vote(content)}
       <div class="discussion-right-wrapper clearfix">
-        
+        <ul class="admin-actions">
+          <li><a href="#" class="admin-endorse">Endorse</a></li>
+          <li><a href="#" class="admin-edit">Edit</a></li>
+          <li><a href="#" class="admin-delete">Delete</a></li>
+        </ul>
+
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
           <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['body'] | h}</div>
