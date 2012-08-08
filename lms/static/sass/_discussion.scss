@@ -184,7 +184,7 @@ $tag_text_color: #5b614f;
     width: flex-grid(12);
 
     .discussion-link {
-      @include button;
+      @include button(simple, #999);
       color: white;
       display: inline-block;
       font-size: inherit;
@@ -662,6 +662,10 @@ $tag_text_color: #5b614f;
   font-size: 0.8em;
   line-height: 1.6em;
   @include border-radius(3px 3px 0 0);
+
+  &::-webkit-input-placeholder {
+    color: #888;
+  }
 }
 
 .wmd-preview {
