@@ -1,4 +1,5 @@
 <%inherit file="main.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="js_extra">
@@ -59,7 +60,10 @@
 
       %for student in students:
       <tr>
-        <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
+        <td><a href="${reverse('student_profile',
+                               kwargs={'course_id' : course_id,
+                                       'student_id': student['id']})}">
+                      ${student['username']}</a></td>
         %for section in student['grade_summary']['section_breakdown']:
           ${percent_data( section['percent'] )}
         %endfor
