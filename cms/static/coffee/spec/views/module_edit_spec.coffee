@@ -8,11 +8,11 @@ describe "CMS.Views.ModuleEdit", ->
         <a href="#" class="cancel">cancel</a>
         <ol>
           <li>
-            <a href="#" class="module-edit" data-id="i4x://mitx.edu/course/module" data-type="html">submodule</a>
+            <a href="#" class="module-edit" data-id="i4x://mitx/course/html/module" data-type="html">submodule</a>
           </li>
         </ol>
       </div>
-      """
+      """ #"
     CMS.unbind()
 
   describe "defaults", ->
@@ -27,7 +27,7 @@ describe "CMS.Views.ModuleEdit", ->
       @stubModule.editUrl.andReturn("/edit_item?id=stub_module")
       new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
 
-    it "load the edit from via ajax and pass to the model", ->
+    it "load the edit via ajax and pass to the model", ->
       expect($.fn.load).toHaveBeenCalledWith("/edit_item?id=stub_module", jasmine.any(Function))
       if $.fn.load.mostRecentCall
         $.fn.load.mostRecentCall.args[1]()
@@ -37,9 +37,9 @@ describe "CMS.Views.ModuleEdit", ->
     beforeEach ->
       @stubJqXHR = jasmine.createSpy("stubJqXHR")
       @stubJqXHR.success = jasmine.createSpy("stubJqXHR.success").andReturn(@stubJqXHR)
-      @stubJqXHR.error= jasmine.createSpy("stubJqXHR.success").andReturn(@stubJqXHR)
+      @stubJqXHR.error = jasmine.createSpy("stubJqXHR.error").andReturn(@stubJqXHR)
       @stubModule.save = jasmine.createSpy("stubModule.save").andReturn(@stubJqXHR)
-      new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
+      new CMS.Views.ModuleEdit(el: $(".module-edit"), model: @stubModule)
       spyOn(window, "alert")
       $(".save-update").click()
 
@@ -77,5 +77,5 @@ describe "CMS.Views.ModuleEdit", ->
       expect(CMS.pushView).toHaveBeenCalledWith @view
       expect(CMS.Views.ModuleEdit).toHaveBeenCalledWith model: @model
       expect(CMS.Models.Module).toHaveBeenCalledWith
-        id: "i4x://mitx.edu/course/module"
+        id: "i4x://mitx/course/html/module"
         type: "html"
