@@ -12,10 +12,12 @@ from models import StudentModule
 log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
-    for child in module.get_display_items():
-        yield child
-        for module in yield_module_descendents(child):
-            yield module
+    stack = module.get_display_items()
+    
+    while len(stack) > 0:
+        next_module = stack.pop()
+        stack.extend( next_module.get_display_items() )
+        yield next_module
    
 def grade(student, request, course, student_module_cache=None):
     """
@@ -89,7 +91,7 @@ def grade(student, request, course, student_module_cache=None):
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.exception("Unable to grade a section with a total possible score of zero. " + str(section_descriptor.id))
+                log.exception("Unable to grade a section with a total possible score of zero. " + str(section_descriptor.location))
         
         totaled_scores[section_format] = format_scores
     
@@ -183,6 +185,10 @@ def get_score(user, problem, student_module_cache):
     problem: an XModule
     cache: A StudentModuleCache
     """
+    if not (problem.descriptor.stores_state and problem.descriptor.has_score):
+        # These are not problems, and do not have a score
+        return (None, None)
+    
     correct = 0.0
 
     # If the ID is not in the cache, add the item

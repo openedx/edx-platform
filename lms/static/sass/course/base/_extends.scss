@@ -59,7 +59,7 @@ h1.top-header {
   width: flex-grid(3);
 
   h1, h2 {
-   font-size: em(18);
+   font-size: em(20);
    font-weight: 100;
    letter-spacing: 0;
    text-transform: none;
@@ -88,27 +88,48 @@ h1.top-header {
     font-weight: normal;
     margin: 0;
     overflow: hidden;
+    font-size: 1em;
 
     a {
-      color: lighten($text-color, 10%);
       display: block;
-      font-size: $body-font-size;
-      padding: 7px 7px 7px 30px;
       text-decoration: none;
       @include transition();
     }
 
-    // span.ui-icon {
-    //   background-image: url(../images/ui-icons_454545_256x240.png);
-    // }
-
     &.active {
-      border-bottom: 1px solid #d3d3d3;
+      @extend .bottom-border;
       color: #000;
       font-weight: bold;
 
       a {
         color: #000;
+      }
+    }
+  }
+
+  ul, ol {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      @extend .bottom-border;
+      @extend .clearfix;
+      background: none;
+      position: relative;
+      padding: 0;
+
+      a {
+        display: block;
+        line-height: lh();
+        font-size: 1em;
+        @include box-sizing(border-box);
+        padding: lh(.25) lh(.5) lh(.25) 0;
+
+        &:hover {
+          color: #666;
+          background: #f6f6f6;
+        }
       }
     }
   }

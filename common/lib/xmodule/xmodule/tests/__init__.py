@@ -9,6 +9,7 @@ import unittest
 import os
 import fs
 
+import json
 import numpy
 
 import xmodule
@@ -291,9 +292,14 @@ class CodeResponseTest(unittest.TestCase):
         for i in range(numAnswers):
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuekey=1000 + i))
 
-        # Message format inherited from ExternalResponse
-        correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
-        incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+        # TODO: Message format inherited from ExternalResponse
+        #correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
+        #incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+
+        # New message format common to external graders
+        correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg':'MESSAGE'})
+        incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg':'MESSAGE'})
+
         xserver_msgs = {'correct': correct_score_msg,
                         'incorrect': incorrect_score_msg,
                         }
@@ -708,6 +714,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, 'a://b/c/d/e', {})
+        xm = x_module.XModule(i4xs, 'a://b/c/d/e', None, {})
         p = xm.get_progress()
         self.assertEqual(p, None)

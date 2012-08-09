@@ -111,12 +111,14 @@ div.course-wrapper {
       ul {
         margin: 0;
         @include clearfix();
+        padding: 0;
 
         li {
           width: flex-grid(3, 9);
           float: left;
           margin-right: flex-gutter(9);
           margin-bottom: lh();
+          line-height: lh();
 
           &:nth-child(3n) {
             margin-right: 0;
