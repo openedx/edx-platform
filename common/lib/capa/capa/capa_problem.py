@@ -393,9 +393,10 @@ class LoncapaProblem(object):
             context['script_code'] += code		# store code source in context
             try:
                 exec code in context, context        	# use "context" for global context; thus defs in code are global within code
-            except Exception:
+            except Exception as err:
                 log.exception("Error while execing script code: " + code)
-                raise responsetypes.LoncapaProblemError("Error while executing script code")
+		msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
+                raise responsetypes.LoncapaProblemError(msg)
             finally:
                 sys.path = original_path
 
