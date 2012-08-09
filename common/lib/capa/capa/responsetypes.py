@@ -834,6 +834,9 @@ class CodeResponse(LoncapaResponse):
 
         self.tests = xml.get('tests')
 
+        # TODO: A common XML format for interacting with external graders
+        #       New format will not require exec
+        #
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
         #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
@@ -903,27 +906,18 @@ class CodeResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-        # Parse 'score_msg' as XML
-        try:
-            rxml = etree.fromstring(score_msg)
-        except Exception as err:
-            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
-            raise Exception(err)
 
-        # The following process is lifted directly from ExternalResponse
-        ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
-                 'WRONG_FORMAT': 'incorrect',
-                 }
-        self.context['correct'] = ['correct']
-        if ad in admap:
-            self.context['correct'][0] = admap[ad]
+        (valid_score_msg, correctness, score, msg) = self._parse_score_msg(score_msg) 
+        if not valid_score_msg:
+            oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
+            return oldcmap
+
+        self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
         #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
-            oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
+            oldcmap.set(self.answer_id, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
@@ -936,6 +930,31 @@ class CodeResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
+    def _parse_score_msg(self, score_msg):
+        '''
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': # TODO -- Partial grading
+             'msg': grader_msg }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           # TODO: Implement partial grading
+            msg:             Message from grader to display to student (string)
+        '''
+        fail = (False, False, -1, '')
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            return fail
+        if not isinstance(score_result, dict):
+            return fail
+        for tag in ['correct', 'score', 'msg']:
+            if not score_result.has_key(tag):
+                return fail
+        return (True, score_result['correct'], score_result['score'], score_result['msg'])
+        
 
 #-----------------------------------------------------------------------------
 
