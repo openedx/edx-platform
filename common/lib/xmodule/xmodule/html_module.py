@@ -18,9 +18,9 @@ class HtmlModule(XModule):
     def get_html(self):
         return self.html
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
 

@@ -11,11 +11,11 @@
   <%static:css group='course'/>
   
   <style type="text/css">
-  .grade_a {color:green;}
-  .grade_b {color:Chocolate;}
-  .grade_c {color:DarkSlateGray;}
-  .grade_f {color:DimGray;}
-  .grade_none {color:LightGray;}
+  .grade_A {color:green;}
+  .grade_B {color:Chocolate;}
+  .grade_C {color:DarkSlateGray;}
+  .grade_F {color:DimGray;}
+  .grade_None {color:LightGray;}
   </style>
   
 </%block>
@@ -54,7 +54,7 @@
           
           data_class = "grade_" + letter_grade
         %>
-        <td class="${data_class}">${ "{0:.0%}".format( percentage ) }</td>
+        <td class="${data_class}" data-percent="${percentage}">${ "{0:.0%}".format( percentage ) }</td>
       </%def>
       
       %for student in students:

@@ -26,12 +26,26 @@ class CustomTagModule(XModule):
         More information given in <a href="/book/234">the text</a>
     """
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
+        self.html = definition['html']
 
-        xmltree = etree.fromstring(self.definition['data'])
+    def get_html(self):
+        return self.html
+
+
+class CustomTagDescriptor(RawDescriptor):
+    """ Descriptor for custom tags.  Loads the template when created."""
+    module_class = CustomTagModule
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        definition = RawDescriptor.definition_from_xml(xml_object, system)
+
+        # Render the template and save it.
+        xmltree = etree.fromstring(definition['data'])
         if 'impl' in xmltree.attrib:
             template_name = xmltree.attrib['impl']
         else:
@@ -45,13 +59,8 @@ class CustomTagModule(XModule):
                                 .format(location))
 
         params = dict(xmltree.items())
-        with self.system.filestore.open(
-                'custom_tags/{name}'.format(name=template_name)) as template:
-            self.html = Template(template.read()).render(**params)
+        with system.resources_fs.open('custom_tags/{name}'
+                                   .format(name=template_name)) as template:
+            definition['html'] = Template(template.read()).render(**params)
 
-    def get_html(self):
-        return self.html
-
-
-class CustomTagDescriptor(RawDescriptor):
-    module_class = CustomTagModule
+        return definition
