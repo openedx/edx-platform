@@ -9,10 +9,25 @@ div.book-wrapper {
     ul#booknav {
       font-size: em(14);
 
+      .chapter-number {
+        
+      }
+
+      .chapter {
+        float: left;
+        width: 87%;
+        line-height: 1.4em;
+      }
+
       .page-number {
         float: right;
+        width: 12%;
         font-size: .8em;
+        line-height: 2.1em;
+        text-align: right;
         color: #9a9a9a;
+        opacity: 0;
+        @include transition(opacity .15s);
       }
 
       li {
@@ -22,9 +37,14 @@ div.book-wrapper {
 
         a {
           padding: 0;
+          @include clearfix;
 
           &:hover {
             background-color: transparent;
+
+            .page-number {
+              opacity: 1;
+            }
           }
         }
 
