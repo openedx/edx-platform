@@ -15,7 +15,6 @@ from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
 from capa.util import convert_files_to_filenames
 from progress import Progress
-from xmodule.util.decorators import lazyproperty
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
@@ -119,11 +118,9 @@ class CapaModule(XModule):
 
         if self.show_answer == "":
             self.show_answer = "closed"
-            
+
         if instance_state is not None:
             instance_state = json.loads(instance_state)
-        self._instance_state = instance_state # We will need this later to lazily load lcp
-        
         if instance_state is not None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
@@ -135,27 +132,18 @@ class CapaModule(XModule):
         else:
             self.weight = None
 
-
-
-    @lazyproperty
-    def lcp(self):
-        """
-        Loading the problem can be fairly expensive, so we do this lazily.
-        
-        This can throw errors. Always be sure to use try/catch before
-        displaying modules to a user.
-        """
-        
         if self.rerandomize == 'never':
             seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
             seed = system.id
         else:
             seed = None
-        
+
         try:
-            return LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      self._instance_state, seed=seed, system=self.system)
+            # TODO (vshnayder): move as much as possible of this work and error
+            # checking to descriptor load time
+            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                                      instance_state, seed=seed, system=self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -172,13 +160,12 @@ class CapaModule(XModule):
                 problem_text = ('<problem><text><font color="red" size="+2">'
                                 'Problem %s has an error:</font>%s</text></problem>' %
                                 (self.location.url(), msg))
-                return LoncapaProblem(
+                self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    self._instance_state, seed=seed, system=self.system)
+                    instance_state, seed=seed, system=self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
-        
 
     @property
     def rerandomize(self):
@@ -441,7 +428,7 @@ class CapaModule(XModule):
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
-         
+
         answers = self.make_dict_of_responses(get)
         event_info['answers'] = convert_files_to_filenames(answers)
 
@@ -577,7 +564,7 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
-    
+
     stores_state = True
     has_score = True
 
