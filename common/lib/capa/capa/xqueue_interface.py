@@ -7,12 +7,9 @@ import logging
 import requests
 import time
 
-# TODO: Collection of parameters to be hooked into rest of edX system
-XQUEUE_LMS_AUTH = { 'username': 'LMS',
-                    'password': 'PaloAltoCA' }
-XQUEUE_URL = 'http://xqueue.edx.org'
 
 log = logging.getLogger('mitx.' + __name__)
+
 
 def make_hashkey(seed=None):
     '''
@@ -63,7 +60,7 @@ class XqueueInterface:
     Interface to the external grading system
     '''
 
-    def __init__(self, url=XQUEUE_URL, auth=XQUEUE_LMS_AUTH):
+    def __init__(self, url, auth):
         self.url  = url
         self.auth = auth
         self.session = requests.session()
@@ -117,5 +114,3 @@ class XqueueInterface:
             return (1, 'unexpected HTTP status code [%d]' % r.status_code)
 
         return parse_xreply(r.text)
-
-qinterface = XqueueInterface()
