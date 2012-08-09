@@ -88,6 +88,7 @@
     ${render_info(content)}
     ${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}
     ${render_link("discussion-link discussion-edit", "Edit")}
+    ${render_link("discussion-link discussion-permanent-link", "Permanent Link")}
 
     <span class="discussion-endorse-control">
       % if content.get('endorsed', False):
