@@ -1,5 +1,23 @@
 """
-WE'RE USING MIGRATIONS!
+Models for Student Information
+
+Replication Notes
+
+In our live deployment, we intend to run in a scenario where there is a pool of
+Portal servers that hold the canoncial user information and that user 
+information is replicated to slave Course server pools. Each Course has a set of
+servers that serves only its content and has users that are relevant only to it.
+
+We replicate the following tables into the Course DBs where the user is 
+enrolled. Only the Portal servers should ever write to these models.
+* UserProfile
+* CourseEnrollment
+
+We do a partial replication of:
+* User -- Askbot extends this and uses the extra fields, so we replicate only
+          the stuff that comes with basic django_auth and ignore the rest.)
+
+Migration Notes
 
 If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
@@ -27,6 +45,24 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 class UserProfile(models.Model):
+    """This is where we store all the user demographic fields. We have a 
+    separate table for this rather than extending the built-in Django auth_user.
+
+    Notes:
+        * Some fields are legacy ones from the first run of 6.002, from which 
+          we imported many users.
+        * Fields like name and address are intentionally open ended, to account
+          for international variations. An unfortunate side-effect is that we
+          cannot efficiently sort on last names for instance.
+
+    Replication:
+        * Only the Portal servers should ever modify this information.
+        * All fields are replicated into relevant Course databases
+
+    Some of the fields are legacy ones that were captured during the initial
+    MITx fall prototype.
+    """
+
     class Meta:
         db_table = "auth_userprofile"
 
@@ -210,10 +246,6 @@ def add_user_to_default_group(user, group):
         utg.save()
     utg.users.add(User.objects.get(username=user))
     utg.save()
-
-
-
-
 
 ################################# SIGNALS ######################################
 
