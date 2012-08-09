@@ -818,7 +818,7 @@ class CodeResponse(LoncapaResponse):
         '''
         Configure CodeResponse from XML. Supports both CodeResponse and ExternalResponse XML
 
-        Determines whether in synchronous or asynchronous (queued) mode
+        TODO: Determines whether in synchronous or asynchronous (queued) mode
         '''
         xml = self.xml
         self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
