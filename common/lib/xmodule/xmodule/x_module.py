@@ -143,7 +143,7 @@ class XModule(HTMLSnippet):
     # in the module
     icon_class = 'other'
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         '''
         Construct a new xmodule
@@ -189,6 +189,7 @@ class XModule(HTMLSnippet):
         self.system = system
         self.location = Location(location)
         self.definition = definition
+        self.descriptor = descriptor
         self.instance_state = instance_state
         self.shared_state = shared_state
         self.id = self.location.url()
@@ -303,6 +304,13 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
+    
+    # Attributes for inpsection of the descriptor
+    stores_state = False # Indicates whether the xmodule state should be 
+    # stored in a database (independent of shared state)
+    has_score = False # This indicates whether the xmodule is a problem-type.
+    # It should respond to max_score() and grade(). It can be graded or ungraded
+    # (like a practice problem).
 
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
@@ -427,6 +435,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             system,
             self.location,
             self.definition,
+            self,
             metadata=self.metadata
         )
 

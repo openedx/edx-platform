@@ -31,8 +31,8 @@ class ABTestModule(XModule):
     Implements an A/B test with an aribtrary number of competing groups
     """
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
 
         if shared_state is None:
 

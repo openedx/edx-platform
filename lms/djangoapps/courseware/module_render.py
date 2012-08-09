@@ -127,19 +127,18 @@ def get_module(user, request, location, student_module_cache, position=None):
     descriptor = modulestore().get_item(location)
     
     #TODO Only check the cache if this module can possibly have state
+    instance_module = None
+    shared_module = None
     if user.is_authenticated():
-        instance_module = student_module_cache.lookup(descriptor.category,
-                                              descriptor.location.url())
+        if descriptor.stores_state:
+            instance_module = student_module_cache.lookup(descriptor.category,
+                                                  descriptor.location.url())
         
         shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
-        else:
-            shared_module = None
-    else:
-        instance_module = None
-        shared_module = None
+        
         
 
     instance_state = instance_module.state if instance_module is not None else '{}'
@@ -206,6 +205,11 @@ def get_instance_module(user, module, student_module_cache):
         or None if this is an anonymous user
     """
     if user.is_authenticated():
+        if not module.descriptor.stores_state:
+            log.exception("Attempted to get the instance_module for a module " 
+                          + str(module.id) + " which does not store state.")
+            return None
+        
         instance_module = student_module_cache.lookup(module.category,
                                               module.location.url())
         
@@ -257,13 +261,16 @@ def xqueue_callback(request, userid, id, dispatch):
     '''
     Entry point for graded results from the queueing system. 
     '''
-    # Parse xqueue response
+    # Test xqueue package, which we expect to be:
+    #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
+    #               'xqueue_body'  : 'Message from grader}
     get = request.POST.copy()
-    try:
-        header = json.loads(get['xqueue_header'])
-    except Exception as err:
-        msg = "Error in xqueue_callback %s: Invalid return format" % err
-        raise Exception(msg)
+    for key in ['xqueue_header', 'xqueue_body']:
+        if not get.has_key(key):
+            return Http404
+    header = json.loads(get['xqueue_header'])
+    if not isinstance(header, dict) or not header.has_key('lms_key'):
+        return Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
@@ -273,8 +280,7 @@ def xqueue_callback(request, userid, id, dispatch):
     instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'",
-                  id, user)
+        log.debug("Couldn't find module '%s' for user '%s'", id, user)
         raise Http404
 
     oldgrade = instance_module.grade

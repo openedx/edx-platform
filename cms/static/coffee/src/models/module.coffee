@@ -4,7 +4,8 @@ class CMS.Models.Module extends Backbone.Model
     data: ''
 
   loadModule: (element) ->
-    @module = XModule.loadModule($(element).find('.xmodule_edit'))
+    elt = $(element).find('.xmodule_edit').first()
+    @module = XModule.loadModule(elt)
 
   editUrl: ->
     "/edit_item?#{$.param(id: @get('id'))}"

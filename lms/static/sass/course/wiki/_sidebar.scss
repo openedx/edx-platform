@@ -2,20 +2,8 @@ div#wiki_panel {
   @extend .sidebar;
   overflow: auto;
 
-  h2 {
-    @extend .bottom-border;
-    margin: 0 ;
-    padding: lh(.5) lh() lh(.5) 0;
-    color: #000;
-  }
-
   ul {
-    padding-left: 0;
-    margin: 0;
-
     li {
-      @extend .bottom-border;
-
       &.search {
         padding: 10px lh() 10px 0;
 
@@ -23,25 +11,14 @@ div#wiki_panel {
           display: none;
         }
       }
-
-      a {
-        color: #666;
-        font-size: 14px;
-        padding: 7px lh() 7px 0;
-
-        &:hover {
-          background: #efefef;
-        }
-
-      }
     }
+  }
 
-    form {
-      input[type="submit"]{
-        @extend .light-button;
-        text-transform: none;
-        text-shadow: none;
-      }
+  form {
+    input[type="submit"]{
+      @extend .light-button;
+      text-transform: none;
+      text-shadow: none;
     }
   }
 

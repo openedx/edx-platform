@@ -99,10 +99,10 @@ class CourseDescriptor(SequenceDescriptor):
             sections = []
             for s in c.get_children():
                 if s.metadata.get('graded', False):
-                    # TODO: Only include modules that have a score here
-                    xmoduledescriptors = [child for child in yield_descriptor_descendents(s)]
-
-                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
+                    xmoduledescriptors = list(yield_descriptor_descendents(s))
+                    
+                    # The xmoduledescriptors included here are only the ones that have scores.
+                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
 
                     section_format = s.metadata.get('format', "")
                     graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
