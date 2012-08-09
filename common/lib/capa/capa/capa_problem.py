@@ -203,8 +203,9 @@ class LoncapaProblem(object):
         cmap.update(self.correct_map)
         for responder in self.responders.values():
             if hasattr(responder, 'update_score'):
-                # Each LoncapaResponse will update the specific entries of 'cmap' that it's responsible for
-                cmap = responder.update_score(score_msg, cmap, queuekey)
+                # Each LoncapaResponse will update its specific entries in cmap
+                #   cmap is passed by reference
+                responder.update_score(score_msg, cmap, queuekey)
         self.correct_map.set_dict(cmap.get_dict())
         return cmap
 
