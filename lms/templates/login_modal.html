@@ -27,9 +27,11 @@
         <span>Not enrolled? <a href="#signup-modal" class="close-login" rel="leanModal">Sign up.</a></span>
         <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset">Forgot password?</a>
       </p>
+% if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
       <p>
       <a href="${MITX_ROOT_URL}/openid/login/">login via openid</a>
       </p>
+% endif
     </section>
 
     <div class="close-modal">
