@@ -30,22 +30,19 @@ class CustomTagModule(XModule):
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
-        self.html = definition['html']
 
     def get_html(self):
-        return self.html
+        return self.descriptor.rendered_html
 
 
 class CustomTagDescriptor(RawDescriptor):
     """ Descriptor for custom tags.  Loads the template when created."""
     module_class = CustomTagModule
 
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        definition = RawDescriptor.definition_from_xml(xml_object, system)
-
-        # Render the template and save it.
-        xmltree = etree.fromstring(definition['data'])
+    @staticmethod
+    def render_template(system, xml_data):
+        '''Render the template, given the definition xml_data'''
+        xmltree = etree.fromstring(xml_data)
         if 'impl' in xmltree.attrib:
             template_name = xmltree.attrib['impl']
         else:
@@ -61,6 +58,18 @@ class CustomTagDescriptor(RawDescriptor):
         params = dict(xmltree.items())
         with system.resources_fs.open('custom_tags/{name}'
                                    .format(name=template_name)) as template:
-            definition['html'] = Template(template.read()).render(**params)
+            return Template(template.read()).render(**params)
 
-        return definition
+
+    def __init__(self, system, definition, **kwargs):
+        '''Render and save the template for this descriptor instance'''
+        super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
+        self.rendered_html = self.render_template(system, definition['data'])
+
+    def export_to_file(self):
+        """
+        Custom tags are special: since they're already pointers, we don't want
+        to export them in a file with yet another layer of indirection.
+        """
+        return False
+

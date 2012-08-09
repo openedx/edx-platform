@@ -166,6 +166,10 @@ class XModule(HTMLSnippet):
             'children': is a list of Location-like values for child modules that
                 this module depends on
 
+        descriptor: the XModuleDescriptor that this module is an instance of.
+            TODO (vshnayder): remove the definition parameter and location--they
+            can come from the descriptor.
+
         instance_state: A string of serialized json that contains the state of
                 this module for current student accessing the system, or None if
                 no state has been saved
@@ -304,9 +308,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
-    
+
     # Attributes for inpsection of the descriptor
-    stores_state = False # Indicates whether the xmodule state should be 
+    stores_state = False # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
     has_score = False # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
@@ -677,7 +681,7 @@ class ModuleSystem(object):
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
 
-        xqueue - Dict containing XqueueInterface object, as well as parameters 
+        xqueue - Dict containing XqueueInterface object, as well as parameters
                     for the specific StudentModule
 
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
