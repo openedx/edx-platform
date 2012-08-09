@@ -257,13 +257,16 @@ def xqueue_callback(request, userid, id, dispatch):
     '''
     Entry point for graded results from the queueing system. 
     '''
-    # Parse xqueue response
+    # Test xqueue package, which we expect to be:
+    #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
+    #               'xqueue_body'  : 'Message from grader}
     get = request.POST.copy()
-    try:
-        header = json.loads(get['xqueue_header'])
-    except Exception as err:
-        msg = "Error in xqueue_callback %s: Invalid return format" % err
-        raise Exception(msg)
+    for key in ['xqueue_header', 'xqueue_body']:
+        if not get.has_key(key):
+            return Http404
+    header = json.loads(get['xqueue_header'])
+    if not isinstance(header, dict) or not header.has_key('lms_key'):
+        return Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
@@ -273,8 +276,7 @@ def xqueue_callback(request, userid, id, dispatch):
     instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'",
-                  id, user)
+        log.debug("Couldn't find module '%s' for user '%s'", id, user)
         raise Http404
 
     oldgrade = instance_module.grade

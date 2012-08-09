@@ -815,10 +815,27 @@ class CodeResponse(LoncapaResponse):
     max_inputfields = 1
 
     def setup_response(self):
+        '''
+        Configure CodeResponse from XML. Supports both CodeResponse and ExternalResponse XML
+
+        Determines whether in synchronous or asynchronous (queued) mode
+        '''
         xml = self.xml
+        self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
-        answer = xml.find('answer')
+        self._parse_externalresponse_xml()
+
+    def _parse_externalresponse_xml(self):
+        '''
+        VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
+            self.code
+            self.tests
+            self.answer
+            self.initial_display
+        '''
+        answer = self.xml.find('answer')
+
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
@@ -832,7 +849,7 @@ class CodeResponse(LoncapaResponse):
                 msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.tests = xml.get('tests')
+        self.tests = self.xml.get('tests')
 
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
@@ -903,27 +920,22 @@ class CodeResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-        # Parse 'score_msg' as XML
-        try:
-            rxml = etree.fromstring(score_msg)
-        except Exception as err:
-            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
-            raise Exception(err)
 
-        # The following process is lifted directly from ExternalResponse
-        ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
-                 'WRONG_FORMAT': 'incorrect',
-                 }
-        self.context['correct'] = ['correct']
-        if ad in admap:
-            self.context['correct'][0] = admap[ad]
+        (valid_score_msg, correct, score, msg) = self._parse_score_msg(score_msg) 
+        if not valid_score_msg:
+            oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
+            return oldcmap
+        
+        correctness = 'incorrect'
+        if correct:
+            correctness = 'correct'
+
+        self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
         #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
-            oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
+            oldcmap.set(self.answer_id, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
@@ -936,6 +948,31 @@ class CodeResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
+    def _parse_score_msg(self, score_msg):
+        '''
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': # TODO -- Partial grading
+             'msg': grader_msg }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           # TODO: Implement partial grading
+            msg:             Message from grader to display to student (string)
+        '''
+        fail = (False, False, -1, '')
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            return fail
+        if not isinstance(score_result, dict):
+            return fail
+        for tag in ['correct', 'score', 'msg']:
+            if not score_result.has_key(tag):
+                return fail
+        return (True, score_result['correct'], score_result['score'], score_result['msg'])
+        
 
 #-----------------------------------------------------------------------------
 
