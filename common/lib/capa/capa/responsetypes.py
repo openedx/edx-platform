@@ -815,10 +815,27 @@ class CodeResponse(LoncapaResponse):
     max_inputfields = 1
 
     def setup_response(self):
+        '''
+        Configure CodeResponse from XML. Supports both CodeResponse and ExternalResponse XML
+
+        Determines whether in synchronous or asynchronous (queued) mode
+        '''
         xml = self.xml
+        self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
-        answer = xml.find('answer')
+        self._parse_externalresponse_xml()
+
+    def _parse_externalresponse_xml(self):
+        '''
+        VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
+            self.code
+            self.tests
+            self.answer
+            self.initial_display
+        '''
+        answer = self.xml.find('answer')
+
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
@@ -832,11 +849,8 @@ class CodeResponse(LoncapaResponse):
                 msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.tests = xml.get('tests')
+        self.tests = self.xml.get('tests')
 
-        # TODO: A common XML format for interacting with external graders
-        #       New format will not require exec
-        #
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
         #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
@@ -907,10 +921,14 @@ class CodeResponse(LoncapaResponse):
 
     def update_score(self, score_msg, oldcmap, queuekey):
 
-        (valid_score_msg, correctness, score, msg) = self._parse_score_msg(score_msg) 
+        (valid_score_msg, correct, score, msg) = self._parse_score_msg(score_msg) 
         if not valid_score_msg:
             oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
             return oldcmap
+        
+        correctness = 'incorrect'
+        if correct:
+            correctness = 'correct'
 
         self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
 
