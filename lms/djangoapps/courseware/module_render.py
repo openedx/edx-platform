@@ -7,9 +7,9 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from capa.xqueue_interface import XQueueInterface
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
-from capa.xqueue_interface import qinterface
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
@@ -21,6 +21,12 @@ from courseware.courses import (has_staff_access_to_course,
                                 has_staff_access_to_location)
 
 log = logging.getLogger("mitx.courseware")
+
+
+xqueue_interface = XQueueInterface(
+    settings.XQUEUE_INTERFACE['url'],
+    settings.XQUEUE_INTERFACE['auth']
+)
 
 
 def make_track_function(request):
@@ -172,9 +178,9 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO: Queuename should be derived from 'course_settings.json' of each course
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
-    xqueue = { 'interface': qinterface,
-               'callback_url': xqueue_callback_url,
-               'default_queuename': xqueue_default_queuename.replace(' ','_') }
+    xqueue = {'interface': xqueue_interface,
+              'callback_url': xqueue_callback_url,
+              'default_queuename': xqueue_default_queuename.replace(' ', '_')}
 
     def _get_module(location):
         return get_module(user, request, location,
