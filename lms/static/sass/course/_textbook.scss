@@ -9,6 +9,12 @@ div.book-wrapper {
     ul#booknav {
       font-size: em(14);
 
+      .page-number {
+        float: right;
+        font-size: .8em;
+        color: #9a9a9a;
+      }
+
       li {
         background: none;
         border-bottom: 0;

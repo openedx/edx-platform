@@ -75,7 +75,11 @@ $("#open_close_accordion a").click(function(){
           <%def name="print_entry(entry)">
               <li>
                   <a href="javascript:goto_page(${entry.get('page')})">
-                      ${' '.join(entry.get(attribute, '') for attribute in ['chapter', 'name', 'page_label'])}
+                      <!--${' '.join(entry.get(attribute, '') for attribute in ['chapter', 'name', 'page_label'])}-->
+                      %if entry.get('chapter'):
+                        <span class="chapter-number">${entry.get('chapter')}</span> 
+                      %endif
+                      <span class="chapter-name">${entry.get('name')}</span> <span class="page-number">${entry.get('page_label')}</span>
                   </a>
                   % if len(entry) > 0:
                       <ul>
