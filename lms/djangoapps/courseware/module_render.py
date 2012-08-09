@@ -186,6 +186,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
+    system.set('DEBUG',settings.DEBUG)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
