@@ -155,6 +155,7 @@ def get_annotated_content_info(course_id, content, user, is_thread):
         'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if not is_thread else False,
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if is_thread else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if is_thread else False,
+        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if is_thread else "vote_for_comment"),
     }
     return permissions
 
