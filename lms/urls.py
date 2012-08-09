@@ -141,7 +141,6 @@ if settings.COURSEWARE_ENABLED:
 
         # discussion
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
-
         include('django_comment_client.urls')),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'courseware.views.gradebook'),        
