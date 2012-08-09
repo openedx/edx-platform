@@ -99,7 +99,8 @@ def add_histogram(get_html, module):
                 # doesn't like symlinks)
                 filepath = filename
             data_dir = osfs.root_path.rsplit('/')[-1]
-            edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filepath)
+            giturl = module.metadata.get('giturl','https://github.com/MITx')
+            edit_link = "%s/%s/tree/master/%s" % (giturl,data_dir,filepath)
         else:
             edit_link = False
 
