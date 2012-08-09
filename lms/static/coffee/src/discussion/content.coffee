@@ -367,6 +367,15 @@ initializeFollowThread = (thread) ->
 
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
+
+    discussion_id = $content.parents(".discussion").attr("_id")
+    if $content.hasClass("thread")
+      permalink = Discussion.urlFor("permanent_link_thread", discussion_id, id)
+    else
+      thread_id = $content.parents(".thread").attr("_id")
+      permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, id)
+    $local(".discussion-permanent-link").attr "href", permalink
+
     if not Discussion.getContentInfo id, 'editable'
       $local(".discussion-edit").remove()
     if not Discussion.getContentInfo id, 'can_reply'
