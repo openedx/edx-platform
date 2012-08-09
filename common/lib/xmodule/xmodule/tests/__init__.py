@@ -708,6 +708,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, 'a://b/c/d/e', {})
+        xm = x_module.XModule(i4xs, 'a://b/c/d/e', None, {})
         p = xm.get_progress()
         self.assertEqual(p, None)
