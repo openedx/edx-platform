@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from mock import patch, Mock
 from override_settings import override_settings
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from student.models import Registration
 
 from xmodule.modulestore.django import modulestore
@@ -88,6 +88,13 @@ class ActivateLoginTestCase(TestCase):
         self.assertTrue(data['success'])
         return resp
 
+    def logout(self):
+        '''Logout, check that it worked.'''
+        resp = self.client.get(reverse('logout'), {})
+        # should redirect
+        self.assertEqual(resp.status_code, 302)
+        return resp
+
     def _create_account(self, username, email, pw):
         '''Try to create an account.  No error checking'''
         resp = self.client.post('/create_account', {
@@ -131,12 +138,16 @@ class ActivateLoginTestCase(TestCase):
         '''The setup function does all the work'''
         pass
 
+    def test_logout(self):
+        '''Setup function does login'''
+        self.logout()
+
 
 class PageLoader(ActivateLoginTestCase):
     ''' Base class that adds a function to load all pages in a modulestore '''
 
-
     def enroll(self, course):
+        """Enroll the currently logged-in user, and check that it worked."""
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'enroll',
             'course_id': course.id,
@@ -193,7 +204,96 @@ class TestCoursesLoadTestCase(PageLoader):
         self.check_pages_load('full', TEST_DATA_DIR, modulestore())
 
 
-    # ========= TODO: check ajax interaction here too?
+@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+class TestInstructorAuth(PageLoader):
+    """Check that authentication works properly"""
+
+    # NOTE: Originally tried putting the imports into a setUpClass() method,
+    # but that seemed to run before override_settings took effect.  Did not debug further.
+
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+        modulestore().collection.drop()
+        import_from_xml(modulestore(), TEST_DATA_DIR, ['toy'])
+        import_from_xml(modulestore(), TEST_DATA_DIR, ['full'])
+        courses = modulestore().get_courses()
+        # hack to get the two courses out
+        courses.sort(key=lambda c: c.location.course)
+        [self.full, self.toy] = courses
+
+        # Create two accounts
+        self.student = 'view@test.com'
+        self.instructor = 'view2@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.create_account('u2', self.instructor, self.password)
+        self.activate_user(self.student)
+        self.activate_user(self.instructor)
+
+    def check_for_get_code(self, code, url):
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, code)
+
+    def test_instructor_page(self):
+        "Make sure only instructors can load it"
+
+        # First, try with an enrolled student
+        self.login(self.student, self.password)
+        # shouldn't work before enroll
+        self.check_for_get_code(302, reverse('courseware', kwargs={'course_id': self.toy.id}))
+        self.enroll(self.toy)
+        self.enroll(self.full)
+        # should work now
+        self.check_for_get_code(200, reverse('courseware', kwargs={'course_id': self.toy.id}))
+
+        # TODO: Disabled rest of test for now.  Fix once raising a 404 actually
+        # returns a 404 to the client
+        raise SkipTest
+
+        def instructor_urls(course):
+            urls = [reverse(name, kwargs={'course_id': course.id}) for name in (
+                'instructor_dashboard',
+                'gradebook',
+                'grade_summary',)]
+            urls += reverse(student_profile, kwargs={'course_id': course.id,
+                                                     'student_id': user(self.student).id})
+            return urls
+
+        # shouldn't be able to get to the instructor pages
+        for url in instructor_urls(self.toy) + instructor_urls(self.full):
+            print 'checking for 404 on {}'.format(url)
+            self.check_for_get_code(404, url)
+
+        # Make the instructor staff in the toy course
+        group_name = course_staff_group_name(self.toy)
+        g = Group.objects.create(name=group_name)
+        g.user_set.add(user(self.instructor))
+
+        self.logout()
+        self.login(self.instructor, self.password)
+
+        # Now should be able to get to the toy course, but not the full course
+        for url in instructor_urls(self.toy):
+            print 'checking for 200 on {}'.format(url)
+            self.check_for_get_code(200, url)
+
+        for url in instructor_urls(self.full):
+            print 'checking for 404 on {}'.format(url)
+            self.check_for_get_code(404, url)
+
+
+        # now also make the instructor staff
+        u = user(self.instructor)
+        u.is_staff = True
+        u.save()
+
+        # and now should be able to load both
+        for url in instructor_urls(self.toy) + instructor_urls(self.full):
+            print 'checking for 200 on {}'.format(url)
+            self.check_for_get_code(200, url)
+
+
+
 
 
 @override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
