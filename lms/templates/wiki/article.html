@@ -1,0 +1,48 @@
+## mako
+<%inherit file="../main.html"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="bodyextra">
+
+This is a mako template with inheritance!
+
+</%block>
+
+
+<!-- {% extends "wiki/base.html" %}
+{% load wiki_tags i18n %}
+{% load url from future %}
+
+{% block pagetitle %}{{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_breadcrumbs %}
+{% include "wiki/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block wiki_contents %}
+  <h1> Did it work? </h1>
+  <div class="tabbable tabs-top" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      <li style="float: left">
+        <h1 style="margin-top: -10px;">{{ article.current_revision.title }}</h1>
+      </li>
+      {% with "view" as selected %}
+        {% include "wiki/includes/article_menu.html" %}
+      {% endwith %}
+    </ul>
+    <div class="tab-content">
+      {% wiki_render article %}
+    </div>
+  </div>
+
+  <div class="tabbable tabs-below" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      {% with "view" as selected %}
+        {% include "wiki/includes/article_menu.html" %}
+      {% endwith %}
+      <li style="margin-top: 10px;"><em>{% trans "Article last modified:" %} {{ article.current_revision.modified }}</em></li>
+    </ul>
+  </div>
+    
+{% endblock %} -->
+

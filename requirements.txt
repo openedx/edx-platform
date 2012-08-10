@@ -43,4 +43,5 @@ django-robots
 django-ses
 django-storages
 django-threaded-multihost
+-e git+git://github.com/benjaoming/django-wiki.git#egg=django-wiki
 -r repo-requirements.txt
