@@ -403,6 +403,21 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
 
+    @staticmethod
+    def compute_inherited_metadata(course):
+        """Given a course descriptor, traverse the entire course tree and do
+        metadata inheritance.  Should be called after importing a course.
+
+        NOTE: This means that there is no such thing as lazy loading at the
+        moment--this accesses all the children."""
+        def do_inherit(node):
+            for c in node.get_children():
+                c.inherit_metadata(node.metadata)
+                do_inherit(c)
+
+        do_inherit(course)
+
+
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
@@ -415,6 +430,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
+        print "final self.metadata: {}".format(self.metadata)
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
@@ -423,6 +439,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             self._child_instances = []
             for child_loc in self.definition.get('children', []):
                 child = self.system.load_item(child_loc)
+                # TODO (vshnayder): this should go away once we have
+                # proper inheritance support in mongo.  The xml
+                # datastore does all inheritance on course load.
                 child.inherit_metadata(self.metadata)
                 self._child_instances.append(child)
 
