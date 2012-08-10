@@ -1,3 +1,4 @@
+from django.template import loader
 from django.template.base import Template, Context
 from django.template.loader import get_template, select_template
 
@@ -21,3 +22,7 @@ def render_inclusion(func, file_name, *args, **kwargs):
     #     'use_tz': context.use_tz,
     # })
     return nodelist.render(new_context)
+    
+def django_template_include(file_name, mako_context):
+    dictionary = dict( mako_context )
+    return loader.render_to_string(file_name, dictionary=dictionary)

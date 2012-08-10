@@ -7,45 +7,35 @@
 %>
 
 <%namespace name="article_menu" file="includes/article_menu.html"/>
+<%namespace name="breadcrumbs" file="includes/breadcrumbs.html"/>
 
 
 <%block name="title"><title>${article.current_revision.title}</title></%block>
 
 
-<%doc>
 <%block name="wiki_breadcrumbs">
-Render "wiki/includes/breadcrumbs.html"
-## {% include "wiki/includes/breadcrumbs.html" %}
+${breadcrumbs.body(article, urlpath)}
 </%block>
-</%doc>
-
-
 
 <%block name="wiki_contents">
-
-<div class="tabbable tabs-top" style="margin-top: 20px;">
-  <ul class="nav nav-tabs">
-    <li style="float: left">
-      <h1 style="margin-top: -10px;">${article.current_revision.title}</h1>
-    </li>
-    ${article_menu.body('view', article, plugins)}
-  </ul>
+  <div class="tabbable tabs-top" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      <li style="float: left">
+        <h1 style="margin-top: -10px;">${article.current_revision.title}</h1>
+      </li>
+      ${article_menu.body('view', article, plugins)}
+    </ul>
   
-  <div class="tab-content">
-    ${ render_inclusion(wiki_render, 'wiki/includes/render.html', article ) }
+    <div class="tab-content">
+      ${ render_inclusion(wiki_render, 'wiki/includes/render.html', article ) }
+    </div>
   </div>
-</div>
 
-<div class="tabbable tabs-below" style="margin-top: 20px;">
-  <%doc>
-  <ul class="nav nav-tabs">
-    {% with "view" as selected %}
-      {% include "wiki/includes/article_menu.html" %}
-    {% endwith %}
-    <li style="margin-top: 10px;"><em>{% trans "Article last modified:" %} {{ article.current_revision.modified }}</em></li>
-  </ul>
-  </%doc>
-</div>
-
+  <div class="tabbable tabs-below" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      ${article_menu.body('view', article, plugins)}
+      <li style="margin-top: 10px;"><em>Article last modified: ${ article.current_revision.modified }</em></li>
+    </ul>
+  </div>
 </%block>
 

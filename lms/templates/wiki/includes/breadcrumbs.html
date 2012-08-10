@@ -1,0 +1,47 @@
+## mako
+<%page args="article, urlpath" />
+<%! from django.core.urlresolvers import reverse %>
+
+%if urlpath:
+  <ul class="breadcrumb pull-left" class="">
+    %for ancestor in urlpath.get_ancestors():
+      <span class="divider">/</span>
+      <li><a href="${reverse('wiki:get_url', ancestor.path)}">${ ancestor.article.current_revision.title }</a></li>
+    %endfor
+    <span class="divider">/</span>
+    <li class="active"><a href="${reverse('wiki:get_url', kwargs={'path' : urlpath.path})}">${ article.current_revision.title }</a></li>
+    <span class="divider">/</span>
+  </ul>
+  <div class="pull-left" style="margin-left: 10px;">
+    <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="padding: 7px;" title="Sub-articles for ${ article.current_revision.title }">
+        <span class="icon-list"></span>
+      <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        %if len(urlpath.get_children()) > 0:
+          %for child in urlpath.get_children():
+            <li>
+            <a href="${reverse('wiki:get_url', child.path)}">
+              ${child.article.current_revision.title}
+            </a>
+            </li>
+          %endfor
+        %else:
+          <li><a href="#"><em>No sub-articles</em></a></li>
+        %endif
+        <li class="divider"></li>
+        <li>
+          <a href="" onclick="alert('TODO')">List sub-pages &raquo;</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="pull-left" style="margin-left: 10px;">
+      <a class="btn" href="${reverse('wiki:create_url', kwargs={'path' : urlpath.path})}" style="padding: 7px;">
+        <span class="icon-plus"></span>
+        Add article
+      </a>
+  </div>
+  <div style="clear: both"></div>
+%endif

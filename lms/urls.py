@@ -152,6 +152,8 @@ if settings.WIKI_ENABLED:
     # )
     urlpatterns += (        
     
+        #url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
+        
         url(r'wiki/', include(wiki_pattern())),
         url(r'^notify/', include(notify_pattern())),
     )
