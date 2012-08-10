@@ -185,3 +185,21 @@ h1.top-header {
 .tran {
   @include transition( all, .2s, $ease-in-out-quad);
 }
+
+.global {
+  h2 {
+    float: left;
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 40px;
+    letter-spacing: 0;
+    text-transform: none;
+    text-shadow: 0 1px 0 #fff;
+
+    .provider {
+      font: inherit;
+      font-weight: bold;
+      color: #6d6d6d;
+    }
+  }
+}
