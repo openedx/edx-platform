@@ -7,16 +7,16 @@
 <header class="global" aria-label="Global Navigation">
   <nav>
     <h1 class="logo"><a href="${reverse('root')}"></a></h1>
-    
+
     %if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
-    %else:
-      <ol class="left">
+    %endif
+
+    <ol class="left find-courses-button">
       <li class="primary">
         <a href="${reverse('courses')}">Find Courses</a>
       </li>
     </ol>
-    %endif
 
   %if user.is_authenticated():
     <ol class="user">
