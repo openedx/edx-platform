@@ -17,6 +17,13 @@ We do a partial replication of:
 * User -- Askbot extends this and uses the extra fields, so we replicate only
           the stuff that comes with basic django_auth and ignore the rest.)
 
+There are a couple different scenarios:
+
+1. There's an update of User or UserProfile -- replicate it to all Course DBs
+   that the user is enrolled in (found via CourseEnrollment).
+2. There's a change in CourseEnrollment. We need to push copies of UserProfile,
+   CourseEnrollment, and the base fields in User
+
 Migration Notes
 
 If you make changes to this model, be sure to create an appropriate migration
@@ -247,53 +254,132 @@ def add_user_to_default_group(user, group):
     utg.users.add(User.objects.get(username=user))
     utg.save()
 
-################################# SIGNALS ######################################
+########################## REPLICATION SIGNALS #################################
+@receiver(post_save, sender=CourseEnrollment)
+def replicate_enrollment_save(sender, **kwargs):
+    """This is called when a Student enrolls in a course. It has to do the 
+    following:
+
+    1. Make sure the User is copied into the Course DB. It may already exist 
+       (someone deleting and re-adding a course). This has to happen first or
+       the foreign key constraint breaks.
+    2. Replicate the CourseEnrollment.
+    3. Replicate the UserProfile.
+    """
+    enrollment_obj = kwargs['instance']
+    replicate_user(enrollment_obj.user, enrollment_obj.course_id)
+    replicate_model(CourseEnrollment.save, enrollment_obj.user_id, **kwargs)
+    replicate_model(UserProfile.save, enrollment_obj.user_id, **kwargs)
+
+@receiver(post_delete, sender=CourseEnrollment)
+def replicate_enrollment_delete(sender, **kwargs):
+    enrollment_obj = kwargs['instance']
+    return replicate_model(CourseEnrollment.delete, enrollment_obj.user_id, **kwargs)
+
+@receiver(post_save, sender=UserProfile)
+def replicate_userprofile_save(sender, **kwargs):
+    """We just updated the UserProfile (say an update to the name), so push that
+    change to all Course DBs that we're enrolled in."""
+    user_profile_obj = kwargs['instance']
+    return replicate_model(UserProfile.save, enrollment_obj.user_id, **kwargs)
+
+######### Replication functions #########
+def replicate_user(portal_user, course_db_name):
+    """Replicate a User to the correct Course DB. This is more complicated than
+    it should be because Askbot extends the auth_user table and adds its own 
+    fields. So we need to only push changes to the standard fields and leave
+    the rest alone so that Askbot can 
+    """
+    try:
+        # If the user exists in the Course DB, update the appropriate fields and
+        # save it back out to the Course DB.
+        course_user = User.objects.using(course_db_name).get(portal_user.id)
+        fields_to_copy = ["username", "first_name", "last_name", "email",
+                          "password", "is_staff", "is_active", "is_superuser",
+                          "last_login", "date_joined"]
+        for field in fields_to_copy:
+            setattr(course_user, field, getattr(portal_user, field))
+
+        mark_handled(course_user)
+        course_user.save(using=course_db_name) # Just being explicit.
+
+    except User.DoesNotExist:
+        # Otherwise, just make a straight copy to the Course DB.
+        mark_handled(portal_user)
+        portal_user.save(using=course_db_name)
+
+def replicate_model(model_method, user_id, **kwargs):
+    """
+    model_method is the model action that we want replicated. For instance, 
+                 UserProfile.save
+    """
+    instance = kwargs['instance']
+    if not should_replicate(instance):
+        return
+
+    mark_handled(instance)
+    course_db_names = db_names_to_replicate_to(user_id)
+    log.debug("Replicating {0} for user {1} to DBs: {2}"
+              .format(model_method, user_id, course_db_names))
+
+    for db_name in course_db_names:
+        model_method(instance, using=db_name)
+
+######### Replication Helpers #########
 
 def is_valid_course_id(course_id):
     """We check to both make sure that it's a valid course_id (and not 
     'default', or some other non-course DB name) and that we have a mapping
     for what database it belongs to."""
     course_ids = set(course.id for course in modulestore().get_courses())
-    return (course_id in course_ids) and (course_id in settings.DATABASES)
+    is_valid = (course_id in course_ids) and (course_id in settings.DATABASES)
+    if not is_valid:
+        log.error("{0} is not a valid DB to replicate to.".format(course_id))
+    return is_valid
 
 def is_portal():
-    """Are we in the portal pool? (in which case we'll have to replicate user
-    updates). Right now, that means we have more than one database defined."""
+    """Are we in the portal pool? Only Portal servers are allowed to replicate
+    their changes. For now, only Portal servers see multiple DBs, so we use
+    that to decide."""
     return len(settings.DATABASES) > 1
 
-def replicate_enrollment(instance_method, **kwargs):
-    log.debug("########## Enrollment replication called ############")
-    instance = kwargs['instance']
+def db_names_to_replicate_to(user_id):
+    """Return a list of DB names that this user_id is enrolled in."""
+    return [c.course_id
+            for c in CourseEnrollment.objects.filter(user_id=user_id)
+            if is_valid_course_id(c.course_id)]
 
+def marked_handled(instance):
+    """Have we marked this instance as being handled to avoid infinite loops
+    caused by saving models in post_save hooks for the same models?"""
+    return hasattr(instance, '_do_not_copy_to_course_db')
+
+def mark_handled(instance):
+    """You have to mark your instance with this function or else we'll go into
+    an infinite loop since we're putting listeners on Model saves/deletes and 
+    the act of replication requires us to call the same model method.
+
+    We create a _replicated attribute to differentiate the first save of this
+    model vs. the duplicate save we force on to the course database. Kind of
+    a hack -- suggestions welcome.
+    """
+    instance._do_not_copy_to_course_db = True
+
+def should_replicate(instance):
+    """Should this instance be replicated? We need to be a Portal server and
+    the instance has to not have been marked_handled."""
+    if marked_handled(instance):
+        # Basically, avoid an infinite loop. You should 
+        log.debug("{0} should not be replicated because it's been marked")
+        return False
     if not is_portal():
-        log.debug("replicate_enrollment triggered, but we're not a portal so " +
-                  "we're not propogating")
-        return
+        log.debug("{0} should not be replicated because we're not a portal."
+                  .format(instance))
+        return False
+    return True
 
-    if not is_valid_course_id(instance.course_id):
-        log.error("Don't know where to replicate to for course_id: {0}"
-                  .format(instance.course_id))
-        return
 
-    # We create a _replicated attribute to differentiate the first save of this
-    # model vs. the duplicate save we force on to the course database.
-    if hasattr(instance, '_replicated'):
-        log.debug("We've already replicated this -- stopping so we don't go " +
-                  "into an infinite loop.")
-        return 
-    instance._replicated = True
 
-    # instance_method is either CourseEnrollment.save or CourseEnrollment.delete
-    # using is the entry in DATABASES we push to (we use course_ids for names)
-    instance_method(instance, using=instance.course_id)
-
-@receiver(post_save, sender=CourseEnrollment)
-def replicate_enrollment_save(sender, **kwargs):
-    return replicate_enrollment(CourseEnrollment.save, **kwargs)
-
-@receiver(post_delete, sender=CourseEnrollment)
-def replicate_enrollment_delete(sender, **kwargs):
-    return replicate_enrollment(CourseEnrollment.delete, **kwargs)
 
 
 
