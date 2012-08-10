@@ -898,7 +898,7 @@ class CodeResponse(LoncapaResponse):
                     'processor': self.code,
                     }
         
-        # Submit request
+        # Submit request. When successful, 'msg' is the prior length of the queue
         if is_file(submission):
             contents.update({'edX_student_response': submission.name})
             (error, msg) = qinterface.send_to_queue(header=xheader,
@@ -914,8 +914,11 @@ class CodeResponse(LoncapaResponse):
             cmap.set(self.answer_id, queuekey=None,
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
-            # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
-            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader. (Queue length: %s)' % msg)
+            # Queueing mechanism flags:
+            #   1) Backend: Non-null CorrectMap['queuekey'] indicates that the problem has been queued
+            #   2) Frontend: correctness='incomplete' eventually trickles down through inputtypes.textbox 
+            #       and .filesubmission to inform the browser to poll the LMS
+            cmap.set(self.answer_id, queuekey=queuekey, correctness='incomplete', msg=msg)
 
         return cmap
 

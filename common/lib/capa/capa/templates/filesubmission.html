@@ -9,6 +9,9 @@
     % elif state == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif
+    % if queued:
+    <span class="xqueue" id="${id}" >${queue_len}</span>
+    % endif
     <span class="debug">(${state})</span>
     <br/>
     <span class="message">${msg|n}</span>
