@@ -15,6 +15,7 @@ from override_settings import override_settings
 
 from django.contrib.auth.models import User, Group
 from student.models import Registration
+from courseware.courses import course_staff_group_name
 
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
@@ -217,7 +218,7 @@ class TestInstructorAuth(PageLoader):
         import_from_xml(modulestore(), TEST_DATA_DIR, ['toy'])
         import_from_xml(modulestore(), TEST_DATA_DIR, ['full'])
         courses = modulestore().get_courses()
-        # hack to get the two courses out
+        # get the two courses sorted out
         courses.sort(key=lambda c: c.location.course)
         [self.full, self.toy] = courses
 
@@ -232,7 +233,13 @@ class TestInstructorAuth(PageLoader):
 
     def check_for_get_code(self, code, url):
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, code)
+        # HACK: workaround the bug that returns 200 instead of 404.
+        # TODO (vshnayder): once we're returning 404s, get rid of this if.
+        if code != 404:
+            self.assertEqual(resp.status_code, code)
+        else:
+            # look for "page not found" instead of the status code
+            self.assertTrue(resp.content.lower().find('page not found') != -1)
 
     def test_instructor_page(self):
         "Make sure only instructors can load it"
@@ -248,15 +255,14 @@ class TestInstructorAuth(PageLoader):
 
         # TODO: Disabled rest of test for now.  Fix once raising a 404 actually
         # returns a 404 to the client
-        raise SkipTest
 
         def instructor_urls(course):
             urls = [reverse(name, kwargs={'course_id': course.id}) for name in (
                 'instructor_dashboard',
                 'gradebook',
                 'grade_summary',)]
-            urls += reverse(student_profile, kwargs={'course_id': course.id,
-                                                     'student_id': user(self.student).id})
+            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+                                                     'student_id': user(self.student).id}))
             return urls
 
         # shouldn't be able to get to the instructor pages
