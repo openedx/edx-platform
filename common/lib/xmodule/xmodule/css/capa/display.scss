@@ -89,7 +89,7 @@ div {
     }
   }
 
-  &.checking {
+  &.processing {
     p.status {
       @include inline-block();
       background: url('../images/spinner.gif') center center no-repeat;
@@ -98,7 +98,7 @@ div {
     }
 
     input {
-      border-color: green;
+      border-color: #aaa;
     }
   }
 
