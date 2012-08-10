@@ -157,9 +157,13 @@ def get_module(user, request, location, student_module_cache, position=None):
     # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
-    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL +
-                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' +
-                          'score_update')
+    xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
+    xqueue_callback_url += reverse('xqueue_callback',
+                                  kwargs=dict(course_id=descriptor.location.course_id,
+                                              userid=str(user.id),
+                                              id=descriptor.location.url(),
+                                              dispatch='score_update'),
+                                  )
 
     # Default queuename is course-specific and is derived from the course that
     #   contains the current module.
@@ -265,7 +269,7 @@ def get_shared_instance_module(user, module, student_module_cache):
         return None
 
 @csrf_exempt
-def xqueue_callback(request, userid, id, dispatch):
+def xqueue_callback(request, course_id, userid, id, dispatch):
     '''
     Entry point for graded results from the queueing system. 
     '''
