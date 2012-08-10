@@ -15,7 +15,7 @@ urlpatterns = ('',
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
-    
+
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -118,7 +118,7 @@ if settings.COURSEWARE_ENABLED:
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
-        
+
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
@@ -130,16 +130,18 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.index_shifted'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/$',
+            'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$',
             'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
             'courseware.views.profile'),
-        
+
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'courseware.views.gradebook'),        
+            'courseware.views.gradebook'),
     )
 
     # Multicourse wiki

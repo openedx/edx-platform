@@ -69,12 +69,12 @@ def gradebook(request, course_id):
     if 'course_admin' not in user_groups(request.user):
         raise Http404
     course = check_course(course_id)
-        
+
     student_objects = User.objects.all()[:100]
     student_info = []
-    
+
     #TODO: Only select students who are in the course
-    for student in student_objects:        
+    for student in student_objects:
         student_info.append({
             'username': student.username,
             'id': student.id,
@@ -104,10 +104,10 @@ def profile(request, course_id, student_id=None):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
     course_module = get_module(request.user, request, course.location, student_module_cache)
-    
+
     courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
-    
+
     context = {'name': user_info.name,
                'username': student.username,
                'location': user_info.location,
@@ -129,19 +129,14 @@ def render_accordion(request, course, chapter, section):
 
         If chapter and section are '' or None, renders a default accordion.
 
+        course, chapter, and section are the url_names.
+
         Returns the html string'''
 
     # grab the table of contents
     toc = toc_for_course(request.user, request, course, chapter, section)
 
-    active_chapter = 1
-    for i in range(len(toc)):
-        if toc[i]['active']:
-            active_chapter = i
-
-    context = dict([('active_chapter', active_chapter),
-                    ('toc', toc),
-                    ('course_name', course.title),
+    context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
