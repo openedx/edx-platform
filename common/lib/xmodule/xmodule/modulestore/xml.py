@@ -213,6 +213,12 @@ class XMLModuleStore(ModuleStoreBase):
             system = ImportSystem(self, org, course, course_dir, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
+            # NOTE: The descriptors end up loading somewhat bottom up, which
+            # breaks metadata inheritance via get_children().  Instead
+            # (actually, in addition to, for now), we do a final inheritance pass
+            # after we have the course descriptor.
+            XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
