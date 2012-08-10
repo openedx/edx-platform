@@ -193,6 +193,7 @@ h1.top-header {
 
   h2 {
     display: block;
+    width: 700px;
     float: left;
     font-size: 0.9em;
     font-weight: 600;
@@ -200,6 +201,9 @@ h1.top-header {
     letter-spacing: 0;
     text-transform: none;
     text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 
     .provider {
       font: inherit;
