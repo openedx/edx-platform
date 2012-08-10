@@ -255,6 +255,11 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 ########################## REPLICATION SIGNALS #################################
+@receiver(post_save, sender=User)
+def replicate_user_save(sender, **kwargs):
+     user_obj = kwargs['instance']
+     return replicate_model(User.save, user_obj.id, **kwargs)
+
 @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
     """This is called when a Student enrolls in a course. It has to do the 
@@ -266,38 +271,44 @@ def replicate_enrollment_save(sender, **kwargs):
     2. Replicate the CourseEnrollment.
     3. Replicate the UserProfile.
     """
+    if not is_portal():
+        return
+
     enrollment_obj = kwargs['instance']
     replicate_user(enrollment_obj.user, enrollment_obj.course_id)
     replicate_model(CourseEnrollment.save, enrollment_obj.user_id, **kwargs)
     replicate_model(UserProfile.save, enrollment_obj.user_id, **kwargs)
-
+ 
 @receiver(post_delete, sender=CourseEnrollment)
 def replicate_enrollment_delete(sender, **kwargs):
-    enrollment_obj = kwargs['instance']
-    return replicate_model(CourseEnrollment.delete, enrollment_obj.user_id, **kwargs)
-
+     enrollment_obj = kwargs['instance']
+     return replicate_model(CourseEnrollment.delete, enrollment_obj.user_id, **kwargs)
+ 
 @receiver(post_save, sender=UserProfile)
 def replicate_userprofile_save(sender, **kwargs):
     """We just updated the UserProfile (say an update to the name), so push that
     change to all Course DBs that we're enrolled in."""
     user_profile_obj = kwargs['instance']
-    return replicate_model(UserProfile.save, enrollment_obj.user_id, **kwargs)
+    return replicate_model(UserProfile.save, user_profile_obj.user_id, **kwargs)
 
+ 
 ######### Replication functions #########
+USER_FIELDS_TO_COPY = ["id", "username", "first_name", "last_name", "email",
+                       "password", "is_staff", "is_active", "is_superuser",
+                       "last_login", "date_joined"]
+
 def replicate_user(portal_user, course_db_name):
     """Replicate a User to the correct Course DB. This is more complicated than
     it should be because Askbot extends the auth_user table and adds its own 
     fields. So we need to only push changes to the standard fields and leave
-    the rest alone so that Askbot can 
+    the rest alone so that Askbot changes at the Course DB level don't get 
+    overridden.
     """
     try:
         # If the user exists in the Course DB, update the appropriate fields and
         # save it back out to the Course DB.
-        course_user = User.objects.using(course_db_name).get(portal_user.id)
-        fields_to_copy = ["username", "first_name", "last_name", "email",
-                          "password", "is_staff", "is_active", "is_superuser",
-                          "last_login", "date_joined"]
-        for field in fields_to_copy:
+        course_user = User.objects.using(course_db_name).get(id=portal_user.id)
+        for field in USER_FIELDS_TO_COPY:
             setattr(course_user, field, getattr(portal_user, field))
 
         mark_handled(course_user)
@@ -331,6 +342,8 @@ def is_valid_course_id(course_id):
     """We check to both make sure that it's a valid course_id (and not 
     'default', or some other non-course DB name) and that we have a mapping
     for what database it belongs to."""
+    return course_id != 'default'
+
     course_ids = set(course.id for course in modulestore().get_courses())
     is_valid = (course_id in course_ids) and (course_id in settings.DATABASES)
     if not is_valid:
@@ -370,7 +383,8 @@ def should_replicate(instance):
     the instance has to not have been marked_handled."""
     if marked_handled(instance):
         # Basically, avoid an infinite loop. You should 
-        log.debug("{0} should not be replicated because it's been marked")
+        log.debug("{0} should not be replicated because it's been marked"
+                  .format(instance))
         return False
     if not is_portal():
         log.debug("{0} should not be replicated because we're not a portal."
