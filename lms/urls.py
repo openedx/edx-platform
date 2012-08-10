@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -144,9 +143,17 @@ if settings.COURSEWARE_ENABLED:
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
-    urlpatterns += (
-        url(r'^wiki/', include('simplewiki.urls')),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
+    from wiki.urls import get_pattern as wiki_pattern
+    from django_notify.urls import get_pattern as notify_pattern
+    
+    # urlpatterns += (
+    #     url(r'^wiki/', include('simplewiki.urls')),
+    #     url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
+    # )
+    urlpatterns += (        
+    
+        url(r'wiki/', include(wiki_pattern())),
+        url(r'^notify/', include(notify_pattern())),
     )
 
 if settings.QUICKEDIT:
