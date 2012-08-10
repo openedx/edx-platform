@@ -21,6 +21,8 @@ myhost = socket.gethostname()
 if ('edxvm' in myhost) or ('ocw' in myhost):
     MITX_FEATURES['DISABLE_LOGIN_BUTTON'] = True	# auto-login with MIT certificate
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 for nginx ssl proxy
+
 #-----------------------------------------------------------------------------
 # disable django debug toolbars
 
