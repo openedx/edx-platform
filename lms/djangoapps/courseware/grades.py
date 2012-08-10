@@ -1,3 +1,6 @@
+# Compute grades using real division, with no integer truncation
+from __future__ import division
+
 import random
 import logging
 
@@ -219,7 +222,7 @@ def get_score(user, problem, student_module_cache):
             if total == 0:
                 log.exception("Cannot reweight a problem with zero weight. Problem: " + str(instance_module))
                 return (correct, total)
-            correct = float(correct) * weight / total
+            correct = correct * weight / total
             total = weight
 
     return (correct, total)

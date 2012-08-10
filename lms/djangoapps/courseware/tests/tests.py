@@ -209,8 +209,8 @@ class TestCoursesLoadTestCase(PageLoader):
 class TestInstructorAuth(PageLoader):
     """Check that authentication works properly"""
 
-    # NOTE: Originally tried putting the imports into a setUpClass() method,
-    # but that seemed to run before override_settings took effect.  Did not debug further.
+    # NOTE: setUpClass() runs before override_settings takes effect, so
+    # can't do imports there without manually hacking settings.
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
@@ -253,10 +253,8 @@ class TestInstructorAuth(PageLoader):
         # should work now
         self.check_for_get_code(200, reverse('courseware', kwargs={'course_id': self.toy.id}))
 
-        # TODO: Disabled rest of test for now.  Fix once raising a 404 actually
-        # returns a 404 to the client
-
         def instructor_urls(course):
+            "list of urls that only instructors/staff should be able to see"
             urls = [reverse(name, kwargs={'course_id': course.id}) for name in (
                 'instructor_dashboard',
                 'gradebook',

@@ -287,15 +287,15 @@ def _do_create_account(post_vars):
 
     Note: this function is also used for creating test users.
     """
-    u = User(username=post_vars['username'],
+    user = User(username=post_vars['username'],
              email=post_vars['email'],
              is_active=False)
-    u.set_password(post_vars['password'])
-    r = Registration()
+    user.set_password(post_vars['password'])
+    registration = Registration()
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
-        u.save()
+        user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
@@ -310,25 +310,25 @@ def _do_create_account(post_vars):
 
         raise
 
-    r.register(u)
+    registration.register(user)
 
-    up = UserProfile(user=u)
-    up.name = post_vars['name']
-    up.level_of_education = post_vars.get('level_of_education')
-    up.gender = post_vars.get('gender')
-    up.mailing_address = post_vars.get('mailing_address')
-    up.goals = post_vars.get('goals')
+    profile = UserProfile(user=user)
+    profile.name = post_vars['name']
+    profile.level_of_education = post_vars.get('level_of_education')
+    profile.gender = post_vars.get('gender')
+    profile.mailing_address = post_vars.get('mailing_address')
+    profile.goals = post_vars.get('goals')
 
     try:
-        up.year_of_birth = int(post_vars['year_of_birth'])
+        profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
-        up.year_of_birth = None  # If they give us garbage, just ignore it instead
+        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
                                 # of asking them to put an integer.
     try:
-        up.save()
+        profile.save()
     except Exception:
-        log.exception("UserProfile creation failed for user {0}.".format(u.id))
-    return (u, up, r)
+        log.exception("UserProfile creation failed for user {0}.".format(user.id))
+    return (user, profile, registration)
 
 
 @ensure_csrf_cookie
@@ -402,10 +402,10 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Ok, looks like everything is legit.  Create the account.
-    (u, up, r) = _do_create_account(post_vars)
+    (user, profile, registration) = _do_create_account(post_vars)
 
     d = {'name': post_vars['name'],
-         'key': r.activation_key,
+         'key': registration.activation_key,
          }
 
     # composes activation email
@@ -417,10 +417,11 @@ def create_account(request, post_override=None):
     try:
         if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = "Activation for %s (%s): %s\n" % (u, u.email, up.name) + '-' * 80 + '\n\n' + message
+            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                       '-' * 80 + '\n\n' + message)
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
-            res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.exception(sys.exc_info())
         js['value'] = 'Could not send activation e-mail.'
@@ -539,7 +540,7 @@ def reactivation_email(request):
     subject = ''.join(subject.splitlines())
     message = render_to_string('reactivation_email.txt', d)
 
-    res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return HttpResponse(json.dumps({'success': True}))
 
