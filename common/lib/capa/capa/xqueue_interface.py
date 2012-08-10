@@ -10,8 +10,7 @@ import time
 # TODO: Collection of parameters to be hooked into rest of edX system
 XQUEUE_LMS_AUTH = { 'username': 'LMS',
                     'password': 'PaloAltoCA' }
-#XQUEUE_URL = 'http://xqueue.edx.org'
-XQUEUE_URL = 'http://ec2-50-17-47-60.compute-1.amazonaws.com'
+XQUEUE_URL = 'http://xqueue.edx.org'
 
 log = logging.getLogger('mitx.' + __name__)
 
