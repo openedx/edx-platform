@@ -49,6 +49,8 @@ padding-left: flex-gutter(9);
   }
 }
 
+
+
 div {
   p.status {
     text-indent: -9999px;
@@ -61,6 +63,16 @@ div {
       background: url('../images/unanswered-icon.png') center center no-repeat;
       height: 14px;
       width: 14px;
+    }
+  }
+
+  &.processing {
+    p.status {
+      @include inline-block();
+      background: url('../images/spinner.gif') center center no-repeat;
+      height: 20px;
+      width: 20px;
+      text-indent: -9999px;
     }
   }
 
@@ -132,6 +144,15 @@ div {
       position: relative;
       top: 4px;
       width: 14px;
+    }
+
+    &.processing, &.ui-icon-check {
+      @include inline-block();
+      background: url('../images/spinner.gif') center center no-repeat;
+      height: 20px;
+      position: relative;
+      top: 6px;
+      width: 25px;
     }
 
     &.correct, &.ui-icon-check {
