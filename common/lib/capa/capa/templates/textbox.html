@@ -19,6 +19,9 @@
   % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
   % endif
+  % if queued:
+    <span class="xqueue" id="${id}" >${queue_len}</span>
+  % endif
   <br/>
   <span class="debug">(${state})</span>
   <br/>
