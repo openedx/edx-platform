@@ -29,7 +29,7 @@ def url_class(url):
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
 % endif
 % if has_staff_access_to_course_id(user, course.id):
-      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('profile')}">Instructor</a></li>
+      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
 % endif
 
     </ol>
