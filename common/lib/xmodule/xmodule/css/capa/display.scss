@@ -159,7 +159,7 @@ div {
       width: 14px;
     }
 
-    &.processing, &.ui-icon-check {
+    &.processing, &.ui-icon-processing {
       @include inline-block();
       background: url('../images/spinner.gif') center center no-repeat;
       height: 20px;
