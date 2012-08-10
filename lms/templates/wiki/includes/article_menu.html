@@ -1,0 +1,51 @@
+## mako
+<%page args="selected, article, plugins" />
+<%! from django.core.urlresolvers import reverse %>
+
+<%
+  if urlpath:
+    tab_reverse = lambda name, kwargs={}: reverse(name, kwargs=dict({'path' : urlpath.path}, **kwargs))
+  else:
+    tab_reverse = lambda name, kwargs={}: reverse(name, kwargs=dict({'article_id' : article.id}, **kwargs))
+%>
+
+
+%for plugin in plugins:
+  %if hasattr(plugin, "article_tab"):
+    <li class="pull-right{% if selected == plugin.slug %} active{% endif %}">
+      <a href="${tab_reverse('wiki:plugin_url', kwargs={'slug' : plugin.slug}) }">
+        <span class="${plugin.article_tab[1]}"></span>
+        ${plugin.article_tab[0]}
+      </a>
+    </li>
+  %endif
+%endfor
+
+
+
+<li class="pull-right${"active" if selected == "settings" else ""}">
+  %if not user.is_anonymous:
+  <a href="${tab_reverse('wiki:settings_url')}">
+    <span class="icon-wrench"></span>
+    Settings
+  </a>
+  %endif
+</li>
+<li class="pull-right${"active" if selected == "history" else ""}">
+  <a href="${tab_reverse('wiki:history_url')}">
+    <span class="icon-time"></span>
+    Changes
+  </a>
+</li>
+<li class="pull-right${"active" if selected == "edit" else ""}">
+  <a href="${tab_reverse('wiki:edit_url')}">
+    <span class="icon-edit"></span>
+    Edit
+  </a>
+</li>
+<li class="pull-right${"active" if selected == "view" else ""}">
+  <a href="${tab_reverse('wiki:get_url')}">
+    <span class="icon-home"></span>
+    View
+  </a>
+</li>
