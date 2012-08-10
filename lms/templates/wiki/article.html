@@ -1,48 +1,51 @@
 ## mako
-<%inherit file="../main.html"/>
-<%namespace name='static' file='../static_content.html'/>
+<%inherit file="mako_base.html"/>
 
-<%block name="bodyextra">
+<%!
+  from wiki.templatetags.wiki_tags import wiki_render
+  from mitxmako.templatetag_helpers import render_inclusion
+%>
 
-This is a mako template with inheritance!
+<%namespace name="article_menu" file="includes/article_menu.html"/>
+
+
+<%block name="title"><title>${article.current_revision.title}</title></%block>
+
+
+<%doc>
+<%block name="wiki_breadcrumbs">
+Render "wiki/includes/breadcrumbs.html"
+## {% include "wiki/includes/breadcrumbs.html" %}
+</%block>
+</%doc>
+
+
+
+<%block name="wiki_contents">
+
+<div class="tabbable tabs-top" style="margin-top: 20px;">
+  <ul class="nav nav-tabs">
+    <li style="float: left">
+      <h1 style="margin-top: -10px;">${article.current_revision.title}</h1>
+    </li>
+    ${article_menu.body('view', article, plugins)}
+  </ul>
+  
+  <div class="tab-content">
+    ${ render_inclusion(wiki_render, 'wiki/includes/render.html', article ) }
+  </div>
+</div>
+
+<div class="tabbable tabs-below" style="margin-top: 20px;">
+  <%doc>
+  <ul class="nav nav-tabs">
+    {% with "view" as selected %}
+      {% include "wiki/includes/article_menu.html" %}
+    {% endwith %}
+    <li style="margin-top: 10px;"><em>{% trans "Article last modified:" %} {{ article.current_revision.modified }}</em></li>
+  </ul>
+  </%doc>
+</div>
 
 </%block>
-
-
-<!-- {% extends "wiki/base.html" %}
-{% load wiki_tags i18n %}
-{% load url from future %}
-
-{% block pagetitle %}{{ article.current_revision.title }}{% endblock %}
-
-{% block wiki_breadcrumbs %}
-{% include "wiki/includes/breadcrumbs.html" %}
-{% endblock %}
-
-{% block wiki_contents %}
-  <h1> Did it work? </h1>
-  <div class="tabbable tabs-top" style="margin-top: 20px;">
-    <ul class="nav nav-tabs">
-      <li style="float: left">
-        <h1 style="margin-top: -10px;">{{ article.current_revision.title }}</h1>
-      </li>
-      {% with "view" as selected %}
-        {% include "wiki/includes/article_menu.html" %}
-      {% endwith %}
-    </ul>
-    <div class="tab-content">
-      {% wiki_render article %}
-    </div>
-  </div>
-
-  <div class="tabbable tabs-below" style="margin-top: 20px;">
-    <ul class="nav nav-tabs">
-      {% with "view" as selected %}
-        {% include "wiki/includes/article_menu.html" %}
-      {% endwith %}
-      <li style="margin-top: 10px;"><em>{% trans "Article last modified:" %} {{ article.current_revision.modified }}</em></li>
-    </ul>
-  </div>
-    
-{% endblock %} -->
 
