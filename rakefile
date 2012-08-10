@@ -88,7 +88,7 @@ $failed_tests = 0
 def run_tests(system, report_dir, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
-    dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
+    dirs = Dir["common/djangoapps/*"] # + Dir["#{system}/djangoapps/*"]
     sh(django_admin(system, :test, 'test', *dirs.each)) do |ok, res|
         if !ok and stop_on_failure
             abort "Test failed!"

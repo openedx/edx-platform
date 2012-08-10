@@ -118,12 +118,22 @@ class ReplicationTest(TestCase):
 
 
     def test_enrollment_for_user_info_after_enrollment(self):
-        """Test the effect of Enrolling in a class if you've already got user
-        data to be copied over."""
+        """Test the effect of modifying User data after you've enrolled."""
         # Create our User
-        portal_user = User.objects.create_user('jack', 'jack@edx.org', 'fakepass')
-        portal_user.first_name = "Jack"
+        portal_user = User.objects.create_user('patty', 'patty@edx.org', 'fakepass')
+        portal_user.first_name = "Patty"
         portal_user.save()
+
+        # Set up our UserProfile info
+        portal_user_profile = UserProfile.objects.create(
+                                  user=portal_user,
+                                  name="Patty Foo",
+                                  level_of_education=None,
+                                  gender='f',
+                                  mailing_address=None,
+                                  goals="World peace",
+                              )
+        portal_user_profile.save()
 
         # Now let's see if creating a CourseEnrollment copies all the relevant
         # data when things are saved.
@@ -131,17 +141,11 @@ class ReplicationTest(TestCase):
                                                             course_id=COURSE_1)
         portal_enrollment.save()
 
-        # Set up our UserProfile info
-        portal_user_profile = UserProfile.objects.create(
-                                  user=portal_user,
-                                  name="Jack Foo",
-                                  level_of_education=None,
-                                  gender='m',
-                                  mailing_address=None,
-                                  goals="World domination",
-                              )
+        portal_user.last_name = "Bar"
+        portal_user.save()
+        portal_user_profile.gender = 'm'
         portal_user_profile.save()
-        
+      
         # Grab all the copies we expect, and make sure it doesn't end up in 
         # places we don't expect.
         course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
