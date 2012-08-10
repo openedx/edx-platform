@@ -89,3 +89,22 @@
   border: 1px solid rgb(6, 65, 18);
   color: rgb(255, 255, 255);
 }
+
+.global {
+  h2 {
+    display: none;
+    float: left;
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 40px;
+    letter-spacing: 0;
+    text-transform: none;
+    text-shadow: 0 1px 0 #fff;
+
+    .provider {
+      font: inherit;
+      font-weight: bold;
+      color: #6d6d6d;
+    }
+  }
+}
