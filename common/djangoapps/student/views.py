@@ -94,8 +94,9 @@ def main_index(extra_context = {}, user=None):
     context.update(extra_context)
     return render_to_response('index.html', context)
 
-def course_from_id(id):
-    course_loc = CourseDescriptor.id_to_location(id)
+def course_from_id(course_id):
+    """Return the CourseDescriptor corresponding to this course_id"""
+    course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_item(course_loc)
 
 
@@ -158,15 +159,19 @@ def try_change_enrollment(request):
 
 @login_required
 def change_enrollment_view(request):
+    """Delegate to change_enrollment to actually do the work."""
     return HttpResponse(json.dumps(change_enrollment(request)))
-
 
 def change_enrollment(request):
     if request.method != "POST":
         raise Http404
 
-    action = request.POST.get("enrollment_action", "")
     user = request.user
+    if not user.is_authenticated():
+        raise Http404
+
+    action = request.POST.get("enrollment_action", "")
+
     course_id = request.POST.get("course_id", None)
     if course_id == None:
         return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
@@ -184,7 +189,7 @@ def change_enrollment(request):
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # require that user be in the staff_* group (or be an overall admin) to be able to enroll
             # eg staff_6.002x or staff_6.00x
-            if not has_staff_access_to_course(user,course):
+            if not has_staff_access_to_course(user, course):
                 staff_group = course_staff_group_name(course)
                 log.debug('user %s denied enrollment to %s ; not in %s' % (user,course.location.url(),staff_group))
                 return {'success': False, 'error' : '%s membership required to access course.' % staff_group}
@@ -264,6 +269,7 @@ def logout_user(request):
 def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location
     '''
+    # TODO (vshnayder): location is no longer used
     up = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
     if 'location' in request.POST:
         up.location = request.POST['location']

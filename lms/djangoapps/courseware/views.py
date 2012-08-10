@@ -228,12 +228,10 @@ def jump_to(request, location):
     '''
     Show the page that contains a specific location.
 
-    If the location is invalid, return a 404.
+    If the location is invalid or not in any class, return a 404.
 
-    If the location is valid, but not present in a course, ?
-
-    If the location is valid, but in a course the current user isn't registered for, ?
-        TODO -- let the index view deal with it?
+    Otherwise, delegates to the index view to figure out whether this user
+    has access, and what they should see.
     '''
     # Complain if the location isn't valid
     try:
@@ -249,16 +247,16 @@ def jump_to(request, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
-    # Rely on index to do all error handling
+    # Rely on index to do all error handling and access control.
     return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
-    '''
+    """
     Display the course's info.html, or 404 if there is no such course.
 
     Assumes the course_id is in a valid format.
-    '''
+    """
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
@@ -284,7 +282,10 @@ def course_about(request, course_id):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def university_profile(request, org_id):
-    all_courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+    """
+    Return the profile for the particular org_id.  404 if it's not valid.
+    """
+    all_courses = modulestore().get_courses()
     valid_org_ids = set(c.org for c in all_courses)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
