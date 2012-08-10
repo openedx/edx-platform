@@ -55,6 +55,8 @@ MITX_FEATURES = {
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
+    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
+
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
