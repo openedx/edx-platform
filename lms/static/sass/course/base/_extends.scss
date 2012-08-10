@@ -187,7 +187,12 @@ h1.top-header {
 }
 
 .global {
+  .find-courses-button {
+    display: none;
+  }
+
   h2 {
+    display: block;
     float: left;
     font-size: 0.9em;
     font-weight: 600;
