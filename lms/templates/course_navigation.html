@@ -7,6 +7,7 @@ def url_class(url):
   return ""
 %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from courseware.courses import has_staff_access_to_course_id %>
 
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
@@ -16,10 +17,10 @@ def url_class(url):
 % if user.is_authenticated():
 % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
       <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
-% endif 
+% endif
 % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
       <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
-% endif 
+% endif
 % endif
 % if settings.WIKI_ENABLED:
       <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
@@ -27,6 +28,10 @@ def url_class(url):
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
 % endif
+% if has_staff_access_to_course_id(user, course.id):
+      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
+% endif
+
     </ol>
   </div>
 </nav>

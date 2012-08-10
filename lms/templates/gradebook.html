@@ -1,4 +1,5 @@
 <%inherit file="main.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="js_extra">
@@ -9,7 +10,7 @@
 
 <%block name="headextra">
   <%static:css group='course'/>
-  
+
   <style type="text/css">
   .grade_A {color:green;}
   .grade_B {color:Chocolate;}
@@ -17,7 +18,7 @@
   .grade_F {color:DimGray;}
   .grade_None {color:LightGray;}
   </style>
-  
+
 </%block>
 
 <%include file="course_navigation.html" args="active_page=''" />
@@ -26,14 +27,14 @@
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
     <h1>Gradebook</h1>
-    
+
     %if len(students) > 0:
     <table>
       <%
       templateSummary = students[0]['grade_summary']
       %>
-      
-      
+
+
       <tr> <!-- Header Row -->
         <th>Student</th>
         %for section in templateSummary['section_breakdown']:
@@ -41,25 +42,28 @@
         %endfor
         <th>Total</th>
       </tr>
-      
-      <%def name="percent_data(percentage)">
+
+      <%def name="percent_data(fraction)">
         <%
           letter_grade = 'None'
-          if percentage > 0:
+          if fraction > 0:
             letter_grade = 'F'
             for grade in ['A', 'B', 'C']:
-              if percentage >= course.grade_cutoffs[grade]:
+              if fraction >= course.grade_cutoffs[grade]:
                 letter_grade = grade
                 break
-          
+
           data_class = "grade_" + letter_grade
         %>
-        <td class="${data_class}" data-percent="${percentage}">${ "{0:.0%}".format( percentage ) }</td>
+        <td class="${data_class}" data-percent="${fraction}">${ "{0:.0f}".format( 100 * fraction ) }</td>
       </%def>
-      
+
       %for student in students:
       <tr>
-        <td><a href="/profile/${student['id']}/">${student['username']}</a></td>
+        <td><a href="${reverse('student_profile',
+                               kwargs={'course_id' : course_id,
+                                       'student_id': student['id']})}">
+                      ${student['username']}</a></td>
         %for section in student['grade_summary']['section_breakdown']:
           ${percent_data( section['percent'] )}
         %endfor

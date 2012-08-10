@@ -145,6 +145,8 @@ def has_staff_access_to_course(user, course):
     '''
     Returns True if the given user has staff access to the course.
     This means that user is in the staff_* group, or is an overall admin.
+    TODO (vshnayder): this needs to be changed to allow per-course_id permissions, not per-course
+    (e.g. staff in 2012 is different from 2013, but maybe some people always have access)
 
     course is the course field of the location being accessed.
     '''
@@ -156,13 +158,18 @@ def has_staff_access_to_course(user, course):
     # note this is the Auth group, not UserTestGroup
     user_groups = [x[1] for x in user.groups.values_list()]
     staff_group = course_staff_group_name(course)
-    log.debug('course %s, staff_group %s, user %s, groups %s' % (
-        course, staff_group, user, user_groups))
     if staff_group in user_groups:
         return True
     return False
 
-def has_access_to_course(user,course):
+def has_staff_access_to_course_id(user, course_id):
+    """Helper method that takes a course_id instead of a course name"""
+    loc = CourseDescriptor.id_to_location(course_id)
+    return has_staff_access_to_course(user, loc.course)
+
+
+def has_access_to_course(user, course):
+    '''course is the .course element of a location'''
     if course.metadata.get('ispublic'):
         return True
     return has_staff_access_to_course(user,course)

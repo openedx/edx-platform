@@ -1,3 +1,6 @@
+# Compute grades using real division, with no integer truncation
+from __future__ import division
+
 import random
 import logging
 
@@ -13,33 +16,33 @@ log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
     stack = module.get_display_items()
-    
+
     while len(stack) > 0:
         next_module = stack.pop()
         stack.extend( next_module.get_display_items() )
         yield next_module
-   
+
 def grade(student, request, course, student_module_cache=None):
     """
-    This grades a student as quickly as possible. It retuns the 
+    This grades a student as quickly as possible. It retuns the
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
-    
+
     - grade : A final letter grade.
     - percent : The final percent for the class (rounded up).
     - section_breakdown : A breakdown of each section that makes
         up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
         make up the final grade. (For display)
-    
+
     More information on the format is in the docstring for CourseGrader.
     """
-    
+
     grading_context = course.grading_context
-    
+
     if student_module_cache == None:
         student_module_cache = StudentModuleCache(student, grading_context['all_descriptors'])
-    
+
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
     # passed to the grader
@@ -48,91 +51,91 @@ def grade(student, request, course, student_module_cache=None):
         for section in sections:
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.metadata.get('display_name')
-            
+
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
                 if student_module_cache.lookup(moduledescriptor.category, moduledescriptor.location.url() ):
                     should_grade_section = True
                     break
-            
+
             if should_grade_section:
                 scores = []
                 # TODO: We need the request to pass into here. If we could forgo that, our arguments
                 # would be simpler
                 section_module = get_module(student, request, section_descriptor.location, student_module_cache)
-                
+
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database
-                for module in yield_module_descendents(section_module):                    
+                for module in yield_module_descendents(section_module):
                     (correct, total) = get_score(student, module, student_module_cache)
                     if correct is None and total is None:
                         continue
-                    
+
                     if settings.GENERATE_PROFILE_SCORES:
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
                             correct = total
-                    
+
                     graded = module.metadata.get("graded", False)
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
-                    
+
                     scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
-                    
+
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
             else:
                 section_total = Score(0.0, 1.0, False, section_name)
                 graded_total = Score(0.0, 1.0, True, section_name)
-                
+
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " + str(section_descriptor.location))
-        
+
         totaled_scores[section_format] = format_scores
-    
+
     grade_summary = course.grader.grade(totaled_scores)
-    
+
     # We round the grade here, to make sure that the grade is an whole percentage and
     # doesn't get displayed differently than it gets grades
     grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
-    
+
     letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
     grade_summary['grade'] = letter_grade
-    
+
     return grade_summary
 
 def grade_for_percentage(grade_cutoffs, percentage):
     """
     Returns a letter grade 'A' 'B' 'C' or None.
-    
+
     Arguments
     - grade_cutoffs is a dictionary mapping a grade to the lowest
         possible percentage to earn that grade.
     - percentage is the final percent across all problems in a course
     """
-    
+
     letter_grade = None
     for possible_grade in ['A', 'B', 'C']:
         if percentage >= grade_cutoffs[possible_grade]:
             letter_grade = possible_grade
             break
-    
-    return letter_grade  
+
+    return letter_grade
 
 def progress_summary(student, course, grader, student_module_cache):
     """
     This pulls a summary of all problems in the course.
 
     Returns
-    - courseware_summary is a summary of all sections with problems in the course. 
-    It is organized as an array of chapters, each containing an array of sections, 
-    each containing an array of scores. This contains information for graded and 
-    ungraded problems, and is good for displaying a course summary with due dates, 
+    - courseware_summary is a summary of all sections with problems in the course.
+    It is organized as an array of chapters, each containing an array of sections,
+    each containing an array of scores. This contains information for graded and
+    ungraded problems, and is good for displaying a course summary with due dates,
     etc.
 
     Arguments:
@@ -152,7 +155,7 @@ def progress_summary(student, course, grader, student_module_cache):
                 if correct is None and total is None:
                     continue
 
-                scores.append(Score(correct, total, graded, 
+                scores.append(Score(correct, total, graded,
                     module.metadata.get('display_name')))
 
             section_total, graded_total = graders.aggregate_scores(
@@ -179,7 +182,7 @@ def progress_summary(student, course, grader, student_module_cache):
 
 def get_score(user, problem, student_module_cache):
     """
-    Return the score for a user on a problem
+    Return the score for a user on a problem, as a tuple (correct, total).
 
     user: a Student object
     problem: an XModule
@@ -188,7 +191,7 @@ def get_score(user, problem, student_module_cache):
     if not (problem.descriptor.stores_state and problem.descriptor.has_score):
         # These are not problems, and do not have a score
         return (None, None)
-    
+
     correct = 0.0
 
     # If the ID is not in the cache, add the item
