@@ -77,6 +77,19 @@ div {
     }
   }
 
+  &.checking {
+    p.status {
+      @include inline-block();
+      background: url('../images/spinner.gif') center center no-repeat;
+      height: 20px;
+      width: 20px;
+    }
+
+    input {
+      border-color: green;
+    }
+  }
+
   &.incorrect, &.ui-icon-close {
     p.status {
       @include inline-block();
