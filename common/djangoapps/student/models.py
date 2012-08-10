@@ -258,7 +258,7 @@ def add_user_to_default_group(user, group):
 @receiver(post_save, sender=User)
 def replicate_user_save(sender, **kwargs):
      user_obj = kwargs['instance']
-     return replicate_model(User.save, user_obj.id, **kwargs)
+     return replicate_model(User.save, user_obj, user_obj.id)
 
 @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
@@ -275,21 +275,27 @@ def replicate_enrollment_save(sender, **kwargs):
         return
 
     enrollment_obj = kwargs['instance']
+    log.debug("Replicating user because of new enrollment")
     replicate_user(enrollment_obj.user, enrollment_obj.course_id)
-    replicate_model(CourseEnrollment.save, enrollment_obj.user_id, **kwargs)
-    replicate_model(UserProfile.save, enrollment_obj.user_id, **kwargs)
+
+    log.debug("Replicating enrollment because of new enrollment")
+    replicate_model(CourseEnrollment.save, enrollment_obj, enrollment_obj.user_id)
+
+    log.debug("Replicating user profile because of new enrollment")
+    user_profile = UserProfile.objects.get(user_id=enrollment_obj.user_id)
+    replicate_model(UserProfile.save, user_profile, enrollment_obj.user_id)
  
 @receiver(post_delete, sender=CourseEnrollment)
 def replicate_enrollment_delete(sender, **kwargs):
      enrollment_obj = kwargs['instance']
-     return replicate_model(CourseEnrollment.delete, enrollment_obj.user_id, **kwargs)
+     return replicate_model(CourseEnrollment.delete, enrollment_obj, enrollment_obj.user_id)
  
 @receiver(post_save, sender=UserProfile)
 def replicate_userprofile_save(sender, **kwargs):
     """We just updated the UserProfile (say an update to the name), so push that
     change to all Course DBs that we're enrolled in."""
     user_profile_obj = kwargs['instance']
-    return replicate_model(UserProfile.save, user_profile_obj.user_id, **kwargs)
+    return replicate_model(UserProfile.save, user_profile_obj, user_profile_obj.user_id)
 
  
 ######### Replication functions #########
@@ -312,19 +318,25 @@ def replicate_user(portal_user, course_db_name):
             setattr(course_user, field, getattr(portal_user, field))
 
         mark_handled(course_user)
+        log.debug("User {0} found in Course DB, replicating fields to {1}"
+                  .format(course_user, course_db_name))
         course_user.save(using=course_db_name) # Just being explicit.
 
     except User.DoesNotExist:
         # Otherwise, just make a straight copy to the Course DB.
         mark_handled(portal_user)
+        log.debug("User {0} not found in Course DB, creating copy in {1}"
+                  .format(portal_user, course_db_name))
         portal_user.save(using=course_db_name)
 
-def replicate_model(model_method, user_id, **kwargs):
+def replicate_model(model_method, instance, user_id):
     """
     model_method is the model action that we want replicated. For instance, 
                  UserProfile.save
     """
-    instance = kwargs['instance']
+    if isinstance(instance, UserProfile):
+        log.debug("replicate_model called on UserProfile {0}".format(instance))
+
     if not should_replicate(instance):
         return
 
