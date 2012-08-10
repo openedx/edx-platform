@@ -1,4 +1,6 @@
 from staticfiles.storage import staticfiles_storage
+from staticfiles import finders
+from django.conf import settings
 import re
 
 
@@ -9,7 +11,15 @@ def replace(static_url, prefix=None):
         prefix = prefix + '/'
 
     quote = static_url.group('quote')
-    if staticfiles_storage.exists(static_url.group('rest')):
+
+    servable = (
+        # If in debug mode, we'll serve up anything that the finders can find
+        (settings.DEBUG and finders.find(static_url.group('rest'), True)) or
+        # Otherwise, we'll only serve up stuff that the storages can find
+        staticfiles_storage.exists(static_url.group('rest'))
+    )
+
+    if servable:
         return static_url.group(0)
     else:
         url = staticfiles_storage.url(prefix + static_url.group('rest'))
