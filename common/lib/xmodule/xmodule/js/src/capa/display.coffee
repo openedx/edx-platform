@@ -4,12 +4,6 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
-
-    # Destroy any existing polling threads on Problem change
-    if window.queuePollerID
-      window.clearTimeout(window.queuePollerID)
-      delete window.queuePollerID
-
     @render()
 
   $: (selector) ->
