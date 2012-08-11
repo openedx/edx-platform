@@ -348,10 +348,6 @@ $tag-text-color: #5b614f;
       }
     }
 
-    .comment > .comments {
-      margin-left: 68px;
-    }
-
     //COMMENT STYLES
     .comments {
       overflow: hidden;
@@ -365,6 +361,7 @@ $tag-text-color: #5b614f;
       }
 
       .comment {
+        margin-left: 68px;
         .comment-body, .content-body {
           @include discussion-font;
           color: black;
