@@ -3,7 +3,13 @@ from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 %>
 
-<%def name='url(file)'>${staticfiles_storage.url(file)}</%def>
+<%def name='url(file)'>
+<%
+try:
+    url = staticfiles_storage.url(file)
+except:
+    url = file
+%>${url}</%def>
 
 <%def name='css(group)'>
   % if settings.MITX_FEATURES['USE_DJANGO_PIPELINE']:
