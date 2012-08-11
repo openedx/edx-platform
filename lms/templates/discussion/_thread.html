@@ -40,9 +40,11 @@
       ${render_vote(content)}
       <div class="discussion-right-wrapper clearfix">
         <ul class="admin-actions">
-          <li><a href="#" class="admin-endorse">Endorse</a></li>
-          <li><a href="#" class="admin-edit">Edit</a></li>
-          <li><a href="#" class="admin-delete">Delete</a></li>
+          % if type == 'comment':
+            <li><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
+          % endif
+          <li><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
+          <li><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
         </ul>
 
         ${render_title(content, type, **kwargs)}
