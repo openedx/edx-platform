@@ -69,7 +69,7 @@ instructor_evals = []
 for question in questions['local']:
   for submission in local_submissions[question][:5]:
     entries_dict = { entry.id:value for entry, value in zip(rubric.entries, local_true_scores[submission.id]) }
-    evaluation = rubric.create_evaluation(user_id=inst1.id, submission_id=submission.id, entry_values=entries_dict)
+    evaluation = rubric.create_evaluation(user_id=inst1.id, question_id=question.id, submission_id=submission.id, entry_values=entries_dict)
     #evaluation.save()
     instructor_evals.append(evaluation)
 

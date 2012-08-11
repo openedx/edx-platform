@@ -46,10 +46,13 @@ class APIModel(object):
             if attribute in kwargs:
                 setattr(self, attribute, kwargs[attribute])
 
+    def to_json(self):
+        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
+        return json.dumps({self.json_root:attributes})
+
     def save(self):
         # TODO: Think of a better way to handle nested resources, currently you have to manually set __base_url__
-        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
-        params = json.dumps({self.json_root:attributes})
+        params = self.to_json()
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         post_url = slumber.url_join(HOST, self.url())
         if self.id: # This object was retrieved from the service or otherwise persisted
@@ -146,8 +149,13 @@ class Submission(APIModel):
             return slumber.url_join('questions', self.question_id, 'submissions')
 
     @staticmethod
-    def get_by_question_id_and_id(question_id, id):
-        return Submission(**API.questions(question_id).submissions(id).get())
+    def get_by_question_id_and_id(question_id, _id):
+        return Submission(**API.questions(question_id).submissions(_id).get())
+
+    @staticmethod
+    def get_by_id(_id):
+        return Submission(**API.submissions(_id).get())
+
 class Rubric(APIModel):
     __attributes__ = ['rubric_type', 'title', 'total_points', 'published']
     __slots__ = ['rubric_type', 'title', 'total_points', 'published', 'entries']
@@ -177,7 +185,7 @@ class Rubric(APIModel):
         self.entries.append(entry)
         return entry
 
-    def create_evaluation(self, user_id, submission_id, entry_values):
+    def create_evaluation(self, user_id, question_id, submission_id, entry_values):
         # TODO: When async API is implemented, entries should be created in a callback
         evaluation = Evaluation(rubric_id=self.id, user_id=user_id, submission_id=submission_id)
         evaluation.save()
@@ -270,11 +278,27 @@ class Example(APIModel):
     __base_url__ = 'examples'
 
 class Evaluation(APIModel):
-    __attributes__ = ['rubric_id', 'user_id', 'submission_id', 'comments', 'offset']
-    __slots__ = __attributes__
-    # TODO: Build some sort of association with entry values?
+    __attributes__ = ['rubric_id', 'user_id', 'submission_id', 'comments', 'offset', 'question_id']
+    __slots__ = __attributes__ + ['entries'] # this is an ugly hack
+    __base_url = 'evaluations'
+    def url(self):
+        if self.id:
+            return slumber.url_join('questions', self.question_id, 'submissions', self.submission_id, 'evaluations')
+        else:
+            return slumber.url_join('questions', self.question_id, 'submissions', self.submission_id, 'evaluations', self.id)
+    def add_entry(self):
+        if self.entries is None:
+            self.entries = {}
+    def to_json(self):
+        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
+        attributes.pop('question_id', None) # Remove question_id from params
+        return json.dumps({self.json_root:attributes})
 
 class RubricEntryValue(APIModel):
+    """
+    This is weird, because you have to set the entries as a child of the evaluation
+    but there's no way to access them individually. Maybe this shouldn't be a class.
+    """
     __attributes__ = ['rubric_entry_id', 'evaluation_id', 'present']
     __slots__ = __attributes__
     @property
