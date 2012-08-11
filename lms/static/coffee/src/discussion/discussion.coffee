@@ -36,7 +36,7 @@ initializeFollowDiscussion = (discussion) ->
       title = $local(".new-post-title").val()
       body = Discussion.getWmdContent $discussion, $local, "new-post-body"
       tags = $local(".new-post-tags").val()
-      url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
+      url = Discussion.urlFor('create_thread', id)
       Discussion.safeAjax
         $elem: $(elem)
         url: url
@@ -95,33 +95,33 @@ initializeFollowDiscussion = (discussion) ->
         $wrapper.hide()
       $title.attr("prev-text", text)
 
-    handleNewPost = (elem) ->
-      newPostForm = $local(".new-post-form")
-      if newPostForm.length
-        newPostForm.show()
-        $(elem).hide()
-      else
-        view = { discussion_id: id }
-        $newPostButton = $local(".discussion-new-post")
-        $newPostButton.after Mustache.render Discussion.newPostTemplate, view
-        newPostBody = $discussion.find(".new-post-body")
-        if newPostBody.length
-          Discussion.makeWmdEditor $discussion, $local, "new-post-body"
+    initializeNewPost = (elem) ->
+      #newPostForm = $local(".new-post-form")
+      #view = { discussion_id: id }
+      #$newPostButton = $local(".discussion-new-post")
+      #$newPostButton.after Mustache.render Discussion.newPostTemplate, view
+      newPostBody = $discussion.find(".new-post-body")
+      if newPostBody.length
+        Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
-        $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
+      $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
+      $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
+        $local(".new-post-form").removeClass('collapsed')
 
-        $local(".new-post-title").blur ->
-          handleSimilarPost(this)
+      $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
-        $local(".hide-similar-posts").click ->
-          $local(".new-post-similar-posts-wrapper").hide()
+      $local(".new-post-title").blur ->
+        handleSimilarPost(this)
 
-        $local(".discussion-submit-post").click ->
-          handleSubmitNewPost(this)
-        $local(".discussion-cancel-post").click ->
-          handleCancelNewPost(this)
+      $local(".hide-similar-posts").click ->
+        $local(".new-post-similar-posts-wrapper").hide()
 
-        $(elem).hide()
+      $local(".discussion-submit-post").click ->
+        handleSubmitNewPost(this)
+      $local(".discussion-cancel-post").click ->
+        handleCancelNewPost(this)
+
+        #$(elem).hide()
 
     handleAjaxReloadDiscussion = (elem, url) ->
       $elem = $(elem)
@@ -151,6 +151,8 @@ initializeFollowDiscussion = (discussion) ->
       $elem = $(elem)
       url = $elem.attr("page-url")
       handleAjaxReloadDiscussion($elem, url)
+
+    initializeNewPost()
     
     Discussion.bindLocalEvents $local,
 
@@ -158,8 +160,8 @@ initializeFollowDiscussion = (discussion) ->
         event.preventDefault()
         handleAjaxSearch(this)
 
-      "click .discussion-new-post": ->
-        handleNewPost(this)
+      #"click .discussion-new-post": ->
+      #  handleNewPost(this)
 
       "click .discussion-search-link": ->
         handleAjaxSearch($local(".search-wrapper>.discussion-search-form"))
