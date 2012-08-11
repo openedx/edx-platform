@@ -309,15 +309,14 @@ def filesubmission(element, value, status, render_template, msg=''):
     eid = element.get('id')
 
     # Check if problem has been queued
-    queued = '' 
     queue_len = 0
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
-        queued = 'true'
+        status = 'queued'
         queue_len = msg
         msg = 'Submitted to grader. (Queue length: %s)' % queue_len 
 
     context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, 
-                'queued': queued, 'queue_len': queue_len
+                'queue_len': queue_len
               }
     html = render_template("filesubmission.html", context)
     return etree.XML(html) 
@@ -342,10 +341,9 @@ def textbox(element, value, status, render_template, msg=''):
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
     
     # Check if problem has been queued
-    queued = '' 
     queue_len = 0
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
-        queued = 'true'
+        status = 'queued' 
         queue_len = msg
         msg = 'Submitted to grader. (Queue length: %s)' % queue_len 
 
@@ -359,7 +357,7 @@ def textbox(element, value, status, render_template, msg=''):
                'mode': mode, 'linenumbers': linenumbers,
                'rows': rows, 'cols': cols,
                'hidden': hidden, 'tabsize': tabsize,
-               'queued': queued, 'queue_len': queue_len,
+               'queue_len': queue_len,
                }
     html = render_template("textbox.html", context)
     try:
