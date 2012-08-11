@@ -22,8 +22,6 @@ from django_comment_client.permissions import check_permissions_by_view
 from collection import defaultdict
 import functools
 
-
-
 def permitted(fn):
     @functools.wraps(fn)
     def wrapper(request, *args, **kwargs):
