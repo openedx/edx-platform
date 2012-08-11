@@ -110,3 +110,72 @@ Notes on refactoring grading queue
 * TODO Benchmark redis performance (for eg. thousands of insertions, priority updates, etc)
 * Pseudo-code using a hypothetical API (basically the API I would want to have)
 ** See demo.py
+
+* API Thoughts
+** Nested resources
+   Resources nested more than one level deep require an API call just to form the URL
+   Either don't nest that deep, or add more required parameters for API calls
+   Currently I'm just adding the extra parameter to the API call but this feels
+   kludgy
+** Asynchronous requests
+   Model.get_by_x(x) becomes asynchronous and only sets up requests
+   If not using Twisted then async methods need to take in a callback function
+   Some sort of queue.run() runs the requests
+   Assign results of API calls in callbacks
+   eg.
+   Foo.get_by_id(x):
+       url = foo_id_url(x)
+       request = async_request(url, get_params())
+       queue.add(request)
+       return request
+   Bar.add_foo(self, foo):
+       self.foos.append(foo)
+   Bar.get_by_id(x):
+       url = bar_id_url(x)
+       request = async_request(url, get_params())
+
+       def cb(result):
+           foo_ids = result.ids
+	   for id in foo_ids:
+               request = Foo.get_by_id(x)
+	       request.on_complete(add_foo)
+
+       request.on_complete(cb)
+       queue.add(request)
+       return request
+
+
+* File uploading service
+** Instructor uploads PDF
+   Service converts it to a PNG in a 'template' queue
+   Presents markup UI when done
+** Instructor marks up regions with corresponding question
+   Service generates markup UI (imgareaselect)
+   Regions are saved to service
+** Student/Teacher uploads a student submission
+   PDF file is saved, conversion request gets pushed onto 'submission' queue
+** Workers process the submission queue
+   Convert PDF to image
+   For each graded region:
+     Crop image corresponding to region
+     Submit image file to submission URL
+
+
+** methods/urls
+   POST templates/new
+     params: external_id, file
+     returns: template.to_json
+   PUT templates/:template_id
+     params: external_id, file
+     returns: template.to_json
+   DELETE templates/:template_id
+   POST templates/:template_id/regions
+     params: x1,y1,x2,y2, external_id
+     returns: region.to_json
+   PUT templates/:template_id/regions/:region_id
+   DELETE templates/:template_id/regions/:region_id
+   POST /templates/:template_id/submit
+     params: file, callback URL (format string?)
+     returns: submission w/ some sort of URL/api call to view conversion status
+   GET submissions/:submission_id
+     returns: submission w/ file, processing state
