@@ -10,8 +10,7 @@ from django.http import Http404
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_urls
-from staticfiles.storage import staticfiles_storage
+from static_replace import replace_urls, try_staticfiles_lookup
 
 log = logging.getLogger(__name__)
 
@@ -46,9 +45,10 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
 
 
 def course_image_url(course):
-    return staticfiles_storage.url(course.metadata['data_dir'] +
-                                   "/images/course_image.jpg")
-
+    """Try to look up the image url for the course.  If it's not found,
+    log an error and return the dead link"""
+    path = course.metadata['data_dir'] + "/images/course_image.jpg"
+    return try_staticfiles_lookup(path)
 
 def get_course_about_section(course, section_key):
     """
