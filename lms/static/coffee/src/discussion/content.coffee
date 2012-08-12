@@ -183,8 +183,6 @@ initializeFollowThread = (thread) ->
 
     handleEndorse = (elem, endorsed) ->
       url = Discussion.urlFor('endorse_comment', id)
-      console.log endorsed
-      console.log url
       Discussion.safeAjax
         $elem: $(elem)
         url: url

@@ -59,7 +59,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
-        'user_info': dict(cc.User.from_django_user(request.user)),#comment_client.get_user_info(request.user.id, raw=True),
+        'user_info': json.dumps(cc.User.from_django_user(request.user).to_dict()),
         'course_id': course_id,
         'request': request,
         'performed_search': _should_perform_search(request),
@@ -90,7 +90,6 @@ def get_threads(request, course_id, discussion_id):
         'course_id': course_id,
     }
 
-    import pdb; pdb.set_trace()
     threads, page, num_pages = cc.Thread.search(query_params)
 
     #if _should_perform_search(request):
@@ -172,16 +171,16 @@ def get_annotated_content_infos(course_id, thread, user, is_thread=True):
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
-    thread = cc.Thread.find(thread_id).retrieve_with_comments()
+    thread = cc.Thread.find(thread_id).retrieve(recursive=True)
     #comment_client.get_thread(thread_id, recursive=True)
 
-    annotated_content_info = get_annotated_content_infos(course_id, thread=dict(thread), \
+    annotated_content_info = get_annotated_content_infos(course_id, thread=thread.to_dict(), \
                                 user=request.user, is_thread=True)
 
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
-        'user_info': dict(cc.User.from_django_user(request.user)),#get_user_info(request.user.id, raw=True),
+        'user_info': cc.User.from_django_user(request.user).to_dict(),#get_user_info(request.user.id, raw=True),
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
@@ -192,9 +191,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
         
-        thread = cc.Thread.find(thread_id).retrieve_with_comments()#comment_client.get_thread(thread_id, recursive=True)
+        thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         annotated_content_info = get_annotated_content_infos(course_id, thread, request.user)
-        context = {'thread': dict(thread)}
+        context = {'thread': thread.to_dict()}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 
         return utils.JsonResponse({
