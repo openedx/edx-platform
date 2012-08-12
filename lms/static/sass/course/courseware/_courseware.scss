@@ -92,6 +92,10 @@ div.course-wrapper {
             list-style: none;
             padding-left: 2em;
           }
+
+          &.admin-actions {
+            list-style: none;
+          }
         }
 
         nav.sequence-bottom {

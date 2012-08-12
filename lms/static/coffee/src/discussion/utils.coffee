@@ -116,20 +116,26 @@ wmdEditors = {}
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = Discussion.urlFor('upload')
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, Discussion.postMathJaxProcessor
+    console.log editor
     wmdEditors["#{cls_identifier}-#{id}"] = editor
+    $input = $("#wmd-input-#{cls_identifier}-#{id}")
+    $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
+      $('.new-post-form').removeClass('collapsed')
     editor
 
   getWmdEditor: ($content, $local, cls_identifier) ->
     id = $content.attr("_id")
     wmdEditors["#{cls_identifier}-#{id}"]
 
-  getWmdContent: ($content, $local, cls_identifier) ->
+  getWmdInput: ($content, $local, cls_identifier) ->
     id = $content.attr("_id")
-    $local("#wmd-input-#{cls_identifier}-#{id}").val()
+    $local("#wmd-input-#{cls_identifier}-#{id}")
+
+  getWmdContent: ($content, $local, cls_identifier) ->
+    Discussion.getWmdInput($content, $local, cls_identifier).val()
 
   setWmdContent: ($content, $local, cls_identifier, text) ->
-    id = $content.attr("_id")
-    $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
+    Discussion.getWmdInput($content, $local, cls_identifier).val(text)
     wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
 
   getContentInfo: (id, attr) ->
