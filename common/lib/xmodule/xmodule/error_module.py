@@ -27,6 +27,14 @@ class ErrorModule(XModule):
             'is_staff' : self.system.is_staff,
             })
 
+    def displayable_items(self):
+        """Hide errors in the profile and table of contents for non-staff
+        users.
+        """
+        if self.system.is_staff:
+            return [self]
+        return []
+
 class ErrorDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
@@ -75,7 +83,8 @@ class ErrorDescriptor(EditingDescriptor):
         # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
         # 64-bit num?
         location = ['i4x', org, course, 'error', url_name]
-        metadata = {}  # stays in the xml_data
+        # real metadata stays in the xml_data, but add a display name
+        metadata = {'display_name': 'Error ' + url_name}
 
         return cls(system, definition, location=location, metadata=metadata)
 

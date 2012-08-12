@@ -8,6 +8,7 @@ from django.conf import settings
 from django.http import Http404
 
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_urls
@@ -167,6 +168,14 @@ def has_staff_access_to_course_id(user, course_id):
     loc = CourseDescriptor.id_to_location(course_id)
     return has_staff_access_to_course(user, loc.course)
 
+
+def has_staff_access_to_location(user, location):
+    """Helper method that checks whether the user has staff access to
+    the course of the location.
+
+    location: something that can be passed to Location
+    """
+    return has_staff_access_to_course(user, Location(location).course)
 
 def has_access_to_course(user, course):
     '''course is the .course element of a location'''
