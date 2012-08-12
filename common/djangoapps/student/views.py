@@ -403,7 +403,10 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Ok, looks like everything is legit.  Create the account.
-    (user, profile, registration) = _do_create_account(post_vars)
+    ret = _do_create_account(post_vars)
+    if isinstance(ret,HttpResponse):		# if there was an error then return that
+        return ret
+    (user, profile, registration) = ret
 
     d = {'name': post_vars['name'],
          'key': registration.activation_key,
