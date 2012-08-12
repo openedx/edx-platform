@@ -128,7 +128,7 @@ def dashboard(request):
         try:
             courses.append(course_from_id(enrollment.course_id))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existant course {1}"
+            log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
     message = ""
@@ -182,7 +182,7 @@ def change_enrollment(request):
         try:
             course = course_from_id(course_id)
         except ItemNotFoundError:
-            log.error("User {0} tried to enroll in non-existant course {1}"
+            log.warning("User {0} tried to enroll in non-existant course {1}"
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
