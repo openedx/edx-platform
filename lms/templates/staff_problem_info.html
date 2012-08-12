@@ -75,12 +75,13 @@ function sendlog_${element_id}(){
            entry: $('#${element_id}_xqa_entry').val()};
  
     $.ajax({
-        url: 'http://zion.ike.net:9001/log',
+        url: 'http://xqa:server@content-qa.mitx.mit.edu/log',
         type: 'GET',
         contentType: 'application/json',
         data: JSON.stringify(xqaLog),
         crossDomain: true,
         dataType: 'jsonp',
+        beforeSend: function (xhr) { xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
         timeout : 1000,
         success: function(result) {
             $('#${element_id}_xqa_log_data').html(result);
@@ -100,7 +101,7 @@ var xqaQuery = {authkey: '${xqa_key}',
            format: 'html'};
  
 $.ajax({
-        url: 'http://zion.ike.net:9001/query',
+        url: 'http://xqa:server@content-qa.mitx.mit.edu/query',
         type: 'GET',
         contentType: 'application/json',
         data: JSON.stringify(xqaQuery),
