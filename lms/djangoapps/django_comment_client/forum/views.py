@@ -15,7 +15,7 @@ import django_comment_client.utils as utils
 from urllib import urlencode
 
 import json
-import comment_client as c
+import comment_client as cc
 import dateutil
 
 from django_comment_client.permissions import check_permissions_by_view
@@ -59,7 +59,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
-        'user_info': dict(c.User.from_django_user(request.user)),#comment_client.get_user_info(request.user.id, raw=True),
+        'user_info': dict(cc.User.from_django_user(request.user)),#comment_client.get_user_info(request.user.id, raw=True),
         'course_id': course_id,
         'request': request,
         'performed_search': _should_perform_search(request),
@@ -90,11 +90,12 @@ def get_threads(request, course_id, discussion_id):
         'course_id': course_id,
     }
 
-    threads, page, num_pages = c.Thread.search(query_params)
+    import pdb; pdb.set_trace()
+    threads, page, num_pages = cc.Thread.search(query_params)
 
     #if _should_perform_search(request):
     #    query_params['commentable_id'] = discussion_id
-    #    threads, page, num_pages = c.Thread.searchcomment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
+    #    threads, page, num_pages = cc.Thread.searchcomment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
     #else:
     #    threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=utils.strip_none(query_params))
 
@@ -126,14 +127,14 @@ def forum_form_discussion(request, course_id, discussion_id):
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
 
-    recent_active_threads = c.search_recent_active_threads(
+    recent_active_threads = cc.search_recent_active_threads(
         course_id,
         recursive=False,
         query_params={'follower_id': request.user.id,
                       'commentable_id': discussion_id},
     )
 
-    trending_tags = c.search_trending_tags(
+    trending_tags = cc.search_trending_tags(
         course_id,
         query_params={'commentable_id': discussion_id},
     )
@@ -171,7 +172,7 @@ def get_annotated_content_infos(thread, user, is_thread=True):
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
-    thread = c.Thread.find(thread_id).retrieve_with_comments()
+    thread = cc.Thread.find(thread_id).retrieve_with_comments()
     #comment_client.get_thread(thread_id, recursive=True)
 
     annotated_content_info = get_annotated_content_infos(thread=dict(thread), \
@@ -180,7 +181,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
-        'user_info': dict(c.User.from_django_user(request.user)),#get_user_info(request.user.id, raw=True),
+        'user_info': dict(cc.User.from_django_user(request.user)),#get_user_info(request.user.id, raw=True),
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
@@ -191,7 +192,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
         
-        thread = c.Thread.find(thread_id).retrieve_with_comments()#comment_client.get_thread(thread_id, recursive=True)
+        thread = cc.Thread.find(thread_id).retrieve_with_comments()#comment_client.get_thread(thread_id, recursive=True)
         annotated_content_info = get_annotated_content_infos(thread, request.user)
         context = {'thread': dict(thread)}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
@@ -223,7 +224,7 @@ def search(request, course_id):
     commentable_id = request.GET.get('commentable_id', None)
     tags = request.GET.get('tags', None)
 
-    threads = c.Threads.search({
+    threads = cc.Threads.search({
         'text': text,
         'commentable_id': commentable_id,
         'tags': tags,
