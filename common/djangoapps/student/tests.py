@@ -28,7 +28,9 @@ class ReplicationTest(TestCase):
         portal_user.last_login=datetime(2012, 1, 1)
         portal_user.date_joined=datetime(2011, 1, 1)
         # This is an Askbot field and will break if askbot is not included
-        portal_user.seen_response_count = 10
+
+        if hasattr(portal_user, 'seen_response_count'):
+            portal_user.seen_response_count = 10
 
         portal_user.save(using='default')
 
@@ -45,18 +47,23 @@ class ReplicationTest(TestCase):
                                  field, portal_user, course_user
                              ))
 
-        # Since it's the first copy over of User data, we should have all of it
-        self.assertEqual(portal_user.seen_response_count,
-                         course_user.seen_response_count)
+        if hasattr(portal_user, 'seen_response_count'):
+            # Since it's the first copy over of User data, we should have all of it
+            self.assertEqual(portal_user.seen_response_count,
+                             course_user.seen_response_count)
 
         # But if we replicate again, the user already exists in the Course DB,
         # so it shouldn't update the seen_response_count (which is Askbot 
-        # controlled)
-        portal_user.seen_response_count = 20
-        replicate_user(portal_user, COURSE_1)
-        course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
-        self.assertEqual(portal_user.seen_response_count, 20)
-        self.assertEqual(course_user.seen_response_count, 10)
+        # controlled).
+        # This hasattr lameness is here because we don't want this test to be
+        # triggered when we're being run by CMS tests (Askbot doesn't exist
+        # there, so the test will fail).
+        if hasattr(portal_user, 'seen_response_count'):
+            portal_user.seen_response_count = 20
+            replicate_user(portal_user, COURSE_1)
+            course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
+            self.assertEqual(portal_user.seen_response_count, 20)
+            self.assertEqual(course_user.seen_response_count, 10)
 
         # Another replication should work for an email change however, since
         # it's a field we care about.
