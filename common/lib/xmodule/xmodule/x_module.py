@@ -522,7 +522,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
             msg = "Error loading from xml."
-            log.exception(msg)
+            log.warning(msg + " " + str(err))
             system.error_tracker(msg)
             err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
             descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
@@ -615,9 +615,10 @@ class DescriptorSystem(object):
                try:
                   x = access_some_resource()
                   check_some_format(x)
-               except SomeProblem:
-                  msg = 'Grommet {0} is broken'.format(x)
-                  log.exception(msg) # don't rely on handler to log
+               except SomeProblem as err:
+                  msg = 'Grommet {0} is broken: {1}'.format(x, str(err))
+                  log.warning(msg)  # don't rely on tracker to log
+                        # NOTE: we generally don't want content errors logged as errors
                   self.system.error_tracker(msg)
                   # work around
                   return 'Oops, couldn't load grommet'
