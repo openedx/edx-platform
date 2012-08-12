@@ -22,6 +22,10 @@ if ('edxvm' in myhost) or ('ocw' in myhost):
     MITX_FEATURES['DISABLE_LOGIN_BUTTON'] = True	# auto-login with MIT certificate
     MITX_FEATURES['USE_XQA_SERVER'] = 'https://qisx.mit.edu/xqa'	# needs to be ssl or browser blocks it
 
+if ('domU' in myhost):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@mitx.mit.edu'	# nonempty string = address for all activation emails
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 for nginx ssl proxy
 
 #-----------------------------------------------------------------------------
