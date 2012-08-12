@@ -20,6 +20,7 @@ MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be
 myhost = socket.gethostname()
 if ('edxvm' in myhost) or ('ocw' in myhost):
     MITX_FEATURES['DISABLE_LOGIN_BUTTON'] = True	# auto-login with MIT certificate
+    MITX_FEATURES['USE_XQA_SERVER'] = 'https://qisx.mit.edu/xqa'	# needs to be ssl or browser blocks it
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 for nginx ssl proxy
 

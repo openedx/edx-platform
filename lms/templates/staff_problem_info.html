@@ -75,7 +75,7 @@ function sendlog_${element_id}(){
            entry: $('#${element_id}_xqa_entry').val()};
  
     $.ajax({
-        url: 'http://xqa:server@content-qa.mitx.mit.edu/log',
+        url: '${xqa_server}/log',
         type: 'GET',
         contentType: 'application/json',
         data: JSON.stringify(xqaLog),
@@ -101,7 +101,7 @@ var xqaQuery = {authkey: '${xqa_key}',
            format: 'html'};
  
 $.ajax({
-        url: 'http://xqa:server@content-qa.mitx.mit.edu/query',
+        url: '${xqa_server}/query',
         type: 'GET',
         contentType: 'application/json',
         data: JSON.stringify(xqaQuery),
