@@ -79,7 +79,6 @@ initializeFollowDiscussion = (discussion) ->
           data:
             text: $local(".new-post-title").val()
           success: (response, textStatus) ->
-            console.log "request"
             $similarPosts.empty()
             if $.type(response) == "array" and response.length
               $wrapper.show()

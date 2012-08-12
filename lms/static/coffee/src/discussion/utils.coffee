@@ -116,7 +116,6 @@ wmdEditors = {}
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = Discussion.urlFor('upload')
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, Discussion.postMathJaxProcessor
-    console.log editor
     wmdEditors["#{cls_identifier}-#{id}"] = editor
     $input = $("#wmd-input-#{cls_identifier}-#{id}")
     $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
