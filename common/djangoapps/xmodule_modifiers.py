@@ -110,7 +110,7 @@ def add_histogram(get_html, module, user):
                          'element_id': module.location.html_id().replace('-','_'),
                          'edit_link': edit_link,
                          'user': user,
-                         'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu'),
+                         'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
                          'module_content': get_html()}
