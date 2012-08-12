@@ -48,6 +48,7 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+    'DARK_LAUNCH': False,  # When True, courses will be active for staff only
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
