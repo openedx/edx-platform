@@ -80,6 +80,7 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
+        'xqa_key',	# for xqaa server access
         # VS[compat] Remove once unused.
         'name', 'slug')
 

@@ -197,7 +197,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_staff_access_to_course(user, module.location.course):
-            module.get_html = add_histogram(module.get_html, module)
+            module.get_html = add_histogram(module.get_html, module, user)
 
     return module
 
