@@ -183,6 +183,8 @@ initializeFollowThread = (thread) ->
 
     handleEndorse = (elem, endorsed) ->
       url = Discussion.urlFor('endorse_comment', id)
+      console.log endorsed
+      console.log url
       Discussion.safeAjax
         $elem: $(elem)
         url: url
@@ -195,6 +197,9 @@ initializeFollowThread = (thread) ->
               $(content).addClass("endorsed")
             else
               $(content).removeClass("endorsed")
+
+            $(elem).unbind('click').click ->
+              handleEndorse(elem, !endorsed)
 
     handleOpenClose = (elem, text) ->
       url = Discussion.urlFor('openclose_thread', id)
@@ -314,19 +319,19 @@ initializeFollowThread = (thread) ->
         else
           handleVote($elem, "down")
 
-      "click .discussion-endorse": ->
-        handleEndorse(this, $(this).is(":checked"))
+      "click .admin-endorse": ->
+        handleEndorse(this, true)#, $(this).is(":checked"))
 
       "click .discussion-openclose": ->
         handleOpenClose(this, $(this).text())
 
-      "click .discussion-edit": ->
+      "click .admin-edit": ->
         if $content.hasClass("thread")
           handleEditThread(this)
         else
           handleEditComment(this)
 
-      "click .discussion-delete": ->
+      "click .admin-delete": ->
         handleDelete(this)
 
   initializeContent: (content) ->

@@ -142,7 +142,7 @@ def get_module(user, request, location, student_module_cache, position=None):
         shared_module = None
         
 
-    instance_state = instance_module.state if instance_module is not None else {}
+    instance_state = instance_module.state if instance_module is not None else '{}'
     shared_state = shared_module.state if shared_module is not None else None
 
     # TODO (vshnayder): fix hardcoded urls (use reverse)
