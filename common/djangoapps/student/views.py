@@ -297,6 +297,7 @@ def _do_create_account(post_vars):
     try:
         user.save()
     except IntegrityError:
+        js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
             js['value'] = "An account with this username already exists."
