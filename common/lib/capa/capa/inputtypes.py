@@ -313,13 +313,13 @@ def filesubmission(element, value, status, render_template, msg=''):
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
         status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader. (Queue length: %s)' % queue_len 
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
 
-    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, 
+    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
                 'queue_len': queue_len
               }
     html = render_template("filesubmission.html", context)
-    return etree.XML(html) 
+    return etree.XML(html)
 
 
 #-----------------------------------------------------------------------------
@@ -339,16 +339,16 @@ def textbox(element, value, status, render_template, msg=''):
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
 
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
-    
+
     # Check if problem has been queued
     queue_len = 0
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
-        status = 'queued' 
+        status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader. (Queue length: %s)' % queue_len 
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
 
     # For CodeMirror
-    mode = element.get('mode','python') 
+    mode = element.get('mode','python')
     linenumbers = element.get('linenumbers','true')
     tabsize = element.get('tabsize','4')
     tabsize = int(tabsize)
