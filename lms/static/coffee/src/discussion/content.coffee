@@ -74,7 +74,8 @@ initializeFollowThread = (thread) ->
           body: body
           anonymous: anonymous
           autowatch: autowatch
-        success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-errors"))
+        success: (response, textStatus) ->
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
@@ -86,7 +87,6 @@ initializeFollowThread = (thread) ->
           $local(".discussion-reply").show()
           $local(".discussion-edit").show()
           $discussionContent.attr("status", "normal")
-        )
 
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
@@ -148,11 +148,11 @@ initializeFollowThread = (thread) ->
         type: "POST"
         dataType: 'json'
         data: {title: title, body: body, tags: tags},
-        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
+        success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
-        )
 
     handleEditComment = (elem) ->
       $local(".discussion-content-wrapper").hide()
@@ -175,11 +175,11 @@ initializeFollowThread = (thread) ->
         type: "POST"
         dataType: "json"
         data: {body: body}
-        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
+        success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
-        )
 
     handleEndorse = (elem, endorsed) ->
       url = Discussion.urlFor('endorse_comment', id)

@@ -622,9 +622,21 @@ $tag-text-color: #5b614f;
     a:hover {
       color: #1C71DD;
       text-decoration: none;
-    };
+    }
+
+    .new-post-title {
+      height: 35px;
+      padding: 5px 12px;
+      border-width: 1px;
+    }
 
     &.collapsed {
+      .new-post-title {
+        height: 0;
+        padding: 0;
+        border-width: 0;
+      }
+
       .wmd-button-row {
         height: 0;
       }
@@ -646,6 +658,10 @@ $tag-text-color: #5b614f;
 
       .reply-post-control {
         height: 0;
+      }
+
+      .tagsinput {
+        display: none;
       }
     }
 

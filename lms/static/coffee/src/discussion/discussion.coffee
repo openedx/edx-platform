@@ -46,7 +46,8 @@ initializeFollowDiscussion = (discussion) ->
           title: title
           body: body
           tags: tags
-        success: Discussion.formErrorHandler($local(".new-post-form-error"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".new-post-form-errors"))
+        success: (response, textStatus) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
           Discussion.setWmdContent $discussion, $local, "new-post-body", ""
@@ -55,7 +56,6 @@ initializeFollowDiscussion = (discussion) ->
           Discussion.bindContentEvents($thread)
           $(".new-post-form").hide()
           $local(".discussion-new-post").show()
-        )
 
     handleCancelNewPost = (elem) ->
       $local(".new-post-form").hide()
@@ -96,9 +96,11 @@ initializeFollowDiscussion = (discussion) ->
 
     initializeNewPost = (elem) ->
       #newPostForm = $local(".new-post-form")
-      #view = { discussion_id: id }
       #$newPostButton = $local(".discussion-new-post")
-      #$newPostButton.after Mustache.render Discussion.newPostTemplate, view
+      view = { discussion_id: id }
+      $discussionNonContent = $discussion.children(".discussion-non-content")
+
+      $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
       newPostBody = $discussion.find(".new-post-body")
       if newPostBody.length
         Discussion.makeWmdEditor $discussion, $local, "new-post-body"
