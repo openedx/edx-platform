@@ -12,7 +12,10 @@ class @Problem
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
     window.update_schematics()
-    @inputs = @$("[id^=input_#{@element_id.replace(/problem_/, '')}_]")
+
+    problem_prefix = @element_id.replace(/problem_/,'')
+    @inputs = @$("[id^=input_#{problem_prefix}_]")
+    
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
     #@$('section.action input.check').click @check
@@ -26,15 +29,37 @@ class @Problem
         @el.attr progress: response.progress_status
         @el.trigger('progressChanged')
 
+  queueing: =>
+    @queued_items = @$(".xqueue")
+    if @queued_items.length > 0
+      if window.queuePollerID # Only one poller 'thread' per Problem
+        window.clearTimeout(window.queuePollerID)
+      window.queuePollerID = window.setTimeout(@poll, 100)
+
+  poll: =>
+    $.postWithPrefix "#{@url}/problem_get", (response) =>
+      @el.html(response.html)
+      @executeProblemScripts()
+      @bind()
+
+      @queued_items = @$(".xqueue")
+      if @queued_items.length == 0 
+        delete window.queuePollerID
+      else
+        # TODO: Dynamically adjust timeout interval based on @queued_items.value
+        window.queuePollerID = window.setTimeout(@poll, 1000)
+
   render: (content) ->
     if content
       @el.html(content)
       @bind()
+      @queueing()
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
         @executeProblemScripts()
         @bind()
+        @queueing()
 
   executeProblemScripts: ->
     @el.find(".script_placeholder").each (index, placeholder) ->
