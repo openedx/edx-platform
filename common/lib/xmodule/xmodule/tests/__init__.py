@@ -8,6 +8,7 @@
 import unittest
 import os
 import fs
+import json
 
 import json
 import numpy
@@ -31,10 +32,11 @@ i4xs = ModuleSystem(
     render_template=Mock(),
     replace_urls=Mock(),
     user=Mock(),
-    filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))),
+    filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
     xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
-    is_staff=False
+    is_staff=False,
+    node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
 
 
@@ -372,6 +374,19 @@ class ChoiceResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
+
+class JavascriptResponseTest(unittest.TestCase):
+
+    def test_jr_grade(self):
+        problem_file = os.path.dirname(__file__) + "/test_files/javascriptresponse.xml"
+        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
+        os.system("coffee -c %s" % (coffee_file_path))
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1': json.dumps({0: 4})}
+        incorrect_answers = {'1_2_1': json.dumps({0: 5})}
+
+        self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
 
 #-----------------------------------------------------------------------------
 # Grading tests
