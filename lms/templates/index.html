@@ -14,7 +14,7 @@
 
         <section class="actions">
           <div class="main-cta">
-            <a href="#signup-modal" class="find-courses" rel="leanModal">Sign Up</a>
+            <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">Sign Up</a>
           </div>
 
           <div class="secondary-actions">
@@ -148,7 +148,7 @@
 % if show_signup_immediately is not UNDEFINED:
 <script type="text/javascript">
 function dosignup(){
-    comp = document.getElementById('signup');
+    comp = document.getElementById('signup_action');
 try { //in firefox
     comp.click();
     return;
