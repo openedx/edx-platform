@@ -30,8 +30,10 @@ class SurveyModule(CapaModule):
 
     """
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        CapaModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, descriptor, instance_state=None,
+                 shared_state=None, **kwargs):
+        CapaModule.__init__(self, system, location, definition, descriptor, instance_state=None,
+                 shared_state=None, **kwargs)
     
         # no maximum number of attempts so students can
         # always answer surveys
@@ -44,12 +46,13 @@ class SurveyModule(CapaModule):
 
     def get_problem_html(self, encapsulate=True):
         '''Similiar to the parent class method from CapaModule
-        but never shows "check answer"
+        but only shows "save answer" (unless past due date)
         '''
 
         try:
             html = self.lcp.get_html()
         except Exception, err:
+            # TODO (vshnayder): another switch on DEBUG.
             if self.system.DEBUG:
                 log.exception(err)
                 msg = (
@@ -65,7 +68,7 @@ class SurveyModule(CapaModule):
         content = {'name': self.metadata['display_name'],
                    'html': html,
                    'weight': self.weight,
-                  }
+                   }
 
         check_button = False
         reset_button = False
@@ -96,3 +99,5 @@ class SurveyModule(CapaModule):
 
 class SurveyDescriptor(RawDescriptor):
     module_class = SurveyModule
+    stores_state = True
+
