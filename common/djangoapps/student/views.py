@@ -1,13 +1,14 @@
 import datetime
+import feedparser
+import itertools
 import json
 import logging
 import random
 import string
 import sys
-import uuid
-import feedparser
+import time
 import urllib
-import itertools
+import uuid
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -26,17 +27,19 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie
-from student.models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
+from student.models import (Registration, UserProfile,
+                            PendingNameChange, PendingEmailChange,
+                            CourseEnrollment)
 from util.cache import cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from models import Registration, UserProfile, PendingNameChange, PendingEmailChange, CourseEnrollment
 from datetime import date
 from collections import namedtuple
-from courseware.courses import course_staff_group_name, has_staff_access_to_course, get_courses_by_university
+from courseware.courses import (course_staff_group_name, has_staff_access_to_course,
+                                get_courses_by_university)
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -47,7 +50,8 @@ def csrf_token(context):
     csrf_token = context.get('csrf_token', '')
     if csrf_token == 'NOTPROVIDED':
         return ''
-    return u'<div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token)
+    return (u'<div style="display:none"><input type="hidden"'
+            ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
 @ensure_csrf_cookie
@@ -162,6 +166,26 @@ def change_enrollment_view(request):
     """Delegate to change_enrollment to actually do the work."""
     return HttpResponse(json.dumps(change_enrollment(request)))
 
+def enrollment_allowed(user, course):
+    """If the course has an enrollment period, check whether we are in it.
+    Also respects the DARK_LAUNCH setting"""
+    now = time.gmtime()
+    start = course.enrollment_start
+    end = course.enrollment_end
+
+    if (start is None or now > start) and (end is None or now < end):
+        # in enrollment period.
+        print "allowing enrollment in {}: start {}, end {}, now {}".format(
+            course.location.url(), start, end, now)
+        return True
+
+    if settings.MITX_FEATURES['DARK_LAUNCH']:
+        if has_staff_access_to_course(user, course):
+            # if dark launch, staff can enroll outside enrollment window
+            return True
+    return False
+
+
 def change_enrollment(request):
     if request.method != "POST":
         raise Http404
@@ -174,7 +198,8 @@ def change_enrollment(request):
 
     course_id = request.POST.get("course_id", None)
     if course_id == None:
-        return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'There was an error receiving the course id.'}))
 
     if action == "enroll":
         # Make sure the course exists
@@ -187,12 +212,20 @@ def change_enrollment(request):
             return {'success': False, 'error': 'The course requested does not exist.'}
 
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            # require that user be in the staff_* group (or be an overall admin) to be able to enroll
-            # eg staff_6.002x or staff_6.00x
+            # require that user be in the staff_* group (or be an
+            # overall admin) to be able to enroll eg staff_6.002x or
+            # staff_6.00x
             if not has_staff_access_to_course(user, course):
                 staff_group = course_staff_group_name(course)
-                log.debug('user %s denied enrollment to %s ; not in %s' % (user,course.location.url(),staff_group))
-                return {'success': False, 'error' : '%s membership required to access course.' % staff_group}
+                log.debug('user %s denied enrollment to %s ; not in %s' % (
+                    user, course.location.url(), staff_group))
+                return {'success': False,
+                        'error' : '%s membership required to access course.' % staff_group}
+
+        if not enrollment_allowed(user, course):
+            return {'success': False,
+                    'error': 'enrollment in {} not allowed at this time'
+                    .format(course.display_name)}
 
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}

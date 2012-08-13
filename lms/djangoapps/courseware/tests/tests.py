@@ -58,8 +58,22 @@ def mongo_store_config(data_dir):
     }
 }
 
+def xml_store_config(data_dir):
+    return {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': data_dir,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            'eager': True,
+        }
+    }
+}
+
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
+TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
 REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
@@ -149,8 +163,27 @@ class ActivateLoginTestCase(TestCase):
 class PageLoader(ActivateLoginTestCase):
     ''' Base class that adds a function to load all pages in a modulestore '''
 
+    def _enroll(self, course):
+        """Post to the enrollment view, and return the parsed json response"""
+        resp = self.client.post('/change_enrollment', {
+            'enrollment_action': 'enroll',
+            'course_id': course.id,
+            })
+        return parse_json(resp)
+
+    def try_enroll(self, course):
+        """Try to enroll.  Return bool success instead of asserting it."""
+        data = self._enroll(course)
+        print 'Enrollment in {} result: {}'.format(course.location.url(), data)
+        return data['success']
+
     def enroll(self, course):
         """Enroll the currently logged-in user, and check that it worked."""
+        data = self._enroll(course)
+        self.assertTrue(data['success'])
+
+    def unenroll(self, course):
+        """Unenroll the currently logged-in user, and check that it worked."""
         resp = self.client.post('/change_enrollment', {
             'enrollment_action': 'enroll',
             'course_id': course.id,
@@ -159,6 +192,7 @@ class PageLoader(ActivateLoginTestCase):
         self.assertTrue(data['success'])
 
     def check_pages_load(self, course_name, data_dir, modstore):
+        """Make all locations in course load"""
         print "Checking course {0} in {1}".format(course_name, data_dir)
         import_from_xml(modstore, data_dir, [course_name])
 
@@ -191,7 +225,7 @@ class PageLoader(ActivateLoginTestCase):
         self.assertTrue(all_ok)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestCoursesLoadTestCase(PageLoader):
     '''Check that all pages in test courses load properly'''
 
@@ -207,7 +241,7 @@ class TestCoursesLoadTestCase(PageLoader):
         self.check_pages_load('full', TEST_DATA_DIR, modulestore())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestViewAuth(PageLoader):
     """Check that view authentication works properly"""
 
@@ -215,15 +249,15 @@ class TestViewAuth(PageLoader):
     # can't do imports there without manually hacking settings.
 
     def setUp(self):
-        print "sys.path: {}".format(sys.path)
         xmodule.modulestore.django._MODULESTORES = {}
-        modulestore().collection.drop()
-        import_from_xml(modulestore(), TEST_DATA_DIR, ['toy'])
-        import_from_xml(modulestore(), TEST_DATA_DIR, ['full'])
         courses = modulestore().get_courses()
-        # get the two courses sorted out
-        courses.sort(key=lambda c: c.location.course)
-        [self.full, self.toy] = courses
+
+        def find_course(name):
+            """Assumes the course is present"""
+            return [c for c in courses if c.location.course==name][0]
+
+        self.full = find_course("full")
+        self.toy = find_course("toy")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -304,24 +338,33 @@ class TestViewAuth(PageLoader):
             self.check_for_get_code(200, url)
 
 
-    def test_dark_launch(self):
-        """Make sure that when dark launch is on, students can't access course
-        pages, but instructors can"""
-
-        # test.py turns off start dates, enable them and set them correctly.
-        # Because settings is global, be careful not to mess it up for other tests
-        # (Can't use override_settings because we're only changing part of the
-        # MITX_FEATURES dict)
+    def run_wrapped(self, test):
+        """
+        test.py turns off start dates.  Enable them and DARK_LAUNCH.
+        Because settings is global, be careful not to mess it up for other tests
+        (Can't use override_settings because we're only changing part of the
+        MITX_FEATURES dict)
+        """
         oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
         oldDL = settings.MITX_FEATURES['DARK_LAUNCH']
 
         try:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = False
             settings.MITX_FEATURES['DARK_LAUNCH'] = True
-            self._do_test_dark_launch()
+            test()
         finally:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
             settings.MITX_FEATURES['DARK_LAUNCH'] = oldDL
+
+
+    def test_dark_launch(self):
+        """Make sure that when dark launch is on, students can't access course
+        pages, but instructors can"""
+        self.run_wrapped(self._do_test_dark_launch)
+
+    def test_enrollment_period(self):
+        """Check that enrollment periods work"""
+        self.run_wrapped(self._do_test_enrollment_period)
 
 
     def _do_test_dark_launch(self):
@@ -338,6 +381,7 @@ class TestViewAuth(PageLoader):
         self.assertTrue(settings.MITX_FEATURES['DARK_LAUNCH'])
 
         def reverse_urls(names, course):
+            """Reverse a list of course urls"""
             return [reverse(name, kwargs={'course_id': course.id}) for name in names]
 
         def dark_student_urls(course):
@@ -423,6 +467,53 @@ class TestViewAuth(PageLoader):
         # and now should be able to load both
         check_staff(self.toy)
         check_staff(self.full)
+
+    def _do_test_enrollment_period(self):
+        """Actually do the test, relying on settings to be right."""
+
+        # Make courses start in the future
+        tomorrow = time.time() + 24 * 3600
+        nextday = tomorrow + 24 * 3600
+        yesterday = time.time() - 24 * 3600
+
+        print "changing"
+        # toy course's enrollment period hasn't started
+        self.toy.enrollment_start = time.gmtime(tomorrow)
+        self.toy.enrollment_end = time.gmtime(nextday)
+
+        # full course's has
+        self.full.enrollment_start = time.gmtime(yesterday)
+        self.full.enrollment_end = time.gmtime(tomorrow)
+
+        print "login"
+        # First, try with an enrolled student
+        print '=== Testing student access....'
+        self.login(self.student, self.password)
+        self.assertFalse(self.try_enroll(self.toy))
+        self.assertTrue(self.try_enroll(self.full))
+
+        print '=== Testing course instructor access....'
+        # Make the instructor staff in the toy course
+        group_name = course_staff_group_name(self.toy)
+        g = Group.objects.create(name=group_name)
+        g.user_set.add(user(self.instructor))
+
+        print "logout/login"
+        self.logout()
+        self.login(self.instructor, self.password)
+        print "Instructor should be able to enroll in toy course"
+        self.assertTrue(self.try_enroll(self.toy))
+
+        print '=== Testing staff access....'
+        # now make the instructor global staff, but not in the instructor group
+        g.user_set.remove(user(self.instructor))
+        u = user(self.instructor)
+        u.is_staff = True
+        u.save()
+
+        # unenroll and try again
+        self.unenroll(self.toy)
+        self.assertTrue(self.try_enroll(self.toy))
 
 
 @override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
