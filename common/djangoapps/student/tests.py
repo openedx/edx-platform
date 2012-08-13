@@ -133,6 +133,12 @@ class ReplicationTest(TestCase):
             self.assertEqual(portal_user.seen_response_count, 200)
             self.assertEqual(course_user.seen_response_count, 0)
 
+            portal_user.email = 'jim@edx.org'
+            portal_user.save()
+            course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
+            self.assertEqual(portal_user.email, 'jim@edx.org')
+            self.assertEqual(course_user.email, 'jim@edx.org')
+
 
 
     def test_enrollment_for_user_info_after_enrollment(self):
