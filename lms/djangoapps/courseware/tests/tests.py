@@ -1,11 +1,14 @@
 import copy
 import json
-from path import path
 import os
+import sys
+import time
 
-from pprint import pprint
 from nose import SkipTest
+from path import path
+from pprint import pprint
 
+from django.contrib.auth.models import User, Group
 from django.test import TestCase
 from django.test.client import Client
 from django.conf import settings
@@ -13,12 +16,11 @@ from django.core.urlresolvers import reverse
 from mock import patch, Mock
 from override_settings import override_settings
 
-from django.contrib.auth.models import User, Group
+import xmodule.modulestore.django
+
 from student.models import Registration
 from courseware.courses import course_staff_group_name
-
 from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 
@@ -206,13 +208,14 @@ class TestCoursesLoadTestCase(PageLoader):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class TestInstructorAuth(PageLoader):
-    """Check that authentication works properly"""
+class TestViewAuth(PageLoader):
+    """Check that view authentication works properly"""
 
     # NOTE: setUpClass() runs before override_settings takes effect, so
     # can't do imports there without manually hacking settings.
 
     def setUp(self):
+        print "sys.path: {}".format(sys.path)
         xmodule.modulestore.django._MODULESTORES = {}
         modulestore().collection.drop()
         import_from_xml(modulestore(), TEST_DATA_DIR, ['toy'])
@@ -237,12 +240,16 @@ class TestInstructorAuth(PageLoader):
         # TODO (vshnayder): once we're returning 404s, get rid of this if.
         if code != 404:
             self.assertEqual(resp.status_code, code)
+            # And 'page not found' shouldn't be in the returned page
+            self.assertTrue(resp.content.lower().find('page not found') == -1)
         else:
             # look for "page not found" instead of the status code
+            #print resp.content
             self.assertTrue(resp.content.lower().find('page not found') != -1)
 
-    def test_instructor_page(self):
-        "Make sure only instructors can load it"
+    def test_instructor_pages(self):
+        """Make sure only instructors for the course or staff can load the instructor
+        dashboard, the grade views, and student profile pages"""
 
         # First, try with an enrolled student
         self.login(self.student, self.password)
@@ -297,7 +304,125 @@ class TestInstructorAuth(PageLoader):
             self.check_for_get_code(200, url)
 
 
+    def test_dark_launch(self):
+        """Make sure that when dark launch is on, students can't access course
+        pages, but instructors can"""
 
+        # test.py turns off start dates, enable them and set them correctly.
+        # Because settings is global, be careful not to mess it up for other tests
+        # (Can't use override_settings because we're only changing part of the
+        # MITX_FEATURES dict)
+        oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
+        oldDL = settings.MITX_FEATURES['DARK_LAUNCH']
+
+        try:
+            settings.MITX_FEATURES['DISABLE_START_DATES'] = False
+            settings.MITX_FEATURES['DARK_LAUNCH'] = True
+            self._do_test_dark_launch()
+        finally:
+            settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
+            settings.MITX_FEATURES['DARK_LAUNCH'] = oldDL
+
+
+    def _do_test_dark_launch(self):
+        """Actually do the test, relying on settings to be right."""
+
+        # Make courses start in the future
+        tomorrow = time.time() + 24*3600
+        self.toy.start = self.toy.metadata['start'] = time.gmtime(tomorrow)
+        self.full.start = self.full.metadata['start'] = time.gmtime(tomorrow)
+
+        self.assertFalse(self.toy.has_started())
+        self.assertFalse(self.full.has_started())
+        self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
+        self.assertTrue(settings.MITX_FEATURES['DARK_LAUNCH'])
+
+        def reverse_urls(names, course):
+            return [reverse(name, kwargs={'course_id': course.id}) for name in names]
+
+        def dark_student_urls(course):
+            """
+            list of urls that students should be able to see only
+            after launch, but staff should see before
+            """
+            urls = reverse_urls(['info', 'book', 'courseware', 'profile'], course)
+            return urls
+
+        def light_student_urls(course):
+            """
+            list of urls that students should be able to see before
+            launch.
+            """
+            urls = reverse_urls(['about_course'], course)
+            urls.append(reverse('courses'))
+            # Need separate test for change_enrollment, since it's a POST view
+            #urls.append(reverse('change_enrollment'))
+
+            return urls
+
+        def instructor_urls(course):
+            """list of urls that only instructors/staff should be able to see"""
+            urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
+                                course)
+            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+                                                     'student_id': user(self.student).id}))
+            return urls
+
+        def check_non_staff(course):
+            """Check that access is right for non-staff in course"""
+            print '=== Checking non-staff access for {}'.format(course.id)
+            for url in instructor_urls(course) + dark_student_urls(course):
+                print 'checking for 404 on {}'.format(url)
+                self.check_for_get_code(404, url)
+
+            for url in light_student_urls(course):
+                print 'checking for 200 on {}'.format(url)
+                self.check_for_get_code(200, url)
+
+        def check_staff(course):
+            """Check that access is right for staff in course"""
+            print '=== Checking staff access for {}'.format(course.id)
+            for url in (instructor_urls(course) +
+                        dark_student_urls(course) +
+                        light_student_urls(course)):
+                print 'checking for 200 on {}'.format(url)
+                self.check_for_get_code(200, url)
+
+        # First, try with an enrolled student
+        print '=== Testing student access....'
+        self.login(self.student, self.password)
+        self.enroll(self.toy)
+        self.enroll(self.full)
+
+        # shouldn't be able to get to anything except the light pages
+        check_non_staff(self.toy)
+        check_non_staff(self.full)
+
+        print '=== Testing course instructor access....'
+        # Make the instructor staff in the toy course
+        group_name = course_staff_group_name(self.toy)
+        g = Group.objects.create(name=group_name)
+        g.user_set.add(user(self.instructor))
+
+        self.logout()
+        self.login(self.instructor, self.password)
+        # Enroll in the classes---can't see courseware otherwise.
+        self.enroll(self.toy)
+        self.enroll(self.full)
+
+        # should now be able to get to everything for toy course
+        check_non_staff(self.full)
+        check_staff(self.toy)
+
+        print '=== Testing staff access....'
+        # now also make the instructor staff
+        u = user(self.instructor)
+        u.is_staff = True
+        u.save()
+
+        # and now should be able to load both
+        check_staff(self.toy)
+        check_staff(self.full)
 
 
 @override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
