@@ -137,7 +137,7 @@ $(function() {
               percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
               %>
 
-              <h3><a href="${reverse('courseware_section', kwargs={'course_id' : course.id, 'chapter' : chapter['url_name'], 'section' : section['url_name']})}">
+              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
                 ${ section['display_name'] }</a><span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span></h3>
               <p>
                 ${section['format']}
