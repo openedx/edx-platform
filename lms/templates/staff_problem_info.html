@@ -1,11 +1,122 @@
 ${module_content}
 %if edit_link:
-<div><a href="${edit_link}">Edit</a></div>
+<div><a href="${edit_link}">Edit</a> / <a href="#${element_id}_xqa-modal" onclick="getlog_${element_id}()" id="${element_id}_xqa_log">QA</a></div>
 % endif
-<div class="staff_info">
+<div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
+
+<section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
+  <div class="inner-wrapper">
+    <header>
+      <h2>edX Content Quality Assessment</h2>
+    </header>
+
+    <form id="${element_id}_xqa_form" class="xqa_form">
+      <label>Comment</label>
+      <input id="${element_id}_xqa_entry" type="text" placeholder="comment">
+      <label>Tag</label>
+      <span style="color:black;vertical-align: -10pt">Optional tag (eg "done" or "broken"):&nbsp;       </span>
+      <input id="${element_id}_xqa_tag" type="text" placeholder="tag" style="width:80px;display:inline">
+      <div class="submit">
+        <button name="submit" type="submit">Add comment</button>
+      </div>
+      <hr>
+      <div id="${element_id}_xqa_log_data"></div>
+    </form>
+
+  </div>
+</section>
+
+<section class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto;" >
+  <div class="inner-wrapper" style="color:black">
+    <header>
+      <h2>Staff Debug</h2>
+    </header>
+    <div class="staff_info">
+location = ${location | h}
+github = <a href="${edit_link}">${edit_link | h}</a>
 definition = <pre>${definition | h}</pre>
 metadata = ${metadata | h}
-</div>
-%if render_histogram:
-<div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
-%endif
+category = ${category | h}
+    </div>
+    %if render_histogram:
+    <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
+    %endif
+  </div>
+</section>
+
+<div id="${element_id}_setup"></div>
+
+## leanModal needs to be included here otherwise this breaks when in a <vertical>
+<script type="text/javascript" src="/static/js/vendor/jquery.leanModal.min.js"></script>
+
+<script type="text/javascript">
+
+function setup_debug_${element_id}(){
+    $('#${element_id}_trig').leanModal(); 
+    $('#${element_id}_xqa_log').leanModal();		
+    $('#${element_id}_xqa_form').submit(sendlog_${element_id});
+}
+ 
+setup_debug_${element_id}();
+
+function sendlog_${element_id}(){
+
+    var xqaLog = {authkey: '${xqa_key}',
+           location: '${location}',
+           %if edit_link:
+           giturl: '${edit_link}',
+           %endif
+           category : '${category}',
+           username : '${user.username}',
+           return : 'query',
+           format : 'html',
+           email : '${user.email}',
+           tag:$('#${element_id}_xqa_tag').val(),
+           entry: $('#${element_id}_xqa_entry').val()};
+ 
+    $.ajax({
+        url: '${xqa_server}/log',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaLog),
+        crossDomain: true,
+        dataType: 'jsonp',
+        beforeSend: function (xhr) { xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
+        timeout : 1000,
+        success: function(result) {
+            $('#${element_id}_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server');
+            console.log('error!');
+        }
+    });
+    return false;
+};
+ 
+function getlog_${element_id}(){
+
+var xqaQuery = {authkey: '${xqa_key}',
+           location: '${location}',
+           format: 'html'};
+ 
+$.ajax({
+        url: '${xqa_server}/query',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaQuery),
+        crossDomain: true,
+        dataType: 'jsonp',
+        timeout : 1000,
+        success: function(result) {
+            $('#${element_id}_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server');
+        }
+    });
+
+
+};
+</script>
+

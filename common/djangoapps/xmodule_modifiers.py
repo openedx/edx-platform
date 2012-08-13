@@ -34,7 +34,7 @@ def wrap_xmodule(get_html, module, template):
     return _get_html
 
 
-def replace_static_urls(get_html, prefix):
+def replace_static_urls(get_html, prefix, module):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -69,14 +69,14 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_histogram(get_html, module):
+def add_histogram(get_html, module, user):
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
     for admin users only, including a histogram of student answers and the
     definition of the xmodule
 
-    Does nothing if module is a SequenceModule
+    Does nothing if module is a SequenceModule or a VerticalModule.
     """
     @wraps(get_html)
     def _get_html():
@@ -90,19 +90,27 @@ def add_histogram(get_html, module):
 
         # TODO (ichuang): Remove after fall 2012 LMS migration done
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            [filepath, filename] = module.definition.get('filename','')
+            [filepath, filename] = module.definition.get('filename', ['', None])
             osfs = module.system.filestore
             if filename is not None and osfs.exists(filename):
-                filepath = filename	# if original, unmangled filename exists then use it (github doesn't like symlinks)
+                # if original, unmangled filename exists then use it (github
+                # doesn't like symlinks)
+                filepath = filename
             data_dir = osfs.root_path.rsplit('/')[-1]
-            edit_link = "https://github.com/MITx/%s/tree/master/%s" % (data_dir,filepath)
+            giturl = module.metadata.get('giturl','https://github.com/MITx')
+            edit_link = "%s/%s/tree/master/%s" % (giturl,data_dir,filepath)
         else:
             edit_link = False
 
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
-                         'element_id': module.location.html_id(),
+                         'location': module.location,
+                         'xqa_key': module.metadata.get('xqa_key',''),
+                         'category': str(module.__class__.__name__),
+                         'element_id': module.location.html_id().replace('-','_'),
                          'edit_link': edit_link,
+                         'user': user,
+                         'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
                          'module_content': get_html()}

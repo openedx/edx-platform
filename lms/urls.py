@@ -1,8 +1,7 @@
 from django.conf import settings
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -15,7 +14,7 @@ urlpatterns = ('',
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
-    
+
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -85,7 +84,6 @@ urlpatterns = ('',
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
 
 
-
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
@@ -98,16 +96,21 @@ if settings.PERFSTATS:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
+        # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
-        url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
-        url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
-        url(r'^change_setting$', 'student.views.change_setting'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.modx_dispatch',
+            name='modx_dispatch'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.xqueue_callback',
+            name='xqueue_callback'),
+        url(r'^change_setting$', 'student.views.change_setting',
+            name='change_setting'),
 
         # TODO: These views need to be updated before they work
         # url(r'^calculate$', 'util.views.calculate'),
-        # url(r'^gradebook$', 'courseware.views.gradebook'),
         # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki circuits for the wiki
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
@@ -131,12 +134,24 @@ if settings.COURSEWARE_ENABLED:
             'staticbook.views.index_shifted'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/$',
+            'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$',
             'courseware.views.profile', name="profile"),
+        # Takes optional student_id for instructor use--shows profile as that student sees it.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
-            'courseware.views.profile'),
+            'courseware.views.profile', name="student_profile"),
+
+        # For the instructor
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
+            'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
+            'courseware.views.gradebook', name='gradebook'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
+            'courseware.views.grade_summary', name='grade_summary'),
+
     )
 
     # Multicourse wiki

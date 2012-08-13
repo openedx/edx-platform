@@ -20,7 +20,7 @@ div.info-wrapper {
 
       > li {
         @extend .clearfix;
-        border-bottom: 1px solid #e3e3e3;
+        border-bottom: 1px solid lighten($border-color, 10%);
         margin-bottom: lh();
         padding-bottom: lh(.5);
         list-style-type: disk;
@@ -76,97 +76,97 @@ div.info-wrapper {
     h1 {
       @extend .bottom-border;
       padding: lh(.5) lh(.5);
-    }
-
-    header {
-
-      // h1 {
-      //   font-weight: 100;
-      //   font-style: italic;
-      // }
-
-      p {
-         color: #666;
-         font-size: 12px;
-         margin-bottom: 0;
-         margin-top: 4px;
-      }
+      margin-bottom: 0;
     }
 
     ol {
-      background: none;
-      list-style: none;
-      padding-left: 0;
-
       li {
-        @extend .clearfix;
-        background: none;
-        border-bottom: 1px solid #d3d3d3;
-        @include box-shadow(0 1px 0 #eee);
-        @include box-sizing(border-box);
-        padding: em(7) lh(.75);
-        position: relative;
+        a {
+          display: block;
+          padding-left: lh(.5);
+          padding-right: 0;
+        }
 
         &.expandable,
         &.collapsable {
           h4 {
-            font-style: $body-font-size;
             font-weight: normal;
-            padding-left: 18px;
+            font-size: 1em;
+            padding: lh(.25) 0 lh(.25) lh(1.5);
+          }
+        }
+
+        &.multiple {
+          padding: lh(.5) 0 lh(.5) lh(.5);
+
+          a {
+            @include inline-block;
+            padding: 0;
+
+            &:hover {
+              background: transparent;
+            }
           }
         }
 
         ul {
           background: none;
-          margin: em(7) (-(lh(.75))) 0;
+          margin: 0;
 
           li {
             border-bottom: 0;
-            border-top: 1px solid #d3d3d3;
+            border-top: 1px solid $border-color;
             @include box-shadow(inset 0 1px 0 #eee);
-            padding-left: lh(1.5);
-          }
-        }
+            font-size: 1em;
+            padding: lh(.5) 0 lh(.5) lh(.5);
 
-        &:hover {
-          background-color: #e9e9e9;
+            a {
+              @include inline-block;
+              padding: 0;
+
+              &:hover {
+                background: transparent;
+              }
+            }
+          }
         }
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
           display: block;
           height: 100%;
-          left: lh(.75);
           margin-left: 0;
-          max-height: 20px;
+          max-height: 30px;
           position: absolute;
           width: 100%;
 
           &:hover {
             opacity: 0.6;
             filter: alpha(opacity=60);
+
+            + h4 {
+              background-color: #e3e3e3;
+            }
           }
 
           &.expandable-hitarea {
-            background-position: -80px 1px;
+            background-position: -72px 7px;
           }
 
           &.collapsable-hitarea {
-            background-position: -64px -21px;
+            background-position: -55px -15px;
           }
         }
 
         h3 {
           border-bottom: 0;
           @include box-shadow(none);
-          color: #999;
-          font-size: $body-font-size;
-          font-weight: bold;
-          text-transform: uppercase;
+          color: #aaa;
+          font-size: 1em;
+          margin-bottom: em(6);
         }
 
         p {
-          font-size: $body-font-size;
           letter-spacing: 0;
           margin: 0;
           text-transform: none;
@@ -187,17 +187,6 @@ div.info-wrapper {
                 padding-right: 0;
               }
             }
-          }
-        }
-
-        a {
-          color: lighten($text-color, 10%);
-          @include inline-block();
-          text-decoration: none;
-          @include transition();
-
-          &:hover {
-            color: $mit-red;
           }
         }
       }

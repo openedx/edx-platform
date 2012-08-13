@@ -4,6 +4,7 @@
 
 <%block name="headextra">
 <%static:css group='course'/>
+<%static:js group='courseware'/>
 </%block>
 
 <%block name="js_extra">
@@ -71,7 +72,31 @@ $("#open_close_accordion a").click(function(){
       </header>
 
       <ul id="booknav" class="treeview-booknav">
-        <%include file="book_toc.html" />
+          <%def name="print_entry(entry)">
+              <li>
+                  <a href="javascript:goto_page(${entry.get('page')})">
+                      <span class="chapter">
+                        %if entry.get('chapter'):
+                          <span class="chapter-number">${entry.get('chapter')}.</span> ${entry.get('name')}
+                        %else:
+                          ${entry.get('name')}
+                        %endif
+                      </span>
+                      <span class="page-number">${entry.get('page_label')}</span>
+                  </a>
+                  % if len(entry) > 0:
+                      <ul>
+                          % for child in entry:
+                              ${print_entry(child)}
+                          % endfor
+                      </ul>
+                  % endif
+              </li>
+          </%def>
+
+          % for entry in table_of_contents:
+            ${print_entry(entry)}
+          % endfor
       </ul>
     </section>
 
@@ -89,17 +114,6 @@ $("#open_close_accordion a").click(function(){
         </nav>
 
         <img id="bookpage" src="${ settings.BOOK_URL }p${ "%03i"%(page) }.png">
-
-        <nav class="bottom-nav">
-          <ul>
-            <li class="last">
-              <a href="javascript:prev_page()">Previous page</a>
-            </li>
-            <li class="next">
-              <a href="javascript:next_page()">Next page</a>
-            </li>
-          </ul>
-        </nav>
       </section>
     </section>
   </div>

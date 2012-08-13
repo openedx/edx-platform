@@ -2,80 +2,49 @@ div#wiki_panel {
   @extend .sidebar;
   overflow: auto;
 
-  h2 {
-    @extend .bottom-border;
-    font-size: 18px;
-    margin: 0 ;
-    padding: lh(.5) lh();
-  }
-
-  input[type="button"] {
-    background: transparent;
-    border: none;
-    @include box-shadow(none);
-    color: #666;
-    font-size: 14px;
-    font-weight: bold;
-    margin: 0px;
-    padding: 7px lh();
-    text-align: left;
-    @include transition();
-    width: 100%;
-  }
-
   ul {
     li {
-      @include box-shadow(inset 0 1px 0 0 #eee);
-      border-top: 1px solid #d3d3d3;
-
-      &:hover {
-        background: #efefef;
-        @include background-image(linear-gradient(-90deg, rgb(245,245,245), rgb(225,225,225)));
-      }
-
-      &:first-child {
-        border: none;
-      }
-
       &.search {
-        padding: 10px lh();
+        padding: 10px lh() 10px 0;
 
         label {
           display: none;
         }
       }
+    }
+  }
 
-      &.create-article {
-        h3 {
-        }
-      }
-
-      a {
-        color: #666;
-        font-size: 14px;
-        padding: 7px lh();
-      }
+  form {
+    input[type="submit"]{
+      @extend .light-button;
+      text-transform: none;
+      text-shadow: none;
     }
   }
 
   div#wiki_create_form {
     @extend .clearfix;
-    background: #dadada;
-    border-bottom: 1px solid #d3d3d3;
-    padding: 15px;
+    padding: lh(.5) lh() lh(.5) 0;
+
+    label {
+      font-family: $sans-serif;
+      margin-bottom: lh(.5);
+    }
 
     input[type="text"] {
       @include box-sizing(border-box);
       display: block;
-      margin-bottom: 6px;
       width: 100%;
+      margin-bottom: lh(.5);
     }
 
     ul {
       list-style: none;
+      margin: 0;
 
       li {
         float: left;
+        border-bottom: 0;
 
         &#cancel {
           float: right;

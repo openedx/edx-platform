@@ -1,5 +1,25 @@
-from staticfiles.storage import staticfiles_storage
+import logging
 import re
+
+from staticfiles.storage import staticfiles_storage
+from staticfiles import finders
+from django.conf import settings
+
+log = logging.getLogger(__name__)
+
+def try_staticfiles_lookup(path):
+    """
+    Try to lookup a path in staticfiles_storage.  If it fails, return
+    a dead link instead of raising an exception.
+    """
+    try:
+        url = staticfiles_storage.url(path)
+    except Exception as err:
+        log.warning("staticfiles_storage couldn't find path {}: {}".format(
+            path, str(err)))
+        # Just return a dead link--don't kill everything.
+        url = "file_not_found"
+    return url
 
 
 def replace(static_url, prefix=None):
@@ -9,10 +29,19 @@ def replace(static_url, prefix=None):
         prefix = prefix + '/'
 
     quote = static_url.group('quote')
-    if staticfiles_storage.exists(static_url.group('rest')):
+
+    servable = (
+        # If in debug mode, we'll serve up anything that the finders can find
+        (settings.DEBUG and finders.find(static_url.group('rest'), True)) or
+        # Otherwise, we'll only serve up stuff that the storages can find
+        staticfiles_storage.exists(static_url.group('rest'))
+    )
+
+    if servable:
         return static_url.group(0)
     else:
-        url = staticfiles_storage.url(prefix + static_url.group('rest'))
+        # don't error if file can't be found
+        url = try_staticfiles_lookup(prefix + static_url.group('rest'))
         return "".join([quote, url, quote])
 
 

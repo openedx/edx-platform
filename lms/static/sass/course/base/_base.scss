@@ -1,8 +1,8 @@
 body {
-  font-family: $sans-serif;
+  min-width: 980px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
   font-family: $sans-serif;
 }
 
@@ -18,4 +18,15 @@ table {
     width: 100%;
     table-layout: fixed;
   }
+}
+
+form {
+  label {
+    display: block;
+  }
+}
+
+::selection, ::-moz-selection, ::-webkit-selection {
+  background:#444;
+  color:#fff;
 }

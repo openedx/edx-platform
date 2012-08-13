@@ -10,12 +10,14 @@ import os
 import fs
 import json
 
+import json
 import numpy
 
 import xmodule
 import capa.calc as calc
 import capa.capa_problem as lcp
 from capa.correctmap import CorrectMap
+from capa.util import convert_files_to_filenames
 from xmodule import graders, x_module
 from xmodule.x_module import ModuleSystem
 from xmodule.graders import Score, aggregate_scores
@@ -32,7 +34,7 @@ i4xs = ModuleSystem(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
-    xqueue=None,
+    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
     is_staff=False,
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
@@ -280,7 +282,6 @@ class StringResponseWithHintTest(unittest.TestCase):
 class CodeResponseTest(unittest.TestCase):
     '''
     Test CodeResponse
-
     '''
     def test_update_score(self):
         problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
@@ -293,9 +294,14 @@ class CodeResponseTest(unittest.TestCase):
         for i in range(numAnswers):
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuekey=1000 + i))
 
-        # Message format inherited from ExternalResponse
-        correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
-        incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+        # TODO: Message format inherited from ExternalResponse
+        #correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
+        #incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+
+        # New message format common to external graders
+        correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg':'MESSAGE'})
+        incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg':'MESSAGE'})
+
         xserver_msgs = {'correct': correct_score_msg,
                         'incorrect': incorrect_score_msg,
                         }
@@ -329,7 +335,18 @@ class CodeResponseTest(unittest.TestCase):
                         self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be dequeued, message delivered
                     else:
                         self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be queued, message undelivered
-
+    
+    def test_convert_files_to_filenames(self):
+        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        fp = open(problem_file)
+        answers_with_file = {'1_2_1': 'String-based answer',
+                             '1_3_1': ['answer1', 'answer2', 'answer3'],
+                             '1_4_1': fp}
+        answers_converted = convert_files_to_filenames(answers_with_file)
+        self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
+        self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
+        self.assertEquals(answers_converted['1_4_1'], fp.name)
+        
 
 class ChoiceResponseTest(unittest.TestCase):
 
@@ -712,6 +729,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, 'a://b/c/d/e', {})
+        xm = x_module.XModule(i4xs, 'a://b/c/d/e', None, {})
         p = xm.get_progress()
         self.assertEqual(p, None)

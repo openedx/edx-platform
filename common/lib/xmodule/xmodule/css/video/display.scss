@@ -16,7 +16,6 @@ div.video {
       height: 0;
       overflow: hidden;
       padding-bottom: 56.25%;
-      padding-top: 30px;
       position: relative;
 
       object, iframe {
@@ -207,7 +206,7 @@ div.video {
             h3 {
               color: #999;
               float: left;
-              font-size: 12px;
+              font-size: em(14);
               font-weight: normal;
               letter-spacing: 1px;
               padding: 0 lh(.25) 0 lh(.5);
@@ -221,6 +220,7 @@ div.video {
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
               line-height: 46px;
+              color: #fff;
             }
 
             &:hover, &:active, &:focus {
@@ -462,7 +462,8 @@ div.video {
     }
 
     ol.subtitles {
-      width: 0px;
+      width: 0;
+      height: 0;
     }
   }
 

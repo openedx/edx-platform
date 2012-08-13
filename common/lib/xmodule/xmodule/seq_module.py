@@ -25,9 +25,9 @@ class SequenceModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    def __init__(self, system, location, definition, instance_state=None,
+    def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.position = 1
 
@@ -107,6 +107,8 @@ class SequenceModule(XModule):
 class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
+    
+    stores_state = True # For remembering where in the sequence the student is
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -122,16 +124,3 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
 
-    @classmethod
-    def split_to_file(cls, xml_object):
-        # Note: if we end up needing subclasses, can port this logic there.
-        yes = ('chapter',)
-        no = ('course',)
-
-        if xml_object.tag in yes:
-            return True
-        elif xml_object.tag in no:
-            return False
-
-        # otherwise maybe--delegate to superclass.
-        return XmlDescriptor.split_to_file(xml_object)

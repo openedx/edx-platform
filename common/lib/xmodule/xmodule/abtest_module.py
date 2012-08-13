@@ -11,18 +11,19 @@ DEFAULT = "_DEFAULT_GROUP"
 
 
 def group_from_value(groups, v):
-    ''' Given group: (('a',0.3),('b',0.4),('c',0.3)) And random value
+    """
+    Given group: (('a', 0.3), ('b', 0.4), ('c', 0.3)) and random value v
     in [0,1], return the associated group (in the above case, return
-    'a' if v<0.3, 'b' if 0.3<=v<0.7, and 'c' if v>0.7
-'''
+    'a' if v < 0.3, 'b' if 0.3 <= v < 0.7, and 'c' if v > 0.7
+    """
     sum = 0
     for (g, p) in groups:
         sum = sum + p
         if sum > v:
             return g
 
-    # Round off errors might cause us to run to the end of the list
-    # If the do, return the last element
+    # Round off errors might cause us to run to the end of the list.
+    # If the do, return the last element.
     return g
 
 
@@ -31,8 +32,8 @@ class ABTestModule(XModule):
     Implements an A/B test with an aribtrary number of competing groups
     """
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
 
         if shared_state is None:
 
@@ -103,7 +104,9 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
         experiment = xml_object.get('experiment')
 
         if experiment is None:
-            raise InvalidDefinitionError("ABTests must specify an experiment. Not found in:\n{xml}".format(xml=etree.tostring(xml_object, pretty_print=True)))
+            raise InvalidDefinitionError(
+                "ABTests must specify an experiment. Not found in:\n{xml}"
+                .format(xml=etree.tostring(xml_object, pretty_print=True)))
 
         definition = {
             'data': {
@@ -127,7 +130,9 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)
 
-        default_portion = 1 - sum(portion for (name, portion) in definition['data']['group_portions'].items())
+        default_portion = 1 - sum(
+            portion for (name, portion) in definition['data']['group_portions'].items())
+
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 

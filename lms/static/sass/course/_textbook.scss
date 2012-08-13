@@ -7,19 +7,46 @@ div.book-wrapper {
     @include box-sizing(border-box);
 
     ul#booknav {
-      font-size: 12px;
+      font-size: em(14);
 
-      a {
-        color: #000;
+      .chapter-number {
+        
+      }
 
-        &:hover {
-          color: #666;
-        }
+      .chapter {
+        float: left;
+        width: 87%;
+        line-height: 1.4em;
+      }
+
+      .page-number {
+        float: right;
+        width: 12%;
+        font-size: .8em;
+        line-height: 2.1em;
+        text-align: right;
+        color: #9a9a9a;
+        opacity: 0;
+        @include transition(opacity .15s);
       }
 
       li {
         background: none;
-        padding-left: 30px;
+        border-bottom: 0;
+        padding-left: lh();
+
+        a {
+          padding: 0;
+          @include clearfix;
+
+          &:hover {
+            background-color: transparent;
+
+            .page-number {
+              opacity: 1;
+            }
+          }
+        }
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
@@ -35,12 +62,18 @@ div.book-wrapper {
 
         ul {
           background: none;
+          margin-top: lh(.25);
+          border-top: 1px solid $border-color;
+          padding-top: lh(.25);
+
+          li {
+            padding-bottom: lh(.25);
+          }
         }
       }
 
       > li {
-        border-bottom: 1px solid #d3d3d3;
-        @include box-shadow(0 1px 0 #eee);
+        border-bottom: 1px solid $border-color;
         padding: 7px 7px 7px 30px;
       }
     }
@@ -48,9 +81,11 @@ div.book-wrapper {
 
   section.book {
     @extend .content;
+    padding-bottom: 0;
+    padding-right: 0;
+    padding-top: 0;
 
     nav {
-      @extend .topbar;
       @extend .clearfix;
 
       a {
@@ -62,42 +97,62 @@ div.book-wrapper {
         @extend .clearfix;
 
         li {
+          position: absolute;
+          height: 100%;
+          width: flex-grid(2, 8);
+
+          a {
+            background-color: rgba(#000, .7);
+            background-position: center;
+            background-repeat: no-repeat;
+            @include box-sizing(border-box);
+            display: table;
+            height: 100%;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            text-indent: -9999px;
+            @include transition;
+            vertical-align: middle;
+            width: 100%;
+
+            &:hover {
+              opacity: 1;
+              filter: alpha(opacity=100);
+            }
+          }
 
           &.last {
-            display: block;
-            float: left;
+            left: 0;
 
             a {
-              border-left: 0;
-              border-right: 1px solid darken(#f6efd4, 20%);
-              @include box-shadow(inset -1px 0 0 lighten(#f6efd4, 5%));
+              background-image: url('../images/textbook/textbook-left.png');
             }
           }
 
           &.next {
-            display: block;
-            float: right;
+            right: 0;
+
+            a {
+              background-image: url('../images/textbook/textbook-right.png');
+            }
           }
 
-          &:hover {
-            background: none;
-          }
         }
       }
 
       &.bottom-nav {
         border-bottom: 0;
-        border-top: 1px solid #EDDFAA;
         margin-bottom: -(lh());
         margin-top: lh();
       }
     }
 
     section.page {
+      border: 1px solid $border-color;
+      position: relative;
       text-align: center;
 
       img {
-        border: 1px solid $border-color;
         max-width: 100%;
       }
     }
