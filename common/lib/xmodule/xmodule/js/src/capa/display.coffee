@@ -39,13 +39,12 @@ class @Problem
 
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
-      @el.html(response.html)
-      @executeProblemScripts () =>
-        @setupInputTypes()
-        @bind()
-
-      @queued_items = @$(".xqueue")
+      @queued_items = $(response.html).find(".xqueue")
       if @queued_items.length == 0 
+        @el.html(response.html)
+        @executeProblemScripts () =>
+          @setupInputTypes()
+          @bind()
         delete window.queuePollerID
       else
         # TODO: Dynamically adjust timeout interval based on @queued_items.value
