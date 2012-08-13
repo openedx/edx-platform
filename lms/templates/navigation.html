@@ -7,7 +7,12 @@
 <header class="global" aria-label="Global Navigation">
   <nav>
     <h1 class="logo"><a href="${reverse('root')}"></a></h1>
-    <ol class="left">
+
+    %if course:
+      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
+    %endif
+
+    <ol class="left find-courses-button">
       <li class="primary">
         <a href="${reverse('courses')}">Find Courses</a>
       </li>

@@ -27,7 +27,8 @@ from xmodule.course_module import CourseDescriptor
 from util.cache import cache, cache_if_anonymous
 from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import check_course, get_courses_by_university
+from courseware.courses import (check_course, get_courses_by_university,
+                                has_staff_access_to_course_id)
 
 
 log = logging.getLogger("mitx.courseware")
@@ -35,6 +36,9 @@ log = logging.getLogger("mitx.courseware")
 template_imports = {'urllib': urllib}
 
 def user_groups(user):
+    """
+    TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
+    """
     if not user.is_authenticated():
         return []
 
@@ -64,64 +68,6 @@ def courses(request):
     universities = get_courses_by_university(request.user)
     return render_to_response("courses.html", {'universities': universities})
 
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_id):
-    if 'course_admin' not in user_groups(request.user):
-        raise Http404
-    course = check_course(course_id)
-        
-    student_objects = User.objects.all()[:100]
-    student_info = []
-    
-    #TODO: Only select students who are in the course
-    for student in student_objects:        
-        student_info.append({
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': grades.grade(student, request, course),
-            'realname': UserProfile.objects.get(user=student).name
-        })
-
-    return render_to_response('gradebook.html', {'students': student_info, 'course': course})
-
-
-@login_required
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
-    ''' User profile. Show username, location, etc, as well as grades .
-        We need to allow the user to change some of these settings .'''
-    course = check_course(course_id)
-
-    if student_id is None:
-        student = request.user
-    else:
-        if 'course_admin' not in user_groups(request.user):
-            raise Http404
-        student = User.objects.get(id=int(student_id))
-
-    user_info = UserProfile.objects.get(user=student)
-
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache)
-    
-    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
-    grade_summary = grades.grade(request.user, request, course, student_module_cache)
-    
-    context = {'name': user_info.name,
-               'username': student.username,
-               'location': user_info.location,
-               'language': user_info.language,
-               'email': student.email,
-               'course': course,
-               'csrf': csrf(request)['csrf_token'],
-               'courseware_summary' : courseware_summary,
-               'grade_summary' : grade_summary
-               }
-    context.update()
-
-    return render_to_response('profile.html', context)
-
 
 def render_accordion(request, course, chapter, section):
     ''' Draws navigation bar. Takes current position in accordion as
@@ -129,19 +75,14 @@ def render_accordion(request, course, chapter, section):
 
         If chapter and section are '' or None, renders a default accordion.
 
+        course, chapter, and section are the url_names.
+
         Returns the html string'''
 
     # grab the table of contents
     toc = toc_for_course(request.user, request, course, chapter, section)
 
-    active_chapter = 1
-    for i in range(len(toc)):
-        if toc[i]['active']:
-            active_chapter = i
-
-    context = dict([('active_chapter', active_chapter),
-                    ('toc', toc),
-                    ('course_name', course.title),
+    context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
     return render_to_string('accordion.html', context)
@@ -233,12 +174,10 @@ def jump_to(request, location):
     '''
     Show the page that contains a specific location.
 
-    If the location is invalid, return a 404.
+    If the location is invalid or not in any class, return a 404.
 
-    If the location is valid, but not present in a course, ?
-
-    If the location is valid, but in a course the current user isn't registered for, ?
-        TODO -- let the index view deal with it?
+    Otherwise, delegates to the index view to figure out whether this user
+    has access, and what they should see.
     '''
     # Complain if the location isn't valid
     try:
@@ -254,16 +193,16 @@ def jump_to(request, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
-    # Rely on index to do all error handling
+    # Rely on index to do all error handling and access control.
     return index(request, course_id, chapter, section, position)
 
 @ensure_csrf_cookie
 def course_info(request, course_id):
-    '''
+    """
     Display the course's info.html, or 404 if there is no such course.
 
     Assumes the course_id is in a valid format.
-    '''
+    """
     course = check_course(course_id)
 
     return render_to_response('info.html', {'course': course})
@@ -289,7 +228,10 @@ def course_about(request, course_id):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def university_profile(request, org_id):
-    all_courses = sorted(modulestore().get_courses(), key=lambda course: course.number)
+    """
+    Return the profile for the particular org_id.  404 if it's not valid.
+    """
+    all_courses = modulestore().get_courses()
     valid_org_ids = set(c.org for c in all_courses)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
@@ -300,3 +242,104 @@ def university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
+
+
+@login_required
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def profile(request, course_id, student_id=None):
+    """ User profile. Show username, location, etc, as well as grades .
+        We need to allow the user to change some of these settings.
+
+    Course staff are allowed to see the profiles of students in their class.
+    """
+    course = check_course(course_id)
+
+    if student_id is None or student_id == request.user.id:
+        # always allowed to see your own profile
+        student = request.user
+    else:
+        # Requesting access to a different student's profile
+        if not has_staff_access_to_course_id(request.user, course_id):
+            raise Http404
+        student = User.objects.get(id=int(student_id))
+
+    user_info = UserProfile.objects.get(user=student)
+
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
+    course_module = get_module(request.user, request, course.location, student_module_cache)
+
+    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    grade_summary = grades.grade(request.user, request, course, student_module_cache)
+
+    context = {'name': user_info.name,
+               'username': student.username,
+               'location': user_info.location,
+               'language': user_info.language,
+               'email': student.email,
+               'course': course,
+               'csrf': csrf(request)['csrf_token'],
+               'courseware_summary' : courseware_summary,
+               'grade_summary' : grade_summary
+               }
+    context.update()
+
+    return render_to_response('profile.html', context)
+
+
+
+# ======== Instructor views =============================================================================
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def gradebook(request, course_id):
+    """
+    Show the gradebook for this course:
+    - only displayed to course staff
+    - shows students who are enrolled.
+    """
+    if not has_staff_access_to_course_id(request.user, course_id):
+        raise Http404
+
+    course = check_course(course_id)
+
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
+
+    # TODO (vshnayder): implement pagination.
+    enrolled_students = enrolled_students[:1000]   # HACK!
+
+    student_info = [{'username': student.username,
+                     'id': student.id,
+                     'email': student.email,
+                     'grade_summary': grades.grade(student, request, course),
+                     'realname': UserProfile.objects.get(user=student).name
+                     }
+                     for student in enrolled_students]
+
+    return render_to_response('gradebook.html', {'students': student_info,
+                                                 'course': course, 'course_id': course_id})
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def grade_summary(request, course_id):
+    """Display the grade summary for a course."""
+    if not has_staff_access_to_course_id(request.user, course_id):
+        raise Http404
+
+    course = check_course(course_id)
+
+    # For now, just a static page
+    context = {'course': course }
+    return render_to_response('grade_summary.html', context)
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def instructor_dashboard(request, course_id):
+    """Display the instructor dashboard for a course."""
+    if not has_staff_access_to_course_id(request.user, course_id):
+        raise Http404
+
+    course = check_course(course_id)
+
+    # For now, just a static page
+    context = {'course': course }
+    return render_to_response('instructor_dashboard.html', context)
+
