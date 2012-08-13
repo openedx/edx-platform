@@ -16,7 +16,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
-from courseware.courses import has_staff_access_to_course
+from courseware.courses import (has_staff_access_to_course,
+                                has_staff_access_to_location)
 
 log = logging.getLogger("mitx.courseware")
 
@@ -182,7 +183,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          is_staff=user.is_staff,
+                          is_staff=has_staff_access_to_location(user, location),
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)

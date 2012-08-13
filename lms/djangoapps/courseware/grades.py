@@ -146,8 +146,14 @@ def progress_summary(student, course, grader, student_module_cache):
     """
     chapters = []
     for c in course.get_children():
+        # Don't include chapters that aren't displayable (e.g. due to error)
+        if c not in c.displayable_items():
+            continue
         sections = []
         for s in c.get_children():
+            # Same for sections
+            if s not in s.displayable_items():
+                continue
             graded = s.metadata.get('graded', False)
             scores = []
             for module in yield_module_descendents(s):
