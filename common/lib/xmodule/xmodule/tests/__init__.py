@@ -325,7 +325,8 @@ class CodeResponseTest(unittest.TestCase):
 
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
-                new_cmap.set(answer_id=answer_ids[i], correctness=correctness, msg='MESSAGE', queuekey=None)
+                npoints = 1 if correctness=='correct' else 0
+                new_cmap.set(answer_id=answer_ids[i], npoints=npoints, correctness=correctness, msg='MESSAGE', queuekey=None)
 
                 test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
