@@ -1024,41 +1024,70 @@ class CodeResponse(LoncapaResponse):
         self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
-        self._parse_externalresponse_xml()
+        # VS[compat]:
+        #   Check if XML uses the ExternalResponse format or the generic CodeResponse format
+        codeparam = self.xml.find('codeparam')
+        if codeparam is None:
+            self._parse_externalresponse_xml()
+        else:
+            self._parse_coderesponse_xml(codeparam)
+
+    def _parse_coderesponse_xml(self,codeparam):
+        '''
+        Parse the new CodeResponse XML format. When successful, sets:
+            self.initial_display
+            self.answer (an answer to display to the student in the LMS)
+            self.payload
+        '''
+        # Note that CodeResponse is agnostic to the specific contents of grader_payload
+        grader_payload = codeparam.find('grader_payload')
+        grader_payload = grader_payload.text if grader_payload is not None else ''
+        self.payload = {'grader_payload': grader_payload}
+
+        answer_display = codeparam.find('answer_display')
+        if answer_display is not None:
+            self.answer = answer_display.text
+        else:
+            self.answer = 'No answer provided.'
+
+        initial_display = codeparam.find('initial_display')
+        if initial_display is not None:
+            self.initial_display = initial_display.text
+        else:
+            self.initial_display = ''
 
     def _parse_externalresponse_xml(self):
         '''
         VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
-            self.code
-            self.tests
-            self.answer
             self.initial_display
+            self.answer (an answer to display to the student in the LMS)
+            self.payload
         '''
         answer = self.xml.find('answer')
 
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
-                self.code = self.system.filesystem.open('src/' + answer_src).read()
+                code = self.system.filesystem.open('src/' + answer_src).read()
             else:
-                self.code = answer.text
+                code = answer.text
         else:  # no <answer> stanza; get code from <script>
-            self.code = self.context['script_code']
-            if not self.code:
+            code = self.context['script_code']
+            if not code:
                 msg = '%s: Missing answer script code for coderesponse' % unicode(self)
                 msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.tests = self.xml.get('tests')
+        tests = self.xml.get('tests')
 
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
         #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
-        #           following the 6.01 problem definition convention
+        #           following the ExternalResponse XML format
         penv = {}
         penv['__builtins__'] = globals()['__builtins__']
         try:
-            exec(self.code, penv, penv)
+            exec(code, penv, penv)
         except Exception as err:
             log.error('Error in CodeResponse %s: Error in problem reference code' % err)
             raise Exception(err)
@@ -1068,6 +1097,14 @@ class CodeResponse(LoncapaResponse):
         except Exception as err:
             log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
             raise Exception(err)
+
+        # Finally, make the ExternalResponse input XML format conform to the generic exteral grader interface
+        #   The XML tagging of grader_payload is pyxserver-specific
+        grader_payload  = '<pyxserver>'
+        grader_payload += '<tests>' + tests + '</tests>\n'
+        grader_payload += '<processor>' + code + '</processor>'
+        grader_payload += '</pyxserver>'
+        self.payload = {'grader_payload': grader_payload}
 
     def get_score(self, student_answers):
         try:
@@ -1093,22 +1130,16 @@ class CodeResponse(LoncapaResponse):
                                                 queue_name=self.queue_name)
 
         # Generate body
-        #   NOTE: Currently specialized to 6.00x's pyxserver, which follows the ExternalResponse interface
-        #         We should define a common interface for external code graders to CodeResponse
-        contents = {'xml': etree.tostring(self.xml, pretty_print=True),
-                    'edX_cmd': 'get_score',
-                    'edX_tests': self.tests,
-                    'processor': self.code,
-                    }
-        
+        contents = self.payload.copy() 
+
         # Submit request. When successful, 'msg' is the prior length of the queue
         if is_file(submission):
-            contents.update({'edX_student_response': submission.name})
+            contents.update({'student_response': submission.name})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
                                                     file_to_upload=submission)
         else:
-            contents.update({'edX_student_response': submission})
+            contents.update({'student_response': submission})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 

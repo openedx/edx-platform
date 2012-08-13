@@ -41,7 +41,7 @@ response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
 entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup', 'filesubmission', 'javascriptinput']
 solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
-response_properties = ["responseparam", "answer"]    	# these get captured as student responses
+response_properties = ["codeparam", "responseparam", "answer"]    	# these get captured as student responses
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -57,7 +57,7 @@ global_context = {'random': random,
                   'eia': eia}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["responseparam", "answer", "script", "hintgroup"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
 
 log = logging.getLogger('mitx.' + __name__)
 
