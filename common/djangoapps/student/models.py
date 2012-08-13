@@ -334,9 +334,6 @@ def replicate_model(model_method, instance, user_id):
     model_method is the model action that we want replicated. For instance, 
                  UserProfile.save
     """
-    if isinstance(instance, UserProfile):
-        log.debug("replicate_model called on UserProfile {0}".format(instance))
-
     if not should_replicate(instance):
         return
 
