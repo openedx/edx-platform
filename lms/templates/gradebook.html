@@ -6,7 +6,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.gradebook.js')}"></script>
 </%block>
 
 <%block name="headextra">
@@ -95,3 +95,10 @@
   </section>
 </div>
 </section>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var gradebook = new Gradebook($('.gradebook-content'));
+  });
+</script>
