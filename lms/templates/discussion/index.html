@@ -20,15 +20,18 @@
         <h2>Discussion Boards</h2>
         <a href="#">close</a>
       </header>
+      <nav>
+        
+        <article class="sidebar-module">
+          <a href="#" class="sidebar-new-post-button">New Post</a>
+        </article>
 
-      <div id="accordion" style="display:none">
-        <nav>
-          ${accordion}
-        </nav>
-      </div>
-      <%include file="_recent_active_posts.html" />
-      <%include file="_trending_tags.html" />
-    </section>
+        <%include file="_recent_active_posts.html" />
+
+        <%include file="_trending_tags.html" />
+        
+      </section>
+    </nav>
 
     <section class="course-content">
       ${content}
