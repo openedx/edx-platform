@@ -14,14 +14,6 @@ div#wiki_panel {
     }
   }
 
-  form {
-    input[type="submit"]{
-      @extend .light-button;
-      text-transform: none;
-      text-shadow: none;
-    }
-  }
-
   div#wiki_create_form {
     @extend .clearfix;
     padding: lh(.5) lh() lh(.5) 0;
@@ -52,5 +44,13 @@ div#wiki_panel {
         }
       }
     }
+  }
+
+  input#wiki_search_input_submit {
+    padding: 4px 8px;
+  }
+
+  input#wiki_search_input {
+    margin-right: 10px;
   }
 }

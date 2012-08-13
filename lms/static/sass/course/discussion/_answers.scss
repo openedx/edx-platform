@@ -17,7 +17,6 @@ div.answer-controls {
     margin-left: flex-gutter();
 
     nav {
-      @extend .action-link;
       float: right;
       margin-top: 34px;
 
@@ -144,7 +143,7 @@ div.answer-actions {
     text-decoration: none;
 
     &.question-delete {
-      // color: $mit-red;
+      color: $mit-red;
     }
   }
 }

@@ -14,7 +14,7 @@ div.video {
 
     section.video-player {
       height: 0;
-      overflow: hidden;
+      // overflow: hidden;
       padding-bottom: 56.25%;
       position: relative;
 
@@ -45,12 +45,13 @@ div.video {
       div.slider {
         @extend .clearfix;
         background: #c2c2c2;
-        border: none;
-        border-bottom: 1px solid #000;
+        border: 1px solid #000;
         @include border-radius(0);
         border-top: 1px solid #000;
         @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
         height: 7px;
+        margin-left: -1px;
+        margin-right: -1px;
         @include transition(height 2.0s ease-in-out);
 
         div.ui-widget-header {
@@ -58,43 +59,12 @@ div.video {
           @include box-shadow(inset 0 1px 0 #999);
         }
 
-        .ui-tooltip.qtip .ui-tooltip-content {
-          background: $mit-red;
-          border: 1px solid darken($mit-red, 20%);
-          @include border-radius(2px);
-          @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
-          color: #fff;
-          font: bold 12px $body-font-family;
-          margin-bottom: 6px;
-          margin-right: 0;
-          overflow: visible;
-          padding: 4px;
-          text-align: center;
-          text-shadow: 0 -1px 0 darken($mit-red, 10%);
-          -webkit-font-smoothing: antialiased;
-
-          &::after {
-            background: $mit-red;
-            border-bottom: 1px solid darken($mit-red, 20%);
-            border-right: 1px solid darken($mit-red, 20%);
-            bottom: -5px;
-            content: " ";
-            display: block;
-            height: 7px;
-            left: 50%;
-            margin-left: -3px;
-            position: absolute;
-            @include transform(rotate(45deg));
-            width: 7px;
-          }
-        }
-
         a.ui-slider-handle {
-          background: $mit-red url(../images/slider-handle.png) center center no-repeat;
+          background: $pink url(../images/slider-handle.png) center center no-repeat;
           @include background-size(50%);
-          border: 1px solid darken($mit-red, 20%);
+          border: 1px solid darken($pink, 20%);
           @include border-radius(15px);
-          @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
+          @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
           cursor: pointer;
           height: 15px;
           margin-left: -7px;
@@ -103,7 +73,7 @@ div.video {
           width: 15px;
 
           &:focus, &:hover {
-            background-color: lighten($mit-red, 10%);
+            background-color: lighten($pink, 10%);
             outline: none;
           }
         }
