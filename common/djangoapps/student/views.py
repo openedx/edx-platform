@@ -297,6 +297,7 @@ def _do_create_account(post_vars):
     try:
         user.save()
     except IntegrityError:
+        js = {'success': False}
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
             js['value'] = "An account with this username already exists."
@@ -402,7 +403,10 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Ok, looks like everything is legit.  Create the account.
-    (user, profile, registration) = _do_create_account(post_vars)
+    ret = _do_create_account(post_vars)
+    if isinstance(ret,HttpResponse):		# if there was an error then return that
+        return ret
+    (user, profile, registration) = ret
 
     d = {'name': post_vars['name'],
          'key': registration.activation_key,
