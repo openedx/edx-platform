@@ -110,7 +110,7 @@
               </div>
               <ul>
                 <li>
-                  <input type="submit" class="button" value="Create" style="display: inline-block; margin-right: 2px; font-weight: bold;" />
+                  <input type="submit" class="button" value="Create" />
                 </li>
               </ul>
             </form>
@@ -120,8 +120,8 @@
         <li class="search">
           <form method="GET" action='${wiki_reverse("wiki_search_articles", course=course, namespace=namespace)}'>
             <label class="wiki_box_title">Search</label>
-            <input type="text" placeholder="Search" name="value" id="wiki_search_input" style="width: 71%" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
-            <input type="submit" id="wiki_search_input_submit" value="Go!" style="width: 20%" />
+            <input type="text" placeholder="Search" name="value" id="wiki_search_input" value="${wiki_search_query if wiki_search_query is not UNDEFINED else '' |h}"/>
+            <input type="submit" id="wiki_search_input_submit" value="Go!" />
           </form>
         </li>
       </ul>
