@@ -227,7 +227,7 @@ class XModule(HTMLSnippet):
     def get_display_items(self):
         '''
         Returns a list of descendent module instances that will display
-        immediately inside this module
+        immediately inside this module.
         '''
         items = []
         for child in self.get_children():
@@ -238,7 +238,7 @@ class XModule(HTMLSnippet):
     def displayable_items(self):
         '''
         Returns list of displayable modules contained by this module. If this
-        module is visible, should return [self]
+        module is visible, should return [self].
         '''
         return [self]
 
