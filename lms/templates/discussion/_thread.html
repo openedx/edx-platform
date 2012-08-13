@@ -96,7 +96,6 @@
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
       <li><div class="follow-wrapper"></div></li>
-      <li>${render_link("discussion-link discussion-edit", "Edit")}</li>
       <li>
       % if type == "comment" and request.user.is_staff:
         % if content['endorsed']:
