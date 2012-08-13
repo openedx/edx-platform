@@ -1,11 +1,10 @@
-<div class="trending-tags">
-Trending tags:
-
-  % for tag, count in trending_tags:
-    <div class="trending-tag">
-      <a class="trending-tag-link" href="javascript:void(0)">${tag}</a>
-      &times;
-      <span class="trending-tag-count">${count}</span>
-    </div>
-  % endfor
-</div>
+<article class="discussion-sidebar-tags sidebar-module">
+  <header>
+    <h4>Recent Tags</h4>
+  </header>
+  <ol class="discussion-sidebar-tags-list">
+    % for tag, count in trending_tags:
+      <li><a href="#" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
+    % endfor
+  <ol>
+</article>
