@@ -2,18 +2,11 @@
 <%page args="selected, article, plugins" />
 <%! from django.core.urlresolvers import reverse %>
 
-<%
-  if urlpath:
-    tab_reverse = lambda name, kwargs={}: reverse(name, kwargs=dict({'path' : urlpath.path}, **kwargs))
-  else:
-    tab_reverse = lambda name, kwargs={}: reverse(name, kwargs=dict({'article_id' : article.id}, **kwargs))
-%>
 
-
-%for plugin in plugins:
+%for plugin in article_tabs:
   %if hasattr(plugin, "article_tab"):
-    <li class="pull-right{% if selected == plugin.slug %} active{% endif %}">
-      <a href="${tab_reverse('wiki:plugin_url', kwargs={'slug' : plugin.slug}) }">
+    <li class="pull-right${"active" if selected == plugin.slug else ""}">
+      <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
         <span class="${plugin.article_tab[1]}"></span>
         ${plugin.article_tab[0]}
       </a>
@@ -25,26 +18,26 @@
 
 <li class="pull-right${"active" if selected == "settings" else ""}">
   %if not user.is_anonymous:
-  <a href="${tab_reverse('wiki:settings_url')}">
+  <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-wrench"></span>
     Settings
   </a>
   %endif
 </li>
 <li class="pull-right${"active" if selected == "history" else ""}">
-  <a href="${tab_reverse('wiki:history_url')}">
+  <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-time"></span>
     Changes
   </a>
 </li>
 <li class="pull-right${"active" if selected == "edit" else ""}">
-  <a href="${tab_reverse('wiki:edit_url')}">
+  <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-edit"></span>
     Edit
   </a>
 </li>
 <li class="pull-right${"active" if selected == "view" else ""}">
-  <a href="${tab_reverse('wiki:get_url')}">
+  <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-home"></span>
     View
   </a>

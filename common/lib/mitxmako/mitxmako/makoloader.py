@@ -23,7 +23,7 @@ class MakoLoader(object):
         return self.load_template(template_name, template_dirs)
 
     def load_template(self, template_name, template_dirs=None):
-        source, display_name = self.base_loader.load_template_source(template_name, template_dirs)
+        source, display_name = self.load_template_source(template_name, template_dirs)
         
         if source.startswith("## mako\n"):
             # This is a mako template
@@ -42,9 +42,9 @@ class MakoLoader(object):
                 # not exist.
                 return source, display_name
     
-    def load_template_source(self):
+    def load_template_source(self, template_name, template_dirs=None):
         # Just having this makes the template load as an instance, instead of a class.
-        raise NotImplementedError
+        return self.base_loader.load_template_source(template_name, template_dirs)
 
     def reset(self):
         self.base_loader.reset()

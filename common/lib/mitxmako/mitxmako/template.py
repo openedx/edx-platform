@@ -53,6 +53,7 @@ class Template(MakoTemplate):
             context_dictionary.update(d)
         context_dictionary['settings'] = settings
         context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
-        
+        context_dictionary['django_context'] = context_instance
+                
         return super(Template, self).render(**context_dictionary)
         
