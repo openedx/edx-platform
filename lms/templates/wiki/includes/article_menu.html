@@ -16,14 +16,14 @@
 
 
 
+%if not user.is_anonymous():
 <li class="pull-right${"active" if selected == "settings" else ""}">
-  %if not user.is_anonymous:
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-wrench"></span>
     Settings
   </a>
-  %endif
 </li>
+%endif
 <li class="pull-right${"active" if selected == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-time"></span>

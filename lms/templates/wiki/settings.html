@@ -1,0 +1,53 @@
+## mako
+<%inherit file="mako_base.html"/>
+
+<%!
+  from wiki.templatetags.wiki_tags import wiki_form
+  from mitxmako.templatetag_helpers import render_inclusion
+%>
+
+<%namespace name="article_menu" file="includes/article_menu.html"/>
+<%namespace name="breadcrumbs" file="includes/breadcrumbs.html"/>
+
+
+<%block name="title"><title>Settings: ${article.current_revision.title}</title></%block>
+
+
+<%block name="wiki_breadcrumbs">
+${breadcrumbs.body(article, urlpath)}
+</%block>
+
+<%block name="wiki_contents">
+  <div class="tabbable tabs-top" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      <li style="float: left">
+        <h1 style="margin-top: -10px;">${article.current_revision.title}</h1>
+      </li>
+      ${article_menu.body('settings', article, plugins)}
+    </ul>
+  
+    <div class="tab-content">
+    %for form in forms:
+      <form method="POST" class="form-horizontal" id="settings_form" action="?f=${form.action}">
+        <h2>${form.settings_form_headline}</h2>
+        <div class="well">
+          ${ render_inclusion(wiki_form, 'wiki/includes/form.html', True, django_context,  form ) }
+        </div>
+        <div class="form-actions">
+          <button type="submit" name="save" value="1" class="btn btn-large btn-primary">
+            <span class="icon-ok"></span>
+            Save changes
+          </button>
+        </div>
+      </form>
+    %endfor
+    </div>
+  </div>
+
+  <div class="tabbable tabs-below" style="margin-top: 20px;">
+    <ul class="nav nav-tabs">
+      ${article_menu.body('settings', article, plugins)}
+      <li style="margin-top: 10px;"><em>Article last modified: ${ article.current_revision.modified }</em></li>
+    </ul>
+  </div>
+</%block>
