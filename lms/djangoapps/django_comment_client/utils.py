@@ -101,9 +101,7 @@ def initialize_discussion_info(request, course):
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
-        content = simplejson.dumps(data,
-                                   indent=2,
-                                   ensure_ascii=False)
+        content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf8')
 
