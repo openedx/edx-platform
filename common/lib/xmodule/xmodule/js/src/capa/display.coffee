@@ -40,8 +40,9 @@ class @Problem
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       @el.html(response.html)
-      @executeProblemScripts()
-      @bind()
+      @executeProblemScripts () =>
+        @setupInputTypes()
+        @bind()
 
       @queued_items = @$(".xqueue")
       if @queued_items.length == 0 
