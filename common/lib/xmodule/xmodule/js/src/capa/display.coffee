@@ -35,8 +35,18 @@ class @Problem
     if @queued_items.length > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
-      window.queuePollerID = window.setTimeout(@poll, 100)
+      queuelen = @get_queuelen()
+      window.queuePollerID = window.setTimeout(@poll, queuelen*10)
 
+  # Retrieves the minimum queue length of all queued items
+  get_queuelen: =>
+    minlen = Infinity
+    @queued_items.each (index, qitem) ->
+      len = parseInt($.text(qitem))  
+      if len < minlen
+        minlen = len
+    return minlen
+    
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       @queued_items = $(response.html).find(".xqueue")
@@ -47,7 +57,7 @@ class @Problem
           @bind()
         delete window.queuePollerID
       else
-        # TODO: Dynamically adjust timeout interval based on @queued_items.value
+        # TODO: Some logic to dynamically adjust polling rate based on queuelen
         window.queuePollerID = window.setTimeout(@poll, 1000)
 
   render: (content) ->
