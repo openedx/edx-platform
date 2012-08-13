@@ -4,8 +4,129 @@ div.gradebook-wrapper {
   section.gradebook-content {
     @extend .content;
 
+    .student-table {
+		float: left;
+		width: 265px;
+		border-radius: 3px 0 0 3px;
+		color: #3c3c3c;
+
+		th {
+			height: 50px;
+		}
+
+		tr:first-child td {
+			border-top-width: 1px;
+		}
+
+		td {
+			height: 50px;
+			padding-left: 20px;
+			border: 1px solid #e9e9e9;
+			border-width: 0 1px 1px 1px;
+			background: #f6f6f6;
+			font-size: 13px;
+			line-height: 50px;
+		}
+
+		tr:nth-child(even) td {
+			background-color: #fbfbfb;
+		}
+	}
+
+	.grades {
+		position: relative;
+		float: left;
+		width: 800px;
+		height: 712px;
+		overflow: hidden;
+	}
+
+	.grade-table {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 1000px;
+		cursor: move;
+		-webkit-transition: left .7s ease-in-out;
+		-webkit-user-select: none;
+		user-select: none;
+
+		td,
+		th {
+			width: 50px;
+			text-align: center;
+		}
+
+		thead th {
+			height: 50px;
+			background: -webkit-linear-gradient(top, #e9e9e9, #e2e2e2);
+			font-size: 10px;
+			line-height: 10px;
+			font-weight: bold;
+			text-align: center;
+			box-shadow: 0 1px 0 #c8c8c8 inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
+
+			&:after {
+				content: '';
+				position: absolute;
+				right: 0;
+				top: 0;
+				z-index: 9999;
+				width: 1px;
+				height: 50px;
+				@includ linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .4));
+			}
+
+			&:first-child {
+				border-radius: 3px 0 0 0;
+				box-shadow: 1px 1px 0 #c8c8c8 inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+			}
+
+			&:last-child {
+				border-radius: 0 3px 0 0;
+				box-shadow: -1px 1px 0 #c8c8c8 inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
+			}
+
+			.assignment {
+				margin: 9px 0;
+			}
+
+			.type,
+			.number,
+			.max {
+				display: block;
+			}
+
+			.max {
+				height: 12px;
+				background: -webkit-linear-gradient(top, #c6c6c6, #bababa);
+				font-size: 9px;
+				line-height: 12px;
+				color: #fff;
+			}
+		}
+
+		tr:first-child td {
+			border-top: 1px solid #e9e9e9;
+		}
+
+		td {
+			height: 50px;
+			border-bottom: 1px solid #e9e9e9;
+			background: #f6f6f6;
+			font-size: 13px;
+			line-height: 50px;
+		}
+
+		tr:nth-child(even) td {
+			background-color: #fbfbfb;
+		}
+	}
+
     h1 {
       @extend .top-header;
     }
   }
 }
+
+
