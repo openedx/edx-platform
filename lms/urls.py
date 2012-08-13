@@ -97,12 +97,16 @@ if settings.PERFSTATS:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
+        # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
-        url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.modx_dispatch'), #reset_problem'),
-        url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$', 'courseware.module_render.xqueue_callback'),
-        url(r'^change_setting$', 'student.views.change_setting'),
+        url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.modx_dispatch', name='modx_dispatch'),
+        url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.xqueue_callback', name='xqueue_callback'),
+        url(r'^change_setting$', 'student.views.change_setting',
+            name='change_setting'),
 
         # TODO: These views need to be updated before they work
         # url(r'^calculate$', 'util.views.calculate'),
