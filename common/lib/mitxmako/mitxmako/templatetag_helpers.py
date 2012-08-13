@@ -3,7 +3,10 @@ from django.template.base import Template, Context
 from django.template.loader import get_template, select_template
 
 
-def render_inclusion(func, file_name, *args, **kwargs):
+def render_inclusion(func, file_name, takes_context, django_context, *args, **kwargs):
+    if takes_context:
+        args = [django_context] + list(args)
+    
     _dict = func(*args, **kwargs)
     if isinstance(file_name, Template):
         t = file_name
@@ -15,6 +18,10 @@ def render_inclusion(func, file_name, *args, **kwargs):
     nodelist = t.nodelist
     
     new_context = Context(_dict)
+    csrf_token = django_context.get('csrf_token', None)
+    if csrf_token is not None:
+        new_context['csrf_token'] = csrf_token
+    
     #  **{
     #     'autoescape': context.autoescape,
     #     'current_app': context.current_app,

@@ -6,10 +6,10 @@
   <ul class="breadcrumb pull-left" class="">
     %for ancestor in urlpath.get_ancestors():
       <span class="divider">/</span>
-      <li><a href="${reverse('wiki:get_url', ancestor.path)}">${ ancestor.article.current_revision.title }</a></li>
+      <li><a href="${reverse('wiki:get', ancestor.path)}">${ ancestor.article.current_revision.title }</a></li>
     %endfor
     <span class="divider">/</span>
-    <li class="active"><a href="${reverse('wiki:get_url', kwargs={'path' : urlpath.path})}">${ article.current_revision.title }</a></li>
+    <li class="active"><a href="${reverse('wiki:get', kwargs={'path' : urlpath.path})}">${ article.current_revision.title }</a></li>
     <span class="divider">/</span>
   </ul>
   <div class="pull-left" style="margin-left: 10px;">
@@ -22,7 +22,7 @@
         %if len(urlpath.get_children()) > 0:
           %for child in urlpath.get_children():
             <li>
-            <a href="${reverse('wiki:get_url', child.path)}">
+            <a href="${reverse('wiki:get', child.path)}">
               ${child.article.current_revision.title}
             </a>
             </li>
@@ -38,7 +38,7 @@
     </div>
   </div>
   <div class="pull-left" style="margin-left: 10px;">
-      <a class="btn" href="${reverse('wiki:create_url', kwargs={'path' : urlpath.path})}" style="padding: 7px;">
+      <a class="btn" href="${reverse('wiki:create', kwargs={'path' : urlpath.path})}" style="padding: 7px;">
         <span class="icon-plus"></span>
         Add article
       </a>

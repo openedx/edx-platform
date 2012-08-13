@@ -27,7 +27,7 @@ ${breadcrumbs.body(article, urlpath)}
     </ul>
   
     <div class="tab-content">
-      ${ render_inclusion(wiki_render, 'wiki/includes/render.html', article ) }
+      ${ render_inclusion(wiki_render, 'wiki/includes/render.html', False, django_context, article ) }
     </div>
   </div>
 

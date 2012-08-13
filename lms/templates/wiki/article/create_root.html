@@ -1,0 +1,38 @@
+## mako
+<%inherit file="../mako_base.html"/>
+<%namespace name='static' file='../../static_content.html'/>
+
+<%!
+  from wiki.templatetags.wiki_tags import wiki_form
+  from mitxmako.templatetag_helpers import django_template_include, render_inclusion  
+%>
+
+<%block name="title"><title>Create root article</title></%block>
+
+<%block name="wiki_headextra">
+  %for js in editor.Media.js:  
+    <script type="text/javascript" src="${static.url(js)}"></script>
+  %endfor
+
+  %for media, srcs in editor.Media.css.items():
+    %for src in srcs:
+      <link rel="stylesheet" media="${ media }" href="${static.url(src)}" />
+    %endfor
+  %endfor
+</%block>
+
+<%block name="wiki_contents">  
+  <h1>Congratulations!</h1>
+  <p class="lead"> You have django-wiki installed... but there are no articles. So it's time to create the first one, the root article. In the beginning, it will only be editable by administrators, but you can define permissions after.
+  </p>
+  
+  <h2 class="page-header">Root article</h2>
+  
+  <form method="POST" class="form-horizontal">
+    ${ render_inclusion(wiki_form, 'wiki/includes/form.html', True, django_context,  create_form ) }
+    <div class="form-actions">
+        <input type="submit" name="save_changes" value="Create root &raquo;" class="btn btn-primary btn-large" />
+    </div>  
+  </form>
+</%block>
+
