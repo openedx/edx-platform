@@ -326,7 +326,7 @@ def replicate_user(portal_user, course_db_name):
         setattr(course_user, field, getattr(portal_user, field))
 
     mark_handled(course_user)
-    course_user.save(using=course_db_name) # Just being explicit.
+    course_user.save(using=course_db_name)
     unmark(course_user)
 
 def replicate_model(model_method, instance, user_id):
