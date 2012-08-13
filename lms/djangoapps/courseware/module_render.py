@@ -196,6 +196,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
                           is_staff=has_staff_access_to_location(user, location),
+                          node_path=settings.NODE_PATH
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
