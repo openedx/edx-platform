@@ -136,16 +136,21 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.profile', name="profile"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
             'courseware.views.profile'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
-            'courseware.views.news', name="news"),
-
-        # discussion
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
-            include('django_comment_client.urls')),
+        
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'courseware.views.gradebook'),        
     )
+
+    # discussion forums live within courseware, so courseware must be enabled first
+    if settings.DISCUSSION_SERVICE_ENABLED:
+
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+                'courseware.views.news', name="news"),
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
+                include('django_comment_client.urls'))
+            )
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
@@ -165,6 +170,7 @@ if settings.ASKBOT_ENABLED:
                     url(r'^followit/', include('followit.urls')), \
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
+
 
 
 if settings.DEBUG:
