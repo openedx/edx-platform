@@ -175,8 +175,6 @@ def enrollment_allowed(user, course):
 
     if (start is None or now > start) and (end is None or now < end):
         # in enrollment period.
-        print "allowing enrollment in {}: start {}, end {}, now {}".format(
-            course.location.url(), start, end, now)
         return True
 
     if settings.MITX_FEATURES['DARK_LAUNCH']:
