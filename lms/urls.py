@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -101,10 +100,12 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
-        url(r'^modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.modx_dispatch', name='modx_dispatch'),
-        url(r'^xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.xqueue_callback', name='xqueue_callback'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.modx_dispatch',
+            name='modx_dispatch'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+            'courseware.module_render.xqueue_callback',
+            name='xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting',
             name='change_setting'),
 

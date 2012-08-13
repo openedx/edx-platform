@@ -14,10 +14,10 @@
     <h1>Instructor Dashboard</h1>
 
     <p>
-    <a href="${reverse('gradebook', kwargs={'course_id': course.id})}">Gradebook</a>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
 
     <p>
-    <a href="${reverse('grade_summary', kwargs={'course_id': course.id})}">Grade summary</a>
+    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">Grade summary</a>
 
   </section>
 </div>
