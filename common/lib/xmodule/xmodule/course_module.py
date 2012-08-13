@@ -7,6 +7,7 @@ from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
+from xmodule.textbook_module import TextbookDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +53,10 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy = load_grading_policy(policy_string)
 
         return grading_policy
+
+    @property
+    def textbooks(self):
+        return [child for child in self.get_children() if type(child) == TextbookDescriptor]
 
 
     @lazyproperty
