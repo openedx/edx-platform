@@ -10,17 +10,16 @@ from django.http import Http404
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_urls
-from staticfiles.storage import staticfiles_storage
+from static_replace import replace_urls, try_staticfiles_lookup
 
 log = logging.getLogger(__name__)
 
 
-def check_course(course_id, course_must_be_open=True, course_required=True):
+def check_course(user, course_id, course_must_be_open=True, course_required=True):
     """
-    Given a course_id, this returns the course object. By default,
-    if the course is not found or the course is not open yet, this
-    method will raise a 404.
+    Given a django user and a course_id, this returns the course
+    object. By default, if the course is not found or the course is
+    not open yet, this method will raise a 404.
 
     If course_must_be_open is False, the course will be returned
     without a 404 even if it is not open.
@@ -28,6 +27,10 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
     If course_required is False, a course_id of None is acceptable. The
     course returned will be None. Even if the course is not required,
     if a course_id is given that does not exist a 404 will be raised.
+
+    This behavior is modified by MITX_FEATURES['DARK_LAUNCH']:
+       if dark launch is enabled, course_must_be_open is ignored for
+    users that have staff access.
     """
     course = None
     if course_required or course_id:
@@ -39,16 +42,23 @@ def check_course(course_id, course_must_be_open=True, course_required=True):
             raise Http404("Course not found.")
 
         started = course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']
-        if course_must_be_open and not started:
+
+        must_be_open = course_must_be_open
+        if (settings.MITX_FEATURES['DARK_LAUNCH'] and
+            has_staff_access_to_course(user, course)):
+            must_be_open = False
+
+        if must_be_open and not started:
             raise Http404("This course has not yet started.")
 
     return course
 
 
 def course_image_url(course):
-    return staticfiles_storage.url(course.metadata['data_dir'] +
-                                   "/images/course_image.jpg")
-
+    """Try to look up the image url for the course.  If it's not found,
+    log an error and return the dead link"""
+    path = course.metadata['data_dir'] + "/images/course_image.jpg"
+    return try_staticfiles_lookup(path)
 
 def get_course_about_section(course, section_key):
     """

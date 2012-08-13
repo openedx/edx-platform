@@ -229,14 +229,14 @@ class LoncapaProblem(object):
 
         Calls the Response for each question in this problem, to do the actual grading.
         '''
-        
+
         self.student_answers = convert_files_to_filenames(answers)
-        
+
         oldcmap = self.correct_map				# old CorrectMap
         newcmap = CorrectMap()					# start new with empty CorrectMap
         # log.debug('Responders: %s' % self.responders)
         for responder in self.responders.values():                  # Call each responsetype instance to do actual grading
-            if 'filesubmission' in responder.allowed_inputfields:   # File objects are passed only if responsetype 
+            if 'filesubmission' in responder.allowed_inputfields:   # File objects are passed only if responsetype
                                                                     #   explicitly allows for file submissions
                 results = responder.evaluate_answers(answers, oldcmap)
             else:
@@ -295,9 +295,9 @@ class LoncapaProblem(object):
                 try:
                     ifp = self.system.filestore.open(file)  # open using ModuleSystem OSFS filestore
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (
+                    log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
-                    log.error('Cannot find file %s in %s' % (
+                    log.warning('Cannot find file %s in %s' % (
                             file, self.system.filestore))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
@@ -306,11 +306,11 @@ class LoncapaProblem(object):
                     else:
                         continue
                 try:
-                    incxml = etree.XML(ifp.read())		# read in and convert to XML
+                    incxml = etree.XML(ifp.read())    # read in and convert to XML
                 except Exception as err:
-                    log.error('Error %s in problem xml include: %s' % (
+                    log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
-                    log.error('Cannot parse XML in %s' % (file))
+                    log.warning('Cannot parse XML in %s' % (file))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
                     if not self.system.get('DEBUG'):
