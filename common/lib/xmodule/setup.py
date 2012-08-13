@@ -31,6 +31,7 @@ setup(
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
+            "textbook = xmodule.textbook_module:TextbookDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
             "video = xmodule.video_module:VideoDescriptor",
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",

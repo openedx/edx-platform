@@ -16,8 +16,10 @@ def url_class(url):
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
 % if user.is_authenticated():
 % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
-      <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
-% endif
+      % for index, textbook in enumerate(course.textbooks):
+          <li class="book"><a href="${reverse('book', args=[course.id, index])}" class="${url_class('book')}">${textbook.title}</a></li>
+      % endfor
+% endif 
 % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
       <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
 % endif
