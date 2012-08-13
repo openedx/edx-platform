@@ -75,7 +75,6 @@ class LoncapaResponse(object):
 
     In addition, these methods are optional:
 
-      - get_max_score        : if defined, this is called to obtain the maximum score possible for this question
       - setup_response       : find and note the answer input field IDs for the response; called by __init__
       - check_hint_condition : check to see if the student's answers satisfy a particular condition for a hint to be displayed
       - render_html          : render this Response as HTML (must return XHTML compliant string)
@@ -134,6 +133,11 @@ class LoncapaResponse(object):
         if self.max_inputfields == 1:
             self.answer_id = self.answer_ids[0]		# for convenience
 
+        self.maxpoints = dict()
+        for inputfield in self.inputfields:
+            maxpoints = inputfield.get('points','1') # By default, each answerfield is worth 1 point
+            self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
+
         self.default_answer_map = {}			# dict for default answer map (provided in input elements)
         for entry in self.inputfields:
             answer = entry.get('correct_answer')
@@ -142,6 +146,12 @@ class LoncapaResponse(object):
 
         if hasattr(self, 'setup_response'):
             self.setup_response()
+
+    def get_max_score(self):
+        '''
+        Return the total maximum points of all answer fields under this Response
+        '''
+        return sum(self.maxpoints.values())
 
     def render_html(self, renderer):
         '''
@@ -1067,7 +1077,10 @@ class CodeResponse(LoncapaResponse):
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
-        self.context.update({'submission': unicode(submission)})
+        if is_file(submission):
+            self.context.update({'submission': submission.name})
+        else:
+            self.context.update({'submission': submission})
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
@@ -1114,21 +1127,24 @@ class CodeResponse(LoncapaResponse):
 
     def update_score(self, score_msg, oldcmap, queuekey):
 
-        (valid_score_msg, correct, score, msg) = self._parse_score_msg(score_msg) 
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg) 
         if not valid_score_msg:
             oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
             return oldcmap
         
-        correctness = 'incorrect'
-        if correct:
-            correctness = 'correct'
+        correctness = 'correct' if correct else 'incorrect'
 
         self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
         #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            oldcmap.set(self.answer_id, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
+            # Sanity check on returned points 
+            if points < 0:
+                points = 0
+            elif points > self.maxpoints[self.answer_id]:
+                points = self.maxpoints[self.answer_id]
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
