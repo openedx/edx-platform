@@ -37,8 +37,6 @@ class SurveyModule(CapaModule):
 
         # no maximum number of attempts so students can
         # always answer surveys
-        # if we're interested in cut-off dates, we can use
-        # the "modified" field from the database
         self.max_attempts = None
 
         # there is no correct answer, never show one or the button
