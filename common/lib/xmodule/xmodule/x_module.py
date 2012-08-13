@@ -319,7 +319,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
         'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
-
+        # TODO (ichuang): used for Fall 2012 xqa server access
+        'xqa_key',
         # TODO: This is used by the XMLModuleStore to provide for locations for
         # static files, and will need to be removed when that code is removed
         'data_dir'

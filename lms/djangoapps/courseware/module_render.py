@@ -199,17 +199,18 @@ def get_module(user, request, location, student_module_cache, position=None):
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
+    system.set('DEBUG',settings.DEBUG)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
-        module.metadata['data_dir']
+        module.metadata['data_dir'], module
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_staff_access_to_course(user, module.location.course):
-            module.get_html = add_histogram(module.get_html, module)
+            module.get_html = add_histogram(module.get_html, module, user)
 
     return module
 
