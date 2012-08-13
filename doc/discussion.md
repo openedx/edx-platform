@@ -94,7 +94,7 @@ For example, you can insert them into overview section as following:
       </section>
     </chapter>
 
-Currently, only the attribute "id" is actually used, which is the unique identification of the discussion forum. In the data generator code, the lines for generating seeds are as following:
+Currently, only the attribute "id" is actually used, which identifies discussion forum. In the code for the data generator, the corresponding lines are:
 
     generate_comments_for("video_1")
     generate_comments_for("lab_1")
@@ -104,13 +104,15 @@ We also have a command for generating comments within a forum with the specified
 
     bundle exec rake db:generate_comments[type_the_discussion_id_here]
 
-For instance, if you want to generate comments for the general discussion, for which the discussion id is the course id with slashes and dots replaced by underscores (you *should* do this before testing forum view) and you are in 6.002x, use the following command
+For instance, if you want to generate comments for the general discussion, for which the discussion id is the course id with slashes and dots replaced by underscores (you **should** do this before testing forum view) and you are in 6.002x, use the following command
 
     bundle exec rake db:generate_comments[MITx_6_002x_2012_Fall]
 
 ### Running tests for the service
 
     bundle exec rspec
+
+Warning: due to an unresolved bug in the test code, testing the service will "flush" the development database. So you need to generate seed again after testing.
 
 ### debugging the service
 
