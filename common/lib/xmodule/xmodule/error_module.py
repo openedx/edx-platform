@@ -1,5 +1,8 @@
-import sys
+import hashlib
 import logging
+import random
+import string
+import sys
 
 from pkg_resources import resource_string
 from lxml import etree
@@ -24,6 +27,14 @@ class ErrorModule(XModule):
             'is_staff' : self.system.is_staff,
             })
 
+    def displayable_items(self):
+        """Hide errors in the profile and table of contents for non-staff
+        users.
+        """
+        if self.system.is_staff:
+            return [self]
+        return []
+
 class ErrorDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
@@ -35,7 +46,8 @@ class ErrorDescriptor(EditingDescriptor):
                  error_msg='Error not available'):
         '''Create an instance of this descriptor from the supplied data.
 
-        Does not try to parse the data--just stores it.
+        Does not require that xml_data be parseable--just stores it and exports
+        as-is if not.
 
         Takes an extra, optional, parameter--the error that caused an
         issue.  (should be a string, or convert usefully into one).
@@ -44,6 +56,13 @@ class ErrorDescriptor(EditingDescriptor):
         inner = {}
         definition = {'data': inner}
         inner['error_msg'] = str(error_msg)
+
+        # Pick a unique url_name -- the sha1 hash of the xml_data.
+        # NOTE: We could try to pull out the url_name of the errored descriptor,
+        # but url_names aren't guaranteed to be unique between descriptor types,
+        # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
+        # it will be written out with the original url_name.
+        url_name = hashlib.sha1(xml_data).hexdigest()
 
         try:
             # If this is already an error tag, don't want to re-wrap it.
@@ -63,8 +82,9 @@ class ErrorDescriptor(EditingDescriptor):
         inner['contents'] = xml_data
         # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
         # 64-bit num?
-        location = ['i4x', org, course, 'error', 'slug']
-        metadata = {}  # stays in the xml_data
+        location = ['i4x', org, course, 'error', url_name]
+        # real metadata stays in the xml_data, but add a display name
+        metadata = {'display_name': 'Error ' + url_name}
 
         return cls(system, definition, location=location, metadata=metadata)
 

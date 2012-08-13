@@ -5,9 +5,13 @@ from fs.memoryfs import MemoryFS
 from lxml import etree
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
+from xmodule.xml_module import is_pointer_tag
 from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .test_export import DATA_DIR
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -46,22 +50,17 @@ class DummySystem(XMLParsingSystem):
             raise Exception("Shouldn't be called")
 
 
-
-
 class ImportTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
-
-
     @staticmethod
     def get_system():
         '''Get a dummy system'''
         return DummySystem()
 
     def test_fallback(self):
-        '''Make sure that malformed xml loads as an ErrorDescriptor.'''
+        '''Check that malformed xml loads as an ErrorDescriptor.'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
-
         system = self.get_system()
 
         descriptor = XModuleDescriptor.load_from_xml(bad_xml, system, 'org', 'course',
@@ -69,6 +68,22 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
+
+
+    def test_unique_url_names(self):
+        '''Check that each error gets its very own url_name'''
+        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
+        bad_xml2 = '''<sequential url_name="oops"><video url="hi"></sequential>'''
+        system = self.get_system()
+
+        descriptor1 = XModuleDescriptor.load_from_xml(bad_xml, system, 'org',
+                                                      'course', None)
+
+        descriptor2 = XModuleDescriptor.load_from_xml(bad_xml2, system, 'org',
+                                                      'course', None)
+
+        self.assertNotEqual(descriptor1.location, descriptor2.location)
+
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -111,30 +126,84 @@ class ImportTestCase(unittest.TestCase):
         xml_out = etree.fromstring(xml_str_out)
         self.assertEqual(xml_out.tag, 'sequential')
 
-    def test_metadata_inherit(self):
-        """Make sure metadata inherits properly"""
+    def test_metadata_import_export(self):
+        """Two checks:
+            - unknown metadata is preserved across import-export
+            - inherited metadata doesn't leak to children.
+        """
         system = self.get_system()
-        v = "1 hour"
-        start_xml = '''<course graceperiod="{grace}" url_name="test1" display_name="myseq">
-                      <chapter url="hi" url_name="ch" display_name="CH">
-                       <html url_name="h" display_name="H">Two houses, ...</html></chapter>
-                   </course>'''.format(grace=v)
+        v = '1 hour'
+        org = 'foo'
+        course = 'bbhh'
+        url_name = 'test1'
+        start_xml = '''
+        <course org="{org}" course="{course}"
+                graceperiod="{grace}" url_name="{url_name}" unicorn="purple">
+            <chapter url="hi" url_name="ch" display_name="CH">
+                <html url_name="h" display_name="H">Two houses, ...</html>
+            </chapter>
+        </course>'''.format(grace=v, org=org, course=course, url_name=url_name)
         descriptor = XModuleDescriptor.load_from_xml(start_xml, system,
-                                                     'org', 'course')
+                                                     org, course)
 
-        print "Errors: {0}".format(system.errorlog.errors)
         print descriptor, descriptor.metadata
         self.assertEqual(descriptor.metadata['graceperiod'], v)
+        self.assertEqual(descriptor.metadata['unicorn'], 'purple')
 
-        # Check that the child inherits correctly
+        # Check that the child inherits graceperiod correctly
         child = descriptor.get_children()[0]
         self.assertEqual(child.metadata['graceperiod'], v)
 
-        # Now export and see if the chapter tag has a graceperiod attribute
+        # check that the child does _not_ inherit any unicorns
+        self.assertTrue('unicorn' not in child.metadata)
+
+        # Now export and check things
         resource_fs = MemoryFS()
         exported_xml = descriptor.export_to_xml(resource_fs)
+
+        # Check that the exported xml is just a pointer
         print "Exported xml:", exported_xml
-        root = etree.fromstring(exported_xml)
-        chapter_tag = root[0]
-        self.assertEqual(chapter_tag.tag, 'chapter')
-        self.assertFalse('graceperiod' in chapter_tag.attrib)
+        pointer = etree.fromstring(exported_xml)
+        self.assertTrue(is_pointer_tag(pointer))
+        # but it's a special case course pointer
+        self.assertEqual(pointer.attrib['course'], course)
+        self.assertEqual(pointer.attrib['org'], org)
+
+        # Does the course still have unicorns?
+        with resource_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
+            course_xml = etree.fromstring(f.read())
+
+        self.assertEqual(course_xml.attrib['unicorn'], 'purple')
+
+        # the course and org tags should be _only_ in the pointer
+        self.assertTrue('course' not in course_xml.attrib)
+        self.assertTrue('org' not in course_xml.attrib)
+
+        # did we successfully strip the url_name from the definition contents?
+        self.assertTrue('url_name' not in course_xml.attrib)
+
+        # Does the chapter tag now have a graceperiod attribute?
+        # hardcoded path to child
+        with resource_fs.open('chapter/ch.xml') as f:
+            chapter_xml = etree.fromstring(f.read())
+        self.assertEqual(chapter_xml.tag, 'chapter')
+        self.assertFalse('graceperiod' in chapter_xml.attrib)
+
+    def test_metadata_inherit(self):
+        """Make sure that metadata is inherited properly"""
+
+        print "Starting import"
+        initial_import = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+
+        courses = initial_import.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+
+        def check_for_key(key, node):
+            "recursive check for presence of key"
+            print "Checking {}".format(node.location.url())
+            self.assertTrue(key in node.metadata)
+            for c in node.get_children():
+                check_for_key(key, c)
+
+        check_for_key('graceperiod', course)

@@ -1,7 +1,7 @@
 h1.top-header {
   border-bottom: 1px solid #e3e3e3;
   text-align: left;
-  font-size: 24px;
+  font-size: em(24);
   font-weight: 100;
   padding-bottom: lh();
 }
@@ -51,7 +51,6 @@ h1.top-header {
 
 .sidebar {
   border-right: 1px solid #C8C8C8;
-  @include box-shadow(inset -1px 0 0 #e6e6e6);
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
@@ -60,7 +59,7 @@ h1.top-header {
   width: flex-grid(3);
 
   h1, h2 {
-   font-size: em(18);
+   font-size: em(20);
    font-weight: 100;
    letter-spacing: 0;
    text-transform: none;
@@ -75,7 +74,7 @@ h1.top-header {
   }
 
   .bottom-border {
-    border-bottom: 1px solid #d3d3d3;
+    border-bottom: 1px solid $border-color;
   }
 
   @media print {
@@ -89,27 +88,48 @@ h1.top-header {
     font-weight: normal;
     margin: 0;
     overflow: hidden;
+    font-size: 1em;
 
     a {
-      color: lighten($text-color, 10%);
       display: block;
-      font-size: $body-font-size;
-      padding: 7px 7px 7px 30px;
       text-decoration: none;
       @include transition();
     }
 
-    // span.ui-icon {
-    //   background-image: url(../images/ui-icons_454545_256x240.png);
-    // }
-
     &.active {
-      border-bottom: 1px solid #d3d3d3;
+      @extend .bottom-border;
       color: #000;
       font-weight: bold;
 
       a {
         color: #000;
+      }
+    }
+  }
+
+  ul, ol {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      @extend .bottom-border;
+      @extend .clearfix;
+      background: none;
+      position: relative;
+      padding: 0;
+
+      a {
+        display: block;
+        line-height: lh();
+        font-size: 1em;
+        @include box-sizing(border-box);
+        padding: lh(.25) lh(.5) lh(.25) 0;
+
+        &:hover {
+          color: #666;
+          background: #f6f6f6;
+        }
       }
     }
   }
@@ -164,4 +184,31 @@ h1.top-header {
 
 .tran {
   @include transition( all, .2s, $ease-in-out-quad);
+}
+
+.global {
+  .find-courses-button {
+    display: none;
+  }
+
+  h2 {
+    display: block;
+    width: 700px;
+    float: left;
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 40px;
+    letter-spacing: 0;
+    text-transform: none;
+    text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    .provider {
+      font: inherit;
+      font-weight: bold;
+      color: #6d6d6d;
+    }
+  }
 }

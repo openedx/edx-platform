@@ -1,10 +1,9 @@
-from staticfiles.storage import staticfiles_storage
-
 from mitxmako.shortcuts import render_to_string
 
 from pipeline.conf import settings
 from pipeline.packager import Packager
 from pipeline.utils import guess_type
+from static_replace import try_staticfiles_lookup
 
 
 def compressed_css(package_name):
@@ -25,9 +24,11 @@ def compressed_css(package_name):
 def render_css(package, path):
     template_name = package.template_name or "mako/css.html"
     context = package.extra_context
+
+    url = try_staticfiles_lookup(path)
     context.update({
         'type': guess_type(path, 'text/css'),
-        'url': staticfiles_storage.url(path)
+        'url': url,
     })
     return render_to_string(template_name, context)
 
@@ -58,7 +59,7 @@ def render_js(package, path):
     context = package.extra_context
     context.update({
         'type': guess_type(path, 'text/javascript'),
-        'url': staticfiles_storage.url(path)
+        'url': try_staticfiles_lookup(path)
     })
     return render_to_string(template_name, context)
 

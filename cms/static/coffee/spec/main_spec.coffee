@@ -2,7 +2,7 @@ describe "CMS", ->
   beforeEach ->
     CMS.unbind()
 
-  it "should iniitalize Models", ->
+  it "should initialize Models", ->
     expect(CMS.Models).toBeDefined()
 
   it "should initialize Views", ->

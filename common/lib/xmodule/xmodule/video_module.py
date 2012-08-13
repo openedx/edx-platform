@@ -23,9 +23,9 @@ class VideoModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
-    def __init__(self, system, location, definition,
+    def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition,
+        XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
         self.youtube = xmltree.get('youtube')
@@ -80,3 +80,5 @@ class VideoModule(XModule):
 
 class VideoDescriptor(RawDescriptor):
     module_class = VideoModule
+    
+    stores_state = True

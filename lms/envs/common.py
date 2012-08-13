@@ -48,12 +48,15 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+    'DARK_LAUNCH': False,  # When True, courses will be active for staff only
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
+
+    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -121,7 +124,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
-    'django.core.context_processors.auth', #this is required for admin
+    'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
 )
 
@@ -169,6 +172,9 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
                                           }
                     }
 
+# IP addresses that are allowed to reload the course, etc.
+# TODO (vshnayder): Will probably need to change as we get real access control in.
+LMS_MIGRATION_ALLOWED_IPS = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -182,6 +188,9 @@ MODULESTORE = {
     }
 }
 
+############################ SIGNAL HANDLERS ################################
+# This is imported to register the exception signal handling that logs exceptions
+import monitoring.exceptions  # noqa
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
@@ -294,7 +303,6 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'util.middleware.ExceptionLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

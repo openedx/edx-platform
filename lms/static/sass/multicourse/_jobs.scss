@@ -135,6 +135,18 @@
           font-weight: 700;
           margin-bottom: 15px;
         }
+
+        ul {
+          padding-left: 50px;
+        }
+
+        li {
+          font-family: $serif;
+          font-size: 1em;
+          line-height: 1.6em;
+          color: #3c3c3c;
+          margin-bottom: 0.2em;
+        }
       }
     }
   }

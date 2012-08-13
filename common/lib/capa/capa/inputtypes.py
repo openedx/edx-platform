@@ -205,7 +205,7 @@ def extract_choices(element):
             raise Exception("[courseware.capa.inputtypes.extract_choices] \
                              Expected a <choice> tag; got %s instead"
                              % choice.tag)
-        choice_text = ''.join([etree.tostring(x) for x in choice])
+        choice_text = ''.join([x.text for x in choice])
 
         choices.append((choice.get("name"), choice_text))
 
@@ -336,9 +336,19 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
-    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, }
+
+    # Check if problem has been queued
+    queue_len = 0
+    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
+        status = 'queued'
+        queue_len = msg
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+
+    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
+                'queue_len': queue_len
+              }
     html = render_template("filesubmission.html", context)
-    return etree.XML(html) 
+    return etree.XML(html)
 
 
 #-----------------------------------------------------------------------------
@@ -359,9 +369,16 @@ def textbox(element, value, status, render_template, msg=''):
 
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
 
+    # Check if problem has been queued
+    queue_len = 0
+    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
+        status = 'queued'
+        queue_len = msg
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+
     # For CodeMirror
-    mode = element.get('mode')	or 'python' # mode, eg "python" or "xml"
-    linenumbers = element.get('linenumbers','true')	 # for CodeMirror
+    mode = element.get('mode','python')
+    linenumbers = element.get('linenumbers','true')
     tabsize = element.get('tabsize','4')
     tabsize = int(tabsize)
 
@@ -369,6 +386,7 @@ def textbox(element, value, status, render_template, msg=''):
                'mode': mode, 'linenumbers': linenumbers,
                'rows': rows, 'cols': cols,
                'hidden': hidden, 'tabsize': tabsize,
+               'queue_len': queue_len,
                }
     html = render_template("textbox.html", context)
     try:

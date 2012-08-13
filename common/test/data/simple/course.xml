@@ -2,7 +2,7 @@
   <chapter name="Overview">
     <video name="Welcome" youtube="0.75:izygArpw-Qo,1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"/>
     <videosequence format="Lecture Sequence" name="A simple sequence">
-      <html id="toylab" filename="toylab"/>
+      <html name="toylab" filename="toylab"/>
       <video name="S0V1: Video Resources" youtube="0.75:EuzkdzfR0i8,1.0:1bK-WdDi6Qw,1.25:0v1VzoDVUTM,1.50:Bxk_-ZJb240"/>
     </videosequence>
     <section name="Lecture 2">
@@ -15,7 +15,7 @@
   <chapter name="Chapter 2">
     <section name="Problem Set 1">
       <sequential>
-        <problem type="lecture" showanswer="attempted" rerandomize="true" title="A simple coding problem" name="Simple coding problem" filename="ps01-simple"/>
+        <problem type="lecture" showanswer="attempted" rerandomize="true" display_name="A simple coding problem" name="Simple coding problem" filename="ps01-simple"/>
       </sequential>
     </section>
     <video name="Lost Video" youtube="1.0:TBvX7HzxexQ"/>
