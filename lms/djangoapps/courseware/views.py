@@ -110,9 +110,10 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     '''
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
     registered = registered_for_course(course, request.user)
     if not registered:
+        # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
@@ -203,7 +204,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     return render_to_response('info.html', {'course': course})
 
@@ -220,7 +221,7 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    course = check_course(course_id, course_must_be_open=False)
+    course = check_course(request.user, course_id, course_must_be_open=False)
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
 
@@ -252,7 +253,7 @@ def profile(request, course_id, student_id=None):
 
     Course staff are allowed to see the profiles of students in their class.
     """
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
@@ -299,7 +300,7 @@ def gradebook(request, course_id):
     if not has_staff_access_to_course_id(request.user, course_id):
         raise Http404
 
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
@@ -324,7 +325,7 @@ def grade_summary(request, course_id):
     if not has_staff_access_to_course_id(request.user, course_id):
         raise Http404
 
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     # For now, just a static page
     context = {'course': course }
@@ -337,7 +338,7 @@ def instructor_dashboard(request, course_id):
     if not has_staff_access_to_course_id(request.user, course_id):
         raise Http404
 
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     # For now, just a static page
     context = {'course': course }
