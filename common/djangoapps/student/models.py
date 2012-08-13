@@ -255,10 +255,13 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 ########################## REPLICATION SIGNALS #################################
-@receiver(post_save, sender=User)
+#@receiver(post_save, sender=User)
 def replicate_user_save(sender, **kwargs):
-     user_obj = kwargs['instance']
-     return replicate_model(User.save, user_obj, user_obj.id)
+    user_obj = kwargs['instance']
+    if not should_replicate(user_obj):
+        return
+    for course_db_name in db_names_to_replicate_to(user_obj.id):
+        replicate_user(user_obj, course_db_name)
 
 @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
@@ -287,8 +290,8 @@ def replicate_enrollment_save(sender, **kwargs):
  
 @receiver(post_delete, sender=CourseEnrollment)
 def replicate_enrollment_delete(sender, **kwargs):
-     enrollment_obj = kwargs['instance']
-     return replicate_model(CourseEnrollment.delete, enrollment_obj, enrollment_obj.user_id)
+    enrollment_obj = kwargs['instance']
+    return replicate_model(CourseEnrollment.delete, enrollment_obj, enrollment_obj.user_id)
  
 @receiver(post_save, sender=UserProfile)
 def replicate_userprofile_save(sender, **kwargs):
@@ -311,23 +314,20 @@ def replicate_user(portal_user, course_db_name):
     overridden.
     """
     try:
-        # If the user exists in the Course DB, update the appropriate fields and
-        # save it back out to the Course DB.
         course_user = User.objects.using(course_db_name).get(id=portal_user.id)
-        for field in USER_FIELDS_TO_COPY:
-            setattr(course_user, field, getattr(portal_user, field))
-
-        mark_handled(course_user)
         log.debug("User {0} found in Course DB, replicating fields to {1}"
                   .format(course_user, course_db_name))
-        course_user.save(using=course_db_name) # Just being explicit.
-
     except User.DoesNotExist:
-        # Otherwise, just make a straight copy to the Course DB.
-        mark_handled(portal_user)
         log.debug("User {0} not found in Course DB, creating copy in {1}"
                   .format(portal_user, course_db_name))
-        portal_user.save(using=course_db_name)
+        course_user = User()
+
+    for field in USER_FIELDS_TO_COPY:
+        setattr(course_user, field, getattr(portal_user, field))
+
+    mark_handled(course_user)
+    course_user.save(using=course_db_name) # Just being explicit.
+    unmark(course_user)
 
 def replicate_model(model_method, instance, user_id):
     """
@@ -337,13 +337,14 @@ def replicate_model(model_method, instance, user_id):
     if not should_replicate(instance):
         return
 
-    mark_handled(instance)
     course_db_names = db_names_to_replicate_to(user_id)
     log.debug("Replicating {0} for user {1} to DBs: {2}"
               .format(model_method, user_id, course_db_names))
 
+    mark_handled(instance)
     for db_name in course_db_names:
         model_method(instance, using=db_name)
+    unmark(instance)
 
 ######### Replication Helpers #########
 
@@ -371,7 +372,7 @@ def db_names_to_replicate_to(user_id):
 def marked_handled(instance):
     """Have we marked this instance as being handled to avoid infinite loops
     caused by saving models in post_save hooks for the same models?"""
-    return hasattr(instance, '_do_not_copy_to_course_db')
+    return hasattr(instance, '_do_not_copy_to_course_db') and instance._do_not_copy_to_course_db
 
 def mark_handled(instance):
     """You have to mark your instance with this function or else we'll go into
@@ -383,6 +384,11 @@ def mark_handled(instance):
     a hack -- suggestions welcome.
     """
     instance._do_not_copy_to_course_db = True
+
+def unmark(instance):
+    """If we don't unmark a model after we do replication, then consecutive 
+    save() calls won't be properly replicated."""
+    instance._do_not_copy_to_course_db = False
 
 def should_replicate(instance):
     """Should this instance be replicated? We need to be a Portal server and
@@ -397,10 +403,4 @@ def should_replicate(instance):
                   .format(instance))
         return False
     return True
-
-
-
-
-
-
 
