@@ -89,6 +89,18 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+# For Node.js
+
+system_node_path = os.environ.get("NODE_PATH", None)
+if system_node_path is None:
+    system_node_path = "/usr/local/lib/node_modules"
+
+node_paths = [COMMON_ROOT / "static/js/vendor", 
+              COMMON_ROOT / "static/coffee/src",
+              system_node_path
+              ]
+NODE_PATH = ':'.join(node_paths)
+                          
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -337,7 +349,7 @@ PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/cour
 courseware_only_js = [
     PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
     for pth
-    in ['courseware', 'histogram', 'navigation', 'time', ]
+    in ['courseware', 'histogram', 'navigation', 'time']
 ]
 courseware_only_js += [
     pth for pth
@@ -465,6 +477,7 @@ if os.path.isdir(DATA_DIR):
                     js_timestamp     = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
+                os.system("rm %s" % (js_dir / new_filename))
                 os.system("coffee -c %s" % (js_dir / filename))
 
 PIPELINE_COMPILERS = [
