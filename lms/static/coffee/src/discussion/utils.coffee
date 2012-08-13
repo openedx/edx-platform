@@ -67,9 +67,9 @@ wmdEditors = {}
     autocomplete:
       remoteDataType: 'json'
     interactive: true
+    height: '30px'
+    width: '100%'
     defaultText: "Tag your post: press enter after each tag"
-    height: "30px"
-    width: "100%"
     removeWithBackspace: true
 
   isSubscribed: (id, type) ->
@@ -88,14 +88,13 @@ wmdEditors = {}
   isDownvoted: (id) ->
     $$user_info? and (id in $$user_info.downvoted_ids)
 
-  formErrorHandler: (errorsField, success) ->
-    (response, textStatus, xhr) ->
+  formErrorHandler: (errorsField) ->
+    (xhr, textStatus, error) ->
+      response = JSON.parse(xhr.responseText)
       if response.errors? and response.errors.length > 0
         errorsField.empty()
         for error in response.errors
           errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-      else
-        success(response, textStatus, xhr)
 
   postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
@@ -135,7 +134,7 @@ wmdEditors = {}
 
   setWmdContent: ($content, $local, cls_identifier, text) ->
     Discussion.getWmdInput($content, $local, cls_identifier).val(text)
-    wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
+    Discussion.getWmdEditor($content, $local, cls_identifier).refreshPreview()
 
   getContentInfo: (id, attr) ->
     if not window.$$annotated_content_info?

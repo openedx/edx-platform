@@ -113,7 +113,7 @@ class JsonError(HttpResponse):
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf8', status=500)
+                                        mimetype='application/json; charset=utf8', status=400)
 
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):

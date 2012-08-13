@@ -7,18 +7,18 @@ Discussion = @Discussion
 @Discussion = $.extend @Discussion,
 
   newPostTemplate: """
-    <form class="new-post-form" _id="{{discussion_id}}">
-      <ul class="discussion-errors new-post-form-error"></ul>    
-      <input type="text" class="new-post-title title-input" placeholder="Title"/>
-      <div class="new-post-similar-posts-wrapper" style="display: none">
-        Similar Posts: 
-        <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
-        <div class="new-post-similar-posts"></div>
+    <form class="new-post-form collapsed" id="new-post-form" style="display: block; ">
+      <ul class="new-post-form-errors discussion-errors"></ul>
+      <input type="text" class="new-post-title title-input" placeholder="Title" />
+      <div class="new-post-body reply-body"></div>
+      <input class="new-post-tags" placeholder="Tags" />
+      <div class="post-options">
+        <input type="checkbox" class="discussion-post-anonymously" id="discussion-post-anonymously-${discussion_id}">
+        <label for="discussion-post-anonymously-${discussion_id}">post anonymously</label>
+        <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-${discussion_id}" checked="">
+        <label for="discussion-auto-watch-${discussion_id}">follow this thread</label>
       </div>
-      <div class="new-post-body body-input"></div>
-      <input class="new-post-tags" placeholder="Tags"/>
-      <div class = "new-post-control">
-        <a class="discussion-cancel-post" href="javascript:void(0)">Cancel</a>
+      <div class="reply-post-control">        
         <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
       </div>
     </form>
