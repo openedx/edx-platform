@@ -7,7 +7,12 @@
 <header class="global" aria-label="Global Navigation">
   <nav>
     <h1 class="logo"><a href="${reverse('root')}"></a></h1>
-    <ol class="left">
+
+    %if course:
+      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
+    %endif
+
+    <ol class="left find-courses-button">
       <li class="primary">
         <a href="${reverse('courses')}">Find Courses</a>
       </li>
@@ -37,11 +42,15 @@
         <a href="${reverse('about_edx')}">About</a>
         <a href="http://edxonline.tumblr.com/">Blog</a>
         <a href="${reverse('jobs')}">Jobs</a>
+% if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
         <a href="#login-modal" id="login" rel="leanModal">Log In</a>
+% endif
       </li>
+% if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
       <li class="primary">
         <a href="#signup-modal" id="signup" rel="leanModal">Sign Up</a>
       </li>
+% endif
     </ol>
   </nav>
   %endif

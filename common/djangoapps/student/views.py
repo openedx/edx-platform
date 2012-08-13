@@ -94,8 +94,9 @@ def main_index(extra_context = {}, user=None):
     context.update(extra_context)
     return render_to_response('index.html', context)
 
-def course_from_id(id):
-    course_loc = CourseDescriptor.id_to_location(id)
+def course_from_id(course_id):
+    """Return the CourseDescriptor corresponding to this course_id"""
+    course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_item(course_loc)
 
 
@@ -127,7 +128,7 @@ def dashboard(request):
         try:
             courses.append(course_from_id(enrollment.course_id))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existant course {1}"
+            log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
     message = ""
@@ -158,15 +159,19 @@ def try_change_enrollment(request):
 
 @login_required
 def change_enrollment_view(request):
+    """Delegate to change_enrollment to actually do the work."""
     return HttpResponse(json.dumps(change_enrollment(request)))
-
 
 def change_enrollment(request):
     if request.method != "POST":
         raise Http404
 
-    action = request.POST.get("enrollment_action", "")
     user = request.user
+    if not user.is_authenticated():
+        raise Http404
+
+    action = request.POST.get("enrollment_action", "")
+
     course_id = request.POST.get("course_id", None)
     if course_id == None:
         return HttpResponse(json.dumps({'success': False, 'error': 'There was an error receiving the course id.'}))
@@ -177,14 +182,14 @@ def change_enrollment(request):
         try:
             course = course_from_id(course_id)
         except ItemNotFoundError:
-            log.error("User {0} tried to enroll in non-existant course {1}"
+            log.warning("User {0} tried to enroll in non-existant course {1}"
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # require that user be in the staff_* group (or be an overall admin) to be able to enroll
             # eg staff_6.002x or staff_6.00x
-            if not has_staff_access_to_course(user,course):
+            if not has_staff_access_to_course(user, course):
                 staff_group = course_staff_group_name(course)
                 log.debug('user %s denied enrollment to %s ; not in %s' % (user,course.location.url(),staff_group))
                 return {'success': False, 'error' : '%s membership required to access course.' % staff_group}
@@ -264,6 +269,7 @@ def logout_user(request):
 def change_setting(request):
     ''' JSON call to change a profile setting: Right now, location
     '''
+    # TODO (vshnayder): location is no longer used
     up = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
     if 'location' in request.POST:
         up.location = request.POST['location']
@@ -271,6 +277,59 @@ def change_setting(request):
 
     return HttpResponse(json.dumps({'success': True,
                                     'location': up.location, }))
+
+def _do_create_account(post_vars):
+    """
+    Given cleaned post variables, create the User and UserProfile objects, as well as the
+    registration for this user.
+
+    Returns a tuple (User, UserProfile, Registration).
+
+    Note: this function is also used for creating test users.
+    """
+    user = User(username=post_vars['username'],
+             email=post_vars['email'],
+             is_active=False)
+    user.set_password(post_vars['password'])
+    registration = Registration()
+    # TODO: Rearrange so that if part of the process fails, the whole process fails.
+    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
+    try:
+        user.save()
+    except IntegrityError:
+        js = {'success': False}
+        # Figure out the cause of the integrity error
+        if len(User.objects.filter(username=post_vars['username'])) > 0:
+            js['value'] = "An account with this username already exists."
+            js['field'] = 'username'
+            return HttpResponse(json.dumps(js))
+
+        if len(User.objects.filter(email=post_vars['email'])) > 0:
+            js['value'] = "An account with this e-mail already exists."
+            js['field'] = 'email'
+            return HttpResponse(json.dumps(js))
+
+        raise
+
+    registration.register(user)
+
+    profile = UserProfile(user=user)
+    profile.name = post_vars['name']
+    profile.level_of_education = post_vars.get('level_of_education')
+    profile.gender = post_vars.get('gender')
+    profile.mailing_address = post_vars.get('mailing_address')
+    profile.goals = post_vars.get('goals')
+
+    try:
+        profile.year_of_birth = int(post_vars['year_of_birth'])
+    except (ValueError, KeyError):
+        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
+                                # of asking them to put an integer.
+    try:
+        profile.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {0}.".format(user.id))
+    return (user, profile, registration)
 
 
 @ensure_csrf_cookie
@@ -343,50 +402,14 @@ def create_account(request, post_override=None):
         js['field'] = 'username'
         return HttpResponse(json.dumps(js))
 
-    u = User(username=post_vars['username'],
-             email=post_vars['email'],
-             is_active=False)
-    u.set_password(post_vars['password'])
-    r = Registration()
-    # TODO: Rearrange so that if part of the process fails, the whole process fails.
-    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
-    try:
-        u.save()
-    except IntegrityError:
-        # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
-            js['field'] = 'username'
-            return HttpResponse(json.dumps(js))
-
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
-            js['field'] = 'email'
-            return HttpResponse(json.dumps(js))
-
-        raise
-
-    r.register(u)
-
-    up = UserProfile(user=u)
-    up.name = post_vars['name']
-    up.level_of_education = post_vars.get('level_of_education')
-    up.gender = post_vars.get('gender')
-    up.mailing_address = post_vars.get('mailing_address')
-    up.goals = post_vars.get('goals')
-
-    try:
-        up.year_of_birth = int(post_vars['year_of_birth'])
-    except (ValueError, KeyError):
-        up.year_of_birth = None  # If they give us garbage, just ignore it instead
-                                # of asking them to put an integer.
-    try:
-        up.save()
-    except Exception:
-        log.exception("UserProfile creation failed for user {0}.".format(u.id))
+    # Ok, looks like everything is legit.  Create the account.
+    ret = _do_create_account(post_vars)
+    if isinstance(ret,HttpResponse):		# if there was an error then return that
+        return ret
+    (user, profile, registration) = ret
 
     d = {'name': post_vars['name'],
-         'key': r.activation_key,
+         'key': registration.activation_key,
          }
 
     # composes activation email
@@ -398,10 +421,11 @@ def create_account(request, post_override=None):
     try:
         if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
             dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = "Activation for %s (%s): %s\n" % (u, u.email, up.name) + '-' * 80 + '\n\n' + message
+            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                       '-' * 80 + '\n\n' + message)
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
         elif not settings.GENERATE_RANDOM_USER_CREDENTIALS:
-            res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+            res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.exception(sys.exc_info())
         js['value'] = 'Could not send activation e-mail.'
@@ -431,24 +455,30 @@ def create_account(request, post_override=None):
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
 
-def create_random_account(create_account_function):
-
+def get_random_post_override():
+    """
+    Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
+    of create_account, with random user info.
+    """
     def id_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
-    def inner_create_random_account(request):
-        post_override = {'username': "random_" + id_generator(),
-                            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
-                            'password': id_generator(),
-                            'location': id_generator(size=5, chars=string.ascii_uppercase),
-                            'name': id_generator(size=5, chars=string.ascii_lowercase) + " " + id_generator(size=7, chars=string.ascii_lowercase),
-                            'honor_code': u'true',
-                            'terms_of_service': u'true', }
+    return {'username': "random_" + id_generator(),
+            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
+            'password': id_generator(),
+            'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
+                     id_generator(size=7, chars=string.ascii_lowercase)),
+                     'honor_code': u'true',
+                     'terms_of_service': u'true', }
 
-        return create_account_function(request, post_override=post_override)
+
+def create_random_account(create_account_function):
+    def inner_create_random_account(request):
+        return create_account_function(request, post_override=get_random_post_override())
 
     return inner_create_random_account
 
+# TODO (vshnayder): do we need GENERATE_RANDOM_USER_CREDENTIALS for anything?
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
@@ -514,7 +544,7 @@ def reactivation_email(request):
     subject = ''.join(subject.splitlines())
     message = render_to_string('reactivation_email.txt', d)
 
-    res = u.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+    res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return HttpResponse(json.dumps({'success': True}))
 

@@ -10,8 +10,8 @@ class_priority = ['video', 'problem']
 class VerticalModule(XModule):
     ''' Layout module for laying out submodules vertically.'''
 
-    def __init__(self, system, location, definition, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
         self.contents = None
 
     def get_html(self):

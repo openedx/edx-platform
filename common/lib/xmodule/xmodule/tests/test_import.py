@@ -8,7 +8,10 @@ from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 from xmodule.xml_module import is_pointer_tag
 from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .test_export import DATA_DIR
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -185,3 +188,22 @@ class ImportTestCase(unittest.TestCase):
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertFalse('graceperiod' in chapter_xml.attrib)
+
+    def test_metadata_inherit(self):
+        """Make sure that metadata is inherited properly"""
+
+        print "Starting import"
+        initial_import = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+
+        courses = initial_import.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+
+        def check_for_key(key, node):
+            "recursive check for presence of key"
+            print "Checking {}".format(node.location.url())
+            self.assertTrue(key in node.metadata)
+            for c in node.get_children():
+                check_for_key(key, c)
+
+        check_for_key('graceperiod', course)

@@ -11,14 +11,25 @@ describe "CMS.Models.Module", ->
         @fakeModule = jasmine.createSpy("fakeModuleObject")
         window.FakeModule = jasmine.createSpy("FakeModule").andReturn(@fakeModule)
         @module = new CMS.Models.Module(type: "FakeModule")
-        @stubElement = $("<div>")
-        @module.loadModule(@stubElement)
+        @stubDiv = $('<div />')
+        @stubElement = $('<div class="xmodule_edit" />')
+        @stubElement.data('type', "FakeModule")
+
+        @stubDiv.append(@stubElement)
+        @module.loadModule(@stubDiv)
 
       afterEach ->
         window.FakeModule = undefined
 
       it "initialize the module", ->
-        expect(window.FakeModule).toHaveBeenCalledWith(@stubElement)
+        expect(window.FakeModule).toHaveBeenCalled()
+        # Need to compare underlying nodes, because jquery selectors
+        # aren't equal even when they point to the same node.
+        # http://stackoverflow.com/questions/9505437/how-to-test-jquery-with-jasmine-for-element-id-if-used-as-this
+        expectedNode = @stubElement[0]
+        actualNode = window.FakeModule.mostRecentCall.args[0][0]
+
+        expect(actualNode).toEqual(expectedNode)
         expect(@module.module).toEqual(@fakeModule)
 
     describe "when the module does not exists", ->
@@ -32,7 +43,8 @@ describe "CMS.Models.Module", ->
         window.console = @previousConsole
 
       it "print out error to log", ->
-        expect(window.console.error).toHaveBeenCalledWith("Unable to load HTML.")
+        expect(window.console.error).toHaveBeenCalled()
+        expect(window.console.error.mostRecentCall.args[0]).toMatch("^Unable to load")
 
 
   describe "editUrl", ->

@@ -1,7 +1,7 @@
 describe "CMS.Views.Module", ->
   beforeEach ->
     setFixtures """
-      <div id="module" data-id="i4x://mitx.edu/course/module" data-type="html">
+      <div id="module" data-id="i4x://mitx/course/html/module" data-type="html">
         <a href="#" class="module-edit">edit</a>
       </div>
       """
@@ -20,5 +20,5 @@ describe "CMS.Views.Module", ->
       expect(CMS.replaceView).toHaveBeenCalledWith @view
       expect(CMS.Views.ModuleEdit).toHaveBeenCalledWith model: @model
       expect(CMS.Models.Module).toHaveBeenCalledWith
-        id: "i4x://mitx.edu/course/module"
+        id: "i4x://mitx/course/html/module"
         type: "html"
