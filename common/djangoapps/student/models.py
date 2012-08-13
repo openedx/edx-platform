@@ -255,7 +255,7 @@ def add_user_to_default_group(user, group):
     utg.save()
 
 ########################## REPLICATION SIGNALS #################################
-#@receiver(post_save, sender=User)
+@receiver(post_save, sender=User)
 def replicate_user_save(sender, **kwargs):
     user_obj = kwargs['instance']
     if not should_replicate(user_obj):
