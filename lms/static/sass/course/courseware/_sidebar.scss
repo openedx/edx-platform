@@ -13,7 +13,7 @@ section.course-index {
   div#accordion {
     h3 {
       @include border-radius(0);
-      border-top: 1px solid #e3e3e3;
+      border-top: 1px solid lighten($border-color, 10%);
       font-size: em(16, 18);
       margin: 0;
       overflow: hidden;
@@ -34,6 +34,7 @@ section.course-index {
       }
 
       &.ui-accordion-header {
+        border-bottom: none;
         color: #000;
 
         a {

@@ -17,8 +17,8 @@ def try_staticfiles_lookup(path):
     except Exception as err:
         log.warning("staticfiles_storage couldn't find path {}: {}".format(
             path, str(err)))
-        # Just return a dead link--don't kill everything.
-        url = "file_not_found"
+        # Just return the original path; don't kill everything.
+        url = path
     return url
 
 

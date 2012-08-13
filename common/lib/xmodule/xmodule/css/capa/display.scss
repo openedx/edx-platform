@@ -89,6 +89,19 @@ div {
     }
   }
 
+  &.processing {
+    p.status {
+      @include inline-block();
+      background: url('../images/spinner.gif') center center no-repeat;
+      height: 20px;
+      width: 20px;
+    }
+
+    input {
+      border-color: #aaa;
+    }
+  }
+
   &.incorrect, &.ui-icon-close {
     p.status {
       @include inline-block();
@@ -146,7 +159,7 @@ div {
       width: 14px;
     }
 
-    &.processing, &.ui-icon-check {
+    &.processing, &.ui-icon-processing {
       @include inline-block();
       background: url('../images/spinner.gif') center center no-repeat;
       height: 20px;
