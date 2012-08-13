@@ -50,8 +50,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # have been imported into the cms from xml
                 xml = clean_out_mako_templating(xml)
                 xml_data = etree.fromstring(xml)
-            except:
-                log.exception("Unable to parse xml: {xml}".format(xml=xml))
+            except Exception as err:
+                log.warning("Unable to parse xml: {err}, xml: {xml}".format(
+                    err=str(err), xml=xml))
                 raise
 
             # VS[compat]. Take this out once course conversion is done
@@ -194,7 +195,7 @@ class XMLModuleStore(ModuleStoreBase):
             if org is None:
                 msg = ("No 'org' attribute set for course in {dir}. "
                           "Using default 'edx'".format(dir=course_dir))
-                log.error(msg)
+                log.warning(msg)
                 tracker(msg)
                 org = 'edx'
 
@@ -206,7 +207,7 @@ class XMLModuleStore(ModuleStoreBase):
                         dir=course_dir,
                         default=course_dir
                         ))
-                log.error(msg)
+                log.warning(msg)
                 tracker(msg)
                 course = course_dir
 
