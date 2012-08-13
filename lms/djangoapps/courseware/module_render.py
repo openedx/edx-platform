@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -148,12 +149,23 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
-    ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
+
+    ajax_url = reverse('modx_dispatch', 
+                       kwargs=dict(course_id=descriptor.location.course_id,
+                                   id=descriptor.location.url(),
+                                   dispatch=''),
+                       )
+
+    # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
-    xqueue_callback_url = (request.build_absolute_uri('/') + settings.MITX_ROOT_URL +
-                          'xqueue/' + str(user.id) + '/' + descriptor.location.url() + '/' +
-                          'score_update')
+    xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
+    xqueue_callback_url += reverse('xqueue_callback',
+                                  kwargs=dict(course_id=descriptor.location.course_id,
+                                              userid=str(user.id),
+                                              id=descriptor.location.url(),
+                                              dispatch='score_update'),
+                                  )
 
     # Default queuename is course-specific and is derived from the course that
     #   contains the current module.
@@ -259,7 +271,7 @@ def get_shared_instance_module(user, module, student_module_cache):
         return None
 
 @csrf_exempt
-def xqueue_callback(request, userid, id, dispatch):
+def xqueue_callback(request, course_id, userid, id, dispatch):
     '''
     Entry point for graded results from the queueing system.
     '''
@@ -310,7 +322,7 @@ def xqueue_callback(request, userid, id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch=None, id=None):
+def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
