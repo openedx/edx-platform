@@ -154,21 +154,10 @@ class LoncapaProblem(object):
     def get_max_score(self):
         '''
         Return maximum score for this problem.
-        We do this by counting the number of answers available for each question
-        in the problem.  If the Response for a question has a get_max_score() method
-        then we call that and add its return value to the count.  That can be
-        used to give complex problems (eg programming questions) multiple points.
         '''
         maxscore = 0
         for response, responder in self.responders.iteritems():
-            if hasattr(responder, 'get_max_score'):
-                try:
-                    maxscore += responder.get_max_score()
-                except Exception:
-                    log.debug('responder %s failed to properly return from get_max_score()' % responder)  # FIXME
-                    raise
-            else:
-                maxscore += len(self.responder_answers[response])
+            maxscore += responder.get_max_score()
         return maxscore
 
     def get_score(self):
