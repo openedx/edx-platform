@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
+<html>
+<head>
+  {% block title %}<title>edX</title>{% endblock %}
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  
+  {% compressed_css 'application' %}
+  {% compressed_js 'main_vendor' %}
+  
+  {% block headextra %}{% endblock %}
+  {% render_block "css" %}
+  {% render_block "js" %}
+  
+  
+  {% comment %}
+  TODO: We need to figure out how to put the MITX_ROOT_URL in here
+  <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
+  {% endcomment %}
+</head>
+
+
+<body class="{% block bodyclass %}{% endblock %}">
+  {% include "navigation.html" %}
+    
+  <section class="content-wrapper">
+    {% block body %}{% endblock %}
+        
+    {% block bodyextra %}{% endblock %}
+  </section>
+  {% include "footer.html" %}
+    
+  {% compressed_js 'application' %}
+  {% compressed_js 'module-js' %}
+</body>
+</html>

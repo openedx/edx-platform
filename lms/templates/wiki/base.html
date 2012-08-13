@@ -1,0 +1,23 @@
+{% extends "main_django.html" %}
+{% load sekizai_tags i18n %}{% load url from future %}
+
+{% block title %}<title>{% block pagetitle %}{% endblock %} | edX Wiki</title>{% endblock %}
+
+{% block body %}
+  {% block wiki_body %}
+  
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <a class="close" data-dismiss="alert" href="#">&times;</a>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    
+    {% block wiki_breadcrumbs %}{% endblock %}
+    
+    {% block wiki_contents %}{% endblock %}
+    
+  {% endblock %}
+{% endblock %}
