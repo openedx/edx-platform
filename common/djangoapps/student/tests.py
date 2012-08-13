@@ -4,6 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+import logging
 from datetime import datetime
 
 from django.test import TestCase
@@ -12,6 +13,8 @@ from .models import User, UserProfile, CourseEnrollment, replicate_user, USER_FI
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
+
+log = logging.getLogger(__name__)
 
 class ReplicationTest(TestCase):
 
@@ -47,23 +50,18 @@ class ReplicationTest(TestCase):
                                  field, portal_user, course_user
                              ))
 
-        if hasattr(portal_user, 'seen_response_count'):
-            # Since it's the first copy over of User data, we should have all of it
-            self.assertEqual(portal_user.seen_response_count,
-                             course_user.seen_response_count)
-
-        # But if we replicate again, the user already exists in the Course DB,
-        # so it shouldn't update the seen_response_count (which is Askbot 
-        # controlled).
         # This hasattr lameness is here because we don't want this test to be
         # triggered when we're being run by CMS tests (Askbot doesn't exist
         # there, so the test will fail).
+        # 
+        # seen_response_count isn't a field we care about, so it shouldn't have
+        # been copied over.
         if hasattr(portal_user, 'seen_response_count'):
             portal_user.seen_response_count = 20
             replicate_user(portal_user, COURSE_1)
             course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
             self.assertEqual(portal_user.seen_response_count, 20)
-            self.assertEqual(course_user.seen_response_count, 10)
+            self.assertEqual(course_user.seen_response_count, 0)
 
         # Another replication should work for an email change however, since
         # it's a field we care about.
@@ -122,6 +120,19 @@ class ReplicationTest(TestCase):
         self.assertRaises(UserProfile.DoesNotExist, 
                           UserProfile.objects.using(COURSE_2).get,
                           id=portal_user_profile.id)
+
+        log.debug("Make sure our seen_response_count is not replicated.")
+        if hasattr(portal_user, 'seen_response_count'):
+            portal_user.seen_response_count = 200
+            course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
+            self.assertEqual(portal_user.seen_response_count, 200)
+            self.assertEqual(course_user.seen_response_count, 0)
+            portal_user.save()
+
+            course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
+            self.assertEqual(portal_user.seen_response_count, 200)
+            self.assertEqual(course_user.seen_response_count, 0)
+
 
 
     def test_enrollment_for_user_info_after_enrollment(self):
