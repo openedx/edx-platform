@@ -348,16 +348,13 @@ def replicate_model(model_method, instance, user_id):
 ######### Replication Helpers #########
 
 def is_valid_course_id(course_id):
-    """We check to both make sure that it's a valid course_id (and not 
-    'default', or some other non-course DB name) and that we have a mapping
-    for what database it belongs to."""
+    """Right now, the only database that's not a course database is 'default'.
+    I had nicer checking in here originally -- it would scan the courses that
+    were in the system and only let you choose that. But it was annoying to run
+    tests with, since we don't have course data for some for our course test 
+    databases. Hence the lazy version.
+    """
     return course_id != 'default'
-
-    course_ids = set(course.id for course in modulestore().get_courses())
-    is_valid = (course_id in course_ids) and (course_id in settings.DATABASES)
-    if not is_valid:
-        log.error("{0} is not a valid DB to replicate to.".format(course_id))
-    return is_valid
 
 def is_portal():
     """Are we in the portal pool? Only Portal servers are allowed to replicate
