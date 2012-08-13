@@ -17,7 +17,7 @@ def url_class(url):
 % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
       <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
 % endif
-% if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
+% if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
       <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id, course.id.replace('/', '_').replace('.', '_')])}" class="${url_class('discussion')}">Discussion</a></li>
       <li class="news"><a href="${reverse('news', args=[course.id])}" class="${url_class('news')}">News</a></li>
 % endif 
