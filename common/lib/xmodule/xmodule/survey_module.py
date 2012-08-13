@@ -24,7 +24,7 @@ class SurveyModule(CapaModule):
     default behavior of a problem for surveying students
 
     Defaults:
-        -Never Show Answer, no max attempts 
+        -Never Show Answer, no max attempts
         -No due date unless specified
         -Only show save button or no buttons
 
@@ -32,12 +32,12 @@ class SurveyModule(CapaModule):
 
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
-        CapaModule.__init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs)
-    
+        CapaModule.__init__(self, system, location, definition, descriptor, instance_state,
+                 shared_state, **kwargs)
+
         # no maximum number of attempts so students can
         # always answer surveys
-        # if we're interested in cut-off dates, we can use 
+        # if we're interested in cut-off dates, we can use
         # the "modified" field from the database
         self.max_attempts = None
 
