@@ -18,7 +18,6 @@ import json
 import comment_client as cc
 import dateutil
 
-from django_comment_client.permissions import check_permissions_by_view
 
 THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
@@ -54,7 +53,7 @@ def render_discussion(request, course_id, threads, discussion_id=None, \
         'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])),
     }[discussion_type]()
 
-    annotated_content_info = {thread['id']: get_annotated_content_info(course_id, thread, request.user, is_thread=True) for thread in threads}
+    annotated_content_info = {thread['id']: utils.get_annotated_content_info(course_id, thread, request.user, type='thread') for thread in threads}
 
     context = {
         'threads': threads,
@@ -151,36 +150,18 @@ def forum_form_discussion(request, course_id, discussion_id):
         }
         return render_to_response('discussion/index.html', context)
 
-
-def get_annotated_content_info(course_id, content, user, is_thread):
-    return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if is_thread else "update_comment"),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if is_thread else "create_sub_comment"),
-        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if not is_thread else False,
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if is_thread else "delete_comment"),
-    }
-
-def get_annotated_content_infos(course_id, thread, user, is_thread=True):
-    infos = {}
-    def _annotate(content, is_thread=is_thread):
-        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, is_thread)
-        for child in content.get('children', []):
-            _annotate(child, is_thread=False)
-    _annotate(thread)
-    return infos
-
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True)
     #comment_client.get_thread(thread_id, recursive=True)
 
-    annotated_content_info = get_annotated_content_infos(course_id, thread=thread.to_dict(), \
-                                user=request.user, is_thread=True)
+    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread.to_dict(), \
+                                user=request.user, type='thread')
 
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
-        'user_info': cc.User.from_django_user(request.user).to_dict(),#get_user_info(request.user.id, raw=True),
+        'user_info': cc.User.from_django_user(request.user).to_dict(),
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
@@ -192,7 +173,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-        annotated_content_info = get_annotated_content_infos(course_id, thread, request.user)
+        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, type='thread')
         context = {'thread': thread.to_dict()}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 

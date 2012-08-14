@@ -10,6 +10,8 @@ from django.conf import settings
 import operator
 import itertools
 
+from django_comment_client.permissions import check_permissions_by_view
+
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
@@ -122,3 +124,20 @@ class HtmlResponse(HttpResponse):
 class ViewNameMiddleware(object):  
     def process_view(self, request, view_func, view_args, view_kwargs):  
         request.view_name = view_func.__name__
+
+def get_annotated_content_info(course_id, content, user, type):
+    return {
+        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if type == 'thread' else "update_comment"),
+        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if type == 'thread' else "create_sub_comment"),
+        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if type == 'comment' else False,
+        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if type == 'thread' else "delete_comment"),
+    }
+
+def get_annotated_content_infos(course_id, thread, user, type='thread'):
+    infos = {}
+    def _annotate(content, type):
+        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, type)
+        for child in content.get('children', []):
+            _annotate(child, 'comment')
+    _annotate(thread, type)
+    return infos

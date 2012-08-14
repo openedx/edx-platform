@@ -147,6 +147,10 @@ wmdEditors = {}
     window.$$annotated_content_info[id] ||= {}
     window.$$annotated_content_info[id][attr] = value
 
+  extendContentInfo: (id, newInfo) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info[id] = newInfo
   bulkExtendContentInfo: (newInfos) ->
     if not window.$$annotated_content_info?
       window.$$annotated_content_info = {}
