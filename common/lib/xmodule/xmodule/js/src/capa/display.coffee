@@ -151,9 +151,16 @@ class @Problem
 
     fd = new FormData()
     
+    # Sanity check of file size
+    file_too_large = false
+    max_filesize = 10*1000*1000 # 10 MB
+
     @inputs.each (index, element) ->
       if element.type is 'file'
         if element.files[0] instanceof File
+          if element.files[0].size > max_filesize
+            file_too_large = true
+            alert 'Submission aborted! Your file "' + element.files[0].name + '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
           fd.append(element.id, element.files[0])
         else
           fd.append(element.id, '')
@@ -173,7 +180,8 @@ class @Problem
           else
             alert(response.success)
 
-    $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    if not file_too_large
+      $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     Logger.log 'problem_check', @answers
