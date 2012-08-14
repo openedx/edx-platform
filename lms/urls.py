@@ -172,9 +172,9 @@ if settings.WIKI_ENABLED:
         
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/?$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/view_wiki/', include(wiki_pattern())),
+        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
     )
 
 if settings.QUICKEDIT:
