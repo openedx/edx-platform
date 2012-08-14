@@ -2,7 +2,7 @@ body {
   min-width: 980px;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
+body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
   text-align: left;
   font-family: $sans-serif;
 }
@@ -25,6 +25,10 @@ form {
   label {
     display: block;
   }
+}
+
+img {
+  max-width: 100%;
 }
 
 ::selection, ::-moz-selection, ::-webkit-selection {
