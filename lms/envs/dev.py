@@ -55,10 +55,11 @@ CACHES = {
 
 XQUEUE_INTERFACE = {
     "url": "http://xqueue.sandbox.edx.org",
-    "auth": {
+    "django_auth": {
         "username": "lms",
         "password": "48b5c838c17eede6355ac7"
-    }
+    },
+    "basic_auth": ('anant', 'agarwal'),
 }
 
 # Make the keyedcache startup warnings go away
