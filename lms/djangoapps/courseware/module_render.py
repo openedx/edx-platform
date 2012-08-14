@@ -336,11 +336,20 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
       - id -- the module id. Used to look up the XModule instance
     '''
     # ''' (fix emacs broken parsing)
+
+    # TODO: Should be in settings.py
+    MAX_UPLOAD_FILE_SIZE = 4*1000*1000 # 4 MB
+
     # Check for submitted files
     p = request.POST.copy()
     if request.FILES:
         for inputfile_id in request.FILES.keys():
-            p[inputfile_id] = request.FILES[inputfile_id]
+            inputfile = request.FILES[inputfile_id]
+            if inputfile.size > MAX_UPLOAD_FILE_SIZE:
+                file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                                    (inputfile.name, MAX_UPLOAD_FILE_SIZE/(1000**2))
+                return HttpResponse(json.dumps({'success': file_too_big_msg}))
+            p[inputfile_id] = inputfile
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache)
