@@ -22,7 +22,7 @@ def url_class(url):
 % endif 
 % endif
 % if settings.WIKI_ENABLED:
-      <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
+      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
 % endif
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
