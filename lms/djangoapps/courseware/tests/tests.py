@@ -18,8 +18,10 @@ from override_settings import override_settings
 
 import xmodule.modulestore.django
 
+# Need access to internal func to put users in the right group
+from courseware.access import _course_staff_group_name
+
 from student.models import Registration
-from courseware.courses import course_staff_group_name
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -310,7 +312,7 @@ class TestViewAuth(PageLoader):
             self.check_for_get_code(404, url)
 
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 
@@ -340,25 +342,22 @@ class TestViewAuth(PageLoader):
 
     def run_wrapped(self, test):
         """
-        test.py turns off start dates.  Enable them and DARK_LAUNCH.
+        test.py turns off start dates.  Enable them.
         Because settings is global, be careful not to mess it up for other tests
         (Can't use override_settings because we're only changing part of the
         MITX_FEATURES dict)
         """
         oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
-        oldDL = settings.MITX_FEATURES['DARK_LAUNCH']
 
         try:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = False
-            settings.MITX_FEATURES['DARK_LAUNCH'] = True
             test()
         finally:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
-            settings.MITX_FEATURES['DARK_LAUNCH'] = oldDL
 
 
     def test_dark_launch(self):
-        """Make sure that when dark launch is on, students can't access course
+        """Make sure that before course start, students can't access course
         pages, but instructors can"""
         self.run_wrapped(self._do_test_dark_launch)
 
@@ -378,7 +377,6 @@ class TestViewAuth(PageLoader):
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
-        self.assertTrue(settings.MITX_FEATURES['DARK_LAUNCH'])
 
         def reverse_urls(names, course):
             """Reverse a list of course urls"""
@@ -444,7 +442,7 @@ class TestViewAuth(PageLoader):
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 
@@ -494,7 +492,7 @@ class TestViewAuth(PageLoader):
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 
