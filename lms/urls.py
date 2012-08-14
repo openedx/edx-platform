@@ -146,10 +146,6 @@ if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
     
-    # urlpatterns += (
-    #     url(r'^wiki/', include('simplewiki.urls')),
-    #     url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
-    # )
     urlpatterns += (        
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
@@ -157,8 +153,7 @@ if settings.WIKI_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki$',
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
         
-        
-        url(r'wiki/', include(wiki_pattern())),
+        url(r'^wiki/', include(wiki_pattern())),
         url(r'^notify/', include(notify_pattern())),
     )
 
