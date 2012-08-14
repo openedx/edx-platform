@@ -3,6 +3,7 @@
 import requests
 import slumber
 import simplejson as json
+from django.core.serializers.json import DjangoJSONEncoder
 
 # HOST = getattr(settings, 'GRADING_SERVICE_HOST', 'http://localhost:3000/')
 # The client library *should* be django independent. Django client should override this value somehow.
@@ -40,7 +41,7 @@ class APIModel(object):
             return self.__base_url__
 
     def update_attributes(self, **kwargs):
-        if 'id' in kwargs:
+        if 'id' in kwargs and kwargs['id'] is not None:
             self._id = int(kwargs['id'])
         for attribute in self.__attributes__:
             if attribute in kwargs:
@@ -48,7 +49,7 @@ class APIModel(object):
 
     def to_json(self):
         attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
-        return json.dumps({self.json_root:attributes})
+        return json.dumps({self.json_root:attributes}, cls=DjangoJSONEncoder)
 
     def save(self):
         # TODO: Think of a better way to handle nested resources, currently you have to manually set __base_url__
@@ -64,7 +65,11 @@ class APIModel(object):
         else:
             # TODO: handle errors
             print response
-            self.errors = response.json['errors']
+            print response.text
+            if response.status_code == 404:
+                raise Exception("404 Not Found")
+            if response.json:
+                self.errors = response.json['errors']
             print self.errors
         return self
 
@@ -78,6 +83,7 @@ class APIModel(object):
     @property
     def json_root(self):
       return self.__class__.__name__.lower()
+
     @property
     def id(self):
         """
@@ -107,20 +113,20 @@ class User(APIModel):
 
 class Question(APIModel):
     __attributes__ = ['external_id', 'rubric_id', 'total_points']
-    __slots__ = __attributes__
+    __slots__ = __attributes__ + ['_grading_configuration']
     __base_url__ = 'questions'
     def submissions(self):
         return [Submission(**data) for data in API.questions(id).submissions.get()]
 
     @property
     def grading_queue(self):
-        return GradingQueue(self, question_id=self.id)
+        return GradingQueue(self)
 
     @property
     def grading_configuration(self):
-        if not self._grading_configuration:
+        if not hasattr(self, '_grading_configuration'):
             # Try to query the service for the grading configuration
-            response = requests.get(slumber.url_join('question', self.id, 'grading_configuration'))
+            response = requests.get(slumber.url_join(HOST, 'questions', self.id, 'grading_configuration'))
             if response.status_code == 200:
                 self._grading_configuration = GradingConfiguration(**response.json)
             else:
@@ -185,16 +191,15 @@ class Rubric(APIModel):
         self.entries.append(entry)
         return entry
 
-    def create_evaluation(self, user_id, question_id, submission_id, entry_values):
+    def create_evaluation(self, user_id, submission_id, entry_values):
         # TODO: When async API is implemented, entries should be created in a callback
         evaluation = Evaluation(rubric_id=self.id, user_id=user_id, submission_id=submission_id)
-        evaluation.save()
         for entry in self.entries:
             present = False
             if entry.id in entry_values:
                 present = entry_values[entry.id]
-            value = RubricEntryValue(rubric_entry_id=entry.id, evaluation_id=evaluation.id, present=present)
-            value.save()
+            evaluation.add_entry(entry.id, present)
+        evaluation.save()
         return evaluation
 
 class RubricEntry(APIModel):
@@ -218,21 +223,22 @@ class GradingConfiguration(APIModel):
     __base_url__ = 'grading_configuration'
 
     def url(self):
-        return slumber.url_join('question', self.question_id, 'grading_configuration')
+        return slumber.url_join('questions', self.question_id, 'grading_configuration')
     @property
     def json_root(self):
       return 'grading_configuration'
 
 class Group(APIModel):
     __attributes__ = ['title']
-    __slots__ = __attributes__
+    __slots__ = __attributes__ + ['memberships']
     __base_url__ = 'groups'
     def __init__(self, **kwargs):
         memberships = kwargs.pop('memberships', None)
         self.update_attributes(**kwargs)
         if memberships:
             print memberships
-            self.memberships = [GroupMembership(**data) for data in memberships]
+            self.save()
+            self.memberships = [GroupMembership(**data).save() for data in memberships]
         else:
             self.memberships = []
 
@@ -241,58 +247,98 @@ class Group(APIModel):
         self.memberships = [GroupMembership(**data) for data in memberships]
 
     def add_user(self, user):
-        return GroupMembership(**API.groups(self.id).memberships.post(user_id=user.id))
+        membership = GroupMembership(group_id=self.id, user_id=user.id)
+        membership.save()
+        return membership
+        #GroupMembership(**API.groups(self.id).memberships.post({'membership':{'user_id':user.id}}))
     def remove_user(self, user):
         """
         The proper way to remove a user from a group would be to have the membership_id ahead of time by eg. clicking on
-        a user from a list. This operation could be done much more easily on the service side but it would make the
-        controller less RESTful.
+        a user from a list. This operation could be done much more easily on the service side.
         """
         membership_id = next((x.id for x in self.memberships if x.user_id == user.id), None)
         if membership_id:
             API.groups(self.id).memberships(membership_id).delete()
     @staticmethod
-    def get_by_id(id, include_members=False):
+    def get_by_id(id, include_members=True):
         g = Group(**API.groups(id).get(include_members=('1' if include_members else '0')))
         return g
 
 class GroupMembership(APIModel):
-    __attributes__ = ['user_id', 'group_id', 'name']
+    __attributes__ = ['user_id', 'group_id']
     __slots__ = __attributes__
     __base_url__ = 'memberships'
     @property
     def json_root(self):
-      return 'group_membership'
-
-class GroupRole(APIModel):
-    __attributes__ = ['grading_configuration_id', 'group_id', 'role']
-    __slots__ = __attributes__
-    __base_url__ = 'group_roles'
-    @property
-    def json_root(self):
-      return 'group_role'
-
-class Example(APIModel):
-    __attributes__ = ['grading_configuration_id', 'submission_id', 'user_id']
-    __slots__ = __attributes__
-    __base_url__ = 'examples'
-
-class Evaluation(APIModel):
-    __attributes__ = ['rubric_id', 'user_id', 'submission_id', 'comments', 'offset', 'question_id']
-    __slots__ = __attributes__ + ['entries'] # this is an ugly hack
-    __base_url = 'evaluations'
+        return 'membership'
     def url(self):
         if self.id:
-            return slumber.url_join('questions', self.question_id, 'submissions', self.submission_id, 'evaluations')
+            return slumber.url_join('groups', self.group_id, 'memberships', self.id)
         else:
-            return slumber.url_join('questions', self.question_id, 'submissions', self.submission_id, 'evaluations', self.id)
-    def add_entry(self):
-        if self.entries is None:
-            self.entries = {}
+            return slumber.url_join('groups', self.group_id, 'memberships')
     def to_json(self):
         attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
-        attributes.pop('question_id', None) # Remove question_id from params
+        attributes.pop('group_id', None)
         return json.dumps({self.json_root:attributes})
+
+class GroupRole(APIModel):
+    __attributes__ = ['question_id', 'group_id', 'role']
+    __slots__ = __attributes__
+    __base_url__ = 'group_roles'
+    (SUBMITTER, GRADER, ADMIN) = (0, 1, 2)
+    def url(self):
+        if self.id:
+            return slumber.url_join('questions', self.question_id, 'group_roles', self.id)
+        else:
+            return slumber.url_join('questions', self.question_id, 'group_roles')
+    @property
+    def json_root(self):
+        return 'group_role'
+    def to_json(self):
+        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
+        attributes.pop('question_id', None)
+        return json.dumps({self.json_root: attributes})
+
+class Example(APIModel):
+    __attributes__ = ['gquestion_id', 'submission_id', 'user_id']
+    __slots__ = __attributes__
+    __base_url__ = 'examples'
+    def url(self):
+        if self.id:
+            return slumber.url_join('questions'. self.question_id, 'examples', self.id)
+        else:
+            return slumber.url_join('questions'. self.question_id, 'examples')
+    @property
+    def json_root(self):
+        return 'example'
+    def to_json(self):
+        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
+        attributes.pop('question_id', None)
+        return json.dumps({self.json_root: attributes})
+
+class Evaluation(APIModel):
+    __attributes__ = ['rubric_id', 'user_id', 'submission_id', 'comments', 'offset']
+    __slots__ = __attributes__ + ['entries']
+    __base_url = 'evaluations'
+
+    def url(self):
+        if self.id:
+            return slumber.url_join('evaluations', self.id)
+        else:
+            return slumber.url_join('evaluations')
+
+    def add_entry(self, rubric_entry_id, value):
+        if not hasattr(self, 'entries'):
+            self.entries = {}
+        self.entries[rubric_entry_id]=value
+
+    def to_json(self):
+        attributes = dict([(key, getattr(self,key, None)) for key in self.__attributes__ if hasattr(self, key)])
+        entries_attributes = []
+        
+        for entry_id, value in self.entries.items():
+            entries_attributes.append({'rubric_entry_id': entry_id, 'present': value})
+        return json.dumps({self.json_root: attributes, 'entries_attributes':entries_attributes})
 
 class RubricEntryValue(APIModel):
     """
@@ -311,10 +357,15 @@ class Task(APIModel):
 
 class GradingQueue(APIModel):
     __attributes__ = ['question_id']
-    def __init__(self, question, grading_configuration, **kwargs):
+    def __init__(self, question, **kwargs):
         self.question = question
+        self.question_id = question.id
+
+    def url(self):
+        return slumber.url_join(HOST, 'questions', self.question_id, 'grading_queue')
     def request_work_for_user(self, user):
-        url = slumber.url_join('questions', self.question_id, 'grading_queue', 'request_work')
+        # TODO: Move this to grading_queue_controller? More sensical that way
+        url = slumber.url_join(HOST, 'questions', self.question_id, 'tasks', 'request_work')
         params = {'user_id':user.id}
         response = requests.post(url, params)
         if response.status_code == 200:
