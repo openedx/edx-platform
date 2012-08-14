@@ -158,7 +158,7 @@ class @Problem
     
     # Sanity check of file size
     file_too_large = false
-    max_filesize = 10*1000*1000 # 10 MB
+    max_filesize = 4*1000*1000 # 4 MB
 
     @inputs.each (index, element) ->
       if element.type is 'file'
