@@ -50,7 +50,7 @@ from django.dispatch import receiver
 
 from functools import partial
 
-import comment_client
+import comment_client as cc
 
 import logging
 
@@ -265,16 +265,9 @@ def add_user_to_default_group(user, group):
 
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
-    if created:
-        func = comment_client.create_user
-    else:
-        func = partial(comment_client.update_user, user_id=instance.id)
     try:
-        func(attributes={
-            'id': instance.id,
-            'username': instance.username,
-            'email': instance.email,
-        })
+        cc_user = cc.User.from_django_user(instance)
+        cc_user.save()
     except Exception as e:
         log = logging.getLogger("mitx.discussion")
         log.error(unicode(e))

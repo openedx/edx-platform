@@ -91,12 +91,6 @@ def get_threads(request, course_id, discussion_id):
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
-    #if _should_perform_search(request):
-    #    query_params['commentable_id'] = discussion_id
-    #    threads, page, num_pages = cc.Thread.searchcomment_client.search_threads(course_id, recursive=False, query_params=utils.strip_none(query_params))
-    #else:
-    #    threads, page, num_pages = comment_client.get_threads(discussion_id, recursive=False, query_params=utils.strip_none(query_params))
-
     query_params['page'] = page
     query_params['num_pages'] = num_pages
 
@@ -153,7 +147,6 @@ def forum_form_discussion(request, course_id, discussion_id):
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-    #comment_client.get_thread(thread_id, recursive=True)
 
     annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread.to_dict(), \
                                 user=request.user, type='thread')
@@ -196,26 +189,18 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return render_to_response('discussion/index.html', context)
 
-def search(request, course_id):
+def user_profile(request, course_id, user_id):
 
     course = check_course(request.user, course_id)
 
-    text = request.GET.get('text', None)
-    commentable_id = request.GET.get('commentable_id', None)
-    tags = request.GET.get('tags', None)
-
-    threads = cc.Threads.search({
-        'text': text,
-        'commentable_id': commentable_id,
-        'tags': tags,
-    })
+    discussion_user = cc.User(id=user_id, course_id=course_id)
 
     context = {
-        'csrf': csrf(request)['csrf_token'],
-        'init': '',
-        'content': render_forum_discussion(request, course_id, threads, search_text=text),
-        'accordion': '',
-        'course': course,
+        'course': course, 
+        'user': request.user,
+        'discussion_user': discussion_user.to_dict(),
     }
 
-    return render_to_response('discussion/index.html', context)
+    print context
+
+    return render_to_response('discussion/user_profile.html', context)

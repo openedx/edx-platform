@@ -1,3 +1,5 @@
+<%! from django_comment_client.utils import pluralize %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -15,26 +17,22 @@
 
 <section class="container">
   <div class="course-wrapper">
-    <section aria-label="Course Navigation" class="course-index">
-      <header id="open_close_accordion">
-        <h2>Discussion Boards</h2>
-        <a href="#">close</a>
-      </header>
+    <section aria-label="User Profile" class="user-profile">
       <nav>
         
         <article class="sidebar-module discussion-sidebar">
-          <a href="#" class="sidebar-new-post-button">New Post</a>
+          <div class="sidebar-username">${user.username}</div>
+          <div class="sidebar-threads-count">${discussion_user['threads_count']} ${pluralize('discussion', discussion_user['threads_count'])} started</div>
+          <div class="sidebar-comments-count">${discussion_user['comments_count']} ${pluralize('comment', discussion_user['comments_count'])}</div>
+          <a href="#" class="sidebar-promote-moderator-button">Promote to Moderator</a>
+          <a href="#" class="sidebar-revoke-moderator-button">Revoke Moderator provileges</a>
         </article>
 
-        <%include file="_recent_active_posts.html" />
-
-        <%include file="_trending_tags.html" />
-        
       </nav>
     </section>
 
     <section class="course-content">
-      ${content}
+      
     </section>
   </div>
 </section>
