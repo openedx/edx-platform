@@ -58,7 +58,7 @@ class User(models.Model):
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
-        if self.course_id:
+        if self.attributes.get('course_id'):
             retrieve_params['course_id'] = self.course_id
         response = perform_request('get', url, retrieve_params)
         self.update_attributes(**response)
