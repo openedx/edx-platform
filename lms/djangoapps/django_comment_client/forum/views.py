@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import check_course
@@ -167,7 +168,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, type='thread')
-        context = {'thread': thread.to_dict()}
+        context = {'thread': thread.to_dict(), 'course_id': course_id}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 
         return utils.JsonResponse({
@@ -185,6 +186,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'content': render_single_thread(request, discussion_id, course_id, thread_id),
             'accordion': render_accordion(request, course, discussion_id),
             'course': course,
+            'course_id': course.id,
         }
 
         return render_to_response('discussion/index.html', context)
@@ -198,9 +200,8 @@ def user_profile(request, course_id, user_id):
     context = {
         'course': course, 
         'user': request.user,
+        'django_user': User.objects.get(id=user_id),
         'discussion_user': discussion_user.to_dict(),
     }
-
-    print context
 
     return render_to_response('discussion/user_profile.html', context)
