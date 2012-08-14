@@ -41,3 +41,6 @@ def course_db_for(course_id):
                 }
             }
 
+def askbot_url_for(course_id):
+    return "courses/{0}/discussions/".format(course_id)
+
