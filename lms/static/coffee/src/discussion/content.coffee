@@ -81,6 +81,7 @@ initializeFollowThread = (thread) ->
           Discussion.setWmdContent $content, $local, "reply-body", ""
           Discussion.setContentInfo response.content['id'], 'can_reply', true
           Discussion.setContentInfo response.content['id'], 'editable', true
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
           $local(".discussion-reply-new").hide()
@@ -151,6 +152,7 @@ initializeFollowThread = (thread) ->
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
 
@@ -178,6 +180,7 @@ initializeFollowThread = (thread) ->
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
 
@@ -207,7 +210,7 @@ initializeFollowThread = (thread) ->
       else if text.match(/[Oo]pen/)
         closed = false
       else
-        return console.log "Unexpected text " + text + "for open/close thread."
+        console.log "Unexpected text " + text + "for open/close thread."
 
       Discussion.safeAjax
         $elem: $(elem)
@@ -278,7 +281,7 @@ initializeFollowThread = (thread) ->
           type: "GET"
           dataType: 'json'
           success: (response, textStatus) ->
-            Discussion.bulkExtendContentInfo response['annotated_content_info']
+            Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
             $content.append(response['html'])
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
@@ -368,10 +371,10 @@ initializeFollowThread = (thread) ->
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
     if not Discussion.getContentInfo id, 'editable'
-      $local(".discussion-edit").remove()
+      $local(".admin-edit").remove()
     if not Discussion.getContentInfo id, 'can_reply'
       $local(".discussion-reply").remove()
     if not Discussion.getContentInfo id, 'can_endorse'
-      $local(".discussion-endorse-control").remove()
+      $local(".admin-endorse").remove()
     if not Discussion.getContentInfo id, 'can_delete'
-      $local(".discussion-delete").remove()
+      $local(".admin-delete").remove()

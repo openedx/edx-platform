@@ -17,6 +17,7 @@ from django.conf import settings
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_comment_client.utils import JsonResponse, JsonError, extract
+import django_comment_client.utils as utils
 
 from django_comment_client.permissions import check_permissions_by_view
 import functools
@@ -58,9 +59,14 @@ def create_thread(request, course_id, commentable_id):
             'thread': thread.to_dict(),
         }
         html = render_to_string('discussion/ajax_create_thread.html', context)
+        annotated_content_info = utils.get_annotated_content_info(course_id, 
+                                                            thread.to_dict(), 
+                                                            request.user, 
+                                                            'thread')
         return JsonResponse({
             'html': html,
             'content': thread.to_dict(),
+            'annotated_content_info': annotated_content_info,
         })
     else:
         return JsonResponse(thread.to_dict())
@@ -78,9 +84,14 @@ def update_thread(request, course_id, thread_id):
             'course_id': course_id,
         }
         html = render_to_string('discussion/ajax_update_thread.html', context)
+        annotated_content_info = utils.get_annotated_content_info(course_id, 
+                                                            thread.to_dict(), 
+                                                            request.user, 
+                                                            'thread')
         return JsonResponse({
             'html': html,
             'content': thread.to_dict(),
+            'annotated_content_info': annotated_content_info,
         })
     else:
         return JsonResponse(thread.to_dict())
@@ -103,9 +114,14 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
             'comment': comment.to_dict(),
         }
         html = render_to_string('discussion/ajax_create_comment.html', context)
+        annotated_content_info = utils.get_annotated_content_info(course_id, 
+                                                            comment.to_dict(), 
+                                                            request.user, 
+                                                            'comment')
         return JsonResponse({
             'html': html,
             'content': comment.to_dict(),
+            'annotated_content_info': annotated_content_info,
         })
     else:
         return JsonResponse(comment.to_dict())
@@ -137,9 +153,14 @@ def update_comment(request, course_id, comment_id):
             'course_id': course_id,
         }
         html = render_to_string('discussion/ajax_update_comment.html', context)
+        annotated_content_info = utils.get_annotated_content_info(course_id, 
+                                                            comment.to_dict(), 
+                                                            request.user, 
+                                                            'comment')
         return JsonResponse({
             'html': html,
             'content': comment.to_dict(),
+            'annotated_content_info': annotated_content_info,
         })
     else:
         return JsonResponse(comment.to_dict()),

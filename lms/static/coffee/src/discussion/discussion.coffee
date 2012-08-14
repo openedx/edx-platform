@@ -51,7 +51,8 @@ initializeFollowDiscussion = (discussion) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
           Discussion.setWmdContent $discussion, $local, "new-post-body", ""
-          Discussion.setContentInfo response.content['id'], 'editable', true
+          #Discussion.setContentInfo response.content['id'], 'editable', true
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($thread)
           Discussion.bindContentEvents($thread)
           $(".new-post-form").addClass("collapsed")
