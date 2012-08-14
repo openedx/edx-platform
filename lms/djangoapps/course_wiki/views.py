@@ -1,9 +1,13 @@
-from django.shortcuts import redirect
+import logging
+import re
 
+from django.shortcuts import redirect
 from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
 from courseware.courses import check_course
+
+log = logging.getLogger(__name__)
 
 def root_create(request):
     
@@ -21,13 +25,23 @@ def course_wiki_redirect(request, course_id):
     as it's home page. A course's wiki must be an article on the root (for
     example, "/6.002x") to keep things simple.
     """
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
     
-    namespace = course.wiki_namespace
+    course_slug = course.wiki_slug
+    valid_slug = True
     #TODO: Make sure this is a legal slug. No "/"'s
+    if not course_slug:
+        log.exception("This course is improperly configured. The slug cannot be empty.")
+        valid_slug = False
+    if re.match('^[-\w\.]+$', course_slug) == None:
+        log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
+        valid_slug = False
+    
+    if not valid_slug:
+        return redirect("wiki:get", path="")
                 
     try:
-        urlpath = URLPath.get_by_path(namespace, select_related=True)
+        urlpath = URLPath.get_by_path(course_slug, select_related=True)
         
         results = list( Article.objects.filter( id = urlpath.article.id ) )
         if results:
@@ -51,7 +65,7 @@ def course_wiki_redirect(request, course_id):
         
         urlpath = URLPath.create_article(
             root,
-            namespace,
+            course_slug,
             title=course.title,
             content="This is the wiki for " + course.title + ".",
             user_message="Course page automatically created.",
