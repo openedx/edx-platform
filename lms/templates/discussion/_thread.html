@@ -1,7 +1,9 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from datehelper import time_ago_in_words %>
 <%! from dateutil.parser import parse %>
+<%! from django_comment_client.utils import pluralize %>
 <%! import urllib %>
+
 
 <%def name="render_thread(course_id, thread, show_comments=False)">
   <div class="thread" _id="${thread['id']}">
@@ -111,23 +113,21 @@
 </%def>
 
 <%def name="render_info(content)">
+  <%
+    def url_for_user(user_id):
+      return reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])
+  %>
   <div class="comment-time">
     ${time_ago_in_words(parse(content['updated_at']))} ago by
     % if content['anonymous']:
       anonymous
     % else:
-      ${content['username']} <!---# TODO add link to user-->
+      <a href="${url_for_user(content['user_id'])}">${content['username']}</a>
     % endif
   </div>
   <div class="comment-count">
     % if content.get('comments_count', -1) >= 0:
-      <a href="javascript:void(0)" class="discussion-show-comments"> 
-      % if content.get('comments_count', -1) >= 2:
-        Show ${content['comments_count']} comments
-      % else:
-        Show ${content['comments_count']} comment
-      % endif
-      </a>
+    <a href="javascript:void(0)" class="discussion-show-comments">Show ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
     % endif
   </div>
 </%def>

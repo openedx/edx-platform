@@ -6,8 +6,9 @@ import settings
 class User(models.Model):
 
     accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
-                         'id', 'external_id', 'subscribed_user_ids', 'children',
+                         'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
                          'subscribed_thread_ids', 'subscribed_commentable_ids',
+                         'threads_count', 'comments_count',
                         ]
 
     updatable_fields = ['username', 'external_id', 'email']
@@ -19,7 +20,10 @@ class User(models.Model):
 
     @classmethod
     def from_django_user(cls, user):
-        return cls(id=str(user.id))
+        return cls(id=str(user.id),
+                   external_id=str(user.id),
+                   username=user.username,
+                   email=user.email)
 
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
@@ -50,6 +54,14 @@ class User(models.Model):
         params = {'user_id': self.id}
         request = perform_request('delete', url, params)
         voteable.update_attributes(request)
+
+    def _retrieve(self, *args, **kwargs):
+        url = self.url(action='get', params=self.attributes)
+        retrieve_params = self.default_retrieve_params
+        if self.course_id:
+            retrieve_params['course_id'] = self.course_id
+        response = perform_request('get', url, retrieve_params)
+        self.update_attributes(**response)
 
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)

@@ -71,8 +71,13 @@ $tag-text-color: #5b614f;
       font-weight: bold;
     }
 
-    .sidebar-new-post-button {
+    .sidebar-new-post-button, .sidebar-promote-moderator-button {
       @include button;
+    }
+    .sidebar-revoke-moderator-button {
+      @include button(simple, gray);
+    }
+    .sidebar-new-post-button, .sidebar-promote-moderator-button, .sidebar-revoke-moderator-button {
       display: block;
       box-sizing: border-box;
       width: 100%;

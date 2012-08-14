@@ -92,8 +92,6 @@ initializeFollowDiscussion = (discussion) ->
       $title.attr("prev-text", text)
 
     initializeNewPost = ->
-      #newPostForm = $local(".new-post-form")
-      #$newPostButton = $local(".discussion-new-post")
       view = { discussion_id: id }
       $discussionNonContent = $discussion.children(".discussion-non-content")
 
@@ -137,8 +135,9 @@ initializeFollowDiscussion = (discussion) ->
         success: (data, textStatus) ->
           $data = $(data)
           $discussion.replaceWith($data)
-          Discussion.initializeDiscussion($data)
-          Discussion.bindDiscussionEvents($data)
+          $discussion = $(".discussion[_id='#{id}']")
+          Discussion.initializeDiscussion($discussion)
+          Discussion.bindDiscussionEvents($discussion)
 
     handleAjaxSearch = (elem) ->
       $elem = $(elem)
@@ -177,5 +176,5 @@ initializeFollowDiscussion = (discussion) ->
       "click .discussion-sort-link": ->
         handleAjaxSort(this)
 
-    $discussion.children(".discussion-paginator").find(".discussion-page-link").click ->
+    $discussion.children(".discussion-paginator").find(".discussion-page-link").unbind('click').click ->
       handleAjaxPage(this)

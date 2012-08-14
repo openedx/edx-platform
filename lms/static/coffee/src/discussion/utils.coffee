@@ -60,7 +60,7 @@ wmdEditors = {}
   bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
-      $local(selector)[event] handler
+      $local(selector).unbind(event)[event] handler
 
   tagsInputOptions: ->
     autocomplete_url: Discussion.urlFor('tags_autocomplete')
