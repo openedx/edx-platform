@@ -222,8 +222,7 @@ STATIC_ROOT = ENV_ROOT / "staticfiles"
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    ASKBOT_ROOT / "askbot" / "skins",
-
+    PROJECT_ROOT / "askbot" / "skins",
 ]
 if os.path.isdir(DATA_DIR):
     STATICFILES_DIRS += [
