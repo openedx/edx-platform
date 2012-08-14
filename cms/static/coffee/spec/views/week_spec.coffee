@@ -1,7 +1,7 @@
 describe "CMS.Views.Week", ->
   beforeEach ->
     setFixtures """
-      <div id="week" data-id="i4x://mitx.edu/course/week">
+      <div id="week" data-id="i4x://mitx/course/chapter/week">
         <div class="editable"></div>
         <textarea class="editable-textarea"></textarea>
         <a href="#" class="week-edit" >edit</a>

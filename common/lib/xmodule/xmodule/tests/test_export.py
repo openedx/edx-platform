@@ -4,6 +4,7 @@ from fs.osfs import OSFS
 from nose.tools import assert_equals, assert_true
 from path import path
 from tempfile import mkdtemp
+from shutil import copytree
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -40,27 +41,32 @@ def strip_filenames(descriptor):
 class RoundTripTestCase(unittest.TestCase):
     '''Check that our test courses roundtrip properly'''
     def check_export_roundtrip(self, data_dir, course_dir):
+
+        root_dir = path(mkdtemp())
+        print "Copying test course to temp dir {0}".format(root_dir)
+
+        data_dir = path(data_dir)
+        copytree(data_dir / course_dir, root_dir / course_dir)
+
         print "Starting import"
-        initial_import = XMLModuleStore(data_dir, eager=True, course_dirs=[course_dir])
+        initial_import = XMLModuleStore(root_dir, eager=True, course_dirs=[course_dir])
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
         initial_course = courses[0]
 
+        # export to the same directory--that way things like the custom_tags/ folder
+        # will still be there.
         print "Starting export"
-        export_dir = mkdtemp()
-        print "export_dir: {0}".format(export_dir)
-        fs = OSFS(export_dir)
-        export_course_dir = 'export'
-        export_fs = fs.makeopendir(export_course_dir)
+        fs = OSFS(root_dir)
+        export_fs = fs.makeopendir(course_dir)
 
         xml = initial_course.export_to_xml(export_fs)
         with export_fs.open('course.xml', 'w') as course_xml:
             course_xml.write(xml)
 
         print "Starting second import"
-        second_import = XMLModuleStore(export_dir, eager=True,
-                                       course_dirs=[export_course_dir])
+        second_import = XMLModuleStore(root_dir, eager=True, course_dirs=[course_dir])
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)

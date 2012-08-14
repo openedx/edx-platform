@@ -25,6 +25,7 @@ SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
+             # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
              '--cover-inclusive', '--cover-html-dir',
              os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
 for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
@@ -66,6 +67,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': PROJECT_ROOT / "db" / "mitx.db",
+    },
+
+    # The following are for testing purposes...
+    'edX/toy/2012_Fall': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "course1.db",
+    },
+    
+    'edx/full/6.002_Spring_2012': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "course2.db",
     }
 }
 
