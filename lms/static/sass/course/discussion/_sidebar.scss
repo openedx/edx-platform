@@ -216,19 +216,20 @@ div.discussion-wrapper aside {
     }
 
     div.karma {
-      background: #eee;
-      border: 1px solid #D3D3D3;
-      @include border-radius(3px);
+      border: 1px solid $border-color;
       @include box-sizing(border-box);
-      @include box-shadow(inset 0 0 0 1px #fff, 0 1px 0 #fff);
       padding: lh(.4) 0;
       text-align: center;
       width: flex-grid(1, 3);
       float: right;
 
-      strong {
-        display: block;
-        font-style: 20px;
+      p {
+        text-align: center;
+
+        strong {
+          display: block;
+          font-style: 20px;
+        }
       }
     }
 
@@ -255,8 +256,6 @@ div.discussion-wrapper aside {
     overflow: visible;
 
     ul {
-      font-size: 14px;
-
       h2 {
         margin:0 (-(lh())) 5px (-(lh()));
         padding: lh(.5) lh();
