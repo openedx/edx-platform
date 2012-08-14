@@ -762,7 +762,7 @@ $tag-text-color: #5b614f;
     }
   }
 
-  &.inline-discussion {
+  &.inline-discussion, .forum-discussion {
     .new-post-form {
       margin: 24px 60px;
 

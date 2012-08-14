@@ -50,15 +50,13 @@ initializeFollowDiscussion = (discussion) ->
         success: (response, textStatus) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
-          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
-          #Discussion.setContentInfo response.content['id'], 'editable', true
-          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
-          Discussion.initializeContent($thread)
-          Discussion.bindContentEvents($thread)
-          $(".new-post-form").addClass("collapsed")
+          $local(".new-post-form").remove()
 
     handleCancelNewPost = (elem) ->
-      $(".new-post-form").addClass("collapsed")
+      if $discussion.hasClass("inline-discussion")
+        $local(".new-post-form").addClass("collapsed")
+      else
+        $local(".new-post-form").hide()
 
     handleSimilarPost = (elem) ->
       $title = $local(".new-post-title")
@@ -99,30 +97,33 @@ initializeFollowDiscussion = (discussion) ->
       view = { discussion_id: id }
       $discussionNonContent = $discussion.children(".discussion-non-content")
 
-      $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
-      newPostBody = $discussion.find(".new-post-body")
-      if newPostBody.length
+      if not $local(".wmd-panel").length
+        $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
+        $newPostBody = $local(".new-post-body")
         Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
         $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
-        $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
-          console.log "triggered"
+        $input.attr("placeholder", "post a new topic...")
+        if $discussion.hasClass("inline-discussion")
+          $input.bind 'focus', (e) ->
+            $local(".new-post-form").removeClass('collapsed')
+        else
           $local(".new-post-form").removeClass('collapsed')
 
-      $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
+        $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
-      $local(".new-post-title").blur ->
-        handleSimilarPost(this)
+        $local(".new-post-title").blur ->
+          handleSimilarPost(this)
 
-      $local(".hide-similar-posts").click ->
-        $local(".new-post-similar-posts-wrapper").hide()
+        $local(".hide-similar-posts").click ->
+          $local(".new-post-similar-posts-wrapper").hide()
 
-      $local(".discussion-submit-post").click ->
-        handleSubmitNewPost(this)
-      $local(".discussion-cancel-post").click ->
-        handleCancelNewPost(this)
+        $local(".discussion-submit-post").click ->
+          handleSubmitNewPost(this)
+        $local(".discussion-cancel-post").click ->
+          handleCancelNewPost(this)
 
-        #$(elem).hide()
+      $local(".new-post-form").show()
 
     handleAjaxReloadDiscussion = (elem, url) ->
       $elem = $(elem)
@@ -153,16 +154,21 @@ initializeFollowDiscussion = (discussion) ->
       url = $elem.attr("page-url")
       handleAjaxReloadDiscussion($elem, url)
 
-    initializeNewPost()
-    
+    if $discussion.hasClass("inline-discussion")
+      initializeNewPost()
+
+    $discussionSidebar = $(".discussion-sidebar")
+    if $discussionSidebar.length
+      $sidebarLocal = Discussion.generateLocal($discussionSidebar)
+      Discussion.bindLocalEvents $sidebarLocal,
+        "click .sidebar-new-post-button": (event) ->
+          initializeNewPost()
+
     Discussion.bindLocalEvents $local,
 
       "submit .search-wrapper>.discussion-search-form": (event) ->
         event.preventDefault()
         handleAjaxSearch(this)
-
-      #"click .discussion-new-post": ->
-      #  handleNewPost(this)
 
       "click .discussion-search-link": ->
         handleAjaxSearch($local(".search-wrapper>.discussion-search-form"))
