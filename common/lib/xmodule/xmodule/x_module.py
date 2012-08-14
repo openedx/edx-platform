@@ -8,8 +8,9 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from pprint import pprint
 
-from xmodule.modulestore import Location
 from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import Location
+from xmodule.timeparse import parse_time
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -384,6 +385,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         self.category = self.location.category
         self.shared_state_key = kwargs.get('shared_state_key')
 
+        # look for a start time, setting to None if not present
+        self.start = self._try_parse_time('start')
+
         self._child_instances = None
         self._inherited_metadata = set()
 
@@ -595,6 +599,23 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             location=self.location,
             metadata=self.metadata
         ))
+
+    # ================================ Internal helpers =======================
+
+    def _try_parse_time(self, key):
+        """
+        Parse an optional metadata key containing a time: if present, must be valid.
+        Return None if not present.
+        """
+        if key in self.metadata:
+            try:
+                parse_time(self.metadata[key])
+            except ValueError as e:
+                msg = "Descriptor {} loaded with a bad metadata key '{}': '{}'".format(
+                    self.location.url(), self.metadata[key], e)
+                log.warning(msg)
+        return None
+
 
 
 class DescriptorSystem(object):

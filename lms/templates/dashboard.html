@@ -1,6 +1,7 @@
-<%! 
-  from django.core.urlresolvers import reverse 
+<%!
+  from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
+  from courseware.access import has_access
 %>
 <%inherit file="main.html" />
 
@@ -17,7 +18,7 @@
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
 
     });
-    
+
      $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
        if(json.success) {
          location.href="${reverse('dashboard')}";
@@ -33,7 +34,7 @@
 </%block>
 
 <section class="container dashboard">
-  
+
   %if message:
     <section class="dashboard-banner">
       ${message}
@@ -66,7 +67,7 @@
 
         <article class="my-course">
           <%
-          if course.has_started() or settings.MITX_FEATURES['DISABLE_START_DATES']:
+          if has_access(user, course, 'load'):
             course_target = reverse('info', args=[course.id])
           else:
             course_target = reverse('about_course', args=[course.id])

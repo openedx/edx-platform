@@ -2,24 +2,24 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from requests.auth import HTTPBasicAuth
+
 from capa.xqueue_interface import XQueueInterface
-from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
+from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
-
-from courseware.courses import (has_staff_access_to_course,
-                                has_staff_access_to_location)
-from requests.auth import HTTPBasicAuth
 
 log = logging.getLogger("mitx.courseware")
 
@@ -140,6 +140,8 @@ def get_module(user, request, location, student_module_cache, position=None):
     Returns: xmodule instance
 
     '''
+    # has_access below needs an actual Location
+    location = Location(location)
     descriptor = modulestore().get_item(location)
 
     #TODO Only check the cache if this module can possibly have state
@@ -163,7 +165,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
 
-    ajax_url = reverse('modx_dispatch', 
+    ajax_url = reverse('modx_dispatch',
                        kwargs=dict(course_id=descriptor.location.course_id,
                                    id=descriptor.location.url(),
                                    dispatch=''),
@@ -208,7 +210,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          is_staff=has_staff_access_to_location(user, location),
+                          is_staff=has_access(user, location, 'staff'),
                           node_path=settings.NODE_PATH
                           )
     # pass position specified in URL to module through ModuleSystem
@@ -223,7 +225,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
-        if has_staff_access_to_course(user, module.location.course):
+        if has_access(user, module, 'staff'):
             module.get_html = add_histogram(module.get_html, module, user)
 
     return module
