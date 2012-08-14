@@ -141,10 +141,6 @@ div.answer-actions {
   a {
     cursor: pointer;
     text-decoration: none;
-
-    &.question-delete {
-      color: $mit-red;
-    }
   }
 }
 
