@@ -1,6 +1,11 @@
-<%page args="active_page" />
+## mako
+<%page args="active_page=None" />
 
 <%
+if active_page == None and active_page_context is not UNDEFINED:
+  # If active_page is not passed in as an argument, it may be in the context as active_page_context
+  active_page = active_page_context
+
 def url_class(url):
   if url == active_page:
     return "active"
