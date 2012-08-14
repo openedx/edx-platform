@@ -28,15 +28,15 @@ def course_wiki_redirect(request, course_id):
     course = check_course(request.user, course_id)
     
     course_slug = course.wiki_slug
+    
     valid_slug = True
-    #TODO: Make sure this is a legal slug. No "/"'s
     if not course_slug:
         log.exception("This course is improperly configured. The slug cannot be empty.")
         valid_slug = False
     if re.match('^[-\w\.]+$', course_slug) == None:
         log.exception("This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.")
         valid_slug = False
-    
+
     if not valid_slug:
         return redirect("wiki:get", path="")
                 

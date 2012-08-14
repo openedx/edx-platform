@@ -1,9 +1,17 @@
 {% extends "main_django.html" %}
-{% load sekizai_tags i18n %}{% load url from future %}
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | edX Wiki</title>{% endblock %}
 
+{% block headextra %}
+  {% compressed_css 'course' %}
+{% endblock %}
+
 {% block body %}
+  {% if course %}
+    {% include "course_navigation.html" with active_page_context="wiki" %}
+  {% endif %}
+
   {% block wiki_body %}
     
     {% if messages %}
