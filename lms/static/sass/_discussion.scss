@@ -106,6 +106,7 @@ $tag-text-color: #5b614f;
 
     .discussion-sidebar-tags-list li {
       @include clearfix;
+      border-bottom: none;
     }
 
     .sidebar-tag-count {

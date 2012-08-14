@@ -268,7 +268,7 @@ def render_notifications(request, course, notifications):
 
 @login_required
 def news(request, course_id):
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     notifications = comment_client.get_notifications(request.user.id)
 
