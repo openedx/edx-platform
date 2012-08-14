@@ -337,17 +337,14 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     '''
     # ''' (fix emacs broken parsing)
 
-    # TODO: Should be in settings.py
-    MAX_UPLOAD_FILE_SIZE = 4*1000*1000 # 4 MB
-
-    # Check for submitted files
+    # Check for submitted files and basic file size checks
     p = request.POST.copy()
     if request.FILES:
         for inputfile_id in request.FILES.keys():
             inputfile = request.FILES[inputfile_id]
-            if inputfile.size > MAX_UPLOAD_FILE_SIZE:
+            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
                 file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                    (inputfile.name, MAX_UPLOAD_FILE_SIZE/(1000**2))
+                                    (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
                 return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[inputfile_id] = inputfile
 
