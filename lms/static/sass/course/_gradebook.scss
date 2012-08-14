@@ -61,12 +61,12 @@ div.gradebook-wrapper {
 			padding-left: 20px;
 			border-bottom: 1px solid $cell-border-color;
 			border-left: 1px solid $table-border-color;
-			background: #f6f6f6;
+			background: #f3f3f3;
 			font-size: 13px;
 			line-height: 50px;
 		}
 
-		tr:nth-child(even) td {
+		tr:nth-child(odd) td {
 			background-color: #fbfbfb;
 		}
 	}
@@ -183,13 +183,13 @@ div.gradebook-wrapper {
 		td {
 			height: 50px;
 			border-bottom: 1px solid $cell-border-color;
-			background: #f6f6f6;
+			background: #f3f3f3;
 			font-size: 13px;
 			line-height: 50px;
 			border-left: 1px solid $cell-border-color;
 		}
 
-		tr:nth-child(even) td {
+		tr:nth-child(odd) td {
 			background-color: #fbfbfb;
 		}
 	}
