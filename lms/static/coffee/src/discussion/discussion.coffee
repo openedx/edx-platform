@@ -126,6 +126,7 @@ initializeFollowDiscussion = (discussion) ->
       $local(".new-post-form").show()
 
     handleAjaxReloadDiscussion = (elem, url) ->
+      if not url then return
       $elem = $(elem)
       $discussion = $elem.parents("section.discussion")
       Discussion.safeAjax
