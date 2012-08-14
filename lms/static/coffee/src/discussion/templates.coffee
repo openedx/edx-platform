@@ -18,7 +18,8 @@ Discussion = @Discussion
         <input type="checkbox" class="discussion-auto-watch" id="discussion-autowatch-${discussion_id}" checked="">
         <label for="discussion-auto-watch-${discussion_id}">follow this thread</label>
       </div>
-      <div class="reply-post-control">        
+      <div class="new-post-control post-control">        
+        <a class="discussion-cancel-post" href="javascript:void(0)">Cancel</a>
         <a class="discussion-submit-post control-button" href="javascript:void(0)">Submit</a>
       </div>
     </form>

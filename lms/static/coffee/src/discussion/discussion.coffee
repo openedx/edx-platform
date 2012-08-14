@@ -54,12 +54,10 @@ initializeFollowDiscussion = (discussion) ->
           Discussion.setContentInfo response.content['id'], 'editable', true
           Discussion.initializeContent($thread)
           Discussion.bindContentEvents($thread)
-          $(".new-post-form").hide()
-          $local(".discussion-new-post").show()
+          $(".new-post-form").addClass("collapsed")
 
     handleCancelNewPost = (elem) ->
-      $local(".new-post-form").hide()
-      $local(".discussion-new-post").show()
+      $(".new-post-form").addClass("collapsed")
 
     handleSimilarPost = (elem) ->
       $title = $local(".new-post-title")

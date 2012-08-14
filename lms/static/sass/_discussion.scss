@@ -656,8 +656,8 @@ $tag-text-color: #5b614f;
         height: 0;
       }
 
-      .reply-post-control {
-        height: 0;
+      .post-control {
+        display: none;
       }
 
       .tagsinput {
@@ -666,7 +666,7 @@ $tag-text-color: #5b614f;
     }
 
     .new-post-control {
-      margin-left: 80%;
+      margin-left: 75%;
       margin-top: 1%;
     }
 
@@ -775,7 +775,7 @@ $tag-text-color: #5b614f;
         }
       }
 
-      .reply-post-control {
+      .post-control {
         overflow: hidden;
       }
     }
