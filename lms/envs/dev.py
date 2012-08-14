@@ -53,6 +53,14 @@ CACHES = {
     }
 }
 
+XQUEUE_INTERFACE = {
+    "url": "http://xqueue.sandbox.edx.org",
+    "auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    }
+}
+
 # Make the keyedcache startup warnings go away
 CACHE_TIMEOUT = 0
 
