@@ -60,10 +60,10 @@ class XQueueInterface:
     Interface to the external grading system
     '''
 
-    def __init__(self, url, auth):
+    def __init__(self, url, django_auth, basic_auth=None):
         self.url  = url
-        self.auth = auth
-        self.session = requests.session()
+        self.auth = django_auth
+        self.session = requests.session(auth=basic_auth)
         
     def send_to_queue(self, header, body, file_to_upload=None):
         '''

@@ -94,8 +94,9 @@ JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
     'url': 'http://localhost:8888',
-    'auth': {'username': 'local',
-             'password': 'local'}
+    'django_auth': {'username': 'local',
+                    'password': 'local'},
+    'basic_auth': None,
 }
 
 

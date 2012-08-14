@@ -25,7 +25,8 @@ log = logging.getLogger("mitx.courseware")
 
 xqueue_interface = XQueueInterface(
     settings.XQUEUE_INTERFACE['url'],
-    settings.XQUEUE_INTERFACE['auth']
+    settings.XQUEUE_INTERFACE['django_auth'],
+    settings.XQUEUE_INTERFACE['basic_auth'],
 )
 
 
