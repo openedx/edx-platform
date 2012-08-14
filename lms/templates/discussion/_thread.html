@@ -115,7 +115,6 @@
 <%def name="render_info(content)">
   <%
     def url_for_user(user_id):
-      import pdb; pdb.set_trace()
       return reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])
   %>
   <div class="comment-time">
