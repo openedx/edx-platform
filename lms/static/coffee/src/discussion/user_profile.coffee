@@ -8,6 +8,8 @@ Discussion = @Discussion
     $local = Discussion.generateLocal $userProfile
 
     handleUpdateModeratorStatus = (elem, isModerator) ->
+      confirmValue = confirm("Are you sure?")
+      if not confirmValue then return
       url = Discussion.urlFor('update_moderator_status', $$profiled_user_id)
       Discussion.safeAjax
         $elem: $(elem)
