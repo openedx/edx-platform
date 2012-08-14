@@ -12,7 +12,6 @@
   {% render_block "css" %}
   {% render_block "js" %}
   
-  
   <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
 </head>
 
@@ -31,3 +30,14 @@
   {% compressed_js 'module-js' %}
 </body>
 </html>
+
+{% comment %}
+  This is a django template version of our main page from which all
+  other pages inherit. This file should be rewritten to reflect any
+  changes in main.html! Files used by {% include %} can be written
+  as mako templates.
+  
+  Inheriting from this file allows us to include apps that use the
+  django templating system without rewriting all of their views in
+  mako. 
+{% endcomment %}
