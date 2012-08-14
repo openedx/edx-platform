@@ -7,6 +7,7 @@ class Command(BaseCommand):
     help = 'Seed default permisssions and roles'
 
     def handle(self, *args, **options):
+        administrator_role = Role.objects.get_or_create(name="Administrator", course_id="MITx/6.002x/2012_Fall")[0]
         moderator_role = Role.objects.get_or_create(name="Moderator", course_id="MITx/6.002x/2012_Fall")[0]
         student_role = Role.objects.get_or_create(name="Student", course_id="MITx/6.002x/2012_Fall")[0]
 
@@ -19,4 +20,9 @@ class Command(BaseCommand):
                         "endorse_comment", "delete_comment"]:
             moderator_role.add_permission(per)
 
+        for per in ["manage_moderator"]:
+            administrator_role.add_permission(per)
+
         moderator_role.inherit_permissions(student_role)
+
+        administrator_role.inherit_permissions(moderator_role)
