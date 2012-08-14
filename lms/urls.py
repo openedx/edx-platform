@@ -151,8 +151,12 @@ if settings.WIKI_ENABLED:
     #     url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
     # )
     urlpatterns += (        
-    
-        #url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
+        # First we include views from course_wiki that we use to override the default views.
+        # They come first in the urlpatterns so they get resolved first
+        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'), 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki$',
+            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
+        
         
         url(r'wiki/', include(wiki_pattern())),
         url(r'^notify/', include(notify_pattern())),
