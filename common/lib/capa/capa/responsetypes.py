@@ -868,7 +868,10 @@ def sympy_check2():
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset) == 1 and not submission[0]:
-            return CorrectMap(idset[0], 'incorrect', msg='<font color="red">No answer entered!</font>')
+            # default to no error message on empty answer (to be consistent with other responsetypes)
+            # but allow author to still have the old behavior by setting empty_answer_err attribute
+            msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
+            return CorrectMap(idset[0], 'incorrect', msg=msg)
 
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
