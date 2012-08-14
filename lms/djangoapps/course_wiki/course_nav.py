@@ -14,6 +14,10 @@ class Middleware(object):
     If it intercepts a request for /wiki/.. that has a referrer in the
     form /courses/course_id/... it will redirect the user to the page
     /courses/course_id/wiki/...
+    
+    It is also possible that someone followed a link leading to a course
+    that they don't have access to. In this case, we redirect them to the
+    same page on the regular wiki.
     """
     
     def process_request(self, request):
@@ -37,11 +41,27 @@ class Middleware(object):
                 # See if we are able to view the course. If we are, redirect to it
                 try:
                     course = check_course(request.user, course_id)
-                    return redirect("/courses/" + course.id + "/view_wiki/" + path_match.group('wiki_path') )
+                    return redirect("/courses/" + course.id + "/wiki/" + path_match.group('wiki_path') )
                     
                 except Http404:
                     # Even though we came from the course, we can't see it. So don't worry about it.
                     pass
+        
+        else:
+            # It is also possible we are going to a course wiki view, but we 
+            # don't have permission to see the course!
+            course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$', request.path)
+            if course_match:
+                course_id = course_match.group('course_id')
+                # See if we are able to view the course. If we aren't, redirect to regular wiki
+                try:
+                    course = check_course(request.user, course_id)
+                    # Good, we can see the course. Carry on
+                    return None
+                except Http404:
+                    # We can't see the course, so redirect to the regular wiki
+                    return redirect("/wiki/" + course_match.group('wiki_path'))
+            
                 
         return None
 
@@ -54,7 +74,7 @@ def context_processor(request):
     bar to be shown.
     """
     
-    match = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/view_wiki(?P<wiki_path>.*|)', request.path)
+    match = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki(?P<wiki_path>.*|)', request.path)
     if match:
         course_id = match.group('course_id')
         
