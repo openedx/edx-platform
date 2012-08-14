@@ -19,7 +19,7 @@ from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
 from courseware.courses import (has_staff_access_to_course,
                                 has_staff_access_to_location)
-from requests import HttpBasicAuth
+from requests.auth import HttpBasicAuth
 
 log = logging.getLogger("mitx.courseware")
 
