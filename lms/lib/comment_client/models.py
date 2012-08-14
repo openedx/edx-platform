@@ -72,7 +72,7 @@ class Model(object):
             else:
                 raise AttributeError("Field {0} does not exist".format(k))
 
-    def updatable_attribtes(self):
+    def updatable_attributes(self):
         return extract(self.attributes, self.updatable_fields)
 
     def initializable_attributes(self):
