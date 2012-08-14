@@ -7,19 +7,46 @@ div.book-wrapper {
     @include box-sizing(border-box);
 
     ul#booknav {
-      font-size: $body-font-size;
+      font-size: em(14);
 
-      a {
-        color: #000;
+      .chapter-number {
+        
+      }
 
-        &:hover {
-          color: #666;
-        }
+      .chapter {
+        float: left;
+        width: 87%;
+        line-height: 1.4em;
+      }
+
+      .page-number {
+        float: right;
+        width: 12%;
+        font-size: .8em;
+        line-height: 2.1em;
+        text-align: right;
+        color: #9a9a9a;
+        opacity: 0;
+        @include transition(opacity .15s);
       }
 
       li {
         background: none;
-        padding-left: 30px;
+        border-bottom: 0;
+        padding-left: lh();
+
+        a {
+          padding: 0;
+          @include clearfix;
+
+          &:hover {
+            background-color: transparent;
+
+            .page-number {
+              opacity: 1;
+            }
+          }
+        }
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
@@ -35,6 +62,13 @@ div.book-wrapper {
 
         ul {
           background: none;
+          margin-top: lh(.25);
+          border-top: 1px solid $border-color;
+          padding-top: lh(.25);
+
+          li {
+            padding-bottom: lh(.25);
+          }
         }
       }
 
@@ -47,8 +81,8 @@ div.book-wrapper {
 
   section.book {
     @extend .content;
-    padding-right: 0;
     padding-bottom: 0;
+    padding-right: 0;
     padding-top: 0;
 
     nav {
@@ -68,28 +102,22 @@ div.book-wrapper {
           width: flex-grid(2, 8);
 
           a {
-            display: table;
-            @include box-sizing(border-box);
-            height: 100%;
-            width: 100%;
-            vertical-align: middle;
-            @include transition;
             background-color: rgba(#000, .7);
-            background-repeat: no-repeat;
             background-position: center;
+            background-repeat: no-repeat;
+            @include box-sizing(border-box);
+            display: table;
+            height: 100%;
             opacity: 0;
             filter: alpha(opacity=0);
             text-indent: -9999px;
+            @include transition;
+            vertical-align: middle;
+            width: 100%;
 
             &:hover {
               opacity: 1;
               filter: alpha(opacity=100);
-
-              &.last {
-              }
-
-              &.next {
-              }
             }
           }
 
@@ -120,9 +148,9 @@ div.book-wrapper {
     }
 
     section.page {
-      text-align: center;
-      position: relative;
       border: 1px solid $border-color;
+      position: relative;
+      text-align: center;
 
       img {
         max-width: 100%;

@@ -69,10 +69,10 @@ class StudentModuleCache(object):
     """
     def __init__(self, user, descriptors):
         '''
-        Find any StudentModule objects that are needed by any child modules of the
-        supplied descriptor, or caches only the StudentModule objects specifically
-        for every descriptor in descriptors. Avoids making multiple queries to the 
-        database.
+        Find any StudentModule objects that are needed by any descriptor
+        in descriptors. Avoids making multiple queries to the database.
+        Note: Only modules that have store_state = True or have shared
+        state will have a StudentModule.
         
         Arguments
         user: The user for which to fetch maching StudentModules
@@ -134,7 +134,8 @@ class StudentModuleCache(object):
         '''
         keys = []
         for descriptor in descriptors:
-            keys.append(descriptor.location.url())
+            if descriptor.stores_state:
+                keys.append(descriptor.location.url())
             
             shared_state_key = getattr(descriptor, 'shared_state_key', None)
             if shared_state_key is not None:

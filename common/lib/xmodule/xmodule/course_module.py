@@ -21,17 +21,34 @@ class CourseDescriptor(SequenceDescriptor):
         try:
             self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
         except KeyError:
-            self.start = time.gmtime(0) #The epoch
             msg = "Course loaded without a start date. id = %s" % self.id
-            log.critical(msg)
         except ValueError as e:
-            self.start = time.gmtime(0) #The epoch
             msg = "Course loaded with a bad start date. %s '%s'" % (self.id, e)
-            log.critical(msg)
 
         # Don't call the tracker from the exception handler.
         if msg is not None:
+            self.start = time.gmtime(0)  # The epoch
+            log.critical(msg)
             system.error_tracker(msg)
+
+        def try_parse_time(key):
+            """
+            Parse an optional metadata key: if present, must be valid.
+            Return None if not present.
+            """
+            if key in self.metadata:
+                try:
+                    return time.strptime(self.metadata[key], "%Y-%m-%dT%H:%M")
+                except ValueError as e:
+                    msg = "Course %s loaded with a bad metadata key %s '%s'" % (
+                        self.id, self.metadata[key], e)
+                    log.warning(msg)
+            return None
+
+        self.enrollment_start = try_parse_time("enrollment_start")
+        self.enrollment_end = try_parse_time("enrollment_end")
+
+
 
 
     def has_started(self):
@@ -99,10 +116,10 @@ class CourseDescriptor(SequenceDescriptor):
             sections = []
             for s in c.get_children():
                 if s.metadata.get('graded', False):
-                    # TODO: Only include modules that have a score here
-                    xmoduledescriptors = [child for child in yield_descriptor_descendents(s)]
+                    xmoduledescriptors = list(yield_descriptor_descendents(s))
 
-                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : xmoduledescriptors}
+                    # The xmoduledescriptors included here are only the ones that have scores.
+                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
 
                     section_format = s.metadata.get('format', "")
                     graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]

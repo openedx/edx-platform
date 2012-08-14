@@ -18,6 +18,7 @@ except Exception as err:
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from path import path
+from lxml import etree
 
 data_dir = settings.DATA_DIR
 print "data_dir = %s" % data_dir
@@ -26,7 +27,17 @@ for course_dir in os.listdir(data_dir):
     # print course_dir
     if not os.path.isdir(path(data_dir) / course_dir):
         continue
-    gname = 'staff_%s' % course_dir
+    
+    cxfn = path(data_dir) / course_dir / 'course.xml'
+    coursexml = etree.parse(cxfn)
+    cxmlroot = coursexml.getroot()
+    course = cxmlroot.get('course')
+    if course is None:
+        print "oops, can't get course id for %s" % course_dir
+        continue
+    print "course=%s for course_dir=%s" % (course,course_dir)
+
+    gname = 'staff_%s' % course
     if Group.objects.filter(name=gname):
         print "group exists for %s" % gname
         continue

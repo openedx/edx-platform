@@ -17,7 +17,11 @@ import random
 import re
 import requests
 import traceback
+import hashlib
 import abc
+import os
+import subprocess
+import xml.sax.saxutils as saxutils
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -71,7 +75,6 @@ class LoncapaResponse(object):
 
     In addition, these methods are optional:
 
-      - get_max_score        : if defined, this is called to obtain the maximum score possible for this question
       - setup_response       : find and note the answer input field IDs for the response; called by __init__
       - check_hint_condition : check to see if the student's answers satisfy a particular condition for a hint to be displayed
       - render_html          : render this Response as HTML (must return XHTML compliant string)
@@ -130,6 +133,11 @@ class LoncapaResponse(object):
         if self.max_inputfields == 1:
             self.answer_id = self.answer_ids[0]		# for convenience
 
+        self.maxpoints = dict()
+        for inputfield in self.inputfields:
+            maxpoints = inputfield.get('points','1') # By default, each answerfield is worth 1 point
+            self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
+
         self.default_answer_map = {}			# dict for default answer map (provided in input elements)
         for entry in self.inputfields:
             answer = entry.get('correct_answer')
@@ -138,6 +146,12 @@ class LoncapaResponse(object):
 
         if hasattr(self, 'setup_response'):
             self.setup_response()
+
+    def get_max_score(self):
+        '''
+        Return the total maximum points of all answer fields under this Response
+        '''
+        return sum(self.maxpoints.values())
 
     def render_html(self, renderer):
         '''
@@ -272,9 +286,190 @@ class LoncapaResponse(object):
 
 
 #-----------------------------------------------------------------------------
+
+class JavascriptResponse(LoncapaResponse):
+    '''
+    This response type is used when the student's answer is graded via
+    Javascript using Node.js.
+    '''
+
+    response_tag = 'javascriptresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['javascriptinput']
+
+    def setup_response(self):
+
+        # Sets up generator, grader, display, and their dependencies.
+        self.parse_xml()
+
+        self.compile_display_javascript()
+
+        self.params = self.extract_params()
+
+        if self.generator:
+            self.problem_state = self.generate_problem_state()
+        else:
+            self.problem_state = None
+        
+        self.solution = None
+
+        self.prepare_inputfield()
+    
+    def compile_display_javascript(self):
+
+        latestTimestamp = 0
+        basepath = self.system.filestore.root_path + '/js/'
+        for filename in (self.display_dependencies + [self.display]):
+            filepath = basepath + filename
+            timestamp = os.stat(filepath).st_mtime
+            if timestamp > latestTimestamp:
+                latestTimestamp = timestamp
+        
+        h = hashlib.md5()
+        h.update(self.answer_id + str(self.display_dependencies))
+        compiled_filename = 'compiled/' + h.hexdigest() + '.js'
+        compiled_filepath = basepath + compiled_filename
+
+        if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
+            outfile = open(compiled_filepath, 'w')
+            for filename in (self.display_dependencies + [self.display]):
+                filepath = basepath + filename
+                infile = open(filepath, 'r')
+                outfile.write(infile.read())
+                outfile.write(';\n')
+                infile.close()
+            outfile.close()
+
+        self.display_filename = compiled_filename
+
+    def parse_xml(self):
+        self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
+                                            id=self.xml.get('id'))[0]
+
+        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader', 
+                                         id=self.xml.get('id'))[0]
+
+        self.display_xml = self.xml.xpath('//*[@id=$id]//display', 
+                                         id=self.xml.get('id'))[0]
+
+        self.xml.remove(self.generator_xml)
+        self.xml.remove(self.grader_xml)
+        self.xml.remove(self.display_xml)
+
+        self.generator = self.generator_xml.get("src")
+        self.grader = self.grader_xml.get("src")
+        self.display = self.display_xml.get("src")
+
+        if self.generator_xml.get("dependencies"):
+            self.generator_dependencies = self.generator_xml.get("dependencies").split()
+        else:
+            self.generator_dependencies = []
+
+        if self.grader_xml.get("dependencies"):
+            self.grader_dependencies = self.grader_xml.get("dependencies").split()
+        else:
+            self.grader_dependencies = []
+
+        if self.display_xml.get("dependencies"):
+            self.display_dependencies = self.display_xml.get("dependencies").split()
+        else:
+            self.display_dependencies = []
+
+        self.display_class = self.display_xml.get("class")
+    
+    def get_node_env(self):
+
+        js_dir = os.path.join(self.system.filestore.root_path, 'js')
+        tmp_env = os.environ.copy()
+        node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
+        tmp_env["NODE_PATH"] = node_path
+        return tmp_env
+
+
+    def generate_problem_state(self):
+
+        generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
+        output = subprocess.check_output(["node",
+                                          generator_file, 
+                                          self.generator, 
+                                          json.dumps(self.generator_dependencies),
+                                          json.dumps(str(self.system.seed)), 
+                                          json.dumps(self.params)
+                                          ],
+                                          env=self.get_node_env()).strip()
+
+        return json.loads(output)
+
+    def extract_params(self):
+
+        params = {}
+    
+        for param in self.xml.xpath('//*[@id=$id]//responseparam', 
+                                        id=self.xml.get('id')):
+
+            params[param.get("name")] = json.loads(param.get("value"))
+        
+        return params
+
+    def prepare_inputfield(self):
+
+        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput', 
+                                        id=self.xml.get('id')):
+
+            escapedict = {'"': '&quot;'}
+
+            encoded_params = json.dumps(self.params)
+            encoded_params = saxutils.escape(encoded_params, escapedict)
+            inputfield.set("params", encoded_params)
+
+            encoded_problem_state = json.dumps(self.problem_state)
+            encoded_problem_state = saxutils.escape(encoded_problem_state,
+                                                    escapedict)
+            inputfield.set("problem_state", encoded_problem_state)
+
+            inputfield.set("display_file",  self.display_filename)
+            inputfield.set("display_class", self.display_class)
+
+    def get_score(self, student_answers):
+        json_submission = student_answers[self.answer_id]
+        (all_correct, evaluation, solution) = self.run_grader(json_submission)
+        self.solution = solution
+        correctness = 'correct' if all_correct else 'incorrect'
+        return CorrectMap(self.answer_id, correctness, msg=evaluation)
+    
+    def run_grader(self, submission):
+        if submission is None or submission == '':
+            submission = json.dumps(None)
+
+        grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
+        outputs = subprocess.check_output(["node",
+                                           grader_file, 
+                                           self.grader, 
+                                           json.dumps(self.grader_dependencies),
+                                           submission, 
+                                           json.dumps(self.problem_state), 
+                                           json.dumps(self.params)
+                                          ],
+                                          env=self.get_node_env()).split('\n')
+
+        all_correct = json.loads(outputs[0].strip())
+        evaluation  = outputs[1].strip()
+        solution    = outputs[2].strip()
+        return (all_correct, evaluation, solution)
+    
+    def get_answers(self):
+        if self.solution is None:
+            (_, _, self.solution) = self.run_grader(None)
+
+        return {self.answer_id: self.solution}
+
+            
+
+#-----------------------------------------------------------------------------
+
 class ChoiceResponse(LoncapaResponse):
     '''
-    This Response type is used when the student chooses from a discrete set of
+    This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
     supplied by the student, and no extraneous choices may be included.
 
@@ -312,6 +507,11 @@ class ChoiceResponse(LoncapaResponse):
 
     In the above example, radiogroup can be replaced with checkboxgroup to allow
     the student to select more than one choice.
+
+    TODO: In order for the inputtypes to render properly, this response type
+    must run setup_response prior to the input type rendering. Specifically, the
+    choices must be given names. This behavior seems like a leaky abstraction,
+    and it'd be nice to change this at some point.
 
     '''
 
@@ -668,7 +868,10 @@ def sympy_check2():
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset) == 1 and not submission[0]:
-            return CorrectMap(idset[0], 'incorrect', msg='<font color="red">No answer entered!</font>')
+            # default to no error message on empty answer (to be consistent with other responsetypes)
+            # but allow author to still have the old behavior by setting empty_answer_err attribute
+            msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
+            return CorrectMap(idset[0], 'incorrect', msg=msg)
 
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
@@ -815,33 +1018,79 @@ class CodeResponse(LoncapaResponse):
     max_inputfields = 1
 
     def setup_response(self):
+        '''
+        Configure CodeResponse from XML. Supports both CodeResponse and ExternalResponse XML
+
+        TODO: Determines whether in synchronous or asynchronous (queued) mode
+        '''
         xml = self.xml
+        self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
-        answer = xml.find('answer')
+        # VS[compat]:
+        #   Check if XML uses the ExternalResponse format or the generic CodeResponse format
+        codeparam = self.xml.find('codeparam')
+        if codeparam is None:
+            self._parse_externalresponse_xml()
+        else:
+            self._parse_coderesponse_xml(codeparam)
+
+    def _parse_coderesponse_xml(self,codeparam):
+        '''
+        Parse the new CodeResponse XML format. When successful, sets:
+            self.initial_display
+            self.answer (an answer to display to the student in the LMS)
+            self.payload
+        '''
+        # Note that CodeResponse is agnostic to the specific contents of grader_payload
+        grader_payload = codeparam.find('grader_payload')
+        grader_payload = grader_payload.text if grader_payload is not None else ''
+        self.payload = {'grader_payload': grader_payload}
+
+        answer_display = codeparam.find('answer_display')
+        if answer_display is not None:
+            self.answer = answer_display.text
+        else:
+            self.answer = 'No answer provided.'
+
+        initial_display = codeparam.find('initial_display')
+        if initial_display is not None:
+            self.initial_display = initial_display.text
+        else:
+            self.initial_display = ''
+
+    def _parse_externalresponse_xml(self):
+        '''
+        VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
+            self.initial_display
+            self.answer (an answer to display to the student in the LMS)
+            self.payload
+        '''
+        answer = self.xml.find('answer')
+
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
-                self.code = self.system.filesystem.open('src/' + answer_src).read()
+                code = self.system.filesystem.open('src/' + answer_src).read()
             else:
-                self.code = answer.text
+                code = answer.text
         else:  # no <answer> stanza; get code from <script>
-            self.code = self.context['script_code']
-            if not self.code:
+            code = self.context['script_code']
+            if not code:
                 msg = '%s: Missing answer script code for coderesponse' % unicode(self)
                 msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.tests = xml.get('tests')
+        tests = self.xml.get('tests')
 
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
         #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
-        #           following the 6.01 problem definition convention
+        #           following the ExternalResponse XML format
         penv = {}
         penv['__builtins__'] = globals()['__builtins__']
         try:
-            exec(self.code, penv, penv)
+            exec(code, penv, penv)
         except Exception as err:
             log.error('Error in CodeResponse %s: Error in problem reference code' % err)
             raise Exception(err)
@@ -852,6 +1101,14 @@ class CodeResponse(LoncapaResponse):
             log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
             raise Exception(err)
 
+        # Finally, make the ExternalResponse input XML format conform to the generic exteral grader interface
+        #   The XML tagging of grader_payload is pyxserver-specific
+        grader_payload  = '<pyxserver>'
+        grader_payload += '<tests>' + tests + '</tests>\n'
+        grader_payload += '<processor>' + code + '</processor>'
+        grader_payload += '</pyxserver>'
+        self.payload = {'grader_payload': grader_payload}
+
     def get_score(self, student_answers):
         try:
             submission = student_answers[self.answer_id] # Note that submission can be a file
@@ -860,7 +1117,10 @@ class CodeResponse(LoncapaResponse):
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
-        self.context.update({'submission': unicode(submission)})
+        if is_file(submission):
+            self.context.update({'submission': submission.name})
+        else:
+            self.context.update({'submission': submission})
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
@@ -873,22 +1133,16 @@ class CodeResponse(LoncapaResponse):
                                                 queue_name=self.queue_name)
 
         # Generate body
-        #   NOTE: Currently specialized to 6.00x's pyxserver, which follows the ExternalResponse interface
-        #         We should define a common interface for external code graders to CodeResponse
-        contents = {'xml': etree.tostring(self.xml, pretty_print=True),
-                    'edX_cmd': 'get_score',
-                    'edX_tests': self.tests,
-                    'processor': self.code,
-                    }
-        
-        # Submit request
+        contents = self.payload.copy() 
+
+        # Submit request. When successful, 'msg' is the prior length of the queue
         if is_file(submission):
-            contents.update({'edX_student_response': submission.name})
+            contents.update({'student_response': submission.name})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
                                                     file_to_upload=submission)
         else:
-            contents.update({'edX_student_response': submission})
+            contents.update({'student_response': submission})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 
@@ -897,33 +1151,34 @@ class CodeResponse(LoncapaResponse):
             cmap.set(self.answer_id, queuekey=None,
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
-            # Non-null CorrectMap['queuekey'] indicates that the problem has been queued 
-            cmap.set(self.answer_id, queuekey=queuekey, msg='Submitted to grader. (Queue length: %s)' % msg)
+            # Queueing mechanism flags:
+            #   1) Backend: Non-null CorrectMap['queuekey'] indicates that the problem has been queued
+            #   2) Frontend: correctness='incomplete' eventually trickles down through inputtypes.textbox 
+            #       and .filesubmission to inform the browser to poll the LMS
+            cmap.set(self.answer_id, queuekey=queuekey, correctness='incomplete', msg=msg)
 
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-        # Parse 'score_msg' as XML
-        try:
-            rxml = etree.fromstring(score_msg)
-        except Exception as err:
-            msg = 'Error in CodeResponse %s: cannot parse response from xworker r.text=%s' % (err, score_msg)
-            raise Exception(err)
 
-        # The following process is lifted directly from ExternalResponse
-        ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
-                 'WRONG_FORMAT': 'incorrect',
-                 }
-        self.context['correct'] = ['correct']
-        if ad in admap:
-            self.context['correct'][0] = admap[ad]
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg) 
+        if not valid_score_msg:
+            oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
+            return oldcmap
+        
+        correctness = 'correct' if correct else 'incorrect'
+
+        self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
 
         # Replace 'oldcmap' with new grading results if queuekey matches.
         #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            msg = rxml.find('message').text.replace('&nbsp;', '&#160;')
-            oldcmap.set(self.answer_id, correctness=self.context['correct'][0], msg=msg, queuekey=None)  # Queuekey is consumed
+            # Sanity check on returned points 
+            if points < 0:
+                points = 0
+            elif points > self.maxpoints[self.answer_id]:
+                points = self.maxpoints[self.answer_id]
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
@@ -936,6 +1191,31 @@ class CodeResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
+    def _parse_score_msg(self, score_msg):
+        '''
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': # TODO -- Partial grading
+             'msg': grader_msg }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           # TODO: Implement partial grading
+            msg:             Message from grader to display to student (string)
+        '''
+        fail = (False, False, -1, '')
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            return fail
+        if not isinstance(score_result, dict):
+            return fail
+        for tag in ['correct', 'score', 'msg']:
+            if not score_result.has_key(tag):
+                return fail
+        return (True, score_result['correct'], score_result['score'], score_result['msg'])
+        
 
 #-----------------------------------------------------------------------------
 
@@ -1321,4 +1601,4 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse]
+__all__ = [CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse, JavascriptResponse]

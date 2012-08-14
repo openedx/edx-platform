@@ -91,6 +91,13 @@ class @Sequence
     event.preventDefault()
     new_position = $(event.target).data('element')
     Logger.log "seq_goto", old: @position, new: new_position, id: @id
+
+    # On Sequence chage, destroy any existing polling thread 
+    #   for queued submissions, see ../capa/display.coffee
+    if window.queuePollerID
+      window.clearTimeout(window.queuePollerID)
+      delete window.queuePollerID
+
     @render new_position
 
   next: (event) =>

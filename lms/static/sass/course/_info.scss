@@ -15,15 +15,15 @@ div.info-wrapper {
 
     > ol {
       list-style: none;
-      padding-left: 0;
       margin-bottom: lh();
+      padding-left: 0;
 
       > li {
         @extend .clearfix;
         border-bottom: 1px solid lighten($border-color, 10%);
+        list-style-type: disk;
         margin-bottom: lh();
         padding-bottom: lh(.5);
-        list-style-type: disk;
 
         &:first-child {
           margin: 0 (-(lh(.5))) lh();
@@ -41,10 +41,10 @@ div.info-wrapper {
 
         h2 {
           float: left;
-          margin: 0 flex-gutter() 0 0;
-          width: flex-grid(2, 9);
           font-size: $body-font-size;
           font-weight: bold;
+          margin: 0 flex-gutter() 0 0;
+          width: flex-grid(2, 9);
         }
 
         section.update-description {
@@ -68,50 +68,67 @@ div.info-wrapper {
 
   section.handouts {
     @extend .sidebar;
-    border-left: 1px solid #d3d3d3;
+    border-left: 1px solid $border-color;
     @include border-radius(0 4px 4px 0);
-    @include box-shadow(none);
     border-right: 0;
+    @include box-shadow(none);
 
     h1 {
       @extend .bottom-border;
-      padding: lh(.5) lh(.5);
       margin-bottom: 0;
+      padding: lh(.5) lh(.5);
     }
 
     ol {
-      background: none;
-      list-style: none;
-      padding-left: 0;
-      margin: 0;
-
       li {
-        @extend .clearfix;
-        background: none;
-        border-bottom: 1px solid $border-color;
-        @include box-sizing(border-box);
-        padding: em(7) lh(.75);
-        position: relative;
-        font-size: 1em;
+        a {
+          display: block;
+          padding-left: lh(.5);
+          padding-right: 0;
+        }
 
         &.expandable,
         &.collapsable {
           h4 {
-            font-weight: normal;
+            color: $blue;
             font-size: 1em;
-            padding-left: 18px;
+            font-weight: normal;
+            padding: lh(.25) 0 lh(.25) lh(1.5);
+          }
+        }
+
+        &.multiple {
+          padding: lh(.5) 0 lh(.5) lh(.5);
+
+          a {
+            @include inline-block;
+            padding: 0;
+
+            &:hover {
+              background: transparent;
+            }
           }
         }
 
         ul {
           background: none;
-          margin: em(7) (-(lh(.75))) 0;
+          margin: 0;
 
           li {
             border-bottom: 0;
             border-top: 1px solid $border-color;
             @include box-shadow(inset 0 1px 0 #eee);
             font-size: 1em;
+            padding: lh(.5) 0 lh(.5) lh(.5);
+
+            a {
+              @include inline-block;
+              padding: 0;
+
+              &:hover {
+                background: transparent;
+              }
+            }
           }
         }
 
@@ -119,23 +136,27 @@ div.info-wrapper {
           background-image: url('../images/treeview-default.gif');
           display: block;
           height: 100%;
-          left: lh(.75);
           margin-left: 0;
-          max-height: 20px;
+          max-height: 30px;
           position: absolute;
           width: 100%;
 
           &:hover {
             opacity: 0.6;
             filter: alpha(opacity=60);
+
+            + h4 {
+              @extend a:hover;
+              text-decoration: underline;
+            }
           }
 
           &.expandable-hitarea {
-            background-position: -80px 1px;
+            background-position: -72px 7px;
           }
 
           &.collapsable-hitarea {
-            background-position: -64px -21px;
+            background-position: -55px -15px;
           }
         }
 
@@ -169,11 +190,6 @@ div.info-wrapper {
               }
             }
           }
-        }
-
-        a {
-          @include inline-block();
-          line-height: lh();
         }
       }
     }
