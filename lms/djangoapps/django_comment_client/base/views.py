@@ -117,6 +117,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     if request.is_ajax():
         context = {
             'comment': comment.to_dict(),
+            'course_id': course_id,
         }
         html = render_to_string('discussion/ajax_create_comment.html', context)
         annotated_content_info = utils.get_annotated_content_info(course_id, 
@@ -312,6 +313,7 @@ def update_moderator_status(request, course_id, user_id):
         discussion_user = cc.User(id=user_id, course_id=course_id)
         context = {
             'course': course, 
+            'course_id': course_id,
             'user': request.user,
             'django_user': user,
             'discussion_user': discussion_user.to_dict(),

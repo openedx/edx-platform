@@ -131,6 +131,30 @@ $tag-text-color: #5b614f;
       text-align: right;
       color: #9a9a9a;
     }
+
+//user profile
+
+    .sidebar-username {
+      font-size: 1.5em;
+      font-weight: bold;
+      line-height: 1.5em;
+    }
+
+    .sidebar-user-roles {
+      color: darkGray;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+
+    .sidebar-threads-count, .sidebar-comments-count {
+      
+      span {
+        font-size: 1.5em;
+        font-weight: bold;
+        line-height: 1.5em;
+        margin-right: 10px;
+      }
+    }
   }
 
   .discussion-non-content {
@@ -424,7 +448,6 @@ $tag-text-color: #5b614f;
 
   .search-wrapper-inline {
     display: inline-block;
-    margin-bottom: 6%;
     margin-top: 3%;
     width: 80%;
   }
@@ -770,7 +793,7 @@ $tag-text-color: #5b614f;
 
   &.inline-discussion, .forum-discussion {
     .new-post-form {
-      margin: 24px 60px;
+      margin: -30px 60px 24px 60px;
 
       .post-options {
         margin: 8px 0 16px 0;
@@ -778,11 +801,13 @@ $tag-text-color: #5b614f;
 
         label {
           margin-right: 15px;
+          display: inline;
         }
       }
 
       .post-control {
         overflow: hidden;
+        margin: 0 0 5% 0;
       }
     }
   }
