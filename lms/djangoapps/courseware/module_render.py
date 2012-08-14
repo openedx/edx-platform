@@ -19,14 +19,20 @@ from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
 
 from courseware.courses import (has_staff_access_to_course,
                                 has_staff_access_to_location)
+from requests import HttpBasicAuth
 
 log = logging.getLogger("mitx.courseware")
 
 
+if settings.XQUEUE_INTERFACE['basic_auth'] is not None:
+    requests_auth = HttpBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
+else:
+    requests_auth = None
+
 xqueue_interface = XQueueInterface(
     settings.XQUEUE_INTERFACE['url'],
     settings.XQUEUE_INTERFACE['django_auth'],
-    settings.XQUEUE_INTERFACE['basic_auth'],
+    requests_auth,
 )
 
 
