@@ -33,8 +33,14 @@
 <!-- Quick fix -- we should reference askbot jquery properly -->
 <script 
     type="text/javascript"
-    src="{{ settings.STATIC_URL }}/js/askbot_jquery.min.js"
+    src="{{'/js/jquery-1.4.3.js'|media}}"
 ></script>
+{#
+<script 
+    type="text/javascript"
+    src="{{ settings.STATIC_ROOT }}/js/askbot_jquery.min.js"
+></script>
+#}
 <!-- History.js --> 
 <script type='text/javascript' src="{{"/js/jquery.history.js"|media }}"></script>
 <script type='text/javascript' src="{{"/js/utils.js"|media }}"></script>
