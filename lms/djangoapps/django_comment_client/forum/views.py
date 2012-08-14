@@ -120,7 +120,7 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id, discussion_id):
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
     threads, query_params = get_threads(request, course_id, discussion_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
@@ -183,7 +183,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         })
 
     else:
-        course = check_course(course_id)
+        course = check_course(request.user, course_id)
 
         context = {
             'discussion_id': discussion_id,
@@ -198,7 +198,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 def search(request, course_id):
 
-    course = check_course(course_id)
+    course = check_course(request.user, course_id)
 
     text = request.GET.get('text', None)
     commentable_id = request.GET.get('commentable_id', None)
