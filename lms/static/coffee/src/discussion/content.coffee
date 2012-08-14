@@ -281,7 +281,7 @@ initializeFollowThread = (thread) ->
           type: "GET"
           dataType: 'json'
           success: (response, textStatus) ->
-            Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
+            Discussion.bulkExtendContentInfo response['annotated_content_info']
             $content.append(response['html'])
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)

@@ -3,6 +3,8 @@ from utils import *
 class Model(object):
 
     accessible_fields = ['id']
+    updatable_fields = ['id']
+    initializable_fields = ['id']
     base_url = None
     default_retrieve_params = {}
 
@@ -55,7 +57,7 @@ class Model(object):
         return self
 
     def _retrieve(self, *args, **kwargs):
-        url = self.url(action='get', id=self.id)
+        url = self.url(action='get', params=self.attributes)
         response = perform_request('get', url, self.default_retrieve_params)
         self.update_attributes(**response)
 
@@ -69,38 +71,41 @@ class Model(object):
                 self.__setattr__(k, v)
             else:
                 raise AttributeError("Field {0} does not exist".format(k))
+
+    def updatable_attribtes(self):
+        return extract(self.attributes, self.updatable_fields)
+
+    def initializable_attributes(self):
+        return extract(self.attributes, self.initializable_fields)
         
     def save(self):
         if self.id: # if we have id already, treat this as an update
-            url = self.url(action='put', id=self.id)
-            response = perform_request('put', url, self.attributes)
+            url = self.url(action='put', params=self.attributes)
+            response = perform_request('put', url, self.updatable_attributes())
         else: # otherwise, treat this as an insert
-            url = self.url(action='post', id=self.id)
-            response = perform_request('post', url, self.attributes)
+            url = self.url(action='post', params=self.attributes)
+            response = perform_request('post', url, self.initializable_attributes())
         self.retrieved = True
         self.update_attributes(**response)
 
     @classmethod
-    def url_with_id(cls, *args, **kwargs):
-        return cls.base_url + '/' + str(kwargs.get('id'))
+    def url_with_id(cls, params={}):
+        return cls.base_url + '/' + str(params['id'])
 
     @classmethod
-    def url_without_id(cls, *args, **kwargs):
+    def url_without_id(cls, params={}):
         return cls.base_url
 
     @classmethod
-    def url(cls, *args, **kwargs):
+    def url(cls, action, params={}):
         if cls.base_url is None:
             raise CommentClientError("Must provide base_url when using default url function")
-        id = kwargs.get('id')
-        action = kwargs.get('action')
-        if not action:
-            raise CommentClientError("Must provide action")
-        elif action not in cls.DEFAULT_ACTIONS:
+        if action not in cls.DEFAULT_ACTIONS:
             raise ValueError("Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS)))
         elif action in cls.DEFAULT_ACTIONS_WITH_ID:
-            if not id:
+            try:
+                return cls.url_with_id(params)
+            except KeyError:
                 raise CommentClientError("Cannot perform action {0} without id".format(action))
-            return cls.url_with_id(id=id)
         else: # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()

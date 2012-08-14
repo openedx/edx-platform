@@ -93,7 +93,7 @@ initializeFollowDiscussion = (discussion) ->
         $wrapper.hide()
       $title.attr("prev-text", text)
 
-    initializeNewPost = (elem) ->
+    initializeNewPost = ->
       #newPostForm = $local(".new-post-form")
       #$newPostButton = $local(".discussion-new-post")
       view = { discussion_id: id }
@@ -104,9 +104,10 @@ initializeFollowDiscussion = (discussion) ->
       if newPostBody.length
         Discussion.makeWmdEditor $discussion, $local, "new-post-body"
 
-      $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
-      $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
-        $local(".new-post-form").removeClass('collapsed')
+        $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
+        $input.attr("placeholder", "post a new topic...").bind 'focus', (e) ->
+          console.log "triggered"
+          $local(".new-post-form").removeClass('collapsed')
 
       $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 

@@ -1,0 +1,61 @@
+from utils import *
+
+import models
+import settings
+
+class User(models.Model):
+
+    accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
+                         'id', 'external_id', 'subscribed_user_ids', 'children',
+                         'subscribed_thread_ids', 'subscribed_commentable_ids',
+                        ]
+
+    updatable_fields = ['username', 'external_id', 'email']
+    initializable_fields = updatable_fields
+
+    base_url = "{prefix}/users".format(prefix=settings.PREFIX)
+    default_retrieve_params = {'complete': True}
+    type = 'user'
+
+    @classmethod
+    def from_django_user(cls, user):
+        return cls(id=str(user.id))
+
+    def follow(self, source):
+        params = {'source_type': source.type, 'source_id': source.id}
+        response = perform_request('post', _url_for_subscription(self.id), params)
+
+    def unfollow(self, source):
+        params = {'source_type': source.type, 'source_id': source.id}
+        response = perform_request('delete', _url_for_subscription(self.id), params)
+
+    def vote(self, voteable, value):
+        if voteable.type == 'thread':
+            url = _url_for_vote_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_vote_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only vote / unvote for threads or comments")
+        params = {'user_id': self.id, 'value': value}
+        request = perform_request('put', url, params)
+        voteable.update_attributes(request)
+
+    def unvote(self, voteable):
+        if voteable.type == 'thread':
+            url = _url_for_vote_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_vote_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only vote / unvote for threads or comments")
+        params = {'user_id': self.id}
+        request = perform_request('delete', url, params)
+        voteable.update_attributes(request)
+
+def _url_for_vote_comment(comment_id):
+    return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
+
+def _url_for_vote_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/votes".format(prefix=settings.PREFIX, thread_id=thread_id)
+
+def _url_for_subscription(user_id):
+    return "{prefix}/users/{user_id}/subscriptions".format(prefix=settings.PREFIX, user_id=user_id)

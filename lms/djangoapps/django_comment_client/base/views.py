@@ -47,6 +47,7 @@ def create_thread(request, course_id, commentable_id):
     post = request.POST
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
     thread.anonymous = post.get('anonymous', 'false').lower() == 'true'
+    thread.commentable_id = commentable_id
     thread.course_id = course_id
     thread.user_id = request.user.id
     thread.save()
