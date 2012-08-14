@@ -1,6 +1,7 @@
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore import Location
 from lxml import etree
+import json
 import copy
 import logging
 import traceback
@@ -32,7 +33,15 @@ def is_pointer_tag(xml_obj):
     actual_attr = set(xml_obj.attrib.keys())
     return len(xml_obj) == 0 and actual_attr == expected_attr
 
-
+def get_metadata_from_xml(xml_object, remove=True):
+    meta = xml_object.find('meta')
+    if meta is None:
+        return ''
+    dmdata = meta.text
+    log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
+    if remove:
+        xml_object.remove(meta)
+    return dmdata
 
 _AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
 
@@ -71,6 +80,7 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
+        'xqa_key',	# for xqaa server access
         # VS[compat] Remove once unused.
         'name', 'slug')
 
@@ -180,8 +190,11 @@ class XmlDescriptor(XModuleDescriptor):
 
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
 
+        definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
         definition = cls.definition_from_xml(definition_xml, system)
+        if definition_metadata:
+            definition['definition_metadata'] = definition_metadata
 
         # TODO (ichuang): remove this after migration
         # for Fall 2012 LMS migration: keep filename (and unmangled filename)
@@ -236,9 +249,9 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = cls._format_filepath(xml_object.tag, url_name)
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
-            definition_xml = xml_object
+            definition_xml = xml_object	# this is just a pointer, not the real definition content
 
-        definition = cls.load_definition(definition_xml, system, location)
+        definition = cls.load_definition(definition_xml, system, location)	# note this removes metadata
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
         if is_pointer_tag(xml_object):
@@ -246,6 +259,17 @@ class XmlDescriptor(XModuleDescriptor):
             definition['filename'] = [filepath, filepath]
 
         metadata = cls.load_metadata(definition_xml)
+
+        # move definition metadata into dict
+        dmdata = definition.get('definition_metadata','')
+        if dmdata:
+            metadata['definition_metadata_raw'] = dmdata
+            try:
+                metadata.update(json.loads(dmdata))
+            except Exception as err:
+                log.debug('Error %s in loading metadata %s' % (err,dmdata))
+                metadata['definition_metadata_err'] = str(err)
+
         return cls(
             system,
             definition,
@@ -258,6 +282,15 @@ class XmlDescriptor(XModuleDescriptor):
         return u'{category}/{name}.{ext}'.format(category=category,
                                                  name=name,
                                                  ext=cls.filename_extension)
+
+    def export_to_file(self):
+        """If this returns True, write the definition of this descriptor to a separate
+        file.
+
+        NOTE: Do not override this without a good reason.  It is here specifically for customtag...
+        """
+        return True
+
 
     def export_to_xml(self, resource_fs):
         """
@@ -295,14 +328,18 @@ class XmlDescriptor(XModuleDescriptor):
             if attr not in self.metadata_to_strip:
                 xml_object.set(attr, val_for_xml(attr))
 
-        # Write the definition to a file
-        filepath = self.__class__._format_filepath(self.category, self.url_name)
-        resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as file:
-            file.write(etree.tostring(xml_object, pretty_print=True))
+        if self.export_to_file():
+            # Write the definition to a file
+            filepath = self.__class__._format_filepath(self.category, self.url_name)
+            resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+            with resource_fs.open(filepath, 'w') as file:
+                file.write(etree.tostring(xml_object, pretty_print=True))
 
-        # And return just a pointer with the category and filename.
-        record_object = etree.Element(self.category)
+            # And return just a pointer with the category and filename.
+            record_object = etree.Element(self.category)
+        else:
+            record_object = xml_object
+
         record_object.set('url_name', self.url_name)
 
         # Special case for course pointers:

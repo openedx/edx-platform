@@ -11,13 +11,13 @@ from datetime import timedelta
 from lxml import etree
 from pkg_resources import resource_string
 
-from xmodule.x_module import XModule
-from xmodule.raw_module import RawDescriptor
-from xmodule.exceptions import NotFoundError
-from progress import Progress
 from capa.capa_problem import LoncapaProblem
 from capa.responsetypes import StudentInputError
 from capa.util import convert_files_to_filenames
+from progress import Progress
+from xmodule.x_module import XModule
+from xmodule.raw_module import RawDescriptor
+from xmodule.exceptions import NotFoundError
 
 log = logging.getLogger("mitx.courseware")
 
@@ -80,9 +80,9 @@ class CapaModule(XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, definition, instance_state=None,
+    def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, instance_state,
+        XModule.__init__(self, system, location, definition, descriptor, instance_state,
                          shared_state, **kwargs)
 
         self.attempts = 0
@@ -134,12 +134,14 @@ class CapaModule(XModule):
 
         if self.rerandomize == 'never':
             seed = 1
-        elif self.rerandomize == "per_student" and hasattr(system, 'id'):
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
             seed = system.id
         else:
             seed = None
 
         try:
+            # TODO (vshnayder): move as much as possible of this work and error
+            # checking to descriptor load time
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
                                       instance_state, seed=seed, system=self.system)
         except Exception as err:
@@ -148,7 +150,7 @@ class CapaModule(XModule):
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
             if self.system.DEBUG:
-                log.error(msg)
+                log.warning(msg)
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
@@ -426,7 +428,7 @@ class CapaModule(XModule):
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
-         
+
         answers = self.make_dict_of_responses(get)
         event_info['answers'] = convert_files_to_filenames(answers)
 
@@ -462,7 +464,7 @@ class CapaModule(XModule):
                 return {'success': msg}
             log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
-
+        
         self.attempts = self.attempts + 1
         self.lcp.done = True
 
@@ -562,6 +564,9 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
+
+    stores_state = True
+    has_score = True
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they

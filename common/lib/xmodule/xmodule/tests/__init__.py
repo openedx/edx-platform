@@ -8,7 +8,9 @@
 import unittest
 import os
 import fs
+import json
 
+import json
 import numpy
 
 import xmodule
@@ -30,10 +32,11 @@ i4xs = ModuleSystem(
     render_template=Mock(),
     replace_urls=Mock(),
     user=Mock(),
-    filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))),
+    filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
     xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
-    is_staff=False
+    is_staff=False,
+    node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
 
 
@@ -291,9 +294,14 @@ class CodeResponseTest(unittest.TestCase):
         for i in range(numAnswers):
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuekey=1000 + i))
 
-        # Message format inherited from ExternalResponse
-        correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
-        incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+        # TODO: Message format inherited from ExternalResponse
+        #correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
+        #incorrect_score_msg = "<edxgrade><awarddetail>WRONG_FORMAT</awarddetail><message>MESSAGE</message></edxgrade>"
+
+        # New message format common to external graders
+        correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg':'MESSAGE'})
+        incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg':'MESSAGE'})
+
         xserver_msgs = {'correct': correct_score_msg,
                         'incorrect': incorrect_score_msg,
                         }
@@ -317,7 +325,8 @@ class CodeResponseTest(unittest.TestCase):
 
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
-                new_cmap.set(answer_id=answer_ids[i], correctness=correctness, msg='MESSAGE', queuekey=None)
+                npoints = 1 if correctness=='correct' else 0
+                new_cmap.set(answer_id=answer_ids[i], npoints=npoints, correctness=correctness, msg='MESSAGE', queuekey=None)
 
                 test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
@@ -366,6 +375,19 @@ class ChoiceResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
+
+class JavascriptResponseTest(unittest.TestCase):
+
+    def test_jr_grade(self):
+        problem_file = os.path.dirname(__file__) + "/test_files/javascriptresponse.xml"
+        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
+        os.system("coffee -c %s" % (coffee_file_path))
+        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
+        correct_answers = {'1_2_1': json.dumps({0: 4})}
+        incorrect_answers = {'1_2_1': json.dumps({0: 5})}
+
+        self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
 
 #-----------------------------------------------------------------------------
 # Grading tests
@@ -708,6 +730,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, 'a://b/c/d/e', {})
+        xm = x_module.XModule(i4xs, 'a://b/c/d/e', None, {})
         p = xm.get_progress()
         self.assertEqual(p, None)

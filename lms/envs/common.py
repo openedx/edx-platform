@@ -50,6 +50,7 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+    'DARK_LAUNCH': False,  # When True, courses will be active for staff only
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
@@ -57,6 +58,8 @@ MITX_FEATURES = {
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
+
+    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -89,6 +92,18 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+# For Node.js
+
+system_node_path = os.environ.get("NODE_PATH", None)
+if system_node_path is None:
+    system_node_path = "/usr/local/lib/node_modules"
+
+node_paths = [COMMON_ROOT / "static/js/vendor", 
+              COMMON_ROOT / "static/coffee/src",
+              system_node_path
+              ]
+NODE_PATH = ':'.join(node_paths)
+                          
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -112,10 +127,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
-    'django.core.context_processors.auth', #this is required for admin
+    'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
 )
 
+STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
 
 # FIXME:
 # We should have separate S3 staged URLs in case we need to make changes to
@@ -340,7 +356,7 @@ PIPELINE_ALWAYS_RECOMPILE = ['sass/application.scss', 'sass/ie.scss', 'sass/cour
 courseware_only_js = [
     PROJECT_ROOT / 'static/coffee/src/' + pth + '.coffee'
     for pth
-    in ['courseware', 'histogram', 'navigation', 'time', ]
+    in ['courseware', 'histogram', 'navigation', 'time']
 ]
 courseware_only_js += [
     pth for pth
@@ -468,6 +484,7 @@ if os.path.isdir(DATA_DIR):
                     js_timestamp     = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
+                os.system("rm %s" % (js_dir / new_filename))
                 os.system("coffee -c %s" % (js_dir / filename))
 
 PIPELINE_COMPILERS = [

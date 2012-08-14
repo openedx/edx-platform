@@ -11,6 +11,7 @@ Module containing the problem elements which render into input objects
 - choicegroup
 - radiogroup
 - checkboxgroup
+- javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
@@ -246,6 +247,34 @@ def checkboxgroup(element, value, status, render_template, msg=''):
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
 
+@register_render_function
+def javascriptinput(element, value, status, render_template, msg='null'):
+    '''
+    Hidden field for javascript to communicate via; also loads the required
+    scripts for rendering the problem and passes data to the problem.
+    '''
+    eid = element.get('id')
+    params = element.get('params')
+    problem_state = element.get('problem_state')
+    display_class = element.get('display_class')
+    display_file = element.get('display_file')
+    
+    # Need to provide a value that JSON can parse if there is no
+    # student-supplied value yet.
+    if value == "":
+        value = 'null'
+    
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value, escapedict)
+    msg   = saxutils.escape(msg, escapedict)
+    context = {'id': eid, 'params': params, 'display_file': display_file, 
+               'display_class': display_class, 'problem_state': problem_state, 
+               'value': value, 'evaluation': msg,
+               }
+    html = render_template("javascriptinput.html", context)
+    return etree.XML(html)
+
+
 
 @register_render_function
 def textline(element, value, status, render_template, msg=""):
@@ -307,9 +336,19 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
-    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value, }
+
+    # Check if problem has been queued
+    queue_len = 0
+    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
+        status = 'queued'
+        queue_len = msg
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+
+    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
+                'queue_len': queue_len
+              }
     html = render_template("filesubmission.html", context)
-    return etree.XML(html) 
+    return etree.XML(html)
 
 
 #-----------------------------------------------------------------------------
@@ -330,9 +369,16 @@ def textbox(element, value, status, render_template, msg=''):
 
     if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
 
+    # Check if problem has been queued
+    queue_len = 0
+    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
+        status = 'queued'
+        queue_len = msg
+        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+
     # For CodeMirror
-    mode = element.get('mode')	or 'python' # mode, eg "python" or "xml"
-    linenumbers = element.get('linenumbers','true')	 # for CodeMirror
+    mode = element.get('mode','python')
+    linenumbers = element.get('linenumbers','true')
     tabsize = element.get('tabsize','4')
     tabsize = int(tabsize)
 
@@ -340,6 +386,7 @@ def textbox(element, value, status, render_template, msg=''):
                'mode': mode, 'linenumbers': linenumbers,
                'rows': rows, 'cols': cols,
                'hidden': hidden, 'tabsize': tabsize,
+               'queue_len': queue_len,
                }
     html = render_template("textbox.html", context)
     try:
