@@ -232,8 +232,13 @@ initializeFollowThread = (thread) ->
     handleDelete = (elem) ->
       if $content.hasClass("thread")
         url = Discussion.urlFor('delete_thread', id)
+        confirmValue = confirm("Are you sure? This will delete the thread and all comments associated with it and cannot be recovered.")
       else
         url = Discussion.urlFor('delete_comment', id)
+        confirmValue = confirm("Are you sure? This will delete the comment and all replies associated with it and cannot be recovered.")
+
+      if not confirmValue
+        return
 
       Discussion.safeAjax
         $elem: $(elem)
