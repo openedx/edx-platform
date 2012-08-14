@@ -8,17 +8,17 @@ div.gradebook-wrapper {
     @extend .content;
 
     .student-search {
-    	padding: 0 15px;
+    	padding: 0 20px 0 15px;
     }
 
     .student-search-field {
-    	width: 230px;
+    	width: 100%;
     	height: 27px;
-    	padding: 0 15px;
+    	padding: 0 15px 0 35px;
     	box-sizing: border-box;
     	border-radius: 13px;
     	border: 1px solid $table-border-color;
-    	background: url(../images/search-icon.png) no-repeat 205px center #f6f6f6;
+    	background: url(../images/search-icon.png) no-repeat 9px center #f6f6f6;
     	font-family: $sans-serif;
     	font-size: 11px;
     	@include box-shadow(0 1px 4px rgba(0, 0, 0, .12) inset);
@@ -37,7 +37,8 @@ div.gradebook-wrapper {
 
     .student-table {
 		float: left;
-		width: 264px;
+		// width: 264px;
+		width: 24%;
 		border-radius: 3px 0 0 3px;
 		color: #3c3c3c;
 
@@ -73,7 +74,7 @@ div.gradebook-wrapper {
 	.grades {
 		position: relative;
 		float: left;
-		width: 800px;
+		width: 76%;
 		overflow: hidden;
 
 		.left-shadow,
@@ -115,7 +116,7 @@ div.gradebook-wrapper {
 		thead th {
 			position: relative;
 			height: 50px;
-			background: -webkit-linear-gradient(top, $cell-border-color, #e2e2e2);
+			background: -webkit-linear-gradient(top, $cell-border-color, #ddd);
 			font-size: 10px;
 			line-height: 10px;
 			font-weight: bold;
