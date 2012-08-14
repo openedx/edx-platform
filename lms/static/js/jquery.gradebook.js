@@ -1,49 +1,66 @@
-/*
-var $gradebook;
-
-$(document).ready(function() {
-	console.log('gradebook');
-});
-*/
-
 
 
 
 var Gradebook = function($element) {
 	var _this = this;
-	_this.$element = $element;
-	_this.$grades = $element.find('.grade-table');
-	_this.maxScroll = _this.$grades.width() - _this.$element.find('.grades').width();
-	_this.body = $('body');
+	var $element = $element;
+	var $grades = $element.find('.grades');
+	var $gradeTable = $element.find('.grade-table');
+	var $leftShadow = $('<div class="left-shadow"></div>');
+	var $rightShadow = $('<div class="right-shadow"></div>');
+	var tableHeight = $gradeTable.height();
+	var maxScroll = $gradeTable.width() - $element.find('.grades').width();
+	var $body = $('body');
+	var mouseOrigin;
+	var tableOrigin;
 
-	_this.startDrag = function(e) {
-		_this.mouseOrigin = e.pageX;
-		_this.tableOrigin = _this.$grades.position().left;
-		_this.body.bind('mousemove', _this.moveDrag);
-		_this.body.bind('mouseup', _this.stopDrag);
+	var startDrag = function(e) {
+		mouseOrigin = e.pageX;
+		tableOrigin = $gradeTable.position().left;
+		$body.bind('mousemove', moveDrag);
+		$body.bind('mouseup', stopDrag);
 	};
 
-	_this.moveDrag = function(e) {
-		var offset = e.pageX - _this.mouseOrigin;
-		var targetLeft = _this.clamp(_this.tableOrigin + offset, -_this.maxScroll, 0);
+	var moveDrag = function(e) {
+		var offset = e.pageX - mouseOrigin;
+		var targetLeft = clamp(tableOrigin + offset, -maxScroll, 0);
 
-		console.log(offset);
-
-		_this.$grades.css({
+		$gradeTable.css({
 			'left': targetLeft + 'px'
-		})
+		});
+
+		setShadows(targetLeft);
 	};
 
-	_this.stopDrag = function(e) {
-		_this.body.unbind('mousemove', _this.moveDrag);
-		_this.body.unbind('mouseup', _this.stopDrag);
+	var stopDrag = function(e) {
+		$body.unbind('mousemove', moveDrag);
+		$body.unbind('mouseup', stopDrag);
 	};
 
-	_this.clamp = function(val, min, max) {
+	var setShadows = function(left) {
+		var padding = 30;
+
+		if(left > -padding) {
+			var percent = -left / padding;
+			$leftShadow.css('opacity', percent);
+		}
+
+		if(left < -maxScroll + padding) {
+			var percent = (maxScroll + left) / padding;
+			$rightShadow.css('opacity', percent);
+		}
+	};
+
+	var clamp = function(val, min, max) {
 	    if(val > max) return max;
 	    if(val < min) return min;
 	    return val;
-	}
+	};
 
-	_this.$element.bind('mousedown', _this.startDrag);
+	$leftShadow.css('height', tableHeight + 'px');
+	$rightShadow.css('height', tableHeight + 'px');
+	$grades.append($leftShadow).append($rightShadow);
+	setShadows(0);
+	$grades.css('height', tableHeight);
+	$gradeTable.bind('mousedown', startDrag);
 }

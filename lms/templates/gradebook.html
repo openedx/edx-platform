@@ -20,6 +20,12 @@
   .grade_None {color:LightGray;}
   </style>
 
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var gradebook = new Gradebook($('.gradebook-content'));
+    });
+  </script>
+
 </%block>
 
 <%include file="course_navigation.html" args="active_page=''" />
@@ -32,7 +38,11 @@
     <table class="student-table">
       <thead>
         <tr>
-          <th><input type="search" /></th>
+          <th>
+            <form class="student-search">
+              <input type="search" class="student-search-field" placeholder="Search students" />
+            </form>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -84,7 +94,7 @@
             %for section in student['grade_summary']['section_breakdown']:
               ${percent_data( section['percent'] )}
             %endfor
-            <th>${percent_data( student['grade_summary']['percent'])}</th>
+            <td>${percent_data( student['grade_summary']['percent'])}</td>
           </tr>
           %endfor
         </tbody>
@@ -97,8 +107,3 @@
 </section>
 
 
-<script type="text/javascript">
-  $(document).ready(function() {
-    var gradebook = new Gradebook($('.gradebook-content'));
-  });
-</script>

@@ -1,12 +1,43 @@
+$cell-border-color: #e1e1e1;
+$table-border-color: #c8c8c8;
+
 div.gradebook-wrapper {
   @extend .table-wrapper;
 
   section.gradebook-content {
     @extend .content;
 
+    .student-search {
+    	padding: 0 15px;
+    }
+
+    .student-search-field {
+    	width: 230px;
+    	height: 27px;
+    	padding: 0 15px;
+    	box-sizing: border-box;
+    	border-radius: 13px;
+    	border: 1px solid $table-border-color;
+    	background: url(../images/search-icon.png) no-repeat 205px center #f6f6f6;
+    	font-family: $sans-serif;
+    	font-size: 11px;
+    	@include box-shadow(0 1px 4px rgba(0, 0, 0, .12) inset);
+    	outline: none;
+    	@include transition(border-color .15s);
+
+    	&::-webkit-input-placeholder,
+    	&::-moz-input-placeholder {
+    		font-style: italic;
+    	}
+
+    	&:focus {
+    		border-color: #1d9dd9;
+    	}
+    }
+
     .student-table {
 		float: left;
-		width: 265px;
+		width: 264px;
 		border-radius: 3px 0 0 3px;
 		color: #3c3c3c;
 
@@ -15,20 +46,20 @@ div.gradebook-wrapper {
 		}
 
 		tr:first-child td {
-			border-top: 1px solid #c8c8c8;
+			border-top: 1px solid $table-border-color;
 			border-radius: 5px 0 0 0;
 		}
 
 		tr:last-child td {
-			border-bottom: 1px solid #c8c8c8;
+			border-bottom: 1px solid $table-border-color;
 			border-radius: 0 0 0 5px;
 		}
 
 		td {
 			height: 50px;
 			padding-left: 20px;
-			border-bottom: 1px solid #e9e9e9;
-			border-left: 1px solid #c8c8c8;
+			border-bottom: 1px solid $cell-border-color;
+			border-left: 1px solid $table-border-color;
 			background: #f6f6f6;
 			font-size: 13px;
 			line-height: 50px;
@@ -43,8 +74,26 @@ div.gradebook-wrapper {
 		position: relative;
 		float: left;
 		width: 800px;
-		height: 712px;
 		overflow: hidden;
+
+		.left-shadow,
+		.right-shadow {
+			position: absolute;
+			top: 0;
+			z-index: 9999;
+			width: 20px;
+			pointer-events: none;
+		}
+
+		.left-shadow {
+			left: 0;
+			background: -webkit-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+		}
+
+		.right-shadow {
+			right: 0;
+			background: -webkit-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+		}
 	}
 
 	.grade-table {
@@ -64,35 +113,39 @@ div.gradebook-wrapper {
 		}
 
 		thead th {
+			position: relative;
 			height: 50px;
-			background: -webkit-linear-gradient(top, #e9e9e9, #e2e2e2);
+			background: -webkit-linear-gradient(top, $cell-border-color, #e2e2e2);
 			font-size: 10px;
 			line-height: 10px;
 			font-weight: bold;
 			text-align: center;
-			box-shadow: 0 1px 0 #c8c8c8 inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
+			box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
 
-			&:after {
+			&:before {
 				content: '';
 				display: block;
 				position: absolute;
-				right: 0;
+				left: 0;
 				top: 0;
 				z-index: 9999;
 				width: 1px;
-				height: 50px;
-				background: #000;
-				
+				height: 100%;
+				background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .15));
 			}
 
 			&:first-child {
 				border-radius: 5px 0 0 0;
-				box-shadow: 1px 1px 0 #c8c8c8 inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+				box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+
+				&:before {
+					display: hidden;
+				}
 			}
 
 			&:last-child {
 				border-radius: 0 3px 0 0;
-				box-shadow: -1px 1px 0 #c8c8c8 inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
+				box-shadow: -1px 1px 0 $table-border-color inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
 			}
 
 			.assignment {
@@ -114,20 +167,25 @@ div.gradebook-wrapper {
 			}
 		}
 
+		tr {
+			border-right: 1px solid $table-border-color;
+		}
+
 		tr:first-child td {
-			border-top: 1px solid #c8c8c8;
+			border-top: 1px solid $table-border-color;
 		}
 
 		tr:last-child td {
-			border-bottom: 1px solid #c8c8c8;
+			border-bottom: 1px solid $table-border-color;
 		}
 
 		td {
 			height: 50px;
-			border-bottom: 1px solid #e9e9e9;
+			border-bottom: 1px solid $cell-border-color;
 			background: #f6f6f6;
 			font-size: 13px;
 			line-height: 50px;
+			border-left: 1px solid $cell-border-color;
 		}
 
 		tr:nth-child(even) td {
