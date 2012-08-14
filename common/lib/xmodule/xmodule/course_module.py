@@ -169,7 +169,7 @@ class CourseDescriptor(SequenceDescriptor):
         return self.location.course
 
     @property
-    def wiki_namespace(self):
+    def wiki_slug(self):
         return self.location.course
 
     @property
