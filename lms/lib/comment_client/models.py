@@ -88,6 +88,12 @@ class Model(object):
         self.retrieved = True
         self.update_attributes(**response)
 
+    def delete(self):
+        url = self.url(action='delete', params=self.attributes)
+        response = perform_request('delete', url)
+        self.retrieved = True
+        self.update_attributes(**response)
+
     @classmethod
     def url_with_id(cls, params={}):
         return cls.base_url + '/' + str(params['id'])
