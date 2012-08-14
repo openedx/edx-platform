@@ -190,6 +190,13 @@ class Location(_LocationBase):
         return "Location%s" % repr(tuple(self))
 
 
+    @property
+    def course_id(self):
+        """Return the ID of the Course that this item belongs to by looking
+        at the location URL hierachy"""
+        return "/".join([self.org, self.course, self.name])
+
+
 class ModuleStore(object):
     """
     An abstract interface for a database backend that stores XModuleDescriptor

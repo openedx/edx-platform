@@ -1,7 +1,8 @@
 <%! from django.core.urlresolvers import reverse %>
 
 <%def name="make_chapter(chapter)">
-  <h3><a href="#">${chapter['display_name']}</a></h3>
+  <h3 ${' class="active"' if 'active' in chapter and chapter['active'] else ''}><a href="#">${chapter['display_name']}</a>
+  </h3>
 
   <ul>
     % for section in chapter['sections']:

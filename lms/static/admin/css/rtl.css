@@ -80,15 +80,8 @@ div.breadcrumbs {
 
 /* SORTABLE TABLES */
 
-
-table thead th.sorted a {
-    padding-left: 13px;
-    padding-right: 0px;
-}
-
-table thead th.ascending a,
-table thead th.descending a {
-    background-position: left;
+table thead th.sorted .sortoptions {
+   float: left;
 }
 
 /* dashboard styles */
@@ -100,12 +93,8 @@ table thead th.descending a {
 
 /* changelists styles */
 
-.change-list ul.toplinks li {
-    float: right;
-}
-
 .change-list .filtered {
-    background: white url(../img/admin/changelist-bg_rtl.gif) top left repeat-y !important;
+    background: white url(../img/changelist-bg_rtl.gif) top left repeat-y !important;
 }
 
 .change-list .filtered table {
@@ -162,7 +151,7 @@ table thead th.descending a {
 }
 
 .submit-row .deletelink {
-    background: url(../img/admin/icon_deletelink.gif) 0 50% no-repeat;
+    background: url(../img/icon_deletelink.gif) 0 50% no-repeat;
     padding-right: 14px;
 }
 
@@ -183,6 +172,7 @@ input[type=submit].default, .submit-row input.default {
 fieldset .field-box {
     float: right;
     margin-left: 20px;
+    margin-right: 0;
 }
 
 .errorlist li {
@@ -236,9 +226,20 @@ fieldset .field-box {
     padding-left: inherit;
     left: 10px;
     right: inherit;
+    float:left;
 }
 
 .inline-related h3 span.delete label {
     margin-left: inherit;
     margin-right: 2px;
+}
+
+/* IE7 specific bug fixes */
+
+div.colM {
+    position: relative;
+}
+
+.submit-row input {
+    float: left;
 }

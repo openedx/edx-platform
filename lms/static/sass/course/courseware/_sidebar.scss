@@ -11,10 +11,10 @@ section.course-index {
   }
 
   div#accordion {
-
     h3 {
       @include border-radius(0);
-      border-top: 1px solid #e3e3e3;
+      border-top: 1px solid lighten($border-color, 10%);
+      font-size: em(16, 18);
       margin: 0;
       overflow: hidden;
 
@@ -23,18 +23,23 @@ section.course-index {
       }
 
       &:hover {
+        color: #666;
         background: #f6f6f6;
-        text-decoration: none;
+      }
+
+      &.ui-state-hover {
+        a {
+          color: #666;
+        }
       }
 
       &.ui-accordion-header {
+        border-bottom: none;
         color: #000;
 
         a {
           @include border-radius(0);
           @include box-shadow(none);
-          color: lighten($text-color, 10%);
-          font-size: $body-font-size;
         }
 
         &.ui-state-active {
@@ -45,30 +50,35 @@ section.course-index {
             background: none;
           }
         }
+
+        span.ui-icon {
+          background-image: url("/static/images/ui-icons_222222_256x240.png");
+          opacity: .3;
+        }
       }
     }
 
     ul.ui-accordion-content {
-      @include border-radius(0);
       background: transparent;
       border: none;
-      font-size: 12px;
+      @include border-radius(0);
+      font-size: em(14, 18);
       margin: 0;
       padding: 1em 1.5em;
 
       li {
+        border-bottom: 0;
         @include border-radius(0);
         margin-bottom: lh(.5);
 
         a {
-          border: 1px solid transparent;
           background: transparent;
+          border: 1px solid transparent;
           @include border-radius(4px);
-          position: relative;
-          padding: 5px 36px 5px 10px;
-          text-decoration: none;
           display: block;
-          color: #666;
+          padding: 5px 36px 5px 10px;
+          position: relative;
+          text-decoration: none;
 
           p {
             font-weight: bold;
@@ -84,16 +94,16 @@ section.course-index {
 
           &:after {
             background: transparent;
-            border-top: 1px solid rgb(180,180,180);
             border-right: 1px solid rgb(180,180,180);
+            border-top: 1px solid rgb(180,180,180);
             content: "";
             display: block;
             height: 12px;
             margin-top: -6px;
             opacity: 0;
             position: absolute;
-            top: 50%;
             right: 30px;
+            top: 50%;
             @include transform(rotate(45deg));
             width: 12px;
           }
@@ -142,7 +152,6 @@ section.course-index {
           span.subtitle {
             font-weight: normal;
           }
-
         }
       }
     }
