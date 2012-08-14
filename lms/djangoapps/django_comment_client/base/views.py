@@ -4,8 +4,10 @@ import os
 import os.path
 import logging
 import urlparse
+import functools
 
 import comment_client as cc
+import django_comment_client.utils as utils
 
 from django.core import exceptions
 from django.contrib.auth.decorators import login_required
@@ -14,13 +16,15 @@ from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
+from courseware.courses import check_course
+
 from django_comment_client.utils import JsonResponse, JsonError, extract
-import django_comment_client.utils as utils
 
 from django_comment_client.permissions import check_permissions_by_view
-import functools
+from django_comment_client.models import Role
 
 def permitted(fn):
     @functools.wraps(fn)
@@ -288,6 +292,35 @@ def unfollow_user(request, course_id, followed_user_id):
     followed_user = cc.User.find(followed_user_id)
     user.unfollow(followed_user)
     return JsonResponse({})
+
+@require_POST
+@login_required
+@permitted
+def update_moderator_status(request, course_id, user_id):
+    is_moderator = request.POST.get('is_moderator', '').lower()
+    if is_moderator not in ["true", "false"]:
+        return JsonError("Must provide is_moderator as boolean value")
+    is_moderator = is_moderator == "true"
+    user = User.objects.get(id=user_id)
+    role = Role.objects.get(course_id=course_id, name="Moderator")
+    if is_moderator:
+        user.roles.add(role)
+    else:
+        user.roles.remove(role)
+    if request.is_ajax():
+        course = check_course(request.user, course_id)
+        discussion_user = cc.User(id=user_id, course_id=course_id)
+        context = {
+            'course': course, 
+            'user': request.user,
+            'django_user': user,
+            'discussion_user': discussion_user.to_dict(),
+        }
+        return JsonResponse({
+            'html': render_to_string('discussion/ajax_user_profile.html', context)
+        })
+    else:
+        return JsonResponse({})
 
 @require_GET
 def search_similar_threads(request, course_id, commentable_id):
