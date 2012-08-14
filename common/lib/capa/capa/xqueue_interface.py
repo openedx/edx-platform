@@ -55,7 +55,7 @@ def parse_xreply(xreply):
     return (return_code, content)
 
 
-class XqueueInterface:
+class XQueueInterface:
     '''
     Interface to the external grading system
     '''
