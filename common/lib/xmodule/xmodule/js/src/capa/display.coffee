@@ -32,7 +32,8 @@ class @Problem
 
   queueing: =>
     @queued_items = @$(".xqueue")
-    if @queued_items.length > 0
+    @num_queued_items = @queued_items.length
+    if @num_queued_items > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
       queuelen = @get_queuelen()
@@ -49,12 +50,16 @@ class @Problem
     
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
-      @queued_items = $(response.html).find(".xqueue")
-      if @queued_items.length == 0 
+      # If queueing status changed, then render
+      @new_queued_items = $(response.html).find(".xqueue")
+      if @new_queued_items.length isnt @num_queued_items
         @el.html(response.html)
         @executeProblemScripts () =>
           @setupInputTypes()
           @bind()
+      
+      @num_queued_items = @new_queued_items.length
+      if @num_queued_items == 0 
         delete window.queuePollerID
       else
         # TODO: Some logic to dynamically adjust polling rate based on queuelen
