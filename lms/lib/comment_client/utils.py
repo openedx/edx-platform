@@ -7,7 +7,10 @@ def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
 
 def extract(dic, keys):
-    return strip_none({k: dic.get(k) for k in keys})
+    if isinstance(keys, str):
+        return strip_none({keys: dic.get(keys)})
+    else:
+        return strip_none({k: dic.get(k) for k in keys})
 
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
