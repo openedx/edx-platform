@@ -98,16 +98,6 @@
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
       <li><div class="follow-wrapper"></div></li>
-      <li>
-      % if type == "comment" and request.user.is_staff:
-        % if content['endorsed']:
-          <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
-        % else:
-          <input type="checkbox" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}">
-        % endif
-        <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
-      % endif
-      </li>
     </ul>
   </div>
 </%def>

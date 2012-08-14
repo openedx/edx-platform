@@ -10,8 +10,8 @@
   <div class="sidebar-user-roles">
     ${", ".join(role_names)}
   </div>
-  <div class="sidebar-threads-count">${discussion_user['threads_count']} ${pluralize('discussion', discussion_user['threads_count'])} started</div>
-  <div class="sidebar-comments-count">${discussion_user['comments_count']} ${pluralize('comment', discussion_user['comments_count'])}</div>
+  <div class="sidebar-threads-count"><span>${discussion_user['threads_count']}</span> ${pluralize('discussion', discussion_user['threads_count'])} started</div>
+  <div class="sidebar-comments-count"><span>${discussion_user['comments_count']}</span> ${pluralize('comment', discussion_user['comments_count'])}</div>
   % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
     % if "Moderator" in role_names:
       <a href="javascript:void(0)" class="sidebar-revoke-moderator-button">Revoke Moderator provileges</a>
