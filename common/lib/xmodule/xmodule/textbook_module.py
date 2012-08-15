@@ -11,6 +11,9 @@ class TextbookModule(XModule):
     def get_display_items(self):
       return []
 
+    def displayable_items(self):
+      return []
+
 class TextbookDescriptor(XmlDescriptor):
 
     module_class = TextbookModule
