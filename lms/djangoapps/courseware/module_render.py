@@ -160,7 +160,6 @@ def get_module(user, request, location, student_module_cache, position=None):
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
-    # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
 
     ajax_url = reverse('modx_dispatch', 
@@ -168,8 +167,6 @@ def get_module(user, request, location, student_module_cache, position=None):
                                    id=descriptor.location.url(),
                                    dispatch=''),
                        )
-
-    # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
@@ -304,7 +301,8 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, modulestore().get_item(id))
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        user, modulestore().get_item(id), depth=0, acquire_lock=True)
     instance = get_module(user, request, id, student_module_cache)
     instance_module = get_instance_module(user, instance, student_module_cache)
 
