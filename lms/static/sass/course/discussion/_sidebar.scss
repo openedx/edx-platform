@@ -63,9 +63,15 @@ div.discussion-wrapper aside {
       li {
         border-bottom: 0;
         background: #eee;
+        padding: 6px 10px 6px 5px;
 
-        a:hover {
-          background: transparent;
+        a {
+          padding: 0;
+          line-height: 12px;
+
+          &:hover {
+            background: transparent;
+          }
         }
       }
     }
@@ -113,6 +119,7 @@ div.discussion-wrapper aside {
       @include box-shadow(none);
       margin-left: 3px;
       opacity: 0.5;
+      padding: 6px 0 0;
       position: absolute;
       text-indent: -9999px;
       width: 24px;
@@ -133,15 +140,22 @@ div.discussion-wrapper aside {
     }
 
     input#clear {
-      @include box-shadow(none);
-      @include border-radius(15px);
+      background: none;
       border: none;
-      background: #bbb;
-      color: #fff;
+      @include border-radius(0);
+      @include box-shadow(none);
+      color: #999;
       display: inline;
-      font-size: 10px;
-      margin-left: -25px;
+      font-size: 12px;
+      font-weight: bold;
+      height: 19px;
+      line-height: 1em;
+      margin: {
+        left: -25px;
+        top: 8px;
+      }
       padding: 2px 5px;
+      text-shadow: none;
     }
   }
 
