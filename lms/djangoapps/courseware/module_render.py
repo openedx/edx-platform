@@ -143,14 +143,11 @@ def get_module(user, request, location, student_module_cache, position=None):
     Returns: xmodule instance
 
     '''
-    # has_access below needs an actual Location
-    location = Location(location)
     descriptor = modulestore().get_item(location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load'):
         return None
-
 
     #TODO Only check the cache if this module can possibly have state
     instance_module = None
@@ -165,21 +162,15 @@ def get_module(user, request, location, student_module_cache, position=None):
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
 
-
-
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
-    # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
-
     ajax_url = reverse('modx_dispatch',
                        kwargs=dict(course_id=descriptor.location.course_id,
                                    id=descriptor.location.url(),
                                    dispatch=''),
                        )
-
-    # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
@@ -225,7 +216,7 @@ def get_module(user, request, location, student_module_cache, position=None):
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    system.set('DEBUG',settings.DEBUG)
+    system.set('DEBUG', settings.DEBUG)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 

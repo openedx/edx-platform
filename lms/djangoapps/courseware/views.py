@@ -333,8 +333,6 @@ def grade_summary(request, course_id):
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
-    if not has_access(request.user, course, 'staff'):
-        raise Http404
 
     # For now, just a static page
     context = {'course': course }
