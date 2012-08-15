@@ -264,24 +264,16 @@ div.discussion-wrapper aside {
  }
 
   div.question-tips, div.markdown {
-    ul {
-      margin-left: 8%;
-    }
-
+    ul,
     ol {
-      margin-left: 8%;
-    }
-  }
-
-  div.markdown ul li {
-    margin: 20px 0;
-
-    &:first-child {
       margin: 0;
-    }
+      padding: 0;
 
-    ol li {
-      margin: 0;
+      li {
+        border-bottom: 0;
+        line-height: lh();
+        margin-bottom: em(8);
+      }
     }
   }
 

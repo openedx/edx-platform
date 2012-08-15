@@ -22,6 +22,8 @@ div#award-list{
 }
 
 ul.badge-list {
+  padding-left: 0;
+
   li.badge {
     border-bottom: 1px solid #eee;
     @extend .clearfix;
@@ -70,12 +72,17 @@ ul.badge-list {
 .bronze, .badge3 {
   color: #cc9933;
 }
-div.badge-desc {
-  > div {
-    margin-bottom: 20px;
-     span {
-      font-size: 18px;
-      @include border-radius(10px);
-     }
+
+div.discussion-wrapper aside {
+  div.badge-desc {
+    border-top: 0;
+
+    > div {
+      margin-bottom: 20px;
+      span {
+        font-size: 18px;
+        @include border-radius(10px);
+      }
+    }
   }
 }
