@@ -1,0 +1,52 @@
+{% load i18n %}{% load url from future %}
+{% if urlpath %}
+
+<header>
+  <ul class="breadcrumb pull-left" class="">
+    {% for ancestor in urlpath.get_ancestors.all %}
+      <li><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title }}</a></li>
+    {% endfor %}
+    <li class="active"><a href="{% url 'wiki:get' path=urlpath.path %}">{{ article.current_revision.title }}</a></li>
+  </ul>
+
+ 
+  <div class="pull-left" style="margin-left: 10px;">
+    <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="padding: 7px;" title="{% trans "Sub-articles for" %} {{ article.current_revision.title }}">
+        <span class="icon-list"></span>
+      <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        {% for child in children_slice %}
+          <li>
+            <a href="{% url 'wiki:get' path=child.path %}">
+              {{ child.article.current_revision.title }}
+            </a>
+          </li>
+          {% empty %}
+          <li><a href="#"><em>{% trans "No sub-articles" %}</em></a></li>
+        {% endfor %}
+        {% if children_slice_more %}
+        <li><a href="#"><em>{% trans "...and more" %}</em></a></li>
+        {% endif %}
+        <li class="divider"></li>
+        <li>
+          <a href="" onclick="alert('TODO')">{% trans "List sub-pages" %} &raquo;</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+
+  <div class="global-functions pull-right">
+    <form class="search-wiki pull-left">
+      <input type="search" placeholder="search wiki" />
+    </form>
+    <a class="add-article-btn btn pull-left" href="{% url 'wiki:create' path=urlpath.path %}" style="padding: 7px;">
+      <span class="icon-plus"></span>
+      {% trans "Add article" %}
+    </a>
+  </div>
+</header>
+
+{% endif %}

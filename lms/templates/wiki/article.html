@@ -1,0 +1,36 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n %}
+{% load url from future %}
+
+{% block pagetitle %}{{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_breadcrumbs %}
+{% include "wiki/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block wiki_contents %}
+
+  <div class="tabbable tabs-top" style="margin-top: 20px;">
+    <article class="main-article">
+      <h1 style="margin-top: -10px;">{{ article.current_revision.title }}</h1>
+      <div class="tab-content">
+        {% block wiki_contents_tab %}
+        {% wiki_render article %}
+        {% endblock %}
+      </div>
+    </article>
+
+    <div class="article-functions">
+      <ul class="nav nav-tabs">
+        {% include "wiki/includes/article_menu.html" %}
+      </ul>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+{% block footer_prepend %}
+  <p style="margin-bottom: 10px;"><em>{% trans "This article was last modified:" %} {{ article.current_revision.modified }}</em></p>
+{% endblock %}

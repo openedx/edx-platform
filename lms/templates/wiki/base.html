@@ -12,20 +12,25 @@
     {% include "course_navigation.html" with active_page_context="wiki" %}
   {% endif %}
 
-  {% block wiki_body %}
-    
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-          <a class="close" data-dismiss="alert" href="#">&times;</a>
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
-    
-    {% block wiki_breadcrumbs %}{% endblock %}
-    
-    {% block wiki_contents %}{% endblock %}
-    
-  {% endblock %}
+  <section class="container wiki">
+
+    {% block wiki_body %}
+      
+      {% block wiki_breadcrumbs %}{% endblock %}
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <a class="close" data-dismiss="alert" href="#">&times;</a>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      
+      {% block wiki_contents %}{% endblock %}
+      
+    {% endblock %}
+
+  </section>
+
 {% endblock %}

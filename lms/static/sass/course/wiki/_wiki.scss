@@ -1,158 +1,166 @@
-div.wiki-wrapper {
-  display: table;
-  width: 100%;
+section.wiki {
+  padding-top: 25px;
 
-  section.wiki-body {
-    @extend .clearfix;
-    @extend .content;
-    @include border-radius(0 4px 4px 0);
-    position: relative;
+  header {
+    height: 33px;
+    margin-bottom: 50px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid $light-gray;
+  }
 
-    header {
-      @extend .topbar;
-      @include border-radius(0 4px 0 0);
-      height:46px;
-      overflow: hidden;
+  .pull-left {
+    float: left;
+  }
 
-      &:empty {
-        border-bottom: 0;
-        display: none !important;
-      }
+  .pull-right {
+    float: right;
+  }
 
-      a {
-        @extend .block-link;
-      }
 
-      p {
-        float: left;
-        line-height: 46px;
-        margin-bottom: 0;
-        padding-left: lh();
-      }
 
-      ul {
-        float: right;
-        list-style: none;
+  /*-----------------
 
-        li {
-          float: left;
+    Breadcrumbs
 
-          input[type="button"] {
-            @extend .block-link;
-            background-position: 12px center;
-            background-repeat: no-repeat;
-            border: 0;
-            border-left: 1px solid darken(#f6efd4, 20%);
-            @include border-radius(0);
-            @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
-            display: block;
-            font-size: 12px;
-            font-weight: normal;
-            letter-spacing: 1px;
-            line-height: 46px;
-            margin: 0;
-            padding: 0 lh() 0 38px;
-            text-shadow: none;
-            text-transform: uppercase;
-            @include transition();
+  -----------------*/
 
-            &.view {
-              background-image: url('../images/sequence-nav/view.png');
-            }
+  .breadcrumb {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
 
-            &.history {
-              background-image:  url('../images/sequence-nav/history.png');
-            }
-
-            &.edit {
-              background-image:  url('../images/sequence-nav/edit.png');
-            }
-
-            &:hover {
-              background-color: transparent;
-            }
-          }
-        }
-      }
-    }
-
-     h2.wiki-title {
-        @include box-sizing(border-box);
-        display: inline-block;
-        float: left;
-        margin-bottom: 15px;
-        margin-top: 0;
-        padding-right: flex-gutter(9);
-        vertical-align: top;
-        width: flex-grid(2.5, 9);
-
-        @media screen and (max-width:900px) {
-          border-right: 0;
-          display: block;
-          width: auto;
-        }
-
-        @media print {
-          border-right: 0;
-          display: block;
-          width: auto;
-        }
-      }
-
-    p {
-      line-height: 1.6em;
-    }
-
-    section.results {
-      border-left: 1px dashed #ddd;
-      @include box-sizing(border-box);
-      display: inline-block;
+    li {
       float: left;
-      padding-left: 10px;
-      width: flex-grid(6.5, 9);
+      margin-right: 10px;
+      font-size: 0.9em;
+      line-height: 31px;
 
-      @media screen and (max-width:900px) {
-        border: 0;
-        display: block;
-        padding-left: 0;
-        width: 100%;
-        width: auto;
+      &:after {
+        content: '›';
+        display: inline-block;
+        margin-left: 10px;
+        color: $base-font-color;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    display: none;
+  }
+
+
+
+  /*-----------------
+
+    Global Functions
+
+  -----------------*/
+
+  .global-functions {
+    display: block;
+    width: auto;
+  }
+
+  .add-article-btn {
+    @include button(simple, #eee);
+    margin-left: 25px;
+    padding: 7px 15px !important;
+    font-size: 0.72em;
+    font-weight: 600;
+  }
+
+  .search-wiki {
+    margin-top: 3px;
+
+    input {
+      width: 180px;
+      height: 27px;
+      padding: 0 15px 0 35px;
+      background: url(../images/search-icon.png) no-repeat 9px center #f6f6f6;
+      border: 1px solid #c8c8c8;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
+      font-family: $sans-serif;
+      font-size: 12px;
+      outline: none;
+      @include transition(border-color .1s);
+
+      &:-webkit-input-placholder {
+        font-style: italic;
       }
 
-      @media print {
-        display: block;
-        padding: 0;
-        width: auto;
-
-        canvas, img {
-          page-break-inside: avoid;
-        }
+      &:focus {
+        border-color: $blue;
       }
+    }
+  }
 
-      ul.article-list {
-        margin-left: 15px;
-        width: 100%;
 
-        @media screen and (max-width:900px) {
-          margin-left: 0px;
-        }
 
-        li {
-          border-bottom: 1px solid #eee;
-          list-style: none;
-          margin: 0;
-          padding: 10px 0;
+  /*-----------------
 
-          &:last-child {
-            border-bottom: 0;
-          }
+    Article
 
-          h3 {
-            font-size: 18px;
-            font-weight: normal;
-          }
-        }
-      }
+  -----------------*/
+
+  h1 {
+    font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  .main-article {
+    float: left;
+    width: flex-grid(9);
+
+    h2 {
+      font-weight: bold;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 1.33em;
+    }
+  }
+
+  .article-functions {
+    float: left;
+    width: flex-grid(2);
+    margin-left: flex-grid(1);
+  }
+
+  .nav-tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-left: 20px;
+    }
+  }
+
+
+
+  /*-----------------
+
+    Alerts
+
+  -----------------*/
+
+  .alert {
+    position: relative;
+    top: -35px;
+    margin-bottom: 24px;
+    padding: 8px 12px;
+    border: 1px solid #EBE8BF;
+    border-radius: 3px;
+    background: $yellow;
+    font-size: 0.9em;
+
+    .close {
+      position: absolute;
+      right: 12px;
+      font-size: 1.3em;
+      top: 6px;
+      color: #999;
+      text-decoration: none;
     }
   }
 }

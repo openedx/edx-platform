@@ -1,0 +1,47 @@
+{% load i18n wiki_tags %}{% load url from future %}
+
+{% with selected_tab as selected %}
+
+
+
+
+
+
+
+<li class="{% if selected == "view" %} active{% endif %}">
+  <a href="{% url 'wiki:get' article_id=article.id path=urlpath.path %}">
+    <span class="icon-home"></span>
+    {% trans "View" %}
+  </a>
+</li>
+<li class="{% if selected == "edit" %} active{% endif %}">
+  <a href="{% url 'wiki:edit' article_id=article.id path=urlpath.path %}">
+    <span class="icon-edit"></span>
+    {% trans "Edit" %}
+  </a>
+</li>
+<li class="{% if selected == "history" %} active{% endif %}">
+  <a href="{% url 'wiki:history' article_id=article.id path=urlpath.path %}">
+    <span class="icon-time"></span>
+    {% trans "Changes" %}
+  </a>
+</li>
+{% for plugin in article_tabs %}
+  <li class="{% if selected == plugin.slug %} active{% endif %}">
+    <a href="{% url 'wiki:plugin' slug=plugin.slug article_id=article.id path=urlpath.path %}">
+      <span class="{{ plugin.article_tab.1 }}"></span>
+      {{ plugin.article_tab.0 }}
+    </a>
+  </li>
+{% endfor %}
+
+<li class="{% if selected == "settings" %} active{% endif %}">
+  {% if not user.is_anonymous %}
+  <a href="{% url 'wiki:settings' article_id=article.id path=urlpath.path %}">
+    <span class="icon-wrench"></span>
+    {% trans "Settings" %}
+  </a>
+  {% endif %}
+</li>
+
+{% endwith %}
