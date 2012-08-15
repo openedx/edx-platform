@@ -32,22 +32,37 @@ class @Problem
 
   queueing: =>
     @queued_items = @$(".xqueue")
-    if @queued_items.length > 0
+    @num_queued_items = @queued_items.length
+    if @num_queued_items > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
-      window.queuePollerID = window.setTimeout(@poll, 100)
+      queuelen = @get_queuelen()
+      window.queuePollerID = window.setTimeout(@poll, queuelen*10)
 
+  # Retrieves the minimum queue length of all queued items
+  get_queuelen: =>
+    minlen = Infinity
+    @queued_items.each (index, qitem) ->
+      len = parseInt($.text(qitem))  
+      if len < minlen
+        minlen = len
+    return minlen
+    
   poll: =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
-      @queued_items = $(response.html).find(".xqueue")
-      if @queued_items.length == 0 
+      # If queueing status changed, then render
+      @new_queued_items = $(response.html).find(".xqueue")
+      if @new_queued_items.length isnt @num_queued_items
         @el.html(response.html)
         @executeProblemScripts () =>
           @setupInputTypes()
           @bind()
+      
+      @num_queued_items = @new_queued_items.length
+      if @num_queued_items == 0 
         delete window.queuePollerID
       else
-        # TODO: Dynamically adjust timeout interval based on @queued_items.value
+        # TODO: Some logic to dynamically adjust polling rate based on queuelen
         window.queuePollerID = window.setTimeout(@poll, 1000)
 
   render: (content) ->
@@ -141,9 +156,16 @@ class @Problem
 
     fd = new FormData()
     
+    # Sanity check of file size
+    file_too_large = false
+    max_filesize = 4*1000*1000 # 4 MB
+
     @inputs.each (index, element) ->
       if element.type is 'file'
         if element.files[0] instanceof File
+          if element.files[0].size > max_filesize
+            file_too_large = true
+            alert 'Submission aborted! Your file "' + element.files[0].name + '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
           fd.append(element.id, element.files[0])
         else
           fd.append(element.id, '')
@@ -163,7 +185,8 @@ class @Problem
           else
             alert(response.success)
 
-    $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    if not file_too_large
+      $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     Logger.log 'problem_check', @answers

@@ -1,12 +1,12 @@
 from fs.errors import ResourceNotFoundError
 import time
-import dateutil.parser
 import logging
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.timeparse import parse_time, stringify_time
 
 log = logging.getLogger(__name__)
 
@@ -18,38 +18,15 @@ class CourseDescriptor(SequenceDescriptor):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
 
         msg = None
-        try:
-            self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
-        except KeyError:
-            msg = "Course loaded without a start date. id = %s" % self.id
-        except ValueError as e:
-            msg = "Course loaded with a bad start date. %s '%s'" % (self.id, e)
-
-        # Don't call the tracker from the exception handler.
-        if msg is not None:
-            self.start = time.gmtime(0)  # The epoch
+        if self.start is None:
+            msg = "Course loaded without a valid start date. id = %s" % self.id
+            # hack it -- start in 1970
+            self.metadata['start'] = stringify_time(time.gmtime(0))
             log.critical(msg)
             system.error_tracker(msg)
 
-        def try_parse_time(key):
-            """
-            Parse an optional metadata key: if present, must be valid.
-            Return None if not present.
-            """
-            if key in self.metadata:
-                try:
-                    return time.strptime(self.metadata[key], "%Y-%m-%dT%H:%M")
-                except ValueError as e:
-                    msg = "Course %s loaded with a bad metadata key %s '%s'" % (
-                        self.id, self.metadata[key], e)
-                    log.warning(msg)
-            return None
-
-        self.enrollment_start = try_parse_time("enrollment_start")
-        self.enrollment_end = try_parse_time("enrollment_end")
-
-
-
+        self.enrollment_start = self._try_parse_time("enrollment_start")
+        self.enrollment_end = self._try_parse_time("enrollment_end")
 
     def has_started(self):
         return time.gmtime() > self.start
@@ -154,6 +131,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def id(self):
+        """Return the course_id for this course"""
         return self.location_to_id(self.location)
 
     @property
