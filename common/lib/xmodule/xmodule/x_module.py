@@ -612,8 +612,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
     def _try_parse_time(self, key):
         """
-        Parse an optional metadata key containing a time: if present, must be valid.
-        Return None if not present.
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
         """
         if key in self.metadata:
             try:
@@ -704,7 +705,6 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 is_staff=False,
                  node_path=""):
         '''
         Create a closure around the system environment.
@@ -735,9 +735,6 @@ class ModuleSystem(object):
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
-
-        is_staff - Is the user making the request a staff user?
-             TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -748,7 +745,6 @@ class ModuleSystem(object):
         self.DEBUG = self.debug = debug
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
-        self.is_staff = is_staff
         self.node_path = node_path
 
     def get(self, attr):
