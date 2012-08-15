@@ -51,7 +51,7 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
         dictionary.update(csrf(request))
 
     if request and course:
-        dictionary['staff_access'] = has_access(request.user, course, 'load')
+        dictionary['staff_access'] = has_access(request.user, course, 'staff')
     else:
         dictionary['staff_access'] = False
 
