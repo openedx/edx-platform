@@ -184,10 +184,10 @@ def endorse_comment(request, course_id, comment_id):
 @login_required
 @permitted
 def openclose_thread(request, course_id, thread_id):
-    comment = cc.Comment.find(comment_id)
-    comment.endorsed = request.POST.get('closed', 'false').lower() == 'true'
-    comment.save()
-    return JsonResponse(comment.to_dict())
+    thread = cc.Thread.find(thread_id)
+    thread.closed = request.POST.get('closed', 'false').lower() == 'true'
+    thread.save()
+    return JsonResponse(thread.to_dict())
 
 @require_POST
 @login_required
