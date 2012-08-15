@@ -138,7 +138,9 @@ For instance, if you want to generate comments for a new discussion tab named "l
 
     bundle exec rspec
 
-Warning: due to an unresolved bug in the test code, testing the service will "flush" the development database. So you need to generate seed again after testing.
+Warning: the development and test environments share the same elasticsearch index. After running tests, search may not work in the development environment. You simply need to reindex:
+
+    bundle exec rake db:reindex_search
 
 ### debugging the service
 
