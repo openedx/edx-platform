@@ -8,6 +8,7 @@ import time
 from django.conf import settings
 
 from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
@@ -49,6 +50,10 @@ def has_access(user, obj, action):
     if isinstance(obj, CourseDescriptor):
         return _has_access_course_desc(user, obj, action)
 
+    if isinstance(obj, ErrorDescriptor):
+        return _has_access_error_desc(user, obj, action)
+
+    # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XModuleDescriptor):
         return _has_access_descriptor(user, obj, action)
 
@@ -94,6 +99,7 @@ def _has_access_course_desc(user, course, action):
 
         if (start is None or now > start) and (end is None or now < end):
             # in enrollment period, so any user is allowed to enroll.
+            debug("Allow: in enrollment period")
             return True
 
         # otherwise, need staff access
@@ -115,6 +121,7 @@ def _has_access_course_desc(user, course, action):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
             if course.metadata.get('ispublic'):
+                debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
             return _has_staff_access_to_descriptor(user, course)
 
@@ -128,6 +135,25 @@ def _has_access_course_desc(user, course, action):
         }
 
     return _dispatch(checkers, action, user, course)
+
+
+def _has_access_error_desc(user, descriptor, action):
+    """
+    Only staff should see error descriptors.
+
+    Valid actions:
+    'load' -- load this descriptor, showing it to the user.
+    'staff' -- staff access to descriptor.
+    """
+    def check_for_staff():
+        return _has_staff_access_to_descriptor(user, descriptor)
+
+    checkers = {
+        'load': check_for_staff,
+        'staff': check_for_staff
+        }
+
+    return _dispatch(checkers, action, user, descriptor)
 
 
 def _has_access_descriptor(user, descriptor, action):
@@ -145,6 +171,7 @@ def _has_access_descriptor(user, descriptor, action):
     def can_load():
         # If start dates are off, can always load
         if settings.MITX_FEATURES['DISABLE_START_DATES']:
+            debug("Allow: DISABLE_START_DATES")
             return True
 
         # Check start date
@@ -152,11 +179,13 @@ def _has_access_descriptor(user, descriptor, action):
             now = time.gmtime()
             if now > descriptor.start:
                 # after start date, everyone can see it
+                debug("Allow: now > start date")
                 return True
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor)
 
         # No start date, so can always load.
+        debug("Allow: no start date")
         return True
 
     checkers = {
@@ -212,7 +241,9 @@ def _dispatch(table, action, user, obj):
         result = table[action]()
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
-              user, obj, action)
+              user,
+              obj.location.url() if isinstance(obj, XModuleDescriptor) else str(obj)[:60],
+              action)
         return result
 
     raise ValueError("Unknown action for object type '{}': '{}'".format(
@@ -239,15 +270,19 @@ def _has_staff_access_to_location(user, location):
     course is a string: the course field of the location being accessed.
     '''
     if user is None or (not user.is_authenticated()):
+        debug("Deny: no user or anon user")
         return False
     if user.is_staff:
+        debug("Allow: user.is_staff")
         return True
 
     # If not global staff, is the user in the Auth group for this class?
     user_groups = [x[1] for x in user.groups.values_list()]
     staff_group = _course_staff_group_name(location)
     if staff_group in user_groups:
+        debug("Allow: user in group %s", staff_group)
         return True
+    debug("Deny: user not in group %s", staff_group)
     return False
 
 def _has_staff_access_to_course_id(user, course_id):

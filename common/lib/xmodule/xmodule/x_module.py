@@ -219,9 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            self._loaded_children = [
-                self.system.get_module(child)
-                for child in self.definition.get('children', [])]
+            # get_module returns None if the current user doesn't have access
+            # to the location.
+            self._loaded_children = filter(None,
+                [self.system.get_module(child)
+                for child in self.definition.get('children', [])])
 
         return self._loaded_children
 
@@ -385,9 +387,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         self.category = self.location.category
         self.shared_state_key = kwargs.get('shared_state_key')
 
-        # look for a start time, setting to None if not present
-        self.start = self._try_parse_time('start')
-
         self._child_instances = None
         self._inherited_metadata = set()
 
@@ -399,6 +398,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         '''
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
+
+    @property
+    def start(self):
+        """
+        If self.metadata contains start, return it.  Else return None.
+        """
+        if 'start' not in self.metadata:
+            return None
+        return self._try_parse_time('start')
 
     @property
     def own_metadata(self):
@@ -609,7 +617,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         """
         if key in self.metadata:
             try:
-                parse_time(self.metadata[key])
+                return parse_time(self.metadata[key])
             except ValueError as e:
                 msg = "Descriptor {} loaded with a bad metadata key '{}': '{}'".format(
                     self.location.url(), self.metadata[key], e)
@@ -709,7 +717,8 @@ class ModuleSystem(object):
                          files.  Update or remove.
 
         get_module - function that takes (location) and returns a corresponding
-                         module instance object.
+                         module instance object.  If the current user does not have
+                         access to that location, returns None.
 
         render_template - a function that takes (template_file, context), and
                          returns rendered html.
