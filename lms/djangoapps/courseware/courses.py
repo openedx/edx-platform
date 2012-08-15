@@ -212,7 +212,9 @@ def get_courses_by_university(user, domain=None):
     courses = sorted(courses, key=lambda course: course.number)
 
     if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-        subdomain = settings.COURSE_LISTINGS.get(domain.split(".")[0], 'default')
+        subdomain = domain.split(".")[0]
+        if subdomain not in settings.COURSE_LISTINGS:
+            subdomain = 'default'
         visible_courses = frozenset(settings.COURSE_LISTINGS[subdomain])
     else:
         visible_courses = frozenset(c.id for c in courses)
