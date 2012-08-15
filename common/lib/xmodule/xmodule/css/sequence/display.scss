@@ -4,7 +4,7 @@ nav.sequence-nav {
   @extend .topbar;
   border-bottom: 1px solid $border-color;
   @include border-top-right-radius(4px);
-  margin: (-(lh())) (-(lh())) lh() (-(lh()));
+  margin: 0 0 lh() (-(lh()));
   position: relative;
 
   ol {
