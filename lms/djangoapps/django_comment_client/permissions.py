@@ -96,7 +96,6 @@ VIEW_PERMISSIONS = {
 
 
 def check_permissions_by_view(user, course_id, content, name):
-    # import pdb; pdb.set_trace()
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:

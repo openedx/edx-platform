@@ -55,7 +55,7 @@ initializeFollowDiscussion = (discussion) ->
     handleCancelNewPost = (elem) ->
       if $discussion.hasClass("inline-discussion")
         $local(".new-post-form").addClass("collapsed")
-      else
+      else if $discussion.hasClass("forum-discussion")
         $local(".new-post-form").hide()
 
     handleSimilarPost = (elem) ->
@@ -106,7 +106,7 @@ initializeFollowDiscussion = (discussion) ->
         if $discussion.hasClass("inline-discussion")
           $input.bind 'focus', (e) ->
             $local(".new-post-form").removeClass('collapsed')
-        else
+        else if $discussion.hasClass("forum-discussion")
           $local(".new-post-form").removeClass('collapsed')
 
         $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
@@ -135,8 +135,9 @@ initializeFollowDiscussion = (discussion) ->
         dataType: 'html'
         success: (data, textStatus) ->
           $data = $(data)
+          $parent = $discussion.parent()
           $discussion.replaceWith($data)
-          $discussion = $(".discussion[_id='#{id}']")
+          $discussion = $parent.children(".discussion")
           Discussion.initializeDiscussion($discussion)
           Discussion.bindDiscussionEvents($discussion)
 
@@ -158,12 +159,13 @@ initializeFollowDiscussion = (discussion) ->
     if $discussion.hasClass("inline-discussion")
       initializeNewPost()
 
-    $discussionSidebar = $(".discussion-sidebar")
-    if $discussionSidebar.length
-      $sidebarLocal = Discussion.generateLocal($discussionSidebar)
-      Discussion.bindLocalEvents $sidebarLocal,
-        "click .sidebar-new-post-button": (event) ->
-          initializeNewPost()
+    if $discussion.hasClass("forum-discussion")
+      $discussionSidebar = $(".discussion-sidebar")
+      if $discussionSidebar.length
+        $sidebarLocal = Discussion.generateLocal($discussionSidebar)
+        Discussion.bindLocalEvents $sidebarLocal,
+          "click .sidebar-new-post-button": (event) ->
+            initializeNewPost()
 
     Discussion.bindLocalEvents $local,
 

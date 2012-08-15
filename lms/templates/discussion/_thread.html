@@ -4,9 +4,16 @@
 <%! from django_comment_client.utils import pluralize %>
 <%! import urllib %>
 
+<%!
+  def user_id_with_anonymity(content):
+    if content.get('anonymous', False):
+      return ''
+    else:
+      return content['user_id']
+%>
 
 <%def name="render_thread(course_id, thread, show_comments=False)">
-  <div class="thread" _id="${thread['id']}">
+  <div class="thread" _id="${thread['id']}" _discussion_id="${thread['commentable_id']}" _author_id="${user_id_with_anonymity(thread)}">
     ${render_content(thread, "thread", show_comments=show_comments)}
     % if show_comments:
       ${render_comments(thread.get('children', []))}
@@ -16,9 +23,9 @@
 
 <%def name="render_comment(comment)">
   % if comment['endorsed']:
-  <div class="comment endorsed" _id="${comment['id']}">
+  <div class="comment endorsed" _id="${comment['id']}" _author_id="${user_id_with_anonymity(comment)}">
   % else:
-  <div class="comment" _id="${comment['id']}">
+  <div class="comment" _id="${comment['id']}" _author_id="${user_id_with_anonymity(comment)}">
   % endif
     ${render_content(comment, "comment")}
     <div class="comments">
@@ -60,7 +67,7 @@
 
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
-          <a name="${content['id']}"></a>
+          <a name="${content['id']}" style="width: 0; height: 0; padding: 0; border: none;"></a>
           % if content.get('highlighted_body', None):
             <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['highlighted_body'] | h}</div>
           % else:
@@ -103,20 +110,16 @@
 
 <%def name="render_bottom_bar(content, type, **kwargs)">
   <div class="info">    
-      ${render_info(content)}
+      ${render_info(content, type, **kwargs)}
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
       <li><div class="follow-wrapper"></div></li>
       <li>${render_link("discussion-link discussion-permanent-link", "Permanent Link")}</li>
     </ul>
-
-
-    
-
   </div>
 </%def>
 
-<%def name="render_info(content)">
+<%def name="render_info(content, type, **kwargs)">
   <%
     def url_for_user(user_id):
       return reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])
@@ -131,7 +134,11 @@
   </div>
   <div class="comment-count">
     % if content.get('comments_count', -1) >= 0:
-    <a href="javascript:void(0)" class="discussion-show-comments">Show ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
+      % if kwargs.get('show_comments') is True:
+        <a href="javascript:void(0)" class="discussion-hide-comments">Hide ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
+      % else:
+        <a href="javascript:void(0)" class="discussion-show-comments">Show ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
+      % endif
     % endif
   </div>
 </%def>
