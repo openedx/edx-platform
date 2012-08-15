@@ -58,6 +58,32 @@ In the discussion service, notifications are handled asynchronously using a thir
 
     bundle exec rake jobs:work
 
+## Initialize roles and permissions
+
+To fully test the discussion forum, you might want to act as a moderator or an administrator. Currently, moderators can manage everything in the forum, and administrator can manage everything plus assigning and revoking moderator status of other users.
+
+First make sure that the database is up-to-date:
+
+    rake django-admin[syncdb]
+    rake django-admin[migrate]
+
+For convenience, add the following environment variables to the terminal (assuming that you're using configuration set lms.envs.dev):
+
+    export DJANGO_SETTINGS_MODULE=lms.envs.dev
+    export PYTHONPATH=.
+
+Now initialzie roles and permissions:
+
+    django-admin.py seed_permissions_roles
+
+To assign yourself as a moderator, use the following command (assuming your username is "test", and the course id is "MITx/6.002x/2012_Fall"):
+
+    django-admin.py assign_role test Moderator "MITx/6.002x/2012_Fall"
+
+To assign yourself as an administrator, use the following command
+
+    django-admin.py assign_role test Administrator "MITx/6.002x/2012_Fall"
+
 ## Some other useful commands
 
 ### generate seeds for a specific forum
@@ -104,9 +130,9 @@ We also have a command for generating comments within a forum with the specified
 
     bundle exec rake db:generate_comments[type_the_discussion_id_here]
 
-For instance, if you want to generate comments for the general discussion, for which the discussion id is the course id with slashes and dots replaced by underscores (you **should** do this before testing forum view) and you are in 6.002x, use the following command
+For instance, if you want to generate comments for a new discussion tab named "lab_3", then use the following command
 
-    bundle exec rake db:generate_comments[MITx_6_002x_2012_Fall]
+    bundle exec rake db:generate_comments[lab_3]
 
 ### Running tests for the service
 
@@ -119,3 +145,13 @@ Warning: due to an unresolved bug in the test code, testing the service will "fl
 You can use the following command to launch a console within the service environment:
 
     bundle exec rake console
+
+### show user roles and permissions
+
+Use the following command to see the roles and permissions of a user in a given course (assuming, again, that the username is "test"):
+
+    django-admin.py show_permissions moderator
+
+You need to make sure that the environment variables are exported. Otherwise you would need to do
+
+    django-admin.py show_permissions moderator --settings=lms.envs.dev --pythonpath=.
