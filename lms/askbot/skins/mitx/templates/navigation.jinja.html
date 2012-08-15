@@ -1,25 +1,25 @@
 <header class="global" aria-label="Global Navigation">
   <nav>
-    <h1 class="logo"><a href="${reverse('root')}"></a></h1>
+    <h1 class="logo"><a href="{% url root %}"></a></h1>
     <ol class="left">
       <li class="primary">
-        <a href="${reverse('courses')}">Find Courses</a>
+        <a href="{% url courses %}">Find Courses</a>
       </li>
     </ol>
 
     <ol class="user">
       <li class="primary">
-        <a href="${reverse('dashboard')}" class="user-link">
+        <a href="{% url dashboard %}" class="user-link">
           <span class="avatar"></span>
-          ${user.username}
+          {{user.username}}
         </a>
       </li>
       <li class="primary">
         <a href="#" class="dropdown">&#9662</a>
         <ul class="dropdown-menu">
-          ##          <li><a href="#">Account Settings</a></li>
-          <li><a href="${reverse('help_edx')}">Help</a></li>
-          <li><a href="${reverse('logout')}">Log Out</a></li>
+          {# <li><a href="#">Account Settings</a></li> #}
+          <li><a href="{% url help_edx %}">Help</a></li>
+          <li><a href="{% url logout %}">Log Out</a></li>
         </ul>
       </li>
     </ol>
