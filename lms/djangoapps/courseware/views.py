@@ -136,6 +136,10 @@ def index(request, course_id, chapter=None, section=None,
                 module = get_module(request.user, request,
                                     section_descriptor.location,
                                     student_module_cache)
+                if module is None:
+                    # User is probably being clever and trying to access something
+                    # they don't have access to.
+                    raise Http404
                 context['content'] = module.get_html()
             else:
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"

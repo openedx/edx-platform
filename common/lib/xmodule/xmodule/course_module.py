@@ -6,7 +6,7 @@ from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.timeparse import parse_time
+from xmodule.timeparse import parse_time, stringify_time
 
 log = logging.getLogger(__name__)
 
@@ -18,16 +18,10 @@ class CourseDescriptor(SequenceDescriptor):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
 
         msg = None
-        try:
-            self.start = parse_time(self.metadata["start"])
-        except KeyError:
-            msg = "Course loaded without a start date. id = %s" % self.id
-        except ValueError as e:
-            msg = "Course loaded with a bad start date. %s '%s'" % (self.id, e)
-
-        # Don't call the tracker from the exception handler.
-        if msg is not None:
-            self.start = time.gmtime(0)  # The epoch
+        if self.start is None:
+            msg = "Course loaded without a valid start date. id = %s" % self.id
+            # hack it -- start in 1970
+            self.metadata['start'] = stringify_time(time.gmtime(0))
             log.critical(msg)
             system.error_tracker(msg)
 

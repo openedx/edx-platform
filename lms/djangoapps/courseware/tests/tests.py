@@ -25,7 +25,7 @@ from student.models import Registration
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
-
+from xmodule.timeparse import stringify_time
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -371,8 +371,8 @@ class TestViewAuth(PageLoader):
 
         # Make courses start in the future
         tomorrow = time.time() + 24*3600
-        self.toy.start = self.toy.metadata['start'] = time.gmtime(tomorrow)
-        self.full.start = self.full.metadata['start'] = time.gmtime(tomorrow)
+        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.full.metadata['start'] = stringify_time(time.gmtime(tomorrow))
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
