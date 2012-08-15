@@ -166,7 +166,7 @@ class XmlDescriptor(XModuleDescriptor):
         Subclasses should not need to override this except in special
         cases (e.g. html module)'''
 
-        # VS[compat] -- the filename tag should go away once everything is
+        # VS[compat] -- the filename attr should go away once everything is
         # converted.  (note: make sure html files still work once this goes away)
         filename = xml_object.get('filename')
         if filename is None:

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import re
@@ -149,7 +150,7 @@ class XMLModuleStore(ModuleStoreBase):
         for course_dir in course_dirs:
             self.try_load_course(course_dir)
 
-    def try_load_course(self,course_dir):
+    def try_load_course(self, course_dir):
         '''
         Load a course, keeping track of errors as we go along.
         '''
@@ -170,7 +171,27 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         String representation - for debugging
         '''
-        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (self.data_dir,len(self.courses),len(self.modules))
+        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (
+            self.data_dir, len(self.courses), len(self.modules))
+
+    def load_policy(self, policy_path, tracker):
+        """
+        Attempt to read a course policy from policy_path.  If the file
+        exists, but is invalid, log an error and return {}.
+
+        If the policy loads correctly, returns the deserialized version.
+        """
+        if not os.path.exists(policy_path):
+            return {}
+        try:
+            with open(policy_path) as f:
+                return json.load(f)
+        except (IOError, ValueError) as err:
+            msg = "Error loading course policy from {}".format(policy_path)
+            tracker(msg)
+            log.warning(msg + " " + str(err))
+        return {}
+
 
     def load_course(self, course_dir, tracker):
         """
@@ -214,6 +235,11 @@ class XMLModuleStore(ModuleStoreBase):
             system = ImportSystem(self, org, course, course_dir, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
+            policy_path = self.data_dir / course_dir / 'policy.json'
+
+            policy = self.load_policy(policy_path, tracker)
+            XModuleDescriptor.apply_policy(course_descriptor, policy)
+
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
