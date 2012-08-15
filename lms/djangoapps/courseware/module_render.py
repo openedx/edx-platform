@@ -19,7 +19,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -232,6 +232,10 @@ def get_module(user, request, location, student_module_cache, position=None, cou
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
         module.metadata['data_dir'], module
     )
+
+    # Allow URLs of the form '/course/' refer to the root of multicourse directory
+    #   hierarchy of this course
+    module.get_html = replace_course_urls(module.get_html, course_id, module)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, module, 'staff'):
