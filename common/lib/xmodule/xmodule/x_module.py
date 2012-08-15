@@ -219,11 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
+            child_locations = self.definition.get('children', [])
+            children = [self.system.get_module(loc) for loc in child_locations]
             # get_module returns None if the current user doesn't have access
             # to the location.
-            self._loaded_children = filter(None,
-                [self.system.get_module(child)
-                for child in self.definition.get('children', [])])
+            self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
