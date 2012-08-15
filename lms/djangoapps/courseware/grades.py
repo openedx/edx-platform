@@ -63,7 +63,12 @@ def grade(student, request, course, student_module_cache=None):
                 scores = []
                 # TODO: We need the request to pass into here. If we could forgo that, our arguments
                 # would be simpler
-                section_module = get_module(student, request, section_descriptor.location, student_module_cache)
+                section_module = get_module(student, request,
+                                            section_descriptor.location, student_module_cache)
+                if section_module is None:
+                    # student doesn't have access to this module, or something else
+                    # went wrong.
+                    continue
 
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database

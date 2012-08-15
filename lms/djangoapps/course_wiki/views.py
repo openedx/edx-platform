@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
-from courseware.courses import check_course
+from courseware.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def course_wiki_redirect(request, course_id):
     as it's home page. A course's wiki must be an article on the root (for
     example, "/6.002x") to keep things simple.
     """
-    course = check_course(request.user, course_id)
+    course = get_course_by_id(course_id)
     
     course_slug = course.wiki_slug
     
