@@ -20,27 +20,27 @@ class Middleware(object):
     same page on the regular wiki.
     """
     
-    def process_request(self, request):        
-        referer = request.META.get('HTTP_REFERER')
+    def get_redirected_url(self, user, referer, destination):
+        """
+        Returns None if the destination shouldn't be changed.
+        """
+        if not referer:
+            return destination
+        referer_path = urlparse(referer).path
         
-        try:
-            parsed_referer = urlparse(referer)
-            referer_path = parsed_referer.path
-        except:
-            referer_path =""
-                
-        path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', request.path)
+        path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', destination)
+        print "path_match" , path_match
         if path_match:
             # We are going to the wiki. Check if we came from a course
             course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
+            print "course_match" , course_match
             if course_match:
                 course_id = course_match.group('course_id')
                 
                 # See if we are able to view the course. If we are, redirect to it
                 try:
-                    course = get_course_with_access(request.user, course_id, 'load')
-                    return redirect("/courses/" + course.id + "/wiki/" + path_match.group('wiki_path') )
-                    
+                    course = get_course_with_access(user, course_id, 'load')
+                    return "/courses/" + course.id + "/wiki/" + path_match.group('wiki_path')
                 except Http404:
                     # Even though we came from the course, we can't see it. So don't worry about it.
                     pass
@@ -48,18 +48,64 @@ class Middleware(object):
         else:
             # It is also possible we are going to a course wiki view, but we 
             # don't have permission to see the course!
-            course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$', request.path)
+            course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$', destination)
             if course_match:
                 course_id = course_match.group('course_id')
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
                 try:
-                    course = get_course_with_access(request.user, course_id, 'load')
+                    course = get_course_with_access(user, course_id, 'load')
                     # Good, we can see the course. Carry on
-                    return None
+                    return destination
                 except Http404:
                     # We can't see the course, so redirect to the regular wiki
-                    return redirect("/wiki/" + course_match.group('wiki_path'))
+                    return "/wiki/" + course_match.group('wiki_path')
+        
+        return destination
+    
+    
+    def process_response(self, request, response):
+        """
+        If this is a redirect response going to /wiki/*, then we might need
+        to change it to be a redirect going to /courses/*/wiki*.
+        """
+        print "processing response. Request: " , request.path, request.META.get('HTTP_REFERER')
+        print "response:", response.status_code, response['LOCATION'] if response.status_code == 302 else ""
+        print "self.redirected" , self.redirected, response.status_code, request.META.get('HTTP_REFERER')
+        if not self.redirected and response.status_code == 302: #This is a redirect
+            referer = request.META.get('HTTP_REFERER')
+            destination_url = response['LOCATION']
+            destination = urlparse(destination_url).path
+        
+            new_destination = self.get_redirected_url(request.user, referer, destination)
             
+            print "old_destination" , destination
+            print "new_destination" , new_destination
+            
+            if new_destination != destination:
+                print "changinging redirection. Used to be " , destination_url
+                new_url = destination_url.replace(destination, new_destination)
+                print "now it is " , new_url
+                response['LOCATION'] = new_url
+        
+        return response
+            
+    
+    
+    def process_request(self, request):
+        self.redirected = False
+        if not request.method == 'GET':
+            return None
+            
+        referer = request.META.get('HTTP_REFERER')
+        destination = request.path
+        
+        new_destination = self.get_redirected_url(request.user, referer, destination)
+        
+        if new_destination != destination:
+            # We mark that we generated this redirection, so we don't modify it again
+            self.redirected = True
+            return redirect(new_destination)
+        
         return None
 
 def context_processor(request):
