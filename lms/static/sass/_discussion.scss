@@ -102,10 +102,12 @@ $tag-text-color: #5b614f;
       li {
         @include clearfix;
         margin-bottom: 8px;
+        border: none;
       }
 
       a {        
         @include standard-discussion-link;
+        background: none;
       }
     }
 
