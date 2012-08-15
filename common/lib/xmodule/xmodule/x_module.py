@@ -219,11 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
+            child_locations = self.definition.get('children', [])
+            children = [self.system.get_module(loc) for loc in child_locations]
             # get_module returns None if the current user doesn't have access
             # to the location.
-            self._loaded_children = filter(None,
-                [self.system.get_module(child)
-                for child in self.definition.get('children', [])])
+            self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
@@ -296,6 +296,14 @@ class XModule(HTMLSnippet):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
+
+
+def policy_key(location):
+    """
+    Get the key for a location in a policy file.  (Since the policy file is
+    specific to a course, it doesn't need the full location url).
+    """
+    return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
 class XModuleDescriptor(Plugin, HTMLSnippet):
@@ -415,6 +423,24 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         """
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
+
+
+    @staticmethod
+    def apply_policy(node, policy):
+        """
+        Given a descriptor, traverse all its descendants and update its metadata
+        with the policy.
+
+        Notes:
+          - this does not propagate inherited metadata.  The caller should
+            call compute_inherited_metadata after applying the policy.
+          - metadata specified in the policy overrides metadata in the xml
+        """
+        k = policy_key(node.location)
+        if k in policy:
+            node.metadata.update(policy[k])
+        for c in node.get_children():
+            XModuleDescriptor.apply_policy(c, policy)
 
     @staticmethod
     def compute_inherited_metadata(node):
