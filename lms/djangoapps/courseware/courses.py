@@ -142,9 +142,6 @@ def get_course_info_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
-<<<<<<< HEAD
-def get_courses_by_university(user):
-=======
 def course_staff_group_name(course):
     '''
     course should be either a CourseDescriptor instance, or a string (the
@@ -200,7 +197,6 @@ def has_access_to_course(user, course):
 
 
 def get_courses_by_university(user, domain=None):
->>>>>>> implement subdomain-based course displays
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).
     Courses are sorted by course.number.
@@ -221,16 +217,10 @@ def get_courses_by_university(user, domain=None):
 
     universities = defaultdict(list)
     for course in courses:
-<<<<<<< HEAD
-        if has_access(user, course, 'see_exists'):
-            universities[course.org].append(course)
-=======
-        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            if not has_access_to_course(user,course):
-                continue
+        if not has_access(user, course, 'see_exists'):
+            continue
         if course.id not in visible_courses:
             continue
         universities[course.org].append(course)
->>>>>>> implement subdomain-based course displays
     return universities
 
