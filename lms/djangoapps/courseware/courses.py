@@ -205,19 +205,18 @@ def get_courses_by_university(user, domain=None):
     Returns dict of lists of courses available, keyed by course.org (ie university).
     Courses are sorted by course.number.
     '''
-    subdomain = domain.split(".")[0]
-
     # TODO: Clean up how 'error' is done.
     # filter out any courses that errored.
-    if settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-        if subdomain in settings.COURSE_LISTINGS:
-            visible_courses = settings.COURSE_LISTINGS[subdomain]
-        else:
-            visible_courses = frozenset(settings.COURSE_LISTINGS['default'])
-
     courses = [c for c in modulestore().get_courses()
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
+
+    if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
+        subdomain = settings.COURSE_LISTINGS.get(domain.split(".")[0], 'default')
+        visible_courses = frozenset(settings.COURSE_LISTINGS[subdomain])
+    else:
+        visible_courses = frozenset(c.id for c in courses)
+
     universities = defaultdict(list)
     for course in courses:
 <<<<<<< HEAD
@@ -227,9 +226,8 @@ def get_courses_by_university(user, domain=None):
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             if not has_access_to_course(user,course):
                 continue
-        if settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-            if course.id not in visible_courses:
-                continue
+        if course.id not in visible_courses:
+            continue
         universities[course.org].append(course)
 >>>>>>> implement subdomain-based course displays
     return universities
