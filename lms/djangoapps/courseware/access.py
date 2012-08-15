@@ -68,6 +68,7 @@ def has_access(user, obj, action):
     raise TypeError("Unknown object type in has_access(): '{}'"
                     .format(type(obj)))
 
+
 # ================ Implementation helpers ================================
 
 def _has_access_course_desc(user, course, action):
@@ -83,8 +84,11 @@ def _has_access_course_desc(user, course, action):
     'staff' -- staff access to course.
     """
     def can_load():
-        "Can this user load this course?"
-        # delegate to generic descriptor check
+        "Can this user load this course?
+
+        NOTE: this is not checking whether user is actually enrolled in the course.
+        "
+        # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, course, action)
 
     def can_enroll():
@@ -169,6 +173,12 @@ def _has_access_descriptor(user, descriptor, action):
     has_access(), it will not do the right thing.
     """
     def can_load():
+        """
+        NOTE: This does not check that the student is enrolled in the course
+        that contains this module.  We may or may not want to allow non-enrolled
+        students to see modules.  If not, views should check the course, so we
+        don't have to hit the enrollments table on every module load.
+        """
         # If start dates are off, can always load
         if settings.MITX_FEATURES['DISABLE_START_DATES']:
             debug("Allow: DISABLE_START_DATES")
@@ -194,8 +204,6 @@ def _has_access_descriptor(user, descriptor, action):
         }
 
     return _dispatch(checkers, action, user, descriptor)
-
-
 
 
 def _has_access_xmodule(user, xmodule, action):
