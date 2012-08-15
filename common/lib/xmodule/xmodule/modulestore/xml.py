@@ -234,10 +234,16 @@ class XMLModuleStore(ModuleStoreBase):
 
             system = ImportSystem(self, org, course, course_dir, tracker)
 
-            course_descriptor = system.process_xml(etree.tostring(course_data))
             policy_path = self.data_dir / course_dir / 'policy.json'
-
             policy = self.load_policy(policy_path, tracker)
+            # Special case -- need to change the url_name of the course before
+            # it gets loaded, so its location and other fields are right
+            if 'course_url_name' in policy:
+                new_url_name = policy['course_url_name']
+                log.info("changing course url_name to {}".format(new_url_name))
+                course_data.set('url_name', new_url_name)
+
+            course_descriptor = system.process_xml(etree.tostring(course_data))
             XModuleDescriptor.apply_policy(course_descriptor, policy)
 
             # NOTE: The descriptors end up loading somewhat bottom up, which
