@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from student.models import CourseEnrollment
 
 import logging
+from util.cache import cache
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -17,9 +18,17 @@ def assign_default_role(sender, instance, **kwargs):
     logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
     instance.user.roles.add(role)
 
-def has_permission(user, permission, course_id=None):
+def cached_has_permission(user, permission, course_id=None):
     # if user.permissions.filter(name=permission).exists():
     #     return True
+    key = "permission_%d_%s_%s" % (user.id, str(course_id), permission)
+    val = cache.get(key, None)
+    if val not in [True, False]:
+        val = has_permission(user, permission, course_id=course_id)
+        cache.set(key, val, 3600)
+    return val
+
+def has_permission(user, permission, course_id=None):
     for role in user.roles.filter(course_id=course_id):
         if role.has_permission(permission):
             return True
@@ -60,7 +69,7 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
         if isinstance(per, basestring):
             if per in CONDITIONS:
                 return check_condition(user, per, course_id, kwargs)
-            return has_permission(user, per, course_id=course_id)
+            return cached_has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
             if operator == "or":
