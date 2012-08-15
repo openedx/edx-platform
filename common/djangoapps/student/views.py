@@ -94,7 +94,7 @@ def main_index(request, extra_context={}, user=None):
 
     # The course selection work is done in courseware.courses.
     universities = get_courses_by_university(None,
-                                             domain=request.META['HTTP_HOST'])
+                                             domain=request.META.get('HTTP_HOST'))
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
