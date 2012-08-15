@@ -1,19 +1,24 @@
 // Styles for the default question list view
 
 div.question-list-header {
+  @extend h1.top-header;
   display: block;
   margin-bottom: 0px;
+  padding-bottom: lh(.5);
   overflow: hidden;
   width: flex-grid(9,9);
-  @extend h1.top-header;
 
   h1 {
     margin: 0;
     font-size: 1em;
     font-weight: 100;
+    padding-bottom: lh(.5);
 
     > a.light-button {
       float: right;
+      font-size: em(14, 24);
+      letter-spacing: 0;
+      font-weight: 400;
     }
   }
 
@@ -87,6 +92,7 @@ div.question-list-header {
 
       a {
         color: #555;
+        font-size: em(14, 24);
       }
     }
 
@@ -95,12 +101,10 @@ div.question-list-header {
     }
 
     ul.tags {
-      li {
-        background: #fff;
-
-        &:before {
-          border-color: transparent #fff transparent transparent;
-        }
+      span, div {
+        line-height: 1em;
+        margin-left: 6px;
+        cursor: pointer;
       }
     }
   }
@@ -155,6 +159,7 @@ ul.question-list, div#question-list {
 
           span.relative-time {
             font-weight: normal;
+            line-height: lh();
           }
         }
 

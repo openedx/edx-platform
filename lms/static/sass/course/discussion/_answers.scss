@@ -7,9 +7,16 @@ div.answer-controls {
   padding-left: flex-grid(1.1);
   width: 100%;
 
+
   div.answer-count {
     display: inline-block;
     float: left;
+
+    h1 {
+      margin-bottom: 0;
+      font-size: em(24);
+      font-weight: 100;
+    }
   }
 
   div.answer-sort {
@@ -18,7 +25,7 @@ div.answer-controls {
 
     nav {
       float: right;
-      margin-top: 34px;
+      margin-top: 10px;
 
       a {
         &.on span{
@@ -44,8 +51,9 @@ div.answer-block {
   width: 100%;
 
   img.answer-img-accept {
-    margin: 10px 0px 10px 16px;
+    margin: 10px 0px 10px 11px;
   }
+
   div.answer-container {
     @extend div.question-container;
 
@@ -130,17 +138,19 @@ div.answer-own {
 
 div.answer-actions {
   margin: 0;
-  padding:8px 8px 8px 0;
+  padding:8px 0 8px 8px;
   text-align: right;
   border-top: 1px solid #efefef;
 
   span.sep {
-    color: #EDDFAA;
+    color: $border-color;
   }
 
   a {
     cursor: pointer;
     text-decoration: none;
+    @extend a:link;
+    font-size: em(14);
   }
 }
 

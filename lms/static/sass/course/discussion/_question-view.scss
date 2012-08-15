@@ -68,16 +68,18 @@ div.question-header {
     h1 {
       margin-top: 0;
       font-weight: 100;
+      line-height: 1.1em;
 
       a {
         font-weight: 100;
+        line-height: 1.1em;
       }
     }
 
     div.meta-bar {
       border-bottom: 1px solid #eee;
       display: block;
-      margin: 10px 0;
+      margin: lh(.5) 0 lh();
       overflow: hidden;
       padding: 5px 0 10px;
 
@@ -158,7 +160,7 @@ div.question-header {
           }
 
           div.change-date {
-            font-size: 12px;
+            font-size: em(14);
             margin-bottom: 2px;
           }
 
@@ -182,13 +184,13 @@ div.question-header {
       display: inline-block;
       padding: 0 0 3% 0;
       width: 100%;
+      margin-top: lh(2);
 
       div.comments-content {
-        font-size: 13px;
-        background: #efefef;
+        border-top: 1px solid lighten($border-color, 10%);
 
         .block {
-          border-top: 1px solid #ddd;
+          border-top: 1px solid lighten($border-color, 10%);
           padding: 15px;
           display: block;
 
@@ -200,10 +202,10 @@ div.question-header {
             padding-top: 10px;
 
             span.official-comment {
-              background: $mit-red;
+              background: $pink;
               color: #fff;
               display: block;
-              font-size: 12px;
+              font-size: em(12);
               margin: 0 0 10px -5%;
               padding:2px 5px 2px 5%;
               text-align: left;
@@ -214,6 +216,10 @@ div.question-header {
 
         form.post-comments {
           padding: 15px;
+
+          button {
+            color: #fff;
+          }
 
            button:last-child {
             margin-left: 10px;
@@ -235,7 +241,6 @@ div.question-header {
             border: none;
             @include box-shadow(none);
             display: inline-block;
-            margin-top: -8px;
             padding:0 2% 0 0;
             text-align: center;
             width: 5%;
@@ -281,16 +286,14 @@ div.question-header {
             }
 
             div.comment-delete {
-              // display: inline;
-              color: $mit-red;
+              @extend a:link;
               cursor: pointer;
-              font-size: 15px;
             }
 
             div.comment-edit {
               @include transform(rotate(50deg));
               cursor: pointer;
-              font-size: 16px;
+
               a.edit-icon {
                 color: #555;
                 text-decoration: none;
@@ -308,13 +311,13 @@ div.question-header {
 
             div.comment-meta {
               text-align: right;
+              margin-top: lh(.5);
 
               a.author {
                 font-weight: bold;
               }
 
               a.edit {
-                font-size: 12px;
                 padding: 2px 10px;
               }
             }
@@ -341,7 +344,6 @@ div.question-header {
 
         a {
           display: inline-block;
-          font-size: 12px;
           margin: 10px 10px 10px 0;
         }
       }
