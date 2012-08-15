@@ -289,6 +289,12 @@ $tag-text-color: #5b614f;
   .thread {
     //display: none;
 
+    .search-highlight {
+      display: inline;
+      font-weight: bold;
+      background-color: lightyellow;
+    }
+
     .thread-title {
       @include discussion-font;
       @include discussion-clickable;
@@ -605,6 +611,27 @@ $tag-text-color: #5b614f;
       //width: $discussion-input-width !important;
     }
 
+    .new-post-similar-posts-wrapper {
+      @include border-radius(3px);
+      border: 1px solid #EEE;
+      font-size: $comment_body_size;
+      line-height: 150%;
+      margin-top: 1%;
+      padding: 1% 1.5%;
+    }
+    
+    .hide-similar-posts {
+      float: right;
+    }
+    
+    .new-post-similar-posts {
+      font: inherit;
+      .similar-post {
+        display: block;
+        line-height: 150%;
+      }
+    }
+
     .discussion-errors {
       color: #8F0E0E;
       display: block;
@@ -612,7 +639,6 @@ $tag-text-color: #5b614f;
     }
 
     .new-post-body {
-      margin-top: flex-gutter();
     }
 
     .tagsinput {
@@ -654,16 +680,19 @@ $tag-text-color: #5b614f;
     }
 
     .new-post-title {
-      height: 35px;
+      display: block;
       padding: 5px 12px;
       border-width: 1px;
+      width: 100%;
+    }
+
+    .thread-title-edit {
+      width: 100%;
     }
 
     &.collapsed {
       .new-post-title {
-        height: 0;
-        padding: 0;
-        border-width: 0;
+        display: none;
       }
 
       .wmd-button-row {
@@ -700,7 +729,6 @@ $tag-text-color: #5b614f;
     }
 
     .edit-post-control {
-      margin-left: 79%;
       margin-top: 1%;
     }
 
@@ -722,6 +750,7 @@ $tag-text-color: #5b614f;
     }
 
     label {
+      display: inline;
       font-family: $sans-serif;
       font-size: .8em;
       font-style: normal;
@@ -793,7 +822,7 @@ $tag-text-color: #5b614f;
 
   &.inline-discussion, .forum-discussion {
     .new-post-form {
-      margin: -30px 60px 24px 60px;
+      margin: 24px 60px;
 
       .post-options {
         margin: 8px 0 16px 0;
