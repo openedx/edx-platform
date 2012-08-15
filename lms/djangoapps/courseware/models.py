@@ -67,7 +67,7 @@ class StudentModuleCache(object):
     """
     A cache of StudentModules for a specific student
     """
-    def __init__(self, user, descriptors):
+    def __init__(self, user, descriptors, select_for_update=False):
         '''
         Find any StudentModule objects that are needed by any descriptor
         in descriptors. Avoids making multiple queries to the database.
@@ -77,6 +77,7 @@ class StudentModuleCache(object):
         Arguments
         user: The user for which to fetch maching StudentModules
         descriptors: An array of XModuleDescriptors.
+        select_for_update: Flag indicating whether the row should be locked until end of transaction
         '''
         if user.is_authenticated():
             module_ids = self._get_module_state_keys(descriptors) 
@@ -86,23 +87,30 @@ class StudentModuleCache(object):
             self.cache = []
             chunk_size = 500
             for id_chunk in [module_ids[i:i + chunk_size] for i in xrange(0, len(module_ids), chunk_size)]:
-                self.cache.extend(StudentModule.objects.filter(
-                    student=user,
-                    module_state_key__in=id_chunk)
-                )
+                if select_for_update:
+                    self.cache.extend(StudentModule.objects.select_for_update().filter(
+                        student=user,
+                        module_state_key__in=id_chunk)
+                    )
+                else:
+                    self.cache.extend(StudentModule.objects.filter(
+                        student=user,
+                        module_state_key__in=id_chunk)
+                    )
 
         else:
             self.cache = []
     
     
     @classmethod
-    def cache_for_descriptor_descendents(cls, user, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
+    def cache_for_descriptor_descendents(cls, user, descriptor, depth=None, descriptor_filter=lambda descriptor: True, select_for_update=False):
         """
         descriptor: An XModuleDescriptor
         depth is the number of levels of descendent modules to load StudentModules for, in addition to
             the supplied descriptor. If depth is None, load all descendent StudentModules
         descriptor_filter is a function that accepts a descriptor and return wether the StudentModule 
             should be cached
+        select_for_update: Flag indicating whether the row should be locked until end of transaction
         """
         
         def get_child_descriptors(descriptor, depth, descriptor_filter):
@@ -122,7 +130,7 @@ class StudentModuleCache(object):
         
         descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
         
-        return StudentModuleCache(user, descriptors)    
+        return StudentModuleCache(user, descriptors, select_for_update)
     
     def _get_module_state_keys(self, descriptors):
         '''

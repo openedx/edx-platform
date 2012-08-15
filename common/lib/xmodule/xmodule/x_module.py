@@ -8,8 +8,9 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from pprint import pprint
 
-from xmodule.modulestore import Location
 from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import Location
+from xmodule.timeparse import parse_time
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -218,9 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            self._loaded_children = [
-                self.system.get_module(child)
-                for child in self.definition.get('children', [])]
+            # get_module returns None if the current user doesn't have access
+            # to the location.
+            self._loaded_children = filter(None,
+                [self.system.get_module(child)
+                for child in self.definition.get('children', [])])
 
         return self._loaded_children
 
@@ -395,6 +398,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         '''
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
+
+    @property
+    def start(self):
+        """
+        If self.metadata contains start, return it.  Else return None.
+        """
+        if 'start' not in self.metadata:
+            return None
+        return self._try_parse_time('start')
 
     @property
     def own_metadata(self):
@@ -596,6 +608,24 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             metadata=self.metadata
         ))
 
+    # ================================ Internal helpers =======================
+
+    def _try_parse_time(self, key):
+        """
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
+        """
+        if key in self.metadata:
+            try:
+                return parse_time(self.metadata[key])
+            except ValueError as e:
+                msg = "Descriptor {} loaded with a bad metadata key '{}': '{}'".format(
+                    self.location.url(), self.metadata[key], e)
+                log.warning(msg)
+        return None
+
+
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
@@ -675,7 +705,6 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 is_staff=False,
                  node_path=""):
         '''
         Create a closure around the system environment.
@@ -688,7 +717,8 @@ class ModuleSystem(object):
                          files.  Update or remove.
 
         get_module - function that takes (location) and returns a corresponding
-                         module instance object.
+                         module instance object.  If the current user does not have
+                         access to that location, returns None.
 
         render_template - a function that takes (template_file, context), and
                          returns rendered html.
@@ -705,9 +735,6 @@ class ModuleSystem(object):
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
-
-        is_staff - Is the user making the request a staff user?
-             TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -718,7 +745,6 @@ class ModuleSystem(object):
         self.DEBUG = self.debug = debug
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
-        self.is_staff = is_staff
         self.node_path = node_path
 
     def get(self, attr):
