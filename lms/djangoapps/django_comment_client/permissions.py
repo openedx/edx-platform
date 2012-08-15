@@ -19,13 +19,16 @@ def assign_default_role(sender, instance, **kwargs):
     instance.user.roles.add(role)
 
 def cached_has_permission(user, permission, course_id=None):
-    # if user.permissions.filter(name=permission).exists():
-    #     return True
+    """
+    Call has_permission if it's not cached. A change in a user's role or
+    a role's permissions will only become effective after CACHE_LIFESPAN seconds. 
+    """
+    CACHE_LIFESPAN = 60
     key = "permission_%d_%s_%s" % (user.id, str(course_id), permission)
     val = cache.get(key, None)
     if val not in [True, False]:
         val = has_permission(user, permission, course_id=course_id)
-        cache.set(key, val, 3600)
+        cache.set(key, val, CACHE_LIFESPAN)
     return val
 
 def has_permission(user, permission, course_id=None):
