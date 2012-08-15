@@ -4,8 +4,11 @@ from urlparse import urlparse
 from django.http import Http404
 from django.shortcuts import redirect
 
+from wiki.models import reverse as wiki_reverse
 from courseware.courses import get_course_with_access
 
+
+IN_COURSE_WIKI_REGEX = r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$'
 
 class Middleware(object):
     """
@@ -18,8 +21,64 @@ class Middleware(object):
     It is also possible that someone followed a link leading to a course
     that they don't have access to. In this case, we redirect them to the
     same page on the regular wiki.
+    
+    If we return a redirect, this middleware makes sure that the redirect
+    keeps the student in the course.
+    
+    Finally, if the student is in the course viewing a wiki, we change the
+    reverse() function to resolve wiki urls as a course wiki url by setting
+    the _transform_url attribute on wiki.models.reverse.
+    
+    Forgive me Father, for I have hacked.
     """
     
+    def __init__(self):
+        self.redirected = False
+    
+    def process_request(self, request):
+        self.redirected = False
+        wiki_reverse._transform_url = lambda url: url
+        
+        referer = request.META.get('HTTP_REFERER')
+        destination = request.path
+        
+        
+        if request.method == 'GET':
+            new_destination = self.get_redirected_url(request.user, referer, destination)
+        
+            if new_destination != destination:
+                # We mark that we generated this redirection, so we don't modify it again
+                self.redirected = True
+                return redirect(new_destination)
+        
+        course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
+        if course_match:
+            course_id = course_match.group('course_id')
+            prepend_string = '/courses/' + course_match.group('course_id')
+            wiki_reverse._transform_url = lambda url: prepend_string + url
+        
+        return None
+    
+    
+    def process_response(self, request, response):
+        """
+        If this is a redirect response going to /wiki/*, then we might need
+        to change it to be a redirect going to /courses/*/wiki*.
+        """
+        if not self.redirected and response.status_code == 302: #This is a redirect
+            referer = request.META.get('HTTP_REFERER')
+            destination_url = response['LOCATION']
+            destination = urlparse(destination_url).path
+        
+            new_destination = self.get_redirected_url(request.user, referer, destination)
+            
+            if new_destination != destination:
+                new_url = destination_url.replace(destination, new_destination)
+                response['LOCATION'] = new_url
+        
+        return response
+    
+        
     def get_redirected_url(self, user, referer, destination):
         """
         Returns None if the destination shouldn't be changed.
@@ -29,11 +88,9 @@ class Middleware(object):
         referer_path = urlparse(referer).path
         
         path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', destination)
-        print "path_match" , path_match
         if path_match:
             # We are going to the wiki. Check if we came from a course
             course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/.*', referer_path)
-            print "course_match" , course_match
             if course_match:
                 course_id = course_match.group('course_id')
                 
@@ -48,7 +105,7 @@ class Middleware(object):
         else:
             # It is also possible we are going to a course wiki view, but we 
             # don't have permission to see the course!
-            course_match = re.match(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/(?P<wiki_path>.*|)$', destination)
+            course_match = re.match(IN_COURSE_WIKI_REGEX, destination)
             if course_match:
                 course_id = course_match.group('course_id')
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
@@ -62,51 +119,6 @@ class Middleware(object):
         
         return destination
     
-    
-    def process_response(self, request, response):
-        """
-        If this is a redirect response going to /wiki/*, then we might need
-        to change it to be a redirect going to /courses/*/wiki*.
-        """
-        print "processing response. Request: " , request.path, request.META.get('HTTP_REFERER')
-        print "response:", response.status_code, response['LOCATION'] if response.status_code == 302 else ""
-        print "self.redirected" , self.redirected, response.status_code, request.META.get('HTTP_REFERER')
-        if not self.redirected and response.status_code == 302: #This is a redirect
-            referer = request.META.get('HTTP_REFERER')
-            destination_url = response['LOCATION']
-            destination = urlparse(destination_url).path
-        
-            new_destination = self.get_redirected_url(request.user, referer, destination)
-            
-            print "old_destination" , destination
-            print "new_destination" , new_destination
-            
-            if new_destination != destination:
-                print "changinging redirection. Used to be " , destination_url
-                new_url = destination_url.replace(destination, new_destination)
-                print "now it is " , new_url
-                response['LOCATION'] = new_url
-        
-        return response
-            
-    
-    
-    def process_request(self, request):
-        self.redirected = False
-        if not request.method == 'GET':
-            return None
-            
-        referer = request.META.get('HTTP_REFERER')
-        destination = request.path
-        
-        new_destination = self.get_redirected_url(request.user, referer, destination)
-        
-        if new_destination != destination:
-            # We mark that we generated this redirection, so we don't modify it again
-            self.redirected = True
-            return redirect(new_destination)
-        
-        return None
 
 def context_processor(request):
     """
@@ -117,7 +129,7 @@ def context_processor(request):
     bar to be shown.
     """
     
-    match = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki(?P<wiki_path>.*|)', request.path)
+    match = re.match(IN_COURSE_WIKI_REGEX, request.path)
     if match:
         course_id = match.group('course_id')
         
