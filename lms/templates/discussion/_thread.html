@@ -44,10 +44,10 @@
 
 <%def name="render_content(content, type, **kwargs)">
   <div class="discussion-content">
-    <div class="discussion-content-wrapper clearfix">
+    <div class="discussion-content-wrapper">
       
       ${render_vote(content)}
-      <div class="discussion-right-wrapper clearfix">
+      <div class="discussion-right-wrapper">
         <ul class="admin-actions">
           % if type == 'comment':
             <li><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
@@ -96,7 +96,7 @@
 <%def name="render_tags(content, type, **kwargs)">
   <%
     def url_for_tags(tags):
-      return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, content['commentable_id']]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
+      return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
   %>
   % if type == "thread":
     <div class="thread-tags">

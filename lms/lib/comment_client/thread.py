@@ -35,13 +35,17 @@ class Thread(models.Model):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
-            del params['commentable_id']
+            if params.get('commentable_id'):
+                del params['commentable_id']
         response = perform_request('get', url, params, *args, **kwargs)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
         
     @classmethod
     def url_for_threads(cls, params={}):
-        return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
+        if params.get('commentable_id'):
+            return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
+        else:
+            return "{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
     def url_for_search_threads(cls, params={}):

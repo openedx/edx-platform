@@ -23,6 +23,10 @@ import dateutil
 THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
+
+def _general_discussion_id(course_id):
+    return course_id.replace('/', '_').replace('.', '_')
+
 def _should_perform_search(request):
     return bool(request.GET.get('text', False) or \
             request.GET.get('tags', False))
@@ -56,7 +60,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
 
     base_url = {
         'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
-        'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id, discussion_id])),
+        'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id])),
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
 
@@ -92,11 +96,11 @@ def render_forum_discussion(*args, **kwargs):
 def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
-def get_threads(request, course_id, discussion_id):
+def get_threads(request, course_id, discussion_id=None):
     query_params = {
         'page': request.GET.get('page', 1),
         'per_page': THREADS_PER_PAGE, #TODO maybe change this later
-        'sort_key': request.GET.get('sort_key', 'date'),
+        'sort_key': request.GET.get('sort_key', 'activity'),
         'sort_order': request.GET.get('sort_order', 'desc'),
         'text': request.GET.get('text', ''), 
         'tags': request.GET.get('tags', ''),
@@ -128,22 +132,19 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     }
     return render_to_string('discussion/_search_bar.html', context)
 
-def forum_form_discussion(request, course_id, discussion_id):
+def forum_form_discussion(request, course_id):
     course = check_course(request.user, course_id)
-    threads, query_params = get_threads(request, course_id, discussion_id)
-    content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
-                                                                   query_params=query_params)
+    threads, query_params = get_threads(request, course_id)
+    content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
 
     recent_active_threads = cc.search_recent_active_threads(
         course_id,
         recursive=False,
-        query_params={'follower_id': request.user.id,
-                      'commentable_id': discussion_id},
+        query_params={'follower_id': request.user.id},
     )
 
     trending_tags = cc.search_trending_tags(
         course_id,
-        query_params={'commentable_id': discussion_id},
     )
 
     if request.is_ajax():
@@ -153,7 +154,6 @@ def forum_form_discussion(request, course_id, discussion_id):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'content': content,
-            'accordion': render_accordion(request, course, discussion_id),
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
         }
