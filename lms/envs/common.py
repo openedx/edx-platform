@@ -77,7 +77,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
-
+    'AUTH_USE_OPENID_PROVIDER': False,
 }
 
 # Used for A/B testing
