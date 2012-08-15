@@ -30,3 +30,5 @@ Discussion = @Discussion
         handleUpdateModeratorStatus(this, false)
       "click .sidebar-promote-moderator-button": (event) ->
         handleUpdateModeratorStatus(this, true)
+
+  initializeUserActiveDiscussion: ($discussion) ->

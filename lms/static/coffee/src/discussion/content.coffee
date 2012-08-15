@@ -252,12 +252,14 @@ initializeFollowThread = (thread) ->
 
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
-      $showComments = $local(".discussion-show-comments")
+      $hideComments = $local(".discussion-hide-comments")
+      $hideComments.removeClass("discussion-hide-comments")
+                   .addClass("discussion-show-comments")
       $content.children(".comments").hide()
       $threadTitle.unbind('click').click handleShowSingleThread
-      $showComments.unbind('click').click handleShowSingleThread
-      prevHtml = $showComments.html()
-      $showComments.html prevHtml.replace "Hide", "Show"
+      $hideComments.unbind('click').click handleShowSingleThread
+      prevHtml = $hideComments.html()
+      $hideComments.html prevHtml.replace "Hide", "Show"
 
     handleShowSingleThread = ->
       $threadTitle = $local(".thread-title")
@@ -269,8 +271,11 @@ initializeFollowThread = (thread) ->
       rebindHideEvents = ->
         $threadTitle.unbind('click').click handleHideSingleThread
         $showComments.unbind('click').click handleHideSingleThread
+        $showComments.removeClass("discussion-show-comments")
+                     .addClass("discussion-hide-comments")
         prevHtml = $showComments.html()
         $showComments.html prevHtml.replace "Show", "Hide"
+
 
       if $content.children(".comments").length
         $content.children(".comments").show()
@@ -298,6 +303,9 @@ initializeFollowThread = (thread) ->
 
       "click .discussion-show-comments": ->
         handleShowSingleThread(this)
+
+      "click .discussion-hide-comments": ->
+        handleHideSingleThread(this)
 
       "click .discussion-reply-thread": ->
         handleShowSingleThread($local(".thread-title"))
@@ -374,11 +382,12 @@ initializeFollowThread = (thread) ->
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
 
-    discussion_id = $content.parents(".discussion").attr("_id")
     if $content.hasClass("thread")
+      discussion_id = $content.attr("_discussion_id")
       permalink = Discussion.urlFor("permanent_link_thread", discussion_id, id)
     else
       thread_id = $content.parents(".thread").attr("_id")
+      discussion_id = $content.parents(".thread").attr("_discussion_id")
       permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, id)
     $local(".discussion-permanent-link").attr "href", permalink
 

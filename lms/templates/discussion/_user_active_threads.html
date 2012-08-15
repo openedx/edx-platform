@@ -1,0 +1,24 @@
+<%namespace name="renderer" file="_thread.html"/>
+<%! from django.template.defaultfilters import escapejs %>
+
+<section class="discussion user-active-discussion">
+
+  <div class="discussion-non-content discussion-local"></div>
+
+  <div class="threads">
+    % for thread in threads:
+      ${renderer.render_thread(course_id, thread, show_comments=True)}
+    % endfor
+  </div>
+
+  <%include file="_paginator.html" />
+</section>
+
+<script type="text/javascript">
+  var $$user_info = JSON.parse("${user_info | escapejs}");
+  var $$course_id = "${course_id | escapejs}";
+  if (typeof $$annotated_content_info === undefined || $$annotated_content_info === null) {
+    var $$annotated_content_info = {};
+  }
+  $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escapejs}"));
+</script>

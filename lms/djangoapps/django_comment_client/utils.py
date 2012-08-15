@@ -16,12 +16,15 @@ _FULLMODULES = None
 _DISCUSSIONINFO = None
 
 def extract(dic, keys):
-    return {k: dic[k] for k in keys}
+    return {k: dic.get(k) for k in keys}
 
 def strip_none(dic):
     def _is_none(v):
         return v is None or (isinstance(v, str) and len(v.strip()) == 0)
     return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
+
+def merge_dict(dic1, dic2):
+    return dict(dic1.items() + dic2.items())
 
 def get_full_modules():
     global _FULLMODULES

@@ -65,9 +65,9 @@ def create_thread(request, course_id, commentable_id):
         }
         html = render_to_string('discussion/ajax_create_thread.html', context)
         annotated_content_info = utils.get_annotated_content_info(course_id, 
-                                                            thread.to_dict(), 
-                                                            request.user, 
-                                                            'thread')
+                                                                  thread.to_dict(), 
+                                                                  request.user, 
+                                                                  'thread')
         return JsonResponse({
             'html': html,
             'content': thread.to_dict(),

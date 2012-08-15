@@ -55,6 +55,15 @@ class User(models.Model):
         request = perform_request('delete', url, params)
         voteable.update_attributes(request)
 
+    def active_threads(self, query_params={}):
+        if not self.course_id:
+            raise CommentClientError("Must provide course_id when retrieving active threads for the user")
+        url = _url_for_user_active_threads(self.id)
+        params = {'course_id': self.course_id}
+        params = merge_dict(params, query_params)
+        response = perform_request('get', url, params)
+        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
@@ -71,3 +80,6 @@ def _url_for_vote_thread(thread_id):
 
 def _url_for_subscription(user_id):
     return "{prefix}/users/{user_id}/subscriptions".format(prefix=settings.PREFIX, user_id=user_id)
+
+def _url_for_user_active_threads(user_id):
+    return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
