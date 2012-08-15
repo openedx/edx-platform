@@ -227,7 +227,7 @@ class XModule(HTMLSnippet):
     def get_display_items(self):
         '''
         Returns a list of descendent module instances that will display
-        immediately inside this module
+        immediately inside this module.
         '''
         items = []
         for child in self.get_children():
@@ -238,7 +238,7 @@ class XModule(HTMLSnippet):
     def displayable_items(self):
         '''
         Returns list of displayable modules contained by this module. If this
-        module is visible, should return [self]
+        module is visible, should return [self].
         '''
         return [self]
 
@@ -319,7 +319,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     # A list of metadata that this module can inherit from its parent module
     inheritable_metadata = (
         'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
-
+        # TODO (ichuang): used for Fall 2012 xqa server access
+        'xqa_key',
         # TODO: This is used by the XMLModuleStore to provide for locations for
         # static files, and will need to be removed when that code is removed
         'data_dir'
@@ -403,6 +404,18 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
 
+    @staticmethod
+    def compute_inherited_metadata(node):
+        """Given a descriptor, traverse all of its descendants and do metadata
+        inheritance.  Should be called on a CourseDescriptor after importing a
+        course.
+
+        NOTE: This means that there is no such thing as lazy loading at the
+        moment--this accesses all the children."""
+        for c in node.get_children():
+            c.inherit_metadata(node.metadata)
+            XModuleDescriptor.compute_inherited_metadata(c)
+
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
@@ -423,6 +436,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             self._child_instances = []
             for child_loc in self.definition.get('children', []):
                 child = self.system.load_item(child_loc)
+                # TODO (vshnayder): this should go away once we have
+                # proper inheritance support in mongo.  The xml
+                # datastore does all inheritance on course load.
                 child.inherit_metadata(self.metadata)
                 self._child_instances.append(child)
 
@@ -507,7 +523,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
             msg = "Error loading from xml."
-            log.exception(msg)
+            log.warning(msg + " " + str(err))
             system.error_tracker(msg)
             err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
             descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
@@ -600,9 +616,10 @@ class DescriptorSystem(object):
                try:
                   x = access_some_resource()
                   check_some_format(x)
-               except SomeProblem:
-                  msg = 'Grommet {0} is broken'.format(x)
-                  log.exception(msg) # don't rely on handler to log
+               except SomeProblem as err:
+                  msg = 'Grommet {0} is broken: {1}'.format(x, str(err))
+                  log.warning(msg)  # don't rely on tracker to log
+                        # NOTE: we generally don't want content errors logged as errors
                   self.system.error_tracker(msg)
                   # work around
                   return 'Oops, couldn't load grommet'
@@ -658,7 +675,8 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 is_staff=False):
+                 is_staff=False,
+                 node_path=""):
         '''
         Create a closure around the system environment.
 
@@ -701,6 +719,7 @@ class ModuleSystem(object):
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.is_staff = is_staff
+        self.node_path = node_path
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

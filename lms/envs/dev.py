@@ -53,6 +53,15 @@ CACHES = {
     }
 }
 
+XQUEUE_INTERFACE = {
+    "url": "http://xqueue.sandbox.edx.org",
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
 # Make the keyedcache startup warnings go away
 CACHE_TIMEOUT = 0
 
@@ -62,6 +71,7 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
+MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
 
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 

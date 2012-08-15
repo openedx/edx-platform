@@ -50,8 +50,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # have been imported into the cms from xml
                 xml = clean_out_mako_templating(xml)
                 xml_data = etree.fromstring(xml)
-            except:
-                log.exception("Unable to parse xml: {xml}".format(xml=xml))
+            except Exception as err:
+                log.warning("Unable to parse xml: {err}, xml: {xml}".format(
+                    err=str(err), xml=xml))
                 raise
 
             # VS[compat]. Take this out once course conversion is done
@@ -194,7 +195,7 @@ class XMLModuleStore(ModuleStoreBase):
             if org is None:
                 msg = ("No 'org' attribute set for course in {dir}. "
                           "Using default 'edx'".format(dir=course_dir))
-                log.error(msg)
+                log.warning(msg)
                 tracker(msg)
                 org = 'edx'
 
@@ -206,13 +207,19 @@ class XMLModuleStore(ModuleStoreBase):
                         dir=course_dir,
                         default=course_dir
                         ))
-                log.error(msg)
+                log.warning(msg)
                 tracker(msg)
                 course = course_dir
 
             system = ImportSystem(self, org, course, course_dir, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
+            # NOTE: The descriptors end up loading somewhat bottom up, which
+            # breaks metadata inheritance via get_children().  Instead
+            # (actually, in addition to, for now), we do a final inheritance pass
+            # after we have the course descriptor.
+            XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 

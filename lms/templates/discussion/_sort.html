@@ -2,11 +2,14 @@
 
 <%def name="link_to_sort(key, title)">
   % if key == sort_key:
+    ${_link_to_sort(key, None, title + '', 'sorted')}
+    <!---
     % if sort_order.lower() == 'desc':
       ${_link_to_sort(key, 'asc', title + '', 'sorted')}
     % else:
       ${_link_to_sort(key, 'desc', title + '', 'sorted')}
     % endif
+    -->
   % else:
     ${_link_to_sort(key, 'desc', title)}
   % endif
@@ -18,14 +21,17 @@
     return dict(dic1.items() + dic2.items())
 
   def url_for_sort(key, order):
-    return base_url + '?' + urlencode(merge(query_params, {'page': 1, 'sort_key': key, 'sort_order': order}))
+    if order is None:
+      return ''
+    else:
+      return base_url + '?' + urlencode(merge(query_params, {'page': 1, 'sort_key': key, 'sort_order': order}))
   %>
   <a class="discussion-sort-link ${cls}" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
 </%def>
 
-<div class="discussion-sort">
+<div class="discussion-sort discussion-local">
   <span class="discussion-label">Sort by:</span>
-  ${link_to_sort('top', 'top')}
+  ${link_to_sort('activity', 'top')}
   
   ${link_to_sort('date', 'date')}
   

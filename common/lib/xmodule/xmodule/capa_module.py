@@ -150,7 +150,7 @@ class CapaModule(XModule):
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
             if self.system.DEBUG:
-                log.error(msg)
+                log.warning(msg)
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
@@ -464,7 +464,7 @@ class CapaModule(XModule):
                 return {'success': msg}
             log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
-
+        
         self.attempts = self.attempts + 1
         self.lcp.done = True
 

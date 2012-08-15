@@ -25,24 +25,12 @@ h1.top-header {
   }
 }
 
-.action-link {
-  a {
-    color: $mit-red;
-
-    &:hover {
-      color: darken($mit-red, 20%);
-      text-decoration: none;
-    }
-  }
-}
-
 .content {
   @include box-sizing(border-box);
   display: table-cell;
   padding: lh();
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
-  overflow: hidden;
 
   @media print {
     @include box-shadow(none);
@@ -164,7 +152,6 @@ h1.top-header {
 .topbar {
   @extend .clearfix;
   border-bottom: 1px solid $border-color;
-  font-size: 14px;
 
   @media print {
     display: none;
@@ -185,3 +172,4 @@ h1.top-header {
 .tran {
   @include transition( all, .2s, $ease-in-out-quad);
 }
+

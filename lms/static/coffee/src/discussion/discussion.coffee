@@ -36,7 +36,7 @@ initializeFollowDiscussion = (discussion) ->
       title = $local(".new-post-title").val()
       body = Discussion.getWmdContent $discussion, $local, "new-post-body"
       tags = $local(".new-post-tags").val()
-      url = Discussion.urlFor('create_thread', $local(".new-post-form").attr("_id"))
+      url = Discussion.urlFor('create_thread', id)
       Discussion.safeAjax
         $elem: $(elem)
         url: url
@@ -46,20 +46,17 @@ initializeFollowDiscussion = (discussion) ->
           title: title
           body: body
           tags: tags
-        success: Discussion.formErrorHandler($local(".new-post-form-error"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".new-post-form-errors"))
+        success: (response, textStatus) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
-          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
-          Discussion.setContentInfo response.content['id'], 'editable', true
-          Discussion.initializeContent($thread)
-          Discussion.bindContentEvents($thread)
-          $(".new-post-form").hide()
-          $local(".discussion-new-post").show()
-        )
+          $local(".new-post-form").remove()
 
     handleCancelNewPost = (elem) ->
-      $local(".new-post-form").hide()
-      $local(".discussion-new-post").show()
+      if $discussion.hasClass("inline-discussion")
+        $local(".new-post-form").addClass("collapsed")
+      else if $discussion.hasClass("forum-discussion")
+        $local(".new-post-form").hide()
 
     handleSimilarPost = (elem) ->
       $title = $local(".new-post-title")
@@ -79,8 +76,8 @@ initializeFollowDiscussion = (discussion) ->
           data:
             text: $local(".new-post-title").val()
           success: (response, textStatus) ->
-            console.log "request"
             $similarPosts.empty()
+            console.log response
             if $.type(response) == "array" and response.length
               $wrapper.show()
               for thread in response
@@ -95,18 +92,22 @@ initializeFollowDiscussion = (discussion) ->
         $wrapper.hide()
       $title.attr("prev-text", text)
 
-    handleNewPost = (elem) ->
-      newPostForm = $local(".new-post-form")
-      if newPostForm.length
-        newPostForm.show()
-        $(elem).hide()
-      else
-        view = { discussion_id: id }
-        $newPostButton = $local(".discussion-new-post")
-        $newPostButton.after Mustache.render Discussion.newPostTemplate, view
-        newPostBody = $discussion.find(".new-post-body")
-        if newPostBody.length
-          Discussion.makeWmdEditor $discussion, $local, "new-post-body"
+    initializeNewPost = ->
+      view = { discussion_id: id }
+      $discussionNonContent = $discussion.children(".discussion-non-content")
+
+      if not $local(".wmd-panel").length
+        $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
+        $newPostBody = $local(".new-post-body")
+        Discussion.makeWmdEditor $discussion, $local, "new-post-body"
+
+        $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
+        $input.attr("placeholder", "post a new topic...")
+        if $discussion.hasClass("inline-discussion")
+          $input.bind 'focus', (e) ->
+            $local(".new-post-form").removeClass('collapsed')
+        else if $discussion.hasClass("forum-discussion")
+          $local(".new-post-form").removeClass('collapsed')
 
         $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
 
@@ -121,9 +122,10 @@ initializeFollowDiscussion = (discussion) ->
         $local(".discussion-cancel-post").click ->
           handleCancelNewPost(this)
 
-        $(elem).hide()
+      $local(".new-post-form").show()
 
     handleAjaxReloadDiscussion = (elem, url) ->
+      if not url then return
       $elem = $(elem)
       $discussion = $elem.parents("section.discussion")
       Discussion.safeAjax
@@ -133,9 +135,11 @@ initializeFollowDiscussion = (discussion) ->
         dataType: 'html'
         success: (data, textStatus) ->
           $data = $(data)
+          $parent = $discussion.parent()
           $discussion.replaceWith($data)
-          Discussion.initializeDiscussion($data)
-          Discussion.bindDiscussionEvents($data)
+          $discussion = $parent.children(".discussion")
+          Discussion.initializeDiscussion($discussion)
+          Discussion.bindDiscussionEvents($discussion)
 
     handleAjaxSearch = (elem) ->
       $elem = $(elem)
@@ -151,15 +155,23 @@ initializeFollowDiscussion = (discussion) ->
       $elem = $(elem)
       url = $elem.attr("page-url")
       handleAjaxReloadDiscussion($elem, url)
-    
+
+    if $discussion.hasClass("inline-discussion")
+      initializeNewPost()
+
+    if $discussion.hasClass("forum-discussion")
+      $discussionSidebar = $(".discussion-sidebar")
+      if $discussionSidebar.length
+        $sidebarLocal = Discussion.generateLocal($discussionSidebar)
+        Discussion.bindLocalEvents $sidebarLocal,
+          "click .sidebar-new-post-button": (event) ->
+            initializeNewPost()
+
     Discussion.bindLocalEvents $local,
 
       "submit .search-wrapper>.discussion-search-form": (event) ->
         event.preventDefault()
         handleAjaxSearch(this)
-
-      "click .discussion-new-post": ->
-        handleNewPost(this)
 
       "click .discussion-search-link": ->
         handleAjaxSearch($local(".search-wrapper>.discussion-search-form"))
@@ -167,5 +179,5 @@ initializeFollowDiscussion = (discussion) ->
       "click .discussion-sort-link": ->
         handleAjaxSort(this)
 
-    $discussion.children(".discussion-paginator").find(".discussion-page-link").click ->
+    $discussion.children(".discussion-paginator").find(".discussion-page-link").unbind('click').click ->
       handleAjaxPage(this)

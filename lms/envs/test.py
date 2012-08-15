@@ -25,6 +25,7 @@ SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
+             # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
              '--cover-inclusive', '--cover-html-dir',
              os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
 for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
@@ -49,6 +50,16 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 
+XQUEUE_INTERFACE = {
+    "url": "http://xqueue.sandbox.edx.org",
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
+
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -66,6 +77,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': PROJECT_ROOT / "db" / "mitx.db",
+    },
+
+    # The following are for testing purposes...
+    'edX/toy/2012_Fall': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "course1.db",
+    },
+    
+    'edx/full/6.002_Spring_2012': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "course2.db",
     }
 }
 
