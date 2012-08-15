@@ -10,6 +10,11 @@ Discussion = @Discussion
     <form class="new-post-form collapsed" id="new-post-form" style="display: block; ">
       <ul class="new-post-form-errors discussion-errors"></ul>
       <input type="text" class="new-post-title title-input" placeholder="Title" />
+      <div class="new-post-similar-posts-wrapper" style="display: none">
+        Similar Posts: 
+        <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
+        <div class="new-post-similar-posts"></div>
+      </div>
       <div class="new-post-body reply-body"></div>
       <input class="new-post-tags" placeholder="Tags" />
       <div class="post-options">
