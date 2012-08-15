@@ -329,6 +329,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
