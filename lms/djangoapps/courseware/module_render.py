@@ -2,24 +2,24 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from requests.auth import HTTPBasicAuth
+
 from capa.xqueue_interface import XQueueInterface
-from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
+from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
-
-from courseware.courses import (has_staff_access_to_course,
-                                has_staff_access_to_location)
-from requests.auth import HTTPBasicAuth
 
 log = logging.getLogger("mitx.courseware")
 
@@ -65,6 +65,9 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     Everything else comes from the xml, or defaults to "".
 
     chapters with name 'hidden' are skipped.
+
+    NOTE: assumes that if we got this far, user has access to course.  Returns
+    None if this is not the case.
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
@@ -142,6 +145,10 @@ def get_module(user, request, location, student_module_cache, position=None):
     '''
     descriptor = modulestore().get_item(location)
 
+    # Short circuit--if the user shouldn't have access, bail without doing any work
+    if not has_access(user, descriptor, 'load'):
+        return None
+
     #TODO Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
@@ -155,14 +162,11 @@ def get_module(user, request, location, student_module_cache, position=None):
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
 
-
-
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
-
-    ajax_url = reverse('modx_dispatch', 
+    ajax_url = reverse('modx_dispatch',
                        kwargs=dict(course_id=descriptor.location.course_id,
                                    id=descriptor.location.url(),
                                    dispatch=''),
@@ -187,6 +191,9 @@ def get_module(user, request, location, student_module_cache, position=None):
               'default_queuename': xqueue_default_queuename.replace(' ', '_')}
 
     def _get_module(location):
+        """
+        Delegate to get_module.  It does an access check, so may return None
+        """
         return get_module(user, request, location,
                                        student_module_cache, position)
 
@@ -205,12 +212,11 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          is_staff=has_staff_access_to_location(user, location),
                           node_path=settings.NODE_PATH
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    system.set('DEBUG',settings.DEBUG)
+    system.set('DEBUG', settings.DEBUG)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
@@ -220,7 +226,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
-        if has_staff_access_to_course(user, module.location.course):
+        if has_access(user, module, 'staff'):
             module.get_html = add_histogram(module.get_html, module, user)
 
     return module
@@ -304,10 +310,14 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         user, modulestore().get_item(id), depth=0, acquire_lock=True)
     instance = get_module(user, request, id, student_module_cache)
+    if instance is None:
+        log.debug("No module {} for user {}--access denied?".format(id, user))
+        raise Http404
+
     instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'", id, user)
+        log.debug("Couldn't find instance of module '%s' for user '%s'", id, user)
         raise Http404
 
     oldgrade = instance_module.grade
@@ -361,6 +371,11 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache)
+    if instance is None:
+        # Either permissions just changed, or someone is trying to be clever
+        # and load something they shouldn't have access to.
+        log.debug("No module {} for user {}--access denied?".format(id, user))
+        raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)
     shared_module = get_shared_instance_module(request.user, instance, student_module_cache)
