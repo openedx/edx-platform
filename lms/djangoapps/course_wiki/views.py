@@ -1,6 +1,9 @@
 import logging
 import re
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
@@ -10,7 +13,6 @@ from courseware.courses import get_course_by_id
 log = logging.getLogger(__name__)
 
 def root_create(request):
-    
     """
     In the edX wiki, we don't show the root_create view. Instead, we
     just create the root automatically if it doesn't exist.
@@ -39,7 +41,19 @@ def course_wiki_redirect(request, course_id):
 
     if not valid_slug:
         return redirect("wiki:get", path="")
-                
+    
+    
+    # The wiki needs a Site object created. We make sure it exists here
+    try:
+        site = Site.objects.get_current()
+    except Site.DoesNotExist:
+        new_site = Site()
+        new_site.domain = settings.SITE_NAME
+        new_site.name = "edX"
+        new_site.save()
+        if str(new_site.id) != str(settings.SITE_ID):
+            raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. " + str(new_site.id) + "!=" + str(settings.SITE_ID))
+    
     try:
         urlpath = URLPath.get_by_path(course_slug, select_related=True)
         
