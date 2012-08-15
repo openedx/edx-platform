@@ -17,10 +17,9 @@ class DiscussionModule(XModule):
         }
         return self.system.render_template('discussion/_discussion_module.html', context)
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
+    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
+
         if isinstance(instance_state, str):
             instance_state = json.loads(instance_state)
         xml_data = etree.fromstring(definition['data'])

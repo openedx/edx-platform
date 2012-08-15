@@ -10,16 +10,21 @@ from django.conf import settings
 import operator
 import itertools
 
+from django_comment_client.permissions import check_permissions_by_view
+
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
 def extract(dic, keys):
-    return {k: dic[k] for k in keys}
+    return {k: dic.get(k) for k in keys}
 
 def strip_none(dic):
     def _is_none(v):
         return v is None or (isinstance(v, str) and len(v.strip()) == 0)
     return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
+
+def merge_dict(dic1, dic2):
+    return dict(dic1.items() + dic2.items())
 
 def get_full_modules():
     global _FULLMODULES
@@ -101,9 +106,7 @@ def initialize_discussion_info(request, course):
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
-        content = simplejson.dumps(data,
-                                   indent=2,
-                                   ensure_ascii=False)
+        content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf8')
 
@@ -115,7 +118,7 @@ class JsonError(HttpResponse):
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf8', status=500)
+                                        mimetype='application/json; charset=utf8', status=400)
 
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
@@ -124,3 +127,27 @@ class HtmlResponse(HttpResponse):
 class ViewNameMiddleware(object):  
     def process_view(self, request, view_func, view_args, view_kwargs):  
         request.view_name = view_func.__name__
+
+def get_annotated_content_info(course_id, content, user, type):
+    return {
+        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if type == 'thread' else "update_comment"),
+        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if type == 'thread' else "create_sub_comment"),
+        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if type == 'comment' else False,
+        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if type == 'thread' else "delete_comment"),
+        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if type == 'thread' else False,
+    }
+
+def get_annotated_content_infos(course_id, thread, user, type='thread'):
+    infos = {}
+    def _annotate(content, type):
+        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, type)
+        for child in content.get('children', []):
+            _annotate(child, 'comment')
+    _annotate(thread, type)
+    return infos
+
+def pluralize(singular_term, count):
+    if int(count) >= 2:
+        return singular_term + 's'
+    return singular_term
+

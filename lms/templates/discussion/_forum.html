@@ -1,8 +1,9 @@
 <%namespace name="renderer" file="_thread.html"/>
+<%! from django.template.defaultfilters import escapejs %>
 
-<section class="discussion inline-discussion" _id="${discussion_id}">
+<section class="discussion forum-discussion" _id="${discussion_id}">
 
-  <div class="discussion-non-content">
+  <div class="discussion-non-content discussion-local">
     <div class="search-wrapper">
       <%include file="_search_bar.html" />
     </div>    
@@ -29,10 +30,10 @@
 %>
 
 <script type="text/javascript">
-  var $$user_info = JSON.parse('${user_info | escape_quotes}');
-  var $$course_id = "${course_id}";
+  var $$user_info = JSON.parse("${user_info | escapejs}");
+  var $$course_id = "${course_id | escapejs}";
   if (typeof $$annotated_content_info === undefined || $$annotated_content_info === null) {
     var $$annotated_content_info = {};
   }
-  $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escape_quotes}"));
+  $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escapejs}"));
 </script>

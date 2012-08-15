@@ -538,7 +538,6 @@
             processResults(this.options.data, value);
         } else {
             this.fetchRemoteData(value, function(remoteData) {
-                console.log(remoteData);
                 processResults(remoteData, value);
             });
         }

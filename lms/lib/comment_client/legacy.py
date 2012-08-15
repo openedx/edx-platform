@@ -1,17 +1,3 @@
-import requests
-import json
-
-SERVICE_HOST = 'http://localhost:4567'
-
-PREFIX = SERVICE_HOST + '/api/v1'
-
-class CommentClientError(Exception):
-    def __init__(self, msg):
-        self.message = msg
-
-class CommentClientUnknownError(CommentClientError):
-    pass
-
 def delete_threads(commentable_id, *args, **kwargs):
     return _perform_request('delete', _url_for_commentable_threads(commentable_id), *args, **kwargs)
 

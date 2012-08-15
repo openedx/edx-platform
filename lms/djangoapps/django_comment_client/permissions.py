@@ -17,7 +17,6 @@ def assign_default_role(sender, instance, **kwargs):
     logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
     instance.user.roles.add(role)
 
-
 def has_permission(user, permission, course_id=None):
     # if user.permissions.filter(name=permission).exists():
     #     return True
@@ -30,10 +29,16 @@ def has_permission(user, permission, course_id=None):
 CONDITIONS = ['is_open', 'is_author']
 def check_condition(user, condition, course_id, data):
     def check_open(user, condition, course_id, data):
-        return not data['content']['closed']
+        try:
+            return data and not data['content']['closed']
+        except KeyError:
+            return False
 
     def check_author(user, condition, course_id, data):
-        return data['content']['user_id'] == str(user.id)
+        try:
+            return data and data['content']['user_id'] == str(user.id)
+        except KeyError:
+            return False
 
     handlers = {
         'is_open'      : check_open,
@@ -86,11 +91,11 @@ VIEW_PERMISSIONS = {
     'unfollow_commentable':     ['unfollow_commentable'],
     'unfollow_user'     :       ['unfollow_user'],
     'create_thread'     :       ['create_thread'],
+    'update_moderator_status' : ['manage_moderator'],
 }
 
 
 def check_permissions_by_view(user, course_id, content, name):
-    # import pdb; pdb.set_trace()
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:

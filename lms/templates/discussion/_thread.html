@@ -1,10 +1,19 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from datehelper import time_ago_in_words %>
 <%! from dateutil.parser import parse %>
+<%! from django_comment_client.utils import pluralize %>
 <%! import urllib %>
 
+<%!
+  def user_id_with_anonymity(content):
+    if content.get('anonymous', False):
+      return ''
+    else:
+      return content['user_id']
+%>
+
 <%def name="render_thread(course_id, thread, show_comments=False)">
-  <div class="thread" _id="${thread['id']}">
+  <div class="thread" _id="${thread['id']}" _discussion_id="${thread['commentable_id']}" _author_id="${user_id_with_anonymity(thread)}">
     ${render_content(thread, "thread", show_comments=show_comments)}
     % if show_comments:
       ${render_comments(thread.get('children', []))}
@@ -14,9 +23,9 @@
 
 <%def name="render_comment(comment)">
   % if comment['endorsed']:
-  <div class="comment endorsed" _id="${comment['id']}">
+  <div class="comment endorsed" _id="${comment['id']}" _author_id="${user_id_with_anonymity(comment)}">
   % else:
-  <div class="comment" _id="${comment['id']}">
+  <div class="comment" _id="${comment['id']}" _author_id="${user_id_with_anonymity(comment)}">
   % endif
     ${render_content(comment, "comment")}
     <div class="comments">
@@ -39,10 +48,26 @@
       
       ${render_vote(content)}
       <div class="discussion-right-wrapper clearfix">
-        
+        <ul class="admin-actions">
+          % if type == 'comment':
+            <li><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
+          % endif
+          <li><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
+          <li><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
+          % if type == "thread":
+          <li>
+            % if content['closed']:
+              <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Re-open thread</a>
+            % else:
+              <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Close thread</a>
+            % endif
+          </li>
+          % endif
+        </ul>
+
         ${render_title(content, type, **kwargs)}
         <div class="discussion-content-view">
-          <a name="${content['id']}"></a>
+          <a name="${content['id']}" style="width: 0; height: 0; padding: 0; border: none;"></a>
           % if content.get('highlighted_body', None):
             <div class="content-body ${type}-body" id="content-body-${content['id']}">${content['highlighted_body'] | h}</div>
           % else:
@@ -84,53 +109,36 @@
 </%def>
 
 <%def name="render_bottom_bar(content, type, **kwargs)">
-  <div class="info">
-    ${render_info(content)}
+  <div class="info">    
+      ${render_info(content, type, **kwargs)}
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
       <li><div class="follow-wrapper"></div></li>
-      <li>${render_link("discussion-link discussion-edit", "Edit")}</li>
       <li>${render_link("discussion-link discussion-permanent-link", "Permanent Link")}</li>
-      <li class="discussion-endorse-control">
-        % if content.get('endorsed', False):
-          <input type="checkbox" checked="checked" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}" />
-        % else:
-          <input type="checkbox" class="discussion-link discussion-endorse" id="discussion-endorse-${content['id']}" />
-        % endif
-          <label class="discussion-link" for="discussion-endorse-${content['id']}">Endorsed</label>
-      </li>
-      <li>  
-        % if type == "thread":
-          % if content['closed']:
-            <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Re-open thread</a>
-          % else:
-            <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Close thread</a>
-          % endif
-        % endif
-      </li>
-      <li>${render_link("discussion-link discussion-delete", "Delete")}</li>
     </ul>
   </div>
 </%def>
 
-<%def name="render_info(content)">
+<%def name="render_info(content, type, **kwargs)">
+  <%
+    def url_for_user(user_id):
+      return reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])
+  %>
   <div class="comment-time">
     ${time_ago_in_words(parse(content['updated_at']))} ago by
     % if content['anonymous']:
       anonymous
     % else:
-      ${content['username']} <!---# TODO add link to user-->
+      <a href="${url_for_user(content['user_id'])}">${content['username']}</a>
     % endif
   </div>
   <div class="comment-count">
     % if content.get('comments_count', -1) >= 0:
-      <a href="javascript:void(0)" class="discussion-show-comments"> 
-      % if content.get('comments_count', -1) >= 2:
-        Show ${content['comments_count']} comments
+      % if discussion_type == 'user':
+        <a href="javascript:void(0)" class="discussion-show-comments first-time">Show all comments (${content['comments_count']} total)</a>
       % else:
-        Show ${content['comments_count']} comment
+        <a href="javascript:void(0)" class="discussion-show-comments">Show ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
       % endif
-      </a>
     % endif
   </div>
 </%def>

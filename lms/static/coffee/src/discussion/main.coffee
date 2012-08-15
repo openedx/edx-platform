@@ -19,3 +19,5 @@ $ ->
   $("section.discussion").each (index, discussion) ->
     Discussion.initializeDiscussion(discussion)
     Discussion.bindDiscussionEvents(discussion)
+
+  Discussion.initializeUserProfile($(".discussion-sidebar>.user-profile"))

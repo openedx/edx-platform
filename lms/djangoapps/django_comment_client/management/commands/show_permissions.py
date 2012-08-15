@@ -8,6 +8,7 @@ class Command(BaseCommand):
     help = "Show a user's roles and permissions"
 
     def handle(self, *args, **options):
+        print args
         if len(args) != 1:
             raise CommandError("The number of arguments does not match. ")
         try:

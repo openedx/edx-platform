@@ -18,33 +18,34 @@ wmdEditors = {}
     
   urlFor: (name, param, param1, param2) ->
     {
-      follow_discussion      : "/courses/#{$$course_id}/discussion/#{param}/follow"
-      unfollow_discussion    : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
-      create_thread          : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
-      search_similar_threads : "/courses/#{$$course_id}/discussion/#{param}/threads/search_similar"
-      update_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
-      create_comment         : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
-      delete_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
-      upvote_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
-      downvote_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
-      undo_vote_for_thread   : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"
-      follow_thread          : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
-      unfollow_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
-      openclose_thread       : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
-      update_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
-      endorse_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
-      create_sub_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
-      delete_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
-      upvote_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
-      downvote_comment       : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
-      undo_vote_for_comment  : "/courses/#{$$course_id}/discussion/comments/#{param}/unvote"
-      upload                 : "/courses/#{$$course_id}/discussion/upload"
-      search                 : "/courses/#{$$course_id}/discussion/forum/search"
-      tags_autocomplete      : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
-      retrieve_discussion    : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
-      retrieve_single_thread : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
-      permanent_link_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
-      permanent_link_comment : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
+      follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
+      unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
+      create_thread           : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
+      search_similar_threads  : "/courses/#{$$course_id}/discussion/#{param}/threads/search_similar"
+      update_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
+      create_comment          : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
+      delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
+      upvote_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
+      downvote_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
+      undo_vote_for_thread    : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"
+      follow_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
+      unfollow_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
+      update_comment          : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
+      endorse_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
+      create_sub_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
+      delete_comment          : "/courses/#{$$course_id}/discussion/comments/#{param}/delete"
+      upvote_comment          : "/courses/#{$$course_id}/discussion/comments/#{param}/upvote"
+      downvote_comment        : "/courses/#{$$course_id}/discussion/comments/#{param}/downvote"
+      undo_vote_for_comment   : "/courses/#{$$course_id}/discussion/comments/#{param}/unvote"
+      upload                  : "/courses/#{$$course_id}/discussion/upload"
+      search                  : "/courses/#{$$course_id}/discussion/forum/search"
+      tags_autocomplete       : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
+      retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
+      retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
+      update_moderator_status : "/courses/#{$$course_id}/discussion/users/#{param}/update_moderator_status"
+      openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
+      permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
+      permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
     }[name]
 
   safeAjax: (params) ->
@@ -62,16 +63,16 @@ wmdEditors = {}
   bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
-      $local(selector)[event] handler
+      $local(selector).unbind(event)[event] handler
 
   tagsInputOptions: ->
     autocomplete_url: Discussion.urlFor('tags_autocomplete')
     autocomplete:
       remoteDataType: 'json'
     interactive: true
+    height: '30px'
+    width: '100%'
     defaultText: "Tag your post: press enter after each tag"
-    height: "30px"
-    width: "100%"
     removeWithBackspace: true
 
   isSubscribed: (id, type) ->
@@ -90,14 +91,13 @@ wmdEditors = {}
   isDownvoted: (id) ->
     $$user_info? and (id in $$user_info.downvoted_ids)
 
-  formErrorHandler: (errorsField, success) ->
-    (response, textStatus, xhr) ->
+  formErrorHandler: (errorsField) ->
+    (xhr, textStatus, error) ->
+      response = JSON.parse(xhr.responseText)
       if response.errors? and response.errors.length > 0
         errorsField.empty()
         for error in response.errors
           errorsField.append($("<li>").addClass("new-post-form-error").html(error))
-      else
-        success(response, textStatus, xhr)
 
   postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
@@ -125,14 +125,16 @@ wmdEditors = {}
     id = $content.attr("_id")
     wmdEditors["#{cls_identifier}-#{id}"]
 
-  getWmdContent: ($content, $local, cls_identifier) ->
+  getWmdInput: ($content, $local, cls_identifier) ->
     id = $content.attr("_id")
-    $local("#wmd-input-#{cls_identifier}-#{id}").val()
+    $local("#wmd-input-#{cls_identifier}-#{id}")
+
+  getWmdContent: ($content, $local, cls_identifier) ->
+    Discussion.getWmdInput($content, $local, cls_identifier).val()
 
   setWmdContent: ($content, $local, cls_identifier, text) ->
-    id = $content.attr("_id")
-    $local("#wmd-input-#{cls_identifier}-#{id}").val(text)
-    wmdEditors["#{cls_identifier}-#{id}"].refreshPreview()
+    Discussion.getWmdInput($content, $local, cls_identifier).val(text)
+    Discussion.getWmdEditor($content, $local, cls_identifier).refreshPreview()
 
   getContentInfo: (id, attr) ->
     if not window.$$annotated_content_info?
@@ -145,6 +147,10 @@ wmdEditors = {}
     window.$$annotated_content_info[id] ||= {}
     window.$$annotated_content_info[id][attr] = value
 
+  extendContentInfo: (id, newInfo) ->
+    if not window.$$annotated_content_info?
+      window.$$annotated_content_info = {}
+    window.$$annotated_content_info[id] = newInfo
   bulkExtendContentInfo: (newInfos) ->
     if not window.$$annotated_content_info?
       window.$$annotated_content_info = {}

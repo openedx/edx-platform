@@ -13,11 +13,12 @@
   <span class="correct" id="status_${id}"></span>
   % elif state == 'incorrect':
   <span class="incorrect" id="status_${id}"></span>
-  % elif state == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
+  % elif state == 'queued':
+  <span class="processing" id="status_${id}"></span>
+  <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
   % endif
   % if hidden:
-      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+  <div style="display:none;" name="${hidden}" inputid="input_${id}" />
   % endif
   <br/>
   <span class="debug">(${state})</span>

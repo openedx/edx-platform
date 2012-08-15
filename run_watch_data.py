@@ -17,7 +17,7 @@ from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 # watch fewer or more extensions, you can change EXTENSIONS. To watch all
 # extensions, add "*" to EXTENSIONS.
 
-WATCH_DIRS = ["../data"]
+WATCH_DIRS = ["../data", "common/lib/xmodule/xmodule/js"]
 EXTENSIONS = ["*", "xml", "js", "css", "coffee", "scss", "html"]
 
 WATCH_DIRS = [os.path.abspath(os.path.normpath(dir)) for dir in WATCH_DIRS]

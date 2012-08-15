@@ -74,19 +74,20 @@ initializeFollowThread = (thread) ->
           body: body
           anonymous: anonymous
           autowatch: autowatch
-        success: Discussion.formErrorHandler($local(".discussion-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-errors"))
+        success: (response, textStatus) ->
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
           Discussion.setContentInfo response.content['id'], 'can_reply', true
           Discussion.setContentInfo response.content['id'], 'editable', true
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
           $local(".discussion-reply-new").hide()
           $local(".discussion-reply").show()
           $local(".discussion-edit").show()
           $discussionContent.attr("status", "normal")
-        )
 
     handleVote = (elem, value) ->
       contentType = if $content.hasClass("thread") then "thread" else "comment"
@@ -148,11 +149,12 @@ initializeFollowThread = (thread) ->
         type: "POST"
         dataType: 'json'
         data: {title: title, body: body, tags: tags},
-        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
+        success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
-        )
 
     handleEditComment = (elem) ->
       $local(".discussion-content-wrapper").hide()
@@ -175,11 +177,12 @@ initializeFollowThread = (thread) ->
         type: "POST"
         dataType: "json"
         data: {body: body}
-        success: Discussion.formErrorHandler($local(".discussion-update-errors"), (response, textStatus) ->
+        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
+        success: (response, textStatus) ->
           $discussionContent.replaceWith(response.html)
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
-        )
 
     handleEndorse = (elem, endorsed) ->
       url = Discussion.urlFor('endorse_comment', id)
@@ -196,6 +199,9 @@ initializeFollowThread = (thread) ->
             else
               $(content).removeClass("endorsed")
 
+            $(elem).unbind('click').click ->
+              handleEndorse(elem, !endorsed)
+
     handleOpenClose = (elem, text) ->
       url = Discussion.urlFor('openclose_thread', id)
       closed = undefined
@@ -204,7 +210,7 @@ initializeFollowThread = (thread) ->
       else if text.match(/[Oo]pen/)
         closed = false
       else
-        return console.log "Unexpected text " + text + "for open/close thread."
+        console.log "Unexpected text " + text + "for open/close thread."
 
       Discussion.safeAjax
         $elem: $(elem)
@@ -246,27 +252,32 @@ initializeFollowThread = (thread) ->
 
     handleHideSingleThread = (elem) ->
       $threadTitle = $local(".thread-title")
-      $showComments = $local(".discussion-show-comments")
+      $hideComments = $local(".discussion-hide-comments")
+      $hideComments.removeClass("discussion-hide-comments")
+                   .addClass("discussion-show-comments")
       $content.children(".comments").hide()
       $threadTitle.unbind('click').click handleShowSingleThread
-      $showComments.unbind('click').click handleShowSingleThread
-      prevHtml = $showComments.html()
-      $showComments.html prevHtml.replace "Hide", "Show"
+      $hideComments.unbind('click').click handleShowSingleThread
+      prevHtml = $hideComments.html()
+      $hideComments.html prevHtml.replace "Hide", "Show"
 
     handleShowSingleThread = ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
 
-      if not $showComments.length or not $threadTitle.length
+      if not $showComments.hasClass("first-time") and (not $showComments.length or not $threadTitle.length)
         return
 
       rebindHideEvents = ->
         $threadTitle.unbind('click').click handleHideSingleThread
         $showComments.unbind('click').click handleHideSingleThread
+        $showComments.removeClass("discussion-show-comments")
+                     .addClass("discussion-hide-comments")
         prevHtml = $showComments.html()
         $showComments.html prevHtml.replace "Show", "Hide"
 
-      if $content.children(".comments").length
+
+      if not $showComments.hasClass("first-time") and $content.children(".comments").length
         $content.children(".comments").show()
         rebindHideEvents()
       else
@@ -283,6 +294,7 @@ initializeFollowThread = (thread) ->
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
               Discussion.bindContentEvents(comment)
+            $showComments.removeClass("first-time")
             rebindHideEvents()
       
     Discussion.bindLocalEvents $local,
@@ -292,6 +304,9 @@ initializeFollowThread = (thread) ->
 
       "click .discussion-show-comments": ->
         handleShowSingleThread(this)
+
+      "click .discussion-hide-comments": ->
+        handleHideSingleThread(this)
 
       "click .discussion-reply-thread": ->
         handleShowSingleThread($local(".thread-title"))
@@ -317,19 +332,19 @@ initializeFollowThread = (thread) ->
         else
           handleVote($elem, "down")
 
-      "click .discussion-endorse": ->
-        handleEndorse(this, $(this).is(":checked"))
+      "click .admin-endorse": ->
+        handleEndorse(this, not $content.hasClass("endorsed"))
 
       "click .discussion-openclose": ->
         handleOpenClose(this, $(this).text())
 
-      "click .discussion-edit": ->
+      "click .admin-edit": ->
         if $content.hasClass("thread")
           handleEditThread(this)
         else
           handleEditComment(this)
 
-      "click .discussion-delete": ->
+      "click .admin-delete": ->
         handleDelete(this)
 
   initializeContent: (content) ->
@@ -368,22 +383,23 @@ initializeFollowThread = (thread) ->
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
 
-    discussion_id = $content.parents(".discussion").attr("_id")
     if $content.hasClass("thread")
+      discussion_id = $content.attr("_discussion_id")
       permalink = Discussion.urlFor("permanent_link_thread", discussion_id, id)
     else
       thread_id = $content.parents(".thread").attr("_id")
+      discussion_id = $content.parents(".thread").attr("_discussion_id")
       permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, id)
     $local(".discussion-permanent-link").attr "href", permalink
 
     if not Discussion.getContentInfo id, 'editable'
-      $local(".discussion-edit").remove()
+      $local(".admin-edit").remove()
     if not Discussion.getContentInfo id, 'can_reply'
       $local(".discussion-reply").remove()
     if not Discussion.getContentInfo id, 'can_endorse'
-      $local(".discussion-endorse-control").remove()
+      $local(".admin-endorse").remove()
     if not Discussion.getContentInfo id, 'can_delete'
-      $local(".discussion-delete").remove()
+      $local(".admin-delete").remove()
     if not Discussion.getContentInfo id, 'can_openclose'
       $local(".discussion-openclose").remove()
     if not Discussion.getContentInfo id, 'can_vote'
