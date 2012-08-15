@@ -84,12 +84,8 @@ def _has_access_course_desc(user, course, action):
     'staff' -- staff access to course.
     """
     def can_load():
-<<<<<<< Updated upstream
         """
         Can this user load this course?
-=======
-        """Can this user load this course?
->>>>>>> Stashed changes
 
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
