@@ -16,21 +16,19 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
-from module_render import toc_for_course, get_module, get_section
-from models import StudentModuleCache
-from student.models import UserProfile
-from xmodule.modulestore import Location
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
-
-from util.cache import cache, cache_if_anonymous
-from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import (check_course, get_courses_by_university,
-                                has_staff_access_to_course_id)
-
+from courseware.access import has_access
+from courseware.courses import (get_course_with_access, get_courses_by_university)
+from models import StudentModuleCache
+from module_render import toc_for_course, get_module, get_section
+from student.models import UserProfile
+from student.models import UserTestGroup, CourseEnrollment
+from util.cache import cache, cache_if_anonymous
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.search import path_to_location
 
 log = logging.getLogger("mitx.courseware")
 
@@ -108,7 +106,8 @@ def render_accordion(request, course, chapter, section):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
-    ''' Displays courseware accordion, and any associated content.
+    """
+    Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
     the accordion.  If they are specified, returns an error if they don't
     point to a valid module.
@@ -124,8 +123,8 @@ def index(request, course_id, chapter=None, section=None,
     Returns:
 
      - HTTPresponse
-    '''
-    course = check_course(request.user, course_id)
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
     registered = registered_for_course(course, request.user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -152,6 +151,10 @@ def index(request, course_id, chapter=None, section=None,
                 module = get_module(request.user, request,
                                     section_descriptor.location,
                                     student_module_cache)
+                if module is None:
+                    # User is probably being clever and trying to access something
+                    # they don't have access to.
+                    raise Http404
                 context['content'] = module.get_html()
             else:
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"
@@ -219,7 +222,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
 
     return render_to_response('info.html', {'course': course})
 
@@ -236,7 +239,7 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    course = check_course(request.user, course_id, course_must_be_open=False)
+    course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
 
@@ -268,14 +271,14 @@ def profile(request, course_id, student_id=None):
 
     Course staff are allowed to see the profiles of students in their class.
     """
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
         # Requesting access to a different student's profile
-        if not has_staff_access_to_course_id(request.user, course_id):
+        if not has_access(request.user, course, 'staff'):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
@@ -312,10 +315,7 @@ def gradebook(request, course_id):
     - only displayed to course staff
     - shows students who are enrolled.
     """
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
@@ -337,10 +337,7 @@ def gradebook(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_id):
     """Display the grade summary for a course."""
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
     context = {'course': course }
@@ -350,10 +347,7 @@ def grade_summary(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
     context = {'course': course }
