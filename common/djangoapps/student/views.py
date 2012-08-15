@@ -68,9 +68,9 @@ def index(request):
         from external_auth.views import edXauth_ssl_login
         return edXauth_ssl_login(request)
 
-    return main_index(user=request.user)
+    return main_index(request, user=request.user)
 
-def main_index(extra_context = {}, user=None):
+def main_index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
 
@@ -93,7 +93,8 @@ def main_index(extra_context = {}, user=None):
         entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
-    universities = get_courses_by_university(None)
+    universities = get_courses_by_university(None,
+                                             domain=request.META['HTTP_HOST'])
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
