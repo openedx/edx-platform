@@ -302,7 +302,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        user, modulestore().get_item(id), depth=0, acquire_lock=True)
+        user, modulestore().get_item(id), depth=0, select_for_update=True)
     instance = get_module(user, request, id, student_module_cache)
     instance_module = get_instance_module(user, instance, student_module_cache)
 
