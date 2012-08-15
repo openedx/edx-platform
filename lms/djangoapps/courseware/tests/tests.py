@@ -187,7 +187,7 @@ class PageLoader(ActivateLoginTestCase):
     def unenroll(self, course):
         """Unenroll the currently logged-in user, and check that it worked."""
         resp = self.client.post('/change_enrollment', {
-            'enrollment_action': 'enroll',
+            'enrollment_action': 'unenroll',
             'course_id': course.id,
             })
         data = parse_json(resp)

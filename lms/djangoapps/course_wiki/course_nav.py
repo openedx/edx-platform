@@ -4,7 +4,7 @@ from urlparse import urlparse
 from django.http import Http404
 from django.shortcuts import redirect
 
-from courseware.courses import check_course
+from courseware.courses import get_course_with_access
 
 
 class Middleware(object):
@@ -20,9 +20,7 @@ class Middleware(object):
     same page on the regular wiki.
     """
     
-    def process_request(self, request):
-        #TODO: We should also redirect people who can't see the class to the regular wiki, so urls don't break
-        
+    def process_request(self, request):        
         referer = request.META.get('HTTP_REFERER')
         
         try:
@@ -30,7 +28,7 @@ class Middleware(object):
             referer_path = parsed_referer.path
         except:
             referer_path =""
-        
+                
         path_match = re.match(r'^/wiki/(?P<wiki_path>.*|)$', request.path)
         if path_match:
             # We are going to the wiki. Check if we came from a course
@@ -40,7 +38,7 @@ class Middleware(object):
                 
                 # See if we are able to view the course. If we are, redirect to it
                 try:
-                    course = check_course(request.user, course_id)
+                    course = get_course_with_access(request.user, course_id, 'load')
                     return redirect("/courses/" + course.id + "/wiki/" + path_match.group('wiki_path') )
                     
                 except Http404:
@@ -55,14 +53,13 @@ class Middleware(object):
                 course_id = course_match.group('course_id')
                 # See if we are able to view the course. If we aren't, redirect to regular wiki
                 try:
-                    course = check_course(request.user, course_id)
+                    course = get_course_with_access(request.user, course_id, 'load')
                     # Good, we can see the course. Carry on
                     return None
                 except Http404:
                     # We can't see the course, so redirect to the regular wiki
                     return redirect("/wiki/" + course_match.group('wiki_path'))
             
-                
         return None
 
 def context_processor(request):
@@ -79,7 +76,7 @@ def context_processor(request):
         course_id = match.group('course_id')
         
         try:
-            course = check_course(request.user, course_id)
+            course = get_course_with_access(request.user, course_id, 'load')
             return {'course' : course}
         except Http404:
             # We couldn't access the course for whatever reason. It is too late to change
