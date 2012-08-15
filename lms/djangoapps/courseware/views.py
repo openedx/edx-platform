@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import urllib
 import itertools
 
@@ -8,7 +9,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -34,6 +35,20 @@ from courseware.courses import (check_course, get_courses_by_university,
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
+
+
+def course_redirect(request, course_path):
+    '''
+    Allows course XML to refer to its own directory structure without knowing the multicourse hierarchy.
+    Prepends the multicourse path to the requested course-internal path.
+    If the course_id cannot be determined, redirect to multicourse page. (NOTE: is Http404 more appropriate?)
+    '''
+    referer = request.META['HTTP_REFERER']
+    match = re.search(r'/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/', referer)
+    courses_path = '/courses/'
+    if match is not None:
+        courses_path += match.group('course_id') + '/' + course_path
+    return HttpResponseRedirect(courses_path)
 
 def user_groups(user):
     """
