@@ -48,7 +48,6 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
-    'DARK_LAUNCH': False,  # When True, courses will be active for staff only
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
@@ -95,12 +94,12 @@ system_node_path = os.environ.get("NODE_PATH", None)
 if system_node_path is None:
     system_node_path = "/usr/local/lib/node_modules"
 
-node_paths = [COMMON_ROOT / "static/js/vendor", 
+node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
               system_node_path
               ]
 NODE_PATH = ':'.join(node_paths)
-                          
+
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
