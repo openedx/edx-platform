@@ -90,6 +90,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
+
+#################### CAPA External Code Evaluation #############################
+XQUEUE_INTERFACE = {
+    'url': 'http://localhost:8888',
+    'django_auth': {'username': 'local',
+                    'password': 'local'},
+    'basic_auth': None,
+}
+
+
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.

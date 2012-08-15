@@ -173,29 +173,3 @@ h1.top-header {
   @include transition( all, .2s, $ease-in-out-quad);
 }
 
-.global {
-  .find-courses-button {
-    display: none;
-  }
-
-  h2 {
-    display: block;
-    float: left;
-    font-size: 0.9em;
-    font-weight: 600;
-    letter-spacing: 0;
-    line-height: 40px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 0 #fff;
-    text-transform: none;
-    white-space: nowrap;
-    width: 700px;
-
-    .provider {
-      font: inherit;
-      font-weight: bold;
-      color: #6d6d6d;
-    }
-  }
-}

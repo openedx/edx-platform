@@ -50,6 +50,16 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 
+XQUEUE_INTERFACE = {
+    "url": "http://xqueue.sandbox.edx.org",
+    "django_auth": {
+        "username": "lms",
+        "password": "***REMOVED***"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
+
+
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
