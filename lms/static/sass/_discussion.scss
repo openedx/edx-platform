@@ -614,7 +614,7 @@ $tag-text-color: #5b614f;
     .new-post-similar-posts-wrapper {
       @include border-radius(3px);
       border: 1px solid #EEE;
-      font-size: $comment_body_size;
+      font-size: $post-font-size;
       line-height: 150%;
       margin-top: 1%;
       padding: 1% 1.5%;
