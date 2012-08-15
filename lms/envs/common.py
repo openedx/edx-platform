@@ -49,6 +49,11 @@ MITX_FEATURES = {
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
+    # When True, will only publicly list courses by the subdomain. Expects you
+    # to define COURSE_LISTINGS, a dictionary mapping subdomains to lists of
+    # course_ids (see dev_int.py for an example)
+    'SUBDOMAIN_COURSE_LISTINGS' : False,
+
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
 
@@ -61,6 +66,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
+
 }
 
 # Used for A/B testing

@@ -63,7 +63,8 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user)
+    universities = get_courses_by_university(request.user, 
+                                             domain=request.META['HTTP_HOST'])
     return render_to_response("courses.html", {'universities': universities})
 
 
@@ -241,7 +242,8 @@ def university_profile(request, org_id):
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses = get_courses_by_university(request.user)[org_id]
+    courses = get_courses_by_university(request.user,
+                                        domain=request.META['HTTP_HOST'])[org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
