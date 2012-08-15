@@ -1,10 +1,12 @@
-<article class="discussion-sidebar-tags sidebar-module">
-  <header>
-    <h4>Recent Tags</h4>
-  </header>
-  <ol class="discussion-sidebar-tags-list">
-    % for tag, count in trending_tags:
-      <li><a href="#" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
-    % endfor
-  <ol>
-</article>
+% if trending_tags:
+  <article class="discussion-sidebar-tags sidebar-module">
+      <header>
+        <h4>Recent Tags</h4>
+      </header>
+      <ol class="discussion-sidebar-tags-list">
+        % for tag, count in trending_tags:
+          <li><a href="#" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
+        % endfor
+      <ol>
+  </article>
+% endif
