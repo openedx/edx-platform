@@ -110,6 +110,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
     course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
     registered = registered_for_course(course, request.user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -123,7 +124,8 @@ def index(request, course_id, chapter=None, section=None,
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
-            'content': ''
+            'content': '',
+            'staff_access': staff_access,
             }
 
         look_for_module = chapter is not None and section is not None
@@ -166,7 +168,8 @@ def index(request, course_id, chapter=None, section=None,
                               position=position
                               ))
             try:
-                result = render_to_response('courseware-error.html', {})
+                result = render_to_response('courseware-error.html',
+                                            {'staff_access': staff_access})
             except:
                 result = HttpResponse("There was an unrecoverable error")
 
@@ -208,8 +211,10 @@ def course_info(request, course_id):
     Assumes the course_id is in a valid format.
     """
     course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('info.html', {'course': course})
+    return render_to_response('info.html', {'course': course,
+                                            'staff_access': staff_access,})
 
 
 def registered_for_course(course, user):
@@ -257,13 +262,14 @@ def profile(request, course_id, student_id=None):
     Course staff are allowed to see the profiles of students in their class.
     """
     course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
         # Requesting access to a different student's profile
-        if not has_access(request.user, course, 'staff'):
+        if not staff_access:
             raise Http404
         student = User.objects.get(id=int(student_id))
 
@@ -282,8 +288,9 @@ def profile(request, course_id, student_id=None):
                'email': student.email,
                'course': course,
                'csrf': csrf(request)['csrf_token'],
-               'courseware_summary' : courseware_summary,
-               'grade_summary' : grade_summary
+               'courseware_summary': courseware_summary,
+               'grade_summary': grade_summary,
+               'staff_access': staff_access,
                }
     context.update()
 
@@ -316,7 +323,10 @@ def gradebook(request, course_id):
                      for student in enrolled_students]
 
     return render_to_response('gradebook.html', {'students': student_info,
-                                                 'course': course, 'course_id': course_id})
+                                                 'course': course,
+                                                 'course_id': course_id,
+                                                 # Checked above
+                                                 'staff_access': True,})
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -325,7 +335,8 @@ def grade_summary(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
-    context = {'course': course }
+    context = {'course': course,
+               'staff_access': True,}
     return render_to_response('grade_summary.html', context)
 
 
@@ -335,6 +346,7 @@ def instructor_dashboard(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
-    context = {'course': course }
+    context = {'course': course,
+               'staff_access': True,}
     return render_to_response('instructor_dashboard.html', context)
 

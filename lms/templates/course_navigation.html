@@ -28,7 +28,7 @@ def url_class(url):
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
 % endif
-% if has_access(user, course, 'staff'):
+% if staff_access:
       <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
 % endif
 

@@ -65,7 +65,7 @@ def has_access(user, obj, action):
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError("Unknown object type in has_access().  Object type: '{}'"
+    raise TypeError("Unknown object type in has_access(): '{}'"
                     .format(type(obj)))
 
 # ================ Implementation helpers ================================
