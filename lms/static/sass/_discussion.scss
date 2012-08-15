@@ -381,6 +381,10 @@ $tag-text-color: #5b614f;
           margin-top: 10px;
           width: 95%;
         }
+
+        .reply-post-control {
+          margin-top: 1%;
+        }
       }
     }
 
@@ -459,7 +463,8 @@ $tag-text-color: #5b614f;
   }
 
   .search-wrapper {
-    height: 110px;
+    margin-bottom: 50px;
+    margin-left: .5%;
   }
 
   .discussion-search-form {
@@ -726,10 +731,25 @@ $tag-text-color: #5b614f;
     .new-post-control {
       margin-left: 75%;
       margin-top: 1%;
+
+     .discussion-cancel-post {
+        margin-right: 1.5%;
+      } 
     }
 
+    .reply-post-control {
+
+      .discussion-cancel-post {
+        margin-right: 1.5%;
+      }
+    }
+    
     .edit-post-control {
       margin-top: 1%;
+
+      .discussion-cancel-update {
+        margin-right: 1.5%;
+      }
     }
 
     .control-button {
@@ -756,6 +776,10 @@ $tag-text-color: #5b614f;
       font-style: normal;
       font-weight: 400;
     }
+  }
+
+  .discussion-content-edit {
+    margin: 3%;
   }
 
   .new-post-form {
