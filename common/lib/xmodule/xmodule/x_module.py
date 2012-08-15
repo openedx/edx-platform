@@ -298,6 +298,14 @@ class XModule(HTMLSnippet):
         return ""
 
 
+def policy_key(location):
+    """
+    Get the key for a location in a policy file.  (Since the policy file is
+    specific to a course, it doesn't need the full location url).
+    """
+    return '{cat}/{name}'.format(cat=location.category, name=location.name)
+
+
 class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     An XModuleDescriptor is a specification for an element of a course. This
@@ -415,6 +423,24 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         """
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
+
+
+    @staticmethod
+    def apply_policy(node, policy):
+        """
+        Given a descriptor, traverse all its descendants and update its metadata
+        with the policy.
+
+        Notes:
+          - this does not propagate inherited metadata.  The caller should
+            call compute_inherited_metadata after applying the policy.
+          - metadata specified in the policy overrides metadata in the xml
+        """
+        k = policy_key(node.location)
+        if k in policy:
+            node.metadata.update(policy[k])
+        for c in node.get_children():
+            XModuleDescriptor.apply_policy(c, policy)
 
     @staticmethod
     def compute_inherited_metadata(node):
