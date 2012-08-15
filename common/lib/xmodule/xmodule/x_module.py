@@ -303,6 +303,10 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
+    # Special case--we need to be able to override the url_name on a course,
+    # so special case where we look for the course descriptor
+    if location.category == 'course':
+        return 'course'
     return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
