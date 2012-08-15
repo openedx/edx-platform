@@ -134,8 +134,8 @@
   </div>
   <div class="comment-count">
     % if content.get('comments_count', -1) >= 0:
-      % if kwargs.get('show_comments') is True:
-        <a href="javascript:void(0)" class="discussion-hide-comments">Hide ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
+      % if discussion_type == 'user':
+        <a href="javascript:void(0)" class="discussion-show-comments first-time">Show all comments (${content['comments_count']} total)</a>
       % else:
         <a href="javascript:void(0)" class="discussion-show-comments">Show ${content['comments_count']} ${pluralize('comment', content['comments_count'])}</a>
       % endif

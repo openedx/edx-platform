@@ -265,7 +265,7 @@ initializeFollowThread = (thread) ->
       $threadTitle = $local(".thread-title")
       $showComments = $local(".discussion-show-comments")
 
-      if not $showComments.length or not $threadTitle.length
+      if not $showComments.hasClass("first-time") and (not $showComments.length or not $threadTitle.length)
         return
 
       rebindHideEvents = ->
@@ -277,7 +277,7 @@ initializeFollowThread = (thread) ->
         $showComments.html prevHtml.replace "Show", "Hide"
 
 
-      if $content.children(".comments").length
+      if not $showComments.hasClass("first-time") and $content.children(".comments").length
         $content.children(".comments").show()
         rebindHideEvents()
       else
@@ -294,6 +294,7 @@ initializeFollowThread = (thread) ->
             $content.find(".comment").each (index, comment) ->
               Discussion.initializeContent(comment)
               Discussion.bindContentEvents(comment)
+            $showComments.removeClass("first-time")
             rebindHideEvents()
       
     Discussion.bindLocalEvents $local,
