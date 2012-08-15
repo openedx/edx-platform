@@ -1,7 +1,7 @@
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
   ${ problem['name'] }
-  % if problem['weight'] != 1:
+  % if problem['weight'] != 1 and problem['weight'] != None:
     : ${ problem['weight'] } points
   % endif
 </h2>
