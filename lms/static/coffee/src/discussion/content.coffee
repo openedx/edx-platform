@@ -326,7 +326,7 @@ initializeFollowThread = (thread) ->
           handleVote($elem, "down")
 
       "click .admin-endorse": ->
-        handleEndorse(this, true)#, $(this).is(":checked"))
+        handleEndorse(this, not $content.hasClass("endorsed"))
 
       "click .discussion-openclose": ->
         handleOpenClose(this, $(this).text())
