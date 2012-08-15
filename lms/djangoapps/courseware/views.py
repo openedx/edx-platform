@@ -33,6 +33,7 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+
 def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
@@ -68,7 +69,7 @@ def courses(request):
     return render_to_response("courses.html", {'universities': universities})
 
 
-def render_accordion(request, course, chapter, section):
+def render_accordion(request, course, chapter, section, course_id=None):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter.
 
@@ -79,7 +80,7 @@ def render_accordion(request, course, chapter, section):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section)
+    toc = toc_for_course(request.user, request, course, chapter, section, course_id=course_id)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -121,7 +122,7 @@ def index(request, course_id, chapter=None, section=None,
     try:
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section),
+            'accordion': render_accordion(request, course, chapter, section, course_id=course_id),
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
@@ -138,7 +139,7 @@ def index(request, course_id, chapter=None, section=None,
                                                           section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache)
+                                    student_module_cache, course_id=course_id)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -278,7 +279,7 @@ def profile(request, course_id, student_id=None):
     user_info = UserProfile.objects.get(user=student)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache)
+    course_module = get_module(request.user, request, course.location, student_module_cache, course_id=course_id)
 
     courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
