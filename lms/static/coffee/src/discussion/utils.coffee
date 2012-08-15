@@ -30,7 +30,6 @@ wmdEditors = {}
       undo_vote_for_thread    : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"
       follow_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/follow"
       unfollow_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/unfollow"
-      openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       update_comment          : "/courses/#{$$course_id}/discussion/comments/#{param}/update"
       endorse_comment         : "/courses/#{$$course_id}/discussion/comments/#{param}/endorse"
       create_sub_comment      : "/courses/#{$$course_id}/discussion/comments/#{param}/reply"
