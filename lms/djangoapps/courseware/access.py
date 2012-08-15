@@ -84,10 +84,11 @@ def _has_access_course_desc(user, course, action):
     'staff' -- staff access to course.
     """
     def can_load():
-        "Can this user load this course?
+        """
+        Can this user load this course?
 
         NOTE: this is not checking whether user is actually enrolled in the course.
-        "
+        """
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, course, action)
 
