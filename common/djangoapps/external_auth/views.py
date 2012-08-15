@@ -317,7 +317,7 @@ def provider_login(request):
     server = Server(store, endpoint)
 
     # handle OpenID request
-    query = get_dict_for_openid(request.GET or request.POST)
+    query = get_dict_for_openid(request.REQUEST)
     error = False
     if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
         # decode request
@@ -358,7 +358,7 @@ def provider_login(request):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             request.session['openid_error'] = True
-            log.warning("Login failed - Unknown user email: {0}".format(email))
+            log.warning("OpenID login failed - Unknown user email: {0}".format(email))
             return HttpResponseRedirect(openid_request['url'])
 
         # attempt to authenticate user
@@ -366,7 +366,7 @@ def provider_login(request):
         user = authenticate(username=username, password=password)
         if user is None:
             request.session['openid_error'] = True
-            log.warning("Login failed - password for {0} is invalid".format(email))
+            log.warning("OpenID login failed - password for {0} is invalid".format(email))
             return HttpResponseRedirect(openid_request['url'])
 
         # authentication succeeded, so log user in
@@ -377,6 +377,7 @@ def provider_login(request):
 
             # fullname field comes from user profile
             profile = UserProfile.objects.get(user=user)
+            log.info("OpenID login success - {0} ({1})".format(user.username, user.email))
 
             # redirect user to return_to location
             response = openid_request['request'].answer(True, None, endpoint + urlquote(user.username))
@@ -389,9 +390,16 @@ def provider_login(request):
         log.warning("Login failed - Account not active for user {0}".format(username))
         return HttpResponseRedirect(openid_request['url'])
 
+    # determine consumer domain if applicable
+    return_to = ''
+    if 'openid.return_to' in request.REQUEST:
+        matches = re.match(r'\w+:\/\/([\w\.-]+)', request.REQUEST['openid.return_to'])
+        return_to = matches.group(1)
+
     # display login page
     response = render_to_response('provider_login.html', {
-        'error': error
+        'error': error,
+        'return_to': return_to
     })
 
     # custom XRDS header necessary for discovery process
