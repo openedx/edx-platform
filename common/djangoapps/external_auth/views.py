@@ -1,3 +1,4 @@
+import functools
 import json
 import logging
 import random
@@ -156,7 +157,7 @@ def edXauth_signup(request, eamap=None):
     
     log.debug('ExtAuth: doing signup for %s' % eamap.external_email)
 
-    return student_views.main_index(extra_context=context)
+    return student_views.main_index(request, extra_context=context)
 
 #-----------------------------------------------------------------------------
 # MIT SSL
@@ -206,7 +207,7 @@ def edXauth_ssl_login(request):
             pass
     if not cert:
         # no certificate information - go onward to main index
-        return student_views.main_index()
+        return student_views.main_index(request)
 
     (user, email, fullname) = ssl_dn_extract_info(cert)
     
@@ -216,4 +217,4 @@ def edXauth_ssl_login(request):
                                             credentials=cert, 
                                             email=email,
                                             fullname=fullname,
-                                            retfun = student_views.main_index)
+                                            retfun = functools.partial(student_views.main_index, request))
