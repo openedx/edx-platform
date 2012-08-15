@@ -77,6 +77,7 @@ initializeFollowDiscussion = (discussion) ->
             text: $local(".new-post-title").val()
           success: (response, textStatus) ->
             $similarPosts.empty()
+            console.log response
             if $.type(response) == "array" and response.length
               $wrapper.show()
               for thread in response
