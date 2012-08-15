@@ -155,7 +155,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
-        'user_info': cc.User.from_django_user(request.user).to_dict(),
+        'user_info': json.dumps(cc.User.from_django_user(request.user).to_dict()),
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
