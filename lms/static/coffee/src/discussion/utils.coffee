@@ -16,7 +16,7 @@ wmdEditors = {}
             .addClass(cls).html(txt)
             .click -> handler(this)
     
-  urlFor: (name, param, param1) ->
+  urlFor: (name, param, param1, param2) ->
     {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
@@ -44,6 +44,9 @@ wmdEditors = {}
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       update_moderator_status : "/courses/#{$$course_id}/discussion/users/#{param}/update_moderator_status"
+      openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
+      permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
+      permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
     }[name]
 
   safeAjax: (params) ->

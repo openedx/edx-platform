@@ -232,14 +232,12 @@ initializeFollowThread = (thread) ->
     handleDelete = (elem) ->
       if $content.hasClass("thread")
         url = Discussion.urlFor('delete_thread', id)
-        confirmValue = confirm("Are you sure? This will delete the thread and all comments associated with it and cannot be recovered.")
+        c = confirm "Are you sure to delete thread \"" + $content.find("a.thread-title").text() + "\"?"
       else
         url = Discussion.urlFor('delete_comment', id)
-        confirmValue = confirm("Are you sure? This will delete the comment and all replies associated with it and cannot be recovered.")
-
-      if not confirmValue
+        c = confirm "Are you sure to delete this comment? "
+      if c != true
         return
-
       Discussion.safeAjax
         $elem: $(elem)
         url: url
@@ -375,6 +373,15 @@ initializeFollowThread = (thread) ->
 
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
     id = $content.attr("_id")
+
+    discussion_id = $content.parents(".discussion").attr("_id")
+    if $content.hasClass("thread")
+      permalink = Discussion.urlFor("permanent_link_thread", discussion_id, id)
+    else
+      thread_id = $content.parents(".thread").attr("_id")
+      permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, id)
+    $local(".discussion-permanent-link").attr "href", permalink
+
     if not Discussion.getContentInfo id, 'editable'
       $local(".admin-edit").remove()
     if not Discussion.getContentInfo id, 'can_reply'
@@ -383,3 +390,5 @@ initializeFollowThread = (thread) ->
       $local(".admin-endorse").remove()
     if not Discussion.getContentInfo id, 'can_delete'
       $local(".admin-delete").remove()
+    if not Discussion.getContentInfo id, 'can_openclose'
+      $local(".discussion-openclose").remove()

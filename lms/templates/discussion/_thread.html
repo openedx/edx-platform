@@ -47,6 +47,15 @@
           % endif
           <li><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
           <li><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
+          % if type == "thread":
+          <li>
+            % if content['closed']:
+              <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Re-open thread</a>
+            % else:
+              <a class="discussion-openclose" id="discussion-openclose-${content['id']}" href="javascript:void(0);">Close thread</a>
+            % endif
+          </li>
+          % endif
         </ul>
 
         ${render_title(content, type, **kwargs)}
@@ -98,7 +107,12 @@
     <ul class="discussion-actions">
       <li>${render_link("discussion-link discussion-reply discussion-reply-" + type, "Reply")}</li>
       <li><div class="follow-wrapper"></div></li>
+      <li>${render_link("discussion-link discussion-permanent-link", "Permanent Link")}</li>
     </ul>
+
+
+    
+
   </div>
 </%def>
 
