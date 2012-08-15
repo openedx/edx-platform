@@ -217,6 +217,10 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
         url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
+        url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
+        url(r'^openid/provider/login/(?:[\w%\. ]+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
+        url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
+        url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
         )
 
 if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):

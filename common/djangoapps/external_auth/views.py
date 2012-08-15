@@ -11,9 +11,12 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from student.models import UserProfile
 
+from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.http import urlquote
 from django.shortcuts import render_to_response
 from django.shortcuts import redirect
 from django.template import RequestContext
@@ -28,6 +31,14 @@ from util.cache import cache_if_anonymous
 from django_openid_auth import auth as openid_auth
 from openid.consumer.consumer import (Consumer, SUCCESS, CANCEL, FAILURE)
 import django_openid_auth.views as openid_views
+
+from openid.server.server import Server, ProtocolError, CheckIDRequest, EncodingError
+from openid.server.trustroot import verifyReturnTo
+from openid.store.filestore import FileOpenIDStore
+from openid.yadis.discover import DiscoveryFailure
+from openid.consumer.discover import OPENID_IDP_2_0_TYPE
+from openid.extensions import ax, sreg
+from openid.fetchers import HTTPFetchingError
 
 import student.views as student_views
 
@@ -218,3 +229,197 @@ def edXauth_ssl_login(request):
                                             email=email,
                                             fullname=fullname,
                                             retfun = functools.partial(student_views.index, request))
+
+def get_dict_for_openid(data):
+    """
+    Return a dictionary suitable for the OpenID library
+    """
+
+    return dict((k, v) for k, v in data.iteritems())
+
+def get_xrds_url(resource, request):
+    """
+    Return the XRDS url for a resource
+    """
+
+    location = request.META['HTTP_HOST'] + '/openid/provider/' + resource + '/'
+    if request.is_secure():
+        url = 'https://' + location
+    else:
+        url = 'http://' + location
+
+    return url
+
+def provider_respond(server, request, response, data):
+    """
+    Respond to an OpenID request
+    """
+
+    # get simple registration request
+    sreg_data = {}
+    sreg_request = sreg.SRegRequest.fromOpenIDRequest(request)
+    sreg_fields = sreg_request.allRequestedFields()
+
+    # if consumer requested simple registration fields, add them
+    if sreg_fields:
+        for field in sreg_fields:
+            if field == 'email' and 'email' in data:
+                sreg_data['email'] = data['email']
+            elif field == 'fullname' and 'fullname' in data:
+                sreg_data['fullname'] = data['fullname']
+
+        # construct sreg response
+        sreg_response = sreg.SRegResponse.extractResponse(sreg_request, sreg_data)
+        sreg_response.toMessage(response.fields)
+
+    # get attribute exchange request
+    try:
+        ax_request = ax.FetchRequest.fromOpenIDRequest(request)
+
+    except ax.AXError:
+        pass
+
+    else:
+        ax_response = ax.FetchResponse()
+
+        # if consumer requested attribute exchange fields, add them
+        if ax_request and ax_request.requested_attributes:
+            for type_uri in ax_request.requested_attributes.iterkeys():
+                if type_uri == 'http://axschema.org/contact/email' and 'email' in data:
+                    ax_response.addValue('http://axschema.org/contact/email', data['email'])
+
+                elif type_uri == 'http://axschema.org/namePerson' and 'fullname' in data:
+                    ax_response.addValue('http://axschema.org/namePerson', data['fullname']);
+
+            # construct ax response
+            ax_response.toMessage(response.fields)
+
+    # create http response from OpenID response
+    webresponse = server.encodeResponse(response)
+    http_response = HttpResponse(webresponse.body)
+    http_response.status_code = webresponse.code
+
+    # add OpenID headers to response
+    for k, v in webresponse.headers.iteritems():
+        http_response[k] = v
+
+    return http_response
+
+@csrf_exempt
+def provider_login(request):
+    """
+    OpenID login endpoint
+    """
+
+    # initialize store and server
+    endpoint = get_xrds_url('login', request)
+    store = FileOpenIDStore('/tmp/openid_provider')
+    server = Server(store, endpoint)
+
+    # handle OpenID request
+    query = get_dict_for_openid(request.GET or request.POST)
+    error = False
+    if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
+        # decode request
+        openid_request = server.decodeRequest(query)
+
+        # checkid_immediate not supported, require user interaction
+        if openid_request.mode == 'checkid_immediate':
+            return provider_respond(server, openid_request, openid_request.answer(false), {})
+
+        # checkid_setup, so display login page
+        elif openid_request.mode == 'checkid_setup':
+            if openid_request.idSelect():
+                # remember request and original path
+                request.session['openid_request'] = {
+                    'request': openid_request,
+                    'url': request.get_full_path()
+                }
+
+                # user failed login on previous attempt
+                if 'openid_error' in request.session:
+                    error = True
+                    del request.session['openid_error']
+
+        # OpenID response
+        else:
+            return provider_respond(server, openid_request, server.handleRequest(openid_request), {})
+
+    # handle login
+    if request.method == 'POST' and 'openid_request' in request.session:
+        # get OpenID request from session
+        openid_request = request.session['openid_request']
+        del request.session['openid_request']
+
+        # check if user with given email exists
+        email = request.POST['email']
+        password = request.POST['password']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            request.session['openid_error'] = True
+            log.warning("Login failed - Unknown user email: {0}".format(email))
+            return HttpResponseRedirect(openid_request['url'])
+
+        # attempt to authenticate user
+        username = user.username
+        user = authenticate(username=username, password=password)
+        if user is None:
+            request.session['openid_error'] = True
+            log.warning("Login failed - password for {0} is invalid".format(email))
+            return HttpResponseRedirect(openid_request['url'])
+
+        # authentication succeeded, so log user in
+        if user is not None and user.is_active:
+            # remove error from session since login succeeded
+            if 'openid_error' in request.session:
+                del request.session['openid_error']
+
+            # fullname field comes from user profile
+            profile = UserProfile.objects.get(user=user)
+
+            # redirect user to return_to location
+            response = openid_request['request'].answer(True, None, endpoint + urlquote(user.username))
+            return provider_respond(server, openid_request['request'], response, {
+                'fullname': profile.name,
+                'email': user.email
+            })
+
+        request.session['openid_error'] = True
+        log.warning("Login failed - Account not active for user {0}".format(username))
+        return HttpResponseRedirect(openid_request['url'])
+
+    # display login page
+    response = render_to_response('provider_login.html', {
+        'error': error
+    })
+
+    # custom XRDS header necessary for discovery process
+    response['X-XRDS-Location'] = get_xrds_url('xrds', request)
+    return response
+
+def provider_identity(request):
+    """
+    XRDS for identity discovery
+    """
+
+    response = render_to_response('identity.xml', {
+        'url': get_xrds_url('login', request)
+    }, mimetype='text/xml')
+
+    # custom XRDS header necessary for discovery process
+    response['X-XRDS-Location'] = get_xrds_url('identity', request)
+    return response
+
+def provider_xrds(request):
+    """
+    XRDS for endpoint discovery
+    """
+
+    response = render_to_response('xrds.xml', {
+        'url': get_xrds_url('login', request)
+    }, mimetype='text/xml')
+
+    # custom XRDS header necessary for discovery process
+    response['X-XRDS-Location'] = get_xrds_url('xrds', request)
+    return response
