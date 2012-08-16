@@ -34,10 +34,9 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
-DISCUSSION_SERVICE_ENABLED = True
 
 # Features
 MITX_FEATURES = {
@@ -53,7 +52,7 @@ MITX_FEATURES = {
     'DARK_LAUNCH': False,  # When True, courses will be active for staff only
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : True,
+    'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
