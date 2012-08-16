@@ -19,7 +19,7 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -48,7 +48,7 @@ def make_track_function(request):
     return f
 
 
-def toc_for_course(user, request, course, active_chapter, active_section):
+def toc_for_course(user, request, course, active_chapter, active_section, course_id=None):
     '''
     Create a table of contents from the module store
 
@@ -71,7 +71,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
-    course = get_module(user, request, course.location, student_module_cache)
+    course = get_module(user, request, course.location, student_module_cache, course_id=course_id)
 
     chapters = list()
     for chapter in course.get_display_items():
@@ -127,7 +127,7 @@ def get_section(course_module, chapter, section):
     return section_module
 
 
-def get_module(user, request, location, student_module_cache, position=None):
+def get_module(user, request, location, student_module_cache, position=None, course_id=None):
     ''' Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
@@ -144,6 +144,14 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     '''
     descriptor = modulestore().get_item(location)
+    
+    # NOTE:
+    #   A 'course_id' is understood to be the triplet (org, course, run), for example
+    #       (MITx, 6.002x, 2012_Spring).
+    #   At the moment generic XModule does not contain enough information to replicate
+    #       the triplet (it is missing 'run'), so we must pass down course_id
+    if course_id is None:
+        course_id = descriptor.location.course_id # Will NOT produce (org, course, run) for non-CourseModule's
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load'):
@@ -167,7 +175,7 @@ def get_module(user, request, location, student_module_cache, position=None):
 
     # Setup system context for module instance
     ajax_url = reverse('modx_dispatch',
-                       kwargs=dict(course_id=descriptor.location.course_id,
+                       kwargs=dict(course_id=course_id,
                                    id=descriptor.location.url(),
                                    dispatch=''),
                        )
@@ -175,7 +183,7 @@ def get_module(user, request, location, student_module_cache, position=None):
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
     xqueue_callback_url += reverse('xqueue_callback',
-                                  kwargs=dict(course_id=descriptor.location.course_id,
+                                  kwargs=dict(course_id=course_id,
                                               userid=str(user.id),
                                               id=descriptor.location.url(),
                                               dispatch='score_update'),
@@ -195,7 +203,7 @@ def get_module(user, request, location, student_module_cache, position=None):
         Delegate to get_module.  It does an access check, so may return None
         """
         return get_module(user, request, location,
-                                       student_module_cache, position)
+                                       student_module_cache, position, course_id=course_id)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -224,6 +232,10 @@ def get_module(user, request, location, student_module_cache, position=None):
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
         module.metadata['data_dir'], module
     )
+
+    # Allow URLs of the form '/course/' refer to the root of multicourse directory
+    #   hierarchy of this course
+    module.get_html = replace_course_urls(module.get_html, course_id, module)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, module, 'staff'):
@@ -370,7 +382,7 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
             p[inputfile_id] = inputfile
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
-    instance = get_module(request.user, request, id, student_module_cache)
+    instance = get_module(request.user, request, id, student_module_cache, course_id=course_id)
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
