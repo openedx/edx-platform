@@ -629,7 +629,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             try:
                 return parse_time(self.metadata[key])
             except ValueError as e:
-                msg = "Descriptor {} loaded with a bad metadata key '{}': '{}'".format(
+                msg = "Descriptor {0} loaded with a bad metadata key '{1}': '{2}'".format(
                     self.location.url(), self.metadata[key], e)
                 log.warning(msg)
         return None

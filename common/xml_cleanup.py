@@ -47,12 +47,12 @@ def cleanup(filepath, remove_meta):
                  'ispublic', 'xqa_key')
 
     try:
-        print "Cleaning {}".format(filepath)
+        print "Cleaning {0}".format(filepath)
         with open(filepath) as f:
             parser = etree.XMLParser(remove_comments=False)
             xml = etree.parse(filepath, parser=parser)
     except:
-        print "Error parsing file {}".format(filepath)
+        print "Error parsing file {0}".format(filepath)
         return
 
     for node in xml.iter(tag=etree.Element):
@@ -67,12 +67,12 @@ def cleanup(filepath, remove_meta):
             del attrs['name']
 
         if 'url_name' in attrs and 'slug' in attrs:
-            print "WARNING: {} has both slug and url_name"
+            print "WARNING: {0} has both slug and url_name".format(node)
 
         if ('url_name' in attrs and 'filename' in attrs and
             len(attrs)==2 and attrs['url_name'] == attrs['filename']):
             # This is a pointer tag in disguise.  Get rid of the filename.
-            print 'turning {}.{} into a pointer tag'.format(node.tag, attrs['url_name'])
+            print 'turning {0}.{1} into a pointer tag'.format(node.tag, attrs['url_name'])
             del attrs['filename']
 
         if remove_meta:
