@@ -237,7 +237,7 @@ class CapaModule(XModule):
             else:
                 raise
 
-        content = {'name': self.metadata['display_name'],
+        content = {'name': self.display_name,
                    'html': html,
                    'weight': self.weight,
                    }
@@ -464,7 +464,7 @@ class CapaModule(XModule):
                 return {'success': msg}
             log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
-        
+
         self.attempts = self.attempts + 1
         self.lcp.done = True
 
