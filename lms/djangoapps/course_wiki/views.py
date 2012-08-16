@@ -116,5 +116,13 @@ def get_or_create_root():
     
     root = URLPath.create_root(title="edX Wiki",
                         content=starting_content)
+    article = root.article
+    article.group = None
+    article.group_read = True
+    article.group_write = False
+    article.other_read = True
+    article.other_write = False
+    article.save()
+    
     return root
     
