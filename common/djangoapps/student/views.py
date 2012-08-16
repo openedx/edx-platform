@@ -38,8 +38,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from datetime import date
 from collections import namedtuple
-from courseware.courses import (course_staff_group_name, has_staff_access_to_course,
-                                get_courses_by_university)
+from courseware.courses import get_courses_by_university
+from courseware.access import has_access
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -68,9 +68,9 @@ def index(request):
         from external_auth.views import edXauth_ssl_login
         return edXauth_ssl_login(request)
 
-    return main_index(user=request.user)
+    return main_index(request, user=request.user)
 
-def main_index(extra_context = {}, user=None):
+def main_index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
 
@@ -93,7 +93,8 @@ def main_index(extra_context = {}, user=None):
         entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
-    universities = get_courses_by_university(None)
+    universities = get_courses_by_university(None,
+                                             domain=request.META.get('HTTP_HOST'))
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
@@ -166,22 +167,6 @@ def change_enrollment_view(request):
     """Delegate to change_enrollment to actually do the work."""
     return HttpResponse(json.dumps(change_enrollment(request)))
 
-def enrollment_allowed(user, course):
-    """If the course has an enrollment period, check whether we are in it.
-    Also respects the DARK_LAUNCH setting"""
-    now = time.gmtime()
-    start = course.enrollment_start
-    end = course.enrollment_end
-
-    if (start is None or now > start) and (end is None or now < end):
-        # in enrollment period.
-        return True
-
-    if settings.MITX_FEATURES['DARK_LAUNCH']:
-        if has_staff_access_to_course(user, course):
-            # if dark launch, staff can enroll outside enrollment window
-            return True
-    return False
 
 
 def change_enrollment(request):
@@ -209,18 +194,7 @@ def change_enrollment(request):
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
-        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            # require that user be in the staff_* group (or be an
-            # overall admin) to be able to enroll eg staff_6.002x or
-            # staff_6.00x
-            if not has_staff_access_to_course(user, course):
-                staff_group = course_staff_group_name(course)
-                log.debug('user %s denied enrollment to %s ; not in %s' % (
-                    user, course.location.url(), staff_group))
-                return {'success': False,
-                        'error' : '%s membership required to access course.' % staff_group}
-
-        if not enrollment_allowed(user, course):
+        if not has_access(user, course, 'enroll'):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
