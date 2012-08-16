@@ -69,9 +69,14 @@ div.info-wrapper {
   section.handouts {
     @extend .sidebar;
     border-left: 1px solid $border-color;
-    @include border-radius(0 4px 4px 0);
     border-right: 0;
+    @include border-radius(0 4px 4px 0);
     @include box-shadow(none);
+
+    &:after {
+      left: -1px;
+      right: auto;
+    }
 
     h1 {
       @extend .bottom-border;
