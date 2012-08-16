@@ -6,6 +6,7 @@ import re
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
+from lxml.html import HtmlComment
 from path import path
 from xmodule.errortracker import ErrorLog, make_error_tracker
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
@@ -16,9 +17,10 @@ from cStringIO import StringIO
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
 
-etree.set_default_parser(
-    etree.XMLParser(dtd_validation=False, load_dtd=False,
-                    remove_comments=True, remove_blank_text=True))
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
+
+etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -211,7 +213,7 @@ class XMLModuleStore(ModuleStoreBase):
             # been imported into the cms from xml
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
-            course_data = etree.parse(course_file).getroot()
+            course_data = etree.parse(course_file,parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
 
