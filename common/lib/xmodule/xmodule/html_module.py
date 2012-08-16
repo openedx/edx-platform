@@ -39,6 +39,8 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     def backcompat_paths(cls, path):
         if path.endswith('.html.xml'):
             path = path[:-9] + '.html'  # backcompat--look for html instead of xml
+        if path.endswith('.html.html'):
+            path = path[:-5]            # some people like to include .html in filenames..
         candidates = []
         while os.sep in path:
             candidates.append(path)
