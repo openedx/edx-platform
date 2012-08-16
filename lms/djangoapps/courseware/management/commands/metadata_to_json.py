@@ -60,7 +60,10 @@ def get_metadata(course):
     queue = [course]
     while len(queue) > 0:
         node = queue.pop()
-        d[policy_key(node.location)] = node_metadata(node)
+        meta = node_metadata(node)
+        # Don't output empty policy for things with no metadata
+        if len(meta) > 0:
+            d[policy_key(node.location)] = meta
         # want to print first children first, so put them at the end
         # (we're popping from the end)
         queue.extend(reversed(node.get_children()))
