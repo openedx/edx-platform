@@ -12,15 +12,28 @@ from django.conf import settings
 
 _MODULESTORES = {}
 
+FUNCTION_KEYS = ['render_template']
+
+
+def load_function(path):
+    module_path, _, name = path.rpartition('.')
+    return getattr(import_module(module_path), name)
+
 
 def modulestore(name='default'):
     global _MODULESTORES
 
     if name not in _MODULESTORES:
-        class_path = settings.MODULESTORE[name]['ENGINE']
-        module_path, _, class_name = class_path.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
+        class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
+
+        options = {}
+        options.update(settings.MODULESTORE[name]['OPTIONS'])
+        for key in FUNCTION_KEYS:
+            if key in options:
+                options[key] = load_function(options[key])
+
         _MODULESTORES[name] = class_(
-            **settings.MODULESTORE[name]['OPTIONS'])
+            **options
+        )
 
     return _MODULESTORES[name]
