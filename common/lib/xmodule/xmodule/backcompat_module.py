@@ -74,7 +74,7 @@ class SemanticSectionDescriptor(XModuleDescriptor):
 
             return system.process_xml(etree.tostring(xml_object[0]))
         else:
-            xml_object.tag = 'sequence'
+            xml_object.tag = 'sequential'
             return system.process_xml(etree.tostring(xml_object))
 
 
