@@ -376,14 +376,17 @@ class CapaModule(XModule):
         '''
         For the "show answer" button.
 
-        TODO: show answer events should be logged here, not just in the problem.js
-
         Returns the answers: {'answers' : answers}
         '''
+        event_info = dict()
+        event_info['problem_id'] = self.location.url()
+        self.system.track_function('show_answer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
+	    # answers (eg <solution>) may have embedded images
+	    answers = dict( (k,self.system.replace_urls(answers[k], self.metadata['data_dir'])) for k in answers )
             return {'answers': answers}
 
     # Figure out if we should move these to capa_problem?
