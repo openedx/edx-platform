@@ -3,7 +3,7 @@ section.wiki {
 
   header {
     height: 33px;
-    margin-bottom: 50px;
+    margin-bottom: 36px;
     padding-bottom: 26px;
     border-bottom: 1px solid $light-gray;
   }
@@ -27,13 +27,22 @@ section.wiki {
   .breadcrumb {
     list-style: none;
     padding-left: 0;
-    margin: 0;
+    margin: 0 0 0 flex-gutter();
 
     li {
       float: left;
       margin-right: 10px;
       font-size: 0.9em;
-      line-height: 31px;
+      line-height: 31px;      
+
+      a {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        height: 30px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
       &:after {
         content: '›';
@@ -59,6 +68,7 @@ section.wiki {
   .global-functions {
     display: block;
     width: auto;
+    margin-right: flex-gutter();
   }
 
   .add-article-btn {
@@ -103,6 +113,10 @@ section.wiki {
 
   -----------------*/
 
+  .article-wrapper {
+
+  }
+
   h1 {
     font-weight: bold;
     letter-spacing: 0;
@@ -111,19 +125,79 @@ section.wiki {
   .main-article {
     float: left;
     width: flex-grid(9);
+    margin-left: flex-gutter();
+    color: $base-font-color;
 
     h2 {
+      padding-bottom: 8px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid $light-gray;
+      font-size: 1.33em;
       font-weight: bold;
+      color: $base-font-color;
       text-transform: none;
       letter-spacing: 0;
-      font-size: 1.33em;
+    }
+
+    h3 {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    h4 {
+
+    }
+
+    h5 {
+
+    }
+
+    h6 {
+
+    }
+
+    ul {
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
+    }
+
+    li {      
+      margin-bottom: 15px;
     }
   }
 
+
+
+
+  /*-----------------
+
+    Sidebar
+
+  -----------------*/
+
   .article-functions {
     float: left;
-    width: flex-grid(2);
+    width: flex-grid(2) + flex-gutter();
     margin-left: flex-grid(1);
+
+    .timestamp {
+      margin: 4px 0 15px;
+      padding: 0 0 15px 5px;
+      border-bottom: 1px solid $light-gray;      
+
+      .label {
+        font-size: 0.7em;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+
+      .date {
+        font-size: 0.9em;
+      }
+    }
   }
 
   .nav-tabs {
@@ -132,7 +206,78 @@ section.wiki {
     margin: 0;
 
     li {
-      margin-left: 20px;
+      &.active {
+        a {
+          color: $blue;
+
+          .icon-view {
+            background-position: -25px 0;
+          }
+
+          .icon-edit {
+            background-position: -25px -25px;
+          }
+
+          .icon-changes {
+            background-position: -25px -49px;
+          }
+
+          .icon-attachments {
+            background-position: -25px -73px;
+          }
+
+          .icon-settings {
+            background-position: -25px -99px;
+          }
+
+          &:hover {
+            background: none;
+          }
+        }
+      }
+    }
+
+    a {
+      display: block;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 0.9em;
+      line-height: 25px;
+      color: #8f8f8f;
+
+      .icon {
+        float: left;
+        display: block;
+        width: 25px;
+        height: 25px;
+        margin-right: 3px;
+        background: url(../images/wiki-icons.png) no-repeat;
+      }
+
+      .icon-view {
+        background-position: 0 0;
+      }
+
+      .icon-edit {
+        background-position: 0 -25px;
+      }
+
+      .icon-changes {
+        background-position: 0 -49px;
+      }
+
+      .icon-attachments {
+        background-position: 0 -73px;
+      }
+
+      .icon-settings {
+        background-position: 0 -99px;
+      }
+
+      &:hover {
+        background-color: #f6f6f6;
+        text-decoration: none;
+      }
     }
   }
 
