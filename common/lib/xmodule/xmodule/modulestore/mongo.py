@@ -9,7 +9,6 @@ from importlib import import_module
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from mitxmako.shortcuts import render_to_string
 
 from . import ModuleStoreBase, Location
 from .exceptions import (ItemNotFoundError,
@@ -82,7 +81,8 @@ class MongoModuleStore(ModuleStoreBase):
     """
 
     # TODO (cpennington): Enable non-filesystem filestores
-    def __init__(self, host, db, collection, fs_root, port=27017, default_class=None,
+    def __init__(self, host, db, collection, fs_root, render_template,
+                 port=27017, default_class=None,
                  error_tracker=null_error_tracker):
 
         ModuleStoreBase.__init__(self)
@@ -108,6 +108,7 @@ class MongoModuleStore(ModuleStoreBase):
             self.default_class = None
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
+        self.render_template = render_template
 
     def _clean_item_data(self, item):
         """
@@ -160,7 +161,7 @@ class MongoModuleStore(ModuleStoreBase):
             self.default_class,
             resource_fs,
             self.error_tracker,
-            render_to_string,
+            self.render_template,
         )
         return system.load_item(item['location'])
 
