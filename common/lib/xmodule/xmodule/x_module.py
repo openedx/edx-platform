@@ -303,10 +303,6 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    # Special case--we need to be able to override the url_name on a course,
-    # so special case where we look for the course descriptor
-    if location.category == 'course':
-        return 'course'
     return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
@@ -428,23 +424,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
 
-
-    @staticmethod
-    def apply_policy(node, policy):
-        """
-        Given a descriptor, traverse all its descendants and update its metadata
-        with the policy.
-
-        Notes:
-          - this does not propagate inherited metadata.  The caller should
-            call compute_inherited_metadata after applying the policy.
-          - metadata specified in the policy overrides metadata in the xml
-        """
-        k = policy_key(node.location)
-        if k in policy:
-            node.metadata.update(policy[k])
-        for c in node.get_children():
-            XModuleDescriptor.apply_policy(c, policy)
 
     @staticmethod
     def compute_inherited_metadata(node):
@@ -701,9 +680,11 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
         """
         load_item, resources_fs, error_tracker: see DescriptorSystem
+
+        policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
@@ -711,6 +692,7 @@ class XMLParsingSystem(DescriptorSystem):
         DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
                                   **kwargs)
         self.process_xml = process_xml
+        self.policy = policy
 
 
 class ModuleSystem(object):

@@ -1,4 +1,4 @@
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from lxml import etree
 import json
@@ -269,6 +269,11 @@ class XmlDescriptor(XModuleDescriptor):
             except Exception as err:
                 log.debug('Error %s in loading metadata %s' % (err,dmdata))
                 metadata['definition_metadata_err'] = str(err)
+
+        # Set/override any metadata specified by policy
+        k = policy_key(location)
+        if k in system.policy:
+            metadata.update(system.policy[k])
 
         return cls(
             system,
