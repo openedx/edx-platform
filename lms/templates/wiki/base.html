@@ -1,11 +1,12 @@
 {% extends "main_django.html" %}
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | edX Wiki</title>{% endblock %}
 
 {% block headextra %}
   {% compressed_css 'course' %}
-  <script src="{{ STATIC_URL }}js/bootstrap-modal.js"></script>
+  
+  <script src="{% static "js/bootstrap-modal.js" %}"></script>
 {% endblock %}
 
 
