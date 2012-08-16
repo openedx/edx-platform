@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
 from courseware.courses import get_opt_course_with_access
+from courseware.access import has_access
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -49,6 +50,10 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
     if request:
         dictionary.update(csrf(request))
 
+    if request and course:
+        dictionary['staff_access'] = has_access(request.user, course, 'staff')
+    else:
+        dictionary['staff_access'] = False
 
 def view(request, article_path, course_id=None):
     course = get_opt_course_with_access(request.user, course_id, 'load')
