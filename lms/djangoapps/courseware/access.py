@@ -65,7 +65,7 @@ def has_access(user, obj, action):
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError("Unknown object type in has_access(): '{}'"
+    raise TypeError("Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
 
@@ -255,7 +255,7 @@ def _dispatch(table, action, user, obj):
               action)
         return result
 
-    raise ValueError("Unknown action for object type '{}': '{}'".format(
+    raise ValueError("Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
 def _course_staff_group_name(location):
