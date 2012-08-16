@@ -1,0 +1,49 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n sekizai_tags %}
+{% load url from future %}
+
+{% block pagetitle %}{% trans "Add new article" %}{% endblock %}
+
+{% block wiki_contents %}
+
+  {% addtoblock "js" %}
+  <script type="text/javascript" src="{{ STATIC_URL }}admin/js/urlify.js "></script>
+  <script type="text/javascript">
+  //<![CDATA[	
+  (function($) {
+	  $(document).ready(function (){
+		  $("#id_title").keyup(function () {
+			  var e = $("#id_slug")[0];
+			  if(!e._changed) {
+				  e.value = URLify(this.value, 64);
+			  }
+	      });
+	  });
+  })(jQuery);
+  //]]>
+  </script>
+  {% endaddtoblock %}
+
+  <article class="main-article new-article">
+
+    {% include "wiki/includes/editormedia.html" %}
+    <h1 class="page-header">{% trans "Add new article" %}</h1>
+    
+    <form method="POST" class="form-horizontal">
+      {% wiki_form create_form %}
+      <div class="form-actions">
+          <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large">
+            <span class="icon-circle-arrow-left"></span>
+            {% trans "Go back" %}
+          </a>
+          <button type="submit" name="save_changes" class="btn btn-primary btn-large">
+            <span class="icon-plus"></span>
+            {% trans "Create article" %}
+          </button>
+      </div>  
+    </form>
+
+  </article>
+
+{% endblock %}
+
