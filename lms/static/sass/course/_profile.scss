@@ -8,6 +8,11 @@ div.profile-wrapper {
     @include border-radius(0px 4px 4px 0);
     border-right: 0;
 
+    &:after {
+      left: -1px;
+      right: auto;
+    }
+
     header {
       @extend .bottom-border;
       margin: 0;

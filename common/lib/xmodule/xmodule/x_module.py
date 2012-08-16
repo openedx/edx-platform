@@ -219,11 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
+            child_locations = self.definition.get('children', [])
+            children = [self.system.get_module(loc) for loc in child_locations]
             # get_module returns None if the current user doesn't have access
             # to the location.
-            self._loaded_children = filter(None,
-                [self.system.get_module(child)
-                for child in self.definition.get('children', [])])
+            self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
@@ -296,6 +296,14 @@ class XModule(HTMLSnippet):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
+
+
+def policy_key(location):
+    """
+    Get the key for a location in a policy file.  (Since the policy file is
+    specific to a course, it doesn't need the full location url).
+    """
+    return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
 class XModuleDescriptor(Plugin, HTMLSnippet):
@@ -415,6 +423,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         """
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
+
 
     @staticmethod
     def compute_inherited_metadata(node):
@@ -671,9 +680,11 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
         """
         load_item, resources_fs, error_tracker: see DescriptorSystem
+
+        policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
@@ -681,6 +692,7 @@ class XMLParsingSystem(DescriptorSystem):
         DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
                                   **kwargs)
         self.process_xml = process_xml
+        self.policy = policy
 
 
 class ModuleSystem(object):

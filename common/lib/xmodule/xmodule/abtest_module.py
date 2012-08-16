@@ -49,9 +49,9 @@ class ABTestModule(XModule):
         return json.dumps({'group': self.group})
 
     def displayable_items(self):
-        return filter(None, [self.system.get_module(child)
-                             for child
-                             in self.definition['data']['group_content'][self.group]])
+        child_locations = self.definition['data']['group_content'][self.group]
+        children = [self.system.get_module(loc) for loc in child_locations]
+        return [c for c in children if c is not None]
 
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being

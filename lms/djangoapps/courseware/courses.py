@@ -2,8 +2,8 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
-from path import path
 
+from path import path
 from django.conf import settings
 from django.http import Http404
 
@@ -142,7 +142,8 @@ def get_course_info_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
-def get_courses_by_university(user):
+
+def get_courses_by_university(user, domain=None):
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).
     Courses are sorted by course.number.
@@ -152,9 +153,21 @@ def get_courses_by_university(user):
     courses = [c for c in modulestore().get_courses()
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
+
+    if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
+        subdomain = domain.split(".")[0]
+        if subdomain not in settings.COURSE_LISTINGS:
+            subdomain = 'default'
+        visible_courses = frozenset(settings.COURSE_LISTINGS[subdomain])
+    else:
+        visible_courses = frozenset(c.id for c in courses)
+
     universities = defaultdict(list)
     for course in courses:
-        if has_access(user, course, 'see_exists'):
-            universities[course.org].append(course)
+        if not has_access(user, course, 'see_exists'):
+            continue
+        if course.id not in visible_courses:
+            continue
+        universities[course.org].append(course)
     return universities
 

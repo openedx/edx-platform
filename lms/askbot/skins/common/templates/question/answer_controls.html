@@ -31,7 +31,7 @@
 {% spaceless %}
 <span class="action-link">
   <a class="question-delete" id="answer-delete-link-{{answer.id}}">
-    {% if answer.deleted %}{% trans %}undelete{% endtrans %}{% else %}&#10006;{% endif %}</a>
+    {% if answer.deleted %}{% trans %}undelete{% endtrans %}{% else %}delete{% endif %}</a>
 </span>
 {% endspaceless %}
 {% endif %}
