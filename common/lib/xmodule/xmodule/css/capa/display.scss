@@ -49,12 +49,15 @@ section.problem {
     }
   }
 
-
-
   div {
-    p.status {
-      text-indent: -9999px;
-      margin: -1px 0 0 10px;
+    p {
+      &.answer {
+        margin-top: -2px;
+      }
+      &.status {
+        text-indent: -9999px;
+        margin: 8px 0 0 10px;
+      }
     }
 
     &.unanswered {
