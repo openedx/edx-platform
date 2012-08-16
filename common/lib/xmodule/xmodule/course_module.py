@@ -32,7 +32,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        self.textbooks = self.definition['textbooks']
+        self.textbooks = self.definition['data']['textbooks']
 
         msg = None
         if self.start is None:
@@ -52,7 +52,7 @@ class CourseDescriptor(SequenceDescriptor):
             textbooks.append(cls.Textbook.from_xml_object(textbook))
             xml_object.remove(textbook)
         definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-        definition['textbooks'] = textbooks
+        definition.setdefault('data', {})['textbooks'] = textbooks
         return definition
 
     def has_started(self):
