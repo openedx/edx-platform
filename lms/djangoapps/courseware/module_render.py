@@ -75,6 +75,10 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
 
     chapters = list()
     for chapter in course.get_display_items():
+        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+        if hide_from_toc:
+            continue 
+
         sections = list()
         for section in chapter.get_display_items():
 
