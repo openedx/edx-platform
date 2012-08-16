@@ -90,6 +90,7 @@ sys.path.append(REPO_ROOT)
 sys.path.append(ASKBOT_ROOT)
 sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
+sys.path.append(PROJECT_ROOT / 'djangoapps' / 'django-wiki')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
@@ -131,6 +132,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
+    
+    # Added for django-wiki
+    'django.core.context_processors.media',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'sekizai.context_processors.sekizai',
+    'course_wiki.course_nav.context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
@@ -288,6 +296,9 @@ djcelery.setup_loader()
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
+################################# WIKI ###################################
+WIKI_ACCOUNT_HANDLING = False
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -301,9 +312,13 @@ STATICFILES_FINDERS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'askbot.skins.loaders.filesystem_load_template_source',
+    'mitxmako.makoloader.MakoFilesystemLoader',
+    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+ 
+    # 'django.template.loaders.filesystem.Loader',
+    # 'django.template.loaders.app_directories.Loader',
+    
+    #'askbot.skins.loaders.filesystem_load_template_source',
     # 'django.template.loaders.eggs.Loader',
 )
 
@@ -319,6 +334,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    
+    'course_wiki.course_nav.Middleware',
 
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
@@ -535,6 +552,15 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
+    
+    #For the wiki
+    'wiki', # The new django-wiki from benjaoming
+    'course_wiki', # Our customizations
+    'django_notify',
+    'mptt',
+    'sekizai',
+    'wiki.plugins.attachments',
+    'wiki.plugins.notifications',
 
     # For testing
     'django_jasmine',

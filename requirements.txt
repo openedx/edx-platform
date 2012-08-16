@@ -43,4 +43,5 @@ django-robots
 django-ses
 django-storages
 django-threaded-multihost
+django-sekizai<0.7
 -r repo-requirements.txt
