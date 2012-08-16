@@ -161,6 +161,7 @@ def get_annotated_content_info(course_id, content, user, type):
         'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if type == 'comment' else False,
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if type == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if type == 'thread' else False,
+        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if type == 'thread' else "vote_for_comment"),
     }
 
 def get_annotated_content_infos(course_id, thread, user, type='thread'):
