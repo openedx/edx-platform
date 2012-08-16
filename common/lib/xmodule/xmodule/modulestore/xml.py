@@ -31,7 +31,8 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir, error_tracker, **kwargs):
+    def __init__(self, xmlstore, org, course, course_dir,
+                 policy, error_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -97,7 +98,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         MakoDescriptorSystem.__init__(self, load_item, resources_fs,
                                       error_tracker, render_template, **kwargs)
         XMLParsingSystem.__init__(self, load_item, resources_fs,
-                                  error_tracker, process_xml, **kwargs)
+                                  error_tracker, process_xml, policy, **kwargs)
 
 
 class XMLModuleStore(ModuleStoreBase):
@@ -184,6 +185,7 @@ class XMLModuleStore(ModuleStoreBase):
         if not os.path.exists(policy_path):
             return {}
         try:
+            log.debug("Loading policy from {}".format(policy_path))
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
@@ -232,13 +234,16 @@ class XMLModuleStore(ModuleStoreBase):
                 tracker(msg)
                 course = course_dir
 
-            system = ImportSystem(self, org, course, course_dir, tracker)
+            url_name = course_data.get('url_name')
+            if url_name:
+                policy_path = self.data_dir / course_dir / 'policies' / '{}.json'.format(url_name)
+                policy = self.load_policy(policy_path, tracker)
+            else:
+                policy = {}
+
+            system = ImportSystem(self, org, course, course_dir, policy, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
-            policy_path = self.data_dir / course_dir / 'policy.json'
-
-            policy = self.load_policy(policy_path, tracker)
-            XModuleDescriptor.apply_policy(course_descriptor, policy)
 
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead

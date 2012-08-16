@@ -112,8 +112,8 @@ class TestMongoModuleStore(object):
         should_work = (
             ("i4x://edX/toy/video/Welcome",
              ("edX/toy/2012_Fall", "Overview", "Welcome", None)),
-            ("i4x://edX/toy/html/toylab",
-             ("edX/toy/2012_Fall", "Overview", "Toy_Videos", None)),
+            ("i4x://edX/toy/chapter/Overview",
+             ("edX/toy/2012_Fall", "Overview", None, None)),
             )
         for location, expected in should_work:
             assert_equals(path_to_location(self.store, location), expected)

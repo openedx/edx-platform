@@ -140,7 +140,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def title(self):
-        return self.metadata['display_name']
+        return self.display_name
 
     @property
     def number(self):

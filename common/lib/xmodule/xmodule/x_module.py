@@ -426,23 +426,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
 
     @staticmethod
-    def apply_policy(node, policy):
-        """
-        Given a descriptor, traverse all its descendants and update its metadata
-        with the policy.
-
-        Notes:
-          - this does not propagate inherited metadata.  The caller should
-            call compute_inherited_metadata after applying the policy.
-          - metadata specified in the policy overrides metadata in the xml
-        """
-        k = policy_key(node.location)
-        if k in policy:
-            node.metadata.update(policy[k])
-        for c in node.get_children():
-            XModuleDescriptor.apply_policy(c, policy)
-
-    @staticmethod
     def compute_inherited_metadata(node):
         """Given a descriptor, traverse all of its descendants and do metadata
         inheritance.  Should be called on a CourseDescriptor after importing a
@@ -697,9 +680,11 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
         """
         load_item, resources_fs, error_tracker: see DescriptorSystem
+
+        policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
@@ -707,6 +692,7 @@ class XMLParsingSystem(DescriptorSystem):
         DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
                                   **kwargs)
         self.process_xml = process_xml
+        self.policy = policy
 
 
 class ModuleSystem(object):

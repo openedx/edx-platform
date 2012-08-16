@@ -42,9 +42,9 @@ class DummySystem(XMLParsingSystem):
             descriptor.get_children()
             return descriptor
 
-
+        policy = {}
         XMLParsingSystem.__init__(self, load_item, self.resources_fs,
-                                  self.errorlog.tracker, process_xml)
+                                  self.errorlog.tracker, process_xml, policy)
 
     def render_template(self, template, context):
             raise Exception("Shouldn't be called")
