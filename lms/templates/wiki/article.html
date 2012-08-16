@@ -10,17 +10,20 @@
 
 {% block wiki_contents %}
 
-  <div class="tabbable tabs-top" style="margin-top: 20px;">
+  <div class="article-wrapper">
+    
     <article class="main-article">
-      <h1 style="margin-top: -10px;">{{ article.current_revision.title }}</h1>
-      <div class="tab-content">
+        <h1>{{ article.current_revision.title }}</h1>  
         {% block wiki_contents_tab %}
         {% wiki_render article %}
-        {% endblock %}
-      </div>
+        {% endblock %}      
     </article>
 
     <div class="article-functions">
+      <div class="timestamp">
+        <span class="label">{% trans "Last modified:" %}</span><br />
+        <span class="date">{{ article.current_revision.modified }}</span>
+      </div>
       <ul class="nav nav-tabs">
         {% include "wiki/includes/article_menu.html" %}
       </ul>
@@ -32,5 +35,5 @@
 {% endblock %}
 
 {% block footer_prepend %}
-  <p style="margin-bottom: 10px;"><em>{% trans "This article was last modified:" %} {{ article.current_revision.modified }}</em></p>
+  <p><em>{% trans "This article was last modified:" %} {{ article.current_revision.modified }}</em></p>
 {% endblock %}
