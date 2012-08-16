@@ -10,7 +10,6 @@
   
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
-  {% render_block "js" %}
   
   <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
 </head>
@@ -28,6 +27,7 @@
     
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
+  {% render_block "js" %}
 </body>
 </html>
 

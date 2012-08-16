@@ -5,7 +5,9 @@
 
 {% block headextra %}
   {% compressed_css 'course' %}
+  <script src="{{ STATIC_URL }}js/bootstrap-modal.js"></script>
 {% endblock %}
+
 
 {% block body %}
   {% if course %}
