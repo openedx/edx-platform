@@ -1,3 +1,2 @@
 -e common/lib/capa
--e common/lib/mitxmako
 -e common/lib/xmodule
