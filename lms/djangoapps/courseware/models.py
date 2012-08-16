@@ -77,7 +77,7 @@ class StudentModuleCache(object):
         Arguments
         user: The user for which to fetch maching StudentModules
         descriptors: An array of XModuleDescriptors.
-        select_for_update: Flag indicating whether the row should be locked until end of transaction
+        select_for_update: Flag indicating whether the rows should be locked until end of transaction
         '''
         if user.is_authenticated():
             module_ids = self._get_module_state_keys(descriptors) 
@@ -110,7 +110,7 @@ class StudentModuleCache(object):
             the supplied descriptor. If depth is None, load all descendent StudentModules
         descriptor_filter is a function that accepts a descriptor and return wether the StudentModule 
             should be cached
-        select_for_update: Flag indicating whether the row should be locked until end of transaction
+        select_for_update: Flag indicating whether the rows should be locked until end of transaction
         """
         
         def get_child_descriptors(descriptor, depth, descriptor_filter):
