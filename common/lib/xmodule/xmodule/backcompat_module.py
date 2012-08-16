@@ -21,6 +21,7 @@ def process_includes(fn):
         xml_object = etree.fromstring(xml_data)
         next_include = xml_object.find('include')
         while next_include is not None:
+            system.error_tracker("WARNING: the <include> tag is deprecated, and will go away.")
             file = next_include.get('file')
             parent = next_include.getparent()
 
@@ -67,6 +68,8 @@ class SemanticSectionDescriptor(XModuleDescriptor):
         the child element
         """
         xml_object = etree.fromstring(xml_data)
+        system.error_tracker("WARNING: the <{}> tag is deprecated.  Please do not use in new content."
+                             .format(xml_object.tag))
 
         if len(xml_object) == 1:
             for (key, val) in xml_object.items():
@@ -83,10 +86,14 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Transforms the xml_data from <$custom_tag attr="" attr=""/> to
-        <customtag attr="" attr=""><impl>$custom_tag</impl></customtag>
+        <customtag attr="" attr="" impl="$custom_tag"/>
         """
 
         xml_object = etree.fromstring(xml_data)
+        system.error_tracker('WARNING: the <{tag}> tag is deprecated.  '
+                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. '
+                             .format(xml_object.tag))
+
         tag = xml_object.tag
         xml_object.tag = 'customtag'
         xml_object.attrib['impl'] = tag
