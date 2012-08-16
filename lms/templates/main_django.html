@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
+<html>
+<head>
+  {% block title %}<title>edX</title>{% endblock %}
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  
+  {% compressed_css 'application' %}
+  {% compressed_js 'main_vendor' %}
+  
+  {% block headextra %}{% endblock %}
+  {% render_block "css" %}
+  
+  <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
+</head>
+
+
+<body class="{% block bodyclass %}{% endblock %}">
+  {% include "navigation.html" %}
+    
+  <section class="content-wrapper">
+    {% block body %}{% endblock %}
+        
+    {% block bodyextra %}{% endblock %}
+  </section>
+  {% include "footer.html" %}
+    
+  {% compressed_js 'application' %}
+  {% compressed_js 'module-js' %}
+  {% render_block "js" %}
+</body>
+</html>
+
+{% comment %}
+  This is a django template version of our main page from which all
+  other pages inherit. This file should be rewritten to reflect any
+  changes in main.html! Files used by {% include %} can be written
+  as mako templates.
+  
+  Inheriting from this file allows us to include apps that use the
+  django templating system without rewriting all of their views in
+  mako. 
+{% endcomment %}

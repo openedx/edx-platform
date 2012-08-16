@@ -1,6 +1,11 @@
-<%page args="active_page" />
+## mako
+<%page args="active_page=None" />
 
 <%
+if active_page == None and active_page_context is not UNDEFINED:
+  # If active_page is not passed in as an argument, it may be in the context as active_page_context
+  active_page = active_page_context
+
 def url_class(url):
   if url == active_page:
     return "active"
@@ -23,7 +28,7 @@ def url_class(url):
 % endif
 % endif
 % if settings.WIKI_ENABLED:
-      <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
+      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
 % endif
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
