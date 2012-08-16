@@ -92,7 +92,7 @@ class TranslateCustomTagDescriptor(XModuleDescriptor):
         xml_object = etree.fromstring(xml_data)
         system.error_tracker('WARNING: the <{tag}> tag is deprecated.  '
                              'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. '
-                             .format(xml_object.tag))
+                             .format(tag=xml_object.tag))
 
         tag = xml_object.tag
         xml_object.tag = 'customtag'
