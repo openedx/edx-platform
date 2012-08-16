@@ -14,7 +14,7 @@
     {% include "course_navigation.html" with active_page_context="wiki" %}
   {% endif %}
 
-  <section class="container wiki">
+  <section class="container wiki {{ selected_tab }}">
 
     {% block wiki_body %}
       
