@@ -6,6 +6,11 @@ div.discussion-wrapper aside {
   border-right: 0;
   width: flex-grid(3);
 
+  &:after {
+    left: -1px;
+    right: auto;
+  }
+
   &.main-sidebar {
     min-width:200px;
   }
