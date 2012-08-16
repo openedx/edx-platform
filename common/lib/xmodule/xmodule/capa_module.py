@@ -108,11 +108,9 @@ class CapaModule(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        self.max_attempts = only_one(dom2.xpath('/problem/@attempts'))
-        if len(self.max_attempts) > 0:
+        self.max_attempts = self.metadata.get('attempts', None)
+        if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
-        else:
-            self.max_attempts = None
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
@@ -244,7 +242,14 @@ class CapaModule(XModule):
 
         # We using strings as truthy values, because the terminology of the
         # check button is context-specific.
-        check_button = "Grade" if self.max_attempts else "Check"
+
+        # Put a "Check" button if unlimited attempts or still some left
+        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+            check_button = "Check"
+        else:
+            # Will be final check so let user know that
+            check_button = "Final Check" 
+
         reset_button = True
         save_button = True
 
