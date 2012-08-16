@@ -40,6 +40,5 @@
 {% endif %}
 
 {% if request.user|can_delete_post(question) %}{{ pipe() }}
-  <a class="question-delete" id="question-delete-link-{{question.id}}">{% if question.deleted %}{% trans %}undelete{% endtrans %}{% else %}&#10006;{% endif %}</a>
-
+  <a class="question-delete" id="question-delete-link-{{question.id}}">{% if question.deleted %}{% trans %}undelete{% endtrans %}{% else %}delete{% endif %}</a>
 {% endif %}
