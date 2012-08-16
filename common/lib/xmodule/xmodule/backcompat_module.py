@@ -68,7 +68,7 @@ class SemanticSectionDescriptor(XModuleDescriptor):
         the child element
         """
         xml_object = etree.fromstring(xml_data)
-        system.error_tracker("WARNING: the <{}> tag is deprecated.  Please do not use in new content."
+        system.error_tracker("WARNING: the <{0}> tag is deprecated.  Please do not use in new content."
                              .format(xml_object.tag))
 
         if len(xml_object) == 1:
