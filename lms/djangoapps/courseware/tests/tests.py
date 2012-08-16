@@ -56,6 +56,7 @@ def mongo_store_config(data_dir):
             'db': 'xmodule',
             'collection': 'modulestore',
             'fs_root': data_dir,
+            'render_template': 'mitxmako.shortcuts.render_to_string',
         }
     }
 }
