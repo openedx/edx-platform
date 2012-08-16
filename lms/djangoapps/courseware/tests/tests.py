@@ -177,7 +177,7 @@ class PageLoader(ActivateLoginTestCase):
     def try_enroll(self, course):
         """Try to enroll.  Return bool success instead of asserting it."""
         data = self._enroll(course)
-        print 'Enrollment in {} result: {}'.format(course.location.url(), data)
+        print 'Enrollment in {0} result: {1}'.format(course.location.url(), data)
         return data['success']
 
     def enroll(self, course):
@@ -309,7 +309,7 @@ class TestViewAuth(PageLoader):
 
         # shouldn't be able to get to the instructor pages
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 404 on {}'.format(url)
+            print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
         # Make the instructor staff in the toy course
@@ -322,11 +322,11 @@ class TestViewAuth(PageLoader):
 
         # Now should be able to get to the toy course, but not the full course
         for url in instructor_urls(self.toy):
-            print 'checking for 200 on {}'.format(url)
+            print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
 
         for url in instructor_urls(self.full):
-            print 'checking for 404 on {}'.format(url)
+            print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
 
@@ -337,7 +337,7 @@ class TestViewAuth(PageLoader):
 
         # and now should be able to load both
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 200 on {}'.format(url)
+            print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
 
 
@@ -413,22 +413,22 @@ class TestViewAuth(PageLoader):
 
         def check_non_staff(course):
             """Check that access is right for non-staff in course"""
-            print '=== Checking non-staff access for {}'.format(course.id)
+            print '=== Checking non-staff access for {0}'.format(course.id)
             for url in instructor_urls(course) + dark_student_urls(course):
-                print 'checking for 404 on {}'.format(url)
+                print 'checking for 404 on {0}'.format(url)
                 self.check_for_get_code(404, url)
 
             for url in light_student_urls(course):
-                print 'checking for 200 on {}'.format(url)
+                print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
 
         def check_staff(course):
             """Check that access is right for staff in course"""
-            print '=== Checking staff access for {}'.format(course.id)
+            print '=== Checking staff access for {0}'.format(course.id)
             for url in (instructor_urls(course) +
                         dark_student_urls(course) +
                         light_student_urls(course)):
-                print 'checking for 200 on {}'.format(url)
+                print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
 
         # First, try with an enrolled student

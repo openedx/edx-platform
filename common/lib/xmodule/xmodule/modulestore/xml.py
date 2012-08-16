@@ -187,11 +187,11 @@ class XMLModuleStore(ModuleStoreBase):
         if not os.path.exists(policy_path):
             return {}
         try:
-            log.debug("Loading policy from {}".format(policy_path))
+            log.debug("Loading policy from {0}".format(policy_path))
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "Error loading course policy from {}".format(policy_path)
+            msg = "Error loading course policy from {0}".format(policy_path)
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
@@ -238,7 +238,7 @@ class XMLModuleStore(ModuleStoreBase):
 
             url_name = course_data.get('url_name')
             if url_name:
-                policy_path = self.data_dir / course_dir / 'policies' / '{}.json'.format(url_name)
+                policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                 policy = self.load_policy(policy_path, tracker)
             else:
                 policy = {}
