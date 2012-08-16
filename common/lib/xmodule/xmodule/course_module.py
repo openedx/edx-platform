@@ -1,22 +1,38 @@
 from fs.errors import ResourceNotFoundError
 import time
 import logging
+from lxml import etree
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
-from xmodule.textbook_module import TextbookDescriptor
 
 log = logging.getLogger(__name__)
-
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
+    class Textbook:
+        def __init__(self, title, table_of_contents_url):
+            self.title = title
+            self.table_of_contents_url = table_of_contents_url
+
+        @classmethod
+        def from_xml_object(cls, xml_object):
+            return cls(xml_object.get('title'), xml_object.get('table_of_contents_url'))
+
+        @property
+        def table_of_contents(self):
+            raw_table_of_contents = open(self.table_of_contents_url, 'r') # TODO: This will need to come from S3
+            table_of_contents = etree.parse(raw_table_of_contents).getroot()
+            return table_of_contents
+
+
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
+        self.textbooks = self.definition['textbooks']
 
         msg = None
         if self.start is None:
@@ -28,6 +44,16 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.enrollment_start = self._try_parse_time("enrollment_start")
         self.enrollment_end = self._try_parse_time("enrollment_end")
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        textbooks = []
+        for textbook in xml_object.findall("textbook"):
+            textbooks.append(cls.Textbook.from_xml_object(textbook))
+            xml_object.remove(textbook)
+        definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition['textbooks'] = textbooks
+        return definition
 
     def has_started(self):
         return time.gmtime() > self.start
@@ -53,11 +79,6 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy = load_grading_policy(policy_string)
 
         return grading_policy
-
-    @property
-    def textbooks(self):
-        return [child for child in self.get_children() if type(child) == TextbookDescriptor]
-
 
     @lazyproperty
     def grading_context(self):
