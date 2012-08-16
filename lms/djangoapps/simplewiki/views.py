@@ -9,7 +9,8 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from mitxmako.shortcuts import render_to_response
 
-from courseware.courses import check_course
+from courseware.courses import get_opt_course_with_access
+from courseware.access import has_access
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -49,9 +50,13 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
     if request:
         dictionary.update(csrf(request))
 
+    if request and course:
+        dictionary['staff_access'] = has_access(request.user, course, 'staff')
+    else:
+        dictionary['staff_access'] = False
 
 def view(request, article_path, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, article_path, course)
     if err:
@@ -67,7 +72,7 @@ def view(request, article_path, course_id=None):
 
 
 def view_revision(request, revision_number, article_path, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, article_path, course)
     if err:
@@ -91,7 +96,7 @@ def view_revision(request, revision_number, article_path, course_id=None):
 
 
 def root_redirect(request, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     #TODO: Add a default namespace to settings.
     namespace = course.wiki_namespace if course else "edX"
@@ -109,7 +114,7 @@ def root_redirect(request, course_id=None):
 
 
 def create(request, article_path, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     article_path_components = article_path.split('/')
 
@@ -170,7 +175,7 @@ def create(request, article_path, course_id=None):
 
 
 def edit(request, article_path, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, article_path, course)
     if err:
@@ -218,7 +223,7 @@ def edit(request, article_path, course_id=None):
 
 
 def history(request, article_path, page=1, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, article_path, course)
     if err:
@@ -300,7 +305,7 @@ def history(request, article_path, page=1, course_id=None):
 
 
 def revision_feed(request, page=1, namespace=None, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     page_size = 10
 
@@ -333,7 +338,7 @@ def revision_feed(request, page=1, namespace=None, course_id=None):
 
 
 def search_articles(request, namespace=None, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
@@ -382,7 +387,7 @@ def search_articles(request, namespace=None, course_id=None):
 
 
 def search_add_related(request, course_id, slug, namespace):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, slug, namespace if namespace else course_id)
     if err:
@@ -415,7 +420,7 @@ def search_add_related(request, course_id, slug, namespace):
 
 
 def add_related(request, course_id, slug, namespace):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, slug, namespace if namespace else course_id)
     if err:
@@ -439,7 +444,7 @@ def add_related(request, course_id, slug, namespace):
 
 
 def remove_related(request, course_id, namespace, slug, related_id):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     (article, err) = get_article(request, slug, namespace if namespace else course_id)
 
@@ -462,7 +467,7 @@ def remove_related(request, course_id, namespace, slug, related_id):
 
 
 def random_article(request, course_id=None):
-    course = check_course(request.user, course_id, course_required=False)
+    course = get_opt_course_with_access(request.user, course_id, 'load')
 
     from random import randint
     num_arts = Article.objects.count()
