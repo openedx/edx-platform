@@ -18,11 +18,14 @@
         {% include "widgets/system_messages.html" %}
         {% include "debug_header.html" %}
         {% include "widgets/header.html" %} {# Logo, user tool navigation and meta navitation #}
-        {# include "widgets/secondary_header.html" #} {# Scope selector, search input and ask button #}
 
-        <section class="container">
+        <section class="content-wrapper">
+          {# include "widgets/secondary_header.html" #} {# Scope selector, search input and ask button #}
+
+          <section class="container">
             {% block body %}
             {% endblock %}
+          </section>
         </section>
 
         {% if settings.FOOTER_MODE == 'default' %}

@@ -12,10 +12,13 @@ h1.top-header {
   @include box-shadow(inset 0 1px 0 #fff);
   color: #666;
   cursor: pointer;
-  font: normal $body-font-size $body-font-family;
+  font: 400 $body-font-size $body-font-family;
   @include linear-gradient(#fff, lighten(#888, 40%));
   padding: 4px 8px;
   text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
 
   &:hover, &:focus {
@@ -28,7 +31,7 @@ h1.top-header {
 .content {
   @include box-sizing(border-box);
   display: table-cell;
-  padding: lh();
+  padding-right: lh();
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
 
