@@ -1,6 +1,3 @@
 [submodule "askbot"]
 	path = askbot
 	url = git@github.com:MITx/askbot-devel.git
-[submodule "lms/djangoapps/django-wiki"]
-	path = lms/djangoapps/django-wiki
-	url = git@github.com:benjaoming/django-wiki.git

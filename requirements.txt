@@ -44,4 +44,5 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
+git+git://github.com/benjaoming/django-wiki.git@484ff1ce49
 -r repo-requirements.txt
