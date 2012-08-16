@@ -73,7 +73,9 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             cls.clean_metadata_from_xml(definition_xml)
             return {'data': stringify_children(definition_xml)}
         else:
-            filepath = cls._format_filepath(xml_object.tag, filename)
+            # html is special.  cls.filename_extension is 'xml', but if 'filename' is in the definition,
+            # that means to load from .html
+            filepath = "{category}/{name}.html".format(category='html', name=filename)
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
