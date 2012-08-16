@@ -327,7 +327,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         user, modulestore().get_item(id), depth=0, select_for_update=True)
     instance = get_module(user, request, id, student_module_cache)
     if instance is None:
-        log.debug("No module {} for user {}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
     instance_module = get_instance_module(user, instance, student_module_cache)
@@ -390,7 +390,7 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {} for user {}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)
