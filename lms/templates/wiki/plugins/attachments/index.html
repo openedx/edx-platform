@@ -7,14 +7,41 @@
 {% block wiki_contents_tab %}
 <div class="row-fluid">
 
-
-
   {% if article|can_write:user %}
 
+  <div class="attachment-options">
+    <a class="btn" href="#" id="upload-file-btn">
+      <span class="icon-upload"></span>{% trans "Upload new file" %}
+    </a>
+    <a class="btn" href="#" id="search-for-file-btn">
+      <span class="icon-plus-sign"></span>{% trans "Search and add file" %}
+    </a>
+  </div>
 
-  <a class="btn" href="#" id="upload-file-btn">
-    <span class="icon-upload"></span>{% trans "Upload new file" %}
-  </a>
+  <div class="modal upload-modal hide fade" id="upload-modal">
+    <div class="modal-inner-wrapper">
+      <h4>Upload File</h4>
+      <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">        
+        {% wiki_form form %}
+        <button type="submit" name="save" value="1" class="btn btn-primary">
+          {% trans "Upload file" %}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal search-file-modal hide fade" id="search-file-modal">
+    <div class="modal-inner-wrapper">
+      <h4>Search files and articles</h4>
+      <p>{% trans "You can reuse files from other articles. These files are subject to updates on other articles which may or may not be a good thing." %}</p>
+      <form method="GET" action="{% url 'wiki:attachments_search' path=urlpath.path article_id=article.id %}" class="form-search">
+        {{ search_form.query }}
+        <button class="btn btn-primary">
+          {% trans "Search" %}
+        </button>
+      </form>
+    </div>
+  </div>
 
   <script type="text/javascript">
     $('#upload-file-btn').bind('click', function(e) {
@@ -24,79 +51,17 @@
         $('#upload-modal').modal('show');
       {% endif %}
     });
+
+    $('#search-for-file-btn').bind('click', function(e) {
+      $('#search-file-modal').modal('show');
+    });
   </script>
-
-
-
-  <div class="modal hide fade" id="upload-modal">
-    {% if anonymous_disallowed %}
-      {% include "wiki/includes/anonymous_blocked.html" %}
-    {% else %}
-    <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">
-      {% wiki_form form %}
-      <button type="submit" name="save" value="1" class="btn btn-large">
-        {% trans "Upload file" %}
-      </button>
-    </form>
-    {% endif %}
-  </div>
-
-
-
-
-  <div class="span5" style="min-width: 330px;">
-    <div class="accordion" id="accordion_upload">
-      <div class="accordion-group">        
-        <div class="accordion-heading">
-          <a class="accordion-toggle btn" href="#collapse_upload" data-toggle="collapse">
-            <span class="icon-upload"></span>{% trans "Upload new file" %} 
-          </a>
-        </div>        
-        <div id="collapse_upload" class="accordion-body collapse{% if form.errors %} in{% endif %}">
-          <div class="accordion-inner">
-            {% if anonymous_disallowed %}
-              {% include "wiki/includes/anonymous_blocked.html" %}
-            {% else %}
-            <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">
-              {% wiki_form form %}
-              <button type="submit" name="save" value="1" class="btn btn-large">
-                {% trans "Upload file" %}
-              </button>
-            </form>
-            {% endif %}
-          </div>
-        </div>
-      
-      </div>
-    </div>
-    <div class="accordion" id="accordion_add">
-      <div class="accordion-group">
-        <div class="accordion-heading">
-          <a class="accordion-toggle btn" href="#collapse_add" data-toggle="collapse">
-            <span class="icon-plus-sign"></span>{% trans "Search and add file" %}
-          </a>
-        </div>
-        
-        <div id="collapse_add" class="accordion-body collapse">
-          <div class="accordion-inner">
-            <p>{% trans "You can reuse files from other articles. These files are subject to updates on other articles which may or may not be a good thing." %}</p>
-            <form method="GET" action="{% url 'wiki:attachments_search' path=urlpath.path article_id=article.id %}" class="form-search">
-              {{ search_form.query }}
-              <button class="btn btn-large">
-                {% trans "Search files and articles" %}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-  </div>
+  
   {% endif %}
 
 
 
-  <div class="span7">
+  <div class="attachment-list">
     <p class="lead">{% trans "The following files are available for this article. Copy the markdown tag to directly refer to a file from the article text." %}</p>
     {% for attachment in attachments %}
       <table class="table table-bordered table-striped" style="width: 100%;">
