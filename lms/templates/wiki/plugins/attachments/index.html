@@ -10,6 +10,30 @@
 
 
   {% if article|can_write:user %}
+
+
+  <a class="accordion-toggle btn" href="#collapse_upload" data-toggle="collapse">
+    <span class="icon-upload"></span>{% trans "Upload new file" %}
+  </a>
+
+
+
+  <div class="modal hide fade" id="upload-modal">
+    {% if anonymous_disallowed %}
+      {% include "wiki/includes/anonymous_blocked.html" %}
+    {% else %}
+    <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">
+      {% wiki_form form %}
+      <button type="submit" name="save" value="1" class="btn btn-large">
+        {% trans "Upload file" %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+
+
+
   <div class="span5" style="min-width: 330px;">
     <div class="accordion" id="accordion_upload">
       <div class="accordion-group">        
