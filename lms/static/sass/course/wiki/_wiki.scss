@@ -359,9 +359,17 @@ section.wiki {
     display: none;
   }
 
+  button {
+    font-family: $sans-serif;
+  }
+
   .btn {
     @include button(simple, #eee);
     font-size: 0.8em;
+    margin-right: 5px;
+    line-height: 1.2em;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
 
     &:hover {
       text-decoration: none;
@@ -376,14 +384,40 @@ section.wiki {
       @include button(simple, $pink);
       font-size: 0.8em;
     }
+
+    &.btn-info {
+      @include button(simple, #ccc);
+      font-size: 0.8em;
+    }
   }
 
-  #previewModal {
+  a.btn {
+    padding: 7px 18px 8px !important;
+  }
+
+  .modal {
     width: 960px;
     z-index: 9999;
     min-height: 500px;
     margin-left: -480px;
-    top: 200px;
+    top: 150px;
+
+    .modal-header {
+      h1, p {
+        color: #fff;  
+      }
+
+      h1 {
+        margin: 3px 12px 8px;
+        font-size: 1.1em;
+      }      
+
+      p {
+        font-size: 0.9em;
+        margin: 5px 12px 20px;
+        line-height: 1em;
+      }
+    }
 
     .modal-body {
       padding-bottom: 8px;
@@ -393,6 +427,10 @@ section.wiki {
       width: 100%;
       min-height: 450px;
       border: 0;
+    }
+
+    .modal-footer {
+      margin: 12px;
     }
 
     .modal-footer .btn {
@@ -421,14 +459,71 @@ section.wiki {
       border: 1px solid $light-gray;
       background: #f9f9f9;
       border-radius: 5px;
+
+      a:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .collapse {
+    display: none;
+
+    &.in {
+      display: block;
+    }
+  }
+
+
+
+
+  /*-----------------
+
+    New
+
+  -----------------*/
+
+  .new-article {
+    margin: auto;
+    float: none;
+
+    .add-on {
+      line-height: 34px;
+      margin-right: 6px;
+    }
+  }
+
+  #hint_id_slug {
+    display: inline-block;
+    font-size: 0.9em;
+    line-height: 1.3em;
+    margin-top: 9px;
+  }
+
+
+
+
+
+  /*-----------------
+
+    Delete
+
+  -----------------*/
+
+  #div_id_confirm {
+    position: relative;
+    height: 30px;
+    margin: 40px 0;
+
+    #id_confirm {
+      position: absolute;
+      top: 6px;
     }
 
-    .collapse {
-      display: none;
-
-      &.in {
-        display: block;
-      }
+    label {
+      position: absolute;
+      left: 25px;
+      font-size: 1.4em;
     }
   }
 
