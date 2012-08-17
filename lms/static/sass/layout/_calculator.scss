@@ -1,0 +1,158 @@
+div.calc-main {
+  bottom: -126px;
+  left: 0;
+  position: fixed;
+  @include transition(bottom);
+  -webkit-appearance: none;
+  width: 100%;
+  z-index: 99;
+
+  &.open {
+    bottom: -36px;
+
+    div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
+      display: block;
+    }
+  }
+
+  a.calc {
+    background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
+    border-bottom: 0;
+    @include border-radius(3px 3px 0 0);
+    color: #fff;
+    float: right;
+    height: 20px;
+    @include hide-text;
+    @include inline-block;
+    margin-right: 10px;
+    padding: 8px 12px;
+    position: relative;
+    top: -36px;
+    width: 16px;
+
+    &:hover {
+      opacity: .8;
+    }
+
+    &.closed {
+      background-image: url("../images/close-calc-icon.png");
+    }
+  }
+
+  div#calculator_wrapper {
+    background: rgba(#111, .9);
+    clear: both;
+    max-height: 90px;
+    position: relative;
+    top: -36px;
+
+    form {
+      @extend .clearfix;
+      @include box-sizing(border-box);
+      padding: lh();
+
+      input#calculator_button {
+        background: #111;
+        border: 1px solid #000;
+        @include border-radius(0);
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        color: #fff;
+        float: left;
+        font-size: 30px;
+        font-weight: bold;
+        margin: 0 (flex-gutter() / 2);
+        padding: 0;
+        text-shadow: none;
+        -webkit-appearance: none;
+        width: flex-grid(.5) + flex-gutter();
+
+        &:hover {
+          color: #333;
+        }
+      }
+
+      input#calculator_output {
+        background: #222;
+        border: 0;
+        @include box-shadow(none);
+        @include box-sizing(border-box);
+        color: #fff;
+        float: left;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 1px 0 0;
+        padding: 10px;
+        -webkit-appearance: none;
+        width: flex-grid(4);
+      }
+
+      div.input-wrapper {
+        @extend .clearfix;
+        float: left;
+        margin: 0;
+        position: relative;
+        width: flex-grid(7.5);
+
+        input#calculator_input {
+          border: none;
+          @include box-shadow(none);
+          @include box-sizing(border-box);
+          font-size: 16px;
+          padding: 10px;
+          -webkit-appearance: none;
+          width: 100%;
+
+          &:focus {
+            outline: none;
+            border: none;
+          }
+        }
+
+        div.help-wrapper {
+          position: absolute;
+          right: 8px;
+          top: 15px;
+
+          a {
+            background: url("../images/info-icon.png") center center no-repeat;
+            height: 17px;
+            @include hide-text;
+            width: 17px;
+          }
+
+          dl {
+            background: #fff;
+            @include border-radius(3px);
+            @include box-shadow(0 0 3px #999);
+            color: #333;
+            display: none;
+            opacity: 0;
+            padding: 10px;
+            position: absolute;
+            right: -40px;
+            top: -110px;
+            @include transition();
+            width: 500px;
+
+            &.shown {
+              opacity: 1;
+              top: -115px;
+            }
+
+            dt {
+              clear: both;
+              float: left;
+              font-weight: bold;
+              padding-right: lh(.5);
+            }
+
+            dd {
+              float: left;
+            }
+          }
+        }
+      }
+    }
+  }
+}
