@@ -38,5 +38,7 @@
   % if msg:
       <span class="message">${msg|n}</span>
   % endif
+% if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete'] or hidden:
 </div>
+% endif
 </section>
