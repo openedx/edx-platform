@@ -436,6 +436,44 @@ section.wiki {
     margin-left: -480px;
     top: 150px;
 
+    &.upload-modal,
+    &.search-file-modal {
+      width: 400px;
+      min-height: 0;
+      margin-left: -200px;
+
+      h4 {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .help-block {
+        font-size: 0.8em;
+      }
+    }
+
+    &.search-file-modal {
+      width: 500px;
+      margin-left: -250px;
+
+      p {
+        font-size: 0.8em;
+        line-height: 1.4em;
+      }
+
+      .form-search {
+        margin: 30px 0 15px;
+
+        input {
+          width: 350px;
+        }
+
+        button {
+          height: 35px;
+        }
+      }
+    }
+
     .modal-header {
       h1, p {
         color: #fff;  
@@ -472,9 +510,16 @@ section.wiki {
     }
   }
 
+  .modal-inner-wrapper {
+    background: #fff;
+    padding: 20px;
+  }
+
   #previewWindow body {
     background: #f00 !important;
   }
+
+  
 
 
 
@@ -563,6 +608,27 @@ section.wiki {
     font-size: 0.9em;
     line-height: 1.3em;
     margin-top: 9px;
+  }
+
+
+
+
+  /*-----------------
+
+    Attachments
+
+  -----------------*/
+
+  .attachment-options {
+    height: 40px;
+    margin-bottom: 30px;
+    padding: 20px 0 2px;
+    border-bottom: 1px solid $light-gray;
+    border-top: 1px solid $light-gray;    
+  }
+
+  .attachment-list {
+    
   }
 
 
