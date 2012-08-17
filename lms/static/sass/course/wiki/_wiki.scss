@@ -354,6 +354,26 @@ section.wiki {
     padding: 7px;
   }
 
+  .schematic_container {
+    position: relative;
+
+    canvas {
+      @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 6px rgba(0, 0, 0, .2));
+    }
+
+    &:before {
+      content: 'click to edit schematic';
+      position: absolute;
+      top: 10px;
+      left: 7px;
+      z-index: 9999;
+      font-family: $sans-serif;
+      font-size: 0.75em;
+      color: #aaa;
+      pointer-events: none;
+    }
+  }
+
   .markItUpContainer {
     margin-right: 0;
   }
