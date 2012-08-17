@@ -336,8 +336,22 @@ section.wiki {
     width: 100%;
   }
 
-  #id_content {
+  #id_content,
+  .CodeMirror {
     font-family: $monospace;
+    font-size: 0.8em;
+    line-height: 1.4em;
+  }
+
+  .CodeMirror {
+    background: #fafafa;
+    border: 1px solid #c8c8c8;
+    @include border-radius(3px);
+    @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1));
+  }
+
+  .CodeMirror-scroll {
+    padding: 7px;
   }
 
   .markItUpContainer {
