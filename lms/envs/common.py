@@ -561,6 +561,7 @@ INSTALLED_APPS = (
     'sekizai',
     'wiki.plugins.attachments',
     'wiki.plugins.notifications',
+    'course_wiki.plugins.markdownedx',
 
     # For testing
     'django_jasmine',
