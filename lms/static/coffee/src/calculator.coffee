@@ -8,7 +8,7 @@ class @Calculator
 
   toggle: (event) ->
     event.preventDefault()
-    $('li.calc-main').toggleClass 'open'
+    $('div.calc-main').toggleClass 'open'
     $('#calculator_wrapper #calculator_input').focus()
     if $('.calc.closed').length
       $('.calc').attr 'aria-label', 'Open Calculator'
