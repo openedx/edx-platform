@@ -368,6 +368,8 @@ section.wiki {
     font-size: 0.8em;
     margin-right: 5px;
     line-height: 1.2em;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
 
     &:hover {
       text-decoration: none;
@@ -382,6 +384,15 @@ section.wiki {
       @include button(simple, $pink);
       font-size: 0.8em;
     }
+
+    &.btn-info {
+      @include button(simple, #ccc);
+      font-size: 0.8em;
+    }
+  }
+
+  a.btn {
+    padding: 7px 18px 8px !important;
   }
 
   .modal {
@@ -453,13 +464,13 @@ section.wiki {
         text-decoration: none;
       }
     }
+  }
 
-    .collapse {
-      display: none;
+  .collapse {
+    display: none;
 
-      &.in {
-        display: block;
-      }
+    &.in {
+      display: block;
     }
   }
 
