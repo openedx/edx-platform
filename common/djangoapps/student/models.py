@@ -279,7 +279,8 @@ def replicate_enrollment_save(sender, **kwargs):
 
     enrollment_obj = kwargs['instance']
     log.debug("Replicating user because of new enrollment")
-    replicate_user(enrollment_obj.user, enrollment_obj.course_id)
+    for course_db_name in db_names_to_replicate_to(enrollment_obj.user.id):
+        replicate_user(enrollment_obj.user, course_db_name)
 
     log.debug("Replicating enrollment because of new enrollment")
     replicate_model(CourseEnrollment.save, enrollment_obj, enrollment_obj.user_id)
