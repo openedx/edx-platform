@@ -13,11 +13,13 @@ import readline
 sys.path.append(os.path.abspath('.'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
 
-try:
-    from lms.envs.dev import *
-except Exception as err:
-    print "Run this script from the top-level mitx directory (mitx_all/mitx), not a subdirectory."
-    sys.exit(-1)
+#try:
+#    from lms.envs.dev import *
+#except Exception as err:
+#    print "Run this script from the top-level mitx directory (mitx_all/mitx), not a subdirectory."
+#    sys.exit(-1)
+
+sys.path.append(os.path.abspath('common/djangoapps'))
 
 from student.models import UserProfile, Registration
 from external_auth.models import ExternalAuthMap
