@@ -201,7 +201,7 @@ class ImportTestCase(unittest.TestCase):
 
         def check_for_key(key, node):
             "recursive check for presence of key"
-            print "Checking {}".format(node.location.url())
+            print "Checking {0}".format(node.location.url())
             self.assertTrue(key in node.metadata)
             for c in node.get_children():
                 check_for_key(key, c)
