@@ -1,12 +1,15 @@
-var schematic_height = 480;
-var schematic_width = 640;
+var schematic_height = 220;
+var schematic_width = 400;
+
+var schematic_editor_height = 300;
+var schematic_editor_width = 500;
 
 $(function(){
   $(document).ready(function() {
 	  //$("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
     
     $("body").append('<div id="circuit_editor" class="leanModal_box" style="z-index: 11000; left: 50%; margin-left: -250px; position: absolute; top: 100px; opacity: 1; "><div align="center">'+
-      '<input class="schematic" height="' + schematic_height + '" width="' + schematic_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/>' + 
+      '<input class="schematic" height="' + schematic_editor_height + '" width="' + schematic_editor_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/>' + 
       '<button type="button" id="circuit_save_btn">save</button></div></div>');
     
     //This is the editor that pops up as a modal

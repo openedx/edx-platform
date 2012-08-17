@@ -297,6 +297,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
+WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
