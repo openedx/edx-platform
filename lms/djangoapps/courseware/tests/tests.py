@@ -388,7 +388,11 @@ class TestViewAuth(PageLoader):
             list of urls that students should be able to see only
             after launch, but staff should see before
             """
-            urls = reverse_urls(['info', 'book', 'courseware', 'profile'], course)
+            urls = reverse_urls(['info', 'courseware', 'profile'], course)
+            urls.extend([
+                reverse('book', kwargs={'course_id': course.id, 'book_index': book.title})
+                for book in course.textbooks
+            ])
             return urls
 
         def light_student_urls(course):
