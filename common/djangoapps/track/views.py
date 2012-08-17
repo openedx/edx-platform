@@ -84,15 +84,27 @@ def server_track(request, event_type, event, page=None):
         "time": datetime.datetime.utcnow().isoformat(),
         }
 
-    if event_type=="/event_logs" and request.user.is_staff:	# don't log
+    if event_type.startswith("/event_logs") and request.user.is_staff:	# don't log
         return
     log_event(event)
 
 @login_required
 @ensure_csrf_cookie
-def view_tracking_log(request):
+def view_tracking_log(request,args=''):
     if not request.user.is_staff:
         return redirect('/')
-    record_instances = TrackingLog.objects.all().order_by('-time')[0:100]
+    nlen = 100
+    username = ''
+    if args:
+        for arg in args.split('/'):
+            if arg.isdigit():
+                nlen = int(arg)
+            if arg.startswith('username='):
+                username = arg[9:]
+            
+    record_instances = TrackingLog.objects.all().order_by('-time')
+    if username:
+        record_instances = record_instances.filter(username=username)
+    record_instances = record_instances[0:nlen]
     return render_to_response('tracking_log.html',{'records':record_instances})
 
