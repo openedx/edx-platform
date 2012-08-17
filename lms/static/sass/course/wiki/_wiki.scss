@@ -466,11 +466,42 @@ section.wiki {
     }
   }
 
+  .accordion small {
+    font-size: 0.8em;
+    color: #aaa;
+  }
+
+  .accordion-toggle div {
+    margin-top: 8px;
+  }
+
   .collapse {
     display: none;
 
     &.in {
       display: block;
+    }
+  }
+
+  .diff-container {
+    overflow-x: scroll;
+
+    table {
+      min-width: 100%;      
+    }
+
+    th {
+      font-family: $sans-serif;
+      font-size: 0.7em;
+    }
+
+    td {
+      font-family: $monospace;
+    }
+
+    .linenumber,
+    .data {
+      font-size: 0.75em;
     }
   }
 

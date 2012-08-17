@@ -5,8 +5,10 @@
 
 {% block headextra %}
   {% compressed_css 'course' %}
+  <script src="{% static 'js/bootstrap-alert.js' %}"></script>
+  <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
+  <script src="{% static 'js/bootstrap-modal.js' %}"></script>
   
-  <script src="{% static 'js/bootstrap.min.js' %}"></script>
   <script type="text/javascript">
     function ajaxError(){}
     
