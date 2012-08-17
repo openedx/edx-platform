@@ -13,6 +13,7 @@
   {% if field.is_hidden %}
     {{ field }}
   {% else %}
+
   <div id="div_{{ field.auto_id }}" class="clearfix control-group{% if field.errors %} error{% endif %}">
     {% if field.label %}
       <label for="{{ field.id_for_label }}" class="control-label {% if field.field.required %}requiredField{% endif %}">
