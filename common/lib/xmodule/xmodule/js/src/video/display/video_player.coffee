@@ -130,13 +130,11 @@ class @VideoPlayer extends Subview
   toggleFullScreen: (event) =>
     event.preventDefault()
     if @el.hasClass('fullscreen')
-      @$('.exit').remove()
       @$('.add-fullscreen').attr('title', 'Fill browser')
       @el.removeClass('fullscreen')
     else
-      @el.append('<a href="#" class="exit">Exit</a>').addClass('fullscreen')
+      @el.addClass('fullscreen')
       @$('.add-fullscreen').attr('title', 'Exit fill browser')
-      @$('.exit').click @toggleFullScreen
     @caption.resize()
 
   # Delegates

@@ -75,6 +75,10 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
 
     chapters = list()
     for chapter in course.get_display_items():
+        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+        if hide_from_toc:
+            continue 
+
         sections = list()
         for section in chapter.get_display_items():
 
@@ -323,7 +327,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         user, modulestore().get_item(id), depth=0, select_for_update=True)
     instance = get_module(user, request, id, student_module_cache)
     if instance is None:
-        log.debug("No module {} for user {}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
     instance_module = get_instance_module(user, instance, student_module_cache)
@@ -386,7 +390,7 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {} for user {}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)
