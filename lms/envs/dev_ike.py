@@ -17,6 +17,9 @@ MITX_FEATURES['ENABLE_TEXTBOOK'] = False
 MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 
+MITX_FEATURES['DISABLE_START_DATES'] = True
+MITX_FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
+
 myhost = socket.gethostname()
 if ('edxvm' in myhost) or ('ocw' in myhost):
     MITX_FEATURES['DISABLE_LOGIN_BUTTON'] = True	# auto-login with MIT certificate
@@ -33,4 +36,9 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 fo
 
 INSTALLED_APPS = tuple([ app for app in INSTALLED_APPS if not app.startswith('debug_toolbar') ])
 MIDDLEWARE_CLASSES = tuple([ mcl for mcl in MIDDLEWARE_CLASSES if not mcl.startswith('debug_toolbar') ])
-TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('askbot') ])
+#TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('askbot') ])
+#TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('mitxmako') ])
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    )
