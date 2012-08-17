@@ -12,9 +12,19 @@
   {% if article|can_write:user %}
 
 
-  <a class="accordion-toggle btn" href="#collapse_upload" data-toggle="collapse">
+  <a class="btn" href="#" id="upload-file-btn">
     <span class="icon-upload"></span>{% trans "Upload new file" %}
   </a>
+
+  <script type="text/javascript">
+    $('#upload-file-btn').bind('click', function(e) {
+      {% if anonymous_disallowed %}
+        console.log('you cannot do that!');
+      {% else %}
+        $('#upload-modal').modal('show');
+      {% endif %}
+    });
+  </script>
 
 
 
