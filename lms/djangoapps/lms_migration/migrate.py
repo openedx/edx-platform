@@ -2,13 +2,21 @@
 # migration tools for content team to go from stable-edx4edx to LMS+CMS
 #
 
+import json
 import logging
+import os
 from pprint import pprint
 import xmodule.modulestore.django as xmodule_django
 from xmodule.modulestore.django import modulestore
 
 from django.http import HttpResponse
 from django.conf import settings
+import track.views
+
+try:
+    from django.views.decorators.csrf import csrf_exempt
+except ImportError:
+    from django.contrib.csrf.middleware import csrf_exempt
 
 log = logging.getLogger("mitx.lms_migrate")
 LOCAL_DEBUG = True
@@ -17,6 +25,15 @@ ALLOWED_IPS = settings.LMS_MIGRATION_ALLOWED_IPS
 def escape(s):
     """escape HTML special characters in string"""
     return str(s).replace('<','&lt;').replace('>','&gt;')
+
+def getip(request):
+    '''
+    Extract IP address of requester from header, even if behind proxy
+    '''
+    ip = request.META.get('HTTP_X_REAL_IP','')	# nginx reverse proxy
+    if not ip:
+        ip = request.META.get('REMOTE_ADDR','None')
+    return ip
 
 def manage_modulestores(request,reload_dir=None):
     '''
@@ -32,9 +49,7 @@ def manage_modulestores(request,reload_dir=None):
     #----------------------------------------
     # check on IP address of requester
 
-    ip = request.META.get('HTTP_X_REAL_IP','')	# nginx reverse proxy
-    if not ip:
-        ip = request.META.get('REMOTE_ADDR','None')
+    ip = getip(request)
 
     if LOCAL_DEBUG:
         html += '<h3>IP address: %s ' % ip
@@ -108,3 +123,66 @@ def manage_modulestores(request,reload_dir=None):
 
     html += "</body></html>"
     return HttpResponse(html)
+
+@csrf_exempt
+def gitreload(request, reload_dir=None):
+    '''
+    This can be used as a github WebHook Service Hook, for reloading of the content repo used by the LMS.
+
+    If reload_dir is not None, then instruct the xml loader to reload that course directory.
+    '''
+    html = "<html><body>"
+    ip = getip(request)
+
+    html += '<h3>IP address: %s ' % ip
+    html += '<h3>User: %s ' % request.user
+
+    ALLOWED_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']	# hardcoded to github
+    if hasattr(settings,'ALLOWED_GITRELOAD_IPS'):	# allow override in settings
+        ALLOWED_IPS = ALLOWED_GITRELOAD_IPS
+
+    if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
+        if request.user and request.user.is_staff:
+            log.debug('request allowed because user=%s is staff' % request.user)
+        else:
+            html += 'Permission denied'
+            html += "</body></html>"
+            log.debug('request denied from %s, ALLOWED_IPS=%s' % (ip,ALLOWED_IPS))
+            return HttpResponse(html)    
+        
+    #----------------------------------------
+    # see if request is from github (POST with JSON)
+
+    if reload_dir is None and 'payload' in request.POST:
+        payload = request.POST['payload']
+        log.debug("payload=%s" % payload)
+        gitargs = json.loads(payload)
+        log.debug("gitargs=%s" % gitargs)
+        reload_dir = gitargs['repository']['name']
+        log.debug("github reload_dir=%s" % reload_dir)
+        gdir = settings.DATA_DIR / reload_dir 
+        if not os.path.exists(gdir):
+            log.debug("====> ERROR in gitreload - no such directory %s" % reload_dir)
+            return HttpResponse('Error')
+        cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
+        log.debug(os.popen(cmd).read())
+        if hasattr(settings,'GITRELOAD_HOOK'):	# hit this hook after reload, if set
+            gh = settings.GITRELOAD_HOOK
+            if gh:
+                ghurl = '%s/%s' % (gh,reload_dir)
+                r = requests.get(ghurl)
+                log.debug("GITRELOAD_HOOK to %s: %s" % (ghurl, r.text))
+        
+    #----------------------------------------
+    # reload course if specified
+
+    if reload_dir is not None:
+        def_ms = modulestore()
+        if reload_dir not in def_ms.courses:
+            html += "<h2><font color='red'>Error: '%s' is not a valid course directory</font></h2>" % reload_dir
+        else:
+            html += "<h2><font color='blue'>Reloaded course directory '%s'</font></h2>" % reload_dir
+            def_ms.try_load_course(reload_dir)
+            track.views.server_track(request, 'reloaded %s' % reload_dir, {}, page='migrate')
+
+    return HttpResponse(html)    
