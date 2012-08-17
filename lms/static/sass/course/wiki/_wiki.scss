@@ -590,6 +590,41 @@ section.wiki {
 
   /*-----------------
 
+    Settings
+
+  -----------------*/
+
+  #settings_form {
+    .well {
+      margin-bottom: 15px;
+      @include clearfix;
+    }
+
+    .control-group {
+      float: left;
+      margin-bottom: 0;
+      clear: both;
+    }
+
+    label {
+      margin-left: 15px;
+    }
+
+    .controls {
+      padding-top: 4px;
+    }
+
+    label,
+    .controls {
+      float: right;
+    }
+  }
+
+
+
+
+  /*-----------------
+
     New
 
   -----------------*/
