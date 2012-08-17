@@ -1,7 +1,7 @@
 section.wiki {
   padding-top: 25px;
 
-  header {
+  > header {
     height: 33px;
     margin-bottom: 36px;
     padding-bottom: 26px;
@@ -406,6 +406,7 @@ section.wiki {
     letter-spacing: 0 !important;
 
     &:hover {
+      color: $base-font-color;
       text-decoration: none;
     }
 
@@ -621,14 +622,58 @@ section.wiki {
 
   .attachment-options {
     height: 40px;
-    margin-bottom: 30px;
-    padding: 20px 0 2px;
-    border-bottom: 1px solid $light-gray;
-    border-top: 1px solid $light-gray;    
+    margin: 40px 0 30px; 
   }
 
   .attachment-list {
-    
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 15px;
+      border: 1px solid #DDD;
+      background: #F9F9F9;
+      @include border-radius(5px);
+    }
+
+    header,
+    .attachment-details {
+      padding: 12px 15px;
+    }
+
+    .attachment-details {
+      background: #eee;
+      @include border-radius(0 0 5px 5px);
+    }
+
+    h3 {
+      a {
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      .badge {
+        float: right;
+        font-size: 0.6em;
+        line-height: 20px;
+        color: #aaa;
+      }
+    }
+
+    .attachment-description {
+      font-size: 0.8em;
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.8em;
+    }
+
+    .attachment-actions .btn {
+      float: right;
+    }
   }
 
 
