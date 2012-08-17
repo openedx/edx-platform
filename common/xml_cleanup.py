@@ -49,7 +49,7 @@ def cleanup(filepath, remove_meta):
     try:
         print "Cleaning {0}".format(filepath)
         with open(filepath) as f:
-            parser = etree.XMLParser(remove_comments=False)
+            parser = etree.XMLParser(remove_comments=False, strip_cdata=False)
             xml = etree.parse(filepath, parser=parser)
     except:
         print "Error parsing file {0}".format(filepath)
@@ -59,7 +59,7 @@ def cleanup(filepath, remove_meta):
         attrs = node.attrib
         if 'url_name' in attrs:
             used_names[node.tag].add(attrs['url_name'])
-        if 'name' in attrs:
+        if False and 'name' in attrs:
             # Replace name with an identical display_name, and a unique url_name
             name = attrs['name']
             attrs['display_name'] = name
