@@ -1,7 +1,7 @@
 section.wiki {
   padding-top: 25px;
 
-  header {
+  > header {
     height: 33px;
     margin-bottom: 36px;
     padding-bottom: 26px;
@@ -406,6 +406,7 @@ section.wiki {
     letter-spacing: 0 !important;
 
     &:hover {
+      color: $base-font-color;
       text-decoration: none;
     }
 
@@ -435,6 +436,44 @@ section.wiki {
     min-height: 500px;
     margin-left: -480px;
     top: 150px;
+
+    &.upload-modal,
+    &.search-file-modal {
+      width: 400px;
+      min-height: 0;
+      margin-left: -200px;
+
+      h4 {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .help-block {
+        font-size: 0.8em;
+      }
+    }
+
+    &.search-file-modal {
+      width: 500px;
+      margin-left: -250px;
+
+      p {
+        font-size: 0.8em;
+        line-height: 1.4em;
+      }
+
+      .form-search {
+        margin: 30px 0 15px;
+
+        input {
+          width: 350px;
+        }
+
+        button {
+          height: 35px;
+        }
+      }
+    }
 
     .modal-header {
       h1, p {
@@ -472,9 +511,16 @@ section.wiki {
     }
   }
 
+  .modal-inner-wrapper {
+    background: #fff;
+    padding: 20px;
+  }
+
   #previewWindow body {
     background: #f00 !important;
   }
+
+  
 
 
 
@@ -544,6 +590,41 @@ section.wiki {
 
   /*-----------------
 
+    Settings
+
+  -----------------*/
+
+  #settings_form {
+    .well {
+      margin-bottom: 15px;
+      @include clearfix;
+    }
+
+    .control-group {
+      float: left;
+      margin-bottom: 0;
+      clear: both;
+    }
+
+    label {
+      margin-left: 15px;
+    }
+
+    .controls {
+      padding-top: 4px;
+    }
+
+    label,
+    .controls {
+      float: right;
+    }
+  }
+
+
+
+
+  /*-----------------
+
     New
 
   -----------------*/
@@ -563,6 +644,71 @@ section.wiki {
     font-size: 0.9em;
     line-height: 1.3em;
     margin-top: 9px;
+  }
+
+
+
+
+  /*-----------------
+
+    Attachments
+
+  -----------------*/
+
+  .attachment-options {
+    height: 40px;
+    margin: 40px 0 30px; 
+  }
+
+  .attachment-list {
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 15px;
+      border: 1px solid #DDD;
+      background: #F9F9F9;
+      @include border-radius(5px);
+    }
+
+    header,
+    .attachment-details {
+      padding: 12px 15px;
+    }
+
+    .attachment-details {
+      background: #eee;
+      @include border-radius(0 0 5px 5px);
+    }
+
+    h3 {
+      a {
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      .badge {
+        float: right;
+        font-size: 0.6em;
+        line-height: 20px;
+        color: #aaa;
+      }
+    }
+
+    .attachment-description {
+      font-size: 0.8em;
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.8em;
+    }
+
+    .attachment-actions .btn {
+      float: right;
+    }
   }
 
 
