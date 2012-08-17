@@ -873,6 +873,7 @@ def sympy_check2():
             msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
+        # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
 
@@ -898,6 +899,7 @@ def sympy_check2():
         if type(self.code) == str:
             try:
                 exec self.code in self.context['global_context'], self.context
+                correct = self.context['correct']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
