@@ -39,6 +39,7 @@ $(function(){
 		    editorCircuit.schematic.components[n - 1 - i].remove();
         
       editorCircuit.schematic.load_schematic(circuit_so_far, "");
+      editorCircuit.schematic.zoomall();
     });
     
     $("#circuit_save_btn").click(function () {
@@ -51,6 +52,7 @@ $(function(){
 		    editingCircuit.schematic.components[n - 1 - i].remove();
         
       editingCircuit.schematic.load_schematic(saving_circuit, "");
+      editingCircuit.schematic.zoomall();
       
       if (editingCircuit.codeMirrorLine) {
         editingCircuit.codeMirrorLine.replace(0, null, "circuit-schematic:" + saving_circuit);
