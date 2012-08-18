@@ -108,11 +108,9 @@ class CapaModule(XModule):
             self.grace_period = None
             self.close_date = self.display_due_date
 
-        self.max_attempts = only_one(dom2.xpath('/problem/@attempts'))
-        if len(self.max_attempts) > 0:
+        self.max_attempts = self.metadata.get('attempts', None)
+        if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
-        else:
-            self.max_attempts = None
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
@@ -237,14 +235,21 @@ class CapaModule(XModule):
             else:
                 raise
 
-        content = {'name': self.metadata['display_name'],
+        content = {'name': self.display_name,
                    'html': html,
                    'weight': self.weight,
                    }
 
         # We using strings as truthy values, because the terminology of the
         # check button is context-specific.
-        check_button = "Grade" if self.max_attempts else "Check"
+
+        # Put a "Check" button if unlimited attempts or still some left
+        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+            check_button = "Check"
+        else:
+            # Will be final check so let user know that
+            check_button = "Final Check" 
+
         reset_button = True
         save_button = True
 
@@ -376,14 +381,17 @@ class CapaModule(XModule):
         '''
         For the "show answer" button.
 
-        TODO: show answer events should be logged here, not just in the problem.js
-
         Returns the answers: {'answers' : answers}
         '''
+        event_info = dict()
+        event_info['problem_id'] = self.location.url()
+        self.system.track_function('show_answer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
+	    # answers (eg <solution>) may have embedded images
+	    answers = dict( (k,self.system.replace_urls(answers[k], self.metadata['data_dir'])) for k in answers )
             return {'answers': answers}
 
     # Figure out if we should move these to capa_problem?
@@ -464,7 +472,7 @@ class CapaModule(XModule):
                 return {'success': msg}
             log.exception("Error in capa_module problem checking")
             raise Exception("error in capa_module")
-        
+
         self.attempts = self.attempts + 1
         self.lcp.done = True
 

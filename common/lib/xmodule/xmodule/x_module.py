@@ -8,8 +8,9 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from pprint import pprint
 
-from xmodule.modulestore import Location
 from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import Location
+from xmodule.timeparse import parse_time
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -218,9 +219,11 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            self._loaded_children = [
-                self.system.get_module(child)
-                for child in self.definition.get('children', [])]
+            child_locations = self.definition.get('children', [])
+            children = [self.system.get_module(loc) for loc in child_locations]
+            # get_module returns None if the current user doesn't have access
+            # to the location.
+            self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
@@ -293,6 +296,14 @@ class XModule(HTMLSnippet):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
+
+
+def policy_key(location):
+    """
+    Get the key for a location in a policy file.  (Since the policy file is
+    specific to a course, it doesn't need the full location url).
+    """
+    return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
 class XModuleDescriptor(Plugin, HTMLSnippet):
@@ -397,12 +408,22 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
                                  self.url_name.replace('_', ' '))
 
     @property
+    def start(self):
+        """
+        If self.metadata contains start, return it.  Else return None.
+        """
+        if 'start' not in self.metadata:
+            return None
+        return self._try_parse_time('start')
+
+    @property
     def own_metadata(self):
         """
         Return the metadata that is not inherited, but was defined on this module.
         """
         return dict((k,v) for k,v in self.metadata.items()
                     if k not in self._inherited_metadata)
+
 
     @staticmethod
     def compute_inherited_metadata(node):
@@ -596,6 +617,24 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             metadata=self.metadata
         ))
 
+    # ================================ Internal helpers =======================
+
+    def _try_parse_time(self, key):
+        """
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
+        """
+        if key in self.metadata:
+            try:
+                return parse_time(self.metadata[key])
+            except ValueError as e:
+                msg = "Descriptor {0} loaded with a bad metadata key '{1}': '{2}'".format(
+                    self.location.url(), self.metadata[key], e)
+                log.warning(msg)
+        return None
+
+
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
@@ -641,9 +680,11 @@ class DescriptorSystem(object):
 
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, **kwargs):
+    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
         """
         load_item, resources_fs, error_tracker: see DescriptorSystem
+
+        policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
@@ -651,6 +692,7 @@ class XMLParsingSystem(DescriptorSystem):
         DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
                                   **kwargs)
         self.process_xml = process_xml
+        self.policy = policy
 
 
 class ModuleSystem(object):
@@ -675,7 +717,6 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 is_staff=False,
                  node_path=""):
         '''
         Create a closure around the system environment.
@@ -688,7 +729,8 @@ class ModuleSystem(object):
                          files.  Update or remove.
 
         get_module - function that takes (location) and returns a corresponding
-                         module instance object.
+                         module instance object.  If the current user does not have
+                         access to that location, returns None.
 
         render_template - a function that takes (template_file, context), and
                          returns rendered html.
@@ -705,9 +747,6 @@ class ModuleSystem(object):
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
-
-        is_staff - Is the user making the request a staff user?
-             TODO (vshnayder): this will need to change once we have real user roles.
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -718,7 +757,6 @@ class ModuleSystem(object):
         self.DEBUG = self.debug = debug
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
-        self.is_staff = is_staff
         self.node_path = node_path
 
     def get(self, attr):

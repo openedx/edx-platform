@@ -126,9 +126,9 @@ if settings.COURSEWARE_ENABLED:
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
             'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<page>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
             'staticbook.views.index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$',
             'staticbook.views.index_shifted'),
@@ -167,9 +167,25 @@ if settings.COURSEWARE_ENABLED:
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
-    urlpatterns += (
-        url(r'^wiki/', include('simplewiki.urls')),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/wiki/', include('simplewiki.urls')),
+    from wiki.urls import get_pattern as wiki_pattern
+    from django_notify.urls import get_pattern as notify_pattern
+    
+    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
+    # them together.
+    urlpatterns += (        
+        # First we include views from course_wiki that we use to override the default views.
+        # They come first in the urlpatterns so they get resolved first
+        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
+
+        
+        url(r'^wiki/', include(wiki_pattern())),
+        url(r'^notify/', include(notify_pattern())),
+        
+        # These urls are for viewing the wiki in the context of a course. They should
+        # never be returned by a reverse() so they come after the other url patterns
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
+            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
+        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
     )
 
 if settings.QUICKEDIT:

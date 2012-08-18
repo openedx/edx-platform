@@ -12,7 +12,8 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    @include border-radius(0 4px 4px 0);
+    padding-right: 0;
+    padding-left: lh();
 
     h1 {
       margin: 0 0 lh();

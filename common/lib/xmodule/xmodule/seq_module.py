@@ -76,7 +76,7 @@ class SequenceModule(XModule):
             contents.append({
                 'content': child.get_html(),
                 'title': "\n".join(
-                    grand_child.metadata['display_name'].strip()
+                    grand_child.display_name.strip()
                     for grand_child in child.get_children()
                     if 'display_name'  in grand_child.metadata
                 ),
@@ -107,7 +107,7 @@ class SequenceModule(XModule):
 class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
-    
+
     stores_state = True # For remembering where in the sequence the student is
 
     @classmethod

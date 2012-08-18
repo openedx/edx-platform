@@ -1,13 +1,18 @@
-<%page args="active_page" />
+## mako
+<%page args="active_page=None" />
 
 <%
+if active_page == None and active_page_context is not UNDEFINED:
+  # If active_page is not passed in as an argument, it may be in the context as active_page_context
+  active_page = active_page_context
+
 def url_class(url):
   if url == active_page:
     return "active"
   return ""
 %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from courseware.courses import has_staff_access_to_course_id %>
+<%! from courseware.access import has_access %>
 
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
@@ -16,20 +21,26 @@ def url_class(url):
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
 % if user.is_authenticated():
 % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
-      <li class="book"><a href="${reverse('book', args=[course.id])}" class="${url_class('book')}">Textbook</a></li>
+      % for index, textbook in enumerate(course.textbooks):
+          <li class="book"><a href="${reverse('book', args=[course.id, index])}" class="${url_class('book')}">${textbook.title}</a></li>
+      % endfor
 % endif
 % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
       <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id, course.id.replace('/', '_').replace('.', '_')])}" class="${url_class('discussion')}">Discussion</a></li>
       <li class="news"><a href="${reverse('news', args=[course.id])}" class="${url_class('news')}">News</a></li>
 % endif 
+      
+% if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
+      <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
+% endif
 % endif
 % if settings.WIKI_ENABLED:
-      <li class="wiki"><a href="${reverse('wiki_root', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
+      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
 % endif
 % if user.is_authenticated():
       <li class="profile"><a href="${reverse('profile', args=[course.id])}" class="${url_class('profile')}">Profile</a></li>
 % endif
-% if has_staff_access_to_course_id(user, course.id):
+% if staff_access:
       <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
 % endif
 

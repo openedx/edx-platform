@@ -19,7 +19,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from courseware.courses import check_course
+from courseware.courses import get_course_with_access
+
 
 from django_comment_client.utils import JsonResponse, JsonError, extract
 
@@ -309,7 +310,7 @@ def update_moderator_status(request, course_id, user_id):
     else:
         user.roles.remove(role)
     if request.is_ajax():
-        course = check_course(request.user, course_id)
+        course = get_course_with_access(request.user, course_id, 'load')
         discussion_user = cc.User(id=user_id, course_id=course_id)
         context = {
             'course': course, 

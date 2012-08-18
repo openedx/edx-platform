@@ -50,7 +50,11 @@ MITX_FEATURES = {
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
-    'DARK_LAUNCH': False,  # When True, courses will be active for staff only
+
+    # When True, will only publicly list courses by the subdomain. Expects you
+    # to define COURSE_LISTINGS, a dictionary mapping subdomains to lists of
+    # course_ids (see dev_int.py for an example)
+    'SUBDOMAIN_COURSE_LISTINGS' : False,
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : True,
@@ -65,6 +69,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
+
 }
 
 # Used for A/B testing
@@ -98,12 +103,12 @@ system_node_path = os.environ.get("NODE_PATH", None)
 if system_node_path is None:
     system_node_path = "/usr/local/lib/node_modules"
 
-node_paths = [COMMON_ROOT / "static/js/vendor", 
+node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
               system_node_path
               ]
 NODE_PATH = ':'.join(node_paths)
-                          
+
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -129,6 +134,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
+    
+    # Added for django-wiki
+    'django.core.context_processors.media',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'sekizai.context_processors.sekizai',
+    'course_wiki.course_nav.context_processor',
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
@@ -286,6 +298,9 @@ djcelery.setup_loader()
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
+################################# WIKI ###################################
+WIKI_ACCOUNT_HANDLING = False
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -299,9 +314,13 @@ STATICFILES_FINDERS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'askbot.skins.loaders.filesystem_load_template_source',
+    'mitxmako.makoloader.MakoFilesystemLoader',
+    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+ 
+    # 'django.template.loaders.filesystem.Loader',
+    # 'django.template.loaders.app_directories.Loader',
+    
+    #'askbot.skins.loaders.filesystem_load_template_source',
     # 'django.template.loaders.eggs.Loader',
 )
 
@@ -318,6 +337,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    
+    'course_wiki.course_nav.Middleware',
 
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
     'askbot.middleware.forum_mode.ForumModeMiddleware',
@@ -536,6 +557,15 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
+    
+    #For the wiki
+    'wiki', # The new django-wiki from benjaoming
+    'course_wiki', # Our customizations
+    'django_notify',
+    'mptt',
+    'sekizai',
+    'wiki.plugins.attachments',
+    'wiki.plugins.notifications',
 
     # For testing
     'django_jasmine',

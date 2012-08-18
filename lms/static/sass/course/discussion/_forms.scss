@@ -5,6 +5,11 @@ form.answer-form {
   border-top: 1px solid #ddd;
   overflow: hidden;
   padding-left: flex-grid(1.1);
+  padding-top: lh();
+
+  p {
+    margin-bottom: lh();
+  }
 
   textarea {
     @include box-sizing(border-box);
@@ -121,7 +126,6 @@ form.question-form {
   border: none;
   padding: 15px 0 0 0;
 
-
   input[type="text"] {
     @include box-sizing(border-box);
     width: flex-grid(6);
@@ -129,6 +133,11 @@ form.question-form {
 
   input[type="checkbox"] {
     margin-top: 10px;
+  }
+
+  input[value="Cancel"] {
+    @extend .light-button;
+    float: right;
   }
 
   div#question-list {
