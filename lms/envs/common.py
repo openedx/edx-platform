@@ -555,8 +555,8 @@ INSTALLED_APPS = (
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
-    'course_wiki', # Our customizations
     'django_notify',
+    'course_wiki', # Our customizations
     'mptt',
     'sekizai',
     'wiki.plugins.attachments',
