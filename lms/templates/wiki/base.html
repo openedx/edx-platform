@@ -5,9 +5,6 @@
 
 {% block headextra %}
   {% compressed_css 'course' %}
-  <script src="{% static 'js/bootstrap-alert.js' %}"></script>
-  <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
-  <script src="{% static 'js/bootstrap-modal.js' %}"></script>
   
   <script type="text/javascript">
     function ajaxError(){}
@@ -30,6 +27,21 @@
       });
     }
   </script>
+  
+  
+  {% addtoblock 'js' %}
+    {% comment %} These scripts load at the bottom of the body {% endcomment %}
+  
+    <script src="{% static 'js/bootstrap-alert.js' %}"></script>
+    <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
+    <script src="{% static 'js/bootstrap-modal.js' %}"></script>
+    
+    {% with mathjax_mode='wiki' %}
+      {% include "mathjax_include.html" %}
+    {% endwith %}
+    
+  {% endaddtoblock %}
+  
 {% endblock %}
 
 
