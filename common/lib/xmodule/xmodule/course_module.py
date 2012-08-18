@@ -1,55 +1,59 @@
 from fs.errors import ResourceNotFoundError
 import time
-import dateutil.parser
 import logging
+from lxml import etree
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.timeparse import parse_time, stringify_time
 
 log = logging.getLogger(__name__)
-
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
+    class Textbook:
+        def __init__(self, title, table_of_contents_url):
+            self.title = title
+            self.table_of_contents_url = table_of_contents_url
+
+        @classmethod
+        def from_xml_object(cls, xml_object):
+            return cls(xml_object.get('title'), xml_object.get('table_of_contents_url'))
+
+        @property
+        def table_of_contents(self):
+            raw_table_of_contents = open(self.table_of_contents_url, 'r') # TODO: This will need to come from S3
+            table_of_contents = etree.parse(raw_table_of_contents).getroot()
+            return table_of_contents
+
+
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
+        self.textbooks = self.definition['data']['textbooks']
 
         msg = None
-        try:
-            self.start = time.strptime(self.metadata["start"], "%Y-%m-%dT%H:%M")
-        except KeyError:
-            msg = "Course loaded without a start date. id = %s" % self.id
-        except ValueError as e:
-            msg = "Course loaded with a bad start date. %s '%s'" % (self.id, e)
-
-        # Don't call the tracker from the exception handler.
-        if msg is not None:
-            self.start = time.gmtime(0)  # The epoch
+        if self.start is None:
+            msg = "Course loaded without a valid start date. id = %s" % self.id
+            # hack it -- start in 1970
+            self.metadata['start'] = stringify_time(time.gmtime(0))
             log.critical(msg)
             system.error_tracker(msg)
 
-        def try_parse_time(key):
-            """
-            Parse an optional metadata key: if present, must be valid.
-            Return None if not present.
-            """
-            if key in self.metadata:
-                try:
-                    return time.strptime(self.metadata[key], "%Y-%m-%dT%H:%M")
-                except ValueError as e:
-                    msg = "Course %s loaded with a bad metadata key %s '%s'" % (
-                        self.id, self.metadata[key], e)
-                    log.warning(msg)
-            return None
+        self.enrollment_start = self._try_parse_time("enrollment_start")
+        self.enrollment_end = self._try_parse_time("enrollment_end")
 
-        self.enrollment_start = try_parse_time("enrollment_start")
-        self.enrollment_end = try_parse_time("enrollment_end")
-
-
-
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        textbooks = []
+        for textbook in xml_object.findall("textbook"):
+            textbooks.append(cls.Textbook.from_xml_object(textbook))
+            xml_object.remove(textbook)
+        definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition.setdefault('data', {})['textbooks'] = textbooks
+        return definition
 
     def has_started(self):
         return time.gmtime() > self.start
@@ -75,7 +79,6 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy = load_grading_policy(policy_string)
 
         return grading_policy
-
 
     @lazyproperty
     def grading_context(self):
@@ -154,6 +157,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def id(self):
+        """Return the course_id for this course"""
         return self.location_to_id(self.location)
 
     @property
@@ -162,14 +166,14 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def title(self):
-        return self.metadata['display_name']
+        return self.display_name
 
     @property
     def number(self):
         return self.location.course
 
     @property
-    def wiki_namespace(self):
+    def wiki_slug(self):
         return self.location.course
 
     @property

@@ -4,7 +4,7 @@ div.video {
   border-bottom: 1px solid #e1e1e1;
   border-top: 1px solid #e1e1e1;
   display: block;
-  margin: 0 (-(lh()));
+  margin: 0 0 0 (-(lh()));
   padding: 6px lh();
 
   article.video-wrapper {
@@ -14,7 +14,7 @@ div.video {
 
     section.video-player {
       height: 0;
-      // overflow: hidden;
+      overflow: hidden;
       padding-bottom: 56.25%;
       position: relative;
 
@@ -171,7 +171,7 @@ div.video {
             position: relative;
             @include transition();
             -webkit-font-smoothing: antialiased;
-            width: 110px;
+            width: 116px;
 
             h3 {
               color: #999;
@@ -209,7 +209,7 @@ div.video {
             display: none;
             opacity: 0;
             position: absolute;
-            width: 125px;
+            width: 133px;
             z-index: 10;
 
             li {
@@ -444,13 +444,13 @@ div.video {
     height: 100%;
     left: 0;
     margin: 0;
-    max-height: 100%;
     overflow: hidden;
     padding: 0;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 999;
+    vertical-align: middle;
 
     &.closed {
       ol.subtitles {
@@ -459,30 +459,17 @@ div.video {
       }
     }
 
-    a.exit {
-      color: #aaa;
-      display: none;
-      font-style: 12px;
-      left: 20px;
-      letter-spacing: 1px;
-      position: absolute;
-      text-transform: uppercase;
-      top: 20px;
-
-      &::after {
-        content: "✖";
-        @include inline-block();
-        padding-left: 6px;
-      }
-
-      &:hover {
-        color: $mit-red;
-      }
-    }
-
     div.tc-wrapper {
+      @include clearfix;
+      display: table;
+      width: 100%;
+      height: 100%;
+
       article.video-wrapper {
         width: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        float: none;
       }
 
       object, iframe {

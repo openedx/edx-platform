@@ -42,9 +42,9 @@ class DummySystem(XMLParsingSystem):
             descriptor.get_children()
             return descriptor
 
-
+        policy = {}
         XMLParsingSystem.__init__(self, load_item, self.resources_fs,
-                                  self.errorlog.tracker, process_xml)
+                                  self.errorlog.tracker, process_xml, policy)
 
     def render_template(self, template, context):
             raise Exception("Shouldn't be called")
@@ -201,7 +201,7 @@ class ImportTestCase(unittest.TestCase):
 
         def check_for_key(key, node):
             "recursive check for presence of key"
-            print "Checking {}".format(node.location.url())
+            print "Checking {0}".format(node.location.url())
             self.assertTrue(key in node.metadata)
             for c in node.get_children():
                 check_for_key(key, c)

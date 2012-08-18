@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from courseware.courses import check_course
+from courseware.courses import get_course_with_access
 
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
@@ -129,7 +129,7 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id, discussion_id):
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
     threads, query_params = get_threads(request, course_id, discussion_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=discussion_id, \
                                                                    query_params=query_params)
@@ -191,7 +191,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         })
 
     else:
-        course = check_course(request.user, course_id)
+        course = get_course_with_access(request.user, course_id, 'load')
 
         context = {
             'discussion_id': discussion_id,
@@ -207,7 +207,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 def user_profile(request, course_id, user_id):
 
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
     discussion_user = cc.User(id=user_id, course_id=course_id)
 
     query_params = {

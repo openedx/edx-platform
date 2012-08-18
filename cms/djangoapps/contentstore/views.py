@@ -215,9 +215,6 @@ def preview_module_system(request, preview_id, descriptor):
         render_template=render_from_lms,
         debug=True,
         replace_urls=replace_urls,
-        # TODO (vshnayder): All CMS users get staff view by default
-        # is that what we want?
-        is_staff=True,
     )
 
 

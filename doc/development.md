@@ -65,3 +65,10 @@ To run a single nose test:
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
 
 
+Very handy: if you uncomment the `--pdb` argument in `NOSE_ARGS` in `lms/envs/test.py`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
+
+## Content development
+
+If you change course content, while running the LMS in dev mode, it is unnecessary to restart to refresh the modulestore.  
+
+Instead, hit /migrate/modules to see a list of all modules loaded, and click on links (eg /migrate/reload/edx4edx) to reload a course.

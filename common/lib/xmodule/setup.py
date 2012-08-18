@@ -10,7 +10,6 @@ setup(
     },
     requires=[
         'capa',
-        'mitxmako'
     ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
