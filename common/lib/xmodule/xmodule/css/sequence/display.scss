@@ -41,11 +41,11 @@ nav.sequence-nav {
         &:hover {
           background-repeat: no-repeat;
           background-position: center;
-          background-color: #F6F6F6;
+          background-color: #F3F3F3;
         }
 
         &.visited {
-          background-color: #F6F6F6;
+          background-color: #F3F3F3;
 
           &:hover {
             background-position: center center;
@@ -62,18 +62,6 @@ nav.sequence-nav {
             background-position: center;
             background-color: #fff;
           }
-        }
-
-        &.progress-none {
-          background-color: lighten(red, 50%);
-        }
-
-        &.progress-some {
-          background-color: yellow;
-        }
-
-        &.progress-done {
-          background-color: green;
         }
 
         //video
@@ -119,6 +107,18 @@ nav.sequence-nav {
 
           &.active {
             background-image: url('../images/sequence-nav/list-icon-current.png');
+          }
+
+          &.progress-none {
+            background-image: url('../images/sequence-nav/list-unstarted.png');
+          }
+
+          &.progress-some, &.progress-in_progress {
+            background-image: url('../images/sequence-nav/list-unfinished.png');
+          }
+
+          &.progress-done {
+            background-image: url('../images/sequence-nav/list-finished.png');
           }
         }
 
