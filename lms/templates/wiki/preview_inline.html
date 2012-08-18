@@ -2,7 +2,8 @@
 {% load wiki_tags i18n %}{% load compressed %}
 <html>
 <head>
-  {% compressed_css 'course' %}
+  {% compressed_css 'course' %}  
+  {% compressed_js 'main_vendor' %}
 </head>
 <body class="modal-preview">
   <section class="container wiki view">
@@ -27,6 +28,9 @@
       {% wiki_render article content %}
     </div>
   </section>
+  
+  {% compressed_js 'application' %}
+  {% compressed_js 'module-js' %}
 </body>
 </html>
 
