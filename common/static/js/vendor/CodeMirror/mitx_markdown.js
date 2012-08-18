@@ -10,9 +10,17 @@ $(function(){
   $(document).ready(function() {
 	  //$("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
     
-    $("body").append('<div id="circuit_editor" class="leanModal_box"><div align="center">'+
-      '<input class="schematic" height="' + schematic_editor_height + '" width="' + schematic_editor_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/>' + 
-      '<button type="button" id="circuit_save_btn" class="btn-primary">save</button></div></div>');
+    $("body").append('\
+    <div id="circuit_editor_modal" class="modal hide fade"> \
+      <div class="modal-body"> \
+        <input class="schematic" height="' + schematic_editor_height + '" width="' + schematic_editor_width + '" id="schematic_editor" name="schematic" type="hidden" value=""/> \
+      </div> \
+      <div class="modal-footer"> \
+        <button type="button" id="circuit_save_btn" class="btn btn-primary" data-dismiss="modal"> \
+          Save circuit \
+        </button> \
+      </div> \
+    </div>');
     
     //This is the editor that pops up as a modal
     var editorCircuit = $("#schematic_editor").get(0);
@@ -47,8 +55,6 @@ $(function(){
       if (editingCircuit.codeMirrorLine) {
         editingCircuit.codeMirrorLine.replace(0, null, "circuit-schematic:" + saving_circuit);
       }
-      
-      $(".modal_close").first().click();
     });
   });
 });
@@ -117,7 +123,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       
       circuit_value = escapeHtml(circuit_value);
       
-      var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor' rel='leanModal' class='schematic_open' style='display:inline-block;'>" + 
+      var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor_modal' data-toggle='modal' class='schematic_open' style='display:inline-block;'>" + 
                   "<input type='hidden' parts='' value='" + circuit_value + "' width='" + schematic_width + "' height='" + schematic_height + "' analyses='' class='schematic ctrls'/></a></div>";
                    
       return html;
@@ -135,7 +141,6 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
           schmInput.schematic.always_draw_grid = true;
           schmInput.schematic.redraw_background();
         }
-        $(node.firstChild).leanModal();
       } catch (err) {
         console.log("Error in mitx_markdown callback: " + err);
       }
