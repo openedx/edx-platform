@@ -46,7 +46,7 @@ CACHES = {
     # In staging environments, we would grab VERSION from data uploaded by the
     # push process.
     'general': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
         'KEY_FUNCTION': 'util.memcache.safe_key',
