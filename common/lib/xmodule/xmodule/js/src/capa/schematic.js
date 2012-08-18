@@ -172,11 +172,13 @@ schematic = (function() {
 	    this.tools = new Array();
 	    this.toolbar = [];
 
+        /* DISABLE HELP BUTTON -- SJSU
 	    if (!this.diagram_only) {
 		this.tools['help'] = this.add_tool(help_icon,'Help: display help page',this.help);
 		this.enable_tool('help',true);
 		this.toolbar.push(null);  // spacer
 	    }
+        END DISABLE HELP BUTTON -- SJSU */
 
 	    if (this.edits_allowed) {
 		this.tools['grid'] = this.add_tool(grid_icon,'Grid: toggle grid display',this.toggle_grid);
