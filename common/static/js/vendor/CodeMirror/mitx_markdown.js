@@ -1,5 +1,7 @@
 var schematic_height = 220;
 var schematic_width = 400;
+var styling_height_delta = 2; //How many pixels are added to the height of the box because of styling (like a shadow)
+var styling_width_delta = 2;
 
 var schematic_editor_height = 300;
 var schematic_editor_width = 500;
@@ -121,7 +123,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       return html;
     },
     size: function(text) {
-      return {width: schematic_width, height:schematic_height};
+      return {width: schematic_width + styling_width_delta, height:schematic_height + styling_height_delta};
     },
     callback: function(node, line) {
       try {
