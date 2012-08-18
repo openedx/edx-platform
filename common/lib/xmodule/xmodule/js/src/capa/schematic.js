@@ -172,7 +172,7 @@ schematic = (function() {
 	    this.tools = new Array();
 	    this.toolbar = [];
 
-        /* DISABLE HELP BUTTON -- SJSU
+        /* DISABLE HELP BUTTON (target URL not consistent with multicourse hierarchy) -- SJSU
 	    if (!this.diagram_only) {
 		this.tools['help'] = this.add_tool(help_icon,'Help: display help page',this.help);
 		this.enable_tool('help',true);
