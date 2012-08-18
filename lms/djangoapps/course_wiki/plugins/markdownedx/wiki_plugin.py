@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse_lazy
 
-from wiki.core import plugins_registry
-from wiki import plugins
+from wiki.core import plugins_registry, baseplugin
+import wiki
 
 from course_wiki.plugins.markdownedx import mdx_circuit, mdx_wikipath, mdx_mathjax, mdx_video
 
-class ExtendMarkdownPlugin(plugins.BasePlugin):
+class ExtendMarkdownPlugin(baseplugin.BasePlugin):
     """
     This plugin simply loads all of the markdown extensions we use in edX.
     """
     
-    wiki_base_url = reverse("wiki:get", kwargs={'path' : ""})
+    wiki_base_url = reverse_lazy("wiki:get", kwargs={'path' : ""})
     
     markdown_extensions = [mdx_circuit.CircuitExtension(configs={}),
                            #mdx_image.ImageExtension() , #This one doesn't work. Tries to import simplewiki.settings
