@@ -120,6 +120,9 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
+    COMMON_ROOT / 'templates',
+    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
