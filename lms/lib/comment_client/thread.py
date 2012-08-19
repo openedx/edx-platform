@@ -10,7 +10,7 @@ class Thread(models.Model):
         'course_id', 'closed', 'tags', 'votes',
         'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count',
-        'at_position_list', 'children',
+        'at_position_list', 'children', 'type',
     ]
 
     updatable_fields = [
