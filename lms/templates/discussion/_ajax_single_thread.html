@@ -1,2 +1,2 @@
-<%namespace name="renderer" file="_thread.html"/>
-${renderer.render_comments(thread['children'])}
+<%namespace name="renderer" file="_content_renderer.html"/>
+${renderer.render_comments(thread.get('children'))}
