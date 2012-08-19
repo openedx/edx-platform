@@ -41,10 +41,7 @@ def convert_files_to_filenames(answers):
     for answer_id in answers.keys():
         answer = answers[answer_id]
         if is_list_of_files(answer): # Files are stored as a list, even if one file
-            list_of_filenames = []
-            for inputfile in answer:
-                list_of_filenames.append(inputfile.name)
-            new_answers[answer_id] = list_of_filenames 
+            new_answers[answer_id] = [f.name for f in answer]
         else:
             new_answers[answer_id] = answers[answer_id]
     return new_answers
