@@ -1,4 +1,4 @@
-<%namespace name="renderer" file="_thread.html"/>
+<%namespace name="renderer" file="_content_renderer.html"/>
 
 <section class="discussion inline-discussion" _id="${discussion_id}">
 
@@ -6,7 +6,7 @@
 
   <div class="threads">
     % for thread in threads:
-      ${renderer.render_thread(course_id, thread, show_comments=False)}
+      ${renderer.render_content_with_comments(thread)}
     % endfor
   </div>
 
