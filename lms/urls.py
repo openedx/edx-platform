@@ -156,7 +156,7 @@ if settings.COURSEWARE_ENABLED:
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
-    if settings.DISCUSSION_SERVICE_ENABLED:
+    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
 
         urlpatterns += (
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 

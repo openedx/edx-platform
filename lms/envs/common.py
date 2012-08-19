@@ -34,10 +34,9 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
-DISCUSSION_SERVICE_ENABLED = True
 
 # Features
 MITX_FEATURES = {
@@ -57,7 +56,7 @@ MITX_FEATURES = {
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : True,
+    'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
@@ -350,6 +349,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################

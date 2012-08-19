@@ -78,7 +78,16 @@ class Model(object):
     def initializable_attributes(self):
         return extract(self.attributes, self.initializable_fields)
         
+    @classmethod
+    def before_save(cls, instance):
+        pass
+
+    @classmethod
+    def after_save(cls, instance):
+        pass
+
     def save(self):
+        self.__class__.before_save(self)
         if self.id: # if we have id already, treat this as an update
             url = self.url(action='put', params=self.attributes)
             response = perform_request('put', url, self.updatable_attributes())
@@ -87,6 +96,7 @@ class Model(object):
             response = perform_request('post', url, self.initializable_attributes())
         self.retrieved = True
         self.update_attributes(**response)
+        self.__class__.after_save(self)
 
     def delete(self):
         url = self.url(action='delete', params=self.attributes)
