@@ -157,17 +157,19 @@ class @Problem
     fd = new FormData()
     
     # Sanity check of file size
-    file_too_large = false
+    abort_submission = false
     max_filesize = 4*1000*1000 # 4 MB
 
     @inputs.each (index, element) ->
       if element.type is 'file'
-        if element.files[0] instanceof File
-          if element.files[0].size > max_filesize
-            file_too_large = true
-            alert 'Submission aborted! Your file "' + element.files[0].name + '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
-          fd.append(element.id, element.files[0])
-        else
+        for file in element.files
+          if file.size > max_filesize
+            abort_submission = true
+            alert 'Submission aborted! Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
+          fd.append(element.id, file)
+        if element.files.length == 0 
+          abort_submission = true
+          alert 'Submission aborted! You did not select any files to submit'
           fd.append(element.id, '')
       else
         fd.append(element.id, element.value)
@@ -185,7 +187,7 @@ class @Problem
           else
             alert(response.success)
 
-    if not file_too_large
+    if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
