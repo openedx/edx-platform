@@ -49,15 +49,8 @@ def convert_files_to_filenames(answers):
             new_answers[answer_id] = answers[answer_id]
     return new_answers
 
-def is_list_of_files(list_of_files_to_test):
-    if not isinstance(list_of_files_to_test, list):
-        return False
-
-    for li in list_of_files_to_test:
-        if not is_file(li):
-            return False
-
-    return True
+def is_list_of_files(files):
+    return isinstance(files, list) and all(is_file(f) for f in files)
 
 def is_file(file_to_test):
     '''
