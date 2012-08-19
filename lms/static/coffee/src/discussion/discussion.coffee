@@ -48,8 +48,12 @@ initializeFollowDiscussion = (discussion) ->
           tags: tags
         error: Discussion.formErrorHandler($local(".new-post-form-errors"))
         success: (response, textStatus) ->
+          Discussion.clearFormErrors($local(".new-post-form-errors"))
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
+          $local(".new-post-title").val("")
+          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
+          $local(".new-post-tags").val("")
           if $discussion.hasClass("inline-discussion")
             $local(".new-post-form").addClass("collapsed")
           else if $discussion.hasClass("forum-discussion")

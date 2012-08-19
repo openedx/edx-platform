@@ -99,6 +99,9 @@ wmdEditors = {}
         for error in response.errors
           errorsField.append($("<li>").addClass("new-post-form-error").html(error))
 
+  clearFormErrors: (errorsField) ->
+    errorsField.empty()
+    
   postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
     RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g
