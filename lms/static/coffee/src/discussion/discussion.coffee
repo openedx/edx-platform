@@ -27,8 +27,8 @@ initializeFollowDiscussion = (discussion) ->
   bindDiscussionEvents: (discussion) ->
 
     $discussion = $(discussion)
-    $discussionNonContent = $discussion.children(".discussion-local")
-    $local = Discussion.generateLocal($discussionNonContent)
+    $discussionNonContent = $discussion.children(".discussion-non-content")
+    $local = Discussion.generateLocal($discussion.children(".discussion-local"))
 
     id = $discussion.attr("_id")
 
@@ -50,7 +50,10 @@ initializeFollowDiscussion = (discussion) ->
         success: (response, textStatus) ->
           $thread = $(response.html)
           $discussion.children(".threads").prepend($thread)
-          $local(".new-post-form").remove()
+          if $discussion.hasClass("inline-discussion")
+            $local(".new-post-form").addClass("collapsed")
+          else if $discussion.hasClass("forum-discussion")
+            $local(".new-post-form").hide()
 
     handleCancelNewPost = (elem) ->
       if $discussion.hasClass("inline-discussion")
