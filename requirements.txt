@@ -45,4 +45,5 @@ django-storages
 django-threaded-multihost
 django-sekizai<0.7
 git+git://github.com/benjaoming/django-wiki.git@97f8413
+git+git://github.com/dementrock/pystache_custom.git
 -r repo-requirements.txt
