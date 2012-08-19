@@ -65,7 +65,7 @@ class XQueueInterface(object):
         self.auth = django_auth
         self.session = requests.session(auth=requests_auth)
         
-    def send_to_queue(self, header, body, files_to_upload=[]):
+    def send_to_queue(self, header, body, files_to_upload=None):
         '''
         Submit a request to xqueue.
         
@@ -98,8 +98,9 @@ class XQueueInterface(object):
         payload = {'xqueue_header': header,
                    'xqueue_body'  : body}
         files = {} 
-        for f in files_to_upload:
-            files.update({ f.name: f })
+        if files_to_upload is not None:
+            for f in files_to_upload:
+                files.update({ f.name: f })
 
         return self._http_post(self.url+'/xqueue/submit/', payload, files=files)
 
