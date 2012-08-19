@@ -151,26 +151,33 @@ class @Problem
       return
 
     if not window.FormData
-      alert "Sorry, your browser does not support file uploads. Your submit request could not be fulfilled. If you can, please use Chrome or Safari which have been verified to support file uploads."
+      alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
       return
 
     fd = new FormData()
     
-    # Sanity check of file size
-    file_too_large = false
+    # Sanity checks on submission
     max_filesize = 4*1000*1000 # 4 MB
+    file_too_large = false
+    file_not_selected = false
 
     @inputs.each (index, element) ->
       if element.type is 'file'
-        if element.files[0] instanceof File
-          if element.files[0].size > max_filesize
+        for file in element.files
+          if file.size > max_filesize
             file_too_large = true
-            alert 'Submission aborted! Your file "' + element.files[0].name + '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
-          fd.append(element.id, element.files[0])
-        else
-          fd.append(element.id, '')
+            alert 'Submission aborted! Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
+          fd.append(element.id, file)
+        if element.files.length == 0 
+          file_not_selected = true
+          fd.append(element.id, '') # In case we want to allow submissions with no file
       else
         fd.append(element.id, element.value)
+    
+    if file_not_selected
+      alert 'Submission aborted! You did not select any files to submit'
+
+    abort_submission = file_too_large or file_not_selected
 
     settings = 
       type: "POST"
@@ -184,8 +191,8 @@ class @Problem
             @updateProgress response
           else
             alert(response.success)
-
-    if not file_too_large
+    
+    if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
