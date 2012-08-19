@@ -45,6 +45,19 @@ def permitted(fn):
             return JsonError("unauthorized")
     return wrapper
 
+def ajax_content_response(request, course_id, content, template_name):
+    context = {
+        'course_id': course_id,
+        'content': content,
+    }
+    html = render_to_string(template_name, context)
+    annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user)
+    return JsonResponse({
+        'html': html,
+        'content': content,
+        'annotated_content_info': annotated_content_info,
+    })
+
 @require_POST
 @login_required
 @permitted
@@ -60,20 +73,7 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
     if request.is_ajax():
-        context = {
-            'course_id': course_id,
-            'thread': thread.to_dict(),
-        }
-        html = render_to_string('discussion/ajax_create_thread.html', context)
-        annotated_content_info = utils.get_annotated_content_info(course_id, 
-                                                                  thread.to_dict(), 
-                                                                  request.user, 
-                                                                  'thread')
-        return JsonResponse({
-            'html': html,
-            'content': thread.to_dict(),
-            'annotated_content_info': annotated_content_info,
-        })
+        return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_create_thread.html')
     else:
         return JsonResponse(thread.to_dict())
 
@@ -85,20 +85,7 @@ def update_thread(request, course_id, thread_id):
     thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
     thread.save()
     if request.is_ajax():
-        context = {
-            'thread': thread.to_dict(),
-            'course_id': course_id,
-        }
-        html = render_to_string('discussion/ajax_update_thread.html', context)
-        annotated_content_info = utils.get_annotated_content_info(course_id, 
-                                                            thread.to_dict(), 
-                                                            request.user, 
-                                                            'thread')
-        return JsonResponse({
-            'html': html,
-            'content': thread.to_dict(),
-            'annotated_content_info': annotated_content_info,
-        })
+        return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
     else:
         return JsonResponse(thread.to_dict())
 
@@ -116,20 +103,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
     if request.is_ajax():
-        context = {
-            'comment': comment.to_dict(),
-            'course_id': course_id,
-        }
-        html = render_to_string('discussion/ajax_create_comment.html', context)
-        annotated_content_info = utils.get_annotated_content_info(course_id, 
-                                                            comment.to_dict(), 
-                                                            request.user, 
-                                                            'comment')
-        return JsonResponse({
-            'html': html,
-            'content': comment.to_dict(),
-            'annotated_content_info': annotated_content_info,
-        })
+        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_create_comment.html')
     else:
         return JsonResponse(comment.to_dict())
 
@@ -155,20 +129,7 @@ def update_comment(request, course_id, comment_id):
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
     if request.is_ajax():
-        context = {
-            'comment': comment.to_dict(),
-            'course_id': course_id,
-        }
-        html = render_to_string('discussion/ajax_update_comment.html', context)
-        annotated_content_info = utils.get_annotated_content_info(course_id, 
-                                                            comment.to_dict(), 
-                                                            request.user, 
-                                                            'comment')
-        return JsonResponse({
-            'html': html,
-            'content': comment.to_dict(),
-            'annotated_content_info': annotated_content_info,
-        })
+        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_update_comment.html')
     else:
         return JsonResponse(comment.to_dict()),
 
@@ -329,15 +290,12 @@ def update_moderator_status(request, course_id, user_id):
 def search_similar_threads(request, course_id, commentable_id):
     text = request.GET.get('text', None)
     if text:
-        return JsonResponse(
-                cc.search_similar_threads(
-                    course_id,
-                    recursive=False,
-                    query_params={
-                        'text': text,
-                        'commentable_id': commentable_id,
-                    },
-                ))
+        query_params = {
+            'text': text,
+            'commentable_id': commentable_id,
+        }
+        result = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
+        return JsonResponse(result)
     else:
         return JsonResponse([])
 

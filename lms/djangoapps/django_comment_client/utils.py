@@ -154,23 +154,23 @@ class QueryCountDebugMiddleware(object):
             logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
 
-def get_annotated_content_info(course_id, content, user, type):
+def get_annotated_content_info(course_id, content, user):
     return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if type == 'thread' else "update_comment"),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if type == 'thread' else "create_sub_comment"),
-        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if type == 'comment' else False,
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if type == 'thread' else "delete_comment"),
-        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if type == 'thread' else False,
-        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if type == 'thread' else "vote_for_comment"),
+        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
+        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
+        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
+        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
+        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
-def get_annotated_content_infos(course_id, thread, user, type='thread'):
+def get_annotated_content_infos(course_id, thread, user):
     infos = {}
-    def _annotate(content, type):
-        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, type)
+    def _annotate(content):
+        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user)
         for child in content.get('children', []):
-            _annotate(child, 'comment')
-    _annotate(thread, type)
+            _annotate(child)
+    _annotate(thread)
     return infos
 
 def pluralize(singular_term, count):

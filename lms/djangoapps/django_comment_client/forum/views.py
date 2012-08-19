@@ -66,7 +66,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
     }[discussion_type]()
 
     print "start annotating"
-    annotated_content_infos = map(lambda x: utils.get_annotated_content_infos(course_id, x, request.user, type='thread'), threads)
+    annotated_content_infos = map(lambda x: utils.get_annotated_content_infos(course_id, x, request.user), threads)
     print "start merging annotations"
     annotated_content_info = reduce(utils.merge_dict, annotated_content_infos, {})
     print "finished annotating"
@@ -161,32 +161,11 @@ def forum_form_discussion(request, course_id):
         }
         return render_to_response('discussion/index.html', context)
 
-def get_annotated_content_info(course_id, content, user, is_thread):
-    permissions = {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if is_thread else "update_comment"),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if is_thread else "create_sub_comment"),
-        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if not is_thread else False,
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if is_thread else "delete_comment"),
-        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if is_thread else False,
-        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if is_thread else "vote_for_comment"),
-    }
-    return permissions
-
-def get_annotated_content_infos(course_id, thread, user, is_thread=True):
-    infos = {}
-    def _annotate(content, is_thread=is_thread):
-        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, is_thread)
-        for child in content.get('children', []):
-            _annotate(child, is_thread=False)
-    _annotate(thread)
-    return infos
-
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True)
 
-    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread.to_dict(), \
-                                                               user=request.user, type='thread')
+    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread.to_dict(), user=request.user)
 
     context = {
         'discussion_id': discussion_id,
@@ -203,7 +182,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, type='thread')
+        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 
