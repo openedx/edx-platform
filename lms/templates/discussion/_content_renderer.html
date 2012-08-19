@@ -7,7 +7,9 @@
 <%def name="render_content_with_comments(content)">
   <div class="${content['type']}" _id="${content['id']}" _discussion_id="${content.get('commentable_id')}" _author_id="${helpers.show_if(content['user_id'], content.get('anonymous'))}">
     ${render_content(content)}
-    ${render_comments(content.get('children', []))}
+    % if content.get('children') is not None:
+      ${render_comments(content['children'])}
+    % endif
   </div>
 </%def>
 
