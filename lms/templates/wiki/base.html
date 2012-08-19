@@ -1,11 +1,47 @@
 {% extends "main_django.html" %}
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 
 {% block title %}<title>{% block pagetitle %}{% endblock %} | edX Wiki</title>{% endblock %}
 
 {% block headextra %}
   {% compressed_css 'course' %}
-  <script src="{{ STATIC_URL }}js/bootstrap-modal.js"></script>
+  
+  <script type="text/javascript">
+    function ajaxError(){}
+    
+    $.ajaxSetup({
+      timeout: 7000,
+      cache: false,
+      error: function(e, xhr, settings, exception) {
+          ajaxError();
+      }
+    });
+
+    function jsonWrapper(url, callback) {
+      $.getJSON(url, function(data) {
+        if (data == null) {
+          ajaxError();
+        } else {
+          callback(data);
+        }
+      });
+    }
+  </script>
+  
+  
+  {% addtoblock 'js' %}
+    {% comment %} These scripts load at the bottom of the body {% endcomment %}
+  
+    <script src="{% static 'js/bootstrap-alert.js' %}"></script>
+    <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
+    <script src="{% static 'js/bootstrap-modal.js' %}"></script>
+    
+    {% with mathjax_mode='wiki' %}
+      {% include "mathjax_include.html" %}
+    {% endwith %}
+    
+  {% endaddtoblock %}
+  
 {% endblock %}
 
 
@@ -14,7 +50,7 @@
     {% include "course_navigation.html" with active_page_context="wiki" %}
   {% endif %}
 
-  <section class="container wiki">
+  <section class="container wiki {{ selected_tab }}">
 
     {% block wiki_body %}
       

@@ -2,29 +2,40 @@
 {% load wiki_tags i18n %}{% load compressed %}
 <html>
 <head>
-  {% compressed_css 'course' %}
+  {% compressed_css 'course' %}  
+  {% compressed_js 'main_vendor' %}
 </head>
-<body>
-  <section class="content-wrapper">
-    {% if revision %}
-      <div class="alert alert-info">
-        <strong>{% trans "Previewing revision" %}:</strong> {{ revision.created }} (#{{ revision.revision_number }}) by {% if revision.user %}{{ revision.user }}{% else %}{% if user|is_moderator %}{{ revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
-      </div>
-    {% endif %}
+<body class="modal-preview">
+  <section class="container wiki view">
+    <div class="main-article">
+      {% if revision %}
+        <div class="alert alert-info">
+          <strong>{% trans "Previewing revision" %}:</strong> {{ revision.created }} (#{{ revision.revision_number }}) by {% if revision.user %}{{ revision.user }}{% else %}{% if user|is_moderator %}{{ revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+        </div>
+      {% endif %}
 
-    {% if merge %}
-      <div class="alert alert-info">
-        <strong>{% trans "Previewing merge between" %}:</strong>
-        {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
-        <strong>{% trans "and" %}</strong>
-        {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
-      </div>
-    {% endif %}
+      {% if merge %}
+        <div class="alert alert-info">
+          <strong>{% trans "Previewing merge between" %}:</strong>
+          {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+          <strong>{% trans "and" %}</strong>
+          {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+        </div>
+      {% endif %}
 
-    <h1 class="page-header">{{ title }}</h1>
+      <h1 class="page-header">{{ title }}</h1>
 
-    {% wiki_render article content %}
+      {% wiki_render article content %}
+    </div>
   </section>
+  
+  {% compressed_js 'application' %}
+  {% compressed_js 'module-js' %}
+  
+  {% with mathjax_mode='wiki' %}
+    {% include "mathjax_include.html" %}
+  {% endwith %}
+  
 </body>
 </html>
 

@@ -13,7 +13,10 @@
   <div class="article-wrapper">
     
     <article class="main-article">
-        <h1>{{ article.current_revision.title }}</h1>  
+        {% if selected_tab != "edit" %}
+          <h1>{{ article.current_revision.title }}</h1>  
+        {% endif %}
+        
         {% block wiki_contents_tab %}
         {% wiki_render article %}
         {% endblock %}      
