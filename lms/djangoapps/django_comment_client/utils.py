@@ -13,7 +13,7 @@ from mitxmako import middleware
 import logging
 import operator
 import itertools
-import pystache
+import pystache_custom as pystache
 
 
 _FULLMODULES = None
