@@ -97,11 +97,11 @@ class XQueueInterface(object):
     def _send_to_queue(self, header, body, files_to_upload):
         payload = {'xqueue_header': header,
                    'xqueue_body'  : body}
-        files = None
+        files = {} 
         for f in files_to_upload:
             files.update({ f.name: f })
 
-        return self._http_post(self.url+'/xqueue/submit/', payload, files)
+        return self._http_post(self.url+'/xqueue/submit/', payload, files=files)
 
 
     def _http_post(self, url, data, files=None):
