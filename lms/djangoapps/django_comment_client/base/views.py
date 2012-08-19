@@ -64,10 +64,12 @@ def ajax_content_response(request, course_id, content, template_name):
 def create_thread(request, course_id, commentable_id):
     post = request.POST
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
-    thread.anonymous = post.get('anonymous', 'false').lower() == 'true'
-    thread.commentable_id = commentable_id
-    thread.course_id = course_id
-    thread.user_id = request.user.id
+    thread.update_attributes({
+        'anonymous'      : post.get('anonymous', 'false').lower() == 'true',
+        'commentable_id' : commentable_id,
+        'course_id'      : course_id,
+        'user_id'        : request.user.id,
+    })
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
@@ -92,13 +94,14 @@ def update_thread(request, course_id, thread_id):
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
-    comment.anonymous = post.get('anonymous', 'false').lower() == 'true'
-    comment.user_id = request.user.id
-    comment.course_id = course_id
-    comment.thread_id = thread_id
-    comment.parent_id = parent_id
+    comment.update_attributes({
+        'anonymous' : post.get('anonymous', 'false').lower() == 'true',
+        'user_id'   : request.user.id,
+        'course_id' : course_id,
+        'thread_id' : thread_id,
+        'parent_id' : parent_id,
+    })
     comment.save()
-    dict_comment = comment.to_dict()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
