@@ -39,11 +39,25 @@ def convert_files_to_filenames(answers):
     '''
     new_answers = dict()
     for answer_id in answers.keys():
-        if is_file(answers[answer_id]):
-            new_answers[answer_id] = answers[answer_id].name
+        answer = answers[answer_id]
+        if is_list_of_files(answer): # Files are stored as a list, even if one file
+            list_of_filenames = []
+            for inputfile in answer:
+                list_of_filenames.append(inputfile.name)
+            new_answers[answer_id] = list_of_filenames 
         else:
             new_answers[answer_id] = answers[answer_id]
     return new_answers
+
+def is_list_of_files(list_of_files_to_test):
+    if not isinstance(list_of_files_to_test, list):
+        return False
+
+    for li in list_of_files_to_test:
+        if not is_file(li):
+            return False
+
+    return True
 
 def is_file(file_to_test):
     '''
