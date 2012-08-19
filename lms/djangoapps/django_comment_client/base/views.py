@@ -64,7 +64,7 @@ def ajax_content_response(request, course_id, content, template_name):
 def create_thread(request, course_id, commentable_id):
     post = request.POST
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
-    thread.update_attributes({
+    thread.update_attributes(**{
         'anonymous'      : post.get('anonymous', 'false').lower() == 'true',
         'commentable_id' : commentable_id,
         'course_id'      : course_id,
@@ -94,7 +94,7 @@ def update_thread(request, course_id, thread_id):
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
-    comment.update_attributes({
+    comment.update_attributes(**{
         'anonymous' : post.get('anonymous', 'false').lower() == 'true',
         'user_id'   : request.user.id,
         'course_id' : course_id,

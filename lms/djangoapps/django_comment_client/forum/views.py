@@ -12,13 +12,14 @@ from courseware.courses import get_course_with_access
 from dateutil.tz import tzlocal
 from datehelper import time_ago_in_words
 
-import django_comment_client.utils as utils
 from urllib import urlencode
 from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.utils import merge_dict, extract, strip_none
 
 import json
-import comment_client as cc
 import dateutil
+import django_comment_client.utils as utils
+import comment_client as cc
 
 
 THREADS_PER_PAGE = 5
@@ -65,11 +66,8 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
 
-    print "start annotating"
     annotated_content_infos = map(lambda x: utils.get_annotated_content_infos(course_id, x, request.user), threads)
-    print "start merging annotations"
-    annotated_content_info = reduce(utils.merge_dict, annotated_content_infos, {})
-    print "finished annotating"
+    annotated_content_info = reduce(merge_dict, annotated_content_infos, {})
 
     context = {
         'threads': threads,
@@ -82,7 +80,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
         'base_url': base_url,
-        'query_params': utils.strip_none(utils.extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
+        'query_params': strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
         'annotated_content_info': json.dumps(annotated_content_info),
     }
     context = dict(context.items() + query_params.items())
@@ -98,16 +96,20 @@ def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
 def get_threads(request, course_id, discussion_id=None):
-    query_params = {
-        'page': request.GET.get('page', 1),
-        'per_page': THREADS_PER_PAGE, #TODO maybe change this later
-        'sort_key': request.GET.get('sort_key', 'activity'),
-        'sort_order': request.GET.get('sort_order', 'desc'),
-        'text': request.GET.get('text', ''), 
-        'tags': request.GET.get('tags', ''),
+
+    default_query_params = {
+        'page': 1,
+        'per_page': THREADS_PER_PAGE,
+        'sort_key': 'activity',
+        'sort_order': 'desc',
+        'text': '',
+        'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
     }
+
+    query_params = merge_dict(default_query_params,
+                              strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -138,7 +140,6 @@ def forum_form_discussion(request, course_id):
     threads, query_params = get_threads(request, course_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
 
-
     recent_active_threads = cc.search_recent_active_threads(
         course_id,
         recursive=False,
@@ -159,6 +160,7 @@ def forum_form_discussion(request, course_id):
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
         }
+        print "start rendering.."
         return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
@@ -209,14 +211,14 @@ def single_thread(request, course_id, discussion_id, thread_id):
 def user_profile(request, course_id, user_id):
 
     course = get_course_with_access(request.user, course_id, 'load')
-    discussion_user = cc.User(id=user_id, course_id=course_id)
+    profiled_user = cc.User(id=user_id, course_id=course_id)
 
     query_params = {
         'page': request.GET.get('page', 1),
         'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
     }
 
-    threads, page, num_pages = discussion_user.active_threads(query_params)
+    threads, page, num_pages = profiled_user.active_threads(query_params)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -230,7 +232,7 @@ def user_profile(request, course_id, user_id):
             'course': course, 
             'user': request.user,
             'django_user': User.objects.get(id=user_id),
-            'discussion_user': discussion_user.to_dict(),
+            'profiled_user': profiled_user.to_dict(),
             'content': content,
         }
 
