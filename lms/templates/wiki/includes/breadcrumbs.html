@@ -3,7 +3,7 @@
 
 <header>
   <ul class="breadcrumb pull-left" class="">
-    {% for ancestor in urlpath.get_ancestors.all %}
+    {% for ancestor in urlpath.cached_ancestors %}
       <li><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title }}</a></li>
     {% endfor %}
     <li class="active"><a href="{% url 'wiki:get' path=urlpath.path %}">{{ article.current_revision.title }}</a></li>
