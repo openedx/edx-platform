@@ -6,12 +6,15 @@ from xmodule.modulestore.django import modulestore
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.db import connection
-import logging
 from django.conf import settings
+from django_comment_client.permissions import check_permissions_by_view
+from mitxmako import middleware
+
+import logging
 import operator
 import itertools
+import pystache
 
-from django_comment_client.permissions import check_permissions_by_view
 
 _FULLMODULES = None
 _DISCUSSIONINFO = None
@@ -175,3 +178,7 @@ def get_annotated_content_infos(course_id, thread, user):
             _annotate(child)
     _annotate(thread)
     return infos
+
+def render_mustache(template_name, dictionary, *args, **kwargs):
+    template = middleware.lookup['main'].get_template(template_name).source
+    return pystache.render(template, dictionary)

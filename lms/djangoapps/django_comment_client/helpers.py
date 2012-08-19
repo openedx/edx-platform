@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_string
+from utils import render_mustache
 import urllib
 
 def pluralize(singular_term, count):
@@ -26,4 +27,7 @@ def url_for_tags(course_id, tags):
     return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
 
 def render_content(content):
-    return render_to_string('discussion/_content.html', {'content': content})
+    context = {
+        'content': content,
+    }
+    return render_mustache('discussion/_content.mustache', context)
