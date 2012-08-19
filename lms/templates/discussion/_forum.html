@@ -1,4 +1,4 @@
-<%namespace name="renderer" file="_thread.html"/>
+<%namespace name="renderer" file="_content_renderer.html"/>
 
 <section class="discussion forum-discussion" _id="${discussion_id}">
 
@@ -16,7 +16,7 @@
     <%include file="_sort.html" />
     <div class="threads">
       % for thread in threads:
-        ${renderer.render_thread(course_id, thread, show_comments=False)}
+        ${renderer.render_content_with_comments(thread)}
       % endfor
     </div>
     <%include file="_paginator.html" />

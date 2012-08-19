@@ -175,9 +175,3 @@ def get_annotated_content_infos(course_id, thread, user):
             _annotate(child)
     _annotate(thread)
     return infos
-
-def pluralize(singular_term, count):
-    if int(count) >= 2:
-        return singular_term + 's'
-    return singular_term
-
