@@ -20,9 +20,12 @@ def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
 def strip_none(dic):
-    def _is_none(v):
-        return v is None or (isinstance(v, str) and len(v.strip()) == 0)
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
+    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
+def strip_blank(dic):
+    def _is_blank(v):
+        return isinstance(v, str) and len(v.strip()) == 0
+    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())

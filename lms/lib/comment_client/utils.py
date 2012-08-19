@@ -2,9 +2,12 @@ import requests
 import json
 
 def strip_none(dic):
-    def _is_none(v):
-        return v is None or (isinstance(v, str) and len(v.strip()) == 0)
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_none(v)])
+    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
+def strip_blank(dic):
+    def _is_blank(v):
+        return isinstance(v, str) and len(v.strip()) == 0
+    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
 def extract(dic, keys):
     if isinstance(keys, str):

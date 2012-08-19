@@ -30,8 +30,8 @@ class Thread(models.Model):
                           'per_page': 20,
                           'course_id': query_params['course_id'],
                           'recursive': False}
-        params = merge_dict(default_params, strip_none(query_params))
-        if query_params['text'] or query_params['tags']:
+        params = merge_dict(default_params, strip_blank(strip_none(query_params)))
+        if query_params.get('text') or query_params.get('tags'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))

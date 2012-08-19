@@ -1,5 +1,4 @@
 <%namespace name="renderer" file="_thread.html"/>
-<%! from django.template.defaultfilters import escapejs %>
 
 <section class="discussion inline-discussion" _id="${discussion_id}">
 
@@ -14,11 +13,4 @@
   <%include file="_paginator.html" />
 </section>
 
-<script type="text/javascript">
-  var $$user_info = JSON.parse("${user_info | escapejs}");
-  var $$course_id = "${course_id | escapejs}";
-  if (typeof $$annotated_content_info === undefined || $$annotated_content_info === null) {
-    var $$annotated_content_info = {};
-  }
-  $$annotated_content_info = $.extend($$annotated_content_info, JSON.parse("${annotated_content_info | escapejs}"));
-</script>
+<%include file="_js_data.html" />
