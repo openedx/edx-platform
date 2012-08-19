@@ -338,7 +338,7 @@ initializeFollowThread = (thread) ->
       "click .admin-endorse": ->
         handleEndorse(this, not $content.hasClass("endorsed"))
 
-      "click .discussion-openclose": ->
+      "click .admin-openclose": ->
         handleOpenClose(this, $(this).text())
 
       "click .admin-edit": ->
@@ -404,6 +404,6 @@ initializeFollowThread = (thread) ->
     if not Discussion.getContentInfo id, 'can_delete'
       $local(".admin-delete").remove()
     if not Discussion.getContentInfo id, 'can_openclose'
-      $local(".discussion-openclose").remove()
+      $local(".admin-openclose").remove()
     #if not Discussion.getContentInfo id, 'can_vote'
     #  $local(".discussion-vote").css "visibility", "hidden"
