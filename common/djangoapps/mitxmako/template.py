@@ -17,8 +17,7 @@ from mako.template import Template as MakoTemplate
 
 from mitxmako import middleware
 
-django_variables = ['lookup', 'output_encoding',
-                    'module_directory', 'encoding_errors']
+django_variables = ['lookup', 'output_encoding', 'encoding_errors']
 
 # TODO: We should make this a Django Template subclass that simply has the MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
 class Template(MakoTemplate):

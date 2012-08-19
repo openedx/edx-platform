@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}
+{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 <html>
 <head>
   {% block title %}<title>edX</title>{% endblock %}
-  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+  <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
   
   {% compressed_css 'application' %}
   {% compressed_js 'main_vendor' %}
@@ -17,7 +17,7 @@
 
 <body class="{% block bodyclass %}{% endblock %}">
   {% include "navigation.html" %}
-    
+  
   <section class="content-wrapper">
     {% block body %}{% endblock %}
         
