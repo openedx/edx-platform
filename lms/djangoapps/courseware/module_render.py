@@ -376,15 +376,16 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     # ''' (fix emacs broken parsing)
 
     # Check for submitted files and basic file size checks
-    p = request.POST.copy()
+    p = request.POST.dict()
     if request.FILES:
-        for inputfile_id in request.FILES.keys():
-            inputfile = request.FILES[inputfile_id]
-            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
-                file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                    (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
-                return HttpResponse(json.dumps({'success': file_too_big_msg}))
-            p[inputfile_id] = inputfile
+        for fileinput_id in request.FILES.keys():
+            inputfiles = request.FILES.getlist(fileinput_id)
+            for inputfile in inputfiles:
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
+                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
+                    return HttpResponse(json.dumps({'success': file_too_big_msg}))
+            p[fileinput_id] = inputfiles
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
     instance = get_module(request.user, request, id, student_module_cache, course_id=course_id)
