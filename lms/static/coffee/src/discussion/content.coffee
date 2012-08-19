@@ -76,6 +76,7 @@ initializeFollowThread = (thread) ->
           autowatch: autowatch
         error: Discussion.formErrorHandler($local(".discussion-errors"))
         success: (response, textStatus) ->
+          Discussion.clearFormErrors($local(".discussion-errors"))
           $comment = $(response.html)
           $content.children(".comments").prepend($comment)
           Discussion.setWmdContent $content, $local, "reply-body", ""
@@ -151,6 +152,7 @@ initializeFollowThread = (thread) ->
         data: {title: title, body: body, tags: tags},
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
+          Discussion.clearFormErrors($local(".discussion-update-errors"))
           $discussionContent.replaceWith(response.html)
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
@@ -179,6 +181,7 @@ initializeFollowThread = (thread) ->
         data: {body: body}
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
+          Discussion.clearFormErrors($local(".discussion-update-errors"))
           $discussionContent.replaceWith(response.html)
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)

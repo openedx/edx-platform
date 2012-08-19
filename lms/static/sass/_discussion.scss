@@ -700,6 +700,7 @@ $tag-text-color: #5b614f;
     &.collapsed {
       .new-post-title {
         display: none;
+        visibility: hidden;
       }
 
       .wmd-button-row {
