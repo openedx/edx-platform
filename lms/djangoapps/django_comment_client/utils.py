@@ -5,7 +5,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from django.http import HttpResponse
 from django.utils import simplejson
-
+from django.db import connection
+import logging
 from django.conf import settings
 import operator
 import itertools
@@ -128,6 +129,31 @@ class ViewNameMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):  
         request.view_name = view_func.__name__
 
+class QueryCountDebugMiddleware(object):
+    """
+    This middleware will log the number of queries run
+    and the total time taken for each request (with a
+    status code of 200). It does not currently support
+    multi-db setups.
+    """
+    def process_response(self, request, response):
+        if response.status_code == 200:
+            total_time = 0
+
+            for query in connection.queries:
+                query_time = query.get('time')
+                if query_time is None:
+                    # django-debug-toolbar monkeypatches the connection
+                    # cursor wrapper and adds extra information in each
+                    # item in connection.queries. The query time is stored
+                    # under the key "duration" rather than "time" and is
+                    # in milliseconds, not seconds.
+                    query_time = query.get('duration', 0) / 1000
+                total_time += float(query_time)
+
+            logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+        return response
+
 def get_annotated_content_info(course_id, content, user, type):
     return {
         'editable': check_permissions_by_view(user, course_id, content, "update_thread" if type == 'thread' else "update_comment"),
@@ -135,6 +161,7 @@ def get_annotated_content_info(course_id, content, user, type):
         'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if type == 'comment' else False,
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if type == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if type == 'thread' else False,
+        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if type == 'thread' else "vote_for_comment"),
     }
 
 def get_annotated_content_infos(course_id, thread, user, type='thread'):
