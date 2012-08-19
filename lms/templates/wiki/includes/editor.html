@@ -1,0 +1,42 @@
+{% load wiki_tags i18n %}
+{% include "wiki/includes/editormedia.html" %}
+
+<div>
+{% wiki_form edit_form %}
+<script language="javascript">
+  $(document).ready(function() {
+    $("#id_revision").val('{{ article.current_revision.id }}');
+  });
+</script>
+</div>
+
+<div>
+  <div>
+    {% for plugin in sidebar %}
+
+    <div class="accordion" id="accordion_{{ plugin.slug }}">
+
+      <div class="accordion-group">
+        
+        <div class="accordion-heading">
+          <a class="accordion-toggle" href="#collapse_{{ plugin.slug }}" data-toggle="collapse">
+            <h2>{{ plugin.sidebar.headline }} <span class="{{ plugin.sidebar.icon_class }}"></span></h2>
+          </a>
+        </div>
+        
+        <div id="collapse_{{ plugin.slug }}" class="accordion-body collapse{% if form_images.errors %} in{% endif %}">
+          <div class="accordion-inner form-vertical">
+            {% if plugin.sidebar.template %}
+              {% with form_images as form and plugin as plugin %}
+                {% include plugin.sidebar.template %}
+              {% endwith %}
+            {% endif %}
+          </div>
+        </div>
+      
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+</div>

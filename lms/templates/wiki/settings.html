@@ -1,0 +1,52 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n %}
+{% load url from future %}
+
+{% block pagetitle %}{% trans "Settings" %}: {{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_breadcrumbs %}
+  {% include "wiki/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block wiki_contents %}
+
+  <div class="article-wrapper">
+    <article class="main-article">
+        {% if selected_tab != "edit" %}
+          <h1>{{ article.current_revision.title }}</h1>  
+        {% endif %}
+        
+        {% for form in forms %}
+        <form method="POST" class="form-horizontal" id="settings_form" action="?f={{form.action}}">
+          <h2>{{ form.settings_form_headline }}</h2>
+          <div class="well">
+            {% wiki_form form %}
+          </div>
+          <div class="form-actions">
+            <button type="submit" name="save" value="1" class="btn btn-large btn-primary">
+              <span class="icon-ok"></span>
+              {% trans "Save changes" %}
+            </button>
+          </div>
+        </form>
+        {% endfor %}
+    </article>
+
+
+
+
+    <div class="article-functions">
+      <div class="timestamp">
+        <span class="label">{% trans "Last modified:" %}</span><br />
+        <span class="date">{{ article.current_revision.modified }}</span>
+      </div>
+      <ul class="nav nav-tabs">
+        {% with "settings" as selected %}
+          {% include "wiki/includes/article_menu.html" %}
+        {% endwith %}
+      </ul>
+    </div>
+  </div>
+  
+{% endblock %}
+

@@ -122,6 +122,9 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
+    COMMON_ROOT / 'templates',
+    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -299,6 +302,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
+WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -560,12 +564,13 @@ INSTALLED_APPS = (
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
-    'course_wiki', # Our customizations
     'django_notify',
+    'course_wiki', # Our customizations
     'mptt',
     'sekizai',
     'wiki.plugins.attachments',
     'wiki.plugins.notifications',
+    'course_wiki.plugins.markdownedx',
 
     # For testing
     'django_jasmine',

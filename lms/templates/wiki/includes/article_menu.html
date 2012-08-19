@@ -1,47 +1,46 @@
-{% load i18n wiki_tags %}{% load url from future %}
+## mako
+<%! from django.core.urlresolvers import reverse %>
 
-{% with selected_tab as selected %}
-
-
-
-
-
-
-
-<li class="{% if selected == "view" %} active{% endif %}">
-  <a href="{% url 'wiki:get' article_id=article.id path=urlpath.path %}">
-    <span class="icon icon-view"></span>
-    {% trans "View" %}
+<li class="${"active" if selected_tab == "view" else ""}">
+  <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
+    <span class="icon-home"></span>
+    View
   </a>
 </li>
-<li class="{% if selected == "edit" %} active{% endif %}">
-  <a href="{% url 'wiki:edit' article_id=article.id path=urlpath.path %}">
-    <span class="icon icon-edit"></span>
-    {% trans "Edit" %}
-  </a>
-</li>
-<li class="{% if selected == "history" %} active{% endif %}">
-  <a href="{% url 'wiki:history' article_id=article.id path=urlpath.path %}">
-    <span class="icon icon-changes"></span>
-    {% trans "Changes" %}
-  </a>
-</li>
-{% for plugin in article_tabs %}
-  <li class="{% if selected == plugin.slug %} active{% endif %}">
-    <a href="{% url 'wiki:plugin' slug=plugin.slug article_id=article.id path=urlpath.path %}">
-      <span class="icon icon-attachments {{ plugin.article_tab.1 }}"></span>
-      {{ plugin.article_tab.0 }}
+
+%if article.can_write(user):
+  <li class="${"active" if selected_tab == "edit" else ""}">
+    <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
+      <span class="icon-edit"></span>
+      Edit
     </a>
   </li>
-{% endfor %}
+%endif
 
-<li class="{% if selected == "settings" %} active{% endif %}">
-  {% if not user.is_anonymous %}
-  <a href="{% url 'wiki:settings' article_id=article.id path=urlpath.path %}">
-    <span class="icon icon-settings"></span>
-    {% trans "Settings" %}
+<li class="${"active" if selected_tab == "history" else ""}">
+  <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
+    <span class="icon-time"></span>
+    Changes
   </a>
-  {% endif %}
 </li>
 
-{% endwith %}
+%for plugin in article_tabs:
+  %if hasattr(plugin, "article_tab"):
+    <li class="${"active" if selected_tab == plugin.slug else ""}">
+      <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
+        <span class="${plugin.article_tab[1]}"></span>
+        ${plugin.article_tab[0]}
+      </a>
+    </li>
+  %endif
+%endfor
+
+%if not user.is_anonymous():
+<li class="${"active" if selected_tab == "settings" else ""}">
+  <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
+    <span class="icon-wrench"></span>
+    Settings
+  </a>
+</li>
+%endif
+

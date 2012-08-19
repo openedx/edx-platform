@@ -1,0 +1,37 @@
+{% csrf_token %}
+{% if form.non_field_errors %}
+  {% if form_error_title %}<h4 class="alert-heading">{{ form_error_title }}</h4>{% endif %}
+  {% for error_message in form.non_field_errors %}
+    <div class="alert alert-block alert-error">
+      {{ error_message }}
+    </div>    
+  {% endfor %}
+{% endif %}
+
+{% for field in form %}
+
+  {% if field.is_hidden %}
+    {{ field }}
+  {% else %}
+
+  <div id="div_{{ field.auto_id }}" class="clearfix control-group{% if field.errors %} error{% endif %}">
+    {% if field.label %}
+      <label for="{{ field.id_for_label }}" class="control-label {% if field.field.required %}requiredField{% endif %}">
+      {{ field.label|safe }}
+      </label>
+    {% endif %}
+    <div class="controls">
+      {{ field }} {% if field.field.required %}<span class="asteriskField">*</span>{% endif %}
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <div id="error_{{ forloop.counter }}_{{ field.auto_id }}" class="help-block"><strong>{{ error }}</strong></div>
+        {% endfor %}
+      {% endif %}
+      {% if field.help_text %}
+        <p id="hint_{{ field.auto_id }}" class="help-block">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+{% endfor %}

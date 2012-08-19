@@ -1119,11 +1119,6 @@ class CodeResponse(LoncapaResponse):
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
-        if is_file(submission):
-            self.context.update({'submission': submission.name})
-        else:
-            self.context.update({'submission': submission})
-
         # Prepare xqueue request
         #------------------------------------------------------------ 
         qinterface = self.system.xqueue['interface']
@@ -1135,14 +1130,19 @@ class CodeResponse(LoncapaResponse):
                                                 queue_name=self.queue_name)
 
         # Generate body
+        if is_list_of_files(submission):
+            self.context.update({'submission': queuekey}) # For tracking. TODO: May want to record something else here
+        else:
+            self.context.update({'submission': submission})
+
         contents = self.payload.copy() 
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        if is_file(submission):
-            contents.update({'student_response': submission.name})
+        if is_list_of_files(submission):
+            contents.update({'student_response': ''}) # TODO: Is there any information we want to send here?
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
-                                                    file_to_upload=submission)
+                                                    files_to_upload=submission)
         else:
             contents.update({'student_response': submission})
             (error, msg) = qinterface.send_to_queue(header=xheader,
