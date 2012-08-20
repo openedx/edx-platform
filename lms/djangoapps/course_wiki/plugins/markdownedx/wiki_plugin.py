@@ -2,12 +2,12 @@
 
 from django.core.urlresolvers import reverse_lazy
 
-from wiki.core import plugins_registry, baseplugin
-import wiki
+from wiki.core.plugins.base import BasePlugin
+from wiki.core.plugins import registry as plugin_registry
 
 from course_wiki.plugins.markdownedx import mdx_circuit, mdx_wikipath, mdx_mathjax, mdx_video
 
-class ExtendMarkdownPlugin(baseplugin.BasePlugin):
+class ExtendMarkdownPlugin(BasePlugin):
     """
     This plugin simply loads all of the markdown extensions we use in edX.
     """
@@ -20,5 +20,5 @@ class ExtendMarkdownPlugin(baseplugin.BasePlugin):
                            mdx_mathjax.MathJaxExtension(configs={}) ,
                            mdx_video.VideoExtension(configs={})]
 
-plugins_registry.register(ExtendMarkdownPlugin)
+plugin_registry.register(ExtendMarkdownPlugin)
 

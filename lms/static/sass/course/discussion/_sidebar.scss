@@ -43,8 +43,8 @@ div.discussion-wrapper aside {
       width: 27%;
       float: right;
       text-align: center;
-      padding-left: 0;
-      padding-right: 0;
+      padding: 4px 0;
+      text-transform: capitalize;
     }
 
     input[type="text"] {
@@ -300,7 +300,7 @@ div.discussion-wrapper aside {
     border-top: 0;
 
     a {
-      @extend .light-button;
+      @extend .gray-button;
       @include box-sizing(border-box);
       display: block;
       text-align: center;
