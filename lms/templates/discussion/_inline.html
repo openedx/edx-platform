@@ -2,7 +2,7 @@
 
 <section class="discussion inline-discussion" _id="${discussion_id}">
 
-  <div class="discussion-non-content discussion-local"></div>
+  <div class="discussion-non-content local"></div>
 
   <div class="threads">
     % for thread in threads:
@@ -10,7 +10,7 @@
     % endfor
   </div>
 
-  <%include file="_paginator.html" />
+  <div class="local"><%include file="_paginator.html" /></div>
 </section>
 
 <%include file="_js_data.html" />
