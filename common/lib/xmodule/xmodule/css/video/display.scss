@@ -305,11 +305,11 @@ div.video {
               @include box-shadow(0 1px 0 #333);
 
               a.ui-slider-handle {
-                background: $mit-red url(../images/slider-handle.png) center center no-repeat;
+                background: $pink url(../images/slider-handle.png) center center no-repeat;
                 @include background-size(50%);
-                border: 1px solid darken($mit-red, 20%);
+                border: 1px solid darken($pink, 20%);
                 @include border-radius(15px);
-                @include box-shadow(inset 0 1px 0 lighten($mit-red, 10%));
+                @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
                 cursor: pointer;
                 height: 15px;
                 left: -6px;
@@ -408,6 +408,7 @@ div.video {
       cursor: pointer;
       margin-bottom: 8px;
       padding: 0;
+      line-height: lh();
 
       &.current {
         color: #333;
@@ -415,7 +416,7 @@ div.video {
       }
 
       &:hover {
-        color: $mit-red;
+        color: $blue;
       }
 
       &:empty {
