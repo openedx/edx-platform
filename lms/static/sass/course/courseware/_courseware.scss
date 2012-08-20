@@ -148,7 +148,7 @@ div.course-wrapper {
 
       a.ui-slider-handle {
         @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
-        background: $mit-red url(../images/slider-bars.png) center center no-repeat;
+        background: $pink url(../images/slider-bars.png) center center no-repeat;
         border: 1px solid darken($pink, 20%);
         cursor: pointer;
 
