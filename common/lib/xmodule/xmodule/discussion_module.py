@@ -4,9 +4,6 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 
 import comment_client
-import dateutil
-from dateutil.tz import tzlocal
-from datehelper import time_ago_in_words
 
 import json
 
