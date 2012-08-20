@@ -11,7 +11,6 @@ python-memcached
 python-openid 
 path.py
 django_debug_toolbar
--e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 django-staticfiles>=1.2.1
 fs
 beautifulsoup 
@@ -44,5 +43,4 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
--e git://github.com/benjaoming/django-wiki.git@c145596#egg=django-wiki
 -r repo-requirements.txt
