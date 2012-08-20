@@ -9,9 +9,6 @@ from django.contrib.auth.models import User
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
 
-from dateutil.tz import tzlocal
-from datehelper import time_ago_in_words
-
 from urllib import urlencode
 from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.utils import merge_dict, extract, strip_none
