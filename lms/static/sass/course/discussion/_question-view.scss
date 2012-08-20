@@ -4,7 +4,7 @@ div.question-header {
   @include clearfix();
 
   div.official-stamp {
-    background: $mit-red;
+    background: $pink;
     color: #fff;
     font-size: 12px;
     margin-left: -1px;
@@ -120,7 +120,7 @@ div.question-header {
         margin-left: 2.5%;
         padding-left: 1.5%;
         border-left: 1px dashed #ddd;
-        color: $mit-red;;
+        color: $pink;
       }
 
       ul, ol, pre {
@@ -217,13 +217,13 @@ div.question-header {
         form.post-comments {
           padding: 15px;
 
-          button {
-            color: #fff;
+          button:first-of-type {
+            @extend .blue-button;
           }
 
            button:last-child {
             margin-left: 10px;
-            @extend .light-button;
+            float: right;
           }
         }
 
@@ -352,7 +352,7 @@ div.question-header {
 }
 
 div.question-status {
-  background: $mit-red;
+  background: $pink;
   clear:both;
   color: #fff;
   display: block;
