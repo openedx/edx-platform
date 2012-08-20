@@ -217,6 +217,13 @@ class MongoModuleStore(ModuleStoreBase):
         item = self._find_one(location)
         return self._load_items([item], depth)[0]
 
+    def get_instance(self, course_id, location):
+        """
+        TODO (vshnayder): implement policy tracking in mongo.
+        For now, just delegate to get_item and ignore policy.
+        """
+        return self.get_item(location)
+
     def get_items(self, location, depth=0):
         items = self.collection.find(
             location_to_query(location),
