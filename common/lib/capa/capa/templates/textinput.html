@@ -10,11 +10,23 @@
       % endif
       >
     % elif state == 'correct':
-    <div class="correct" id="status_${id}">
+    <div class="correct" id="status_${id}"
+      % if inline:
+         style="display:inline"
+      % endif
+      >
     % elif state == 'incorrect':
-    <div class="incorrect" id="status_${id}">
+    <div class="incorrect" id="status_${id}"
+      % if inline:
+         style="display:inline"
+      % endif
+      >
     % elif state == 'incomplete':
-    <div class="incorrect" id="status_${id}">
+    <div class="incorrect" id="status_${id}"
+      % if inline:
+         style="display:inline"
+      % endif
+      >
     % endif
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
