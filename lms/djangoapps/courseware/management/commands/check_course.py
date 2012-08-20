@@ -74,6 +74,9 @@ class Command(BaseCommand):
 
         # TODO: use args as list of files to check.  Fix loading to work for other files.
 
+        print "This command needs updating before use"
+        return
+"""
         sample_user = User.objects.all()[0]
 
         print "Attempting to load courseware"
@@ -99,3 +102,4 @@ class Command(BaseCommand):
             print 'Courseware passes all checks!'
         else:
             print "Courseware fails some checks"
+"""
