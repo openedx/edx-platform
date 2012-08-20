@@ -3,8 +3,6 @@ from lxml import etree
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 
-import comment_client
-
 import json
 
 class DiscussionModule(XModule):
