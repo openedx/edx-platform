@@ -5,6 +5,8 @@
   <%static:css group='course'/>
 </%block>
 
+<%block name="title"><title>${course.number} Course Info</title></%block>
+
 <%include file="course_navigation.html" args="active_page='info'" />
 <%! 
   from courseware.courses import get_course_info_section
