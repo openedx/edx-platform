@@ -6,11 +6,6 @@ sessions. Assumes structure:
         /db   # This is where it'll write the database file
         /mitx # The location of this repo
         /log  # Where we're going to write log files
-
-AUG 20 2012 [mchang]:
-    copied from lms.envs.dev
-    modified to include custom 'acceptance_testing' djangoapp
-    modified to include lettuce django connection
 """
 from .common import *
 from .logsettings import get_logger_config
@@ -97,6 +92,8 @@ MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS += ('acceptance_testing',)
+INSTALLED_APPS += ('lettuce.django',)
 
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
@@ -132,9 +129,3 @@ FILE_UPLOAD_HANDLERS = (
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
-
-########################### LETTUCE TESTING ##########################
-LETTUCE_APPS = ('acceptance_testing',)
-INSTALLED_APPS += ('acceptance_testing',)
-INSTALLED_APPS += ('lettuce.django',)
-
