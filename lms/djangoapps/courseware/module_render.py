@@ -379,6 +379,12 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
     if request.FILES:
         for fileinput_id in request.FILES.keys():
             inputfiles = request.FILES.getlist(fileinput_id)
+
+            if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
+                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+                    settings.MAX_FILEUPLOADS_PER_INPUT
+                return HttpResponse(json.dumps({'success': too_many_files_msg}))
+
             for inputfile in inputfiles:
                 if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
                     file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
