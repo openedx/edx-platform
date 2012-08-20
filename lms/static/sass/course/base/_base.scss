@@ -1,6 +1,6 @@
 body {
   min-width: 980px;
-  background: #f7f7f7;
+  background: url(../images/bg-texture.png) #f7f7f7;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
@@ -10,6 +10,13 @@ body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
 
 table {
   table-layout: fixed;
+}
+
+a {
+  &:hover {
+    color: $pink;
+    text-decoration: none !important;
+  }
 }
 
 .content-wrapper {
@@ -36,6 +43,6 @@ form {
 }
 
 ::selection, ::-moz-selection, ::-webkit-selection {
-  background:#444;
-  color:#fff;
+  background: #444;
+  color: #fff;
 }
