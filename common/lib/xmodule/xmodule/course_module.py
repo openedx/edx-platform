@@ -27,15 +27,12 @@ class CourseDescriptor(SequenceDescriptor):
 
         @property
         def table_of_contents(self):
-            '''
-            raw_table_of_contents = open(self.book_url, 'r') # TODO: This will need to come from S3
-            table_of_contents = etree.parse(raw_table_of_contents).getroot()
-            return table_of_contents
-            '''
             return self.table_of_contents
 
         def _get_toc_from_s3(self):
             '''
+            Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
+
             Returns XML tree representation of the table of contents
             '''
             toc_url = self.book_url + 'toc.xml'
