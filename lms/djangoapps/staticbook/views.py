@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
 
@@ -14,7 +15,7 @@ def index(request, course_id, book_index, page=0):
     table_of_contents = textbook.table_of_contents
 
     return render_to_response('staticbook.html',
-                              {'page': int(page), 'course': course,
+                              {'page': int(page), 'course': course, 'book_url': textbook.book_url,
                                'table_of_contents': table_of_contents,
                                'staff_access': staff_access})
 
