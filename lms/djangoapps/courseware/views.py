@@ -170,8 +170,9 @@ def index(request, course_id, chapter=None, section=None,
                               position=position
                               ))
             try:
-                result = render_to_response('courseware-error.html',
-                                            {'staff_access': staff_access})
+                result = render_to_response('courseware/courseware-error.html',
+                                            {'staff_access': staff_access,
+                                            'course' : course})
             except:
                 result = HttpResponse("There was an unrecoverable error")
 
