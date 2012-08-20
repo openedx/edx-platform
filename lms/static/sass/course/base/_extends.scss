@@ -6,26 +6,32 @@ h1.top-header {
   padding-bottom: lh();
 }
 
-.light-button, a.light-button {
-  border: 1px solid #ccc;
-  @include border-radius(3px);
-  @include box-shadow(inset 0 1px 0 #fff);
-  color: #666;
-  cursor: pointer;
-  font: 400 $body-font-size $body-font-family;
-  @include linear-gradient(#fff, lighten(#888, 40%));
-  padding: 4px 8px;
-  text-decoration: none;
-  text-shadow: none;
+.button-reset {
   text-transform: none;
   letter-spacing: 0;
-  -webkit-font-smoothing: antialiased;
 
-  &:hover, &:focus {
-    border: 1px solid #ccc;
-    @include linear-gradient(#fff, lighten(#888, 37%));
+  &:hover {
     text-decoration: none;
   }
+}
+
+.light-button, a.light-button, // only used in askbot as classes
+.gray-button {
+  @include button(simple, #eee);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.blue-button {
+  @include button(simple, $blue);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.pink-button {
+  @include button(simple, $pink);
+  @extend .button-reset;
+  font-size: em(13);
 }
 
 .content {

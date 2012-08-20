@@ -1,6 +1,7 @@
 from fs.errors import ResourceNotFoundError
 import time
 import logging
+import requests
 from lxml import etree
 
 from xmodule.util.decorators import lazyproperty
@@ -15,18 +16,44 @@ class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
     class Textbook:
-        def __init__(self, title, table_of_contents_url):
+        def __init__(self, title, book_url):
             self.title = title
-            self.table_of_contents_url = table_of_contents_url
+            self.book_url = book_url 
+            self.table_of_contents = self._get_toc_from_s3()
 
         @classmethod
         def from_xml_object(cls, xml_object):
-            return cls(xml_object.get('title'), xml_object.get('table_of_contents_url'))
+            return cls(xml_object.get('title'), xml_object.get('book_url'))
 
         @property
         def table_of_contents(self):
-            raw_table_of_contents = open(self.table_of_contents_url, 'r') # TODO: This will need to come from S3
-            table_of_contents = etree.parse(raw_table_of_contents).getroot()
+            return self.table_of_contents
+
+        def _get_toc_from_s3(self):
+            '''
+            Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
+
+            Returns XML tree representation of the table of contents
+            '''
+            toc_url = self.book_url + 'toc.xml'
+
+            # Get the table of contents from S3
+            log.info("Retrieving textbook table of contents from %s" % toc_url)
+            try:
+                r = requests.get(toc_url)
+            except Exception as err:
+                msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
+                log.error(msg)
+                raise Exception(msg)
+
+            # TOC is XML. Parse it
+            try:
+                table_of_contents = etree.fromstring(r.text)
+            except Exception as err:
+                msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
+                log.error(msg)
+                raise Exception(msg)
+
             return table_of_contents
 
 
@@ -133,6 +160,10 @@ class CourseDescriptor(SequenceDescriptor):
         return { 'graded_sections' : graded_sections,
                  'all_descriptors' : all_descriptors,}
 
+
+    @staticmethod
+    def make_id(org, course, url_name):
+        return '/'.join([org, course, url_name])
 
     @staticmethod
     def id_to_location(course_id):
