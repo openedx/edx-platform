@@ -1,6 +1,14 @@
-<section id="textinput_${id}" class="textinput">
+<section id="textinput_${id}" class="textinput"
+      % if inline:
+         style="display:inline"
+      % endif
+    >
     % if state == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
+    <div class="unanswered" id="status_${id}"
+      % if inline:
+         style="display:inline"
+      % endif
+      >
     % elif state == 'correct':
     <div class="correct" id="status_${id}">
     % elif state == 'incorrect':
