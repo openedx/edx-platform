@@ -4,7 +4,8 @@ Feature: Homepage renders
   We want to see lots of information about edX on the home page
 
   Scenario: We can see all the courses
-    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
+    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+    #"http://anant:agarwal@stage-edx-001.m.edx.org/"
     I should see "3.091x"
     I should see "CS50x"
     I should see "CS169.1x"
@@ -14,15 +15,27 @@ Feature: Homepage renders
     I should see "6.00x"
 
   Scenario: We can see the "Login" button
-    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
+    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+    #"http://anant:agarwal@stage-edx-001.m.edx.org/"
     I should see "Sign Up"
 
   Scenario: We can see the "Sign up" button
-    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
+    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+    #"http://anant:agarwal@stage-edx-001.m.edx.org/"
     I should see "Log In"
 
   Scenario: We can see the three partner institutions
-    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
+    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+     #"http://anant:agarwal@stage-edx-001.m.edx.org/"
     I should see "MITx"
     I should see "HarvardX"
     I should see "BerkeleyX"
+
+  Scenario: We can see the static content pages
+    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+    #"http://anant:agarwal@stage-edx-001.m.edx.org/"
+    I should see "Find Courses"
+    I should see "About"
+    I should see "Blog"
+    I should see "Jobs"
+    I should see "Contact"
