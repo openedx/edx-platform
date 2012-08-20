@@ -8,7 +8,7 @@ body.askbot {
         @include box-sizing(border-box);
         display: table-cell;
         min-width: 650px;
-        padding: lh();
+        padding-right: lh();
         vertical-align: top;
         width: flex-grid(9) + flex-gutter();
 
@@ -76,6 +76,6 @@ body.askbot {
 }
 
 .acSelect {
-  background-color: $mit-red;
+  background-color: $pink;
   color: #fff;
 }

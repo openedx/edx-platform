@@ -15,7 +15,7 @@ def try_staticfiles_lookup(path):
     try:
         url = staticfiles_storage.url(path)
     except Exception as err:
-        log.warning("staticfiles_storage couldn't find path {}: {}".format(
+        log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
             path, str(err)))
         # Just return the original path; don't kill everything.
         url = path

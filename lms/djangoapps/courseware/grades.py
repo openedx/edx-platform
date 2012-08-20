@@ -9,6 +9,7 @@ from django.conf import settings
 from models import StudentModuleCache
 from module_render import get_module, get_instance_module
 from xmodule import graders
+from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
 from models import StudentModule
 
@@ -63,7 +64,14 @@ def grade(student, request, course, student_module_cache=None):
                 scores = []
                 # TODO: We need the request to pass into here. If we could forgo that, our arguments
                 # would be simpler
-                section_module = get_module(student, request, section_descriptor.location, student_module_cache)
+                course_id = CourseDescriptor.location_to_id(course.location)
+                section_module = get_module(student, request,
+                                            section_descriptor.location, student_module_cache,
+                                            course_id)
+                if section_module is None:
+                    # student doesn't have access to this module, or something else
+                    # went wrong.
+                    continue
 
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database

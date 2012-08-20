@@ -1,0 +1,24 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
+
+<section class="container">
+<div class="instructor-dashboard-wrapper">
+  <section class="instructor-dashboard-content">
+    <h1>Instructor Dashboard</h1>
+
+    <p>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
+
+    <p>
+    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">Grade summary</a>
+
+  </section>
+</div>
+</section>

@@ -1,298 +1,279 @@
 h2 {
-margin-top: 0;
-margin-bottom: 15px;
-width: flex-grid(2, 9);
-padding-right: flex-gutter(9);
-border-right: 1px dashed #ddd;
-@include box-sizing(border-box);
-display: table-cell;
-vertical-align: top;
+  margin-top: 0;
+  margin-bottom: 15px;
 
-&.problem-header {
-  section.staff {
-    margin-top: 30px;
-    font-size: 80%;
+  &.problem-header {
+    section.staff {
+      margin-top: 30px;
+      font-size: 80%;
+    }
   }
-}
 
-@media screen and (max-width:1120px) {
-  display: block;
-  width: auto;
-  border-right: 0;
-}
-
-@media print {
-  display: block;
-  width: auto;
-  border-right: 0;
-}
+  @media print {
+    display: block;
+    width: auto;
+    border-right: 0;
+  }
 }
 
 section.problem {
-display: table-cell;
-width: flex-grid(7, 9);
-padding-left: flex-gutter(9);
-
-@media screen and (max-width:1120px) {
-  display: block;
-  width: auto;
-  padding: 0;
-}
-
-@media print {
-  display: block;
-  width: auto;
-  padding: 0;
-
-  canvas, img {
-    page-break-inside: avoid;
-  }
-}
-
-
-
-div {
-  p.status {
-    text-indent: -9999px;
-    margin: -1px 0 0 10px;
-  }
-
-  &.unanswered {
-    p.status {
-      @include inline-block();
-      background: url('../images/unanswered-icon.png') center center no-repeat;
-      height: 14px;
-      width: 14px;
-    }
-  }
-
-  &.processing {
-    p.status {
-      @include inline-block();
-      background: url('../images/spinner.gif') center center no-repeat;
-      height: 20px;
-      width: 20px;
-      text-indent: -9999px;
-    }
-  }
-
-  &.correct, &.ui-icon-check {
-    p.status {
-      @include inline-block();
-      background: url('../images/correct-icon.png') center center no-repeat;
-      height: 20px;
-      width: 25px;
-    }
-
-    input {
-      border-color: green;
-    }
-  }
-
-  &.processing {
-    p.status {
-      @include inline-block();
-      background: url('../images/spinner.gif') center center no-repeat;
-      height: 20px;
-      width: 20px;
-    }
-
-    input {
-      border-color: #aaa;
-    }
-  }
-
-  &.incorrect, &.ui-icon-close {
-    p.status {
-      @include inline-block();
-      background: url('../images/incorrect-icon.png') center center no-repeat;
-      height: 20px;
-      width: 20px;
-      text-indent: -9999px;
-    }
-
-    input {
-      border-color: red;
-    }
-  }
-
-  > span {
+  @media print {
     display: block;
-    margin-bottom: lh(.5);
+    width: auto;
+    padding: 0;
+
+    canvas, img {
+      page-break-inside: avoid;
+    }
   }
 
-  p.answer {
-    @include inline-block();
-    margin-bottom: 0;
-    margin-left: 10px;
-
-    &:before {
-      content: "Answer: ";
-      font-weight: bold;
-      display: inline;
-
+  div {
+    p {
+      &.answer {
+        margin-top: -2px;
+      }
+      &.status {
+        text-indent: -9999px;
+        margin: 8px 0 0 10px;
+      }
     }
-    &:empty {
+
+    &.unanswered {
+      p.status {
+        @include inline-block();
+        background: url('../images/unanswered-icon.png') center center no-repeat;
+        height: 14px;
+        width: 14px;
+      }
+    }
+
+    &.processing {
+      p.status {
+        @include inline-block();
+        background: url('../images/spinner.gif') center center no-repeat;
+        height: 20px;
+        width: 20px;
+        text-indent: -9999px;
+      }
+    }
+
+    &.correct, &.ui-icon-check {
+      p.status {
+        @include inline-block();
+        background: url('../images/correct-icon.png') center center no-repeat;
+        height: 20px;
+        width: 25px;
+      }
+
+      input {
+        border-color: green;
+      }
+    }
+
+    &.processing {
+      p.status {
+        @include inline-block();
+        background: url('../images/spinner.gif') center center no-repeat;
+        height: 20px;
+        width: 20px;
+      }
+
+      input {
+        border-color: #aaa;
+      }
+    }
+
+    &.incorrect, &.ui-icon-close {
+      p.status {
+        @include inline-block();
+        background: url('../images/incorrect-icon.png') center center no-repeat;
+        height: 20px;
+        width: 20px;
+        text-indent: -9999px;
+      }
+
+      input {
+        border-color: red;
+      }
+    }
+
+    > span {
+      display: block;
+      margin-bottom: lh(.5);
+    }
+
+    p.answer {
+      @include inline-block();
+      margin-bottom: 0;
+      margin-left: 10px;
+
       &:before {
-        display: none;
+        content: "Answer: ";
+        font-weight: bold;
+        display: inline;
+
+      }
+      &:empty {
+        &:before {
+          display: none;
+        }
+      }
+    }
+
+    div.equation {
+      clear: both;
+      padding: 6px;
+      background: #eee;
+
+      span {
+        margin-bottom: 0;
+      }
+    }
+
+    span {
+      &.unanswered, &.ui-icon-bullet {
+        @include inline-block();
+        background: url('../images/unanswered-icon.png') center center no-repeat;
+        height: 14px;
+        position: relative;
+        top: 4px;
+        width: 14px;
+      }
+
+      &.processing, &.ui-icon-processing {
+        @include inline-block();
+        background: url('../images/spinner.gif') center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px;
+      }
+
+      &.correct, &.ui-icon-check {
+        @include inline-block();
+        background: url('../images/correct-icon.png') center center no-repeat;
+        height: 20px;
+        position: relative;
+        top: 6px;
+        width: 25px;
+      }
+
+      &.incorrect, &.ui-icon-close {
+        @include inline-block();
+        background: url('../images/incorrect-icon.png') center center no-repeat;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        top: 6px;
       }
     }
   }
 
-  div.equation {
-    clear: both;
-    padding: 6px;
-    background: #eee;
+  ul {
+    list-style: disc outside none;
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+  }
 
-    span {
+  ol {
+    list-style: decimal outside none;
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+  }
+
+  dl {
+    line-height: 1.4em;
+  }
+
+  dl dt {
+    font-weight: bold;
+  }
+
+  dl dd {
+    margin-bottom: 0;
+  }
+
+  dd {
+    margin-left: .5em;
+    margin-left: .5rem;
+  }
+
+  li {
+    line-height: 1.4em;
+    margin-bottom: lh(.5);
+
+    &:last-child {
       margin-bottom: 0;
     }
   }
 
-  span {
-    &.unanswered, &.ui-icon-bullet {
-      @include inline-block();
-      background: url('../images/unanswered-icon.png') center center no-repeat;
-      height: 14px;
-      position: relative;
-      top: 4px;
-      width: 14px;
+  p {
+    margin-bottom: lh();
+  }
+
+  table {
+    margin-bottom: lh();
+    border-collapse: collapse;
+    table-layout: auto;
+
+    th {
+      font-weight: bold;
+      text-align: left;
     }
 
-    &.processing, &.ui-icon-processing {
-      @include inline-block();
-      background: url('../images/spinner.gif') center center no-repeat;
-      height: 20px;
-      position: relative;
-      top: 6px;
-      width: 25px;
+    caption, th, td {
+      padding: .25em .75em .25em 0;
+      padding: .25rem .75rem .25rem 0;
     }
 
-    &.correct, &.ui-icon-check {
-      @include inline-block();
-      background: url('../images/correct-icon.png') center center no-repeat;
-      height: 20px;
-      position: relative;
-      top: 6px;
-      width: 25px;
+    caption {
+      background: #f1f1f1;
+      margin-bottom: .75em;
+      margin-bottom: .75rem;
+      padding: .75em 0;
+      padding: .75rem 0;
     }
 
-    &.incorrect, &.ui-icon-close {
-      @include inline-block();
-      background: url('../images/incorrect-icon.png') center center no-repeat;
-      height: 20px;
-      width: 20px;
-      position: relative;
-      top: 6px;
+    tr, td, th {
+      vertical-align: middle;
+    }
+
+  }
+
+  hr {
+    background: #ddd;
+    border: none;
+    clear: both;
+    color: #ddd;
+    float: none;
+    height: 1px;
+    margin: 0 0 .75rem;
+    width: 100%;
+  }
+
+  .hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  #{$all-text-inputs} {
+    display: inline;
+    width: auto;
+  }
+
+  // this supports a deprecated element and should be removed once the center tag is removed
+  center {
+    display: block;
+    margin: lh() 0;
+    border: 1px solid #ccc;
+    padding: lh();
+  }
+
+  section.action {
+    input.save {
+      @extend .blue-button;
     }
   }
-}
-
-ul {
-  list-style: disc outside none;
-  margin-bottom: lh();
-  margin-left: .75em;
-  margin-left: .75rem;
-}
-
-ol {
-  list-style: decimal outside none;
-  margin-bottom: lh();
-  margin-left: .75em;
-  margin-left: .75rem;
-}
-
-dl {
-  line-height: 1.4em;
-}
-
-dl dt {
-  font-weight: bold;
-}
-
-dl dd {
-  margin-bottom: 0;
-}
-
-dd {
-  margin-left: .5em;
-  margin-left: .5rem;
-}
-
-li {
-  line-height: 1.4em;
-  margin-bottom: lh(.5);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-p {
-  margin-bottom: lh();
-}
-
-table {
-  margin-bottom: lh();
-  width: 100%;
-  // border: 1px solid #ddd;
-  border-collapse: collapse;
-
-  th {
-    // border-bottom: 2px solid #ccc;
-    font-weight: bold;
-    text-align: left;
-  }
-
-  td {
-    // border: 1px solid #ddd;
-  }
-
-  caption, th, td {
-    padding: .25em .75em .25em 0;
-    padding: .25rem .75rem .25rem 0;
-  }
-
-  caption {
-    background: #f1f1f1;
-    margin-bottom: .75em;
-    margin-bottom: .75rem;
-    padding: .75em 0;
-    padding: .75rem 0;
-  }
-
-  tr, td, th {
-    vertical-align: middle;
-  }
-
-}
-
-hr {
-  background: #ddd;
-  border: none;
-  clear: both;
-  color: #ddd;
-  float: none;
-  height: 1px;
-  margin: 0 0 .75rem;
-  width: 100%;
-}
-
-.hidden {
-  display: none;
-  visibility: hidden;
-}
-
-#{$all-text-inputs} {
-  display: inline;
-  width: auto;
-}
-
-// this supports a deprecated element and should be removed once the center tag is removed
-center {
-  display: block;
-  margin: lh() 0;
-  border: 1px solid #ccc;
-  padding: lh();
-}
 }

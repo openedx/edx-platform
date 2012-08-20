@@ -1,4 +1,4 @@
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from lxml import etree
 import json
@@ -166,7 +166,7 @@ class XmlDescriptor(XModuleDescriptor):
         Subclasses should not need to override this except in special
         cases (e.g. html module)'''
 
-        # VS[compat] -- the filename tag should go away once everything is
+        # VS[compat] -- the filename attr should go away once everything is
         # converted.  (note: make sure html files still work once this goes away)
         filename = xml_object.get('filename')
         if filename is None:
@@ -269,6 +269,11 @@ class XmlDescriptor(XModuleDescriptor):
             except Exception as err:
                 log.debug('Error %s in loading metadata %s' % (err,dmdata))
                 metadata['definition_metadata_err'] = str(err)
+
+        # Set/override any metadata specified by policy
+        k = policy_key(location)
+        if k in system.policy:
+            metadata.update(system.policy[k])
 
         return cls(
             system,

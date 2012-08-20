@@ -10,6 +10,7 @@ $fg-min-width: 810px;
 $sans-serif: 'Open Sans', $verdana;
 $body-font-family: $sans-serif;
 $serif: $georgia;
+$monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 
 $body-font-size: em(14);
 $body-line-height: golden-ratio(.875em, 1);
@@ -27,6 +28,5 @@ $sidebar-color: #f6f6f6;
 
 $light-gray: #ddd;
 $dark-gray: #333;
-$mit-red: #993333;
 $text-color: $dark-gray;
 

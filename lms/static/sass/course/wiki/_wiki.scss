@@ -1,158 +1,847 @@
-div.wiki-wrapper {
-  display: table;
-  width: 100%;
+section.wiki {
+  padding-top: 25px;
 
-  section.wiki-body {
-    @extend .clearfix;
-    @extend .content;
-    @include border-radius(0 4px 4px 0);
-    position: relative;
+  > header {
+    height: 33px;
+    margin-bottom: 36px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid $light-gray;
+  }
 
-    header {
-      @extend .topbar;
-      @include border-radius(0 4px 0 0);
-      height:46px;
-      overflow: hidden;
+  .pull-left {
+    float: left;
+  }
 
-      &:empty {
-        border-bottom: 0;
-        display: none !important;
-      }
+  .pull-right {
+    float: right;
+  }
+
+
+
+  /*-----------------
+
+    Breadcrumbs
+
+  -----------------*/
+
+  .breadcrumb {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 0 flex-gutter();
+
+    li {
+      float: left;
+      margin-right: 10px;
+      font-size: 0.9em;
+      line-height: 31px;      
 
       a {
-        @extend .block-link;
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        height: 30px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      p {
-        float: left;
-        line-height: 46px;
-        margin-bottom: 0;
-        padding-left: lh();
-      }
-
-      ul {
-        float: right;
-        list-style: none;
-
-        li {
-          float: left;
-
-          input[type="button"] {
-            @extend .block-link;
-            background-position: 12px center;
-            background-repeat: no-repeat;
-            border: 0;
-            border-left: 1px solid darken(#f6efd4, 20%);
-            @include border-radius(0);
-            @include box-shadow(inset 1px 0 0 lighten(#f6efd4, 5%));
-            display: block;
-            font-size: 12px;
-            font-weight: normal;
-            letter-spacing: 1px;
-            line-height: 46px;
-            margin: 0;
-            padding: 0 lh() 0 38px;
-            text-shadow: none;
-            text-transform: uppercase;
-            @include transition();
-
-            &.view {
-              background-image: url('../images/sequence-nav/view.png');
-            }
-
-            &.history {
-              background-image:  url('../images/sequence-nav/history.png');
-            }
-
-            &.edit {
-              background-image:  url('../images/sequence-nav/edit.png');
-            }
-
-            &:hover {
-              background-color: transparent;
-            }
-          }
-        }
+      &:after {
+        content: '›';
+        display: inline-block;
+        margin-left: 10px;
+        color: $base-font-color;
       }
     }
+  }
 
-     h2.wiki-title {
-        @include box-sizing(border-box);
-        display: inline-block;
-        float: left;
-        margin-bottom: 15px;
-        margin-top: 0;
-        padding-right: flex-gutter(9);
-        vertical-align: top;
-        width: flex-grid(2.5, 9);
+  .dropdown-menu {
+    display: none;
+  }
 
-        @media screen and (max-width:900px) {
-          border-right: 0;
-          display: block;
-          width: auto;
-        }
 
-        @media print {
-          border-right: 0;
-          display: block;
-          width: auto;
-        }
+
+  /*-----------------
+
+    Global Functions
+
+  -----------------*/
+
+  .global-functions {
+    display: block;
+    width: auto;
+    margin-right: flex-gutter();
+  }
+
+  .add-article-btn {
+    @include button(simple, #eee);
+    margin-left: 25px;
+    padding: 7px 15px !important;
+    font-size: 0.72em;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .search-wiki {
+    margin-top: 3px;
+
+    input {
+      width: 180px;
+      height: 27px;
+      padding: 0 15px 0 35px;
+      background: url(../images/search-icon.png) no-repeat 9px center #f6f6f6;
+      border: 1px solid #c8c8c8;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
+      font-family: $sans-serif;
+      font-size: 12px;
+      outline: none;
+      @include transition(border-color .1s);
+
+      &:-webkit-input-placholder {
+        font-style: italic;
       }
 
-    p {
+      &:focus {
+        border-color: $blue;
+      }
+    }
+  }
+
+
+
+  /*-----------------
+
+    Article
+
+  -----------------*/
+
+  .article-wrapper {
+
+  }
+
+  h1 {
+    font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  .main-article {
+    float: left;
+    width: flex-grid(9);
+    margin-left: flex-gutter();
+    color: $base-font-color;
+  }
+
+  &.view .main-article {
+    h2 {
+      padding-bottom: 8px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid $light-gray;
+      font-size: 1.6em;
+      font-weight: bold;
+      color: $base-font-color;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 1.25em;
+    }
+
+    h4 {
+      margin: 30px 0 10px;
+      font-size: 1em;
+      color: #999;
+      font-weight: bold;
+    }
+
+    h5 {
+      margin: 20px 0 10px;
+      font-size: .8em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    h6 {
+      margin: 20px 0 10px;
+      font-size: .8em;
+      font-weight: bold;
+      color: #999;
+      text-transform: uppercase;
+    }
+
+    ul {
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
+    }
+
+    li {
+      margin-bottom: 15px;
       line-height: 1.6em;
     }
 
-    section.results {
-      border-left: 1px dashed #ddd;
-      @include box-sizing(border-box);
-      display: inline-block;
-      float: left;
-      padding-left: 10px;
-      width: flex-grid(6.5, 9);
+    pre {
+      padding: 10px;
+      border: 1px solid #ddd;
+      background: #f8f8f8;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: Monaco, monospace;
+    }
+  }
 
-      @media screen and (max-width:900px) {
-        border: 0;
-        display: block;
-        padding-left: 0;
-        width: 100%;
-        width: auto;
+
+
+
+  /*-----------------
+
+    Sidebar
+
+  -----------------*/
+
+  .article-functions {
+    float: left;
+    width: flex-grid(2) + flex-gutter();
+    margin-left: flex-grid(1);
+
+    .timestamp {
+      margin: 4px 0 15px;
+      padding: 0 0 15px 5px;
+      border-bottom: 1px solid $light-gray;      
+
+      .label {
+        font-size: 0.7em;
+        color: #aaa;
+        text-transform: uppercase;
       }
 
-      @media print {
-        display: block;
-        padding: 0;
-        width: auto;
-
-        canvas, img {
-          page-break-inside: avoid;
-        }
+      .date {
+        font-size: 0.9em;
       }
+    }
+  }
 
-      ul.article-list {
-        margin-left: 15px;
-        width: 100%;
+  .nav-tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
-        @media screen and (max-width:900px) {
-          margin-left: 0px;
-        }
+    li {
+      &.active {
+        a {
+          color: $blue;
 
-        li {
-          border-bottom: 1px solid #eee;
-          list-style: none;
-          margin: 0;
-          padding: 10px 0;
-
-          &:last-child {
-            border-bottom: 0;
+          .icon-view {
+            background-position: -25px 0;
           }
 
-          h3 {
-            font-size: 18px;
-            font-weight: normal;
+          .icon-edit {
+            background-position: -25px -25px;
+          }
+
+          .icon-changes {
+            background-position: -25px -49px;
+          }
+
+          .icon-attachments {
+            background-position: -25px -73px;
+          }
+
+          .icon-settings {
+            background-position: -25px -99px;
+          }
+
+          &:hover {
+            background: none;
           }
         }
       }
     }
+
+    a {
+      display: block;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 0.9em;
+      line-height: 25px;
+      color: #8f8f8f;
+
+      .icon {
+        float: left;
+        display: block;
+        width: 25px;
+        height: 25px;
+        margin-right: 3px;
+        background: url(../images/wiki-icons.png) no-repeat;
+      }
+
+      .icon-view {
+        background-position: 0 0;
+      }
+
+      .icon-edit {
+        background-position: 0 -25px;
+      }
+
+      .icon-changes {
+        background-position: 0 -49px;
+      }
+
+      .icon-attachments {
+        background-position: 0 -73px;
+      }
+
+      .icon-settings {
+        background-position: 0 -99px;
+      }
+
+      &:hover {
+        background-color: #f6f6f6;
+        text-decoration: none;
+      }
+    }
+  }
+
+
+
+
+  /*-----------------
+
+    Edit
+
+  -----------------*/
+
+  label {
+    font-family: $sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    font-style: normal;
+    text-transform: uppercase;
+    color: #aaa;
+  }
+
+  input {
+    font-family: $sans-serif;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  #id_title,
+  #id_content {
+    width: 100%;
+  }
+
+  #id_content,
+  .CodeMirror {
+    font-family: $monospace;
+    font-size: 0.8em;
+    line-height: 1.4em;
+  }
+
+  .CodeMirror {
+    background: #fafafa;
+    border: 1px solid #c8c8c8;
+    @include border-radius(3px);
+    @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1));
+  }
+
+  .CodeMirror-scroll {
+    padding: 7px;
+  }
+
+  .schematic_container {
+    position: relative;
+
+    canvas {
+      @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 6px rgba(0, 0, 0, .2));
+    }
+
+    &:before {
+      content: 'click to edit schematic';
+      position: absolute;
+      top: 10px;
+      left: 7px;
+      z-index: 9999;
+      font-family: $sans-serif;
+      font-size: 0.75em;
+      color: #aaa;
+      pointer-events: none;
+    }
+  }
+
+  .markItUpContainer {
+    margin-right: 0;
+  }
+
+  .control-group {
+    margin-bottom: 20px;
+  }
+
+  #hint_id_summary {
+    display: inline-block;
+    font-size: 0.9em;
+    line-height: 32px;
+    margin-left: 15px;
+  }
+
+  .asteriskField {
+    display: none;
+  }
+
+  button {
+    font-family: $sans-serif;
+  }
+
+  .btn {
+    @include button(simple, #eee);
+    font-size: 0.8em;
+    margin-right: 5px;
+    line-height: 1.2em;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+
+    &:hover {
+      color: $base-font-color;
+      text-decoration: none;
+    }
+
+    &.btn-primary {
+      @include button;
+      font-size: 0.8em;
+    }
+
+    &.btn-danger {
+      @include button(simple, $pink);
+      font-size: 0.8em;
+    }
+
+    &.btn-info {
+      @include button(simple, #ccc);
+      font-size: 0.8em;
+    }
+  }
+
+  a.btn {
+    padding: 7px 18px 8px !important;
+  }
+
+  .modal {
+    width: 960px;
+    z-index: 9999;
+    min-height: 500px;
+    margin-left: -480px;
+    top: 150px;
+
+    &.upload-modal,
+    &.search-file-modal {
+      width: 400px;
+      min-height: 0;
+      margin-left: -200px;
+
+      h4 {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .help-block {
+        font-size: 0.8em;
+      }
+    }
+
+    &.search-file-modal {
+      width: 500px;
+      margin-left: -250px;
+
+      p {
+        font-size: 0.8em;
+        line-height: 1.4em;
+      }
+
+      .form-search {
+        margin: 30px 0 15px;
+
+        input {
+          width: 350px;
+        }
+
+        button {
+          height: 35px;
+        }
+      }
+    }
+
+    .modal-header {
+      h1, p {
+        color: #fff;  
+      }
+
+      h1 {
+        margin: 3px 12px 8px;
+        font-size: 1.1em;
+      }      
+
+      p {
+        font-size: 0.9em;
+        margin: 5px 12px 20px;
+        line-height: 1em;
+      }
+    }
+
+    .modal-body {
+      padding-bottom: 8px;
+    }
+
+    iframe {
+      width: 100%;
+      min-height: 450px;
+      border: 0;
+    }
+
+    .modal-footer {
+      margin: 12px;
+    }
+
+    .modal-footer .btn {
+      margin-right: 10px;
+    }
+  }
+
+  .modal-inner-wrapper {
+    background: #fff;
+    padding: 20px;
+  }
+
+  #previewWindow body {
+    background: #f00 !important;
+  }
+
+  
+
+
+
+
+
+  /*-----------------
+
+    Changes
+
+  -----------------*/
+
+  &.history {
+    .accordion {
+      margin-bottom: 15px;
+      padding: 15px;
+      border: 1px solid $light-gray;
+      background: #f9f9f9;
+      border-radius: 5px;
+
+      a:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .accordion small {
+    font-size: 0.8em;
+    color: #aaa;
+  }
+
+  .accordion-toggle div {
+    margin-top: 8px;
+  }
+
+  .collapse {
+    display: none;
+
+    &.in {
+      display: block;
+    }
+  }
+
+  .diff-container {
+    overflow-x: scroll;
+
+    table {
+      min-width: 100%;      
+    }
+
+    th {
+      font-family: $sans-serif;
+      font-size: 0.7em;
+    }
+
+    td {
+      font-family: $monospace;
+    }
+
+    .linenumber,
+    .data {
+      font-size: 0.75em;
+    }
+  }
+
+
+
+
+  /*-----------------
+
+    Settings
+
+  -----------------*/
+
+  #settings_form {
+    .well {
+      margin-bottom: 15px;
+      @include clearfix;
+    }
+
+    .control-group {
+      float: left;
+      margin-bottom: 0;
+      clear: both;
+    }
+
+    label {
+      margin-left: 15px;
+    }
+
+    .controls {
+      padding-top: 4px;
+    }
+
+    label,
+    .controls {
+      float: right;
+    }
+  }
+
+
+
+
+  /*-----------------
+
+    New
+
+  -----------------*/
+
+  .new-article {
+    margin: auto;
+    float: none;
+
+    .add-on {
+      line-height: 34px;
+      margin-right: 6px;
+    }
+  }
+
+  #hint_id_slug {
+    display: inline-block;
+    font-size: 0.9em;
+    line-height: 1.3em;
+    margin-top: 9px;
+  }
+
+
+
+
+  /*-----------------
+
+    Attachments
+
+  -----------------*/
+
+  .attachment-options {
+    height: 40px;
+    margin: 40px 0 30px; 
+  }
+
+  .attachment-list {
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 15px;
+      border: 1px solid #DDD;
+      background: #F9F9F9;
+      @include border-radius(5px);
+    }
+
+    header,
+    .attachment-details {
+      padding: 12px 15px;
+    }
+
+    .attachment-details {
+      background: #eee;
+      @include border-radius(0 0 5px 5px);
+    }
+
+    h3 {
+      a {
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      .badge {
+        float: right;
+        font-size: 0.6em;
+        line-height: 20px;
+        color: #aaa;
+      }
+    }
+
+    .attachment-description {
+      font-size: 0.8em;
+    }
+
+    table {
+      width: 100%;
+      font-size: 0.8em;
+    }
+
+    .attachment-actions .btn {
+      float: right;
+    }
+  }
+
+
+
+
+
+  /*-----------------
+
+    Delete
+
+  -----------------*/
+
+  #div_id_confirm {
+    position: relative;
+    height: 30px;
+    margin: 40px 0;
+
+    #id_confirm {
+      position: absolute;
+      top: 6px;
+    }
+
+    label {
+      position: absolute;
+      left: 25px;
+      font-size: 1.4em;
+    }
+  }
+
+
+
+
+
+  /*-----------------
+
+    Alerts
+
+  -----------------*/
+
+  .alert {
+    position: relative;
+    top: -15px;
+    margin-bottom: 24px;
+    padding: 8px 12px;
+    border: 1px solid #EBE8BF;
+    border-radius: 3px;
+    background: $yellow;
+    font-size: 0.9em;
+
+    .close {
+      position: absolute;
+      right: 12px;
+      font-size: 1.3em;
+      top: 6px;
+      color: #999;
+      text-decoration: none;
+    }
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .4);
+}
+
+.modal-preview {
+  min-width: 0;
+}
+
+.modal-preview .container {
+  padding: 50px;
+}
+
+.modal-preview .main-article {
+  width: 100% !important;
+  margin-left: 0;
+}
+
+
+#circuit_editor_modal.modal {
+  width: 648px;
+  z-index: 9999;
+  margin-left: -325px;
+  top: 150px;
+
+  .modal-header {
+    h1, p {
+      color: #fff;  
+    }
+
+    h1 {
+      margin: 3px 12px 8px;
+      font-size: 1.1em;
+    }      
+
+    p {
+      font-size: 0.9em;
+      margin: 5px 12px 20px;
+      line-height: 1em;
+    }
+  }
+
+  .modal-body {
+    padding-bottom: 8px;
+  }
+
+  .modal-footer {
+    margin: 12px;
+  }
+
+  .modal-footer .btn {
+    @include button(simple, #eee);
+    font-size: 0.8em;
+    margin-right: 5px;
+    line-height: 1.2em;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+
+    &:hover {
+      color: $base-font-color;
+      text-decoration: none;
+    }
+
+    &.btn-primary {
+      @include button;
+      font-size: 0.8em;
+    }
+    
+    margin-right: 10px;
   }
 }

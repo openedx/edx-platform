@@ -8,6 +8,7 @@
 import unittest
 import os
 import fs
+import fs.osfs
 import json
 
 import json
@@ -35,7 +36,6 @@ i4xs = ModuleSystem(
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
     xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
-    is_staff=False,
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
 
@@ -336,18 +336,18 @@ class CodeResponseTest(unittest.TestCase):
                         self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be dequeued, message delivered
                     else:
                         self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be queued, message undelivered
-    
+
     def test_convert_files_to_filenames(self):
         problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
         fp = open(problem_file)
         answers_with_file = {'1_2_1': 'String-based answer',
                              '1_3_1': ['answer1', 'answer2', 'answer3'],
-                             '1_4_1': fp}
+                             '1_4_1': [fp, fp]}
         answers_converted = convert_files_to_filenames(answers_with_file)
         self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
         self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
-        self.assertEquals(answers_converted['1_4_1'], fp.name)
-        
+        self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
+
 
 class ChoiceResponseTest(unittest.TestCase):
 

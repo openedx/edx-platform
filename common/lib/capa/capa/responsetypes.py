@@ -873,6 +873,7 @@ def sympy_check2():
             msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
+        # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
 
@@ -898,6 +899,7 @@ def sympy_check2():
         if type(self.code) == str:
             try:
                 exec self.code in self.context['global_context'], self.context
+                correct = self.context['correct']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
@@ -1117,11 +1119,6 @@ class CodeResponse(LoncapaResponse):
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
-        if is_file(submission):
-            self.context.update({'submission': submission.name})
-        else:
-            self.context.update({'submission': submission})
-
         # Prepare xqueue request
         #------------------------------------------------------------ 
         qinterface = self.system.xqueue['interface']
@@ -1133,14 +1130,19 @@ class CodeResponse(LoncapaResponse):
                                                 queue_name=self.queue_name)
 
         # Generate body
+        if is_list_of_files(submission):
+            self.context.update({'submission': queuekey}) # For tracking. TODO: May want to record something else here
+        else:
+            self.context.update({'submission': submission})
+
         contents = self.payload.copy() 
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        if is_file(submission):
-            contents.update({'student_response': submission.name})
+        if is_list_of_files(submission):
+            contents.update({'student_response': ''}) # TODO: Is there any information we want to send here?
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
-                                                    file_to_upload=submission)
+                                                    files_to_upload=submission)
         else:
             contents.update({'student_response': submission})
             (error, msg) = qinterface.send_to_queue(header=xheader,
@@ -1271,7 +1273,7 @@ main()
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://eecs1.mit.edu:8889/pyloncapa"	 # FIXME - hardcoded URL
+        self.url = xml.get('url') or "http://qisx.mit.edu:8889/pyloncapa"	 # FIXME - hardcoded URL
 
         # answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
         answer = xml.find('answer')

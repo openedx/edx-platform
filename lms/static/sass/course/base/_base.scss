@@ -3,7 +3,7 @@ body {
   background: url(../images/bg-texture.png) #f7f7f7;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
+body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
   text-align: left;
   font-family: $sans-serif;
 }
@@ -41,6 +41,58 @@ form {
   label {
     display: block;
   }
+}
+
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  background: rgb(250,250,250);
+  border: 1px solid rgb(200,200,200);
+  @include border-radius(0);
+  @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
+  @include box-sizing(border-box);
+  font: normal 1em $sans-serif;
+  height: 35px;
+  padding: 5px 12px;
+  vertical-align: top;
+  -webkit-font-smoothing: antialiased;
+
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  &:focus {
+    border-color: lighten($blue, 20%);
+    @include box-shadow(0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15));
+    outline: none;
+  }
+}
+
+label {
+  font-weight: normal;
+  font-style: normal;
+}
+
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
+button,
+.button {
+  @extend .gray-button;
+
+  form & {
+    @extend .gray-button;
+  }
+}
+
+
+img {
+  max-width: 100%;
+}
+
+.container {
+  padding: em(40) 0;
 }
 
 ::selection, ::-moz-selection, ::-webkit-selection {

@@ -15,25 +15,24 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
-from module_render import toc_for_course, get_module, get_section
-from models import StudentModuleCache
-from student.models import UserProfile
-from xmodule.modulestore import Location
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
-
-from util.cache import cache, cache_if_anonymous
-from student.models import UserTestGroup, CourseEnrollment
 from courseware import grades
-from courseware.courses import (check_course, get_courses_by_university,
-                                has_staff_access_to_course_id)
-
+from courseware.access import has_access
+from courseware.courses import (get_course_with_access, get_courses_by_university)
+from models import StudentModuleCache
+from module_render import toc_for_course, get_module, get_section
+from student.models import UserProfile
+from student.models import UserTestGroup, CourseEnrollment
+from util.cache import cache, cache_if_anonymous
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.search import path_to_location
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
+
 
 def user_groups(user):
     """
@@ -65,11 +64,12 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user)
+    universities = get_courses_by_university(request.user,
+                                             domain=request.META.get('HTTP_HOST'))
     return render_to_response("courses.html", {'universities': universities})
 
 
-def render_accordion(request, course, chapter, section):
+def render_accordion(request, course, chapter, section, course_id=None):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter.
 
@@ -80,7 +80,7 @@ def render_accordion(request, course, chapter, section):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section)
+    toc = toc_for_course(request.user, request, course, chapter, section, course_id=course_id)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -93,7 +93,8 @@ def render_accordion(request, course, chapter, section):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
-    ''' Displays courseware accordion, and any associated content.
+    """
+    Displays courseware accordion, and any associated content.
     If course, chapter, and section aren't all specified, just returns
     the accordion.  If they are specified, returns an error if they don't
     point to a valid module.
@@ -109,8 +110,9 @@ def index(request, course_id, chapter=None, section=None,
     Returns:
 
      - HTTPresponse
-    '''
-    course = check_course(request.user, course_id)
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
     registered = registered_for_course(course, request.user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
@@ -120,11 +122,12 @@ def index(request, course_id, chapter=None, section=None,
     try:
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section),
+            'accordion': render_accordion(request, course, chapter, section, course_id=course_id),
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
-            'content': ''
+            'content': '',
+            'staff_access': staff_access,
             }
 
         look_for_module = chapter is not None and section is not None
@@ -136,7 +139,11 @@ def index(request, course_id, chapter=None, section=None,
                                                           section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache)
+                                    student_module_cache, course_id)
+                if module is None:
+                    # User is probably being clever and trying to access something
+                    # they don't have access to.
+                    raise Http404
                 context['content'] = module.get_html()
             else:
                 log.warning("Couldn't find a section descriptor for course_id '{0}',"
@@ -147,7 +154,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Add a list of all the errors...
                 context['course_errors'] = modulestore().get_item_errors(course.location)
 
-        result = render_to_response('courseware.html', context)
+        result = render_to_response('courseware/courseware.html', context)
     except:
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
@@ -163,7 +170,9 @@ def index(request, course_id, chapter=None, section=None,
                               position=position
                               ))
             try:
-                result = render_to_response('courseware-error.html', {})
+                result = render_to_response('courseware/courseware-error.html',
+                                            {'staff_access': staff_access,
+                                            'course' : course})
             except:
                 result = HttpResponse("There was an unrecoverable error")
 
@@ -204,9 +213,11 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('info.html', {'course': course})
+    return render_to_response('courseware/info.html', {'course': course,
+                                            'staff_access': staff_access,})
 
 
 def registered_for_course(course, user):
@@ -221,7 +232,7 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    course = check_course(request.user, course_id, course_must_be_open=False)
+    course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
     return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
 
@@ -238,7 +249,8 @@ def university_profile(request, org_id):
         raise Http404("University Profile not found for {0}".format(org_id))
 
     # Only grab courses for this org...
-    courses = get_courses_by_university(request.user)[org_id]
+    courses = get_courses_by_university(request.user,
+                                        domain=request.META.get('HTTP_HOST'))[org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
@@ -247,44 +259,39 @@ def university_profile(request, org_id):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
-    """ User profile. Show username, location, etc, as well as grades .
-        We need to allow the user to change some of these settings.
+def progress(request, course_id, student_id=None):
+    """ User progress. We show the grade bar and every problem score.
 
-    Course staff are allowed to see the profiles of students in their class.
+    Course staff are allowed to see the progress of students in their class.
     """
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
 
     if student_id is None or student_id == request.user.id:
         # always allowed to see your own profile
         student = request.user
     else:
         # Requesting access to a different student's profile
-        if not has_staff_access_to_course_id(request.user, course_id):
+        if not staff_access:
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    user_info = UserProfile.objects.get(user=student)
-
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache)
+    course_module = get_module(request.user, request, course.location,
+                               student_module_cache, course_id)
 
-    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, course_module,
+                                                 course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
 
-    context = {'name': user_info.name,
-               'username': student.username,
-               'location': user_info.location,
-               'language': user_info.language,
-               'email': student.email,
-               'course': course,
-               'csrf': csrf(request)['csrf_token'],
-               'courseware_summary' : courseware_summary,
-               'grade_summary' : grade_summary
+    context = {'course': course,
+               'courseware_summary': courseware_summary,
+               'grade_summary': grade_summary,
+               'staff_access': staff_access,
                }
     context.update()
 
-    return render_to_response('profile.html', context)
+    return render_to_response('courseware/progress.html', context)
 
 
 
@@ -297,10 +304,7 @@ def gradebook(request, course_id):
     - only displayed to course staff
     - shows students who are enrolled.
     """
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
@@ -315,32 +319,31 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('gradebook.html', {'students': student_info,
-                                                 'course': course, 'course_id': course_id})
+    return render_to_response('courseware/gradebook.html', {'students': student_info,
+                                                 'course': course,
+                                                 'course_id': course_id,
+                                                 # Checked above
+                                                 'staff_access': True,})
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_id):
     """Display the grade summary for a course."""
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
-    context = {'course': course }
-    return render_to_response('grade_summary.html', context)
+    context = {'course': course,
+               'staff_access': True,}
+    return render_to_response('courseware/grade_summary.html', context)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
-    if not has_staff_access_to_course_id(request.user, course_id):
-        raise Http404
-
-    course = check_course(request.user, course_id)
+    course = get_course_with_access(request.user, course_id, 'staff')
 
     # For now, just a static page
-    context = {'course': course }
-    return render_to_response('instructor_dashboard.html', context)
+    context = {'course': course,
+               'staff_access': True,}
+    return render_to_response('courseware/instructor_dashboard.html', context)
 

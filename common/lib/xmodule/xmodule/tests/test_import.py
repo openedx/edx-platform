@@ -42,9 +42,9 @@ class DummySystem(XMLParsingSystem):
             descriptor.get_children()
             return descriptor
 
-
+        policy = {}
         XMLParsingSystem.__init__(self, load_item, self.resources_fs,
-                                  self.errorlog.tracker, process_xml)
+                                  self.errorlog.tracker, process_xml, policy)
 
     def render_template(self, template, context):
             raise Exception("Shouldn't be called")
@@ -201,9 +201,54 @@ class ImportTestCase(unittest.TestCase):
 
         def check_for_key(key, node):
             "recursive check for presence of key"
-            print "Checking {}".format(node.location.url())
+            print "Checking {0}".format(node.location.url())
             self.assertTrue(key in node.metadata)
             for c in node.get_children():
                 check_for_key(key, c)
 
         check_for_key('graceperiod', course)
+
+
+    def test_policy_loading(self):
+        """Make sure that when two courses share content with the same
+        org and course names, policy applies to the right one."""
+
+        def get_course(name):
+            print "Importing {0}".format(name)
+
+            modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=[name])
+            courses = modulestore.get_courses()
+            self.assertEquals(len(courses), 1)
+            return courses[0]
+
+        toy = get_course('toy')
+        two_toys = get_course('two_toys')
+
+        self.assertEqual(toy.url_name, "2012_Fall")
+        self.assertEqual(two_toys.url_name, "TT_2012_Fall")
+
+        toy_ch = toy.get_children()[0]
+        two_toys_ch = two_toys.get_children()[0]
+
+        self.assertEqual(toy_ch.display_name, "Overview")
+        self.assertEqual(two_toys_ch.display_name, "Two Toy Overview")
+
+
+    def test_definition_loading(self):
+        """When two courses share the same org and course name and
+        both have a module with the same url_name, the definitions shouldn't clash.
+
+        TODO (vshnayder): once we have a CMS, this shouldn't
+        happen--locations should uniquely name definitions.  But in
+        our imperfect XML world, it can (and likely will) happen."""
+
+        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy', 'two_toys'])
+
+        toy_id = "edX/toy/2012_Fall"
+        two_toy_id = "edX/toy/TT_2012_Fall"
+
+        location = Location(["i4x", "edX", "toy", "video", "Welcome"])
+        toy_video = modulestore.get_instance(toy_id, location)
+        two_toy_video =  modulestore.get_instance(two_toy_id, location)
+        self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
+        self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
