@@ -3,12 +3,12 @@ html {
   max-height: 100%;
 }
 
-div.info-wrapper {
+div.inner-container {
   padding: 40px;
   box-sizing: border-box;
   border-radius: 3px;
   background: #fff;
-  @include box-shadow(0  1px 25px rgba(0, 0, 0, .1));
+  @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .08), 0 1px 10px rgba(0, 0, 0, 0.1));
 }
 
 div.course-wrapper {
@@ -17,7 +17,7 @@ div.course-wrapper {
   box-sizing: border-box;
   border-radius: 3px;
   background: #fff;
-  @include box-shadow(0  1px 25px rgba(0, 0, 0, .1));
+  @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .08), 0 1px 10px rgba(0, 0, 0, 0.1));
 
 
   ul, ol {
