@@ -1,0 +1,89 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%namespace name="profile_graphs" file="profile_graphs.js"/>
+
+<%block name="title"><title>Progress - edX 6.002x</title></%block>
+
+<%!
+    from django.core.urlresolvers import reverse
+%>
+
+<%block name="js_extra">
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+<script>
+${profile_graphs.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")}
+</script>
+</%block>
+
+<%include file="course_navigation.html" args="active_page='progress'" />
+
+<section class="container">
+  <div class="profile-wrapper">
+
+    <section class="course-info">
+      <header>
+        <h1>Course Progress</h1>
+      </header>
+
+      <div id="grade-detail-graph"></div>
+
+      <ol class="chapters">
+        %for chapter in courseware_summary:
+        %if not chapter['display_name'] == "hidden":
+        <li>
+          <h2>${ chapter['display_name'] }</h2>
+
+          <ol class="sections">
+            %for section in chapter['sections']:
+            <li>
+              <%
+              earned = section['section_total'].earned
+              total = section['section_total'].possible
+              percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
+              %>
+
+              <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
+                ${ section['display_name'] }</a><span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span></h3>
+              <p>
+                ${section['format']}
+
+                %if 'due' in section and section['due']!="":
+                  <em>
+                  due ${section['due']}
+                  </em>
+                %endif
+              </p>
+
+              %if len(section['scores']) > 0:
+                <section class="scores">
+                  <h3> ${ "Problem Scores: " if section['graded'] else "Practice Scores: "} </h3>
+                  <ol>
+                    %for score in section['scores']:
+                    <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
+                    %endfor
+                  </ol>
+                </section>
+              %endif
+
+            </li> <!--End section-->
+            %endfor
+          </ol> <!--End sections-->
+        </li> <!--End chapter-->
+        %endif
+        %endfor
+      </ol> <!--End chapters-->
+
+    </section>
+
+    <section aria-label="Profile Navigation" class="user-info">
+      
+    </section>
+  </div>
+</section>

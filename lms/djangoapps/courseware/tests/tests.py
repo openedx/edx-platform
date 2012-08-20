@@ -303,7 +303,7 @@ class TestViewAuth(PageLoader):
                 'instructor_dashboard',
                 'gradebook',
                 'grade_summary',)]
-            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
                                                      'student_id': user(self.student).id}))
             return urls
 
@@ -388,7 +388,7 @@ class TestViewAuth(PageLoader):
             list of urls that students should be able to see only
             after launch, but staff should see before
             """
-            urls = reverse_urls(['info', 'courseware', 'profile'], course)
+            urls = reverse_urls(['info', 'courseware', 'progress'], course)
             urls.extend([
                 reverse('book', kwargs={'course_id': course.id, 'book_index': book.title})
                 for book in course.textbooks
@@ -411,7 +411,7 @@ class TestViewAuth(PageLoader):
             """list of urls that only instructors/staff should be able to see"""
             urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
                                 course)
-            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
                                                      'student_id': user(self.student).id}))
             return urls
 
