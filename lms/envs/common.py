@@ -260,7 +260,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # the advertised public IPs of the github WebHook servers.
 # These are listed, eg at https://github.com/MITx/mitx/admin/hooks
 
-ALLOWED_GITRELOAD = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
+ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it
