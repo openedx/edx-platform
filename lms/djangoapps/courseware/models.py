@@ -43,7 +43,7 @@ class StudentModule(models.Model):
     course_id = models.CharField(max_length=255, db_index=True)
 
     class Meta:
-        unique_together = (('course_id', 'student', 'module_state_key'),)
+        unique_together = (('student', 'module_state_key', 'course_id'),)
 
     ## Internal state of the object
     state = models.TextField(null=True, blank=True)
