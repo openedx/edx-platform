@@ -1,7 +1,7 @@
-<%inherit file="main.html" />
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware</%block>
-<%block name="title"><title>Courseware – MITx 6.002x</title></%block>
+<%block name="title"><title>${course.number} Courseware</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
@@ -19,7 +19,7 @@
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
 
-   <%static:js group='courseware'/>
+  <%static:js group='courseware'/>
 
   <%include file="discussion/_js_dependencies.html" />
   
@@ -35,7 +35,7 @@
   </script>
 </%block>
 
-<%include file="course_navigation.html" args="active_page='courseware'" />
+<%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 
 <section class="container">
   <div class="course-wrapper">
