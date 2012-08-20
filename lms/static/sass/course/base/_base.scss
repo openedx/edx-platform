@@ -1,5 +1,6 @@
 body {
   min-width: 980px;
+  background: #f7f7f7;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
@@ -9,6 +10,11 @@ body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a {
 
 table {
   table-layout: fixed;
+}
+
+.content-wrapper {
+  background: none;
+  border: none;
 }
 
 .container {
