@@ -11,7 +11,6 @@ python-memcached
 python-openid 
 path.py
 django_debug_toolbar
-django-staticfiles>=1.2.1
 fs
 beautifulsoup 
 beautifulsoup4
@@ -43,4 +42,6 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
+networkx
+pystache
 -r repo-requirements.txt
