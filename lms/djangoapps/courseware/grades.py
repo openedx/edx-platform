@@ -29,6 +29,8 @@ def grade(student, request, course, student_module_cache=None):
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
 
+    course: a CourseDescriptor
+
     - grade : A final letter grade.
     - percent : The final percent for the class (rounded up).
     - section_breakdown : A breakdown of each section that makes
