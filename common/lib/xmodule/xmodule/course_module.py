@@ -135,6 +135,10 @@ class CourseDescriptor(SequenceDescriptor):
 
 
     @staticmethod
+    def make_id(org, course, url_name):
+        return '/'.join([org, course, url_name])
+
+    @staticmethod
     def id_to_location(course_id):
         '''Convert the given course_id (org/course/name) to a location object.
         Throws ValueError if course_id is of the wrong format.

@@ -64,7 +64,7 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user, 
+    universities = get_courses_by_university(request.user,
                                              domain=request.META.get('HTTP_HOST'))
     return render_to_response("courses.html", {'universities': universities})
 
@@ -139,7 +139,7 @@ def index(request, course_id, chapter=None, section=None,
                                                           section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id=course_id)
+                                    student_module_cache, course_id)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -279,9 +279,11 @@ def profile(request, course_id, student_id=None):
     user_info = UserProfile.objects.get(user=student)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache, course_id=course_id)
+    course_module = get_module(request.user, request, course.location,
+                               student_module_cache, course_id)
 
-    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, course_module,
+                                                 course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
 
     context = {'name': user_info.name,
