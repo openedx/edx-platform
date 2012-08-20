@@ -3,8 +3,22 @@ html {
   max-height: 100%;
 }
 
+div.info-wrapper {
+  padding: 40px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: #fff;
+  @include box-shadow(0  1px 25px rgba(0, 0, 0, .1));
+}
+
 div.course-wrapper {
   @extend .table-wrapper;
+  padding: 40px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: #fff;
+  @include box-shadow(0  1px 25px rgba(0, 0, 0, .1));
+
 
   ul, ol {
     list-style: none;
