@@ -68,23 +68,31 @@ div.info-wrapper {
 
   section.handouts {
     @extend .sidebar;
-    border-left: 1px solid $border-color;
     @include border-radius(0 4px 4px 0);
     border-right: 0;
     @include box-shadow(none);
+    font-size: 14px;
 
     h1 {
-      @extend .bottom-border;
       margin-bottom: 0;
-      padding: lh(.5) lh(.5);
+      padding: 20px 26px;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: bold;
     }
 
     ol {
       li {
+        padding: 0 26px;
+        margin-bottom: 14px;
+
         a {
           display: block;
-          padding-left: lh(.5);
-          padding-right: 0;
+          padding: 0;
+
+          &:hover {
+            background: transparent;
+          }
         }
 
         &.expandable,
@@ -98,7 +106,6 @@ div.info-wrapper {
         }
 
         &.multiple {
-          padding: lh(.5) 0 lh(.5) lh(.5);
 
           a {
             @include inline-block;
@@ -133,7 +140,7 @@ div.info-wrapper {
         }
 
         div.hitarea {
-          background-image: url('../images/treeview-default.gif');
+          background-image: url('../images/treeview-default.gif') no-repeat;
           display: block;
           height: 100%;
           margin-left: 0;
@@ -165,7 +172,7 @@ div.info-wrapper {
           @include box-shadow(none);
           color: #aaa;
           font-size: 1em;
-          margin-bottom: em(6);
+          margin-bottom: em(6);          
         }
 
         p {

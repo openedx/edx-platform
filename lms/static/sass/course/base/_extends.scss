@@ -28,7 +28,7 @@ h1.top-header {
 .content {
   @include box-sizing(border-box);
   display: table-cell;
-  padding: lh();
+  padding: 2.5em;
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
 
@@ -38,13 +38,14 @@ h1.top-header {
 }
 
 .sidebar {
-  border-right: 1px solid #C8C8C8;
+  // border-right: 1px solid #C8C8C8;
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
   position: relative;
   vertical-align: top;
   width: flex-grid(3);
+  background: $sidebar-color;
 
   h1, h2 {
    font-size: em(20);
@@ -85,7 +86,7 @@ h1.top-header {
     }
 
     &.active {
-      @extend .bottom-border;
+      // @extend .bottom-border;
       color: #000;
       font-weight: bold;
 
@@ -101,7 +102,7 @@ h1.top-header {
     padding-left: 0;
 
     li {
-      @extend .bottom-border;
+      // @extend .bottom-border;
       @extend .clearfix;
       background: none;
       position: relative;

@@ -5,12 +5,6 @@ html {
 
 div.course-wrapper {
   @extend .table-wrapper;
-  padding: 40px;
-  box-sizing: border-box;
-  border-radius: 3px;
-  background: #fff;
-  @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .08), 0 1px 10px rgba(0, 0, 0, 0.1));
-
 
   ul, ol {
     list-style: none;
