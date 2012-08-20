@@ -76,7 +76,7 @@ def grade(student, request, course, student_module_cache=None):
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database
                 for module in yield_module_descendents(section_module):
-                    (correct, total) = get_score(student, module, student_module_cache)
+                    (correct, total) = get_score(course.id, student, module, student_module_cache)
                     if correct is None and total is None:
                         continue
 
@@ -171,7 +171,9 @@ def progress_summary(student, course, grader, student_module_cache):
             graded = s.metadata.get('graded', False)
             scores = []
             for module in yield_module_descendents(s):
-                (correct, total) = get_score(student, module, student_module_cache)
+                # course is a module, not a descriptor...
+                course_id = course.descriptor.id
+                (correct, total) = get_score(course_id, student, module, student_module_cache)
                 if correct is None and total is None:
                     continue
 
@@ -200,7 +202,7 @@ def progress_summary(student, course, grader, student_module_cache):
     return chapters
 
 
-def get_score(user, problem, student_module_cache):
+def get_score(course_id, user, problem, student_module_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
 
@@ -215,7 +217,7 @@ def get_score(user, problem, student_module_cache):
     correct = 0.0
 
     # If the ID is not in the cache, add the item
-    instance_module = get_instance_module(user, problem, student_module_cache)
+    instance_module = get_instance_module(course_id, user, problem, student_module_cache)
     # instance_module = student_module_cache.lookup(problem.category, problem.id)
     # if instance_module is None:
     #     instance_module = StudentModule(module_type=problem.category,
