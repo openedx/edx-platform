@@ -149,6 +149,7 @@ def optioninput(element, value, status, render_template, msg=''):
              'state': status,
              'msg': msg,
              'options': osetdict,
+             'inline': element.get('inline',''),
              }
 
     html = render_template("optioninput.html", context)
