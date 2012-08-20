@@ -1,11 +1,11 @@
-<%inherit file="main.html" />
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
   <%static:css group='course'/>
 </%block>
 
-<%namespace name="profile_graphs" file="profile_graphs.js"/>
+<%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
 <%block name="title"><title>${course.number} Progress</title></%block>
 
@@ -18,11 +18,11 @@
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
 <script>
-${profile_graphs.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")}
+${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")}
 </script>
 </%block>
 
-<%include file="course_navigation.html" args="active_page='progress'" />
+<%include file="/courseware/course_navigation.html" args="active_page='progress'" />
 
 <section class="container">
   <div class="profile-wrapper">

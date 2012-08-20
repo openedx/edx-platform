@@ -1,5 +1,5 @@
-<%inherit file="main.html" />
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>${course.number} Courseware</title></%block>
 
@@ -21,7 +21,7 @@
 
    <%static:js group='courseware'/>
 
-  <%include file="mathjax_include.html" />
+  <%include file="/mathjax_include.html" />
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
@@ -30,7 +30,7 @@
   </script>
 </%block>
 
-<%include file="course_navigation.html" args="active_page='courseware'" />
+<%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 
 <section class="container">
   <div class="course-wrapper">

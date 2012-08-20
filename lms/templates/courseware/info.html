@@ -1,5 +1,5 @@
-<%inherit file="main.html" />
-<%namespace name='static' file='static_content.html'/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
   <%static:css group='course'/>
@@ -7,7 +7,7 @@
 
 <%block name="title"><title>${course.number} Course Info</title></%block>
 
-<%include file="course_navigation.html" args="active_page='info'" />
+<%include file="/courseware/course_navigation.html" args="active_page='info'" />
 <%! 
   from courseware.courses import get_course_info_section
 %>
