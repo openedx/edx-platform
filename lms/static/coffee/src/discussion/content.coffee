@@ -374,6 +374,8 @@ initializeFollowThread = (thread) ->
       initializeFollowThread $content
     $local = Discussion.generateLocal($content.children(".discussion-content"))
 
+    $local("span.timeago").timeago()
+
     $contentTitle = $local(".thread-title")
 
     if $contentTitle.length
