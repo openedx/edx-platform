@@ -338,7 +338,8 @@ class ModuleStoreBase(ModuleStore):
         and datastores.
         """
         # check that item is present and raise the promised exceptions if needed
-        self.get_item(location)
+        # TODO (vshnayder): post-launch, make errors properties of items
+        #self.get_item(location)
 
         errorlog = self._get_errorlog(location)
         return errorlog.errors
