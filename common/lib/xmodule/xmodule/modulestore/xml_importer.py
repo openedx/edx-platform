@@ -22,21 +22,22 @@ def import_from_xml(store, data_dir, course_dirs=None, eager=True,
         eager=eager,
         course_dirs=course_dirs
     )
-    for module in module_store.modules.itervalues():
+    for course_id in module_store.modules.keys():
+        for module in module_store.modules[course_id].itervalues():
 
-        # TODO (cpennington): This forces import to overrite the same items.
-        # This should in the future create new revisions of the items on import
-        try:
-            store.create_item(module.location)
-        except DuplicateItemError:
-            log.exception('Item already exists at %s' % module.location.url())
-            pass
-        if 'data' in module.definition:
-            store.update_item(module.location, module.definition['data'])
-        if 'children' in module.definition:
-            store.update_children(module.location, module.definition['children'])
-        # NOTE: It's important to use own_metadata here to avoid writing
-        # inherited metadata everywhere.
-        store.update_metadata(module.location, dict(module.own_metadata))
+            # TODO (cpennington): This forces import to overrite the same items.
+            # This should in the future create new revisions of the items on import
+            try:
+                store.create_item(module.location)
+            except DuplicateItemError:
+                log.exception('Item already exists at %s' % module.location.url())
+                pass
+            if 'data' in module.definition:
+                store.update_item(module.location, module.definition['data'])
+            if 'children' in module.definition:
+                store.update_children(module.location, module.definition['children'])
+            # NOTE: It's important to use own_metadata here to avoid writing
+            # inherited metadata everywhere.
+            store.update_metadata(module.location, dict(module.own_metadata))
 
     return module_store

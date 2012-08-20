@@ -223,6 +223,13 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def get_instance(self, course_id, location):
+        """
+        Get an instance of this location, with policy for course_id applied.
+        TODO (vshnayder): this may want to live outside the modulestore eventually
+        """
+        raise NotImplementedError
+
     def get_item_errors(self, location):
         """
         Return a list of (msg, exception-or-None) errors that the modulestore
@@ -331,7 +338,8 @@ class ModuleStoreBase(ModuleStore):
         and datastores.
         """
         # check that item is present and raise the promised exceptions if needed
-        self.get_item(location)
+        # TODO (vshnayder): post-launch, make errors properties of items
+        #self.get_item(location)
 
         errorlog = self._get_errorlog(location)
         return errorlog.errors

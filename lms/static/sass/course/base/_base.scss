@@ -53,6 +53,23 @@ input[type="password"] {
   }
 }
 
+label {
+  font-weight: normal;
+  font-style: normal;
+}
+
+input[type="reset"],
+input[type="submit"],
+input[type="button"],
+button,
+.button {
+  @extend .gray-button;
+
+  form & {
+    @extend .gray-button;
+  }
+}
+
 
 img {
   max-width: 100%;
