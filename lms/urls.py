@@ -100,7 +100,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
@@ -138,11 +138,11 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$',
-            'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
+            'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
-            'courseware.views.profile', name="student_profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress/(?P<student_id>[^/]*)/$',
+            'courseware.views.progress', name="student_progress"),
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
@@ -158,18 +158,18 @@ if settings.COURSEWARE_ENABLED:
 if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
-    
+
     # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
     # them together.
-    urlpatterns += (        
+    urlpatterns += (
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
         url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
 
-        
+
         url(r'^wiki/', include(wiki_pattern())),
         url(r'^notify/', include(notify_pattern())),
-        
+
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
