@@ -37,11 +37,7 @@ h1.top-header {
 .content {
   @include box-sizing(border-box);
   display: table-cell;
-<<<<<<< HEAD
   padding: 2em 2.5em;
-=======
-  padding-right: lh();
->>>>>>> master
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
 
