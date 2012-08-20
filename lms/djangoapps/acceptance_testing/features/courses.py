@@ -2,9 +2,11 @@ from lettuce import * #before, world
 from selenium import *
 import lettuce_webdriver.webdriver
 import logging
+import nose.tools
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 
+## imported from lms/djangoapps/courseware/courses.py
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
@@ -20,9 +22,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
+## end import
 
-## set up logger
-# logging.basicConfig(filename='lettuce.log', level=logging.DEBUG)
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
 
 ## support functions
 def get_courses():
@@ -30,15 +33,20 @@ def get_courses():
   Returns dict of lists of courses available, keyed by course.org (ie university).
   Courses are sorted by course.number.
   '''
-  # TODO: Clean up how 'error' is done.
-  # filter out any courses that errored.
   courses = [c for c in modulestore().get_courses()
              if isinstance(c, CourseDescriptor)]
   courses = sorted(courses, key=lambda course: course.number)
+  logging.info("COURSES FOUND")
+  logging.info(courses)
 
-  logging.debug(courses)
+  return courses
 
 ## course listing step
 @step(u'I should see all courses')
 def i_should_see_all_courses(step):
-  get_courses()
+  courses = get_courses()
+  page_source = world.browser.page_source
+
+  course_link_texts = [ (c.location.course, c.display_name) for c in courses]
+  for c in course_link_texts:
+    assert world.browser.find_element_by_partial_link_text(c[0] + ' ' + c[1])
