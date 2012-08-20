@@ -25,7 +25,7 @@ def get_course_by_id(course_id):
     """
     try:
         course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_item(course_loc)
+        return modulestore().get_instance(course_id, course_loc)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
 

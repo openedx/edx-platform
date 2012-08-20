@@ -71,13 +71,13 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
-    course = get_module(user, request, course.location, student_module_cache, course_id=course_id)
+    course = get_module(user, request, course.location, student_module_cache, course_id)
 
     chapters = list()
     for chapter in course.get_display_items():
         hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
         if hide_from_toc:
-            continue 
+            continue
 
         sections = list()
         for section in chapter.get_display_items():
@@ -131,7 +131,7 @@ def get_section(course_module, chapter, section):
     return section_module
 
 
-def get_module(user, request, location, student_module_cache, position=None, course_id=None):
+def get_module(user, request, location, student_module_cache, course_id, position=None):
     ''' Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
@@ -141,21 +141,14 @@ def get_module(user, request, location, student_module_cache, position=None, cou
       - request               : current django HTTPrequest
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
+      - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
 
     Returns: xmodule instance
 
     '''
-    descriptor = modulestore().get_item(location)
-    
-    # NOTE:
-    #   A 'course_id' is understood to be the triplet (org, course, run), for example
-    #       (MITx, 6.002x, 2012_Spring).
-    #   At the moment generic XModule does not contain enough information to replicate
-    #       the triplet (it is missing 'run'), so we must pass down course_id
-    if course_id is None:
-        course_id = descriptor.location.course_id # Will NOT produce (org, course, run) for non-CourseModule's
+    descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load'):
@@ -207,7 +200,7 @@ def get_module(user, request, location, student_module_cache, position=None, cou
         Delegate to get_module.  It does an access check, so may return None
         """
         return get_module(user, request, location,
-                                       student_module_cache, position, course_id=course_id)
+                                       student_module_cache, course_id, position)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -325,7 +318,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         user, modulestore().get_item(id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, student_module_cache)
+    instance = get_module(user, request, id, student_module_cache, course_id)
     if instance is None:
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
@@ -361,7 +354,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch=None, id=None, course_id=None):
+def modx_dispatch(request, dispatch, location, course_id):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
@@ -370,7 +363,8 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
       - dispatch -- the command string to pass through to the module's handle_ajax call
            (e.g. 'problem_reset').  If this string contains '?', only pass
            through the part before the first '?'.
-      - id -- the module id. Used to look up the XModule instance
+      - location -- the module location. Used to look up the XModule instance
+      - course_id -- defines the course context for this request.
     '''
     # ''' (fix emacs broken parsing)
 
@@ -392,12 +386,14 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
-    instance = get_module(request.user, request, id, student_module_cache, course_id=course_id)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        request.user, modulestore().get_item(course_id, location))
+
+    instance = get_module(request.user, request, location, student_module_cache, course_id)
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {0} for user {1}--access denied?".format(id, user))
+        log.debug("No module {0} for user {1}--access denied?".format(location, user))
         raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)

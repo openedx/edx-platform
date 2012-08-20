@@ -8,6 +8,7 @@
 import unittest
 import os
 import fs
+import fs.osfs
 import json
 
 import json
