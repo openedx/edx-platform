@@ -154,7 +154,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Add a list of all the errors...
                 context['course_errors'] = modulestore().get_item_errors(course.location)
 
-        result = render_to_response('courseware.html', context)
+        result = render_to_response('courseware/courseware.html', context)
     except:
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
@@ -215,7 +215,7 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('info.html', {'course': course,
+    return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
 
@@ -288,7 +288,7 @@ def progress(request, course_id, student_id=None):
                }
     context.update()
 
-    return render_to_response('progress.html', context)
+    return render_to_response('courseware/progress.html', context)
 
 
 
@@ -316,7 +316,7 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('gradebook.html', {'students': student_info,
+    return render_to_response('courseware/gradebook.html', {'students': student_info,
                                                  'course': course,
                                                  'course_id': course_id,
                                                  # Checked above
@@ -331,7 +331,7 @@ def grade_summary(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('grade_summary.html', context)
+    return render_to_response('courseware/grade_summary.html', context)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -342,5 +342,5 @@ def instructor_dashboard(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('instructor_dashboard.html', context)
+    return render_to_response('courseware/instructor_dashboard.html', context)
 
