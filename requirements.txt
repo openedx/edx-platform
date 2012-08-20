@@ -43,5 +43,5 @@ django-storages
 django-threaded-multihost
 django-sekizai<0.7
 networkx
-pystache
+pystache>=0.5.2
 -r repo-requirements.txt
