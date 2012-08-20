@@ -63,7 +63,7 @@ def manage_modulestores(request,reload_dir=None):
             html += 'Permission denied'
             html += "</body></html>"
             log.debug('request denied, ALLOWED_IPS=%s' % ALLOWED_IPS)
-            return HttpResponse(html)
+            return HttpResponse(html, status=403)
 
     #----------------------------------------
     # reload course if specified
@@ -137,7 +137,7 @@ def gitreload(request, reload_dir=None):
     html += '<h3>IP address: %s ' % ip
     html += '<h3>User: %s ' % request.user
 
-    ALLOWED_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']	# hardcoded to github
+    ALLOWED_IPS = []	# allow none by default
     if hasattr(settings,'ALLOWED_GITRELOAD_IPS'):	# allow override in settings
         ALLOWED_IPS = ALLOWED_GITRELOAD_IPS
 
