@@ -1,6 +1,10 @@
 from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_string
-from utils import render_mustache
+from utils import *
+from mustache_helpers import mustache_helpers
+from functools import partial
+
+import pystache_custom as pystache
 import urllib
 
 def pluralize(singular_term, count):
@@ -14,20 +18,17 @@ def show_if(text, condition):
     else:
         return ''
 
-def close_thread_text(content):
-    if content.get('closed'):
-        return 'Re-open thread'
-    else:
-        return 'Close thread'
-
-def url_for_user(course_id, user_id):
-    return reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])
-
-def url_for_tags(course_id, tags):
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': ",".join(tags)})
-
-def render_content(content):
-    context = {
-        'content': content,
+def render_content(content, additional_context={}):
+    content_info = {
+        'displayed_title': content.get('highlighted_title') or content.get('title', ''),
+        'displayed_body': content.get('highlighted_body') or content.get('body', ''),
+        'raw_tags': ','.join(content.get('tags', [])),
     }
+    context = {
+        'content': merge_dict(content, content_info),
+        content['type']: True,
+    }
+    context = merge_dict(context, additional_context)
+    partial_mustache_helpers = {k: partial(v, content) for k, v in mustache_helpers.items()}
+    context = merge_dict(context, partial_mustache_helpers)
     return render_mustache('discussion/_content.mustache', context)

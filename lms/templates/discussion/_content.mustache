@@ -10,7 +10,9 @@
         <li><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
         <li><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
         <li><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
-        <li><a href="javascript:void(0)" class="admin-openclose">Close thread</a></li>
+        {{#thread}}
+          <li><a href="javascript:void(0)" class="admin-openclose">{{close_thread_text}}</a></li>
+        {{/thread}}
       </ul>
       {{#thread}}
         <a class="thread-title" name="{{content.id}}" href="javascript:void(0)">{{{content.displayed_title}}}</a>
@@ -18,12 +20,12 @@
       {{/thread}}
       <div class="discussion-content-view">
         <a name="{{content.id}}" style="width: 0; height: 0; padding: 0; border: none;"></a>
-        <div class="content-body">{{{content.displayed_body}}}</div>
-        <div class="content-raw-body" style="display: none">{{{content.body}}}</div>
+        <div class="content-body {{content.type}}-body" id="content-body-{{content.id}}">{{{content.displayed_body}}}</div>
+        <div class="content-raw-body {{content.type}}-raw-body" style="display: none">{{{content.body}}}</div>
         {{#thread}}
           <div class="thread-tags">
             {{#content.tags}}
-              <a class="thread-tag" href="{{#url_for_tags}}{{tag}}{{/url_for_tags}}">{{tag}}</a>
+              <a class="thread-tag" href="{{##url_for_tags}}{{.}}{{/url_for_tags}}">{{.}}</a>
             {{/content.tags}}
           </div>
           <div class="thread-raw-tags" style="display: none">{{content.raw_tags}}</div>
@@ -35,7 +37,7 @@
               anonymous
             {{/content.anonymous}}
             {{^content.anonymous}}
-              <a href="{{#url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
+              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
           <div class="comment-count">
@@ -44,7 +46,7 @@
                 <a href="javascript:void(0)" class="discussion-show-comments first-time">Show all comments ({{content.comments_count}} total)</a>
               {{/partial_comments}}
               {{^partial_comments}}
-                <a href="javascript:void(0)" class="discussion-show-comments">Show {{#pluralize}}{{content.comments_count}} comment}}{{/pluralize}}</a>
+                <a href="javascript:void(0)" class="discussion-show-comments">Show {{##pluralize}}{{content.comments_count}} comment{{/pluralize}}</a>
               {{/partial_comments}}
             {{/thread}}
           </div>
