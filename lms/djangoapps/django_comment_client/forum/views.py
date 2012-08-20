@@ -82,6 +82,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'base_url': base_url,
         'query_params': strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
         'annotated_content_info': json.dumps(annotated_content_info),
+        'discussion_data': json.dumps({ discussion_id: threads }),
     }
     context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
