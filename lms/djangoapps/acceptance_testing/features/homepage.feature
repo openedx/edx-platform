@@ -1,4 +1,4 @@
-Feature: There are courses
+Feature: There are courses on the homepage
   In order to view and sign up for courses
   As anonymous web users
   We want to be able to see all the courses available on the home page
