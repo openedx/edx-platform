@@ -73,6 +73,11 @@ div.info-wrapper {
     @include box-shadow(none);
     font-size: 14px;
 
+    &:after {
+      left: -1px;
+      right: auto;
+    }
+
     h1 {
       margin-bottom: 0;
       padding: 32px 26px 20px 26px;

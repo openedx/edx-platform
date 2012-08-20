@@ -9,9 +9,9 @@ body.user-profile-page {
   }
 
   ul.sub-info {
-    // border-top: 1px solid #ddd;
     margin-top: lh();
     list-style: none;
+    padding: 0;
 
     > li {
       display: table-cell;
@@ -57,6 +57,7 @@ body.user-profile-page {
 
     ul {
       list-style: none;
+      padding: 0;
 
       &.user-stats-table {
         list-style: none;
@@ -72,37 +73,28 @@ body.user-profile-page {
         margin-bottom: 30px;
 
         li {
-          background-position: 10px center;
+          background-position: 10px -10px;
           background-repeat: no-repeat;
-          @include border-radius(4px);
           display: inline-block;
-          height: 20px;
-          padding: 10px 10px 10px 40px;
+          padding: 2px 10px 2px 40px;
+          margin-bottom: lh(.5);
+          border: 1px solid lighten($border-color, 10%);
 
           &.up {
-            background-color:#d1e3a8;
-            background-image: url(../images/askbot/vote-arrow-up-activate.png);
+            background-image: url(../images/askbot/vote-arrow-up.png);
             margin-right: 6px;
-
-            span.vote-count {
-              color: #3f6c3e;
-            }
           }
 
           &.down {
-            background-image: url(../images/askbot/vote-arrow-down-activate.png);
-            background-color:#eac6ad;
-
-            span.vote-count {
-              color: $mit-red;
-            }
-
+            background-image: url(../images/askbot/vote-arrow-down.png);
           }
         }
       }
 
       &.badges {
         @include inline-block();
+        padding: 0;
+        margin: 0;
 
         a {
           background-color: #e3e3e3;

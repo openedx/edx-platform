@@ -1,7 +1,6 @@
 // Style for modal boxes that pop up to notify the user of various events
-
 .vote-notification {
-  background-color: darken($mit-red, 7%);
+  background-color: darken(#666, 7%);
   @include border-radius(4px);
   @include box-shadow(0px 2px 9px #aaa);
   color: white;
@@ -15,12 +14,12 @@
   z-index: 1;
 
   h3 {
-    background: $mit-red;
+    background: #666;
     padding: 10px 10px 10px 10px;
     font-size: 13px;
     margin-bottom: 5px;
-    border-bottom: darken(#8e0000, 10%) 1px solid;
-    @include box-shadow(0 1px 0 lighten($mit-red, 10%));
+    border-bottom: darken(#666, 10%) 1px solid;
+    @include box-shadow(0 1px 0 lighten(#666, 10%));
     color: #fff;
     font-weight: normal;
     @include border-radius(4px 4px 0 0);

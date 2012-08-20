@@ -1,0 +1,66 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="bodyclass">courseware</%block>
+<%block name="title"><title>${course.number} Courseware</title></%block>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+
+  ## codemirror
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+
+  ## alternate codemirror
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
+  ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
+
+   <%static:js group='courseware'/>
+
+  <%include file="/mathjax_include.html" />
+
+  <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
+  <script type="text/javascript">
+    document.write('\x3Cscript type="text/javascript" src="' +
+        document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+  </script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+
+<section class="container">
+  <div class="course-wrapper">
+    <section aria-label="Course Navigation" class="course-index">
+      <header id="open_close_accordion">
+        <a href="#">close</a>
+      </header>
+
+      <div id="accordion" style="display: none">
+        <nav>
+          ${accordion}
+        </nav>
+      </div>
+    </section>
+
+    <section class="course-content">
+      ${content}
+
+      % if course_errors is not UNDEFINED:
+          <h2>Course errors</h2>
+          <div id="course-errors">
+            <ul>
+          % for (msg, err) in course_errors:
+            <li>${msg}
+              <ul><li><pre>${err}</pre></li></ul>
+            </li>
+          % endfor
+            </ul>
+          </div>
+      % endif
+    </section>
+  </div>
+</section>

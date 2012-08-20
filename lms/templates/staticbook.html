@@ -32,7 +32,7 @@ function goto_page(n) {
   if(n<10) {
     prefix="00";
   }
-  $("#bookpage").attr("src","${ settings.BOOK_URL }p"+prefix+n+".png");
+  $("#bookpage").attr("src","${ book_url }p"+prefix+n+".png");
   $.cookie("book_page", n, {'expires':3650, 'path':'/'});
 };
 
@@ -61,7 +61,7 @@ $("#open_close_accordion a").click(function(){
 </script>
 </%block>
 
-<%include file="course_navigation.html" args="active_page='book'" />
+<%include file="/courseware/course_navigation.html" args="active_page='book'" />
 
 <section class="container">
   <div class="book-wrapper">
@@ -113,7 +113,7 @@ $("#open_close_accordion a").click(function(){
           </ul>
         </nav>
 
-        <img id="bookpage" src="${ settings.BOOK_URL }p${ "%03i"%(page) }.png">
+        <img id="bookpage" src="${ book_url }p${ "%03i"%(page) }.png">
       </section>
     </section>
   </div>

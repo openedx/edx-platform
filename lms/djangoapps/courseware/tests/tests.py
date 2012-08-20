@@ -18,12 +18,14 @@ from override_settings import override_settings
 
 import xmodule.modulestore.django
 
+# Need access to internal func to put users in the right group
+from courseware.access import _course_staff_group_name
+
 from student.models import Registration
-from courseware.courses import course_staff_group_name
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
-
+from xmodule.timeparse import stringify_time
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -54,6 +56,7 @@ def mongo_store_config(data_dir):
             'db': 'xmodule',
             'collection': 'modulestore',
             'fs_root': data_dir,
+            'render_template': 'mitxmako.shortcuts.render_to_string',
         }
     }
 }
@@ -174,7 +177,7 @@ class PageLoader(ActivateLoginTestCase):
     def try_enroll(self, course):
         """Try to enroll.  Return bool success instead of asserting it."""
         data = self._enroll(course)
-        print 'Enrollment in {} result: {}'.format(course.location.url(), data)
+        print 'Enrollment in {0} result: {1}'.format(course.location.url(), data)
         return data['success']
 
     def enroll(self, course):
@@ -185,7 +188,7 @@ class PageLoader(ActivateLoginTestCase):
     def unenroll(self, course):
         """Unenroll the currently logged-in user, and check that it worked."""
         resp = self.client.post('/change_enrollment', {
-            'enrollment_action': 'enroll',
+            'enrollment_action': 'unenroll',
             'course_id': course.id,
             })
         data = parse_json(resp)
@@ -300,17 +303,17 @@ class TestViewAuth(PageLoader):
                 'instructor_dashboard',
                 'gradebook',
                 'grade_summary',)]
-            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
                                                      'student_id': user(self.student).id}))
             return urls
 
         # shouldn't be able to get to the instructor pages
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 404 on {}'.format(url)
+            print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 
@@ -319,11 +322,11 @@ class TestViewAuth(PageLoader):
 
         # Now should be able to get to the toy course, but not the full course
         for url in instructor_urls(self.toy):
-            print 'checking for 200 on {}'.format(url)
+            print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
 
         for url in instructor_urls(self.full):
-            print 'checking for 404 on {}'.format(url)
+            print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
 
@@ -334,31 +337,28 @@ class TestViewAuth(PageLoader):
 
         # and now should be able to load both
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
-            print 'checking for 200 on {}'.format(url)
+            print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
 
 
     def run_wrapped(self, test):
         """
-        test.py turns off start dates.  Enable them and DARK_LAUNCH.
+        test.py turns off start dates.  Enable them.
         Because settings is global, be careful not to mess it up for other tests
         (Can't use override_settings because we're only changing part of the
         MITX_FEATURES dict)
         """
         oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
-        oldDL = settings.MITX_FEATURES['DARK_LAUNCH']
 
         try:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = False
-            settings.MITX_FEATURES['DARK_LAUNCH'] = True
             test()
         finally:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
-            settings.MITX_FEATURES['DARK_LAUNCH'] = oldDL
 
 
     def test_dark_launch(self):
-        """Make sure that when dark launch is on, students can't access course
+        """Make sure that before course start, students can't access course
         pages, but instructors can"""
         self.run_wrapped(self._do_test_dark_launch)
 
@@ -372,13 +372,12 @@ class TestViewAuth(PageLoader):
 
         # Make courses start in the future
         tomorrow = time.time() + 24*3600
-        self.toy.start = self.toy.metadata['start'] = time.gmtime(tomorrow)
-        self.full.start = self.full.metadata['start'] = time.gmtime(tomorrow)
+        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.full.metadata['start'] = stringify_time(time.gmtime(tomorrow))
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
-        self.assertTrue(settings.MITX_FEATURES['DARK_LAUNCH'])
 
         def reverse_urls(names, course):
             """Reverse a list of course urls"""
@@ -389,7 +388,11 @@ class TestViewAuth(PageLoader):
             list of urls that students should be able to see only
             after launch, but staff should see before
             """
-            urls = reverse_urls(['info', 'book', 'courseware', 'profile'], course)
+            urls = reverse_urls(['info', 'courseware', 'progress'], course)
+            urls.extend([
+                reverse('book', kwargs={'course_id': course.id, 'book_index': book.title})
+                for book in course.textbooks
+            ])
             return urls
 
         def light_student_urls(course):
@@ -408,28 +411,28 @@ class TestViewAuth(PageLoader):
             """list of urls that only instructors/staff should be able to see"""
             urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
                                 course)
-            urls.append(reverse('student_profile', kwargs={'course_id': course.id,
+            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
                                                      'student_id': user(self.student).id}))
             return urls
 
         def check_non_staff(course):
             """Check that access is right for non-staff in course"""
-            print '=== Checking non-staff access for {}'.format(course.id)
+            print '=== Checking non-staff access for {0}'.format(course.id)
             for url in instructor_urls(course) + dark_student_urls(course):
-                print 'checking for 404 on {}'.format(url)
+                print 'checking for 404 on {0}'.format(url)
                 self.check_for_get_code(404, url)
 
             for url in light_student_urls(course):
-                print 'checking for 200 on {}'.format(url)
+                print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
 
         def check_staff(course):
             """Check that access is right for staff in course"""
-            print '=== Checking staff access for {}'.format(course.id)
+            print '=== Checking staff access for {0}'.format(course.id)
             for url in (instructor_urls(course) +
                         dark_student_urls(course) +
                         light_student_urls(course)):
-                print 'checking for 200 on {}'.format(url)
+                print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
 
         # First, try with an enrolled student
@@ -444,7 +447,7 @@ class TestViewAuth(PageLoader):
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 
@@ -494,7 +497,7 @@ class TestViewAuth(PageLoader):
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = course_staff_group_name(self.toy)
+        group_name = _course_staff_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(user(self.instructor))
 

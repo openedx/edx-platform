@@ -35,7 +35,7 @@ def manage_modulestores(request,reload_dir=None):
     ip = request.META.get('HTTP_X_REAL_IP','')	# nginx reverse proxy
     if not ip:
         ip = request.META.get('REMOTE_ADDR','None')
-    
+
     if LOCAL_DEBUG:
         html += '<h3>IP address: %s ' % ip
         html += '<h3>User: %s ' % request.user
@@ -48,7 +48,7 @@ def manage_modulestores(request,reload_dir=None):
             html += 'Permission denied'
             html += "</body></html>"
             log.debug('request denied, ALLOWED_IPS=%s' % ALLOWED_IPS)
-            return HttpResponse(html)    
+            return HttpResponse(html)
 
     #----------------------------------------
     # reload course if specified
@@ -74,10 +74,10 @@ def manage_modulestores(request,reload_dir=None):
     #----------------------------------------
 
     dumpfields = ['definition','location','metadata']
-    
+
     for cdir, course in def_ms.courses.items():
         html += '<hr width="100%"/>'
-        html += '<h2>Course: %s (%s)</h2>' % (course.metadata['display_name'],cdir)
+        html += '<h2>Course: %s (%s)</h2>' % (course.display_name,cdir)
 
         for field in dumpfields:
             data = getattr(course,field)
@@ -89,7 +89,7 @@ def manage_modulestores(request,reload_dir=None):
                 html += '</ul>'
             else:
                 html += '<ul><li>%s</li></ul>' % escape(data)
-        
+
 
     #----------------------------------------
 
@@ -107,4 +107,4 @@ def manage_modulestores(request,reload_dir=None):
     log.debug('def_ms=%s' % unicode(def_ms))
 
     html += "</body></html>"
-    return HttpResponse(html)    
+    return HttpResponse(html)

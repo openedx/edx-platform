@@ -2,24 +2,24 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from requests.auth import HTTPBasicAuth
+
 from capa.xqueue_interface import XQueueInterface
-from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
+from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_static_urls, add_histogram, wrap_xmodule
-
-from courseware.courses import (has_staff_access_to_course,
-                                has_staff_access_to_location)
-from requests.auth import HTTPBasicAuth
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
 
@@ -48,7 +48,7 @@ def make_track_function(request):
     return f
 
 
-def toc_for_course(user, request, course, active_chapter, active_section):
+def toc_for_course(user, request, course, active_chapter, active_section, course_id=None):
     '''
     Create a table of contents from the module store
 
@@ -65,13 +65,20 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     Everything else comes from the xml, or defaults to "".
 
     chapters with name 'hidden' are skipped.
+
+    NOTE: assumes that if we got this far, user has access to course.  Returns
+    None if this is not the case.
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
-    course = get_module(user, request, course.location, student_module_cache)
+    course = get_module(user, request, course.location, student_module_cache, course_id)
 
     chapters = list()
     for chapter in course.get_display_items():
+        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+        if hide_from_toc:
+            continue
+
         sections = list()
         for section in chapter.get_display_items():
 
@@ -124,7 +131,7 @@ def get_section(course_module, chapter, section):
     return section_module
 
 
-def get_module(user, request, location, student_module_cache, position=None):
+def get_module(user, request, location, student_module_cache, course_id, position=None):
     ''' Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
@@ -134,13 +141,18 @@ def get_module(user, request, location, student_module_cache, position=None):
       - request               : current django HTTPrequest
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
+      - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
 
     Returns: xmodule instance
 
     '''
-    descriptor = modulestore().get_item(location)
+    descriptor = modulestore().get_instance(course_id, location)
+
+    # Short circuit--if the user shouldn't have access, bail without doing any work
+    if not has_access(user, descriptor, 'load'):
+        return None
 
     #TODO Only check the cache if this module can possibly have state
     instance_module = None
@@ -155,26 +167,20 @@ def get_module(user, request, location, student_module_cache, position=None):
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
 
-
-
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
-    # TODO (vshnayder): fix hardcoded urls (use reverse)
     # Setup system context for module instance
-
-    ajax_url = reverse('modx_dispatch', 
-                       kwargs=dict(course_id=descriptor.location.course_id,
-                                   id=descriptor.location.url(),
+    ajax_url = reverse('modx_dispatch',
+                       kwargs=dict(course_id=course_id,
+                                   location=descriptor.location.url(),
                                    dispatch=''),
                        )
-
-    # ajax_url = settings.MITX_ROOT_URL + '/modx/' + descriptor.location.url() + '/'
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
     xqueue_callback_url += reverse('xqueue_callback',
-                                  kwargs=dict(course_id=descriptor.location.course_id,
+                                  kwargs=dict(course_id=course_id,
                                               userid=str(user.id),
                                               id=descriptor.location.url(),
                                               dispatch='score_update'),
@@ -190,8 +196,11 @@ def get_module(user, request, location, student_module_cache, position=None):
               'default_queuename': xqueue_default_queuename.replace(' ', '_')}
 
     def _get_module(location):
+        """
+        Delegate to get_module.  It does an access check, so may return None
+        """
         return get_module(user, request, location,
-                                       student_module_cache, position)
+                                       student_module_cache, course_id, position)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -208,12 +217,11 @@ def get_module(user, request, location, student_module_cache, position=None):
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          is_staff=has_staff_access_to_location(user, location),
                           node_path=settings.NODE_PATH
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    system.set('DEBUG',settings.DEBUG)
+    system.set('DEBUG', settings.DEBUG)
 
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
 
@@ -222,8 +230,12 @@ def get_module(user, request, location, student_module_cache, position=None):
         module.metadata['data_dir'], module
     )
 
+    # Allow URLs of the form '/course/' refer to the root of multicourse directory
+    #   hierarchy of this course
+    module.get_html = replace_course_urls(module.get_html, course_id, module)
+
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
-        if has_staff_access_to_course(user, module.location.course):
+        if has_access(user, module, 'staff'):
             module.get_html = add_histogram(module.get_html, module, user)
 
     return module
@@ -256,7 +268,7 @@ def get_instance_module(user, module, student_module_cache):
     else:
         return None
 
-def get_shared_instance_module(user, module, student_module_cache):
+def get_shared_instance_module(course_id, user, module, student_module_cache):
     """
     Return shared_module is a StudentModule specific to all modules with the same
         'shared_state_key' attribute, or None if the module does not elect to
@@ -264,7 +276,7 @@ def get_shared_instance_module(user, module, student_module_cache):
     """
     if user.is_authenticated():
         # To get the shared_state_key, we need to descriptor
-        descriptor = modulestore().get_item(module.location)
+        descriptor = modulestore().get_instance(course_id, module.location)
 
         shared_state_key = getattr(module, 'shared_state_key', None)
         if shared_state_key is not None:
@@ -304,12 +316,17 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, modulestore().get_item(id))
-    instance = get_module(user, request, id, student_module_cache)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
+    instance = get_module(user, request, id, student_module_cache, course_id)
+    if instance is None:
+        log.debug("No module {0} for user {1}--access denied?".format(id, user))
+        raise Http404
+
     instance_module = get_instance_module(user, instance, student_module_cache)
 
     if instance_module is None:
-        log.debug("Couldn't find module '%s' for user '%s'", id, user)
+        log.debug("Couldn't find instance of module '%s' for user '%s'", id, user)
         raise Http404
 
     oldgrade = instance_module.grade
@@ -337,7 +354,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch=None, id=None, course_id=None):
+def modx_dispatch(request, dispatch, location, course_id):
     ''' Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
@@ -346,26 +363,41 @@ def modx_dispatch(request, dispatch=None, id=None, course_id=None):
       - dispatch -- the command string to pass through to the module's handle_ajax call
            (e.g. 'problem_reset').  If this string contains '?', only pass
            through the part before the first '?'.
-      - id -- the module id. Used to look up the XModule instance
+      - location -- the module location. Used to look up the XModule instance
+      - course_id -- defines the course context for this request.
     '''
     # ''' (fix emacs broken parsing)
 
     # Check for submitted files and basic file size checks
-    p = request.POST.copy()
+    p = request.POST.dict()
     if request.FILES:
-        for inputfile_id in request.FILES.keys():
-            inputfile = request.FILES[inputfile_id]
-            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
-                file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                    (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
-                return HttpResponse(json.dumps({'success': file_too_big_msg}))
-            p[inputfile_id] = inputfile
+        for fileinput_id in request.FILES.keys():
+            inputfiles = request.FILES.getlist(fileinput_id)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, modulestore().get_item(id))
-    instance = get_module(request.user, request, id, student_module_cache)
+            if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
+                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+                    settings.MAX_FILEUPLOADS_PER_INPUT
+                return HttpResponse(json.dumps({'success': too_many_files_msg}))
+
+            for inputfile in inputfiles:
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
+                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
+                    return HttpResponse(json.dumps({'success': file_too_big_msg}))
+            p[fileinput_id] = inputfiles
+
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        request.user, modulestore().get_instance(course_id, location))
+
+    instance = get_module(request.user, request, location, student_module_cache, course_id)
+    if instance is None:
+        # Either permissions just changed, or someone is trying to be clever
+        # and load something they shouldn't have access to.
+        log.debug("No module {0} for user {1}--access denied?".format(location, user))
+        raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)
-    shared_module = get_shared_instance_module(request.user, instance, student_module_cache)
+    shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
 
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:

@@ -6,29 +6,42 @@ h1.top-header {
   padding-bottom: lh();
 }
 
-.light-button, a.light-button {
-  border: 1px solid #ccc;
-  @include border-radius(3px);
-  @include box-shadow(inset 0 1px 0 #fff);
-  color: #666;
-  cursor: pointer;
-  font: normal $body-font-size $body-font-family;
-  @include linear-gradient(#fff, lighten(#888, 40%));
-  padding: 4px 8px;
-  text-decoration: none;
-  -webkit-font-smoothing: antialiased;
+.button-reset {
+  text-transform: none;
+  letter-spacing: 0;
 
-  &:hover, &:focus {
-    border: 1px solid #ccc;
-    @include linear-gradient(#fff, lighten(#888, 37%));
+  &:hover {
     text-decoration: none;
   }
+}
+
+.light-button, a.light-button, // only used in askbot as classes
+.gray-button {
+  @include button(simple, #eee);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.blue-button {
+  @include button(simple, $blue);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.pink-button {
+  @include button(simple, $pink);
+  @extend .button-reset;
+  font-size: em(13);
 }
 
 .content {
   @include box-sizing(border-box);
   display: table-cell;
+<<<<<<< HEAD
   padding: 2em 2.5em;
+=======
+  padding-right: lh();
+>>>>>>> master
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
 
@@ -46,6 +59,18 @@ h1.top-header {
   vertical-align: top;
   width: flex-grid(3);
   background: $sidebar-color;
+
+  &:after {
+    width: 1px;
+    height: 100%;
+    @include position(absolute,  0px -1px 0px 0);
+    content: "";
+    @include background-image(linear-gradient(top, #fff, rgba(#fff, 0)), linear-gradient(top, rgba(#fff, 0), #fff));
+    background-position: top, bottom;
+    @include background-size(1px 20px);
+    background-repeat: no-repeat;
+    display: block;
+  }
 
   h1, h2 {
    font-size: em(20);
@@ -135,7 +160,7 @@ h1.top-header {
       position: absolute;
       right: -1px;
       text-indent: -9999px;
-      top: 6px;
+      top: 12px;
       width: 16px;
       z-index: 99;
 
