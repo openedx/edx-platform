@@ -3,6 +3,7 @@ import logging
 import os
 import re
 
+from collections import defaultdict
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
@@ -33,7 +34,7 @@ def clean_out_mako_templating(xml_string):
     return xml_string
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
-    def __init__(self, xmlstore, org, course, course_dir,
+    def __init__(self, xmlstore, course_id, course_dir,
                  policy, error_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
@@ -43,6 +44,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed_modules = 0
         self.used_slugs = set()
+        self.org, self.course, self.url_name = course_id.split('/')
 
         def process_xml(xml):
             """Takes an xml string, and returns a XModuleDescriptor created from
@@ -80,21 +82,24 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 xml_data.set('url_name', slug)
 
             descriptor = XModuleDescriptor.load_from_xml(
-                etree.tostring(xml_data), self, org,
-                course, xmlstore.default_class)
+                etree.tostring(xml_data), self, self.org,
+                self.course, xmlstore.default_class)
 
             #log.debug('==> importing descriptor location %s' %
             #          repr(descriptor.location))
             descriptor.metadata['data_dir'] = course_dir
 
-            xmlstore.modules[descriptor.location] = descriptor
+            xmlstore.modules[course_id][descriptor.location] = descriptor
 
             if xmlstore.eager:
                 descriptor.get_children()
             return descriptor
 
         render_template = lambda: ''
-        load_item = xmlstore.get_item
+        # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
+        # load_item should actually be get_instance, because it expects the course-specific
+        # policy to be loaded.  For now, just add the course_id here...
+        load_item = lambda location: xmlstore.get_instance(course_id, location)
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
         MakoDescriptorSystem.__init__(self, load_item, resources_fs,
@@ -127,7 +132,7 @@ class XMLModuleStore(ModuleStoreBase):
 
         self.eager = eager
         self.data_dir = path(data_dir)
-        self.modules = {}  # location -> XModuleDescriptor
+        self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
 
         if default_class is None:
@@ -236,14 +241,24 @@ class XMLModuleStore(ModuleStoreBase):
                 tracker(msg)
                 course = course_dir
 
-            url_name = course_data.get('url_name')
+            url_name = course_data.get('url_name', course_data.get('slug'))
             if url_name:
                 policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                 policy = self.load_policy(policy_path, tracker)
             else:
                 policy = {}
+                # VS[compat] : 'name' is deprecated, but support it for now...
+                if course_data.get('name'):
+                    url_name = Location.clean(course_data.get('name'))
+                    tracker("'name' is deprecated for module xml.  Please use "
+                            "display_name and url_name.")
+                else:
+                    raise ValueError("Can't load a course without a 'url_name' "
+                                     "(or 'name') set.  Set url_name.")
 
-            system = ImportSystem(self, org, course, course_dir, policy, tracker)
+
+            course_id = CourseDescriptor.make_id(org, course, url_name)
+            system = ImportSystem(self, course_id, course_dir, policy, tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
 
@@ -256,6 +271,27 @@ class XMLModuleStore(ModuleStoreBase):
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
+
+    def get_instance(self, course_id, location, depth=0):
+        """
+        Returns an XModuleDescriptor instance for the item at
+        location, with the policy for course_id.  (In case two xml
+        dirs have different content at the same location, return the
+        one for this course_id.)
+
+        If any segment of the location is None except revision, raises
+            xmodule.modulestore.exceptions.InsufficientSpecificationError
+
+        If no object is found at that location, raises
+            xmodule.modulestore.exceptions.ItemNotFoundError
+
+        location: Something that can be passed to Location
+        """
+        location = Location(location)
+        try:
+            return self.modules[course_id][location]
+        except KeyError:
+            raise ItemNotFoundError(location)
 
     def get_item(self, location, depth=0):
         """
@@ -271,11 +307,8 @@ class XMLModuleStore(ModuleStoreBase):
 
         location: Something that can be passed to Location
         """
-        location = Location(location)
-        try:
-            return self.modules[location]
-        except KeyError:
-            raise ItemNotFoundError(location)
+        raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
+                                  " are unique. Use get_instance.")
 
 
     def get_courses(self, depth=0):

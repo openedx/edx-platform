@@ -83,6 +83,9 @@ class XQueueInterface(object):
 
         if error and (msg == 'login_required'): # Log in, then try again
             self._login()
+            if files_to_upload is not None:
+                for f in files_to_upload: # Need to rewind file pointers
+                    f.seek(0)
             (error, msg) = self._send_to_queue(header, body, files_to_upload)
 
         return (error, msg)

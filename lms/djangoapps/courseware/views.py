@@ -78,7 +78,7 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user, 
+    universities = get_courses_by_university(request.user,
                                              domain=request.META.get('HTTP_HOST'))
     return render_to_response("courses.html", {'universities': universities})
 
@@ -153,7 +153,7 @@ def index(request, course_id, chapter=None, section=None,
                                                           section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id=course_id)
+                                    student_module_cache, course_id)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -168,7 +168,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Add a list of all the errors...
                 context['course_errors'] = modulestore().get_item_errors(course.location)
 
-        result = render_to_response('courseware.html', context)
+        result = render_to_response('courseware/courseware.html', context)
     except:
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
@@ -184,8 +184,9 @@ def index(request, course_id, chapter=None, section=None,
                               position=position
                               ))
             try:
-                result = render_to_response('courseware-error.html',
-                                            {'staff_access': staff_access})
+                result = render_to_response('courseware/courseware-error.html',
+                                            {'staff_access': staff_access,
+                                            'course' : course})
             except:
                 result = HttpResponse("There was an unrecoverable error")
 
@@ -229,7 +230,7 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('info.html', {'course': course,
+    return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
 
@@ -292,11 +293,10 @@ def news(request, course_id):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
-    """ User profile. Show username, location, etc, as well as grades .
-        We need to allow the user to change some of these settings.
+def progress(request, course_id, student_id=None):
+    """ User progress. We show the grade bar and every problem score.
 
-    Course staff are allowed to see the profiles of students in their class.
+    Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
@@ -310,28 +310,22 @@ def profile(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    user_info = UserProfile.objects.get(user=student)
-
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache, course_id=course_id)
+    course_module = get_module(request.user, request, course.location,
+                               student_module_cache, course_id)
 
-    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, course_module,
+                                                 course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
 
-    context = {'name': user_info.name,
-               'username': student.username,
-               'location': user_info.location,
-               'language': user_info.language,
-               'email': student.email,
-               'course': course,
-               'csrf': csrf(request)['csrf_token'],
+    context = {'course': course,
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
                }
     context.update()
 
-    return render_to_response('profile.html', context)
+    return render_to_response('courseware/progress.html', context)
 
 
 
@@ -359,7 +353,7 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('gradebook.html', {'students': student_info,
+    return render_to_response('courseware/gradebook.html', {'students': student_info,
                                                  'course': course,
                                                  'course_id': course_id,
                                                  # Checked above
@@ -374,7 +368,7 @@ def grade_summary(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('grade_summary.html', context)
+    return render_to_response('courseware/grade_summary.html', context)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -385,4 +379,4 @@ def instructor_dashboard(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('instructor_dashboard.html', context)
+    return render_to_response('courseware/instructor_dashboard.html', context)
