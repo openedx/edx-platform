@@ -341,11 +341,11 @@ class CodeResponseTest(unittest.TestCase):
         fp = open(problem_file)
         answers_with_file = {'1_2_1': 'String-based answer',
                              '1_3_1': ['answer1', 'answer2', 'answer3'],
-                             '1_4_1': fp}
+                             '1_4_1': [fp, fp]}
         answers_converted = convert_files_to_filenames(answers_with_file)
         self.assertEquals(answers_converted['1_2_1'], 'String-based answer')
         self.assertEquals(answers_converted['1_3_1'], ['answer1', 'answer2', 'answer3'])
-        self.assertEquals(answers_converted['1_4_1'], fp.name)
+        self.assertEquals(answers_converted['1_4_1'], [fp.name, fp.name])
 
 
 class ChoiceResponseTest(unittest.TestCase):
