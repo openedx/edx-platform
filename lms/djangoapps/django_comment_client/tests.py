@@ -1,6 +1,11 @@
 from django.contrib.auth.models import User
 from django.utils import unittest
-from student.models import CourseEnrollment, replicate_enrollment_save, replicate_enrollment_delete
+from student.models import CourseEnrollment, \
+                           replicate_enrollment_save, \
+                           replicate_enrollment_delete, \
+                           update_user_information, \
+                           replicate_user_save
+                           
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_delete, post_save
 from django.dispatch.dispatcher import _make_id
 import string
@@ -114,7 +119,12 @@ class PermissionsTestCase(NoSignalTestCase):
 
     def setUp(self):
 
-        sender_receivers_to_discard = [(replicate_enrollment_save, CourseEnrollment), (replicate_enrollment_delete, CourseEnrollment)]
+        sender_receivers_to_discard = [
+            (replicate_enrollment_save, CourseEnrollment),
+            (replicate_enrollment_delete, CourseEnrollment),
+            (update_user_information, User),
+            (replicate_user_save, User),
+        ]
         super(PermissionsTestCase, self).setUp(sender_receivers_to_discard=sender_receivers_to_discard)
 
         self.course_id = "MITx/6.002x/2012_Fall"
@@ -132,10 +142,10 @@ class PermissionsTestCase(NoSignalTestCase):
         self.moderator_enrollment = CourseEnrollment.objects.create(user=self.moderator, course_id=self.course_id)
 
     def tearDown(self):
-        self.student.delete()
-        self.moderator.delete()
         self.student_enrollment.delete()
         self.moderator_enrollment.delete()
+        self.student.delete()
+        self.moderator.delete()
         super(PermissionsTestCase, self).tearDown()
 
     def testDefaultRoles(self):
