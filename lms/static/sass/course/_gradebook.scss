@@ -6,6 +6,9 @@ div.gradebook-wrapper {
 
   section.gradebook-content {
     @extend .content;
+    display: block;
+    width: 100%;
+    @include clearfix;
 
     .student-search {
     	padding: 0 20px 0 15px;

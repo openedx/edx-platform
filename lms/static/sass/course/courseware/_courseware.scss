@@ -12,6 +12,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
+    padding-top: 0 !important;
     @include border-radius(0 4px 4px 0);
 
     h1 {
@@ -45,6 +46,7 @@ div.course-wrapper {
     ol.vert-mod {
       padding: 0;
       margin: 0;
+      line-height: 1.4;
 
       > li {
         @extend .clearfix;
@@ -210,3 +212,12 @@ div.course-wrapper {
     }
   }
 }
+
+.xmodule_VideoModule {
+  margin-bottom: 30px;
+
+  
+}
+
+
+
