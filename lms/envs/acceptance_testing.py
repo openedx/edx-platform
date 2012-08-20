@@ -92,6 +92,7 @@ MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS += ('acceptance_testing',)
 INSTALLED_APPS += ('lettuce.django',)
 
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
