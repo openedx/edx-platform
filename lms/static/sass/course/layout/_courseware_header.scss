@@ -17,6 +17,7 @@ nav.course-material {
     @include border-top-radius(4px);
     @include clearfix;
     padding: 10px 0 0 0;
+    margin-left: 10px;
 
     li {
       float: left;
@@ -56,6 +57,10 @@ nav.course-material {
   background: none !important;
   border: none !important;
   box-shadow: none !important;
+
+  .logo {
+    margin-left: 13px !important;
+  }
 
   .find-courses-button {
     display: none;

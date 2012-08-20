@@ -18,12 +18,14 @@ table {
 }
 
 .container {
-  padding: 1.4em lh(2);
+  padding: 1.4em 0;
 
   > div {
-    display: table;
     width: 100%;
-    table-layout: fixed;
+    box-sizing: border-box;
+    border-radius: 3px;
+    background: #fff;
+    @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .08), 0 1px 10px rgba(0, 0, 0, 0.1));
   }
 }
 
