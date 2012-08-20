@@ -173,7 +173,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     # Setup system context for module instance
     ajax_url = reverse('modx_dispatch',
                        kwargs=dict(course_id=course_id,
-                                   id=descriptor.location.url(),
+                                   location=descriptor.location.url(),
                                    dispatch=''),
                        )
 
@@ -268,7 +268,7 @@ def get_instance_module(user, module, student_module_cache):
     else:
         return None
 
-def get_shared_instance_module(user, module, student_module_cache):
+def get_shared_instance_module(course_id, user, module, student_module_cache):
     """
     Return shared_module is a StudentModule specific to all modules with the same
         'shared_state_key' attribute, or None if the module does not elect to
@@ -276,7 +276,7 @@ def get_shared_instance_module(user, module, student_module_cache):
     """
     if user.is_authenticated():
         # To get the shared_state_key, we need to descriptor
-        descriptor = modulestore().get_item(module.location)
+        descriptor = modulestore().get_instance(course_id, module.location)
 
         shared_state_key = getattr(module, 'shared_state_key', None)
         if shared_state_key is not None:
@@ -317,7 +317,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     user = User.objects.get(id=userid)
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        user, modulestore().get_item(id), depth=0, select_for_update=True)
+        user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
     instance = get_module(user, request, id, student_module_cache, course_id)
     if instance is None:
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
@@ -387,7 +387,7 @@ def modx_dispatch(request, dispatch, location, course_id):
             p[fileinput_id] = inputfiles
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        request.user, modulestore().get_item(course_id, location))
+        request.user, modulestore().get_instance(course_id, location))
 
     instance = get_module(request.user, request, location, student_module_cache, course_id)
     if instance is None:
@@ -397,7 +397,7 @@ def modx_dispatch(request, dispatch, location, course_id):
         raise Http404
 
     instance_module = get_instance_module(request.user, instance, student_module_cache)
-    shared_module = get_shared_instance_module(request.user, instance, student_module_cache)
+    shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
 
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
