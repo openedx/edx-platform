@@ -258,11 +258,10 @@ def university_profile(request, org_id):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
-    """ User profile. Show username, location, etc, as well as grades .
-        We need to allow the user to change some of these settings.
+def progress(request, course_id, student_id=None):
+    """ User progress. We show the grade bar and every problem score.
 
-    Course staff are allowed to see the profiles of students in their class.
+    Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
@@ -276,28 +275,20 @@ def profile(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    user_info = UserProfile.objects.get(user=student)
-
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
     course_module = get_module(request.user, request, course.location, student_module_cache, course_id=course_id)
 
     courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
 
-    context = {'name': user_info.name,
-               'username': student.username,
-               'location': user_info.location,
-               'language': user_info.language,
-               'email': student.email,
-               'course': course,
-               'csrf': csrf(request)['csrf_token'],
+    context = {'course': course,
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
                }
     context.update()
 
-    return render_to_response('profile.html', context)
+    return render_to_response('progress.html', context)
 
 
 
