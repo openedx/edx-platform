@@ -1,24 +1,12 @@
 h2 {
   margin-top: 0;
   margin-bottom: 15px;
-  width: flex-grid(2, 9);
-  padding-right: flex-gutter(9);
-  border-right: 1px dashed #ddd;
-  @include box-sizing(border-box);
-  display: table-cell;
-  vertical-align: top;
 
   &.problem-header {
     section.staff {
       margin-top: 30px;
       font-size: 80%;
     }
-  }
-
-  @media screen and (max-width:1120px) {
-    display: block;
-    width: auto;
-    border-right: 0;
   }
 
   @media print {
@@ -29,16 +17,6 @@ h2 {
 }
 
 section.problem {
-  display: table-cell;
-  width: flex-grid(7, 9);
-  padding-left: flex-gutter(9);
-
-  @media screen and (max-width:1120px) {
-    display: block;
-    width: auto;
-    padding: 0;
-  }
-
   @media print {
     display: block;
     width: auto;
