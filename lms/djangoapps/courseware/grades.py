@@ -155,8 +155,18 @@ def progress_summary(student, course, grader, student_module_cache):
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
     for c in course.get_display_items():
+        # Skip if the chapter is hidden
+        hidden = c.metadata.get('hide_from_toc','false')
+        if hidden == 'true':
+            continue
+
         sections = []
         for s in c.get_display_items():
+            # Skip if the section is hidden
+            hidden = s.metadata.get('hide_from_toc','false')
+            if hidden == 'true':
+                continue
+
             # Same for sections
             graded = s.metadata.get('graded', False)
             scores = []
