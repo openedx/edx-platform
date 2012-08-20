@@ -243,8 +243,13 @@ class XMLModuleStore(ModuleStoreBase):
 
             url_name = course_data.get('url_name', course_data.get('slug'))
             if url_name:
-                policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
-                policy = self.load_policy(policy_path, tracker)
+                old_policy_path = self.data_dir / course_dir / 'policies' / url_name / 'policy.json'
+                policy = self.load_policy(old_policy_path, tracker)
+
+                # VS[compat]: remove once courses use the policy dirs.
+                if policy == {}:
+                    old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
+                    policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
                 # VS[compat] : 'name' is deprecated, but support it for now...
