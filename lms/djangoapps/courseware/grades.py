@@ -42,7 +42,7 @@ def grade(student, request, course, student_module_cache=None):
     grading_context = course.grading_context
 
     if student_module_cache == None:
-        student_module_cache = StudentModuleCache(student, grading_context['all_descriptors'])
+        student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -56,7 +56,8 @@ def grade(student, request, course, student_module_cache=None):
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
-                if student_module_cache.lookup(moduledescriptor.category, moduledescriptor.location.url() ):
+                if student_module_cache.lookup(
+                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
                     should_grade_section = True
                     break
 
@@ -64,10 +65,9 @@ def grade(student, request, course, student_module_cache=None):
                 scores = []
                 # TODO: We need the request to pass into here. If we could forgo that, our arguments
                 # would be simpler
-                course_id = CourseDescriptor.location_to_id(course.location)
                 section_module = get_module(student, request,
                                             section_descriptor.location, student_module_cache,
-                                            course_id)
+                                            course.id)
                 if section_module is None:
                     # student doesn't have access to this module, or something else
                     # went wrong.
@@ -219,6 +219,7 @@ def get_score(user, problem, student_module_cache):
     # instance_module = student_module_cache.lookup(problem.category, problem.id)
     # if instance_module is None:
     #     instance_module = StudentModule(module_type=problem.category,
+    #                                     course_id=????,
     #                                     module_state_key=problem.id,
     #                                     student=user,
     #                                     state=None,

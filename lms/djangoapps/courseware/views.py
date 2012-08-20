@@ -149,8 +149,7 @@ def index(request, course_id, chapter=None, section=None,
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
                 student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                                                          request.user,
-                                                          section_descriptor)
+                    course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
                                     student_module_cache, course_id)
@@ -310,7 +309,8 @@ def progress(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        course_id, request.user, course)
     course_module = get_module(request.user, request, course.location,
                                student_module_cache, course_id)
 
