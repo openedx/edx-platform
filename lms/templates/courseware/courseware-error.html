@@ -1,8 +1,13 @@
-<%inherit file="main.html" />
+<%inherit file="/main.html" />
+<%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>Courseware – edX</title></%block>
 
-<%include file="course_navigation.html" args="active_page='courseware'" />
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 
 <section class="container">
   <section class="outside-app">
