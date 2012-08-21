@@ -47,3 +47,4 @@ django-mptt>=0.5.3
 sorl-thumbnail
 networkx
 -r repo-requirements.txt
+-r test-acceptance-requirements.txt

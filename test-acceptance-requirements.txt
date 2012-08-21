@@ -1,3 +1,2 @@
 lettuce
 lettuce_webdriver
-nose
