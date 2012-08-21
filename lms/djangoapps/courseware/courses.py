@@ -30,7 +30,6 @@ def get_course_by_id(course_id):
         raise Http404("Course not found.")
 
 
-
 def get_course_with_access(user, course_id, action):
     """
     Given a course_id, look up the corresponding course descriptor,
