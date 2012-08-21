@@ -3,8 +3,7 @@ class @Sequence
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @id = @el.data('id')
-    @modx_url = @$('#course_modx_root').text()
-    @modx_url = @modx_url.substr(1,@modx_url.length-2) # Remove enclosing quotes
+    @modx_url = @el.data('course_modx_root')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
