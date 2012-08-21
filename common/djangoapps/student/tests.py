@@ -12,7 +12,7 @@ from django.test import TestCase
 from .models import User, UserProfile, CourseEnrollment, replicate_user, USER_FIELDS_TO_COPY
 
 COURSE_1 = 'edX/toy/2012_Fall'
-COURSE_2 = 'edx/full/6.002_Spring_2012'
+COURSE_2 = 'edX/full/6.002_Spring_2012'
 
 log = logging.getLogger(__name__)
 
