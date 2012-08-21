@@ -1,5 +1,7 @@
 import os.path
 
+# THIS COMMAND IS OUT OF DATE
+
 from lxml import etree
 
 from django.core.management.base import BaseCommand
@@ -72,13 +74,17 @@ class Command(BaseCommand):
 
         # TODO: use args as list of files to check.  Fix loading to work for other files.
 
+        print "This command needs updating before use"
+        return
+"""
         sample_user = User.objects.all()[0]
 
         print "Attempting to load courseware"
 
         # TODO (cpennington): Get coursename in a legitimate way
         course_location = 'i4x://edx/6002xs12/course/6.002_Spring_2012'
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(sample_user, modulestore().get_item(course_location))
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            sample_user, modulestore().get_item(course_location))
         course = get_module(sample_user, None, course_location, student_module_cache)
 
         to_run = [
@@ -96,3 +102,4 @@ class Command(BaseCommand):
             print 'Courseware passes all checks!'
         else:
             print "Courseware fails some checks"
+"""
