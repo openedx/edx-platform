@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
+from courseware.access import has_access
 
 from urllib import urlencode
 from django_comment_client.permissions import check_permissions_by_view
@@ -156,8 +157,9 @@ def forum_form_discussion(request, course_id):
             'content': content,
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
+            'staff_access' : has_access(request.user, course, 'staff'),
         }
-        print "start rendering.."
+        # print "start rendering.."
         return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
