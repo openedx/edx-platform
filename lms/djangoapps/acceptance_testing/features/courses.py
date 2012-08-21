@@ -25,7 +25,7 @@ from courseware.access import has_access
 ## end import
 
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section
+from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 
 ## support functions
 def get_courses():
@@ -40,6 +40,30 @@ def get_courses():
   logging.info(courses)
 
   return courses
+
+def get_courseware(course_id):
+  """
+  Given a course_id (string), return a courseware array of dictionaries for the
+  top two levels of navigation. Example:
+
+  [
+    {'chapter_name': 'Overview', 
+     'sections': ['Welcome', 'System Usage Sequence', 'Lab0: Using the tools', 'Circuit Sandbox']
+    },
+    {'chapter_name': 'Week 1',
+     'sections': ['Administrivia and Circuit Elements', 'Basic Circuit Analysis', 'Resistor Divider', 'Week 1 Tutorials']
+     },
+    {'chapter_name': 'Midterm Exam',
+     'sections': ['Midterm Exam']
+    }
+  ]
+  """
+
+  course = get_course_by_id(course_id)
+  chapters = course.get_children()
+  courseware = [ {'chapter_name':c.display_name, 'sections':[s.display_name for s in c.get_children()]} for c in chapters]
+  return courseware
+
 
 ## course listing step
 @step(u'I should see all courses')
