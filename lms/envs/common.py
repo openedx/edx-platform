@@ -260,6 +260,14 @@ USE_L10N = True
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+#################################### GITHUB #######################################
+# gitreload is used in LMS-workflow to pull content from github
+# gitreload requests are only allowed from these IP addresses, which are
+# the advertised public IPs of the github WebHook servers.
+# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+
+ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
+
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that

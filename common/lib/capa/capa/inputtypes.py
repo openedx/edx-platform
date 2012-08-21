@@ -150,6 +150,7 @@ def optioninput(element, value, status, render_template, msg=''):
              'state': status,
              'msg': msg,
              'options': osetdict,
+             'inline': element.get('inline',''),
              }
 
     html = render_template("optioninput.html", context)
@@ -294,7 +295,9 @@ def textline(element, value, status, render_template, msg=""):
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
     escapedict = {'"': '&quot;'}
     value = saxutils.escape(value, escapedict)	 # otherwise, answers with quotes in them crashes the system!
-    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg, 'hidden': hidden}
+    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg, 'hidden': hidden,
+               'inline': element.get('inline',''),
+               }
     html = render_template("textinput.html", context)
     try:
         xhtml = etree.XML(html)
