@@ -85,7 +85,7 @@ class @Sequence
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules('display', @$('#seq_content'))
 
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()
