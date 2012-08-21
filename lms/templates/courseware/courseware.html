@@ -5,6 +5,7 @@
 
 <%block name="headextra">
   <%static:css group='course'/>
+  <%include file="discussion/_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
@@ -21,7 +22,7 @@
 
   <%static:js group='courseware'/>
 
-  <%include file="discussion/_js_dependencies.html" />
+  <%include file="discussion/_js_body_dependencies.html" />
   
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
