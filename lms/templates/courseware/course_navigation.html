@@ -19,6 +19,9 @@ def url_class(url):
     <ol class="course-tabs">
       <li class="courseware"><a href="${reverse('courseware', args=[course.id])}" class="${url_class('courseware')}">Courseware</a></li>
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
+% if settings.MITX_FEATURES.get('ENABLE_SYLLABUS'):
+      <li class="syllabus"><a href="${reverse('syllabus', args=[course.id])}" class="${url_class('syllabus')}">Syllabus</a></li>
+% endif
 % if user.is_authenticated():
   % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
         % for index, textbook in enumerate(course.textbooks):
