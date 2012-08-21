@@ -58,18 +58,20 @@ div.course-wrapper {
           @extend h1.top-header;
           @include border-radius(0 4px 0 0);
           margin-bottom: -16px;
+          border-bottom: 0;
 
           h1 {
             margin: 0;
+            font-size: 1em;
           }
 
           h2 {
             float: right;
-            margin-right: 0;
-            margin-top: 8px;
+            margin: 12px 0 0;
             text-align: right;
             padding-right: 0;
             border-right: 0;
+            font-size: em(14, 24);
           }
         }
 
