@@ -34,3 +34,11 @@ def i_click_on_every_item_in_every_week_of_the_course(step):
 			j += 1
 			clean = re.sub('\"','',good_section_text)
 			wait_until_id_renders("sequence_i4x-MITx-6_00x-sequential-"+clean,3)
+			tabs = world.browser.find_elements_by_xpath("//ol[@id='sequence-list']//li")
+			num_tabs = len(tabs)
+			l = 1
+			while l <= num_tabs:
+				tab = world.browser.find_element_by_xpath("//ol[@id='sequence-list']//li["+str(l)+"]")
+				#tab.click()
+				tab.find_element_by_xpath("//a[@data-element='"+str(l)+"']").click()
+				l+=1
