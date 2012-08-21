@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # NOTE (vshnayder): This constraint has the wrong field order, so it doesn't actually
-        # do anything.  Migration 0004 actually removes this index.
+        # do anything in sqlite.  Migration 0004 actually removes this index for sqlite.
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
         db.delete_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
 

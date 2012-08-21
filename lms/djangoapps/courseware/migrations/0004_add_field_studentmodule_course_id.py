@@ -16,9 +16,10 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'student']
         db.delete_unique('courseware_studentmodule', ['module_id', 'student_id'])
 
-        # NOTE: manually remove this constaint (from 0001)--0003 tries, but fails.
+        # NOTE: manually remove this constaint (from 0001)--0003 tries, but fails for sqlite.
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+        if db.backend_name == "sqlite3":
+            db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
 
         # Adding unique constraint on 'StudentModule', fields ['course_id', 'module_state_key', 'student']
         db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
