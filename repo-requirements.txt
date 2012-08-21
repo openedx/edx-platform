@@ -1,5 +1,5 @@
 -e git://github.com/MITx/django-staticfiles.git@6d2504e5c8#egg=django-staticfiles
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
--e git://github.com/benjaoming/django-wiki.git@e237b2ac#egg=django-wiki
+-e git://github.com/benjaoming/django-wiki.git@876357a#egg=django-wiki
 -e common/lib/capa
 -e common/lib/xmodule
