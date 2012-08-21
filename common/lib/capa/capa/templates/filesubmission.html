@@ -1,5 +1,5 @@
 <section id="filesubmission_${id}" class="filesubmission">
-    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" /><br />
+    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files}" data-allowed_files="${allowed_files}"/><br />
     % if state == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
     % elif state == 'correct':
