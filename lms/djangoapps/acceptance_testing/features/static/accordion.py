@@ -5,7 +5,6 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from helpers import *
 import re
-from courses import *
 
 
 @step(u'I should see an element with class of "(.*)" within "(.*)" seconds')
@@ -20,9 +19,12 @@ def i_should_see_an_element_with_class_of_classname(step,classname):
 def i_click_on_every_item_in_every_week_of_the_course(step):
 	get_courseware()
 	weeks = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//h3")
-	for week in weeks:
-		week.click()
+	numweeks = len(weeks)
+	k = 1
+	while k < numweeks:
+		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//h3["+str(k)+"]").click()
 		wait_until_class_renders('p',1)
+		k+=1
 		nodes = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li")
 		i = len(nodes)
 		j = 1
