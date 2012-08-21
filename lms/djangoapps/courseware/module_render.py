@@ -374,7 +374,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # ''' (fix emacs broken parsing)
 
     # Check for submitted files and basic file size checks
-    p = request.POST.dict()
+    p = request.POST.copy()
     if request.FILES:
         for fileinput_id in request.FILES.keys():
             inputfiles = request.FILES.getlist(fileinput_id)
