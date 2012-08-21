@@ -56,18 +56,6 @@ h1.top-header {
   width: flex-grid(3);
   background: $sidebar-color;
 
-  &:after {
-    width: 1px;
-    height: 100%;
-    @include position(absolute,  0px -1px 0px 0);
-    content: "";
-    @include background-image(linear-gradient(top, #fff, rgba(#fff, 0)), linear-gradient(top, rgba(#fff, 0), #fff));
-    background-position: top, bottom;
-    @include background-size(1px 20px);
-    background-repeat: no-repeat;
-    display: block;
-  }
-
   h1, h2 {
    font-size: em(20);
    font-weight: 100;
