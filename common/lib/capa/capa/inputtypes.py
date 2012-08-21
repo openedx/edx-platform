@@ -205,7 +205,7 @@ def extract_choices(element):
             raise Exception("[courseware.capa.inputtypes.extract_choices] \
                              Expected a <choice> tag; got %s instead"
                              % choice.tag)
-        choice_text = ''.join([x.text for x in choice])
+        choice_text = ''.join([etree.tostring(x) for x in choice])
 
         choices.append((choice.get("name"), choice_text))
 
