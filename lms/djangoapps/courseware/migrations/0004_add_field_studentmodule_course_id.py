@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -8,34 +8,36 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # NOTE (vshnayder): This constraint has the wrong field order, so it doesn't actually
-        # do anything in sqlite.  Migration 0004 actually removes this index for sqlite.
-        # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.delete_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
-
-        # Adding field 'StudentModule.max_grade'
-        db.add_column('courseware_studentmodule', 'max_grade', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
-
-        # Adding field 'StudentModule.done'
-        db.add_column('courseware_studentmodule', 'done', self.gf('django.db.models.fields.CharField')(default='na', max_length=8, db_index=True), keep_default=False)
-
-        # Adding unique constraint on 'StudentModule', fields ['module_id', 'student']
-        db.create_unique('courseware_studentmodule', ['module_id', 'student_id'])
-
-    def backwards(self, orm):
+        # Adding field 'StudentModule.course_id'
+        db.add_column('courseware_studentmodule', 'course_id',
+                      self.gf('django.db.models.fields.CharField')(default="", max_length=255, db_index=True),
+                      keep_default=False)
 
         # Removing unique constraint on 'StudentModule', fields ['module_id', 'student']
         db.delete_unique('courseware_studentmodule', ['module_id', 'student_id'])
 
-        # Deleting field 'StudentModule.max_grade'
-        db.delete_column('courseware_studentmodule', 'max_grade')
+        # NOTE: manually remove this constaint (from 0001)--0003 tries, but fails for sqlite.
+        # Removing unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
+        if db.backend_name == "sqlite3":
+            db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
 
-        # Deleting field 'StudentModule.done'
-        db.delete_column('courseware_studentmodule', 'done')
+        # Adding unique constraint on 'StudentModule', fields ['course_id', 'module_state_key', 'student']
+        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
+
+
+    def backwards(self, orm):
+        # Removing unique constraint on 'StudentModule', fields ['studnet_id', 'module_state_key', 'course_id']
+        db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
+
+        # Deleting field 'StudentModule.course_id'
+        db.delete_column('courseware_studentmodule', 'course_id')
+
+        # Adding unique constraint on 'StudentModule', fields ['module_id', 'student']
+        db.create_unique('courseware_studentmodule', ['module_id', 'student_id'])
 
         # Adding unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
-        db.create_unique('courseware_studentmodule', ['module_id', 'module_type', 'student_id'])
+        db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
+
 
     models = {
         'auth.group': {
@@ -100,14 +102,15 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'courseware.studentmodule': {
-            'Meta': {'unique_together': "(('student', 'module_id'),)", 'object_name': 'StudentModule'},
+            'Meta': {'unique_together': "(('course_id', 'student', 'module_state_key'),)", 'object_name': 'StudentModule'},
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'done': ('django.db.models.fields.CharField', [], {'default': "'na'", 'max_length': '8', 'db_index': 'True'}),
             'grade': ('django.db.models.fields.FloatField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'max_grade': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'module_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'module_state_key': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_column': "'module_id'", 'db_index': 'True'}),
             'module_type': ('django.db.models.fields.CharField', [], {'default': "'problem'", 'max_length': '32', 'db_index': 'True'}),
             'state': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
