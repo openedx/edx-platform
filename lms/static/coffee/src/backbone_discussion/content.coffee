@@ -18,6 +18,9 @@ class @Content extends Backbone.Model
   can: (action) ->
     DiscussionUtil.getContentInfo @id, action
 
+  thread_id: ->
+    if @get('type') == "comment" then @get('thread_id') else @id
+
   initialize: ->
     @set('comments', new Comments())
     if @get('children')
@@ -28,99 +31,110 @@ class @ContentView extends Backbone.View
   $: (selector) ->
     @$local.find(selector)
 
-  showSingleThread: (event) ->
-    if @showed
-      @$el.children(".comments").hide()
-      @showed = false
-      $showComments = @$(".discussion-show-comments")
-      prevHtml = $showComments.html()
-      $showComments.html prevHtml.replace "Hide", "Show"
-    else
-      if @retrieved
-        @$el.children(".comments").show()
-        @showed = true
-      else
-        discussion_id = @model.discussion.id
-        url = DiscussionUtil.urlFor('retrieve_single_thread', discussion_id, @model.id)
-        DiscussionUtil.safeAjax
-          $elem: $.merge @$(".thread-title"), @$(".discussion-show-comments")
-          url: url
-          type: "GET"
-          dataType: 'json'
-          success: (response, textStatus) =>
-            DiscussionUtil.bulkExtendContentInfo response['annotated_content_info']
-            @retrieved = true
-            @showed = true
-            @$el.append(response['html'])
-            @model.get('comments').reset response.content.children, {silent: false}
-            @initCommentViews()
-    return
-    $threadTitle = @$(".thread-title")
+  discussionContent: ->
+    @_discussionContent ||= @$el.children(".discussion-content")
+
+  hideSingleThread: (event) ->
     $showComments = @$(".discussion-show-comments")
+    @$el.children(".comments").hide()
+    @showed = false
+    $showComments.html $showComments.html().replace "Hide", "Show"
 
-    if not $showComments.hasClass("first-time") and (not $showComments.length or not $threadTitle.length)
-      return
-
-    rebindHideEvents = ->
-      $threadTitle.unbind('click').click @hideSingleThread
-      $showComments.unbind('click').click @hideSingleThread
-      $showComments.removeClass("discussion-show-comments")
-                   .addClass("discussion-hide-comments")
-      prevHtml = $showComments.html()
-      $showComments.html prevHtml.replace "Show", "Hide"
-
-    if not $showComments.hasClass("first-time") and @$el.children(".comments").length
+  showSingleThread: (event) ->
+    $showComments = @$(".discussion-show-comments")
+    retrieved = not $showComments.hasClass("first-time") and @model.get("children") != undefined
+    if retrieved
       @$el.children(".comments").show()
-      rebindHideEvents()
+      $showComments.html $showComments.html().replace "Show", "Hide"
+      @showed = true
     else
       discussion_id = @model.discussion.id
       url = DiscussionUtil.urlFor('retrieve_single_thread', discussion_id, @model.id)
       DiscussionUtil.safeAjax
-        $elem: $.merge($threadTitle, $showComments)
+        $elem: $.merge @$(".thread-title"), @$(".discussion-show-comments")
         url: url
         type: "GET"
         dataType: 'json'
         success: (response, textStatus) =>
           DiscussionUtil.bulkExtendContentInfo response['annotated_content_info']
+          @showed = true
+          $showComments.html $showComments.html().replace "Show", "Hide"
           @$el.append(response['html'])
+          @model.set('children', response.content.children)
           @model.get('comments').reset response.content.children, {silent: false}
           @initCommentViews()
-          $showComments.removeClass("first-time")
-          rebindHideEvents()
 
+  toggleSingleThread: (event) ->
+    if @showed
+      @hideSingleThread(event)
+    else
+      @showSingleThread(event)
+      
   initCommentViews: ->
     @$el.children(".comments").children(".comment").each (index, elem) =>
       model = @model.get('comments').find $(elem).attr("_id")
       if not model.view
         commentView = new CommentView el: elem, model: model
 
-  hideSingleThread: ->
-    $threadTitle = @$(".thread-title")
-    $hideComments = @$(".discussion-hide-comments")
-    $hideComments.removeClass("discussion-hide-comments")
-                 .addClass("discussion-show-comments")
-    @$el.children(".comments").hide()
-    $threadTitle.unbind('click').click @showSingleThread
-    $hideComments.unbind('click').click @showSingleThread
-    prevHtml = $hideComments.html()
-    $hideComments.html prevHtml.replace "Hide", "Show"
-
   reply: ->
+    if @model.get('type') == 'thread'
+      @showSingleThread()
     $replyView = @$(".discussion-reply-new")
     if $replyView.length
       $replyView.show()
     else
-      thread_id = if @model.get('type') == "comment" then @model.get('thread_id') else @model.id
+      thread_id = @model.thread_id()
       view =
         id: @model.id
         showWatchCheckbox: not DiscussionUtil.isSubscribed(thread_id, "thread")
-      @$discussionContent.append Mustache.render DiscussionUtil.replyTemplate, view
-      DiscussionUtil.makeWmdEditor @$el, @$local, "reply-body"
-      @$(".discussion-submit-post").click @submitReply
-      @$(".discussion-cancel-post").click @cancelReply
+      html = Mustache.render DiscussionUtil.getTemplate('_reply'), view
+      @discussionContent().append html
+      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "reply-body"
+      @$(".discussion-submit-post").click $.proxy(@submitReply, @)
+      @$(".discussion-cancel-post").click $.proxy(@cancelReply, @)
     @$(".discussion-reply").hide()
     @$(".discussion-edit").hide()
 
+  submitReply: (event) ->
+    if @model.get('type') == 'thread'
+      url = DiscussionUtil.urlFor('create_comment', @model.id)
+    else if @model.get('type') == 'comment'
+      url = DiscussionUtil.urlFor('create_sub_comment', @model.id)
+    else
+      console.error "unrecognized model type #{@model.get('type')}"
+      return
+
+    body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "reply-body"
+
+    anonymous = false || @$(".discussion-post-anonymously").is(":checked")
+    autowatch = false || @$(".discussion-auto-watch").is(":checked")
+
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        body: body
+        anonymous: anonymous
+        autowatch: autowatch
+      error: DiscussionUtil.formErrorHandler @$(".discussion-errors")
+      success: (response, textStatus) =>
+        DiscussionUtil.clearFormErrors @$(".discussion-errors")
+        $comment = $(response.html)
+        @$el.children(".comments").prepend($comment)
+        DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "reply-body", ""
+        #DiscussionUtil.setContentInfo response.content['id'], 'can_reply', true
+        #DiscussionUtil.setContentInfo response.content['id'], 'editable', true
+        comment = new Comment(response.content)
+        DiscussionUtil.extendContentInfo comment.id, response['annotated_content_info']
+        @model.get('children').push(response.content)
+        @model.get('comments').add(comment)
+        commentView = new CommentView el: $comment[0], model: comment
+        @$(".discussion-reply-new").hide()
+        @$(".discussion-reply").show()
+        @$(".discussion-edit").show()
+        @discussionContent().attr("status", "normal")
   cancelReply: ->
     $replyView = @$(".discussion-reply-new")
     if $replyView.length
@@ -213,7 +227,7 @@ class @ContentView extends Backbone.View
         body: $local(".thread-raw-body").html()
         tags: $local(".thread-raw-tags").html()
       }
-      $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
+      @discussionContent().append Mustache.render Discussion.editThreadTemplate, view
       Discussion.makeWmdEditor $content, $local, "thread-body-edit"
       $local(".thread-tags-edit").tagsInput Discussion.tagsInputOptions()
       $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
@@ -233,7 +247,7 @@ class @ContentView extends Backbone.View
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
           Discussion.clearFormErrors($local(".discussion-update-errors"))
-          $discussionContent.replaceWith(response.html)
+          @discussionContent().replaceWith(response.html)
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
@@ -262,7 +276,6 @@ class @ContentView extends Backbone.View
   events:
     "click .thread-title": "showSingleThread"
     "click .discussion-show-comments": "showSingleThread"
-    "click .discussion-hide-comments": "hideSingleThread"
     "click .discussion-reply-thread": "reply"
     "click .discussion-reply-comment": "reply"
     "click .discussion-cancel-reply": "cancelReply"
