@@ -1,9 +1,10 @@
 class @Discussion extends Backbone.Collection
   model: Thread
   initialize: ->
+
+    DiscussionUtil.addDiscussion @id, @
     
     @bind "add", (item) =>
-      console.log item
       item.discussion = @
 
   find: (id) ->
