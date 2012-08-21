@@ -302,6 +302,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
+WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
