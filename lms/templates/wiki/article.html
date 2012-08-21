@@ -14,7 +14,11 @@
     
     <article class="main-article">
         {% if selected_tab != "edit" %}
-          <h1>{{ article.current_revision.title }}</h1>  
+          <h1>{{ article.current_revision.title }}</h1>
+          
+          {% if urlpath %}
+            <a href="{% url 'wiki:dir' path=urlpath.path %}">Show all children</a>
+          {% endif %}
         {% endif %}
         
         {% block wiki_contents_tab %}
