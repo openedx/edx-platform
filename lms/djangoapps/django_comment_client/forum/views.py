@@ -10,6 +10,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
 
 from urllib import urlencode
+from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.utils import merge_dict, extract, strip_none
 
@@ -188,6 +189,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return utils.JsonResponse({
             'html': html,
+            'content': thread.to_dict(),
             'annotated_content_info': annotated_content_info,
         })
 

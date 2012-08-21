@@ -1,8 +1,10 @@
 class @Discussion extends Backbone.Collection
   model: Thread
   initialize: ->
-    this.bind "add", (item) =>
-      item.collection = this
+    
+    @bind "add", (item) =>
+      console.log item
+      item.discussion = @
 
   find: (id) ->
     _.first @where(id: id)
@@ -16,9 +18,11 @@ class @DiscussionView extends Backbone.View
 
   initLocal: ->
     @$local = @$el.children(".local")
+    @$delegateElement = @$local
 
   initialize: ->
     @initLocal()
+    @model.id = @$el.attr("_id")
     @model.view = @
     @$el.children(".threads").children(".thread").each (index, elem) =>
       threadView = new ThreadView el: elem, model: @model.find $(elem).attr("_id")
