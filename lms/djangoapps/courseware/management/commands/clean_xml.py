@@ -124,9 +124,11 @@ def check_roundtrip(course_dir):
     print "======== ideally there is no diff above this ======="
 
 
-def clean_xml(course_dir, export_dir):
+def clean_xml(course_dir, export_dir, force):
     (ok, course) = import_with_checks(course_dir)
-    if ok:
+    if ok or force:
+        if not ok:
+            print "WARNING: Exporting despite errors"
         export(course, export_dir)
         check_roundtrip(export_dir)
     else:
@@ -138,11 +140,18 @@ class Command(BaseCommand):
     help = """Imports specified course.xml, validate it, then exports in
     a canonical format.
 
-Usage: clean_xml PATH-TO-COURSE-DIR PATH-TO-OUTPUT-DIR
+Usage: clean_xml PATH-TO-COURSE-DIR PATH-TO-OUTPUT-DIR [force]
+
+If 'force' is specified as the last argument, exports even if there
+were import errors.
 """
     def handle(self, *args, **options):
-        if len(args) != 2:
+        n = len(args)
+        if n < 2 or n > 3:
             print Command.help
             return
 
-        clean_xml(args[0], args[1])
+        force = False
+        if n == 3 and args[2] == 'force':
+            force = True
+        clean_xml(args[0], args[1], force)

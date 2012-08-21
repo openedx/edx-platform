@@ -36,7 +36,7 @@ class WikiRedirectTestCase(PageLoader):
         """
         Test that requesting wiki URLs redirect properly to or out of classes.
         
-        An enrolled in student going from /courses/edX/toy/2012_Fall/profile 
+        An enrolled in student going from /courses/edX/toy/2012_Fall/progress 
         to /wiki/some/fake/wiki/page/ will redirect to 
         /courses/edX/toy/2012_Fall/wiki/some/fake/wiki/page/
         
@@ -48,10 +48,10 @@ class WikiRedirectTestCase(PageLoader):
         
         self.enroll(self.toy)
         
-        referer = reverse("profile", kwargs={ 'course_id' : self.toy.id })
+        referer = reverse("progress", kwargs={ 'course_id' : self.toy.id })
         destination = reverse("wiki:get", kwargs={'path': 'some/fake/wiki/page/'})
         
-        redirected_to = referer.replace("profile", "wiki/some/fake/wiki/page/")
+        redirected_to = referer.replace("progress", "wiki/some/fake/wiki/page/")
         
         resp = self.client.get( destination, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 302 )
@@ -77,11 +77,11 @@ class WikiRedirectTestCase(PageLoader):
         """
         
         course_wiki_home = reverse('course_wiki', kwargs={'course_id' : course.id})
-        referer = reverse("profile", kwargs={ 'course_id' : self.toy.id })
+        referer = reverse("progress", kwargs={ 'course_id' : self.toy.id })
         
         resp = self.client.get(course_wiki_home, follow=True, HTTP_REFERER=referer)
                 
-        course_wiki_page = referer.replace('profile', 'wiki/' + self.toy.wiki_slug + "/")
+        course_wiki_page = referer.replace('progress', 'wiki/' + self.toy.wiki_slug + "/")
         
         ending_location = resp.redirect_chain[-1][0]
         ending_status = resp.redirect_chain[-1][1]

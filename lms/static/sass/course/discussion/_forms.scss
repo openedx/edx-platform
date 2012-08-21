@@ -16,6 +16,18 @@ form.answer-form {
     margin-top: 15px;
     resize: vertical;
     width: 99%;
+
+    &#editor {
+      min-height: em(120);
+    }
+  }
+
+  div.checkbox {
+    margin-bottom: lh();
+
+    label {
+      display: inline;
+    }
   }
 
   div.form-item {
@@ -97,7 +109,7 @@ form.answer-form {
       margin-left: 2.5%;
       padding-left: 1.5%;
       border-left: 1px dashed #ddd;
-      color: $mit-red;
+      color: $pink;
     }
 
     ul, ol, pre {
@@ -141,32 +153,32 @@ form.question-form {
   }
 
   div#question-list {
-  background-color: rgba(255,255,255,0.95);
-  @include box-sizing(border-box);
-  margin-top: -15px;
-  max-width: 505px;
-  min-width: 300px;
-  overflow: hidden;
-  padding-left: 5px;
-  position: absolute;
-  width: 35%;
-  z-index: 9999;
+    background-color: rgba(255,255,255,0.95);
+    @include box-sizing(border-box);
+    margin-top: -15px;
+    max-width: 505px;
+    min-width: 300px;
+    overflow: hidden;
+    padding-left: 5px;
+    position: absolute;
+    width: 35%;
+    z-index: 9999;
 
-  h2 {
-    text-transform: none;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    margin: 0;
+    h2 {
+      text-transform: none;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      margin: 0;
 
-    span {
-      background: #eee;
-      color: #555;
-      padding: 2px 5px;
-      @include border-radius(2px);
-      margin-right: 5px;
+      span {
+        background: #eee;
+        color: #555;
+        padding: 2px 5px;
+        @include border-radius(2px);
+        margin-right: 5px;
+      }
     }
   }
-}
 }
 
 
