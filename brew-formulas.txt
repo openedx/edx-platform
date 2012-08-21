@@ -6,3 +6,4 @@ gfortran
 python 
 yuicompressor 
 node
+graphviz
