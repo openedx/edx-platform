@@ -13,13 +13,13 @@
     </div>
     <div class="threads"></div>
   % else:
-    <div class="local"><%include file="_sort.html" /></div>
+    <%include file="_sort.html" />
     <div class="threads">
       % for thread in threads:
         ${renderer.render_content_with_comments(thread)}
       % endfor
     </div>
-    <div class="local"><%include file="_paginator.html" /></div>
+    <%include file="_paginator.html" />
   % endif
 </section>
 

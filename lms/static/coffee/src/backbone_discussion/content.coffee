@@ -29,6 +29,32 @@ class @ContentView extends Backbone.View
     @$local.find(selector)
 
   showSingleThread: (event) ->
+    if @showed
+      @$el.children(".comments").hide()
+      @showed = false
+      $showComments = @$(".discussion-show-comments")
+      prevHtml = $showComments.html()
+      $showComments.html prevHtml.replace "Hide", "Show"
+    else
+      if @retrieved
+        @$el.children(".comments").show()
+        @showed = true
+      else
+        discussion_id = @model.discussion.id
+        url = DiscussionUtil.urlFor('retrieve_single_thread', discussion_id, @model.id)
+        DiscussionUtil.safeAjax
+          $elem: $.merge @$(".thread-title"), @$(".discussion-show-comments")
+          url: url
+          type: "GET"
+          dataType: 'json'
+          success: (response, textStatus) =>
+            DiscussionUtil.bulkExtendContentInfo response['annotated_content_info']
+            @retrieved = true
+            @showed = true
+            @$el.append(response['html'])
+            @model.get('comments').reset response.content.children, {silent: false}
+            @initCommentViews()
+    return
     $threadTitle = @$(".thread-title")
     $showComments = @$(".discussion-show-comments")
 
@@ -133,15 +159,15 @@ class @ContentView extends Backbone.View
             @$(".discussion-votes-point").html response.votes.point
 
   endorse: (event) ->
-    url = DiscussionUtil.urlFor('endorse_comment', id)
-    endorsed = not @model.get('endorsed')
+    url = DiscussionUtil.urlFor('endorse_comment', @model.id)
+    endorsed = not @$el.hasClass("endorsed")
     Discussion.safeAjax
       $elem: $(event.target)
       url: url
       type: "POST"
       dataType: "json"
       data: {endorsed: endorsed}
-      success: (response, textStatus) ->
+      success: (response, textStatus) =>
         if textStatus == "success"
           if endorsed
             @$el.addClass("endorsed")
@@ -211,6 +237,7 @@ class @ContentView extends Backbone.View
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
+
   delete: ->
     if $content.hasClass("thread")
       url = Discussion.urlFor('delete_thread', id)
@@ -274,12 +301,25 @@ class @ContentView extends Backbone.View
   initTimeago: ->
     @$("span.timeago").timeago()
 
+  initPermalink: ->
+
+    if @model.get('type') == 'thread'
+      discussion_id = @model.get('commentable_id')
+      permalink = Discussion.urlFor("permanent_link_thread", discussion_id, @model.id)
+    else
+      thread_id = @model.get('thread_id')
+      discussion_id = @$el.parents(".thread").attr("_discussion_id")
+      permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, @model.id)
+
+    @$(".discussion-permanent-link").attr "href", permalink
+
   initialize: ->
     @model.view = @
     @initLocal()
     @initVote()
     @initTimeago()
     @initBody()
+    @initPermalink()
     @initActions()
     @initCommentViews()
     

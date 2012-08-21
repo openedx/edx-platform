@@ -164,9 +164,9 @@ def forum_form_discussion(request, course_id):
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
-    thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+    thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
 
-    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread.to_dict(), user=request.user)
+    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user)
 
     context = {
         'discussion_id': discussion_id,
@@ -175,6 +175,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
+        'discussion_data': json.dumps({ discussion_id: [thread] }),
     }
     return render_to_string('discussion/_single_thread.html', context)
 
@@ -201,7 +202,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'csrf': csrf(request)['csrf_token'],
             'init': '',
             'content': render_single_thread(request, discussion_id, course_id, thread_id),
-            'accordion': render_accordion(request, course, discussion_id),
             'course': course,
             'course_id': course.id,
         }
