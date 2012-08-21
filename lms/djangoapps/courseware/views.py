@@ -233,6 +233,7 @@ def course_info(request, course_id):
     return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
+# TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
 @ensure_csrf_cookie
 def syllabus(request, course_id):
     """
