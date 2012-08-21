@@ -107,6 +107,21 @@
       </section>
     % endif
 
+    % if staff_access and len(errored_courses) > 0:
+      <div id="course-errors">
+        <h2>Course-loading errors</h2>
+
+      % for course_dir, errors in errored_courses.items():
+         <h3>${course_dir | h}</h3>
+             <ul>
+           % for (msg, err) in errors:
+               <li>${msg}
+                 <ul><li><pre>${err}</pre></li></ul>
+               </li>
+           % endfor
+             </ul>
+      % endfor
+    % endif
   </section>
 </section>
 
