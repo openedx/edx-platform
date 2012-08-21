@@ -626,6 +626,7 @@ INSTALLED_APPS = (
     'certificates',
     'instructor',
     'psychometrics',
+    'licenses',
 
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
