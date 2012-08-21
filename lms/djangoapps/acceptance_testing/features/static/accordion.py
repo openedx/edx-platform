@@ -17,21 +17,20 @@ def i_should_see_an_element_with_class_of_classname(step,classname):
 
 @step(u'I click on every item in every week of the course')
 def i_click_on_every_item_in_every_week_of_the_course(step):
-	get_courseware()
-	weeks = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//h3")
-	numweeks = len(weeks)
+	chapters = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//h3")
+	num_chapters = len(chapters)
 	k = 1
-	while k < numweeks:
+	while k <= num_chapters:
 		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//h3["+str(k)+"]").click()
 		wait_until_class_renders('p',1)
 		k+=1
-		nodes = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li")
-		i = len(nodes)
+		sections = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li")
+		i = len(sections)
 		j = 1
 		while j <= i:
-			node = world.browser.find_element_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li["+str(1)+"]//a//p")
-			goodnodetext = re.sub(r'\s','_',node.text)
-			node.click()
+			section = world.browser.find_element_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li["+str(j)+"]//a//p")
+			good_section_text = re.sub(r'\s','_',section.text)
+			section.click()
 			j += 1
-			clean = re.sub('\"','',goodnodetext)
+			clean = re.sub('\"','',good_section_text)
 			wait_until_id_renders("sequence_i4x-MITx-6_00x-sequential-"+clean,3)
