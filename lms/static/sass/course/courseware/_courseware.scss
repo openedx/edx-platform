@@ -12,8 +12,7 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
-    padding-right: 0;
-    padding-left: lh();
+    padding: 40px;
 
     h1 {
       margin: 0 0 lh();
