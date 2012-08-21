@@ -21,12 +21,17 @@
 
    <%static:js group='courseware'/>
 
+  <%include file="../discussion/_js_dependencies.html" />
   <%include file="/mathjax_include.html" />
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
     document.write('\x3Cscript type="text/javascript" src="' +
         document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+  </script>
+
+  <script type="text/javascript">
+    var $$course_id = "${course.id}";
   </script>
 </%block>
 
@@ -54,8 +59,8 @@
           <div id="course-errors">
             <ul>
           % for (msg, err) in course_errors:
-            <li>${msg}
-              <ul><li><pre>${err}</pre></li></ul>
+            <li>${msg | h}
+              <ul><li><pre>${err | h}</pre></li></ul>
             </li>
           % endfor
             </ul>
