@@ -149,12 +149,23 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'courseware.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'courseware.views.grade_summary', name='grade_summary'),
 
     )
+
+    # discussion forums live within courseware, so courseware must be enabled first
+    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+                'courseware.views.news', name="news"),
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
+                include('django_comment_client.urls'))
+            )
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
@@ -190,6 +201,8 @@ if settings.ASKBOT_ENABLED:
                     url(r'^followit/', include('followit.urls')), \
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
+
+
 
 if settings.DEBUG:
     ## Jasmine

@@ -74,5 +74,4 @@ There is also a script "create-dev-env.sh" that automates these steps.
         $ django-admin.py syncdb --settings=envs.dev --pythonpath=.
         $ django-admin.py migrate --settings=envs.dev --pythonpath=.
         $ django-admin.py runserver --settings=envs.dev --pythonpath=.   
- 
 
