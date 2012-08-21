@@ -143,7 +143,9 @@ class @DiscussionUtil
     id = $content.attr("_id")
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
-    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, @postMathJaxProcessor
+    _processor = (_this) ->
+      (text) -> _this.postMathJaxProcessor(text)
+    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, _processor(@)
     @wmdEditors["#{cls_identifier}-#{id}"] = editor
     editor
 
