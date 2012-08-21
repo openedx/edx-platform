@@ -44,3 +44,4 @@ django-threaded-multihost
 django-sekizai<0.7
 networkx
 -r repo-requirements.txt
+-r test-acceptance-requirements.txt
