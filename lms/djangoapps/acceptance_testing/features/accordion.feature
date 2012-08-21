@@ -12,7 +12,5 @@ Feature: Use the Accordion
     I should see an element with class of "user" within "3" seconds
   	I visit "http://stage-edx-001.m.edx.org/courses/MITx/6.00x/2012_Fall/info"
   	I click "Courseware"
-  	I should see an element with id of "open_close_accordion"
-  	I should see an element with class of "ui-accordion"
   	I should see an element with id of "accordion"
   	I click on every item in every week of the course
