@@ -3,6 +3,10 @@ import logging
 import urllib
 import itertools
 
+from functools import partial
+
+from functools import partial
+
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -21,6 +25,11 @@ from courseware.courses import (get_course_with_access, get_courses_by_universit
 from models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_section
 from student.models import UserProfile
+
+from multicourse import multicourse_settings
+
+from django_comment_client.utils import get_discussion_title
+
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
@@ -28,6 +37,11 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+
+import comment_client
+
+
+
 
 log = logging.getLogger("mitx.courseware")
 
@@ -268,6 +282,26 @@ def university_profile(request, org_id):
 
     return render_to_response(template_file, context)
 
+def render_notifications(request, course, notifications):
+    context = {
+        'notifications': notifications,
+        'get_discussion_title': partial(get_discussion_title, request=request, course=course),
+        'course': course,
+    }
+    return render_to_string('notifications.html', context)
+
+@login_required
+def news(request, course_id):
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    notifications = comment_client.get_notifications(request.user.id)
+
+    context = {
+        'course': course,
+        'content': render_notifications(request, course, notifications),
+    }
+
+    return render_to_response('news.html', context)
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -358,4 +392,3 @@ def instructor_dashboard(request, course_id):
     context = {'course': course,
                'staff_access': True,}
     return render_to_response('courseware/instructor_dashboard.html', context)
-

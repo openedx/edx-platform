@@ -1,0 +1,8 @@
+<%namespace name="renderer" file="_content_renderer.html"/>
+
+<section class="discussion" _id="${discussion_id}">
+  <a class="discussion-title" href="javascript:void(0)">Discussion</a>
+  ${renderer.render_content_with_comments(thread)}
+</section>
+
+<%include file="_js_data.html" />

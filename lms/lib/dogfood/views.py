@@ -24,7 +24,6 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 import track.views
 from lxml import etree
 
-
 from courseware.module_render import make_track_function, ModuleSystem, get_module
 from courseware.models import StudentModule
 from multicourse import multicourse_settings

@@ -29,6 +29,7 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 import logging
 import re
 import shlex  # for splitting quoted strings
+import json
 
 from lxml import etree
 import xml.sax.saxutils as saxutils
@@ -336,6 +337,11 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
+    escapedict = {'"': '&quot;'}
+    allowed_files  = json.dumps(element.get('allowed_files', '').split())
+    allowed_files  = saxutils.escape(allowed_files, escapedict)
+    required_files = json.dumps(element.get('required_files', '').split())
+    required_files = saxutils.escape(required_files, escapedict)
 
     # Check if problem has been queued
     queue_len = 0
@@ -345,7 +351,8 @@ def filesubmission(element, value, status, render_template, msg=''):
         msg = 'Submitted to grader. (Queue length: %s)' % queue_len
 
     context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
-                'queue_len': queue_len
+            'queue_len': queue_len, 'allowed_files': allowed_files,
+            'required_files': required_files
               }
     html = render_template("filesubmission.html", context)
     return etree.XML(html)
