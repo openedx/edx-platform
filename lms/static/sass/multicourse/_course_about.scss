@@ -274,6 +274,17 @@
           }
         }
       }
+
+      .prerequisites, .syllabus {
+        ul {
+          li {
+            font: normal 1em/1.6em $serif;
+          }
+          ul {
+            margin: 5px 0px 10px;
+          }
+        }
+      }
       
       .faq {
         @include clearfix;
