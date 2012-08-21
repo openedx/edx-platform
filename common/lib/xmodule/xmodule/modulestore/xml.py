@@ -4,16 +4,17 @@ import os
 import re
 
 from collections import defaultdict
+from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from lxml.html import HtmlComment
 from path import path
+
 from xmodule.errortracker import ErrorLog, make_error_tracker
-from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from cStringIO import StringIO
+from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
@@ -202,6 +203,27 @@ class XMLModuleStore(ModuleStoreBase):
         return {}
 
 
+    def read_grading_policy(self, paths, tracker):
+        """Load a grading policy from the specified paths, in order, if it exists."""
+        # Default to a blank policy
+        policy_str = ""
+
+        for policy_path in paths:
+            if not os.path.exists(policy_path):
+                continue
+            try:
+                with open(policy_path) as grading_policy_file:
+                    policy_str = grading_policy_file.read()
+                    # if we successfully read the file, stop looking at backups
+                    break
+            except (IOError):
+                msg = "Unable to load course settings file from '{0}'".format(policy_path)
+                tracker(msg)
+                log.warning(msg)
+
+        return policy_str
+
+
     def load_course(self, course_dir, tracker):
         """
         Load a course into this module store
@@ -242,9 +264,11 @@ class XMLModuleStore(ModuleStoreBase):
                 course = course_dir
 
             url_name = course_data.get('url_name', course_data.get('slug'))
+            policy_dir = None
             if url_name:
-                old_policy_path = self.data_dir / course_dir / 'policies' / url_name / 'policy.json'
-                policy = self.load_policy(old_policy_path, tracker)
+                policy_dir = self.data_dir / course_dir / 'policies' / url_name
+                policy_path = policy_dir / 'policy.json'
+                policy = self.load_policy(policy_path, tracker)
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
@@ -272,6 +296,15 @@ class XMLModuleStore(ModuleStoreBase):
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+
+            # Try to load grading policy
+            paths = [self.data_dir / 'grading_policy.json']
+            if policy_dir:
+                paths = [policy_dir / 'grading_policy.json'] + paths
+
+            policy_str = self.read_grading_policy(paths, tracker)
+            course_descriptor.set_grading_policy(policy_str)
+
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor

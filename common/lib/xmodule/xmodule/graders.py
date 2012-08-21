@@ -14,11 +14,11 @@ def load_grading_policy(course_policy_string):
     """
     This loads a grading policy from a string (usually read from a file),
     which can be a JSON object or an empty string.
-    
+
     The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
     missing, it reverts to the default.
     """
-    
+
     default_policy_string = """
     {
         "GRADER" : [
@@ -56,7 +56,7 @@ def load_grading_policy(course_policy_string):
         }
     }
     """
-    
+
     # Load the global settings as a dictionary
     grading_policy = json.loads(default_policy_string)
 
@@ -64,15 +64,15 @@ def load_grading_policy(course_policy_string):
     course_policy = {}
     if course_policy_string:
         course_policy = json.loads(course_policy_string)
-    
+
     # Override any global settings with the course settings
     grading_policy.update(course_policy)
 
     # Here is where we should parse any configurations, so that we can fail early
     grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
-    
+
     return grading_policy
-    
+
 
 def aggregate_scores(scores, section_name="summary"):
     """
@@ -130,7 +130,9 @@ def grader_from_conf(conf):
                 raise ValueError("Configuration has no appropriate grader class.")
 
         except (TypeError, ValueError) as error:
-            errorString = "Unable to parse grader configuration:\n    " + str(subgraderconf) + "\n    Error was:\n    " + str(error)
+            errorString = ("Unable to parse grader configuration:\n    " +
+                           str(subgraderconf) +
+                           "\n    Error was:\n    " + str(error))
             log.critical(errorString)
             raise ValueError(errorString)
 
