@@ -1,31 +1,36 @@
-$ ->
-  
-  class Discussion extends Backbone.Collection
-    model: Thread
-    initialize: ->
-      this.bind "add", (item) =>
-        item.collection = this
+class @Discussion extends Backbone.Collection
+  model: Thread
+  initialize: ->
+    this.bind "add", (item) =>
+      item.collection = this
 
-  class DiscussionModuleView extends Backbone.View
+  find: (id) ->
+    _.first @where(id: id)
 
-  class DiscussionView extends Backbone.View
+class @DiscussionModuleView extends Backbone.View
 
-    $: (selector) ->
-      @$local.find(selector)
+class @DiscussionView extends Backbone.View
 
-    initialize: ->
-      @$local = @$el.children(".local")
+  $: (selector) ->
+    @$local.find(selector)
 
-    events:
-      "submit .search-wrapper>.discussion-search-form": "search"
-      "click .discussion-search-link": "search"
-      "click .discussion-sort-link": "sort"
-      "click .discussion-paginator>.discussion-page-link": "page"
-  
-  $(".discussion-module").each (index, elem) ->
-    view = new DiscussionModuleView(el: elem)
+  initLocal: ->
+    @$local = @$el.children(".local")
 
-  $("section.discussion").each (index, elem) ->
-    discussionData = DiscussionUtil.getDiscussionData(elem)
-    discussion = new Discussion(discussionData)
-    view = new DiscussionView(el: elem, model: discussion)
+  initialize: ->
+    @initLocal()
+    @model.view = @
+    @$el.children(".threads").children(".thread").each (index, elem) =>
+      threadView = new ThreadView el: elem, model: @model.find $(elem).attr("_id")
+
+  search: ->
+
+  sort: ->
+
+  page: ->
+
+  events:
+    "submit .search-wrapper>.discussion-search-form": "search"
+    "click .discussion-search-link": "search"
+    "click .discussion-sort-link": "sort"
+    "click .discussion-paginator>.discussion-page-link": "page"
