@@ -4,7 +4,7 @@ Feature: Sign up and Sign out
   We'll see if I can create an account and log out
 
   Scenario: Visit the homepage to Sign Up
-    Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
+    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
     ## "http://anant:agarwal@stage-edx-001.m.edx.org/"
     When I click "SIGN UP"
       And I signup with "bob62@bob.com" in the "email" field

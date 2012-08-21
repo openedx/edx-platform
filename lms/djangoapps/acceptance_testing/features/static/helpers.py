@@ -4,8 +4,8 @@ import lettuce_webdriver.webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 
-url = 'http://anant:agarwal@sandbox-test-001.m.edx.org/'
-#url = 'http://anant:agarwal@stage-edx-001.m.edx.org/'
+#url = 'http://anant:agarwal@sandbox-test-001.m.edx.org/'
+url = 'http://anant:agarwal@stage-edx-001.m.edx.org/'
 
 ## Helper methods for selenium tests for EdX
 
