@@ -19,6 +19,11 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
+# Disable askbot, enable Berkeley forums
+MITX_FEATURES['ENABLE_DISCUSSION'] = False
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
+
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
 with open(ENV_ROOT / "env.json") as env_file:
@@ -59,4 +64,6 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
+
+COMMENTS_SERVICE_URL = ENV_TOKENS["COMMENTS_SERVICE_URL"]
 
