@@ -126,6 +126,8 @@ if settings.COURSEWARE_ENABLED:
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
+            'courseware.views.syllabus', name="syllabus"), # TODO arjun remove when custom tabs in place, see courseware/courses.py
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
             'staticbook.views.index', name="book"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
@@ -217,11 +219,14 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^gitreload$', 'lms_migration.migrate.gitreload'),
+        url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
         )
 
 if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += (
         url(r'^event_logs$', 'track.views.view_tracking_log'),
+        url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
         )
 
 urlpatterns = patterns(*urlpatterns)

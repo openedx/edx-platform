@@ -73,6 +73,8 @@ MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
 
+INSTALLED_APPS += ('lms_migration',)
+
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
