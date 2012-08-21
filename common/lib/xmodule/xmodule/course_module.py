@@ -18,7 +18,7 @@ class CourseDescriptor(SequenceDescriptor):
     class Textbook:
         def __init__(self, title, book_url):
             self.title = title
-            self.book_url = book_url 
+            self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
 
         @classmethod
@@ -30,11 +30,11 @@ class CourseDescriptor(SequenceDescriptor):
             return self.table_of_contents
 
         def _get_toc_from_s3(self):
-            '''
+            """
             Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
 
             Returns XML tree representation of the table of contents
-            '''
+            """
             toc_url = self.book_url + 'toc.xml'
 
             # Get the table of contents from S3
@@ -72,6 +72,15 @@ class CourseDescriptor(SequenceDescriptor):
         self.enrollment_start = self._try_parse_time("enrollment_start")
         self.enrollment_end = self._try_parse_time("enrollment_end")
 
+        # NOTE: relies on the modulestore to call set_grading_policy() right after
+        # init.  (Modulestore is in charge of figuring out where to load the policy from)
+
+
+    def set_grading_policy(self, policy_str):
+        """Parse the policy specified in policy_str, and save it"""
+        self._grading_policy = load_grading_policy(policy_str)
+
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
@@ -87,25 +96,11 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def grader(self):
-        return self.__grading_policy['GRADER']
+        return self._grading_policy['GRADER']
 
     @property
     def grade_cutoffs(self):
-        return self.__grading_policy['GRADE_CUTOFFS']
-
-    @lazyproperty
-    def __grading_policy(self):
-        policy_string = ""
-
-        try:
-            with self.system.resources_fs.open("grading_policy.json") as grading_policy_file:
-                policy_string = grading_policy_file.read()
-        except (IOError, ResourceNotFoundError):
-            log.warning("Unable to load course settings file from grading_policy.json in course " + self.id)
-
-        grading_policy = load_grading_policy(policy_string)
-
-        return grading_policy
+        return self._grading_policy['GRADE_CUTOFFS']
 
     @lazyproperty
     def grading_context(self):
