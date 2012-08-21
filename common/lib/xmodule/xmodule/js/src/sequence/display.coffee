@@ -3,6 +3,7 @@ class @Sequence
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @id = @el.data('id')
+    @modx_url = @el.data('course_modx_root')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -76,13 +77,14 @@ class @Sequence
     if @position != new_position
       if @position != undefined
         @mark_visited @position
-        $.postWithPrefix "/modx/#{@id}/goto_position", position: new_position
+        modx_full_url = @modx_url + '/' + @id + '/goto_position'
+        $.postWithPrefix modx_full_url, position: new_position
 
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules('display', @$('#seq_content'))
 
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()
@@ -91,7 +93,7 @@ class @Sequence
     event.preventDefault()
     new_position = $(event.target).data('element')
     Logger.log "seq_goto", old: @position, new: new_position, id: @id
-
+    
     # On Sequence chage, destroy any existing polling thread 
     #   for queued submissions, see ../capa/display.coffee
     if window.queuePollerID
