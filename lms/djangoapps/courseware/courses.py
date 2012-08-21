@@ -142,6 +142,9 @@ def get_course_info_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
+# TODO: Fix this such that these are pulled in as extra course-specific tabs.
+#       arjun will address this by the end of October if no one does so prior to
+#       then. 
 def get_course_syllabus_section(course, section_key):
     """
     This returns the snippet of html to be rendered on the syllabus page,
