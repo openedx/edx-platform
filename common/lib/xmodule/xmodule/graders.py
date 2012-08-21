@@ -1,6 +1,7 @@
 import abc
 import json
 import logging
+import sys
 
 from collections import namedtuple
 
@@ -130,11 +131,11 @@ def grader_from_conf(conf):
                 raise ValueError("Configuration has no appropriate grader class.")
 
         except (TypeError, ValueError) as error:
-            errorString = ("Unable to parse grader configuration:\n    " +
-                           str(subgraderconf) +
-                           "\n    Error was:\n    " + str(error))
-            log.critical(errorString)
-            raise ValueError(errorString)
+            # Add info and re-raise
+            msg = ("Unable to parse grader configuration:\n    " +
+                   str(subgraderconf) +
+                   "\n    Error was:\n    " + str(error))
+            raise ValueError(msg), None, sys.exc_info()[2]
 
     return WeightedSubsectionsGrader(subgraders)
 
