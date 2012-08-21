@@ -80,8 +80,8 @@ def course_wiki_redirect(request, course_id):
         urlpath = URLPath.create_article(
             root,
             course_slug,
-            title=course.title,
-            content="This is the wiki for " + course.title + ".",
+            title=course.number,
+            content="{0}\n===\nThis is the wiki for **{1}**'s _{2}_.".format(course.number, course.org, course.title),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,
