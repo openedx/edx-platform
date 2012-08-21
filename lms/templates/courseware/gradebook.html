@@ -1,6 +1,6 @@
-<%inherit file="main.html" />
+<%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%namespace name='static' file='static_content.html'/>
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
@@ -28,7 +28,7 @@
 
 </%block>
 
-<%include file="course_navigation.html" args="active_page=''" />
+<%include file="/courseware/course_navigation.html" args="active_page=''" />
 
 <section class="container">
 <div class="gradebook-wrapper">
@@ -49,7 +49,7 @@
         %for student in students:
         <tr>
           <td>
-            <a href="${reverse('student_profile', kwargs=dict(course_id=course_id, student_id=student['id']))}">${student['username']}</a>
+            <a href="${reverse('student_progress', kwargs=dict(course_id=course_id, student_id=student['id']))}">${student['username']}</a>
           </td>
         </tr>
         %endfor
