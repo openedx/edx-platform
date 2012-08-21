@@ -47,6 +47,7 @@ LOGGING = get_logger_config(LOG_DIR,
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)
 
+COURSE_LISTINGS = ENV_TOKENS['COURSE_LISTINGS']
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.

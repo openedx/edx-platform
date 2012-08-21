@@ -1,12 +1,14 @@
-<section id="textinput_${id}" class="textinput">
+<% doinline = "inline" if inline else "" %>
+
+<section id="textinput_${id}" class="textinput ${doinline}" >
     % if state == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
+    <div class="unanswered ${doinline}" id="status_${id}">
     % elif state == 'correct':
-    <div class="correct" id="status_${id}">
+    <div class="correct ${doinline}" id="status_${id}">
     % elif state == 'incorrect':
-    <div class="incorrect" id="status_${id}">
+    <div class="incorrect ${doinline}" id="status_${id}">
     % elif state == 'incomplete':
-    <div class="incorrect" id="status_${id}">
+    <div class="incorrect ${doinline}" id="status_${id}">
     % endif
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />

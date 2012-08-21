@@ -1,0 +1,18 @@
+{% extends "wiki/base.html" %}
+{% load wiki_tags i18n %}
+{% load url from future %}
+
+{% block pagetitle %}{{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_breadcrumbs %}
+{% include "wiki/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block wiki_contents %}
+
+  <div class="missing-wrapper">
+    <p>This article was not found, and neither was the parent. <a href="#">Go back to the main wiki article.</a></p>
+    <button type="submit">Create a new article</button>
+  </div>
+
+{% endblock %}
