@@ -25,11 +25,11 @@ a {
 }
 
 .container {
-  padding: 1.4em 0;
+  padding: 1.4em 0 0 0;
 
   > div {
     width: 100%;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border-radius: 3px;
     border: 1px solid #ccc;
     background: #fff;
