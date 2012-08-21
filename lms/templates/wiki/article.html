@@ -23,13 +23,14 @@
     </article>
 
     <div class="article-functions">
+      
+      <ul class="nav nav-tabs">
+        {% include "wiki/includes/article_menu.html" %}
+      </ul>
       <div class="timestamp">
         <span class="label">{% trans "Last modified:" %}</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
-      <ul class="nav nav-tabs">
-        {% include "wiki/includes/article_menu.html" %}
-      </ul>
     </div>
   </div>
 
