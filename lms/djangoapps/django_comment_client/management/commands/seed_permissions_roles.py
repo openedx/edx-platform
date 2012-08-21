@@ -3,13 +3,16 @@ from django_comment_client.models import Permission, Role
 
 
 class Command(BaseCommand):
-    args = ''
+    args = 'course_id'
     help = 'Seed default permisssions and roles'
 
     def handle(self, *args, **options):
-        administrator_role = Role.objects.get_or_create(name="Administrator", course_id="MITx/6.002x/2012_Fall")[0]
-        moderator_role = Role.objects.get_or_create(name="Moderator", course_id="MITx/6.002x/2012_Fall")[0]
-        student_role = Role.objects.get_or_create(name="Student", course_id="MITx/6.002x/2012_Fall")[0]
+        if len(args) != 1:
+            raise CommandError("The number of arguments does not match. ")
+        course_id = args[0]
+        administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
+        moderator_role = Role.objects.get_or_create(name="Moderator", course_id=course_id)[0]
+        student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
 
         for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
                        "update_comment", "create_sub_comment", "unvote" , "create_thread",
