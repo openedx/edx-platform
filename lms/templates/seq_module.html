@@ -1,18 +1,20 @@
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
-    <ol id="sequence-list">
-      % for idx, item in enumerate(items):
-      ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
-      ## Make sure it gets updated after ajax calls.
-      ## implementation note: will need to figure out how to handle combining detail
-      ## statuses of multiple modules in js.
-      <li>
-        <a class="seq_${item['type']} inactive progress-${item['progress_status']}" data-element="${idx+1}">
-          <p>${item['title']}</p>
-        </a>
-      </li>
-      % endfor
-    </ol>
+    <div class="sequence-list-wrapper">
+      <ol id="sequence-list">
+        % for idx, item in enumerate(items):
+        ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
+        ## Make sure it gets updated after ajax calls.
+        ## implementation note: will need to figure out how to handle combining detail
+        ## statuses of multiple modules in js.
+        <li>
+          <a class="seq_${item['type']} inactive progress-${item['progress_status']}" data-element="${idx+1}">
+            <p>${item['title']}</p>
+          </a>
+        </li>
+        % endfor
+      </ol>
+    </div>
 
     <ul class="sequence-nav-buttons">
       <li class="prev"><a href="#">Previous</a></li>
@@ -32,3 +34,15 @@
     </ul>
   </nav>
 </div>
+
+
+
+<script type="text/javascript">
+  var sequenceNav;
+  $(document).ready(function() {
+    // console.log($('.sequence-nav'));
+
+    sequenceNav = new SequenceNav($('.sequence-nav'));
+    console.log(sequenceNav);
+  });
+</script>
