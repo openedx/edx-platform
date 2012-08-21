@@ -4,9 +4,9 @@ nav.sequence-nav {
   @extend .topbar;
   border: 1px solid #ccc;
   height: 44px;
-  @include linear-gradient(top, #f6f6f6, #e6e6e6);
+  @include linear-gradient(top, #eee, #ddd);
   @include border-radius(25px);
-  margin: 0 -20px 30px;
+  margin: -4px -20px 30px;
   position: relative;
   @include box-shadow(0 1px 0 #fff inset);
 
@@ -16,7 +16,7 @@ nav.sequence-nav {
     height: 100%;
     margin: 0;
     padding-left: 3px;
-    padding-right: flex-grid(1, 9);
+    padding-right: 90px;
     width: 100%;
 
     a {
@@ -28,8 +28,8 @@ nav.sequence-nav {
       min-width: 20px;
 
       a {
-        width: 35px;
-        height: 35px;
+        width: 34px;
+        height: 34px;
         margin: 4px auto;
         background-position: center 10px;
         background-repeat: no-repeat;
@@ -51,6 +51,17 @@ nav.sequence-nav {
           border-color: $blue;
           background-color: #fff;
           z-index: 9;
+
+          // &:after {
+          //   content: '▲';
+          //   position: absolute;
+          //   top: 28px;
+          //   left: 50%;
+          //   z-index: 9999;
+          //   margin-left: -5px;
+          //   font-size: 12px;
+          //   color: #aaa;
+          // }
 
           &:hover {
             background-color: #fff;
@@ -172,7 +183,7 @@ nav.sequence-nav {
     right: 0;
     top: 0;
     width: 81px;
-    margin-right: 5px;
+    margin: 5px 5px 0 0;
     border: none;
     border-bottom: 0;
     @include border-radius(3px 3px 0 0);
@@ -180,24 +191,24 @@ nav.sequence-nav {
     li {
       float: left;
       margin-bottom: 0;
-      height: 35px;
+      height: 34px;
       width: 40px;
 
       &.prev, &.next {
         @include linear-gradient(top, #ccc, #888);
+        @include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset);
 
         a {
           background-position: center;
           background-repeat: no-repeat;
           display: block;
-          height: 35px;
+          height: 34px;
           width: 40px;
           text-indent: -9999px;
           @include transition(all, .2s, $ease-in-out-quad);
 
           &:hover {
             opacity: .5;
-            background-color: #f4f4f4;
           }
 
           &.disabled {
@@ -212,6 +223,7 @@ nav.sequence-nav {
 
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
+          background-position: center 10px;
         }
       }
 
@@ -219,8 +231,9 @@ nav.sequence-nav {
         border-radius: 0 35px 35px 0;
 
         a {
-          border-left: 1px solid lighten($border-color, 10%);
+          border-left: 1px solid #888;
           background-image: url('../images/sequence-nav/next-icon.png');
+          background-position: center 10px;
         }
       }
     }
