@@ -141,6 +141,35 @@ def get_course_info_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
+# TODO: Fix this such that these are pulled in as extra course-specific tabs.
+#       arjun will address this by the end of October if no one does so prior to
+#       then. 
+def get_course_syllabus_section(course, section_key):
+    """
+    This returns the snippet of html to be rendered on the syllabus page,
+    given the key for the section.
+
+    Valid keys:
+    - syllabus
+    - guest_syllabus
+    """
+
+    # Many of these are stored as html files instead of some semantic
+    # markup. This can change without effecting this interface when we find a
+    # good format for defining so many snippets of text/html.
+
+    if section_key in ['syllabus', 'guest_syllabus']:
+        try:
+            with course.system.resources_fs.open(path("syllabus") / section_key + ".html") as htmlFile:
+                return replace_urls(htmlFile.read().decode('utf-8'),
+                                    course.metadata['data_dir'])
+        except ResourceNotFoundError:
+            log.exception("Missing syllabus section {key} in course {url}".format(
+                key=section_key, url=course.location.url()))
+            return "! Syllabus missing !"
+
+    raise KeyError("Invalid about key " + str(section_key))
+
 
 def get_courses_by_university(user, domain=None):
     '''
