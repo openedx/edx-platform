@@ -767,6 +767,39 @@ section.wiki {
       text-decoration: none;
     }
   }
+
+  .missing {
+    max-width: 400px;
+    margin: lh(2) auto;
+    display: block;
+    overflow: hidden;
+    background: $pink;
+    padding: lh();
+    @include box-shadow(inset 0 0 0 1px lighten($pink, 10%));
+    border: 1px solid darken($pink, 15%);
+
+    p {
+      color: #fff;
+
+      a {
+        display: block;
+        background: darken($pink, 8%);
+        margin: lh() (-(lh())) (-(lh()));
+        padding: lh();
+        border-top: 1px solid darken($pink, 15%);
+        color: #fff;
+        font-weight: bold;
+        font-size: em(18);
+        @include transition;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+
+        &:hover {
+          background: darken($pink, 12%);
+        }
+      }
+    }
+  }
 }
 
 .modal-backdrop {
