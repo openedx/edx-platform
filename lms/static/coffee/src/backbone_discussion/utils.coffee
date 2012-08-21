@@ -12,26 +12,17 @@ class @DiscussionUtil
       id = $(id).attr("_id")
     return $$discussion_data[id]
 
-  @getContentInfo: (id, attr) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    (window.$$annotated_content_info[id] || {})[attr]
+  @addContent: (id, content) -> window.$$contents[id] = content
 
-  @setContentInfo: (id, attr, value) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info[id] ||= {}
-    window.$$annotated_content_info[id][attr] = value
+  @getContent: (id) -> window.$$contents[id]
 
-  @extendContentInfo: (id, newInfo) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info[id] = newInfo
+  @addDiscussion: (id, discussion) -> window.$$discussions[id] = discussion
 
-  @bulkExtendContentInfo: (newInfos) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info = $.extend window.$$annotated_content_info, newInfos
+  @getDiscussion: (id) -> window.$$discussions[id]
+  
+  @bulkUpdateContentInfo: (infos) ->
+    for id, info of infos
+      @getContent(id).updateInfo(info)
 
   @generateDiscussionLink: (cls, txt, handler) ->
     $("<a>").addClass("discussion-link")
@@ -79,9 +70,22 @@ class @DiscussionUtil
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
 
-  @handleAnchorAndReload: (response) ->
-    #window.location = window.location.pathname + "#" + response['id']
-    window.location.reload()
+  @get: ($elem, url, success) ->
+    @safeAjax
+      $elem: $elem
+      url: url
+      type: "GET"
+      dataType: "json"
+      success: success
+
+  @post: ($elem, url, data, success) ->
+    @safeAjax
+      $elem: $elem
+      url: url
+      type: "POST"
+      dataType: "json"
+      data: data
+      success: success
 
   @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
@@ -97,22 +101,6 @@ class @DiscussionUtil
     width: '100%'
     defaultText: "Tag your post: press enter after each tag"
     removeWithBackspace: true
-
-  @isSubscribed: (id, type) ->
-    $$user_info? and (
-      if type == "thread"
-        id in $$user_info.subscribed_thread_ids
-      else if type == "commentable" or type == "discussion"
-        id in $$user_info.subscribed_commentable_ids
-      else
-        id in $$user_info.subscribed_user_ids
-    )
-
-  @isUpvoted: (id) ->
-    $$user_info? and (id in $$user_info.upvoted_ids)
-
-  @isDownvoted: (id) ->
-    $$user_info? and (id in $$user_info.downvoted_ids)
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->

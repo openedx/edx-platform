@@ -1,5 +1,8 @@
 $ ->
 
+  window.$$contents = {}
+  window.$$discussions = {}
+
   $(".discussion-module").each (index, elem) ->
     view = new DiscussionModuleView(el: elem)
 
@@ -8,3 +11,5 @@ $ ->
     discussion = new Discussion()
     discussion.reset(discussionData, {silent: false})
     view = new DiscussionView(el: elem, model: discussion)
+
+  DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)

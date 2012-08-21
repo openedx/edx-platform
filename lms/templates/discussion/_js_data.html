@@ -1,7 +1,6 @@
 <%! from django.template.defaultfilters import escapejs %>
 
 <script type="text/javascript">
-  var $$user_info = JSON.parse("${user_info | escapejs}");
   var $$course_id = "${course_id | escapejs}";
   if (typeof $$annotated_content_info === undefined) {
     var $$annotated_content_info = {};

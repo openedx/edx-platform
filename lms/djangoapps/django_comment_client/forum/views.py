@@ -15,7 +15,6 @@ from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.utils import merge_dict, extract, strip_none
 
 import json
-import dateutil
 import django_comment_client.utils as utils
 import comment_client as cc
 
@@ -64,14 +63,17 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
 
-    annotated_content_infos = map(lambda x: utils.get_annotated_content_infos(course_id, x, request.user), threads)
-    annotated_content_info = reduce(merge_dict, annotated_content_infos, {})
+    user_info = cc.User.from_django_user(request.user).to_dict()
+
+    def infogetter(thread):
+        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
         'user_id': user_id,
-        'user_info': json.dumps(cc.User.from_django_user(request.user).to_dict()),
         'course_id': course_id,
         'request': request,
         'performed_search': _should_perform_search(request),
@@ -166,12 +168,13 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
 
-    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user)
+    user_info = cc.User.from_django_user(request.user).to_dict()
+
+    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
 
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
-        'user_info': json.dumps(cc.User.from_django_user(request.user).to_dict()),
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
@@ -183,8 +186,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
         
+        user_info = cc.User.from_django_user(request.user).to_dict()
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user)
+        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 

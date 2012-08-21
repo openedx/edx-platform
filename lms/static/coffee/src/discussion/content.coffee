@@ -85,6 +85,7 @@ initializeFollowThread = (thread) ->
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($comment)
           Discussion.bindContentEvents($comment)
+          @cancelReply()
           $local(".discussion-reply-new").hide()
           $local(".discussion-reply").show()
           $local(".discussion-edit").show()

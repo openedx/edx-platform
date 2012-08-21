@@ -9,60 +9,107 @@ class @Content extends Backbone.Model
     can_delete: '.admin-delete'
     can_openclose: '.admin-openclose'
     
-  isUpvoted: ->
-    DiscussionUtil.isUpvoted @id
+  urlMappers: {}
 
-  isDownvoted: ->
-    DiscussionUtil.isDownvoted @id
+  urlFor: (name) ->
+    @urlMappers[name].apply(@)
 
   can: (action) ->
     DiscussionUtil.getContentInfo @id, action
 
-  thread_id: ->
-    if @get('type') == "comment" then @get('thread_id') else @id
+  updateInfo: (info) ->
+    @set('ability', info.ability)
+    @set('voted', info.voted)
+    @set('subscribed', info.subscribed)
+
+  addComment: (comment) ->
+    @get('children').push comment
+    model = new Comment $.extend {}, comment, { thread: @get('thread') }
+    @get('comments').add model
+    model
+
+  resetComments: (children) ->
+    @set 'children', []
+    @set 'comments', new Comments()
+    for comment in (children || [])
+      @addComment comment
 
   initialize: ->
-    @set('comments', new Comments())
-    if @get('children')
-      @get('comments').reset @get('children'), {silent: false}
+    DiscussionUtil.addContent @id, @
+    @resetComments(@get('children'))
+    
 
 class @ContentView extends Backbone.View
 
   $: (selector) ->
     @$local.find(selector)
 
-  discussionContent: ->
+  partial:
+    endorsed: (endorsed) ->
+      if endorsed
+        @$el.addClass("endorsed")
+      else
+        @$el.removeClass("endorsed")
+
+    closed: (closed) -> # we should just re-render the whole thread, or update according to new abilities
+      if closed
+        @$el.addClass("closed")
+        @$(".admin-openclose").text "Re-open Thread"
+      else
+        @$el.removeClass("closed")
+        @$(".admin-openclose").text "Close Thread"
+
+    voted: (voted) ->
+      @$(".discussion-vote-up").removeClass("voted") if voted != "up"
+      @$(".discussion-vote-down").removeClass("voted") if voted != "down"
+      @$(".discussion-vote-#{voted}").addClass("voted") if voted in ["up", "down"]
+
+    votes_point: (votes_point) ->
+      @$(".discussion-votes-point").html(votes_point)
+      
+    subscribed: (subscribed) -> #later
+
+    ability: (ability) ->
+      for action, elemSelector of @model.actions
+        if not ability[action]
+          @$(elemSelector).remove()
+
+  $discussionContent: ->
     @_discussionContent ||= @$el.children(".discussion-content")
 
+  $showComments: ->
+    @_showComments ||= @$(".discussion-show-comments")
+
+  updateShowComments: ->
+    if @showed
+      @$showComments().html @$showComments().html().replace "Show", "Hide"
+    else
+      @$showComments().html @$showComments().html().replace "Hide", "Show"
+
+  retrieved: ->
+    @$showComments().hasClass("retrieved")
+      
   hideSingleThread: (event) ->
-    $showComments = @$(".discussion-show-comments")
     @$el.children(".comments").hide()
     @showed = false
-    $showComments.html $showComments.html().replace "Hide", "Show"
+    @updateShowComments()
 
   showSingleThread: (event) ->
-    $showComments = @$(".discussion-show-comments")
-    retrieved = not $showComments.hasClass("first-time") and @model.get("children") != undefined
-    if retrieved
+    if @retrieved()
       @$el.children(".comments").show()
-      $showComments.html $showComments.html().replace "Show", "Hide"
       @showed = true
+      @updateShowComments()
     else
-      discussion_id = @model.discussion.id
-      url = DiscussionUtil.urlFor('retrieve_single_thread', discussion_id, @model.id)
-      DiscussionUtil.safeAjax
-        $elem: $.merge @$(".thread-title"), @$(".discussion-show-comments")
-        url: url
-        type: "GET"
-        dataType: 'json'
-        success: (response, textStatus) =>
-          DiscussionUtil.bulkExtendContentInfo response['annotated_content_info']
-          @showed = true
-          $showComments.html $showComments.html().replace "Show", "Hide"
-          @$el.append(response['html'])
-          @model.set('children', response.content.children)
-          @model.get('comments').reset response.content.children, {silent: false}
-          @initCommentViews()
+      $elem = $.merge @$(".thread-title"), @$showComments()
+      url = @model.urlFor('retrieve_single_thread')
+      DiscussionUtil.get $elem, url, (response, textStatus) =>
+        @showed = true
+        @updateShowComments()
+        @$showComments().addClass("retrieved")
+        @$el.children(".comments").replaceWith response.html
+        @model.resetComments response.content.children
+        @initCommentViews()
+        DiscussionUtil.bulkUpdateContentInfo response.annotated_content_info
 
   toggleSingleThread: (event) ->
     if @showed
@@ -83,12 +130,11 @@ class @ContentView extends Backbone.View
     if $replyView.length
       $replyView.show()
     else
-      thread_id = @model.thread_id()
-      view =
-        id: @model.id
-        showWatchCheckbox: not DiscussionUtil.isSubscribed(thread_id, "thread")
+      view = {}
+      view.id = @model.id
+      view.showWatchCheckbox = not @model.get('thread').get('subscribed')
       html = Mustache.render DiscussionUtil.getTemplate('_reply'), view
-      @discussionContent().append html
+      @$discussionContent().append html
       DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "reply-body"
       @$(".discussion-submit-post").click $.proxy(@submitReply, @)
       @$(".discussion-cancel-post").click $.proxy(@cancelReply, @)
@@ -96,13 +142,7 @@ class @ContentView extends Backbone.View
     @$(".discussion-edit").hide()
 
   submitReply: (event) ->
-    if @model.get('type') == 'thread'
-      url = DiscussionUtil.urlFor('create_comment', @model.id)
-    else if @model.get('type') == 'comment'
-      url = DiscussionUtil.urlFor('create_sub_comment', @model.id)
-    else
-      console.error "unrecognized model type #{@model.get('type')}"
-      return
+    url = @model.urlFor('reply')
 
     body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "reply-body"
 
@@ -122,19 +162,13 @@ class @ContentView extends Backbone.View
       success: (response, textStatus) =>
         DiscussionUtil.clearFormErrors @$(".discussion-errors")
         $comment = $(response.html)
-        @$el.children(".comments").prepend($comment)
+        @$el.children(".comments").prepend $comment
         DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "reply-body", ""
-        #DiscussionUtil.setContentInfo response.content['id'], 'can_reply', true
-        #DiscussionUtil.setContentInfo response.content['id'], 'editable', true
-        comment = new Comment(response.content)
-        DiscussionUtil.extendContentInfo comment.id, response['annotated_content_info']
-        @model.get('children').push(response.content)
-        @model.get('comments').add(comment)
+        comment = @model.addComment response.content
+        comment.updateInfo response.annotated_content_info
         commentView = new CommentView el: $comment[0], model: comment
-        @$(".discussion-reply-new").hide()
-        @$(".discussion-reply").show()
-        @$(".discussion-edit").show()
-        @discussionContent().attr("status", "normal")
+        @cancelReply()
+
   cancelReply: ->
     $replyView = @$(".discussion-reply-new")
     if $replyView.length
@@ -143,77 +177,42 @@ class @ContentView extends Backbone.View
     @$(".discussion-edit").show()
 
   unvote: (event) ->
-    url = DiscussionUtil.urlFor("undo_vote_for_#{@model.get('type')}", @model.id)
-    DiscussionUtil.safeAjax
-      $elem: @$(".discussion-vote")
-      url: url
-      type: "POST"
-      dataType: "json"
-      success: (response, textStatus) =>
-        if textStatus == "success"
-          @$(".discussion-vote").removeClass("voted")
-          @$(".discussion-votes-point").html response.votes.point
+    url = @model.urlFor('unvote')
+    $elem = @$(".discussion-vote")
+    DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
+      @model.set('voted', '')
+      @model.set('votes_point', response.votes.point)
 
-  vote: (event) ->
+  vote: (event, value) ->
+    url = @model.urlFor("#{value}vote")
+    $elem = @$(".discussion-vote")
+    DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
+      @model.set('voted', value)
+      @model.set('votes_point', response.votes.point)
+
+  toggleVote: (event) ->
     $elem = $(event.target)
-    if $elem.hasClass("voted")
+    value = $elem.attr("value")
+    if @model.get("voted") == value
       @unvote(event)
     else
-      value = $elem.attr("value")
-      url = Discussion.urlFor("#{value}vote_#{@model.get('type')}", @model.id)
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        dataType: "json"
-        success: (response, textStatus) =>
-          if textStatus == "success"
-            @$(".discussion-vote").removeClass("voted")
-            @$(".discussion-vote-#{value}").addClass("voted")
-            @$(".discussion-votes-point").html response.votes.point
+      @vote(event, value)
 
-  endorse: (event) ->
-    url = DiscussionUtil.urlFor('endorse_comment', @model.id)
-    endorsed = not @$el.hasClass("endorsed")
-    Discussion.safeAjax
-      $elem: $(event.target)
-      url: url
-      type: "POST"
-      dataType: "json"
-      data: {endorsed: endorsed}
-      success: (response, textStatus) =>
-        if textStatus == "success"
-          if endorsed
-            @$el.addClass("endorsed")
-          else
-            @$el.removeClass("endorsed")
+  toggleEndorse: (event) ->
+    $elem = $(event.target)
+    url = @model.urlFor('endorse')
+    endorsed = @model.get('endorsed')
+    data = { endorsed: not endorsed }
+    DiscussionUtil.post $elem, url, data, (response, textStatus) =>
+      @model.set('endorsed', not endorsed)
 
-  close: (event) ->
-    url = DiscussionUtil.urlFor('openclose_thread', @model.id)
-    closed = undefined
-    text = $(event.target).text()
-    if text.match(/Close/)
-      closed = true
-    else if text.match(/[Oo]pen/)
-      closed = false
-    else
-      console.log "Unexpected text " + text + "for open/close thread."
-    Discussion.safeAjax
-      $elem: $(event.target)
-      url: url
-      type: "POST"
-      dataType: "json"
-      data: {closed: closed}
-      success: (response, textStatus) =>
-        if textStatus == "success"
-          if closed
-            @$el.addClass("closed")
-            $(event.target).text "Re-open Thread"
-          else
-            @$el.removeClass("closed")
-            $(event.target).text "Close Thread"
-      error: (response, textStatus, e) ->
-        console.log e
+  toggleClosed: (event) ->
+    $elem = $(event.target)
+    url = @model.urlFor('close')
+    closed = @model.get('closed')
+    data = { closed: not closed }
+    DiscussionUtil.post $elem, url, data, (response, textStatus) =>
+      @model.set('closed', not closed)
 
   edit: ->
     $local(".discussion-content-wrapper").hide()
@@ -227,7 +226,7 @@ class @ContentView extends Backbone.View
         body: $local(".thread-raw-body").html()
         tags: $local(".thread-raw-tags").html()
       }
-      @discussionContent().append Mustache.render Discussion.editThreadTemplate, view
+      @$discussionContent().append Mustache.render Discussion.editThreadTemplate, view
       Discussion.makeWmdEditor $content, $local, "thread-body-edit"
       $local(".thread-tags-edit").tagsInput Discussion.tagsInputOptions()
       $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
@@ -247,7 +246,7 @@ class @ContentView extends Backbone.View
         error: Discussion.formErrorHandler($local(".discussion-update-errors"))
         success: (response, textStatus) ->
           Discussion.clearFormErrors($local(".discussion-update-errors"))
-          @discussionContent().replaceWith(response.html)
+          @$discussionContent().replaceWith(response.html)
           Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
           Discussion.initializeContent($content)
           Discussion.bindContentEvents($content)
@@ -274,15 +273,15 @@ class @ContentView extends Backbone.View
         console.log e
 
   events:
-    "click .thread-title": "showSingleThread"
-    "click .discussion-show-comments": "showSingleThread"
+    "click .thread-title": "toggleSingleThread"
+    "click .discussion-show-comments": "toggleSingleThread"
     "click .discussion-reply-thread": "reply"
     "click .discussion-reply-comment": "reply"
     "click .discussion-cancel-reply": "cancelReply"
-    "click .discussion-vote-up": "vote"
-    "click .discussion-vote-down": "vote"
-    "click .admin-endorse": "endorse"
-    "click .admin-openclose": "close"
+    "click .discussion-vote-up": "toggleVote"
+    "click .discussion-vote-down": "toggleVote"
+    "click .admin-endorse": "toggleEndorse"
+    "click .admin-openclose": "toggleClosed"
     "click .admin-edit": "edit"
     "click .admin-delete": "delete"
 
@@ -290,57 +289,65 @@ class @ContentView extends Backbone.View
     @$local = @$el.children(".local")
     @$delegateElement = @$local
 
-  initFollowThread: ->
-    $el.children(".discussion-content")
-       .find(".follow-wrapper")
-       .append(DiscussionUtil.subscriptionLink('thread', id))
-
-  initVote: ->
-    if @model.isUpvoted()
-      @$(".discussion-vote-up").addClass("voted")
-    else if @model.isDownvoted()
-      @$(".discussion-vote-down").addClass("voted")
-
   initBody: ->
     $contentBody = @$(".content-body")
     $contentBody.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight $contentBody.html()
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
 
-  initActions: ->
-    for action, elemSelector of @model.actions
-      if not @model.can action
-        @$(elemSelector).remove()
-
   initTimeago: ->
     @$("span.timeago").timeago()
 
   initPermalink: ->
+    @$(".discussion-permanent-link").attr "href", @model.permalink()
 
-    if @model.get('type') == 'thread'
-      discussion_id = @model.get('commentable_id')
-      permalink = Discussion.urlFor("permanent_link_thread", discussion_id, @model.id)
-    else
-      thread_id = @model.get('thread_id')
-      discussion_id = @$el.parents(".thread").attr("_discussion_id")
-      permalink = Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, @model.id)
+  renderPartial: ->
+    for attr, value of @model.changedAttributes()
+      if @partial[attr]
+        @partial[attr].apply(@, [value])
 
-    @$(".discussion-permanent-link").attr "href", permalink
+  initBindings: ->
+    @model.view = @
+    @model.bind('change', @renderPartial, @)
 
   initialize: ->
-    @model.view = @
+    @initBindings()
     @initLocal()
-    @initVote()
     @initTimeago()
     @initBody()
     @initPermalink()
-    @initActions()
     @initCommentViews()
     
 class @Thread extends @Content
+  urlMappers:
+    'retrieve_single_thread': -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+    'reply': -> DiscussionUtil.urlFor('create_comment', @id)
+    'unvote': -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
+    'upvote': -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
+    'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
+    'close': -> DiscussionUtil.urlFor('openclose_thread', @id)
+
+  initialize: ->
+    @set('thread', @)
+    super()
+
+  permalink: ->
+    discussion_id = @get('commentable_id')
+    return Discussion.urlFor("permanent_link_thread", discussion_id, @id)
 
 class @ThreadView extends @ContentView
 
 class @Comment extends @Content
+  urlMappers:
+    'reply': -> DiscussionUtil.urlFor('create_sub_comment', @id)
+    'unvote': -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
+    'upvote': -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
+    'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
+    'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
+
+  permalink: ->
+    thread_id = @get('thread').id
+    discussion_id = @get('thread').get('commentable_id')
+    return Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, @id)
 
 class @CommentView extends @ContentView
 
