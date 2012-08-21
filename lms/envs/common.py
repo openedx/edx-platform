@@ -30,10 +30,11 @@ import djcelery
 from path import path
 
 from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -55,7 +56,8 @@ MITX_FEATURES = {
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : True,
+    'ENABLE_DISCUSSION' : False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -302,6 +304,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
+WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -327,6 +330,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -349,6 +353,9 @@ MIDDLEWARE_CLASSES = (
     'askbot.middleware.spaceless.SpacelessMiddleware',
     # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'django_comment_client.utils.ViewNameMiddleware',
+    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -569,6 +576,9 @@ INSTALLED_APPS = (
 
     # For testing
     'django_jasmine',
+
+    # Discussion
+    'django_comment_client',
 
     # For Askbot
     'django.contrib.sitemaps',
