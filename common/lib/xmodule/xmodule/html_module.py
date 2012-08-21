@@ -86,7 +86,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                log.debug("candidates = {0}".format(candidates))
+                #log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
