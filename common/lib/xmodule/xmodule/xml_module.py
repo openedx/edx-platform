@@ -38,7 +38,7 @@ def get_metadata_from_xml(xml_object, remove=True):
     if meta is None:
         return ''
     dmdata = meta.text
-    log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
+    #log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
     if remove:
         xml_object.remove(meta)
     return dmdata
