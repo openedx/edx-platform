@@ -135,12 +135,12 @@ class XMLModuleStore(ModuleStoreBase):
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
+        self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
         if default_class is None:
             self.default_class = None
         else:
             module_path, _, class_name = default_class.rpartition('.')
-            #log.debug('module_path = %s' % module_path)
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
@@ -163,18 +163,27 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         Load a course, keeping track of errors as we go along.
         '''
+        # Special-case code here, since we don't have a location for the
+        # course before it loads.
+        # So, make a tracker to track load-time errors, then put in the right
+        # place after the course loads and we have its location
+        errorlog = make_error_tracker()
+        course_descriptor = None
         try:
-            # Special-case code here, since we don't have a location for the
-            # course before it loads.
-            # So, make a tracker to track load-time errors, then put in the right
-            # place after the course loads and we have its location
-            errorlog = make_error_tracker()
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
+        except Exception as e:
+            msg = "Failed to load course '{0}': {1}".format(course_dir, str(e))
+            log.exception(msg)
+            errorlog.tracker(msg)
+
+        if course_descriptor is not None:
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
-        except:
-            msg = "Failed to load course '%s'" % course_dir
-            log.exception(msg)
+        else:
+            # Didn't load course.  Instead, save the errors elsewhere.
+            self.errored_courses[course_dir] = errorlog
+
+
 
     def __unicode__(self):
         '''
@@ -211,6 +220,7 @@ class XMLModuleStore(ModuleStoreBase):
         for policy_path in paths:
             if not os.path.exists(policy_path):
                 continue
+            log.debug("Loading grading policy from {0}".format(policy_path))
             try:
                 with open(policy_path) as grading_policy_file:
                     policy_str = grading_policy_file.read()
@@ -298,7 +308,7 @@ class XMLModuleStore(ModuleStoreBase):
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
 
             # Try to load grading policy
-            paths = [self.data_dir / 'grading_policy.json']
+            paths = [self.data_dir / course_dir / 'grading_policy.json']
             if policy_dir:
                 paths = [policy_dir / 'grading_policy.json'] + paths
 
@@ -356,6 +366,12 @@ class XMLModuleStore(ModuleStoreBase):
         """
         return self.courses.values()
 
+    def get_errored_courses(self):
+        """
+        Return a dictionary of course_dir -> [(msg, exception_str)], for each
+        course_dir where course loading failed.
+        """
+        return dict( (k, self.errored_courses[k].errors) for k in self.errored_courses)
 
     def create_item(self, location):
         raise NotImplementedError("XMLModuleStores are read-only")
