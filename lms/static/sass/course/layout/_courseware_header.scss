@@ -15,29 +15,32 @@ nav.course-material {
   ol.course-tabs {
     @include border-top-radius(4px);
     @include clearfix;
-    padding: 10px 0 0 0;
+    padding: 28px 0 10px 0;
     margin-left: 10px;
 
     li {
       float: left;
       list-style: none;
+      margin-right: 6px;
 
       a {
+        border-radius: 3px;
         color: #555;
         display: block;
         text-align: center;
-        padding: 8px 13px 12px;
+        padding: 10px 13px 12px;
         font-size: 14px;
         font-weight: bold;
         text-decoration: none;
-        text-shadow: 0 1px rgb(255,255,255);
 
         &:hover {
           color: #333;
+          background: rgba(0, 0, 0, .08);
         }
 
         &.active {
           color: $blue;
+          background: rgba(255, 255, 255, .8);
         }
       }
     }
@@ -52,13 +55,49 @@ nav.course-material {
   }
 }
 
-.global {
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
+header.global {
+  border-bottom: 1px solid #bbb;
+  @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+  height: 45px;
+  @include linear-gradient(top, #fff, #eee);
 
-  .logo {
-    margin-left: 13px !important;
+  nav {
+    padding-top: 2px;
+  }
+
+  h1.logo {    
+    margin-left: 13px;
+    margin-right: 20px;
+    padding-right: 20px;
+
+    &::before {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 40px;
+      position: absolute;
+      right: 3px;
+      top: -8px;
+      width: 1px;
+    }
+
+    &::after {
+      @extend .faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 40px;
+      position: absolute;
+      right: 0px;
+      top: -12px;
+      width: 1px;
+    }
+
+    a {
+      width: 48px;
+      height: 24px;
+      background: url(../images/small-header-logo.png) no-repeat !important;  
+    }
+    
   }
 
   .find-courses-button {
@@ -71,9 +110,9 @@ nav.course-material {
     float: left;
     font-size: 0.9em;
     font-weight: 600;
-    color: #888;
-    line-height: 40px;
+    color: #777;
     letter-spacing: 0;
+    margin-top: 9px;
     text-transform: none;
     text-shadow: 0 1px 0 #fff;
     white-space: nowrap;
@@ -83,7 +122,6 @@ nav.course-material {
     .provider {
       font: inherit;
       font-weight: bold;
-      color: #555;
     }
   }
 }
