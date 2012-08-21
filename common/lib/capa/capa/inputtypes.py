@@ -29,6 +29,7 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 import logging
 import re
 import shlex  # for splitting quoted strings
+import json
 
 from lxml import etree
 import xml.sax.saxutils as saxutils
@@ -149,6 +150,7 @@ def optioninput(element, value, status, render_template, msg=''):
              'state': status,
              'msg': msg,
              'options': osetdict,
+             'inline': element.get('inline',''),
              }
 
     html = render_template("optioninput.html", context)
@@ -205,7 +207,7 @@ def extract_choices(element):
             raise Exception("[courseware.capa.inputtypes.extract_choices] \
                              Expected a <choice> tag; got %s instead"
                              % choice.tag)
-        choice_text = ''.join([x.text for x in choice])
+        choice_text = ''.join([etree.tostring(x) for x in choice])
 
         choices.append((choice.get("name"), choice_text))
 
@@ -293,7 +295,9 @@ def textline(element, value, status, render_template, msg=""):
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
     escapedict = {'"': '&quot;'}
     value = saxutils.escape(value, escapedict)	 # otherwise, answers with quotes in them crashes the system!
-    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg, 'hidden': hidden}
+    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg, 'hidden': hidden,
+               'inline': element.get('inline',''),
+               }
     html = render_template("textinput.html", context)
     try:
         xhtml = etree.XML(html)
@@ -336,6 +340,11 @@ def filesubmission(element, value, status, render_template, msg=''):
     Upload a single file (e.g. for programming assignments)
     '''
     eid = element.get('id')
+    escapedict = {'"': '&quot;'}
+    allowed_files  = json.dumps(element.get('allowed_files', '').split())
+    allowed_files  = saxutils.escape(allowed_files, escapedict)
+    required_files = json.dumps(element.get('required_files', '').split())
+    required_files = saxutils.escape(required_files, escapedict)
 
     # Check if problem has been queued
     queue_len = 0
@@ -345,7 +354,8 @@ def filesubmission(element, value, status, render_template, msg=''):
         msg = 'Submitted to grader. (Queue length: %s)' % queue_len
 
     context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
-                'queue_len': queue_len
+            'queue_len': queue_len, 'allowed_files': allowed_files,
+            'required_files': required_files
               }
     html = render_template("filesubmission.html", context)
     return etree.XML(html)
