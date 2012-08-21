@@ -143,7 +143,7 @@ def dashboard(request):
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
-    errored_courses = []
+    errored_courses = {}
     if has_access(user, 'global', 'staff'):
         # Show any courses that errored on load
         staff_access = True
