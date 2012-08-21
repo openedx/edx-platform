@@ -6,6 +6,7 @@ import lettuce_webdriver.webdriver
 def setup_browser():
   world.browser = webdriver.Firefox()
 
+
 @after.all
 def teardown_browser(total):
   world.browser.quit()
