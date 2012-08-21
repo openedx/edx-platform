@@ -35,8 +35,10 @@ class PermissionsTestCase(TestCase):
     def tearDown(self):
         self.student_enrollment.delete()
         self.moderator_enrollment.delete()
-        self.student.delete()
-        self.moderator.delete()
+
+# Do we need to have this? We shouldn't be deleting students, ever
+#        self.student.delete()
+#        self.moderator.delete()
 
     def testDefaultRoles(self):
         self.assertTrue(self.student_role in self.student.roles.all())
