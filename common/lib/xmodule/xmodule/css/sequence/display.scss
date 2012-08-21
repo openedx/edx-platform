@@ -2,21 +2,52 @@ nav.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  border: 1px solid #ccc;
-  height: 44px;
-  @include linear-gradient(top, #eee, #ddd);
-  @include border-radius(25px);
-  margin: -4px -20px 30px;
+  margin: -4px 0 30px;
   position: relative;
-  @include box-shadow(0 1px 0 #fff inset);
+  border-bottom: none;
+
+  .left-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 46px;
+    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .right-shadow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 46px;
+    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .sequence-list-wrapper {
+    position: relative;
+    z-index: 9999;
+    border: 1px solid #ccc;
+    height: 44px;
+    margin: 0 30px;
+    @include linear-gradient(top, #ddd, #eee);
+    overflow: hidden;
+    @include box-shadow(0 1px 3px rgba(0, 0, 0, .1) inset);
+  }
 
   ol {
+    position: absolute;
+    top: 0;
+    left: 0;
     @include box-sizing(border-box);
     display: table;
     height: 100%;
     margin: 0;
-    padding-left: 3px;
-    padding-right: 90px;
+    padding: 0 10px;
     width: 100%;
 
     a {
@@ -48,7 +79,6 @@ nav.sequence-nav {
         }
 
         &.active {
-          border-color: $blue;
           background-color: #fff;
           z-index: 9;
 
@@ -177,26 +207,26 @@ nav.sequence-nav {
   }
 
   ul {
+    position: absolute;
+    top: 0;
     list-style: none;
     height: 100%;
-    position: absolute;
     right: 0;
     top: 0;
-    width: 81px;
-    margin: 5px 5px 0 0;
+    width: 100%;
+    margin: 0;
     border: none;
-    border-bottom: 0;
-    @include border-radius(3px 3px 0 0);
 
     li {
-      float: left;
+      position: absolute;
       margin-bottom: 0;
-      height: 34px;
-      width: 40px;
+      height: 44px;
+      width: 70px;
+      border: 1px solid #ccc;
+      @include linear-gradient(top, #eee, #ddd);
+      @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
 
       &.prev, &.next {
-        @include linear-gradient(top, #ccc, #888);
-        @include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset);
 
         a {
           background-position: center;
@@ -219,21 +249,23 @@ nav.sequence-nav {
       }
 
       &.prev {
+        left: -10px;
         border-radius: 35px 0 0 35px;
 
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
-          background-position: center 10px;
+          background-position: center 15px;
         }
       }
 
       &.next {
+        right: -10px;
         border-radius: 0 35px 35px 0;
 
         a {
-          border-left: 1px solid #888;
+          margin-left: 30px;
           background-image: url('../images/sequence-nav/next-icon.png');
-          background-position: center 10px;
+          background-position: center 15px;
         }
       }
     }
