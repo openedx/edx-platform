@@ -69,10 +69,38 @@ class @ContentView extends Backbone.View
         commentView = new CommentView el: elem, model: model
 
   hideSingleThread: ->
+    $threadTitle = @$(".thread-title")
+    $hideComments = @$(".discussion-hide-comments")
+    $hideComments.removeClass("discussion-hide-comments")
+                 .addClass("discussion-show-comments")
+    @$el.children(".comments").hide()
+    $threadTitle.unbind('click').click @showSingleThread
+    $hideComments.unbind('click').click @showSingleThread
+    prevHtml = $hideComments.html()
+    $hideComments.html prevHtml.replace "Hide", "Show"
 
   reply: ->
+    $replyView = @$(".discussion-reply-new")
+    if $replyView.length
+      $replyView.show()
+    else
+      thread_id = if @model.get('type') == "comment" then @model.get('thread_id') else @model.id
+      view =
+        id: @model.id
+        showWatchCheckbox: not DiscussionUtil.isSubscribed(thread_id, "thread")
+      @$discussionContent.append Mustache.render DiscussionUtil.replyTemplate, view
+      DiscussionUtil.makeWmdEditor @$el, @$local, "reply-body"
+      @$(".discussion-submit-post").click @submitReply
+      @$(".discussion-cancel-post").click @cancelReply
+    @$(".discussion-reply").hide()
+    @$(".discussion-edit").hide()
 
   cancelReply: ->
+    $replyView = @$(".discussion-reply-new")
+    if $replyView.length
+      $replyView.hide()
+    @$(".discussion-reply").show()
+    @$(".discussion-edit").show()
 
   unvote: (event) ->
     url = DiscussionUtil.urlFor("undo_vote_for_#{@model.get('type')}", @model.id)
@@ -104,13 +132,105 @@ class @ContentView extends Backbone.View
             @$(".discussion-vote-#{value}").addClass("voted")
             @$(".discussion-votes-point").html response.votes.point
 
-  endorse: ->
+  endorse: (event) ->
+    url = DiscussionUtil.urlFor('endorse_comment', id)
+    endorsed = not @model.get('endorsed')
+    Discussion.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: "json"
+      data: {endorsed: endorsed}
+      success: (response, textStatus) ->
+        if textStatus == "success"
+          if endorsed
+            @$el.addClass("endorsed")
+          else
+            @$el.removeClass("endorsed")
 
-  close: ->
+  close: (event) ->
+    url = DiscussionUtil.urlFor('openclose_thread', @model.id)
+    closed = undefined
+    text = $(event.target).text()
+    if text.match(/Close/)
+      closed = true
+    else if text.match(/[Oo]pen/)
+      closed = false
+    else
+      console.log "Unexpected text " + text + "for open/close thread."
+    Discussion.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: "json"
+      data: {closed: closed}
+      success: (response, textStatus) =>
+        if textStatus == "success"
+          if closed
+            @$el.addClass("closed")
+            $(event.target).text "Re-open Thread"
+          else
+            @$el.removeClass("closed")
+            $(event.target).text "Close Thread"
+      error: (response, textStatus, e) ->
+        console.log e
 
   edit: ->
+    $local(".discussion-content-wrapper").hide()
+    $editView = $local(".discussion-content-edit")
+    if $editView.length
+      $editView.show()
+    else
+      view = {
+        id: id
+        title: $local(".thread-raw-title").html()
+        body: $local(".thread-raw-body").html()
+        tags: $local(".thread-raw-tags").html()
+      }
+      $discussionContent.append Mustache.render Discussion.editThreadTemplate, view
+      Discussion.makeWmdEditor $content, $local, "thread-body-edit"
+      $local(".thread-tags-edit").tagsInput Discussion.tagsInputOptions()
+      $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
+      $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
 
+    handleSubmitEditThread = (elem) ->
+      url = Discussion.urlFor('update_thread', id)
+      title = $local(".thread-title-edit").val()
+      body = Discussion.getWmdContent $content, $local, "thread-body-edit"
+      tags = $local(".thread-tags-edit").val()
+      Discussion.safeAjax
+        $elem: $(elem)
+        url: url
+        type: "POST"
+        dataType: 'json'
+        data: {title: title, body: body, tags: tags},
+        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
+        success: (response, textStatus) ->
+          Discussion.clearFormErrors($local(".discussion-update-errors"))
+          $discussionContent.replaceWith(response.html)
+          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
+          Discussion.initializeContent($content)
+          Discussion.bindContentEvents($content)
   delete: ->
+    if $content.hasClass("thread")
+      url = Discussion.urlFor('delete_thread', id)
+      c = confirm "Are you sure to delete thread \"" + $content.find("a.thread-title").text() + "\"?"
+    else
+      url = Discussion.urlFor('delete_comment', id)
+      c = confirm "Are you sure to delete this comment? "
+    if c != true
+      return
+    Discussion.safeAjax
+      $elem: $(elem)
+      url: url
+      type: "POST"
+      dataType: "json"
+      data: {}
+      success: (response, textStatus) =>
+        if textStatus == "success"
+          $(content).remove()
+      error: (response, textStatus, e) ->
+        console.log e
 
   events:
     "click .thread-title": "showSingleThread"
