@@ -167,6 +167,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
             shared_module = student_module_cache.lookup(descriptor.category,
                                                         shared_state_key)
 
+
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
