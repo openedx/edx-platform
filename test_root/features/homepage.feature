@@ -17,12 +17,12 @@ Feature: Homepage renders
   Scenario: We can see the "Login" button
     Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
     #"http://anant:agarwal@stage-edx-001.m.edx.org/"
-    I should see "Sign Up"
+    I should see "Log In"
 
   Scenario: We can see the "Sign up" button
     Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
     #"http://anant:agarwal@stage-edx-001.m.edx.org/"
-    I should see "Log In"
+    I should see "Sign Up"
 
   Scenario: We can see the three partner institutions
     Given I visit "http://anant:agarwal@sandbox-test-001.m.edx.org/"
@@ -39,3 +39,15 @@ Feature: Homepage renders
     I should see "Blog"
     I should see "Jobs"
     I should see "Contact"
+    When I click "Find Courses"
+    I should be at "http://sandbox-test-001.m.edx.org/courses"
+    When I click "About"
+    I should be at "http://sandbox-test-001.m.edx.org/about"
+    When I click "Jobs"
+    I should be at "http://sandbox-test-001.m.edx.org/jobs"
+    When I click "Contact"
+    I should be at "http://sandbox-test-001.m.edx.org/contact"
+    When I click "Blog"
+    I should be at "http://blog.edx.org/"
+    When I click "EDX HOME"
+    I should be at "http://www.edx.org"
