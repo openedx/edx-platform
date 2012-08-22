@@ -1,60 +1,35 @@
 import logging
-from itertools import groupby
-from collections import Iterable
+from collections import namedtuple, defaultdict
 
-from django.db.models import Q
+from mitxmako.shortcuts import render_to_string
 
-from models import CourseSoftware, UserLicense
+from models import get_courses_licenses, get_or_create_license
+
 
 log = logging.getLogger("mitx.licenses")
 
 
-def get_or_create_courses_licenses(user, courses):
-    user_licenses = get_courses_licenses(user, courses)
+License = namedtuple('License', 'software serial')
 
-    for software, license in user_licenses.iteritems():
+
+def get_licenses_by_course(user, courses):
+    licenses = get_courses_licenses(user, courses)
+    licenses_by_course = defaultdict(list)
+
+    # create missing licenses and group by course_id
+    for software, license in licenses.iteritems():
         if license is None:
-            user_licenses[software] = get_or_create_user_license(user, software)
+            licenses[software] = get_or_create_license(user, software)
 
-    log.info(user_licenses)
+        course_id = software.course_id
+        serial = license.serial if license else None
+        licenses_by_course[course_id].append(License(software, serial))
 
-    return user_licenses
+    # render elements
+    data_by_course = {}
+    for course_id, licenses in licenses_by_course.iteritems():
+        context = {'licenses': licenses}
+        template = 'licenses/serial_numbers.html'
+        data_by_course[course_id] = render_to_string(template, context)
 
-
-def get_courses_licenses(user, courses):
-    course_ids = set(course.id for course in courses)
-    all_software = CourseSoftware.objects.filter(course_id__in=course_ids)
-
-    user_licenses = dict.fromkeys(all_software, None)
-
-    assigned_licenses = UserLicense.objects.filter(software__in=all_software, user=user)
-    assigned_by_software = {lic.software:lic for lic in assigned_licenses}
-
-    for software, license in assigned_by_software.iteritems():
-        user_licenses[software] = license
-
-    return user_licenses
-
-
-def get_or_create_user_license(user, software):
-    license = None
-    try:
-        # Find a licenses associated with the user or with no user
-        # associated.
-        query = (Q(user__isnull=True) | Q(user=user)) & Q(software=software)
-
-        # TODO fix a race condition in this code when more than one
-        # user is getting a license assigned
-
-        license = UserLicense.objects.filter(query)[0]
-
-        if license.user is not user:
-            license.user = user
-            license.save()
-
-    except IndexError:
-        # TODO look if someone has unenrolled from the class and already has a serial number
-        log.error('No serial numbers available for {0}', software)
-
-
-    return license
+    return data_by_course
