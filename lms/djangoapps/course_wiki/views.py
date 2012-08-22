@@ -80,8 +80,8 @@ def course_wiki_redirect(request, course_id):
         urlpath = URLPath.create_article(
             root,
             course_slug,
-            title=course.number,
-            content="{0}\n===\nThis is the wiki for **{1}**'s _{2}_.".format(course.number, course.org, course.title),
+            title=course_slug,
+            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.title),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,
@@ -114,7 +114,7 @@ def get_or_create_root():
     "===",
     "Visit a course wiki to add an article."))
     
-    root = URLPath.create_root(title="edX Wiki",
+    root = URLPath.create_root(title="Wiki",
                         content=starting_content)
     article = root.article
     article.group = None

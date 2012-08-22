@@ -1,11 +1,10 @@
 div.video {
   @include clearfix();
   background: #f3f3f3;
-  border-bottom: 1px solid #e1e1e1;
-  border-top: 1px solid #e1e1e1;
   display: block;
-  margin: 0 0 0 (-(lh()));
-  padding: 6px lh();
+  margin: 0 -12px;
+  padding: 12px;
+  border-radius: 5px;
 
   article.video-wrapper {
     float: left;
@@ -102,6 +101,11 @@ div.video {
             @include transition(background-color, opacity);
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
+            outline: 0;
+
+            &:focus {
+              outline: 0;
+            }
 
             &:empty {
               height: 46px;
@@ -172,6 +176,11 @@ div.video {
             @include transition();
             -webkit-font-smoothing: antialiased;
             width: 116px;
+            outline: 0;
+
+            &:focus {
+              outline: 0;
+            }
 
             h3 {
               color: #999;
@@ -401,6 +410,7 @@ div.video {
     overflow: auto;
     width: flex-grid(3, 9);
     margin: 0;
+    font-size: 14px;
 
     li {
       border: 0;

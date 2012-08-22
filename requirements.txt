@@ -2,7 +2,7 @@ django>=1.4,<1.5
 pip
 numpy
 scipy
-markdown
+Markdown<2.3.0
 pygments
 lxml
 boto
@@ -43,5 +43,7 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
+django-mptt>=0.5.3
+sorl-thumbnail
 networkx
 -r repo-requirements.txt

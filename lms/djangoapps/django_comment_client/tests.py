@@ -18,6 +18,7 @@ class PermissionsTestCase(TestCase):
         return ''.join(random.choice(chars) for x in range(length))
 
     def setUp(self):
+
         self.course_id = "MITx/6.002x/2012_Fall"
 
         self.moderator_role = Role.objects.get_or_create(name="Moderator", course_id=self.course_id)[0]

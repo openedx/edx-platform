@@ -3,7 +3,7 @@
 
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-home"></span>
+    <span class="icon-home icon"></span>
     View
   </a>
 </li>
@@ -11,7 +11,7 @@
 %if article.can_write(user):
   <li class="${"active" if selected_tab == "edit" else ""}">
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-      <span class="icon-edit"></span>
+      <span class="icon-edit icon"></span>
       Edit
     </a>
   </li>
@@ -19,7 +19,7 @@
 
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-time"></span>
+    <span class="icon-changes icon"></span>
     Changes
   </a>
 </li>
@@ -28,19 +28,25 @@
   %if hasattr(plugin, "article_tab"):
     <li class="${"active" if selected_tab == plugin.slug else ""}">
       <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
-        <span class="${plugin.article_tab[1]}"></span>
+        <span class="${plugin.article_tab[1]} icon"></span>
         ${plugin.article_tab[0]}
       </a>
     </li>
   %endif
 %endfor
 
+
+<%doc>
+The settings link has been disabled because the notifications app hasn't been integrated yet and those are the only useful settings.
+
 %if not user.is_anonymous():
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-wrench"></span>
+    <span class="icon-settings icon"></span>
     Settings
   </a>
 </li>
 %endif
+</%doc>
+
 

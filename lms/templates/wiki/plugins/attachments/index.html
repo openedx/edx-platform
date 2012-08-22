@@ -115,7 +115,13 @@
               {% if attachment.current_revision.user %}{{ attachment.current_revision.user }}{% else %}{% if user|is_moderator %}{{ attachment.current_revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
               </td>
               <td>{{ attachment.current_revision.get_size|filesizeformat }}</td>
-              <td>{{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %}</td>
+
+              <td>
+                <a href="{% url 'wiki:attachments_history' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">
+                  <span class="icon-time"></span>
+                  {% trans "File history" %} ({{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %})
+                </a>
+              </td>
             </tr>
             </table>
           </div>

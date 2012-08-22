@@ -1,0 +1,29 @@
+<h1>Student Enrollment Form </h1>
+
+<p> Course: ${ course }
+
+<form method="POST"> 
+<input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+<h2> Add new students </h2>
+<textarea name="new_students">
+</textarea>
+<input type="submit">
+</form>
+
+<p> Existing students:
+
+<p> ${ existing_students }
+
+<p> New students added: 
+${ added_students }
+
+<p> Students rejected: 
+${ rejected_students }
+
+<p> Debug: 
+<p> ${ debug }
+
+
+<p> foo
+<p> bar
+<p> biff

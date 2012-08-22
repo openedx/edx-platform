@@ -2,9 +2,10 @@
 
 div.discussion-wrapper aside {
   @extend .sidebar;
-  border-left: 1px solid $border-color;
+  border-left: 1px solid #ccc;
   border-right: 0;
   width: flex-grid(3);
+  border-radius: 0 3px 3px 0;
 
   &:after {
     left: -1px;
@@ -16,9 +17,7 @@ div.discussion-wrapper aside {
   }
 
   h1 {
-    @extend .bottom-border;
-    padding: lh(.5) lh();
-    margin-bottom: em(16, 20);
+    margin-bottom: 0;
   }
 
   h2 {
@@ -54,7 +53,7 @@ div.discussion-wrapper aside {
 
   div.box {
     display: block;
-    padding: lh(.5) lh();
+    padding: 18px 26px;
     border-top: 1px solid lighten($border-color, 10%);
 
     &:first-child {
@@ -67,7 +66,7 @@ div.discussion-wrapper aside {
 
       li {
         border-bottom: 0;
-        background: #eee;
+        background: #ddd;
         padding: 6px 10px 6px 5px;
 
         a {
@@ -298,6 +297,7 @@ div.discussion-wrapper aside {
 
   div.view-profile {
     border-top: 0;
+    padding-top: 0;
 
     a {
       @extend .gray-button;

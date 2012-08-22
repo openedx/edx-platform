@@ -55,10 +55,10 @@ $tag-text-color: #5b614f;
 
   .sidebar-module {    
     @include clearfix;
-    padding: 0 24px 24px 0;
+    padding: 0 26px 24px;
     margin-bottom: 24px;    
     border-bottom: 1px solid #d3d3d3;
-    font-size: 0.8em;
+    font-size: 13px;
 
     header {
       margin-bottom: 14px;
@@ -67,16 +67,18 @@ $tag-text-color: #5b614f;
 
     h4 {
       float: left;
-      font-size: 1.1em;
+      font-size: 15px;
       font-weight: bold;
     }
 
     .sidebar-new-post-button, .sidebar-promote-moderator-button {
       @include button;
     }
+
     .sidebar-revoke-moderator-button {
       @include button(simple, gray);
     }
+
     .sidebar-new-post-button, .sidebar-promote-moderator-button, .sidebar-revoke-moderator-button {
       display: block;
       box-sizing: border-box;
@@ -91,9 +93,13 @@ $tag-text-color: #5b614f;
       }
     }
 
+    .sidebar-new-post-button {
+      margin: 40px 0 20px 0;
+    }
+
     .sidebar-view-all {
       float: right;
-      font-size: 0.9em;
+      font-size: 13px;
       line-height: 1.6em;
       @include standard-discussion-link;
     }
@@ -108,6 +114,10 @@ $tag-text-color: #5b614f;
       a {        
         @include standard-discussion-link;
         background: none;
+
+        span {
+          line-height: 1.3;
+        }
       }
     }
 
@@ -340,7 +350,7 @@ $tag-text-color: #5b614f;
         margin-right: 1em;
       }
 
-      .comment-count {        
+      .show-comments-wrapper {        
         display: inline;
         margin-right: 20px;
       }

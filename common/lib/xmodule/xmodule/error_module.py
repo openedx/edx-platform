@@ -15,15 +15,36 @@ from xmodule.errortracker import exc_info_to_str
 
 log = logging.getLogger(__name__)
 
+# NOTE: This is not the most beautiful design in the world, but there's no good
+# way to tell if the module is being used in a staff context or not.  Errors that get discovered
+# at course load time are turned into ErrorDescriptor objects, and automatically hidden from students.
+# Unfortunately, we can also have errors when loading modules mid-request, and then we need to decide
+# what to show, and the logic for that belongs in the LMS (e.g. in get_module), so the error handler
+# decides whether to create a staff or not-staff module.
+
 class ErrorModule(XModule):
     def get_html(self):
-        '''Show an error.
+        '''Show an error to staff.
         TODO (vshnayder): proper style, divs, etc.
         '''
         # staff get to see all the details
         return self.system.render_template('module-error.html', {
+            'staff_access' : True,
             'data' : self.definition['data']['contents'],
             'error' : self.definition['data']['error_msg'],
+            })
+
+
+class NonStaffErrorModule(XModule):
+    def get_html(self):
+        '''Show an error to a student.
+        TODO (vshnayder): proper style, divs, etc.
+        '''
+        # staff get to see all the details
+        return self.system.render_template('module-error.html', {
+            'staff_access' : False,
+            'data' : "",
+            'error' : "",
             })
 
 
@@ -99,3 +120,9 @@ class ErrorDescriptor(EditingDescriptor):
             err_node = etree.SubElement(root, 'error_msg')
             err_node.text = self.definition['data']['error_msg']
             return etree.tostring(root)
+
+class NonStaffErrorDescriptor(ErrorDescriptor):
+    """
+    Module that provides non-staff error messages.
+    """
+    module_class = NonStaffErrorModule
