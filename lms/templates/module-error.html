@@ -2,10 +2,19 @@
   <h1>There has been an error on the <em>MITx</em> servers</h1>
   <p>We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible. Please email us at <a href="mailto:technical@mitx.mit.edu">technical@mitx.mit.edu</a> to report any problems or downtime.</p>
 
-<h1>Details below:</h1>
+% if staff_access:
+<h1>Details</h1>
 
-<p>Error: ${error | h}</p>
+<p>Error:
+<pre>
+${error | h}
+</pre>
+</p>
 
-<p>Raw data: ${data | h}</p>
+<p>Raw data:
 
+<pre>${data | h}</pre>
+</p>
+
+% endif
 </section>
