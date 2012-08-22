@@ -33,6 +33,7 @@ def i_click_on_every_item_in_every_week_of_the_course(step):
 			section = world.browser.find_element_by_xpath("//*[@id='accordion']//nav//ul[@class='ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active']//li["+str(j)+"]//a//p")
 			good_section_text = re.sub(r'\s','_',section.text)
 			section.click()
+			assert world.browser.find_element_by_xpath("//section[@class='outside-app'//h1[@text='THERE HAS BEEN AN ERROR ON THE edX SERVERS']") == None
 			j += 1
 			clean = re.sub('\"','',good_section_text)
 			wait_until_id_renders("sequence_i4x-MITx-6_00x-sequential-"+clean,3)
@@ -40,7 +41,11 @@ def i_click_on_every_item_in_every_week_of_the_course(step):
 			num_tabs = len(tabs)
 			l = 1
 			while l <= num_tabs:
+
 				tab = world.browser.find_element_by_xpath("//ol[@id='sequence-list']//li["+str(l)+"]")
 				#tab.click()
 				tab.find_element_by_xpath("//a[@data-element='"+str(l)+"']").click()
-				l+=1
+				if world.browser.find_element_by_xpath("//section[@class='outside-app'//h1"):
+					assert False
+				else:
+					l+=1

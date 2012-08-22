@@ -72,3 +72,5 @@ def i_should_see_all_courses(step):
   course_link_texts = [ (c.location.course, c.display_name) for c in courses]
   for c in course_link_texts:
     assert world.browser.find_element_by_partial_link_text(c[0] + ' ' + c[1])
+
+
