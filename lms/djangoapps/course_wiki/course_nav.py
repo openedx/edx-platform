@@ -5,6 +5,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 
 from wiki.models import reverse as wiki_reverse
+from courseware.access import has_access
 from courseware.courses import get_course_with_access
 
 
@@ -135,7 +136,9 @@ def context_processor(request):
         
         try:
             course = get_course_with_access(request.user, course_id, 'load')
-            return {'course' : course}
+            staff_access = has_access(request.user, course, 'staff')
+            return {'course' : course,
+                    'staff_access': staff_access}
         except Http404:
             # We couldn't access the course for whatever reason. It is too late to change
             # the URL here, so we just leave the course context. The middleware shouldn't
