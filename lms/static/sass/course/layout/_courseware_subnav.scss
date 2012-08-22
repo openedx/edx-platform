@@ -1,8 +1,7 @@
 nav.course-material {
   @include clearfix;
   @include box-sizing(border-box);
-  background: #f6f6f6;
-  border-bottom: 1px solid rgb(200,200,200);
+  background: none;
   margin: 0px auto 0px;
   padding: 0px;
   width: 100%;
@@ -37,11 +36,6 @@ nav.course-material {
         }
 
         &.active {
-          background: rgb(255,255,255);
-          border: 1px solid rgb(200,200,200);
-          border-bottom: 0px;
-          @include border-top-radius(4px);
-          @include box-shadow(0 2px 0 0 rgba(255,255,255, 1));
           color: $blue;
         }
       }

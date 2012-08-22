@@ -390,9 +390,19 @@ class CapaModule(XModule):
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
+
 	    # answers (eg <solution>) may have embedded images
-	    answers = dict( (k,self.system.replace_urls(answers[k], self.metadata['data_dir'])) for k in answers )
-            return {'answers': answers}
+        #   but be careful, some problems are using non-string answer dicts
+        new_answers = dict()
+        for answer_id in answers:
+            try:
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'])}
+            except TypeError:
+                log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
+                new_answer = {answer_id: answers[answer_id]}
+            new_answers.update(new_answer)
+
+        return {'answers': new_answers}
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):

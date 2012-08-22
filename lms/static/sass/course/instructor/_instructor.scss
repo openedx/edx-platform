@@ -1,0 +1,15 @@
+.instructor-dashboard-wrapper {
+	@extend .table-wrapper;
+	display: table;
+
+	section.instructor-dashboard-content {
+		@extend .content;
+    padding: 40px;
+    width: 100%;
+
+    h1 {
+      @extend .top-header;
+    }
+	}
+}
+

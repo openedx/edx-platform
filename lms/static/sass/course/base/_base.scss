@@ -1,5 +1,7 @@
 body {
   min-width: 980px;
+  min-height: 100%;
+  background: url(../images/bg-texture.png) #ddd;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
@@ -11,15 +13,36 @@ table {
   table-layout: fixed;
 }
 
+a {
+  &:hover {
+    color: $pink;
+    text-decoration: none !important;
+  }
+}
+
+.content-wrapper {
+  background: none;
+  border: none;
+}
+
 .container {
-  padding: lh(2);
+  padding: 20px 0 0 0;
 
   > div {
     display: table;
-    width: 100%;
     table-layout: fixed;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid $outer-border-color;
+    background: #fff;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
   }
 }
+
+
+
+
+
 
 form {
   label {
@@ -75,11 +98,7 @@ img {
   max-width: 100%;
 }
 
-.container {
-  padding: em(40) 0;
-}
-
 ::selection, ::-moz-selection, ::-webkit-selection {
-  background:#444;
-  color:#fff;
+  background: #444;
+  color: #fff;
 }
