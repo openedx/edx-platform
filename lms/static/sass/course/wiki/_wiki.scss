@@ -390,7 +390,6 @@ section.wiki {
   .CodeMirror {
     background: #fafafa;
     border: 1px solid #c8c8c8;
-    @include border-radius(3px);
     @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1));
   }
 
@@ -689,6 +688,28 @@ section.wiki {
     line-height: 1.3em;
     margin-top: 9px;
   }
+
+  .error {
+    font-size: 1em;
+    color: $pink;
+
+    .help-block {
+      margin-top: 10px;
+    }
+
+    input {
+      border-color: $pink;
+    }
+  }
+
+  .back {
+    float: right;
+  }
+
+
+
+
+
 
   /*-----------------
 
