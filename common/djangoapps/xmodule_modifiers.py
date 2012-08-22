@@ -112,11 +112,14 @@ def add_histogram(get_html, module, user):
             edit_link = "%s/%s/tree/master/%s" % (giturl,data_dir,filepath)
         else:
             edit_link = False
+        source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
 
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'location': module.location,
                          'xqa_key': module.metadata.get('xqa_key',''),
+                         'source_file' : source_file,
+                         'source_url': '%s/%s/tree/master/%s' % (giturl,data_dir,source_file),
                          'category': str(module.__class__.__name__),
                          'element_id': module.location.html_id().replace('-','_'),
                          'edit_link': edit_link,
