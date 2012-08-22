@@ -10,22 +10,31 @@
     <div class="main-article">
       {% if revision %}
         <div class="alert alert-info">
-          <strong>{% trans "Previewing revision" %}:</strong> {{ revision.created }} (#{{ revision.revision_number }}) by {% if revision.user %}{{ revision.user }}{% else %}{% if user|is_moderator %}{{ revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+          <strong>{% trans "Previewing revision" %}:</strong>
+          {% include "wiki/includes/revision_info.html" %}
         </div>
       {% endif %}
 
       {% if merge %}
         <div class="alert alert-info">
           <strong>{% trans "Previewing merge between" %}:</strong>
-          {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+          {% include "wiki/includes/revision_info.html" with revision=merge1 %}
           <strong>{% trans "and" %}</strong>
-          {{ merge1.created }} (#{{ merge1.revision_number }}) by {% if merge1.user %}{{ merge1.user }}{% else %}{% if user|is_moderator %}{{ merge1.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+          {% include "wiki/includes/revision_info.html" with revision=merge2 %}
         </div>
       {% endif %}
 
       <h1 class="page-header">{{ title }}</h1>
 
-      {% wiki_render article content %}
+      {% if revision and revision.deleted %}
+        <div class="warning">
+          <strong>This revision has been deleted.</strong> 
+          <p>Restoring to this revision will mark the article as deleted.</p>
+        </div>
+      {% else %}
+        {% wiki_render article content %}
+      {% endif %}
+      
     </div>
   </section>
   

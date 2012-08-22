@@ -11,18 +11,19 @@
 {% block wiki_contents %}
 
   <div class="article-wrapper">
-    
+
     <article class="main-article">
         {% if selected_tab != "edit" %}
-          <h1>{{ article.current_revision.title }}</h1>  
+          <h1>{{ article.current_revision.title }}</h1>
+
         {% endif %}
-        
+
         {% block wiki_contents_tab %}
         {% wiki_render article %}
-        {% endblock %}      
+        {% endblock %}
     </article>
 
-    <div class="article-functions">      
+    <div class="article-functions">
       <ul class="nav nav-tabs">
         {% include "wiki/includes/article_menu.html" %}
       </ul>
@@ -30,6 +31,12 @@
         <span class="label">{% trans "Last modified:" %}</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
+
+      {% if urlpath %}
+      <div class="see-children">
+        <a href="{% url 'wiki:dir' path=urlpath.path %}">See all children</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 

@@ -557,7 +557,7 @@ class ChoiceResponse(LoncapaResponse):
             return CorrectMap(self.answer_id, 'incorrect')
 
     def get_answers(self):
-        return {self.answer_id: self.correct_choices}
+        return {self.answer_id: list(self.correct_choices)}
 
 #-----------------------------------------------------------------------------
 
