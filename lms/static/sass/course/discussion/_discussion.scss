@@ -3,14 +3,15 @@ body.askbot {
   section.container {
     div.discussion-wrapper {
       @extend .table-wrapper;
+      display: table;
 
       div.discussion-content {
         @include box-sizing(border-box);
         display: table-cell;
         min-width: 650px;
-        padding-right: lh();
-        vertical-align: top;
+        padding: 40px;
         width: flex-grid(9) + flex-gutter();
+
 
         a.tabula-rasa, .tabula-rasa{
           @extend .light-button;

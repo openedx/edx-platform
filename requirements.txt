@@ -2,7 +2,7 @@ django>=1.4,<1.5
 pip
 numpy
 scipy
-markdown
+Markdown<2.3.0
 pygments
 lxml
 boto
@@ -28,6 +28,7 @@ django-override-settings
 mock>=0.8, <0.9
 PyYAML
 South
+pytz
 django-celery
 django-countries
 django-kombu
@@ -42,6 +43,12 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
+django-mptt>=0.5.3
+sorl-thumbnail
 networkx
 -r repo-requirements.txt
+<<<<<<< HEAD
 -r test-acceptance-requirements.txt
+=======
+-r test-acceptance-requirements.txt
+>>>>>>> 693875fd96a3e4686380117fa472d76e561e10f4

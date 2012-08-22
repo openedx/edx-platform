@@ -25,3 +25,6 @@ Gemfile.lock
 .env/
 lms/static/sass/*.css
 cms/static/sass/*.css
+lms/lib/comment_client/python
+nosetests.xml
+cover_html/

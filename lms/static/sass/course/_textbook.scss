@@ -1,10 +1,17 @@
 div.book-wrapper {
   @extend .table-wrapper;
 
+  #open_close_accordion {
+    display: none;
+  }
+
   section.book-sidebar {
     @extend .sidebar;
     @extend .tran;
     @include box-sizing(border-box);
+    padding: 10px 0;
+    border-radius: 3px 0 0 3px;
+    border-right: 1px solid #ccc;
 
     ul#booknav {
       font-size: em(14);
@@ -32,7 +39,7 @@ div.book-wrapper {
       li {
         background: none;
         border-bottom: 0;
-        padding-left: lh();
+        padding-left: lh();       
 
         a {
           padding: 0;
@@ -49,7 +56,7 @@ div.book-wrapper {
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
-          margin-left: -22px;
+          
           position: relative;
           top: 4px;
 
@@ -62,26 +69,23 @@ div.book-wrapper {
         ul {
           background: none;
           margin-top: lh(.25);
-          border-top: 1px solid $border-color;
           padding-top: lh(.25);
 
           li {
-            padding-bottom: lh(.25);
+            padding-bottom: 10px;
           }
         }
       }
 
       > li {
-        border-bottom: 1px solid $border-color;
-        padding: 7px 7px 7px 30px;
+        padding: 5px 6px;
+        margin: 0 16px 5px 25px;
       }
     }
   }
 
   section.book {
     @extend .content;
-    padding-right: 0;
-    padding-left: lh();
 
     nav {
       @extend .clearfix;
