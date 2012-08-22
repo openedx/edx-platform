@@ -60,6 +60,8 @@ class CourseDescriptor(SequenceDescriptor):
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
         self.textbooks = self.definition['data']['textbooks']
+        
+        self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
         msg = None
         if self.start is None:
@@ -94,8 +96,19 @@ class CourseDescriptor(SequenceDescriptor):
         for textbook in xml_object.findall("textbook"):
             textbooks.append(cls.Textbook.from_xml_object(textbook))
             xml_object.remove(textbook)
+        
+        #Load the wiki tag if it exists
+        wiki_slug = None
+        wiki_tag = xml_object.find("wiki")
+        if wiki_tag is not None:
+            wiki_slug = wiki_tag.attrib.get("slug", default=None)
+            xml_object.remove(wiki_tag)
+        
         definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        
         definition.setdefault('data', {})['textbooks'] = textbooks
+        definition['data']['wiki_slug'] = wiki_slug
+        
         return definition
 
     def has_started(self):
@@ -203,10 +216,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def number(self):
-        return self.location.course
-
-    @property
-    def wiki_slug(self):
         return self.location.course
 
     @property
