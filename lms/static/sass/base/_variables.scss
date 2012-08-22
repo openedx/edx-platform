@@ -15,16 +15,19 @@ $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-size: em(14);
 $body-line-height: golden-ratio(.875em, 1);
 $base-font-color: rgb(60,60,60);
-$lighter-base-font-color: rgb(160,160,160);
+$lighter-base-font-color: rgb(100,100,100);
 
 $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
 $error-red: rgb(253, 87, 87);
 $border-color: #C8C8C8;
+$sidebar-color: #f6f6f6;
+$outer-border-color: #aaa;
 
 // old variables
 
 $light-gray: #ddd;
 $dark-gray: #333;
 $text-color: $dark-gray;
+
