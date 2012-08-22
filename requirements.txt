@@ -28,6 +28,7 @@ django-override-settings
 mock>=0.8, <0.9
 PyYAML
 South
+pytz
 django-celery
 django-countries
 django-kombu
