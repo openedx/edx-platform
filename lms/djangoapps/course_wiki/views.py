@@ -114,7 +114,7 @@ def get_or_create_root():
     "===",
     "Visit a course wiki to add an article."))
     
-    root = URLPath.create_root(title="edX Wiki",
+    root = URLPath.create_root(title="Wiki",
                         content=starting_content)
     article = root.article
     article.group = None
