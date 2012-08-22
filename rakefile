@@ -124,6 +124,11 @@ TEST_TASKS = []
         sh(django_admin(system, args.env, 'runserver', args.options))
     end
 
+    task "#{system}_shell", [:env, :options] => [:predjango] do |t, args|
+        args.with_defaults(:env => 'dev', :options => default_options[system])
+        sh(django_admin(system, args.env, 'shell'))
+    end
+
     # Per environment tasks
     Dir["#{system}/envs/*.py"].each do |env_file|
         env = File.basename(env_file).gsub(/\.py/, '')
