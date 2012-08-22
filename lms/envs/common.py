@@ -67,6 +67,8 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
 
+    # acceptance testing flag that enable/disable toy courses in the views
+    'DISPLAY_TOY_COURSES': False,
 }
 
 # Used for A/B testing
