@@ -175,7 +175,7 @@ class @ContentView extends Backbone.View
       data:
         body: body
         anonymous: anonymous
-        autowatch: autowatch
+        auto_subscribe: autowatch
       error: DiscussionUtil.formErrorHandler @$(".discussion-errors")
       success: (response, textStatus) =>
         DiscussionUtil.clearFormErrors @$(".discussion-errors")

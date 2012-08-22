@@ -125,7 +125,11 @@ def inline_discussion(request, course_id, discussion_id):
     threads, query_params = get_threads(request, course_id, discussion_id)
     html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
                                                                  query_params=query_params)
-    return utils.HtmlResponse(html)
+    
+    return utils.JsonResponse({
+        'html': html,
+        'discussionData': threads,
+    })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
     if not discussion_id:
@@ -141,8 +145,6 @@ def forum_form_discussion(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     threads, query_params = get_threads(request, course_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
-
-    
 
     if request.is_ajax():
         return utils.JsonResponse({

@@ -6,10 +6,6 @@ class @DiscussionUtil
     $("script##{id}").html()
 
   @getDiscussionData: (id) ->
-    if id instanceof $
-      id = id.attr("_id")
-    else if typeof id == "object"
-      id = $(id).attr("_id")
     return $$discussion_data[id]
 
   @addContent: (id, content) -> window.$$contents[id] = content
