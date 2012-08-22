@@ -200,6 +200,8 @@ task :package do
             "--exclude=**/.git/**",
             "--exclude=**/*.pyc",
             "--exclude=**/reports/**",
+            "--exclude=**/test_root/**",
+            "--exclude=**/.coverage/**",
             "-C", "#{REPO_ROOT}",
             "--provides=#{PACKAGE_NAME}",
             "--name=#{NORMALIZED_DEPLOY_NAME}",

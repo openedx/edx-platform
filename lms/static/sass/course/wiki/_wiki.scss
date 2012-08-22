@@ -203,6 +203,17 @@ section.wiki {
       font-size: 0.9em;
       font-family: Monaco, monospace;
     }
+
+    .toc {
+      background-color: $sidebar-color;
+      padding: 9px;
+      margin: 10px 0;
+      @include border-radius(5px);
+
+      ul {
+        margin: 0;
+      }
+    }
   }
 
 
@@ -220,7 +231,7 @@ section.wiki {
     padding: 40px 40px;
     @include box-sizing(border-box);
 
-    .timestamp {
+    .timestamp{
       margin-top: 15px;
       padding: 15px 0 0 10px;
       border-top: 1px solid $light-gray;      
@@ -233,6 +244,26 @@ section.wiki {
 
       .date {
         font-size: 0.9em;
+      }
+
+    }
+
+    .see-children {
+      padding: 15px 0 0;
+      border-top: 1px solid $light-gray;
+      margin-top: 15px;
+
+      a {
+        display: block;
+        padding: 2px 4px 2px 10px;
+        border-radius: 3px;
+        font-size: 0.9em;
+        line-height: 25px;
+
+        &:hover {
+          background-color: #f6f6f6;
+          text-decoration: none;
+        }
       }
     }
   }
@@ -663,6 +694,59 @@ section.wiki {
     margin-top: 9px;
   }
 
+  /*-----------------
+
+    Directory
+
+  -----------------*/
+  .directory-toolbar {
+    background-color: $sidebar-color;
+    padding: 9px;
+    margin: 0 -9px 20px;
+    @include border-radius(5px);
+
+    .well-small {
+      @include clearfix;
+
+      a {
+        @include inline-block;
+      }
+    }
+
+    + p {
+      font-size: 0.9em;
+      color: #aaa;
+    }
+  }
+
+  .filter-clear {
+    margin-right: 10px;
+    margin-top: 10px;
+    font-size: .9em;
+
+    a {
+      color: #aaa;
+
+      &:hover {
+        color: #777;
+      }
+    }
+  }
+
+  .table.table-striped {
+    width: 100%;
+    margin-top: 20px;
+
+    th, td {
+      border-bottom: 1px solid $light-gray;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background: #F6F6F6;
+    }
+  }
+
 
 
 
@@ -786,6 +870,39 @@ section.wiki {
       top: 6px;
       color: #999;
       text-decoration: none;
+    }
+  }
+
+  .missing {
+    max-width: 400px;
+    margin: lh(2) auto;
+    display: block;
+    overflow: hidden;
+    background: $pink;
+    padding: lh();
+    @include box-shadow(inset 0 0 0 1px lighten($pink, 10%));
+    border: 1px solid darken($pink, 15%);
+
+    p {
+      color: #fff;
+
+      a {
+        display: block;
+        background: darken($pink, 8%);
+        margin: lh() (-(lh())) (-(lh()));
+        padding: lh();
+        border-top: 1px solid darken($pink, 15%);
+        color: #fff;
+        font-weight: bold;
+        font-size: em(18);
+        @include transition;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+
+        &:hover {
+          background: darken($pink, 12%);
+        }
+      }
     }
   }
 }
