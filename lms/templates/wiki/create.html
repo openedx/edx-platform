@@ -32,14 +32,15 @@
     <form method="POST" class="form-horizontal">
       {% wiki_form create_form %}
       <div class="form-actions">
-          <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large">
-            <span class="icon-circle-arrow-left"></span>
-            {% trans "Go back" %}
-          </a>
           <button type="submit" name="save_changes" class="btn btn-primary btn-large">
             <span class="icon-plus"></span>
             {% trans "Create article" %}
           </button>
+
+          <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large back">
+            <span class="icon-circle-arrow-left"></span>
+            {% trans "Go back" %}
+          </a>
       </div>  
     </form>
 
