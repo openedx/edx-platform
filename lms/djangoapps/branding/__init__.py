@@ -26,17 +26,27 @@ def get_visible_courses(domain=None):
         return courses
 
 
+def get_university(domain=None):
+    """
+    Return the university name specified for the domain, or None
+    if no university was specified
+    """
+    if not settings.MITX_FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
+        return None
+
+    subdomain = get_subdomain(domain)
+    return settings.SUBDOMAIN_BRANDING.get(subdomain)
+
+
 def get_logo_url(domain=None):
     """
     Return the url for the branded logo image to be used
     """
-    if not settings.MITX_FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
-        return '/static/images/header-logo.png'
+    university = get_university(domain)
 
-    subdomain = get_subdomain(domain)
-    if subdomain not in settings.SUBDOMAIN_BRANDING:
+    if university is None:
         return '/static/images/header-logo.png'
 
     return '/static/images/{uni}-on-edx-logo.png'.format(
-        uni=settings.SUBDOMAIN_BRANDING[subdomain]
+        uni=university
     )
