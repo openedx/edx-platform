@@ -69,8 +69,7 @@ def get_courseware(course_id):
 @step(u'I should see all courses')
 def i_should_see_all_courses(step):
   courses = get_courses()
-  page_source = world.browser.page_source
-
+  
   course_link_texts = [ (c.location.course, c.display_name) for c in courses]
   for c in course_link_texts:
     assert world.browser.find_element_by_partial_link_text(c[0] + ' ' + c[1])
