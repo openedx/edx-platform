@@ -397,7 +397,6 @@ def instructor_dashboard(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
-    course = get_course_with_access(request.user, course_id, 'staff')
     ''' Allows a staff member to enroll students in a course. 
 
     This is a short-term hack for Berkeley courses launching fall
@@ -412,7 +411,7 @@ def enroll_students(request, course_id):
 
     course = get_course_with_access(request.user, course_id, 'staff')
     existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id = course_id)]
-    print request.POST
+
     if 'new_students' in request.POST:
         new_students = request.POST['new_students'].split('\n')
     else:
