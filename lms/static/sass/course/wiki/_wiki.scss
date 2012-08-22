@@ -199,6 +199,17 @@ section.wiki {
       font-size: 0.9em;
       font-family: Monaco, monospace;
     }
+
+    .toc {
+      border: 1px solid #ccc;
+      background-color: $sidebar-color;
+      padding: 20px;
+      margin: 10px 0;
+
+      ul {
+        margin: 0;
+      }
+    }
   }
 
 
