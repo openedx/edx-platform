@@ -17,10 +17,12 @@ def i_should_see_an_element_with_class_of_classname(step,classname):
 
 @step(u'I click on every item in every week of the course')
 def i_click_on_every_item_in_every_week_of_the_course(step):
+	wait_until_id_renders('accordion',2)
 	chapters = world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//h3")
 	num_chapters = len(chapters)
 	k = 1
 	while k <= num_chapters:
+
 		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//h3["+str(k)+"]").click()
 		wait_until_class_renders('p',1)
 		k+=1
