@@ -89,7 +89,7 @@ class @ContentView extends Backbone.View
     ability: (ability) ->
       for action, elemSelector of @model.actions
         if not ability[action]
-          @$(elemSelector).remove()
+          @$(elemSelector).parent().remove()
 
   $discussionContent: ->
     @_discussionContent ||= @$el.children(".discussion-content")
