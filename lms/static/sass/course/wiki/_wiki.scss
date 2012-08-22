@@ -394,7 +394,6 @@ section.wiki {
   .CodeMirror {
     background: #fafafa;
     border: 1px solid #c8c8c8;
-    @include border-radius(3px);
     @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1));
   }
 
@@ -694,6 +693,28 @@ section.wiki {
     margin-top: 9px;
   }
 
+  .error {
+    font-size: 1em;
+    color: $pink;
+
+    .help-block {
+      margin-top: 10px;
+    }
+
+    input {
+      border-color: $pink;
+    }
+  }
+
+  .back {
+    float: right;
+  }
+
+
+
+
+
+
   /*-----------------
 
     Directory
@@ -740,6 +761,7 @@ section.wiki {
     th, td {
       border-bottom: 1px solid $light-gray;
       padding: 8px;
+      overflow: hidden;
     }
 
     tr:nth-child(even) {
@@ -841,6 +863,10 @@ section.wiki {
       left: 25px;
       font-size: 1.4em;
     }
+  }
+
+  section.delete {
+    padding: 40px;
   }
 
 
