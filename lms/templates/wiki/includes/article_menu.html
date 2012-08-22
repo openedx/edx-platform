@@ -35,6 +35,10 @@
   %endif
 %endfor
 
+
+<%doc>
+The settings link has been disabled because the notifications app hasn't been integrated yet and those are the only useful settings.
+
 %if not user.is_anonymous():
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
@@ -43,4 +47,6 @@
   </a>
 </li>
 %endif
+</%doc>
+
 
