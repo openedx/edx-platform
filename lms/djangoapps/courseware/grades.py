@@ -29,6 +29,8 @@ def grade(student, request, course, student_module_cache=None):
     output from the course grader, augmented with the final letter
     grade. The keys in the output are:
 
+    course: a CourseDescriptor
+
     - grade : A final letter grade.
     - percent : The final percent for the class (rounded up).
     - section_breakdown : A breakdown of each section that makes
@@ -42,7 +44,7 @@ def grade(student, request, course, student_module_cache=None):
     grading_context = course.grading_context
 
     if student_module_cache == None:
-        student_module_cache = StudentModuleCache(student, grading_context['all_descriptors'])
+        student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
 
     totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
@@ -56,7 +58,8 @@ def grade(student, request, course, student_module_cache=None):
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
-                if student_module_cache.lookup(moduledescriptor.category, moduledescriptor.location.url() ):
+                if student_module_cache.lookup(
+                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
                     should_grade_section = True
                     break
 
@@ -64,10 +67,9 @@ def grade(student, request, course, student_module_cache=None):
                 scores = []
                 # TODO: We need the request to pass into here. If we could forgo that, our arguments
                 # would be simpler
-                course_id = CourseDescriptor.location_to_id(course.location)
                 section_module = get_module(student, request,
                                             section_descriptor.location, student_module_cache,
-                                            course_id)
+                                            course.id)
                 if section_module is None:
                     # student doesn't have access to this module, or something else
                     # went wrong.
@@ -76,7 +78,7 @@ def grade(student, request, course, student_module_cache=None):
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database
                 for module in yield_module_descendents(section_module):
-                    (correct, total) = get_score(student, module, student_module_cache)
+                    (correct, total) = get_score(course.id, student, module, student_module_cache)
                     if correct is None and total is None:
                         continue
 
@@ -171,7 +173,9 @@ def progress_summary(student, course, grader, student_module_cache):
             graded = s.metadata.get('graded', False)
             scores = []
             for module in yield_module_descendents(s):
-                (correct, total) = get_score(student, module, student_module_cache)
+                # course is a module, not a descriptor...
+                course_id = course.descriptor.id
+                (correct, total) = get_score(course_id, student, module, student_module_cache)
                 if correct is None and total is None:
                     continue
 
@@ -200,7 +204,7 @@ def progress_summary(student, course, grader, student_module_cache):
     return chapters
 
 
-def get_score(user, problem, student_module_cache):
+def get_score(course_id, user, problem, student_module_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
 
@@ -215,10 +219,11 @@ def get_score(user, problem, student_module_cache):
     correct = 0.0
 
     # If the ID is not in the cache, add the item
-    instance_module = get_instance_module(user, problem, student_module_cache)
+    instance_module = get_instance_module(course_id, user, problem, student_module_cache)
     # instance_module = student_module_cache.lookup(problem.category, problem.id)
     # if instance_module is None:
     #     instance_module = StudentModule(module_type=problem.category,
+    #                                     course_id=????,
     #                                     module_state_key=problem.id,
     #                                     student=user,
     #                                     state=None,

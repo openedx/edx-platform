@@ -1,4 +1,4 @@
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" >
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-course_modx_root="/course/modx" >
   <nav aria-label="Section Navigation" class="sequence-nav">
     <ol id="sequence-list">
       % for idx, item in enumerate(items):
@@ -21,7 +21,7 @@
   </nav>
 
   % for item in items:
-  <div class="seq_contents">${item['content'] | h}</div>
+  <div class="seq_contents tex2jax_ignore asciimath2jax_ignore">${item['content'] | h}</div>
   % endfor
   <div id="seq_content"></div>
 
