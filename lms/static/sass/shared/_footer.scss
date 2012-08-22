@@ -69,6 +69,7 @@ footer {
           position: relative;
           width: 47px;
           vertical-align: middle;
+          @include transition(none);
 
           &:hover {
             background-position: 0 0;
