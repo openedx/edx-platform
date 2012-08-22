@@ -157,7 +157,7 @@ def edXauth_signup(request, eamap=None):
     
     log.debug('ExtAuth: doing signup for %s' % eamap.external_email)
 
-    return student_views.main_index(request, extra_context=context)
+    return student_views.index(request, extra_context=context)
 
 #-----------------------------------------------------------------------------
 # MIT SSL
@@ -193,7 +193,7 @@ def edXauth_ssl_login(request):
     The certificate provides user email and fullname; this populates the ExternalAuthMap.
     The user is nevertheless still asked to complete the edX signup.  
 
-    Else continues on with student.views.main_index, and no authentication.
+    Else continues on with student.views.index, and no authentication.
     """
     certkey = "SSL_CLIENT_S_DN"	 # specify the request.META field to use
     
@@ -207,7 +207,7 @@ def edXauth_ssl_login(request):
             pass
     if not cert:
         # no certificate information - go onward to main index
-        return student_views.main_index(request)
+        return student_views.index(request)
 
     (user, email, fullname) = ssl_dn_extract_info(cert)
     
@@ -217,4 +217,4 @@ def edXauth_ssl_login(request):
                                             credentials=cert, 
                                             email=email,
                                             fullname=fullname,
-                                            retfun = functools.partial(student_views.main_index, request))
+                                            retfun = functools.partial(student_views.index, request))
