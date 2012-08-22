@@ -38,22 +38,26 @@ section.wiki {
       float: left;
       margin-right: 10px;
       font-size: 0.9em;
-      line-height: 31px;      
 
       a {
-        display: inline-block;
-        max-width: 200px;
+        float: left;
+        display: block;        
         overflow: hidden;
-        height: 30px;
+        height: 30px;        
+        line-height: 31px;    
+        max-width: 200px;
+        height: 100%;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
       &:after {
         content: '›';
-        display: inline-block;
+        display: inline;
         margin-left: 10px;
         color: $base-font-color;
+        height: 30px;        
+        line-height: 31px;
       }
     }
   }
