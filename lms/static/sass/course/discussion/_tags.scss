@@ -10,7 +10,7 @@ ul.tags {
   }
 
   li {
-    background: #eee;
+    background: #ddd;
     color: #555;
     display: inline-block;
     font-size: 12px;
@@ -19,7 +19,7 @@ ul.tags {
     padding: 6px 10px 6px 5px;
 
     &:before {
-     border-color:transparent #eee transparent transparent;
+     border-color:transparent #ddd transparent transparent;
      border-style:solid;
      border-width:12px 10px 12px 0;
      content:"";

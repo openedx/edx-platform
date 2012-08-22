@@ -1,19 +1,24 @@
 section.wiki {
   padding-top: 25px;
 
-  > header {
-    height: 33px;
-    margin-bottom: 36px;
-    padding-bottom: 26px;
-    border-bottom: 1px solid $light-gray;
-  }
-
   .pull-left {
     float: left;
   }
 
   .pull-right {
     float: right;
+  }
+
+  .wiki-wrapper {
+    @include clearfix;
+
+    > header {
+      height: 33px;
+      padding: 24px 0 26px;
+      border-bottom: 1px solid #ccc;
+      border-radius: 3px 3px 0 0;
+      background-color: $sidebar-color;
+    }
   }
 
 
@@ -27,7 +32,7 @@ section.wiki {
   .breadcrumb {
     list-style: none;
     padding-left: 0;
-    margin: 0 0 0 flex-gutter();
+    margin: 0 0 0 40px;
 
     li {
       float: left;
@@ -68,7 +73,7 @@ section.wiki {
   .global-functions {
     display: block;
     width: auto;
-    margin-right: flex-gutter();
+    margin-right: 20px;
   }
 
   .add-article-btn {
@@ -129,8 +134,9 @@ section.wiki {
   .main-article {
     float: left;
     width: flex-grid(9);
-    margin-left: flex-gutter();
+    padding: 40px 0 40px 40px;
     color: $base-font-color;
+    @include box-sizing(border-box);
   }
 
   &.view .main-article {
@@ -206,13 +212,14 @@ section.wiki {
 
   .article-functions {
     float: left;
-    width: flex-grid(2) + flex-gutter();
-    margin-left: flex-grid(1);
+    width: flex-grid(3);
+    padding: 40px 40px;
+    @include box-sizing(border-box);
 
     .timestamp {
-      margin: 4px 0 15px;
-      padding: 0 0 15px 5px;
-      border-bottom: 1px solid $light-gray;      
+      margin-top: 15px;
+      padding: 15px 0 0 10px;
+      border-top: 1px solid $light-gray;      
 
       .label {
         font-size: 0.7em;
@@ -236,7 +243,8 @@ section.wiki {
         a {
           color: $blue;
 
-          .icon-view {
+          .icon-view,
+          .icon-home {
             background-position: -25px 0;
           }
 
@@ -244,11 +252,13 @@ section.wiki {
             background-position: -25px -25px;
           }
 
-          .icon-changes {
+          .icon-changes,
+          .icon-time {
             background-position: -25px -49px;
           }
 
-          .icon-attachments {
+          .icon-attachments,
+          .icon-file {
             background-position: -25px -73px;
           }
 
@@ -280,7 +290,8 @@ section.wiki {
         background: url(../images/wiki-icons.png) no-repeat;
       }
 
-      .icon-view {
+      .icon-view,
+      .icon-home {
         background-position: 0 0;
       }
 
@@ -288,11 +299,13 @@ section.wiki {
         background-position: 0 -25px;
       }
 
-      .icon-changes {
+      .icon-changes,
+      .icon-time {
         background-position: 0 -49px;
       }
 
-      .icon-attachments {
+      .icon-attachments,
+      .icon-file {
         background-position: 0 -73px;
       }
 
@@ -704,6 +717,10 @@ section.wiki {
     table {
       width: 100%;
       font-size: 0.8em;
+    }
+
+    .attachment-actions {
+      width: 175px;
     }
 
     .attachment-actions .btn {
