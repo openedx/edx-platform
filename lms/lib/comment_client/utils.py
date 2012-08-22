@@ -1,5 +1,6 @@
 import requests
 import json
+import settings
 
 def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
@@ -19,6 +20,7 @@ def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
     
 def perform_request(method, url, data_or_params=None, *args, **kwargs):
+    data_or_params['api_key'] = settings.API_KEY
     if method in ['post', 'put', 'patch']:
         response = requests.request(method, url, data=data_or_params)
     else:
