@@ -1,0 +1,64 @@
+div.syllabus {
+
+  padding: 0px 10px;
+
+  text-align: center;
+
+  h1 {
+    @extend .top-header
+  }
+
+  .notes {
+    width: 740px;
+    margin: 0px auto 10px;
+  }
+
+  table {
+
+    text-align: left;
+
+    margin: 10px auto;
+
+    thead {
+      font-weight: bold;
+      border-bottom: 1px solid black;
+    }
+
+    tr.first {
+      td {
+        padding-top: 15px;
+      }
+    }
+
+    td {
+
+      vertical-align: middle;
+
+      padding: 5px 10px;
+
+      &.day, &.due {
+        white-space: nowrap;
+      }
+
+      &.no_class {
+        text-align: center;
+      }
+
+      &.important {
+        color: red;
+      }
+
+      &.week_separator {
+        padding: 0px;
+        
+        hr {
+          margin: 10px;
+        }
+
+      }
+
+    }
+
+  }
+
+}

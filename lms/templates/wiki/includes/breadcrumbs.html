@@ -1,52 +1,38 @@
-{% load i18n %}{% load url from future %}
-{% if urlpath %}
+## mako
+<%! from django.core.urlresolvers import reverse %>
 
+%if urlpath is not Undefined and urlpath:
 <header>
   <ul class="breadcrumb pull-left" class="">
-    {% for ancestor in urlpath.get_ancestors.all %}
-      <li><a href="{% url 'wiki:get' path=ancestor.path %}">{{ ancestor.article.current_revision.title }}</a></li>
-    {% endfor %}
-    <li class="active"><a href="{% url 'wiki:get' path=urlpath.path %}">{{ article.current_revision.title }}</a></li>
+    <%
+      # The create button links to the highest ancestor we have edit priveleges to
+      create_article_root = None
+    %>
+    %for ancestor in urlpath.cached_ancestors:
+      <li><a href="${reverse('wiki:get', kwargs={'path' : ancestor.path})}">${ancestor.article.current_revision.title}</a></li>
+      <% 
+        if not create_article_root and ancestor.article.can_write(user):
+          create_article_root = ancestor
+      %>
+    %endfor
+    <li class="active"><a href="${reverse('wiki:get', kwargs={'path' : urlpath.path})}">${article.current_revision.title}</a></li>
+    <% 
+      if not create_article_root and urlpath.article.can_write(user):
+        create_article_root = urlpath
+    %>
   </ul>
 
- 
-  <div class="pull-left" style="margin-left: 10px;">
-    <div class="btn-group">
-      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" style="padding: 7px;" title="{% trans "Sub-articles for" %} {{ article.current_revision.title }}">
-        <span class="icon-list"></span>
-      <span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu">
-        {% for child in children_slice %}
-          <li>
-            <a href="{% url 'wiki:get' path=child.path %}">
-              {{ child.article.current_revision.title }}
-            </a>
-          </li>
-          {% empty %}
-          <li><a href="#"><em>{% trans "No sub-articles" %}</em></a></li>
-        {% endfor %}
-        {% if children_slice_more %}
-        <li><a href="#"><em>{% trans "...and more" %}</em></a></li>
-        {% endif %}
-        <li class="divider"></li>
-        <li>
-          <a href="" onclick="alert('TODO')">{% trans "List sub-pages" %} &raquo;</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  
-
   <div class="global-functions pull-right">
-    <form class="search-wiki pull-left">
+    <!-- <form class="search-wiki pull-left">
       <input type="search" placeholder="search wiki" />
-    </form>
-    <a class="add-article-btn btn pull-left" href="{% url 'wiki:create' path=urlpath.path %}" style="padding: 7px;">
+    </form> -->
+    %if create_article_root:
+    <a class="add-article-btn btn pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
       <span class="icon-plus"></span>
-      {% trans "Add article" %}
+      Add article
     </a>
+    %endif
   </div>
 </header>
 
-{% endif %}
+%endif

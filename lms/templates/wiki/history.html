@@ -52,6 +52,9 @@
 </style>
 {% endaddtoblock %}
 
+<p class="lead">
+  {% trans "Click each revision to see a list of edited lines. Click the Preview button to see how the article looked at this stage. At the bottom of this page, you can change to a particular revision or merge an old revision with the current one." %}
+</p>
 
 <form method="GET">
   <div class="tab-content" style="overflow: visible;">
@@ -60,20 +63,14 @@
         <div class="accordion-group">
           <div class="accordion-heading">
             <a class="accordion-toggle" style="float: left;" href="#collapse{{ revision.revision_number }}" onclick="get_diff_json('{% url 'wiki:diff' revision.id %}', $('#collapse{{ revision.revision_number }}'))">
-              {{ revision.created }} (#{{ revision.revision_number }}) by {% if revision.user %}{{ revision.user }}{% else %}{% if user|is_moderator %}{{ revision.ip_address|default:"anonymous (IP not logged)" }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
-              {% if revision == article.current_revision %}
-                <strong>*</strong>
-              {% endif %}
-              {% if revision.deleted %}
-              <span class="badge badge-important">{% trans "deleted" %}</span>
-              {% endif %}
-              {% if revision.previous_revision.deleted and not revision.deleted %}
-              <span class="badge badge-success">{% trans "restored" %}</span>
-              {% endif %}
+              <span class="icon-plus"></span>
+              {% include "wiki/includes/revision_info.html" with current_revision=article.current_revision %}
               <div style="color: #CCC;">
                 <small>
                 {% if revision.user_message %}
                   {{ revision.user_message }}
+                {% elif revision.automatic_log %}
+                  {{ revision.automatic_log }}
                 {% else %}
                   ({% trans "no log message" %})
                 {% endif %}
@@ -84,21 +81,12 @@
               <div class="bar" style="width: 100%;"></div>
             </div>
             <div class="pull-right" style="vertical-align: middle; margin: 8px 3px;">
-              {% if revision == article.current_revision %}
-              <a href="#" class="btn disabled">
-                <span class="icon-lock"></span>
-                {% trans "Preview this version" %}
-              </a>
-              {% else %}
+              {% if not revision == article.current_revision %}
               <button type="submit" class="btn" onclick="$('#previewModal').modal('show'); this.form.target='previewWindow'; this.form.r.value='{{ revision.id }}'; this.form.action='{% url 'wiki:preview_revision' article.id %}'; $('#previewModal .switch-to-revision').attr('href', '{% url 'wiki:change_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}')">
                 <span class="icon-eye-open"></span>
-                {% trans "Preview this version" %}
+                {% trans "Preview this revision" %}
               </button>
               {% endif %}
-              <a class="btn btn-info" href="#collapse{{ revision.revision_number }}" onclick="get_diff_json('{% url 'wiki:diff' revision_id=revision.id %}', $('#collapse{{ revision.revision_number }}'))">
-                <span class="icon-list-alt"></span>
-                {% trans "Show changes" %}
-              </a>
               
               {% if article|can_write:user %}
               <input type="radio"{% if revision == article.current_revision %} disabled="true"{% endif %} style="margin: 0 10px;" value="{{ revision.id }}" name="revision_id" switch-button-href="{% url 'wiki:change_revision' path=urlpath.path revision_id=revision.id %}" merge-button-href="{% url 'wiki:merge_revision_preview' article_id=article.id revision_id=revision.id %}" merge-button-commit-href="{% url 'wiki:merge_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}" />
@@ -157,7 +145,7 @@
   <input type="hidden" name="r" value="" />
   <div class="modal hide fade" id="previewModal">
     <div class="modal-body">
-      <iframe name="previewWindow" frameborder="0"></iframe>
+      <iframe name="previewWindow"></iframe>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn btn-large" data-dismiss="modal">
@@ -184,7 +172,7 @@
       <p class="lead"><span class="icon-info-sign"></span> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." %} <strong>{% trans "After this, it's important to do a manual review." %}</strong></p>
     </div>
     <div class="modal-body">
-      <iframe name="mergeWindow" frameborder="0"></iframe>
+      <iframe name="mergeWindow"></iframe>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn btn-large" data-dismiss="modal">

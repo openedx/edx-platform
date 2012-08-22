@@ -149,8 +149,7 @@ def index(request, course_id, chapter=None, section=None,
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
                 student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                                                          request.user,
-                                                          section_descriptor)
+                    course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
                                     student_module_cache, course_id)
@@ -233,6 +232,19 @@ def course_info(request, course_id):
     return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
+# TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
+@ensure_csrf_cookie
+def syllabus(request, course_id):
+    """
+    Display the course's syllabus.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    return render_to_response('courseware/syllabus.html', {'course': course,
+                                            'staff_access': staff_access,})
 
 def registered_for_course(course, user):
     '''Return CourseEnrollment if user is registered for course, else False'''
@@ -310,7 +322,8 @@ def progress(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        course_id, request.user, course)
     course_module = get_module(request.user, request, course.location,
                                student_module_cache, course_id)
 

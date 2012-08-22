@@ -140,7 +140,20 @@ def dashboard(request):
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
 
-    context = {'courses': courses, 'message': message}
+
+    # Global staff can see what courses errored on their dashboard
+    staff_access = False
+    errored_courses = {}
+    if has_access(user, 'global', 'staff'):
+        # Show any courses that errored on load
+        staff_access = True
+        errored_courses = modulestore().get_errored_courses()
+
+    context = {'courses': courses,
+               'message': message,
+               'staff_access': staff_access,
+               'errored_courses': errored_courses,}
+
     return render_to_response('dashboard.html', context)
 
 
