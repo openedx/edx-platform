@@ -60,10 +60,6 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
-    # TODO: This will be removed once course-specific tabs are in place. see
-    # courseware/courses.py
-    'ENABLE_SYLLABUS' : True,
-
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,

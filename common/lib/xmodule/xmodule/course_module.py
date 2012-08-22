@@ -3,6 +3,7 @@ import time
 import logging
 import requests
 from lxml import etree
+from path import path # NOTE (THK): Only used for detecting presence of syllabus
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -76,6 +77,10 @@ class CourseDescriptor(SequenceDescriptor):
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
+
+        # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
+        #   disable the syllabus content for courses that do not provide a syllabus
+        self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
 
     def set_grading_policy(self, policy_str):
