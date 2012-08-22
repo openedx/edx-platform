@@ -19,7 +19,7 @@ def url_class(url):
     <ol class="course-tabs">
       <li class="courseware"><a href="${reverse('courseware', args=[course.id])}" class="${url_class('courseware')}">Courseware</a></li>
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
-% if course.syllabus_present:
+% if hasattr(course,'syllabus_present') and course.syllabus_present:
       <li class="syllabus"><a href="${reverse('syllabus', args=[course.id])}" class="${url_class('syllabus')}">Syllabus</a></li>
 % endif
 % if user.is_authenticated():
