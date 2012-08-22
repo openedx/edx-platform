@@ -142,19 +142,23 @@ def forum_form_discussion(request, course_id):
     threads, query_params = get_threads(request, course_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
 
-    recent_active_threads = cc.search_recent_active_threads(
-        course_id,
-        recursive=False,
-        query_params={'follower_id': request.user.id},
-    )
-
-    trending_tags = cc.search_trending_tags(
-        course_id,
-    )
+    
 
     if request.is_ajax():
-        return utils.HtmlResponse(content)
+        return utils.JsonResponse({
+            'html': content,
+            'discussionData': threads,
+        })
     else:
+        recent_active_threads = cc.search_recent_active_threads(
+            course_id,
+            recursive=False,
+            query_params={'follower_id': request.user.id},
+        )
+
+        trending_tags = cc.search_trending_tags(
+            course_id,
+        )
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
