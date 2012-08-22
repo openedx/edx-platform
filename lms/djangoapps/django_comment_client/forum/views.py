@@ -13,7 +13,7 @@ from courseware.access import has_access
 from urllib import urlencode
 from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.utils import merge_dict, extract, strip_none
+from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank
 
 import json
 import django_comment_client.utils as utils
@@ -81,7 +81,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'pages_nearby_delta': PAGES_NEARBY_DELTA,
         'discussion_type': discussion_type,
         'base_url': base_url,
-        'query_params': strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text'])),
+        'query_params': strip_blank(strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text']))),
         'annotated_content_info': json.dumps(annotated_content_info),
         'discussion_data': json.dumps({ discussion_id: threads }),
     }
