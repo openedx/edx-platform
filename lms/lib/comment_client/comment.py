@@ -1,5 +1,6 @@
 from utils import *
 
+from thread import Thread
 import models
 import settings
 
@@ -22,6 +23,10 @@ class Comment(models.Model):
 
     base_url = "{prefix}/comments".format(prefix=settings.PREFIX)
     type = 'comment'
+
+    @property
+    def thread(self):
+        return Thread(id=self.thread_id, type='thread')
 
     @classmethod
     def url_for_comments(cls, params={}):

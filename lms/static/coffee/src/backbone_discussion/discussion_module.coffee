@@ -2,7 +2,6 @@ class @DiscussionModuleView extends Backbone.View
   events:
     "click .discussion-show": "toggleDiscussion"
   toggleDiscussion: (event) ->
-    console.log "toggle"
     if @showed
       @$("section.discussion").hide()
       $(event.target).html("Show Discussion")

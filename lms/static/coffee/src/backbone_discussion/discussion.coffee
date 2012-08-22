@@ -37,10 +37,8 @@ class @DiscussionView extends Backbone.View
       @newPost()
 
   reload: ($elem, url) ->
-    console.log "here"
     if not url then return
     DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
-      console.log response
       $parent = @$el.parent()
       @$el.replaceWith(response.html)
       $discussion = $parent.find("section.discussion")
@@ -49,7 +47,6 @@ class @DiscussionView extends Backbone.View
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
 
   loadSimilarPost: (event) ->
-    console.log "loading"
     $title = @$(".new-post-title")
     $wrapper = @$(".new-post-similar-posts-wrapper")
     $similarPosts = @$(".new-post-similar-posts")
@@ -63,7 +60,6 @@ class @DiscussionView extends Backbone.View
       url = DiscussionUtil.urlFor 'search_similar_threads', @model.id
       data = { text: @$(".new-post-title").val() }
       DiscussionUtil.get $elem, url, data, (response, textStatus) =>
-        console.log response
         $similarPosts.empty()
         if $.type(response) == "array" and response.length
           $wrapper.show()
