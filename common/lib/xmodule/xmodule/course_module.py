@@ -201,6 +201,11 @@ class CourseDescriptor(SequenceDescriptor):
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have
     # different numbers.
+    # 
+    # TODO get rid of this as soon as possible or potentially build in a robust
+    # way to add in course-specific styling. There needs to be a discussion
+    # about the right way to do this, but arjun will address this ASAP. Also
+    # note that the courseware template needs to change when this is removed.
     @property
     def css_class(self):
         return self.metadata.get('css_class', '')
