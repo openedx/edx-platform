@@ -16,7 +16,7 @@ import branding
   <header class="global" aria-label="Global Navigation">
 %endif
   <nav>
-  <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META['HTTP_HOST']))}"/></a></h1>
+  <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
 
     %if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
