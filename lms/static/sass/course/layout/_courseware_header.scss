@@ -55,11 +55,15 @@ nav.course-material {
   }
 }
 
-header.global {
+header.global.slim {
   border-bottom: 1px solid #bbb;
   @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
   height: 50px;
   @include linear-gradient(top, #fff, #eee);
+
+  .guest .secondary {
+    display: none;
+  }
 
   nav {
     padding-top: 5px;
@@ -123,5 +127,15 @@ header.global {
       font: inherit;
       font-weight: bold;
     }
+  }
+
+  a#signup {
+    position: relative;
+    margin-top: 4px;
+    padding: 6px 12px 8px;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0;
   }
 }

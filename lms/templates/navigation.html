@@ -5,7 +5,11 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
 
-<header class="global" aria-label="Global Navigation">
+%if course:
+  <header class="global slim" aria-label="Global Navigation">
+%else:
+  <header class="global" aria-label="Global Navigation">
+%endif
   <nav>
     <h1 class="logo"><a href="${reverse('root')}"></a></h1>
 
