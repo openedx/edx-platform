@@ -9,15 +9,18 @@ from xmodule.modulestore.django import modulestore
 
 from licenses.models import CourseSoftware, UserLicense
 
+
 class Command(BaseCommand):
     help = """Imports serial numbers for software used in a course.
 
-    Usage: import_serial_numbers <course_id> <software_name> <filename>
+    Usage: import_serial_numbers <course_id> <software_name> <file>
 
-    serial_file is a text file that list one available serial number per line.
+    <file> is a text file that list one available serial number per line.
 
     Example:
-      django-admin.py import_serial_numbers MITx/6.002x/2012_Fall matlab /tmp/matlab-serials.txt
+
+       import_serial_numbers MITx/6.002x/2012_Fall matlab serials.txt
+
     """
     args = "course_id software_id serial_file"
 
@@ -48,7 +51,6 @@ class Command(BaseCommand):
             raise CommandError("Cannot find filename {0}".format(filename))
 
         return course_id, software_name, filename
-
 
     def _import_serials(self, software, filename):
         print "Importing serial numbers for {0}.".format(software)
