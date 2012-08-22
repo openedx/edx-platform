@@ -55,9 +55,14 @@ MITX_FEATURES = {
     # course_ids (see dev_int.py for an example)
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
+    # When True, will override certain branding with university specific values
+    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
+    # university to use for branding purposes
+    'SUBDOMAIN_BRANDING': False,
+
     # TODO: This will be removed once course-specific tabs are in place. see
     # courseware/courses.py
-    'ENABLE_SYLLABUS' : True, 
+    'ENABLE_SYLLABUS' : True,
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
@@ -66,7 +71,7 @@ MITX_FEATURES = {
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
-    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
+    'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -198,6 +203,11 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+######################## subdomain specific settings ###########################
+COURSE_LISTINGS = {}
+SUBDOMAIN_BRANDING = {}
+
 
 ############################### XModule Store ##################################
 MODULESTORE = {
