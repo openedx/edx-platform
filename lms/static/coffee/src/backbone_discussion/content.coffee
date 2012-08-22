@@ -261,27 +261,18 @@ class @ContentView extends Backbone.View
     @$(".discussion-content-edit").hide()
     @$(".discussion-content-wrapper").show()
 
-  delete: ->
-    if $content.hasClass("thread")
-      url = Discussion.urlFor('delete_thread', id)
-      c = confirm "Are you sure to delete thread \"" + $content.find("a.thread-title").text() + "\"?"
+  delete: (event) ->
+    url = @model.urlFor('delete')
+    if @model.get('type') == 'thread'
+      c = confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
     else
-      url = Discussion.urlFor('delete_comment', id)
       c = confirm "Are you sure to delete this comment? "
-    if c != true
+    if not c
       return
-    Discussion.safeAjax
-      $elem: $(elem)
-      url: url
-      type: "POST"
-      dataType: "json"
-      data: {}
-      success: (response, textStatus) =>
-        if textStatus == "success"
-          $(content).remove()
-      error: (response, textStatus, e) ->
-        console.log e
-
+    $elem = $(event.target)
+    DiscussionUtil.post $elem, url, {}, (response, textStatus) => @$el.remove()
+    #TODO also do data-wise operation
+      
   events:
     "click .thread-title": "toggleSingleThread"
     "click .discussion-show-comments": "toggleSingleThread"
@@ -336,6 +327,7 @@ class @Thread extends @Content
     'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
     'close': -> DiscussionUtil.urlFor('openclose_thread', @id)
     'update': -> DiscussionUtil.urlFor('update_thread', @id)
+    'delete': -> DiscussionUtil.urlFor('delete_thread', @id)
 
   initialize: ->
     @set('thread', @)
@@ -355,6 +347,7 @@ class @Comment extends @Content
     'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
     'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
     'update': -> DiscussionUtil.urlFor('update_comment', @id)
+    'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
 
   permalink: ->
     thread_id = @get('thread').id
