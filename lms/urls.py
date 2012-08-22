@@ -154,7 +154,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'courseware.views.grade_summary', name='grade_summary'),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
+            'courseware.views.enroll_students', name='enroll_students'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
