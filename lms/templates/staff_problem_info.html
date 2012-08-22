@@ -31,9 +31,12 @@ ${module_content}
     <header>
       <h2>Staff Debug</h2>
     </header>
-    <div class="staff_info">
+    <div class="staff_info" style="display:block">
 location = ${location | h}
 github = <a href="${edit_link}">${edit_link | h}</a>
+%if source_file:
+source_url = <a href="${source_url}">${source_file | h}</a>
+%endif
 definition = <pre>${definition | h}</pre>
 metadata = ${metadata | h}
 category = ${category | h}
