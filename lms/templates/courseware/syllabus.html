@@ -13,12 +13,14 @@
 %>
 
 <section class="container">
-  <div class="syllabus">
-    <h1> Syllabus </h1>
-    % if user.is_authenticated():
-    ${get_course_syllabus_section(course, 'syllabus')}
-    % else:
-    ${get_course_syllabus_section(course, 'guest_syllabus')}
-    % endif
+  <div class="syllabus_wrapper">
+    <div class="syllabus">
+        <h1> Syllabus </h1>
+        % if user.is_authenticated():
+        ${get_course_syllabus_section(course, 'syllabus')}
+        % else:
+        ${get_course_syllabus_section(course, 'guest_syllabus')}
+        % endif
+    </div>
   </div>
 </section>
