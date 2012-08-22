@@ -101,6 +101,11 @@ div.video {
             @include transition(background-color, opacity);
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
+            outline: 0;
+
+            &:focus {
+              outline: 0;
+            }
 
             &:empty {
               height: 46px;
@@ -171,6 +176,11 @@ div.video {
             @include transition();
             -webkit-font-smoothing: antialiased;
             width: 116px;
+            outline: 0;
+
+            &:focus {
+              outline: 0;
+            }
 
             h3 {
               color: #999;
