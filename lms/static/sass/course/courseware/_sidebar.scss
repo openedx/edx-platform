@@ -70,8 +70,10 @@ section.course-index {
       width: 100%;
       @include box-sizing(border-box);
       padding: 11px 14px;
-      @include linear-gradient(top, #f9f9f9, #eee);
+      @include linear-gradient(top, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
+      background-color: #eee;
       @include box-shadow(0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset);
+      @include transition(background-color .1s);
 
       &:first-child {
         border-radius: 3px 0 0 0;
@@ -80,6 +82,10 @@ section.course-index {
       &:last-child {
         border-radius: 0 0 0 3px;
         @include box-shadow(0 1px 0 #fff inset);
+      }
+
+      &:hover {
+        background-color: #fff
       }
     }
 
