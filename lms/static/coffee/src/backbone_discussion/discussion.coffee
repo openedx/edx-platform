@@ -15,8 +15,6 @@ class @Discussion extends Backbone.Collection
     @add model
     model
 
-class @DiscussionModuleView extends Backbone.View
-
 class @DiscussionView extends Backbone.View
 
   $: (selector) ->
@@ -39,11 +37,13 @@ class @DiscussionView extends Backbone.View
       @newPost()
 
   reload: ($elem, url) ->
+    console.log "here"
     if not url then return
     DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
-      $discussion = $(response.html)
+      console.log response
       $parent = @$el.parent()
-      @$el.replaceWith($discussion)
+      @$el.replaceWith(response.html)
+      $discussion = $parent.find("section.discussion")
       @model.reset(response.discussionData, { silent: false })
       view = new DiscussionView el: $discussion[0], model: @model
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
@@ -111,6 +111,8 @@ class @DiscussionView extends Backbone.View
     title = @$(".new-post-title").val()
     body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "new-post-body"
     tags = @$(".new-post-tags").val()
+    anonymous = false || @$(".discussion-post-anonymously").is(":checked")
+    autowatch = false || @$(".discussion-auto-watch").is(":checked")
     url = DiscussionUtil.urlFor('create_thread', @model.id)
     DiscussionUtil.safeAjax
       $elem: $(event.target)
@@ -121,6 +123,8 @@ class @DiscussionView extends Backbone.View
         title: title
         body: body
         tags: tags
+        anonymous: anonymous
+        auto_subscribe: autowatch
       error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
       success: (response, textStatus) =>
         DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
