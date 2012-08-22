@@ -136,6 +136,7 @@ header.global {
 
     &.user {
       float: right;
+      margin-top: 4px;
 
       > li.primary {
         display: block;
@@ -151,22 +152,22 @@ header.global {
           > a {
             @include border-radius(0 4px 4px 0);
             border-left: none;
+            padding: 5px 8px 7px 8px;
           }
         }
       }
 
       a.user-link {
-        padding: 10px 12px 10px 42px;
+        padding: 6px 12px 8px 35px;
         position: relative;
         text-transform: none;
+        font-size: 14px;
+        font-weight: bold;
+        letter-spacing: 0;
 
         .avatar {
-          //background: rgb(220,220,220);
-          @include background-image(url('../images/portal-icons/home-icon.png'));
-          background-size: cover;
-          //@include border-radius(3px);
-          //border: 1px solid rgb(80,80,80);
-          //@include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          @include background-image(url('../images/small-header-home-icon.png'));
+          background-repeat: no-repeat;
           height: 26px;
           @include inline-block;
           left: 8px;
@@ -194,7 +195,7 @@ header.global {
         padding: 5px 10px;
         position: absolute;
         right: 0px;
-        top: 50px;
+        top: 34px;
         width: 170px;
         z-index: 3;
 

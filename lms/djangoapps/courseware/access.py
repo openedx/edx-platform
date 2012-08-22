@@ -13,7 +13,6 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 
-
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
