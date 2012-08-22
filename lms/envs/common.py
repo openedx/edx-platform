@@ -585,6 +585,7 @@ INSTALLED_APPS = (
     'mptt',
     'sekizai',
     #'wiki.plugins.attachments',
+    'wiki.plugins.links',
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
