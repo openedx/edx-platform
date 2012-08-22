@@ -197,6 +197,10 @@ class CourseDescriptor(SequenceDescriptor):
     def start_date_text(self):
         return time.strftime("%b %d, %Y", self.start)
 
+    # An extra property is used rather than the wiki_slug/number because
+    # there are courses that change the number for different runs. This allows
+    # courses to share the same css_class across runs even if they have
+    # different numbers.
     @property
     def css_class(self):
         return self.metadata.get('css_class', '')
