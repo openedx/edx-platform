@@ -2,18 +2,54 @@ nav.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  border-bottom: 1px solid $border-color;
-  @include border-top-right-radius(4px);
-  margin: 0 0 lh() (-(lh()));
+  margin: -4px 0 30px;
   position: relative;
+  border-bottom: none;
+
+  .left-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 20px;
+    height: 46px;
+    @include linear-gradient(left, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .right-shadow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+    width: 20px;
+    height: 46px;
+    @include linear-gradient(right, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0));
+    background-color: transparent;
+    pointer-events: none;
+  }
+
+  .sequence-list-wrapper {
+    position: relative;
+    z-index: 9999;
+    border: 1px solid #ccc;
+    height: 44px;
+    margin: 0 30px;
+    @include linear-gradient(top, #ddd, #eee);
+    overflow: hidden;
+    @include box-shadow(0 1px 3px rgba(0, 0, 0, .1) inset);
+  }
 
   ol {
+    position: absolute;
+    top: 0;
+    left: 0;
     @include box-sizing(border-box);
     display: table;
     height: 100%;
     margin: 0;
-    padding-left: 3px;
-    padding-right: flex-grid(1, 9);
+    padding: 0 10px;
     width: 100%;
 
     a {
@@ -25,42 +61,44 @@ nav.sequence-nav {
       min-width: 20px;
 
       a {
-        background-position: center;
+        width: 34px;
+        height: 34px;
+        margin: 4px auto;
+        background-position: center 10px;
         background-repeat: no-repeat;
         border: 1px solid transparent;
-        border-bottom: none;
-        @include border-radius(3px 3px 0 0);
+        @include border-radius(35px);
         cursor: pointer;
         display: block;
-        height: 10px;
-        padding: 15px 0 14px;
+        padding: 0;
         position: relative;
         @include transition();
-        width: 100%;
 
         &:hover {
+          background-color: #fff;
           background-repeat: no-repeat;
-          background-position: center;
-          background-color: #F3F3F3;
-        }
-
-        &.visited {
-          background-color: #F3F3F3;
-
-          &:hover {
-            background-position: center center;
-          }
+          background-position: center 10px;
         }
 
         &.active {
-          border-color: $border-color;
-          @include box-shadow(0 2px 0 #fff);
           background-color: #fff;
           z-index: 9;
 
+          // &:after {
+          //   content: '▲';
+          //   position: absolute;
+          //   top: 28px;
+          //   left: 50%;
+          //   z-index: 9999;
+          //   margin-left: -5px;
+          //   font-size: 12px;
+          //   color: #aaa;
+          // }
+
           &:hover {
-            background-position: center;
             background-color: #fff;
+            background-repeat: no-repeat;
+            background-position: center 10px;
           }
         }
 
@@ -171,20 +209,24 @@ nav.sequence-nav {
   }
 
   ul {
+    position: absolute;
+    top: 0;
     list-style: none;
     height: 100%;
-    position: absolute;
     right: 0;
     top: 0;
-    width: flex-grid(1, 9);
-    border: 1px solid $border-color;
-    border-bottom: 0;
-    @include border-radius(3px 3px 0 0);
+    width: 100%;
+    margin: 0;
+    border: none;
 
     li {
-      float: left;
+      position: absolute;
       margin-bottom: 0;
-      width: 50%;
+      height: 44px;
+      width: 70px;
+      border: 1px solid #ccc;
+      @include linear-gradient(top, #eee, #ddd);
+      @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
 
       &.prev, &.next {
 
@@ -192,14 +234,13 @@ nav.sequence-nav {
           background-position: center;
           background-repeat: no-repeat;
           display: block;
-          height: 10px;
-          padding: 15px 0 14px;
+          height: 34px;
+          width: 40px;
           text-indent: -9999px;
           @include transition(all, .2s, $ease-in-out-quad);
 
           &:hover {
             opacity: .5;
-            background-color: #f4f4f4;
           }
 
           &.disabled {
@@ -210,15 +251,23 @@ nav.sequence-nav {
       }
 
       &.prev {
+        left: -10px;
+        border-radius: 35px 0 0 35px;
+
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
+          background-position: center 15px;
         }
       }
 
       &.next {
+        right: -10px;
+        border-radius: 0 35px 35px 0;
+
         a {
-          border-left: 1px solid lighten($border-color, 10%);
+          margin-left: 30px;
           background-image: url('../images/sequence-nav/next-icon.png');
+          background-position: center 15px;
         }
       }
     }

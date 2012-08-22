@@ -55,9 +55,14 @@ MITX_FEATURES = {
     # course_ids (see dev_int.py for an example)
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
+    # When True, will override certain branding with university specific values
+    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
+    # university to use for branding purposes
+    'SUBDOMAIN_BRANDING': False,
+
     # TODO: This will be removed once course-specific tabs are in place. see
     # courseware/courses.py
-    'ENABLE_SYLLABUS' : True, 
+    'ENABLE_SYLLABUS' : True,
 
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
@@ -66,7 +71,7 @@ MITX_FEATURES = {
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
-    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
+    'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -199,6 +204,11 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
 
+######################## subdomain specific settings ###########################
+COURSE_LISTINGS = {}
+SUBDOMAIN_BRANDING = {}
+
+
 ############################### XModule Store ##################################
 MODULESTORE = {
     'default': {
@@ -318,6 +328,7 @@ WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False # Don't allow anonymous access until the styling is figured out
+WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.has_perm('wiki.assign')
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

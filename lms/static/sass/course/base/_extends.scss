@@ -37,7 +37,7 @@ h1.top-header {
 .content {
   @include box-sizing(border-box);
   display: table-cell;
-  padding-right: lh();
+  padding: 2em 2.5em;
   vertical-align: top;
   width: flex-grid(9) + flex-gutter();
 
@@ -47,34 +47,28 @@ h1.top-header {
 }
 
 .sidebar {
-  border-right: 1px solid #C8C8C8;
   @include box-sizing(border-box);
   display: table-cell;
   font-family: $sans-serif;
+  font-size: 14px;
   position: relative;
   vertical-align: top;
   width: flex-grid(3);
-
-  &:after {
-    width: 1px;
-    height: 100%;
-    @include position(absolute,  0px -1px 0px 0);
-    content: "";
-    @include background-image(linear-gradient(top, #fff, rgba(#fff, 0)), linear-gradient(top, rgba(#fff, 0), #fff));
-    background-position: top, bottom;
-    @include background-size(1px 20px);
-    background-repeat: no-repeat;
-    display: block;
-  }
+  background: $sidebar-color;
 
   h1, h2 {
    font-size: em(20);
-   font-weight: 100;
+   font-weight: bold;
    letter-spacing: 0;
    text-transform: none;
    font-family: $sans-serif;
    text-align: left;
-   font-style: italic;
+   font-style: normal;
+  }
+
+  h1 {
+    font-size: 18px;
+    padding: 32px 26px 20px 26px;
   }
 
   a {
@@ -106,7 +100,7 @@ h1.top-header {
     }
 
     &.active {
-      @extend .bottom-border;
+      // @extend .bottom-border;
       color: #000;
       font-weight: bold;
 
@@ -122,7 +116,7 @@ h1.top-header {
     padding-left: 0;
 
     li {
-      @extend .bottom-border;
+      // @extend .bottom-border;
       @extend .clearfix;
       background: none;
       position: relative;

@@ -1,6 +1,12 @@
 section.course-index {
   @extend .sidebar;
   @extend .tran;
+  @include border-radius(3px 0 0 3px);
+  border-right: 1px solid #ddd;
+
+  #open_close_accordion {
+    display: none;
+  }
 
   header {
     max-height: 47px;
@@ -11,10 +17,11 @@ section.course-index {
   }
 
   div#accordion {
+    width: auto;
+    font-size: 14px;
+
     h3 {
       @include border-radius(0);
-      border-top: 1px solid lighten($border-color, 10%);
-      font-size: em(16, 18);
       margin: 0;
       overflow: hidden;
 
@@ -24,7 +31,6 @@ section.course-index {
 
       &:hover {
         color: #666;
-        background: #f6f6f6;
       }
 
       &.ui-state-hover {
@@ -40,6 +46,7 @@ section.course-index {
         a {
           @include border-radius(0);
           @include box-shadow(none);
+          padding-left: 19px;
         }
 
         &.ui-state-active {
@@ -52,9 +59,33 @@ section.course-index {
         }
 
         span.ui-icon {
+          left: 0;
           background-image: url("/static/images/ui-icons_222222_256x240.png");
           opacity: .3;
         }
+      }
+    }
+
+    .chapter {
+      width: 100%;
+      @include box-sizing(border-box);
+      padding: 11px 14px;
+      @include linear-gradient(top, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
+      background-color: #eee;
+      @include box-shadow(0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset);
+      @include transition(background-color .1s);
+
+      &:first-child {
+        border-radius: 3px 0 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 0 3px;
+        @include box-shadow(0 1px 0 #fff inset);
+      }
+
+      &:hover {
+        background-color: #fff
       }
     }
 
@@ -62,18 +93,16 @@ section.course-index {
       background: transparent;
       border: none;
       @include border-radius(0);
-      font-size: em(14, 18);
       margin: 0;
-      padding: 1em 1.5em;
+      padding: 9px 0 9px 9px;
 
       li {
         border-bottom: 0;
         @include border-radius(0);
-        margin-bottom: lh(.5);
+        margin-bottom: 4px;
 
         a {
           background: transparent;
-          border: 1px solid transparent;
           @include border-radius(4px);
           display: block;
           padding: 5px 36px 5px 10px;
@@ -84,39 +113,18 @@ section.course-index {
             font-weight: bold;
             font-family: $sans-serif;
             margin-bottom: 0;
+            line-height: 1.3;
 
             span.subtitle {
               color: #666;
+              font-size: 13px;
               font-weight: normal;
               display: block;
             }
-          }
-
-          &:after {
-            background: transparent;
-            border-right: 1px solid rgb(180,180,180);
-            border-top: 1px solid rgb(180,180,180);
-            content: "";
-            display: block;
-            height: 12px;
-            margin-top: -6px;
-            opacity: 0;
-            position: absolute;
-            right: 30px;
-            top: 50%;
-            @include transform(rotate(45deg));
-            width: 12px;
-          }
+          }          
 
           &:hover {
-            @include background-image(linear-gradient(-90deg, rgba(245,245,245, 0.4), rgba(230,230,230, 0.4)));
-            border-color: rgb(200,200,200);
-
-            &:after {
-              opacity: 1;
-              right: 15px;
-              @include transition();
-            }
+            background: rgba(0, 0, 0, .1);
 
             > a p {
               color: #333;
@@ -136,8 +144,23 @@ section.course-index {
         &.active {
           font-weight: bold;
 
+          &:after {
+            content: '›';
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            margin-top: -13px;
+            font-size: 30px;
+            font-weight: normal;
+            color: #333;
+            opacity: 0;
+            @include transition();
+          }
+
           > a {
-            border-color: rgb(200,200,200);
+            border: 1px solid #bbb;
+            @include box-shadow(0 1px 0 rgba(255, 255, 255, .35) inset);
+            @include linear-gradient(top, #e6e6e6, #d6d6d6);
 
             &:after {
               opacity: 1;
