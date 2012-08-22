@@ -35,16 +35,16 @@
 
 
 
-    <div class="article-functions">
-      <div class="timestamp">
-        <span class="label">{% trans "Last modified:" %}</span><br />
-        <span class="date">{{ article.current_revision.modified }}</span>
-      </div>
+    <div class="article-functions">      
       <ul class="nav nav-tabs">
         {% with "settings" as selected %}
           {% include "wiki/includes/article_menu.html" %}
         {% endwith %}
       </ul>
+      <div class="timestamp">
+        <span class="label">{% trans "Last modified:" %}</span><br />
+        <span class="date">{{ article.current_revision.modified }}</span>
+      </div>
     </div>
   </div>
   

@@ -51,24 +51,24 @@
   {% endif %}
 
   <section class="container wiki {{ selected_tab }}">
+    <div class="wiki-wrapper">
+      {% block wiki_body %}
+        
+        {% block wiki_breadcrumbs %}{% endblock %}
 
-    {% block wiki_body %}
-      
-      {% block wiki_breadcrumbs %}{% endblock %}
-
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            <a class="close" data-dismiss="alert" href="#">&times;</a>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-      
-      {% block wiki_contents %}{% endblock %}
-      
-    {% endblock %}
-
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              <a class="close" data-dismiss="alert" href="#">&times;</a>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+        
+        {% block wiki_contents %}{% endblock %}
+        
+      {% endblock %}
+    </div>
   </section>
 
 {% endblock %}
