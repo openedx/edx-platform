@@ -1,22 +1,32 @@
-if not @Discussion?
-  @Discussion = {}
+class @DiscussionUtil
 
-Discussion = @Discussion
+  @wmdEditors: {}
 
-wmdEditors = {}
+  @getTemplate: (id) ->
+    $("script##{id}").html()
 
-@Discussion = $.extend @Discussion,
+  @getDiscussionData: (id) ->
+    return $$discussion_data[id]
 
-  generateLocal: (elem) ->
-    (selector) -> $(elem).find(selector)
+  @addContent: (id, content) -> window.$$contents[id] = content
 
-  generateDiscussionLink: (cls, txt, handler) ->
+  @getContent: (id) -> window.$$contents[id]
+
+  @addDiscussion: (id, discussion) -> window.$$discussions[id] = discussion
+
+  @getDiscussion: (id) -> window.$$discussions[id]
+  
+  @bulkUpdateContentInfo: (infos) ->
+    for id, info of infos
+      @getContent(id).updateInfo(info)
+
+  @generateDiscussionLink: (cls, txt, handler) ->
     $("<a>").addClass("discussion-link")
             .attr("href", "javascript:void(0)")
             .addClass(cls).html(txt)
             .click -> handler(this)
     
-  urlFor: (name, param, param1, param2) ->
+  @urlFor: (name, param, param1, param2) ->
     {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
@@ -48,7 +58,7 @@ wmdEditors = {}
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
     }[name]
 
-  safeAjax: (params) ->
+  @safeAjax: (params) ->
     $elem = params.$elem
     if $elem.attr("disabled")
       return
@@ -56,17 +66,31 @@ wmdEditors = {}
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
 
-  handleAnchorAndReload: (response) ->
-    #window.location = window.location.pathname + "#" + response['id']
-    window.location.reload()
+  @get: ($elem, url, data, success) ->
+    @safeAjax
+      $elem: $elem
+      url: url
+      type: "GET"
+      dataType: "json"
+      data: data
+      success: success
 
-  bindLocalEvents: ($local, eventsHandler) ->
+  @post: ($elem, url, data, success) ->
+    @safeAjax
+      $elem: $elem
+      url: url
+      type: "POST"
+      dataType: "json"
+      data: data
+      success: success
+
+  @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
       $local(selector).unbind(event)[event] handler
 
-  tagsInputOptions: ->
-    autocomplete_url: Discussion.urlFor('tags_autocomplete')
+  @tagsInputOptions: ->
+    autocomplete_url: @urlFor('tags_autocomplete')
     autocomplete:
       remoteDataType: 'json'
     interactive: true
@@ -75,23 +99,7 @@ wmdEditors = {}
     defaultText: "Tag your post: press enter after each tag"
     removeWithBackspace: true
 
-  isSubscribed: (id, type) ->
-    $$user_info? and (
-      if type == "thread"
-        id in $$user_info.subscribed_thread_ids
-      else if type == "commentable" or type == "discussion"
-        id in $$user_info.subscribed_commentable_ids
-      else
-        id in $$user_info.subscribed_user_ids
-    )
-
-  isUpvoted: (id) ->
-    $$user_info? and (id in $$user_info.upvoted_ids)
-
-  isDownvoted: (id) ->
-    $$user_info? and (id in $$user_info.downvoted_ids)
-
-  formErrorHandler: (errorsField) ->
+  @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
       response = JSON.parse(xhr.responseText)
       if response.errors? and response.errors.length > 0
@@ -99,13 +107,13 @@ wmdEditors = {}
         for error in response.errors
           errorsField.append($("<li>").addClass("new-post-form-error").html(error))
 
-  clearFormErrors: (errorsField) ->
+  @clearFormErrors: (errorsField) ->
     errorsField.empty()
     
-  postMathJaxProcessor: (text) ->
+  @postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
     RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g
-    Discussion.processEachMathAndCode text, (s, type) ->
+    @processEachMathAndCode text, (s, type) ->
       if type == 'display'
         s.replace RE_DISPLAYMATH, ($0, $1) ->
           "\\[" + $1 + "\\]"
@@ -115,61 +123,43 @@ wmdEditors = {}
       else
         s
 
-  makeWmdEditor: ($content, $local, cls_identifier) ->
+  @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
     id = $content.attr("_id")
     appended_id = "-#{cls_identifier}-#{id}"
-    imageUploadUrl = Discussion.urlFor('upload')
-    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, Discussion.postMathJaxProcessor
-    wmdEditors["#{cls_identifier}-#{id}"] = editor
+    imageUploadUrl = @urlFor('upload')
+    _processor = (_this) ->
+      (text) -> _this.postMathJaxProcessor(text)
+    editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, _processor(@)
+    @wmdEditors["#{cls_identifier}-#{id}"] = editor
     editor
 
-  getWmdEditor: ($content, $local, cls_identifier) ->
+  @getWmdEditor: ($content, $local, cls_identifier) ->
     id = $content.attr("_id")
-    wmdEditors["#{cls_identifier}-#{id}"]
+    @wmdEditors["#{cls_identifier}-#{id}"]
 
-  getWmdInput: ($content, $local, cls_identifier) ->
+  @getWmdInput: ($content, $local, cls_identifier) ->
     id = $content.attr("_id")
     $local("#wmd-input-#{cls_identifier}-#{id}")
 
-  getWmdContent: ($content, $local, cls_identifier) ->
-    Discussion.getWmdInput($content, $local, cls_identifier).val()
+  @getWmdContent: ($content, $local, cls_identifier) ->
+    @getWmdInput($content, $local, cls_identifier).val()
 
-  setWmdContent: ($content, $local, cls_identifier, text) ->
-    Discussion.getWmdInput($content, $local, cls_identifier).val(text)
-    Discussion.getWmdEditor($content, $local, cls_identifier).refreshPreview()
+  @setWmdContent: ($content, $local, cls_identifier, text) ->
+    @getWmdInput($content, $local, cls_identifier).val(text)
+    @getWmdEditor($content, $local, cls_identifier).refreshPreview()
 
-  getContentInfo: (id, attr) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    (window.$$annotated_content_info[id] || {})[attr]
-
-  setContentInfo: (id, attr, value) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info[id] ||= {}
-    window.$$annotated_content_info[id][attr] = value
-
-  extendContentInfo: (id, newInfo) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info[id] = newInfo
-  bulkExtendContentInfo: (newInfos) ->
-    if not window.$$annotated_content_info?
-      window.$$annotated_content_info = {}
-    window.$$annotated_content_info = $.extend window.$$annotated_content_info, newInfos
-
-  subscriptionLink: (type, id) ->
+  @subscriptionLink: (type, id) ->
     followLink = ->
-      Discussion.generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
+      @generateDiscussionLink("discussion-follow-#{type}", "Follow", handleFollow)
 
     unfollowLink = ->
-      Discussion.generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
+      @generateDiscussionLink("discussion-unfollow-#{type}", "Unfollow", handleUnfollow)
 
     handleFollow = (elem) ->
-      Discussion.safeAjax
+      @safeAjax
         $elem: $(elem)
-        url: Discussion.urlFor("follow_#{type}", id)
+        url: @urlFor("follow_#{type}", id)
         type: "POST"
         success: (response, textStatus) ->
           if textStatus == "success"
@@ -177,21 +167,21 @@ wmdEditors = {}
         dataType: 'json'
 
     handleUnfollow = (elem) ->
-      Discussion.safeAjax
+      @safeAjax
         $elem: $(elem)
-        url: Discussion.urlFor("unfollow_#{type}", id)
+        url: @urlFor("unfollow_#{type}", id)
         type: "POST"
         success: (response, textStatus) ->
           if textStatus == "success"
             $(elem).replaceWith followLink()
         dataType: 'json'
 
-    if Discussion.isSubscribed(id, type)
+    if @isSubscribed(id, type)
         unfollowLink()
     else
       followLink()
     
-  processEachMathAndCode: (text, processor) ->
+  @processEachMathAndCode: (text, processor) ->
   
     codeArchive = []
 
@@ -242,3 +232,18 @@ wmdEditors = {}
     text = $div.html()
 
     text
+
+  @unescapeHighlightTag: (text) ->
+    text.replace(/\&lt\;highlight\&gt\;/g, "<span class='search-highlight'>")
+        .replace(/\&lt\;\/highlight\&gt\;/g, "</span>")
+
+  @stripHighlight: (text) ->
+    text.replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, "")
+        .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, "")
+
+  @stripLatexHighlight: (text) ->
+    @processEachMathAndCode text, @stripHighlight
+
+  @markdownWithHighlight: (text) ->
+    converter = Markdown.getMathCompatibleConverter()
+    @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
