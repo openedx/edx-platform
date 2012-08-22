@@ -1,9 +1,8 @@
 class @Discussion extends Backbone.Collection
   model: Thread
-  initialize: ->
 
+  initialize: ->
     DiscussionUtil.addDiscussion @id, @
-    
     @bind "add", (item) =>
       item.discussion = @
 

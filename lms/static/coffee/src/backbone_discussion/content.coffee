@@ -80,7 +80,11 @@ class @ContentView extends Backbone.View
     comments_count: (comments_count) ->
       @$(".comments-count").html(comments_count)
       
-    subscribed: (subscribed) -> #later
+    subscribed: (subscribed) ->
+      if subscribed
+        @$(".discussion-follow-thread").addClass("discussion-unfollow-thread").html("Unfollow")
+      else
+        @$(".discussion-follow-thread").removeClass("discussion-unfollow-thread").html("Follow")
 
     ability: (ability) ->
       for action, elemSelector of @model.actions
@@ -114,7 +118,7 @@ class @ContentView extends Backbone.View
       @updateShowComments()
     else
       $elem = $.merge @$(".thread-title"), @$showComments()
-      url = @model.urlFor('retrieve_single_thread')
+      url = @model.urlFor('retrieve')
       DiscussionUtil.get $elem, url, (response, textStatus) =>
         @showed = true
         @updateShowComments()
@@ -219,6 +223,16 @@ class @ContentView extends Backbone.View
     DiscussionUtil.post $elem, url, data, (response, textStatus) =>
       @model.set('endorsed', not endorsed)
 
+  toggleFollow: (event) ->
+    $elem = $(event.target)
+    subscribed = @model.get('subscribed')
+    if subscribed
+      url = @model.urlFor('unfollow')
+    else
+      url = @model.urlFor('follow')
+    DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
+      @model.set('subscribed', not subscribed)
+
   toggleClosed: (event) ->
     $elem = $(event.target)
     url = @model.urlFor('close')
@@ -288,6 +302,7 @@ class @ContentView extends Backbone.View
       @model.get('thread').removeComment(@model)
       
   events:
+    "click .discussion-follow-thread": "toggleFollow"
     "click .thread-title": "toggleSingleThread"
     "click .discussion-show-comments": "toggleSingleThread"
     "click .discussion-reply-thread": "reply"
@@ -334,14 +349,16 @@ class @ContentView extends Backbone.View
     
 class @Thread extends @Content
   urlMappers:
-    'retrieve_single_thread': -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
-    'reply': -> DiscussionUtil.urlFor('create_comment', @id)
-    'unvote': -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
-    'upvote': -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
-    'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
-    'close': -> DiscussionUtil.urlFor('openclose_thread', @id)
-    'update': -> DiscussionUtil.urlFor('update_thread', @id)
-    'delete': -> DiscussionUtil.urlFor('delete_thread', @id)
+    'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+    'reply'    : -> DiscussionUtil.urlFor('create_comment', @id)
+    'unvote'   : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
+    'upvote'   : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
+    'downvote' : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
+    'close'    : -> DiscussionUtil.urlFor('openclose_thread', @id)
+    'update'   : -> DiscussionUtil.urlFor('update_thread', @id)
+    'delete'   : -> DiscussionUtil.urlFor('delete_thread', @id)
+    'follow'   : -> DiscussionUtil.urlFor('follow_thread', @id)
+    'unfollow' : -> DiscussionUtil.urlFor('unfollow_thread', @id)
 
   initialize: ->
     @set('thread', @)
@@ -381,7 +398,6 @@ class @Comments extends Backbone.Collection
   model: Comment
 
   initialize: ->
-    
     @bind "add", (item) =>
       item.collection = @
 
