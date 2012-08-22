@@ -22,17 +22,27 @@ class @Content extends Backbone.Model
     @set('voted', info.voted)
     @set('subscribed', info.subscribed)
 
-  addComment: (comment) ->
+  addComment: (comment, options) ->
+    options ||= {}
+    if not options.silent
+      thread = @get('thread')
+      comments_count = parseInt(thread.get('comments_count'))
+      thread.set('comments_count', comments_count + 1)
     @get('children').push comment
     model = new Comment $.extend {}, comment, { thread: @get('thread') }
     @get('comments').add model
     model
 
+  removeComment: (comment) ->
+    thread = @get('thread')
+    comments_count = parseInt(thread.get('comments_count'))
+    thread.set('comments_count', comments_count - 1 - comment.getCommentsCount())
+
   resetComments: (children) ->
     @set 'children', []
     @set 'comments', new Comments()
     for comment in (children || [])
-      @addComment comment
+      @addComment comment, { silent: true }
 
   initialize: ->
     DiscussionUtil.addContent @id, @
@@ -66,6 +76,9 @@ class @ContentView extends Backbone.View
 
     votes_point: (votes_point) ->
       @$(".discussion-votes-point").html(votes_point)
+
+    comments_count: (comments_count) ->
+      @$(".comments-count").html(comments_count)
       
     subscribed: (subscribed) -> #later
 
@@ -270,8 +283,9 @@ class @ContentView extends Backbone.View
     if not c
       return
     $elem = $(event.target)
-    DiscussionUtil.post $elem, url, {}, (response, textStatus) => @$el.remove()
-    #TODO also do data-wise operation
+    DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
+      @$el.remove()
+      @model.get('thread').removeComment(@model)
       
   events:
     "click .thread-title": "toggleSingleThread"
@@ -353,6 +367,12 @@ class @Comment extends @Content
     thread_id = @get('thread').id
     discussion_id = @get('thread').get('commentable_id')
     return Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, @id)
+
+  getCommentsCount: ->
+    count = 0
+    @get('comments').each (comment) ->
+      count += comment.getCommentsCount() + 1
+    count
 
 class @CommentView extends @ContentView
 
