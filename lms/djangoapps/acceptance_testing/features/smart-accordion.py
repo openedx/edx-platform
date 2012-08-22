@@ -5,6 +5,7 @@ import logging
 import nose.tools
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
+import re
 
 ## imported from lms/djangoapps/courseware/courses.py
 from collections import defaultdict
@@ -27,21 +28,55 @@ from courseware.access import has_access
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 from courses import *
-
+import os.path
+import sys
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+if not path in sys.path:
+    sys.path.insert(1, path)
+del path
+from helpers import *
+	
 
 @step(u'I verify all the content of each course')
 def i_verify_all_the_content_of_each_course(step):
-	courses = get_courses()
-	for course in courses:
-		browse_course(course)
+	all_possible_courses = get_courses()
+	ids = [c.id for c in all_possible_courses]
+	registered_courses = len(world.browser.find_elements_by_class_name("my-course"))
+	if len(all_possible_courses) < registered_courses:
+		assert False, "user is registered for more courses than are uniquely posssible"
+	else:
+		pass
+	i = 0
+	while i < registered_courses:
+		world.browser.find_element_by_xpath("//section[@class='my-courses']//article["+str(i+1)+"]//a").click()
+		wait_until_class_renders('my-courses',1)
+		current_course = re.sub('/info','',re.sub('.*/courses/','',world.browser.current_url))
+		validate_course(current_course,ids)
+		
+
+		#
+		#validate_course_content(current_course)
+		#
 
 
-		## click on a course i'm rgistered for
+
+		world.browser.find_element_by_xpath("//a[@class='user-link']").click()
+		i += 1
+
+
+
+#	courses = get_courses()
+#	for course in courses:
+#		browse_course(course)
+
+
+		## click on a course i'm registered for
 		## extract the course id from the url
 		## match it to the course id from get_courses() and then walkthrough
 
-def browse_course(step,course,base_url="http://localhost:8000"):
-	for course in courses:
+def browse_course(course_id):
+	course = get_course_by_id(course_id)
+	
 		chapters = course.get_children()
 		world.browser.get(base_url+'/courses/'+course+'/courseware')
 		wait_until_id_renders('accordion',2)
@@ -62,4 +97,12 @@ def browse_course(step,course,base_url="http://localhost:8000"):
 				while j < len(sections):
 					section = sections[j]
 
-					course.id -> course url betwen /courses/(.*)/info
+				#	course.id -> course url betwen /courses/(.*)/info
+					j += 1
+
+
+def validate_course(current_course, ids):
+	try:
+		ids.index(current_course)
+	except:	
+		assert False, "invalid course id"
