@@ -126,6 +126,8 @@ if settings.COURSEWARE_ENABLED:
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
+            'courseware.views.syllabus', name="syllabus"), # TODO arjun remove when custom tabs in place, see courseware/courses.py
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
             'staticbook.views.index', name="book"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
@@ -147,12 +149,23 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'courseware.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'courseware.views.grade_summary', name='grade_summary'),
 
     )
+
+    # discussion forums live within courseware, so courseware must be enabled first
+    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+                'courseware.views.news', name="news"),
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
+                include('django_comment_client.urls'))
+            )
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
@@ -189,6 +202,8 @@ if settings.ASKBOT_ENABLED:
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
 
+
+
 if settings.DEBUG:
     ## Jasmine
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
@@ -204,11 +219,14 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^gitreload$', 'lms_migration.migrate.gitreload'),
+        url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
         )
 
 if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += (
         url(r'^event_logs$', 'track.views.view_tracking_log'),
+        url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
         )
 
 urlpatterns = patterns(*urlpatterns)

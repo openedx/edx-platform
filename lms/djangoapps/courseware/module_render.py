@@ -70,7 +70,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
     None if this is not the case.
     '''
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course, depth=2)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        course_id, user, course, depth=2)
     course = get_module(user, request, course.location, student_module_cache, course_id)
 
     chapters = list()
@@ -159,13 +160,15 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     shared_module = None
     if user.is_authenticated():
         if descriptor.stores_state:
-            instance_module = student_module_cache.lookup(descriptor.category,
-                                                  descriptor.location.url())
+            instance_module = student_module_cache.lookup(
+                course_id, descriptor.category, descriptor.location.url())
 
         shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
-            shared_module = student_module_cache.lookup(descriptor.category,
+            shared_module = student_module_cache.lookup(course_id,
+                                                        descriptor.category,
                                                         shared_state_key)
+
 
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
@@ -240,7 +243,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
 
     return module
 
-def get_instance_module(user, module, student_module_cache):
+def get_instance_module(course_id, user, module, student_module_cache):
     """
     Returns instance_module is a StudentModule specific to this module for this student,
         or None if this is an anonymous user
@@ -251,11 +254,12 @@ def get_instance_module(user, module, student_module_cache):
                           + str(module.id) + " which does not store state.")
             return None
 
-        instance_module = student_module_cache.lookup(module.category,
-                                              module.location.url())
+        instance_module = student_module_cache.lookup(
+            course_id, module.category, module.location.url())
 
         if not instance_module:
             instance_module = StudentModule(
+                course_id=course_id,
                 student=user,
                 module_type=module.category,
                 module_state_key=module.id,
@@ -284,6 +288,7 @@ def get_shared_instance_module(course_id, user, module, student_module_cache):
                                                         shared_state_key)
             if not shared_module:
                 shared_module = StudentModule(
+                    course_id=course_id,
                     student=user,
                     module_type=descriptor.category,
                     module_state_key=shared_state_key,
@@ -316,14 +321,14 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
         user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
     instance = get_module(user, request, id, student_module_cache, course_id)
     if instance is None:
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
-    instance_module = get_instance_module(user, instance, student_module_cache)
+    instance_module = get_instance_module(course_id, user, instance, student_module_cache)
 
     if instance_module is None:
         log.debug("Couldn't find instance of module '%s' for user '%s'", id, user)
@@ -369,7 +374,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # ''' (fix emacs broken parsing)
 
     # Check for submitted files and basic file size checks
-    p = request.POST.dict()
+    p = request.POST.copy()
     if request.FILES:
         for fileinput_id in request.FILES.keys():
             inputfiles = request.FILES.getlist(fileinput_id)
@@ -386,7 +391,7 @@ def modx_dispatch(request, dispatch, location, course_id):
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
         request.user, modulestore().get_instance(course_id, location))
 
     instance = get_module(request.user, request, location, student_module_cache, course_id)
@@ -396,7 +401,7 @@ def modx_dispatch(request, dispatch, location, course_id):
         log.debug("No module {0} for user {1}--access denied?".format(location, user))
         raise Http404
 
-    instance_module = get_instance_module(request.user, instance, student_module_cache)
+    instance_module = get_instance_module(course_id, request.user, instance, student_module_cache)
     shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
 
     # Don't track state for anonymous users (who don't have student modules)

@@ -1,0 +1,16 @@
+<%namespace name="renderer" file="_thread.html"/>
+
+<section class="discussion user-active-discussion">
+
+  <div class="discussion-non-content discussion-local"></div>
+
+  <div class="threads">
+    % for thread in threads:
+      ${renderer.render_thread(course_id, thread, show_comments=True)}
+    % endfor
+  </div>
+
+  <%include file="_paginator.html" />
+</section>
+
+<%include file="_js_data.html" />

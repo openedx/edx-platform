@@ -1,0 +1,23 @@
+<%! from django_comment_client.utils import pluralize %>
+<%! from django_comment_client.permissions import has_permission, check_permissions_by_view %>
+<%! from operator import attrgetter %>
+
+
+<div class="user-profile">
+  <%
+    role_names = sorted(map(attrgetter('name'), django_user.roles.all()))
+  %>
+  <div class="sidebar-username">${django_user.username}</div>
+  <div class="sidebar-user-roles">
+    ${", ".join(role_names)}
+  </div>
+  <div class="sidebar-threads-count"><span>${profiled_user['threads_count']}</span> ${pluralize('discussion', profiled_user['threads_count'])} started</div>
+  <div class="sidebar-comments-count"><span>${profiled_user['comments_count']}</span> ${pluralize('comment', profiled_user['comments_count'])}</div>
+  % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
+    % if "Moderator" in role_names:
+      <a href="javascript:void(0)" class="sidebar-revoke-moderator-button">Revoke Moderator provileges</a>
+    % else:
+      <a href="javascript:void(0)" class="sidebar-promote-moderator-button">Promote to Moderator</a>
+    % endif
+  % endif
+</div>

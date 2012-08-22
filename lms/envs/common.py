@@ -30,10 +30,11 @@ import djcelery
 from path import path
 
 from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -54,8 +55,13 @@ MITX_FEATURES = {
     # course_ids (see dev_int.py for an example)
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
+    # TODO: This will be removed once course-specific tabs are in place. see
+    # courseware/courses.py
+    'ENABLE_SYLLABUS' : True, 
+
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : True,
+    'ENABLE_DISCUSSION' : False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
@@ -258,6 +264,14 @@ USE_L10N = True
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+#################################### GITHUB #######################################
+# gitreload is used in LMS-workflow to pull content from github
+# gitreload requests are only allowed from these IP addresses, which are
+# the advertised public IPs of the github WebHook servers.
+# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+
+ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
+
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that
@@ -303,6 +317,7 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
+WIKI_ANONYMOUS = False # Don't allow anonymous access until the styling is figured out
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -328,6 +343,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -350,6 +366,9 @@ MIDDLEWARE_CLASSES = (
     'askbot.middleware.spaceless.SpacelessMiddleware',
     # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'django_comment_client.utils.ViewNameMiddleware',
+    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -564,12 +583,15 @@ INSTALLED_APPS = (
     'course_wiki', # Our customizations
     'mptt',
     'sekizai',
-    'wiki.plugins.attachments',
+    #'wiki.plugins.attachments',
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
     # For testing
     'django_jasmine',
+
+    # Discussion
+    'django_comment_client',
 
     # For Askbot
     'django.contrib.sitemaps',
