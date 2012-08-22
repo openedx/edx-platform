@@ -120,7 +120,7 @@ class @ContentView extends Backbone.View
     else
       $elem = $.merge @$(".thread-title"), @$showComments()
       url = @model.urlFor('retrieve')
-      DiscussionUtil.get $elem, url, (response, textStatus) =>
+      DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
         @showed = true
         @updateShowComments()
         @$showComments().addClass("retrieved")
@@ -183,8 +183,8 @@ class @ContentView extends Backbone.View
         @$el.children(".comments").prepend $comment
         DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "reply-body", ""
         comment = @model.addComment response.content
-        comment.updateInfo response.annotated_content_info
         commentView = new CommentView el: $comment[0], model: comment
+        comment.updateInfo response.annotated_content_info
         @cancelReply()
 
   cancelReply: ->
@@ -320,6 +320,11 @@ class @ContentView extends Backbone.View
     @$local = @$el.children(".local")
     @$delegateElement = @$local
 
+  initTitle: ->
+    $contentTitle = @$(".thread-title")
+    if $contentTitle.length
+      $contentTitle.html DiscussionUtil.unescapeHighlightTag DiscussionUtil.stripLatexHighlight $contentTitle.html()
+
   initBody: ->
     $contentBody = @$(".content-body")
     $contentBody.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight $contentBody.html()
@@ -344,8 +349,8 @@ class @ContentView extends Backbone.View
     @initBindings()
     @initLocal()
     @initTimeago()
+    @initTitle()
     @initBody()
-    #@initPermalink()
     @initCommentViews()
     
 class @Thread extends @Content

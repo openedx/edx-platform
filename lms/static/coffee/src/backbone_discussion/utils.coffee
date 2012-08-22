@@ -70,12 +70,13 @@ class @DiscussionUtil
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
 
-  @get: ($elem, url, success) ->
+  @get: ($elem, url, data, success) ->
     @safeAjax
       $elem: $elem
       url: url
       type: "GET"
       dataType: "json"
+      data: data
       success: success
 
   @post: ($elem, url, data, success) ->

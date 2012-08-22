@@ -9,6 +9,12 @@ class @Discussion extends Backbone.Collection
   find: (id) ->
     _.first @where(id: id)
 
+  addThread: (thread, options) ->
+    options ||= {}
+    model = new Thread thread
+    @add model
+    model
+
 class @DiscussionModuleView extends Backbone.View
 
 class @DiscussionView extends Backbone.View
@@ -34,7 +40,7 @@ class @DiscussionView extends Backbone.View
 
   reload: ($elem, url) ->
     if not url then return
-    DiscussionUtil.get $elem, url, (response, textStatus) =>
+    DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
       $discussion = $(response.html)
       $parent = @$el.parent()
       @$el.replaceWith($discussion)
@@ -42,9 +48,104 @@ class @DiscussionView extends Backbone.View
       view = new DiscussionView el: $discussion[0], model: @model
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
 
+  loadSimilarPost: (event) ->
+    console.log "loading"
+    $title = @$(".new-post-title")
+    $wrapper = @$(".new-post-similar-posts-wrapper")
+    $similarPosts = @$(".new-post-similar-posts")
+    prevText = $title.attr("prev-text")
+    text = $title.val()
+    if text == prevText
+      if @$(".similar-post").length
+        $wrapper.show()
+    else if $.trim(text).length
+      $elem = $(event.target)
+      url = DiscussionUtil.urlFor 'search_similar_threads', @model.id
+      data = { text: @$(".new-post-title").val() }
+      DiscussionUtil.get $elem, url, data, (response, textStatus) =>
+        console.log response
+        $similarPosts.empty()
+        if $.type(response) == "array" and response.length
+          $wrapper.show()
+          for thread in response
+            $similarPost = $("<a>").addClass("similar-post")
+                                   .html(thread["title"])
+                                   .attr("href", "javascript:void(0)") #TODO
+                                   .appendTo($similarPosts)
+        else
+          $wrapper.hide()
+    else
+      $wrapper.hide()
+    $title.attr("prev-text", text)
+
+
   newPost: ->
+    if not @$(".wmd-panel").length
+      view = { discussion_id: @model.id }
+      @$el.children(".discussion-non-content").append Mustache.render DiscussionUtil.getTemplate("_new_post"), view
+      $newPostBody = @$(".new-post-body")
+      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
+
+      $input = DiscussionUtil.getWmdInput @$el, $.proxy(@$, @), "new-post-body"
+      $input.attr("placeholder", "post a new topic...")
+      if @$el.hasClass("inline-discussion")
+        $input.bind 'focus', (e) =>
+          @$(".new-post-form").removeClass('collapsed')
+      else if @$el.hasClass("forum-discussion")
+        @$(".new-post-form").removeClass('collapsed')
+
+      @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
+
+      @$(".new-post-title").blur $.proxy(@loadSimilarPost, @)
+
+      @$(".hide-similar-posts").click =>
+        @$(".new-post-similar-posts-wrapper").hide()
+
+      @$(".discussion-submit-post").click $.proxy(@submitNewPost, @)
+      @$(".discussion-cancel-post").click $.proxy(@cancelNewPost, @)
+      
+
+    @$(".new-post-form").show()
+
+  submitNewPost: (event) ->
+    title = @$(".new-post-title").val()
+    body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "new-post-body"
+    tags = @$(".new-post-tags").val()
+    url = DiscussionUtil.urlFor('create_thread', @model.id)
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        title: title
+        body: body
+        tags: tags
+      error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
+      success: (response, textStatus) =>
+        DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
+        $thread = $(response.html)
+        @$el.children(".threads").prepend($thread)
+
+        @$(".new-post-title").val("")
+        DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
+        @$(".new-post-tags").val("")
+        @$(".new-post-tags").importTags("")
+
+        thread = @model.addThread response.content
+        threadView = new ThreadView el: $thread[0], model: thread
+        thread.updateInfo response.annotated_content_info
+        @cancelNewPost()
+        
+
+  cancelNewPost: (event) ->
+    if @$el.hasClass("inline-discussion")
+      @$(".new-post-form").addClass("collapsed")
+    else if @$el.hasClass("forum-discussion")
+      @$(".new-post-form").hide()
 
   search: (event) ->
+    event.preventDefault()
     $elem = $(event.target)
     url = URI($elem.attr("action")).addSearch({text: @$(".search-input").val()})
     @reload($elem, url)
