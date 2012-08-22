@@ -16,9 +16,12 @@
         {% if selected_tab != "edit" %}
           <h1>{{ article.current_revision.title }}</h1>
           
+          {% comment %}
+          This has been disabled until we can style it.
           {% if urlpath %}
             <a href="{% url 'wiki:dir' path=urlpath.path %}">Show all children</a>
           {% endif %}
+          {% endcomment %}
         {% endif %}
         
         {% block wiki_contents_tab %}
