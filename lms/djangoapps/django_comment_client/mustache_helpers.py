@@ -6,9 +6,9 @@ import inspect
 def pluralize(content, text):
     num, word = text.split(' ')
     if int(num or '0') >= 2:
-        return num + ' ' + word + 's'
+        return word + 's'
     else:
-        return num + ' ' + word
+        return word
 
 def url_for_user(content, user_id):
     return urlresolvers.reverse('django_comment_client.forum.views.user_profile', args=[content['course_id'], user_id])

@@ -40,13 +40,13 @@
               <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
-          <div class="comment-count">
+          <div class="show-comments-wrapper">
             {{#thread}}
               {{#partial_comments}}
-                <a href="javascript:void(0)" class="discussion-show-comments first-time">Show all comments ({{content.comments_count}} total)</a>
+                <a href="javascript:void(0)" class="discussion-show-comments first-time">Show all comments (<span class="comments-count">{{content.comments_count}}</span> total)</a>
               {{/partial_comments}}
               {{^partial_comments}}
-                <a href="javascript:void(0)" class="discussion-show-comments">Show {{##pluralize}}{{content.comments_count}} comment{{/pluralize}}</a>
+                <a href="javascript:void(0)" class="discussion-show-comments">Show <span class="comments-count">{{content.comments_count}}</span> {{##pluralize}}{{content.comments_count}} comment{{/pluralize}}</a>
               {{/partial_comments}}
             {{/thread}}
           </div>
