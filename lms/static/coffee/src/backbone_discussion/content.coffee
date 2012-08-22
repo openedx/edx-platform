@@ -87,7 +87,6 @@ class @ContentView extends Backbone.View
         @$(".discussion-follow-thread").removeClass("discussion-unfollow-thread").html("Follow")
 
     ability: (ability) ->
-      console.log "triggered"
       for action, elemSelector of @model.actions
         if not ability[action]
           @$(elemSelector).parent().remove()
