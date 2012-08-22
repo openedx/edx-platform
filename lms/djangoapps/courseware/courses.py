@@ -13,6 +13,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
+import branding
 
 log = logging.getLogger(__name__)
 
@@ -141,9 +142,10 @@ def get_course_info_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
+
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.
 #       arjun will address this by the end of October if no one does so prior to
-#       then. 
+#       then.
 def get_course_syllabus_section(course, section_key):
     """
     This returns the snippet of html to be rendered on the syllabus page,
@@ -178,24 +180,11 @@ def get_courses_by_university(user, domain=None):
     '''
     # TODO: Clean up how 'error' is done.
     # filter out any courses that errored.
-    courses = [c for c in modulestore().get_courses()
-               if isinstance(c, CourseDescriptor)]
-    courses = sorted(courses, key=lambda course: course.number)
-
-    if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-        subdomain = domain.split(".")[0]
-        if subdomain not in settings.COURSE_LISTINGS:
-            subdomain = 'default'
-        visible_courses = frozenset(settings.COURSE_LISTINGS[subdomain])
-    else:
-        visible_courses = frozenset(c.id for c in courses)
+    visible_courses = branding.get_visible_courses(domain)
 
     universities = defaultdict(list)
-    for course in courses:
+    for course in visible_courses:
         if not has_access(user, course, 'see_exists'):
-            continue
-        if course.id not in visible_courses:
             continue
         universities[course.org].append(course)
     return universities
-
