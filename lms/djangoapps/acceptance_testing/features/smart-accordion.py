@@ -51,54 +51,51 @@ def i_verify_all_the_content_of_each_course(step):
 		world.browser.find_element_by_xpath("//section[@class='my-courses']//article["+str(i+1)+"]//a").click()
 		wait_until_class_renders('my-courses',1)
 		current_course = re.sub('/info','',re.sub('.*/courses/','',world.browser.current_url))
+		
 		validate_course(current_course,ids)
 		
-
-		#
-		#validate_course_content(current_course)
-		#
-
-
+		world.browser.find_element_by_link_text('Courseware').click()
+		wait_until_id_renders('accordion',2)
+		browse_course(current_course)
 
 		world.browser.find_element_by_xpath("//a[@class='user-link']").click()
 		i += 1
 
 
 
-#	courses = get_courses()
-#	for course in courses:
-#		browse_course(course)
-
-
-		## click on a course i'm registered for
-		## extract the course id from the url
-		## match it to the course id from get_courses() and then walkthrough
 
 def browse_course(course_id):
-	course = get_course_by_id(course_id)
-	
-		chapters = course.get_children()
-		world.browser.get(base_url+'/courses/'+course+'/courseware')
-		wait_until_id_renders('accordion',2)
-		rendered_chapters = len(world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//h3"))
-		assert rendered_chapters == len(chapters)
-		i = 0
-		while i < len(chapters):
-			world.browser.find_element_by_xpath("//*[@id='accordion']//nav//h3["+str(i+1)+"]").click()
-			sections = chapter.get_children()
-			accordion_class = "ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active"
-			rendered_sections = world.browser.find_element_by_xpath("//*[@id='accordion']//nav//ul[@class='"+accordion_class+"']//li")
-			assert rendered_sections == len(sections)
-			i += 1
-			if world.browser.find_element_by_xpath("//section[@class='outside-app']"):
-				assert False
-			else:
-				j = 0
-				while j < len(sections):
-					section = sections[j]
+	world.browser.find_element_by_xpath("//div[@id='accordion']//nav//div[1]").click()
 
-				#	course.id -> course url betwen /courses/(.*)/info
-					j += 1
+	wait_until_id_renders('accordion',2)
+	chapters = get_courseware_with_tabs(course_id)
+	num_chapters = len(chapters)
+	rendered_chapters = len(world.browser.find_elements_by_class_name("chapter"))
+	
+	assert num_chapters == rendered_chapters, '%d chapters expected, %d chapters found on page' % (num_chapters, rendered_chapters)
+	
+	chapter_it = 0
+
+	## Iterate the chapters
+	while chapter_it < num_chapters:
+		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//h3").click()
+		
+		num_sections = len(chapters[chapter_it]['sections'])
+		accordion_class = "ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active"
+		rendered_sections = len(world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//ul//li"))
+		
+		assert num_sections == rendered_sections, '%d sections expected, %d sections found on page, iteration number %d' % (num_sections, rendered_sections, chapter_it)
+		
+		section_it = 0
+
+		## Iterate the sections
+		while section_it < num_sections:
+			world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div//ul[@class='"+accordion_class+"']//li["+str(section_it+1)+"]//a").click()
+			wait_until_class_renders('p',3)
+
+			chapter_it += 1
+			section_it += 1
+
 
 
 def validate_course(current_course, ids):
