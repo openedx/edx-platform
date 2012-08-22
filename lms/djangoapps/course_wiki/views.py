@@ -81,7 +81,7 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course.number,
-            content="{0}\n===\nThis is the wiki for **{1}**'s _{2}_.".format(course.number, course.org, course.title),
+            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.title),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,
