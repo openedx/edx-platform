@@ -757,6 +757,7 @@ section.wiki {
     th, td {
       border-bottom: 1px solid $light-gray;
       padding: 8px;
+      overflow: hidden;
     }
 
     tr:nth-child(even) {
@@ -858,6 +859,10 @@ section.wiki {
       left: 25px;
       font-size: 1.4em;
     }
+  }
+
+  section.delete {
+    padding: 40px;
   }
 
 
