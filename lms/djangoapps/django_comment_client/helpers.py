@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 from mustache_helpers import mustache_helpers
+from django.core.urlresolvers import reverse
 from functools import partial
 
 from utils import *
@@ -40,6 +41,12 @@ def render_content(content, additional_context={}):
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
         'raw_tags': ','.join(content.get('tags', [])),
     }
+    if content['type'] == 'thread':
+        content_info['permalink'] = reverse('django_comment_client.forum.views.single_thread',
+                                            args=[content['course_id'], content['commentable_id'], content['id']])
+    else:
+        content_info['permalink'] = reverse('django_comment_client.forum.views.single_thread',
+                                            args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
     context = {
         'content': merge_dict(content, content_info),
         content['type']: True,
