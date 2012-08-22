@@ -198,6 +198,10 @@ class CourseDescriptor(SequenceDescriptor):
         return time.strftime("%b %d, %Y", self.start)
 
     @property
+    def css_class(self):
+        return self.metadata.get('css_class', '')
+
+    @property
     def title(self):
         return self.display_name
 
