@@ -52,7 +52,9 @@
           </div>
           <ul class="discussion-actions">
             <li><a class="discussion-link discussion-reply discussion-reply-{{content.type}}" href="javascript:void(0)">Reply</a></li>
-            <li><div class="follow-wrapper"></div></li>
+            {{#thread}}
+              <li><div class="follow-wrapper"><a class="discussion-link discussion-follow-thread" href="javascript:void(0)">Follow</a></div></li>
+            {{/thread}}
             <li><a class="discussion-link discussion-permanent-link" href="javascript:void(0)">Permanent Link</a></li>
           </ul>
         </div>
