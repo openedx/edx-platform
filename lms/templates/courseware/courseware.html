@@ -1,15 +1,17 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
-<%block name="bodyclass">courseware</%block>
+<%block name="bodyclass">courseware ${course.css_class}</%block>
 <%block name="title"><title>${course.number} Courseware</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
+  <%include file="../discussion/_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.sequence.js')}"></script>
 
   ## codemirror
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
@@ -19,10 +21,10 @@
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
 
-   <%static:js group='courseware'/>
+  <%static:js group='courseware'/>
 
-  <%include file="../discussion/_js_dependencies.html" />
-  <%include file="/mathjax_include.html" />
+  <%include file="../discussion/_js_body_dependencies.html" />
+  
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">

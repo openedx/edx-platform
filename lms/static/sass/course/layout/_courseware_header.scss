@@ -1,8 +1,7 @@
 nav.course-material {
   @include clearfix;
   @include box-sizing(border-box);
-  background: #f6f6f6;
-  border-bottom: 1px solid rgb(200,200,200);
+  border-bottom: none;
   margin: 0px auto 0px;
   padding: 0px;
   width: 100%;
@@ -16,33 +15,37 @@ nav.course-material {
   ol.course-tabs {
     @include border-top-radius(4px);
     @include clearfix;
-    padding: 10px 0 0 0;
+    padding: 28px 0 10px 0;
+    margin-left: 10px;
 
     li {
       float: left;
       list-style: none;
+      margin-right: 6px;
 
       a {
-        color: darken($lighter-base-font-color, 20%);
+        border-radius: 3px;
+        color: #555;
         display: block;
         text-align: center;
-        padding: 8px 13px 12px;
+        padding: 10px 13px 12px;
         font-size: 14px;
-        font-weight: 400;
+        font-weight: bold;
         text-decoration: none;
-        text-shadow: 0 1px rgb(255,255,255);
+        // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
         &:hover {
-          color: $base-font-color;
+          color: #333;
+          background: rgba(255, 255, 255, .6);
         }
 
         &.active {
-          background: rgb(255,255,255);
-          border: 1px solid rgb(200,200,200);
-          border-bottom: 0px;
-          @include border-top-radius(4px);
-          @include box-shadow(0 2px 0 0 rgba(255,255,255, 1));
-          color: $blue;
+          // background: rgba(0, 0, 0, .2);
+          @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
+          background-color: transparent;
+          @include box-shadow(0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset);
+          color: #fff;
+          text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
         }
       }
     }
@@ -57,7 +60,48 @@ nav.course-material {
   }
 }
 
-.global {
+header.global.slim {
+  border-bottom: 1px solid $outer-border-color;
+  @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+  height: 50px;
+  @include linear-gradient(top, #fff, #eee);
+
+  .guest .secondary {
+    display: none;
+  }
+
+  nav {
+    padding-top: 5px;
+  }
+
+  h1.logo {    
+    margin-left: 13px;
+    margin-right: 20px;
+    padding-right: 20px;
+
+    &::before {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 40px;
+      position: absolute;
+      right: 3px;
+      top: -8px;
+      width: 1px;
+    }
+
+    &::after {
+      @extend .faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 40px;
+      position: absolute;
+      right: 0px;
+      top: -12px;
+      width: 1px;
+    }
+  }
+
   .find-courses-button {
     display: none;
   }
@@ -68,8 +112,9 @@ nav.course-material {
     float: left;
     font-size: 0.9em;
     font-weight: 600;
-    line-height: 40px;
+    color: #777;
     letter-spacing: 0;
+    margin-top: 9px;
     text-transform: none;
     text-shadow: 0 1px 0 #fff;
     white-space: nowrap;
@@ -79,7 +124,16 @@ nav.course-material {
     .provider {
       font: inherit;
       font-weight: bold;
-      color: #6d6d6d;
     }
+  }
+
+  a#signup {
+    position: relative;
+    margin-top: 4px;
+    padding: 6px 12px 8px;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0;
   }
 }

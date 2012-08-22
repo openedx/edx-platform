@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,10 +16,12 @@ from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
+from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 log = logging.getLogger("mitx.courseware")
@@ -73,6 +76,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         course_id, user, course, depth=2)
     course = get_module(user, request, course.location, student_module_cache, course_id)
+    if course is None:
+        return None
 
     chapters = list()
     for chapter in course.get_display_items():
@@ -131,9 +136,9 @@ def get_section(course_module, chapter, section):
 
     return section_module
 
-
 def get_module(user, request, location, student_module_cache, course_id, position=None):
-    ''' Get an instance of the xmodule class identified by location,
+    """
+    Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
     exists.
 
@@ -146,9 +151,22 @@ def get_module(user, request, location, student_module_cache, course_id, positio
       - position              : extra information from URL for user-specified
                                 position within module
 
-    Returns: xmodule instance
+    Returns: xmodule instance, or None if the user does not have access to the
+    module.  If there's an error, will try to return an instance of ErrorModule
+    if possible.  If not possible, return None.
+    """
+    try:
+        return _get_module(user, request, location, student_module_cache, course_id, position)
+    except:
+        # Something has gone terribly wrong, but still not letting it turn into a 500.
+        log.exception("Error in get_module")
+        return None
 
-    '''
+def _get_module(user, request, location, student_module_cache, course_id, position=None):
+    """
+    Actually implement get_module.  See docstring there for details.
+    """
+    location = Location(location)
     descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
@@ -198,7 +216,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
               'callback_url': xqueue_callback_url,
               'default_queuename': xqueue_default_queuename.replace(' ', '_')}
 
-    def _get_module(location):
+    def inner_get_module(location):
         """
         Delegate to get_module.  It does an access check, so may return None
         """
@@ -214,7 +232,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
                           xqueue=xqueue,
                           # TODO (cpennington): Figure out how to share info between systems
                           filestore=descriptor.system.resources_fs,
-                          get_module=_get_module,
+                          get_module=inner_get_module,
                           user=user,
                           # TODO (cpennington): This should be removed when all html from
                           # a module is coming through get_html and is therefore covered
@@ -226,7 +244,22 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
 
-    module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    try:
+        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    except:
+        log.exception("Error creating module from descriptor {0}".format(descriptor))
+
+        # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+        import_system = descriptor.system
+        if has_access(user, location, 'staff'):
+            err_descriptor = ErrorDescriptor.from_xml(str(descriptor), import_system,
+                                                      error_msg=exc_info_to_str(sys.exc_info()))
+        else:
+            err_descriptor = NonStaffErrorDescriptor.from_xml(str(descriptor), import_system,
+                                                              error_msg=exc_info_to_str(sys.exc_info()))
+
+        # Make an error module
+        return err_descriptor.xmodule_constructor(system)(None, None)
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
@@ -374,7 +407,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # ''' (fix emacs broken parsing)
 
     # Check for submitted files and basic file size checks
-    p = request.POST.dict()
+    p = request.POST.copy()
     if request.FILES:
         for fileinput_id in request.FILES.keys():
             inputfiles = request.FILES.getlist(fileinput_id)

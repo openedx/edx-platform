@@ -2,7 +2,9 @@
 
 <section class="discussion" _id="${discussion_id}">
   <a class="discussion-title" href="javascript:void(0)">Discussion</a>
-  ${renderer.render_content_with_comments(thread)}
+  <div class="threads">
+    ${renderer.render_content_with_comments(thread)}
+  </div>
 </section>
 
 <%include file="_js_data.html" />

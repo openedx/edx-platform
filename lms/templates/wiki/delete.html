@@ -5,6 +5,7 @@
 {% block pagetitle %}{% trans "Delete article" %}{% endblock %}
 
 {% block wiki_contents %}
+  <section class="delete">
   <h1 class="page-header">{% trans "Delete" %} "{{ article.current_revision.title }}"</h1>
   
   {% if cannot_delete_root %}
@@ -44,19 +45,20 @@
         $('#id_revision').val('{{ article.current_revision.id }}');
       </script>
       <div class="form-actions">
-          <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large">
-            <span class="icon-circle-arrow-left"></span>
-            {% trans "Go back" %}
-          </a>
           <button type="submit" name="save_changes" class="btn btn-danger btn-large">
             <span class="icon-plus"></span>
             {% trans "Delete article" %}
           </button>
+          <a href="{% url 'wiki:get' path=urlpath.path article_id=article.id %}" class="btn btn-large back">
+            <span class="icon-circle-arrow-left"></span>
+            {% trans "Go back" %}
+          </a>
       </div>  
     </form>
     {% endif %}
  
   {% endif %}
+  </section>
 
 {% endblock %}
 

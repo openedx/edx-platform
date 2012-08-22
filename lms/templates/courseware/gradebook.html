@@ -67,9 +67,9 @@
         <thead>
           <tr> <!-- Header Row -->
             %for section in templateSummary['section_breakdown']:
-              <th>${section['label']}</th>
+              <th><div class="assignment-label">${section['label']}</div></th>
             %endfor
-            <th>Total</th>
+            <th><div class="assignment-label">Total</div></th>
           </tr>
         </thead>
 

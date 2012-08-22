@@ -3,6 +3,7 @@ import time
 import logging
 import requests
 from lxml import etree
+from path import path # NOTE (THK): Only used for detecting presence of syllabus
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -60,6 +61,8 @@ class CourseDescriptor(SequenceDescriptor):
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
         self.textbooks = self.definition['data']['textbooks']
+        
+        self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
         msg = None
         if self.start is None:
@@ -74,6 +77,10 @@ class CourseDescriptor(SequenceDescriptor):
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
+
+        # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
+        #   disable the syllabus content for courses that do not provide a syllabus
+        self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
 
     def set_grading_policy(self, policy_str):
@@ -94,8 +101,19 @@ class CourseDescriptor(SequenceDescriptor):
         for textbook in xml_object.findall("textbook"):
             textbooks.append(cls.Textbook.from_xml_object(textbook))
             xml_object.remove(textbook)
+        
+        #Load the wiki tag if it exists
+        wiki_slug = None
+        wiki_tag = xml_object.find("wiki")
+        if wiki_tag is not None:
+            wiki_slug = wiki_tag.attrib.get("slug", default=None)
+            xml_object.remove(wiki_tag)
+        
         definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        
         definition.setdefault('data', {})['textbooks'] = textbooks
+        definition['data']['wiki_slug'] = wiki_slug
+        
         return definition
 
     def has_started(self):
@@ -197,16 +215,25 @@ class CourseDescriptor(SequenceDescriptor):
     def start_date_text(self):
         return time.strftime("%b %d, %Y", self.start)
 
+    # An extra property is used rather than the wiki_slug/number because
+    # there are courses that change the number for different runs. This allows
+    # courses to share the same css_class across runs even if they have
+    # different numbers.
+    # 
+    # TODO get rid of this as soon as possible or potentially build in a robust
+    # way to add in course-specific styling. There needs to be a discussion
+    # about the right way to do this, but arjun will address this ASAP. Also
+    # note that the courseware template needs to change when this is removed.
+    @property
+    def css_class(self):
+        return self.metadata.get('css_class', '')
+
     @property
     def title(self):
         return self.display_name
 
     @property
     def number(self):
-        return self.location.course
-
-    @property
-    def wiki_slug(self):
         return self.location.course
 
     @property
