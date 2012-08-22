@@ -214,42 +214,52 @@ class @ContentView extends Backbone.View
     DiscussionUtil.post $elem, url, data, (response, textStatus) =>
       @model.set('closed', not closed)
 
-  edit: ->
-    $local(".discussion-content-wrapper").hide()
-    $editView = $local(".discussion-content-edit")
+  edit: (event) ->
+    @$(".discussion-content-wrapper").hide()
+    $editView = @$(".discussion-content-edit")
     if $editView.length
       $editView.show()
     else
-      view = {
-        id: id
-        title: $local(".thread-raw-title").html()
-        body: $local(".thread-raw-body").html()
-        tags: $local(".thread-raw-tags").html()
-      }
-      @$discussionContent().append Mustache.render Discussion.editThreadTemplate, view
-      Discussion.makeWmdEditor $content, $local, "thread-body-edit"
-      $local(".thread-tags-edit").tagsInput Discussion.tagsInputOptions()
-      $local(".discussion-submit-update").unbind("click").click -> handleSubmitEditThread(this)
-      $local(".discussion-cancel-update").unbind("click").click -> handleCancelEdit(this)
+      view = {}
+      view.id = @model.id
+      if @model.get('type') == 'thread'
+        view.title = @$(".thread-raw-title").html()
+        view.body = @$(".thread-raw-body").html()
+        view.tags = @$(".thread-raw-tags").html()
+      else
+        view.body = @$(".comment-raw-body").html()
+      @$discussionContent().append Mustache.render DiscussionUtil.getTemplate("_edit_#{@model.get('type')}"), view
+      Discussion.makeWmdEditor @$el, $.proxy(@$, @), "#{@model.get('type')}-body-edit"
+      @$(".thread-tags-edit").tagsInput DiscussionUtil.tagsInputOptions()
+      @$(".discussion-submit-update").unbind("click").click $.proxy(@submitEdit, @)
+      @$(".discussion-cancel-update").unbind("click").click $.proxy(@cancelEdit, @)
 
-    handleSubmitEditThread = (elem) ->
-      url = Discussion.urlFor('update_thread', id)
-      title = $local(".thread-title-edit").val()
-      body = Discussion.getWmdContent $content, $local, "thread-body-edit"
-      tags = $local(".thread-tags-edit").val()
-      Discussion.safeAjax
-        $elem: $(elem)
-        url: url
-        type: "POST"
-        dataType: 'json'
-        data: {title: title, body: body, tags: tags},
-        error: Discussion.formErrorHandler($local(".discussion-update-errors"))
-        success: (response, textStatus) ->
-          Discussion.clearFormErrors($local(".discussion-update-errors"))
-          @$discussionContent().replaceWith(response.html)
-          Discussion.extendContentInfo response.content['id'], response['annotated_content_info']
-          Discussion.initializeContent($content)
-          Discussion.bindContentEvents($content)
+  submitEdit: (event) ->
+
+    url = @model.urlFor('update')
+    data = {}
+    if @model.get('type') == 'thread'
+      data.title = @$(".thread-title-edit").val()
+      data.body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "thread-body-edit"
+      data.tags = @$(".thread-tags-edit").val()
+    else
+      data.body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "comment-body-edit"
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data: data
+      error: DiscussionUtil.formErrorHandler @$(".discussion-update-errors")
+      success: (response, textStatus) =>
+        DiscussionUtil.clearFormErrors @$(".discussion-update-errors")
+        @$discussionContent().replaceWith(response.html)
+        @model.set response.content
+        @model.updateInfo response.annotated_content_info
+
+  cancelEdit: (event) ->
+    @$(".discussion-content-edit").hide()
+    @$(".discussion-content-wrapper").show()
 
   delete: ->
     if $content.hasClass("thread")
@@ -325,6 +335,7 @@ class @Thread extends @Content
     'upvote': -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
     'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
     'close': -> DiscussionUtil.urlFor('openclose_thread', @id)
+    'update': -> DiscussionUtil.urlFor('update_thread', @id)
 
   initialize: ->
     @set('thread', @)
@@ -343,6 +354,7 @@ class @Comment extends @Content
     'upvote': -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
     'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
     'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
+    'update': -> DiscussionUtil.urlFor('update_comment', @id)
 
   permalink: ->
     thread_id = @get('thread').id
