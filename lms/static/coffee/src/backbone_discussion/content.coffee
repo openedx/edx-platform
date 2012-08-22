@@ -344,7 +344,7 @@ class @ContentView extends Backbone.View
     @initLocal()
     @initTimeago()
     @initBody()
-    @initPermalink()
+    #@initPermalink()
     @initCommentViews()
     
 class @Thread extends @Content
