@@ -257,7 +257,7 @@ if Backbone?
         else
           view.body = @$(".comment-raw-body").html()
         @$discussionContent().append Mustache.render DiscussionUtil.getTemplate("_edit_#{@model.get('type')}"), view
-        Discussion.makeWmdEditor @$el, $.proxy(@$, @), "#{@model.get('type')}-body-edit"
+        DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "#{@model.get('type')}-body-edit"
         @$(".thread-tags-edit").tagsInput DiscussionUtil.tagsInputOptions()
         @$(".discussion-submit-update").unbind("click").click $.proxy(@submitEdit, @)
         @$(".discussion-cancel-update").unbind("click").click $.proxy(@cancelEdit, @)

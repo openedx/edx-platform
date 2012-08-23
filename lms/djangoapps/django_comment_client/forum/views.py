@@ -83,7 +83,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'base_url': base_url,
         'query_params': strip_blank(strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text']))),
         'annotated_content_info': json.dumps(annotated_content_info),
-        'discussion_data': json.dumps({ discussion_id: threads }),
+        'discussion_data': json.dumps({ (discussion_id or user_id): threads })
     }
     context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
@@ -250,7 +250,10 @@ def user_profile(request, course_id, user_id):
     content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
 
     if request.is_ajax():
-        return utils.HtmlResponse(content)
+        return utils.JsonResponse({
+            'html': content,
+            'discussionData': threads,
+        })
     else:
         context = {
             'course': course, 
