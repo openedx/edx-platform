@@ -46,4 +46,4 @@ class MakoMiddleware(object):
         global requestcontext
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
-        requestcontext['site'] = settings.SITE_NAME
+        requestcontext['site'] = request.get_host()
