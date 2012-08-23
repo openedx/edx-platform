@@ -1,0 +1,26 @@
+html, body {
+	height: 100%;
+	background: -webkit-radial-gradient(center, #fff, #e6e6e6);
+	background:    -moz-radial-gradient(center, #fff, #e6e6e6);
+	background:     -ms-radial-gradient(center, #fff, #e6e6e6);
+	background:      -o-radial-gradient(center, #fff, #e6e6e6);
+}
+
+body {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+}
+
+.legos {
+	width: 693px;
+	height: 327px;
+	margin: 0 auto 50px auto;
+	padding-top: 150px;
+}
+
+h1 {
+	font-size: 22px;
+	line-height: 36px;
+	color: #666;
+	text-align: center;
+}
