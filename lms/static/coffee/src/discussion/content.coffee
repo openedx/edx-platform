@@ -191,6 +191,8 @@ if Backbone?
           comment = @model.addComment response.content
           commentView = new CommentView el: $comment[0], model: comment
           comment.updateInfo response.annotated_content_info
+          if autowatch
+            @model.get('thread').set('subscribed', true)
           @cancelReply()
 
     cancelReply: ->
@@ -330,9 +332,11 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         url: url
+        type: "POST"
         success: (response, textStatus) =>
           @$el.remove()
-          @model.get('thread').removeComment(@model)
+          if @model.get('type') == 'comment'
+            @model.get('thread').removeComment(@model)
         
     events:
       "click .discussion-follow-thread": "toggleFollow"
