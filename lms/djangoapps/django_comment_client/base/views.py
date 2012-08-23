@@ -156,7 +156,11 @@ def openclose_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     thread.closed = request.POST.get('closed', 'false').lower() == 'true'
     thread.save()
-    return JsonResponse(thread.to_dict())
+    thread = thread.to_dict()
+    return JsonResponse({
+        'content': thread,
+        'ability': utils.get_ability(course_id, thread, request.user),
+    })
 
 @require_POST
 @login_required
