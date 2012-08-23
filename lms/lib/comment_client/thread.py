@@ -11,6 +11,7 @@ class Thread(models.Model):
         'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count',
         'at_position_list', 'children', 'type',
+        'highlighted_title', 'highlighted_body',
     ]
 
     updatable_fields = [

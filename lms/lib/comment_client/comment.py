@@ -1,5 +1,6 @@
 from utils import *
 
+from thread import Thread
 import models
 import settings
 
@@ -10,7 +11,7 @@ class Comment(models.Model):
         'endorsed', 'parent_id', 'thread_id',
         'username', 'votes', 'user_id', 'closed',
         'created_at', 'updated_at', 'depth',
-        'at_position_list', 'type',
+        'at_position_list', 'type', 'commentable_id',
     ]
 
     updatable_fields = [
@@ -22,6 +23,10 @@ class Comment(models.Model):
 
     base_url = "{prefix}/comments".format(prefix=settings.PREFIX)
     type = 'comment'
+
+    @property
+    def thread(self):
+        return Thread(id=self.thread_id, type='thread')
 
     @classmethod
     def url_for_comments(cls, params={}):

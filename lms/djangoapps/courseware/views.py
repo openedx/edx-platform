@@ -395,6 +395,7 @@ def instructor_dashboard(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
+
     return render_to_response('courseware/instructor_dashboard.html', context)
 
 @ensure_csrf_cookie
