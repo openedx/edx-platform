@@ -75,7 +75,7 @@ def browse_course(course_id):
 	num_chapters = len(chapters)
 	rendered_chapters = len(world.browser.find_elements_by_class_name("chapter"))
 	
-	assert num_chapters == rendered_chapters, '%d chapters expected, %d chapters found on page' % (num_chapters, rendered_chapters)
+	assert num_chapters == rendered_chapters, '%d chapters expected, %d chapters found on page for %s' % (num_chapters, rendered_chapters, course_id)
 	
 	chapter_it = 0
 
@@ -89,7 +89,7 @@ def browse_course(course_id):
 		accordion_class = "ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active"
 		rendered_sections = len(world.browser.find_elements_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//ul//li"))
 		
-		assert num_sections == rendered_sections, '%d sections expected, %d sections found on page, iteration number %d' % (num_sections, rendered_sections, chapter_it)
+		assert num_sections == rendered_sections, '%d sections expected, %d sections found on page, iteration number %d on %s' % (num_sections, rendered_sections, chapter_it, course_id)
 		
 		section_it = 0
 		## Iterate the sections
@@ -105,7 +105,7 @@ def browse_course(course_id):
 			else:
 				rendered_tabs = 0
 
-			assert num_tabs == rendered_tabs ,'%d tabs expected, %d tabs found, iteration number %d' % (num_tabs,rendered_tabs,section_it)
+			assert num_tabs == rendered_tabs ,'%d tabs expected, %d tabs found, iteration number %d, on %s' % (num_tabs,rendered_tabs,section_it, course_id)
 			
 			## Iterate the tabs
 			tab_it = 0
@@ -113,7 +113,7 @@ def browse_course(course_id):
 				tab = world.browser.find_element_by_xpath("//ol[@id='sequence-list']//li["+str(tab_it+1)+"]//a[@data-element='"+str(tab_it+1)+"']")
 				tab.click()
 				check_for_errors()
-				
+
 				tab_it += 1
 
 			section_it += 1

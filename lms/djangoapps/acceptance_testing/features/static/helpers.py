@@ -21,10 +21,9 @@ def find_element_by_name_in_selection(selection_id, field):
 
 def wait_until_class_renders(class_name,time):
 	try:
-		e = WebDriverWait(world.browser, time).until(lambda driver : driver.find_element_by_class_name(class_name))
-		return e
+		WebDriverWait(world.browser, time).until(lambda driver : driver.find_element_by_class_name(class_name))
 	except:
-		return False
+		assert False, "%s failed to render" % (class_name)
 
 def wait_until_id_renders(element_id,time):
 	try:
