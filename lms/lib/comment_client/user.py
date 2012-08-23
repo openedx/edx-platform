@@ -33,6 +33,16 @@ class User(models.Model):
         params = {'source_type': source.type, 'source_id': source.id}
         response = perform_request('delete', _url_for_subscription(self.id), params)
 
+    # TODO this is a hack to compensate for the fact that synchronization isn't
+    # happening properly.
+    def safe_attributes(self):
+        try: 
+            return self.to_dict()
+        except:
+            self.save()
+            self._retrieve()
+            return self.to_dict()
+
     def vote(self, voteable, value):
         if voteable.type == 'thread':
             url = _url_for_vote_thread(voteable.id)
