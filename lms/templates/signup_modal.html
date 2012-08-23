@@ -122,13 +122,41 @@
 <script type="text/javascript">
   (function() {
 
-   $(document).delegate('#register_form', 'ajax:before', function() {
-     var username = $("input[name=username]").value();
-     console.log(username)
-     return false;
+   $.fn.extend({
+    minLength: function(length) {
+      $(this).on("blur", function() {
+        $(this).next(".validation-error-message").remove()
+        if($(this).val().length < length) {
+          $(this).addClass("validation-error");
+          $(this).after("<div class='validation-error-message'>Must be at least "+length+" characters.</div>");
+        } else {
+          $(this).removeClass("validation-error");
+        }
+      });
+      return $(this);
+    },
+
+    matchEmail: function() {
+      $(this).on("blur", function() {
+        $(this).next(".validation-error-message").remove()
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if(!re.test($(this).val())) {
+          $(this).addClass("validation-error");
+          $(this).after("<div class='validation-error-message'>Must be a valid email address</div>");
+        } else {
+          $(this).removeClass("validation-error");
+        }
+      });
+      return $(this);
+    }
    });
 
-
+   $(document).ready(function(){
+     $("input[name=username]").minLength(2);
+     $("input[name=email]").matchEmail();
+     $("input[name=password]").minLength(2);
+     $("input[name=name]").minLength(2);
+   });
 
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
