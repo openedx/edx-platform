@@ -21,7 +21,6 @@ from django.contrib.auth.models import User
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
 
-
 from django_comment_client.utils import JsonResponse, JsonError, extract
 
 from django_comment_client.permissions import check_permissions_by_view
@@ -282,7 +281,7 @@ def update_moderator_status(request, course_id, user_id):
             'course_id': course_id,
             'user': request.user,
             'django_user': user,
-            'discussion_user': discussion_user.to_dict(),
+            'profiled_user': discussion_user.to_dict(),
         }
         return JsonResponse({
             'html': render_to_string('discussion/ajax_user_profile.html', context)
@@ -298,10 +297,13 @@ def search_similar_threads(request, course_id, commentable_id):
             'text': text,
             'commentable_id': commentable_id,
         }
-        result = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
-        return JsonResponse(result)
+        threads = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
     else:
-        return JsonResponse([])
+        theads = []
+    context = { 'threads': map(utils.extend_content, threads) }
+    return JsonResponse({
+        'html': render_to_string('discussion/_similar_posts.html', context)
+    })
 
 @require_GET
 def tags_autocomplete(request, course_id):
@@ -334,8 +336,8 @@ def upload(request, course_id):#ajax upload file to a question or answer
         # check file type
         f = request.FILES['file-upload']
         file_extension = os.path.splitext(f.name)[1].lower()
-        if not file_extension in settings.DISCUSSION_ALLOWED_UPLOAD_FILE_TYPES:
-            file_types = "', '".join(settings.DISCUSSION_ALLOWED_UPLOAD_FILE_TYPES)
+        if not file_extension in cc_settings.ALLOWED_UPLOAD_FILE_TYPES:
+            file_types = "', '".join(cc_settings.ALLOWED_UPLOAD_FILE_TYPES)
             msg = _("allowed file types are '%(file_types)s'") % \
                     {'file_types': file_types}
             raise exceptions.PermissionDenied(msg)
@@ -354,15 +356,16 @@ def upload(request, course_id):#ajax upload file to a question or answer
         # check file size
         # byte
         size = file_storage.size(new_file_name)
-        if size > settings.ASKBOT_MAX_UPLOAD_FILE_SIZE:
+        if size > cc_settings.MAX_UPLOAD_FILE_SIZE:
             file_storage.delete(new_file_name)
             msg = _("maximum upload file size is %(file_size)sK") % \
-                    {'file_size': settings.ASKBOT_MAX_UPLOAD_FILE_SIZE}
+                    {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
             raise exceptions.PermissionDenied(msg)
 
     except exceptions.PermissionDenied, e:
         error = unicode(e)
     except Exception, e:
+        print e
         logging.critical(unicode(e))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
