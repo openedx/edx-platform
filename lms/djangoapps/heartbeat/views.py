@@ -10,6 +10,6 @@ def heartbeat(request):
     """
     output = {
         'date': datetime.now().isoformat(),
-        'courses': [course.location for course in modulestore().get_courses()],
+        'courses': [course.location.url() for course in modulestore().get_courses()],
     }
     return HttpResponse(json.dumps(output, indent=4))
