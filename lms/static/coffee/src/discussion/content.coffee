@@ -120,14 +120,19 @@ if Backbone?
       else
         $elem = $.merge @$(".thread-title"), @$showComments()
         url = @model.urlFor('retrieve')
-        DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
-          @showed = true
-          @updateShowComments()
-          @$showComments().addClass("retrieved")
-          @$el.children(".comments").replaceWith response.html
-          @model.resetComments response.content.children
-          @initCommentViews()
-          DiscussionUtil.bulkUpdateContentInfo response.annotated_content_info
+        DiscussionUtil.safeAjax
+          $elem: $elem
+          $loading: $(event.target) if event
+          type: "GET"
+          url: url
+          success: (response, textStatus) =>
+            @showed = true
+            @updateShowComments()
+            @$showComments().addClass("retrieved")
+            @$el.children(".comments").replaceWith response.html
+            @model.resetComments response.content.children
+            @initCommentViews()
+            DiscussionUtil.bulkUpdateContentInfo response.annotated_content_info
 
     toggleSingleThread: (event) ->
       if @showed
@@ -169,6 +174,7 @@ if Backbone?
 
       DiscussionUtil.safeAjax
         $elem: $(event.target)
+        $loading: $(event.target) if event
         url: url
         type: "POST"
         dataType: 'json'
@@ -197,16 +203,24 @@ if Backbone?
     unvote: (event) ->
       url = @model.urlFor('unvote')
       $elem = @$(".discussion-vote")
-      DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
-        @model.set('voted', '')
-        @model.set('votes_point', response.votes.point)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('voted', '')
+          @model.set('votes_point', response.votes.point)
 
     vote: (event, value) ->
       url = @model.urlFor("#{value}vote")
       $elem = @$(".discussion-vote")
-      DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
-        @model.set('voted', value)
-        @model.set('votes_point', response.votes.point)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('voted', value)
+          @model.set('votes_point', response.votes.point)
 
     toggleVote: (event) ->
       $elem = $(event.target)
@@ -221,8 +235,13 @@ if Backbone?
       url = @model.urlFor('endorse')
       endorsed = @model.get('endorsed')
       data = { endorsed: not endorsed }
-      DiscussionUtil.post $elem, url, data, (response, textStatus) =>
-        @model.set('endorsed', not endorsed)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        data: data
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('endorsed', not endorsed)
 
     toggleFollow: (event) ->
       $elem = $(event.target)
@@ -231,16 +250,25 @@ if Backbone?
         url = @model.urlFor('unfollow')
       else
         url = @model.urlFor('follow')
-      DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
-        @model.set('subscribed', not subscribed)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('subscribed', not subscribed)
 
     toggleClosed: (event) ->
       $elem = $(event.target)
       url = @model.urlFor('close')
       closed = @model.get('closed')
       data = { closed: not closed }
-      DiscussionUtil.post $elem, url, data, (response, textStatus) =>
-        @model.set('closed', not closed)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+        data: data
+        success: (response, textStatus) =>
+          @model.set('closed', not closed)
 
     edit: (event) ->
       @$(".discussion-content-wrapper").hide()
@@ -274,6 +302,7 @@ if Backbone?
         data.body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "comment-body-edit"
       DiscussionUtil.safeAjax
         $elem: $(event.target)
+        $loading: $(event.target) if event
         url: url
         type: "POST"
         dataType: 'json'
@@ -298,9 +327,12 @@ if Backbone?
       if not c
         return
       $elem = $(event.target)
-      DiscussionUtil.post $elem, url, {}, (response, textStatus) =>
-        @$el.remove()
-        @model.get('thread').removeComment(@model)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        success: (response, textStatus) =>
+          @$el.remove()
+          @model.get('thread').removeComment(@model)
         
     events:
       "click .discussion-follow-thread": "toggleFollow"
