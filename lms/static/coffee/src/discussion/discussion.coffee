@@ -49,6 +49,7 @@ if Backbone?
         $("html, body").animate({ scrollTop: 0 }, 0)
 
     loadSimilarPost: (event) ->
+      console.log "loading similar"
       $title = @$(".new-post-title")
       $wrapper = @$(".new-post-similar-posts-wrapper")
       $similarPosts = @$(".new-post-similar-posts")
@@ -68,9 +69,10 @@ if Backbone?
           dataType: 'json'
           success: (response, textStatus) =>
             $wrapper.html(response.html)
-            $wrapper.show()
-            $wrapper.find(".hide-similar-posts").click =>
-              $wrapper.hide()
+            if $wrapper.find(".similar-post").length
+              $wrapper.show()
+              $wrapper.find(".hide-similar-posts").click =>
+                $wrapper.hide()
       else
         $wrapper.hide()
       $title.attr("prev-text", text)
