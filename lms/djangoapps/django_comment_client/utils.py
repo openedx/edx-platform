@@ -160,23 +160,32 @@ class QueryCountDebugMiddleware(object):
             logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
 
-def get_annotated_content_info(course_id, content, user):
+def get_annotated_content_info(course_id, content, user, user_info):
+    voted = ''
+    if content['id'] in user_info['upvoted_ids']:
+        voted = 'up'
+    elif content['id'] in user_info['downvoted_ids']:
+        voted = 'down'
     return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
-        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
-        'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
-        'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
-        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
+        'voted': voted,
+        'subscribed': content['id'] in user_info['subscribed_thread_ids'],
+        'ability': {
+            'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+            'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
+            'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
+            'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
+            'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
+            'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
+        },
     }
 
-def get_annotated_content_infos(course_id, thread, user):
+def get_annotated_content_infos(course_id, thread, user, user_info):
     infos = {}
-    def _annotate(content):
-        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user)
+    def annotate(content):
+        infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
         for child in content.get('children', []):
-            _annotate(child)
-    _annotate(thread)
+            annotate(child)
+    annotate(thread)
     return infos
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
