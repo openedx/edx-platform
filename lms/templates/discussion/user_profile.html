@@ -36,6 +36,6 @@
 </section>
 
 <script type="text/javascript">
-  var $$profiled_user_id = "${user.id | escapejs}";
+  var $$profiled_user_id = "${django_user.id | escapejs}";
   var $$course_id = "${course.id | escapejs}";
 </script>
