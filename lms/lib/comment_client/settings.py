@@ -7,4 +7,7 @@ else:
 
 PREFIX = SERVICE_HOST + '/api/v1'
 
-API_KEY = "PUT_YOUR_API_KEY_HERE"
+if hasattr(settings, "COMMENTS_SERVICE_KEY"):
+    API_KEY = settings.COMMENTS_SERVICE_KEY
+else:
+    API_KEY = "PUT_YOUR_API_KEY_HERE"
