@@ -12,7 +12,7 @@ import urllib
 import os
 
 def pluralize(singular_term, count):
-    if int(count) >= 2:
+    if int(count) >= 2 or int(count) == 0:
         return singular_term + 's'
     return singular_term
 
