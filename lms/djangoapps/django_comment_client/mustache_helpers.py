@@ -1,3 +1,5 @@
+from .utils import url_for_tags as _url_for_tags
+
 import django.core.urlresolvers as urlresolvers
 import urllib
 import sys
@@ -14,7 +16,7 @@ def url_for_user(content, user_id):
     return urlresolvers.reverse('django_comment_client.forum.views.user_profile', args=[content['course_id'], user_id])
 
 def url_for_tags(content, tags): # assume that attribute 'tags' is in the format u'a, b, c'
-    return urlresolvers.reverse('django_comment_client.forum.views.forum_form_discussion', args=[content['course_id']]) + '?' + urllib.urlencode({'tags': tags})
+    return _url_for_tags(content['course_id'], tags)
 
 def close_thread_text(content):
     if content.get('closed'):
