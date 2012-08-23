@@ -10,7 +10,7 @@ sessions. Assumes structure:
 from .common import *
 from .logsettings import get_logger_config
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = True
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
