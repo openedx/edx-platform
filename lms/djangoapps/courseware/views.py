@@ -187,7 +187,10 @@ def index(request, course_id, chapter=None, section=None,
                                             {'staff_access': staff_access,
                                             'course' : course})
             except:
-                result = HttpResponse("There was an unrecoverable error")
+                # Let the exception propagate, relying on global config to at
+                # at least return a nice error message
+                log.exception("Error while rendering courseware-error page")
+                raise
 
     return result
 
@@ -397,7 +400,7 @@ def instructor_dashboard(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
-    ''' Allows a staff member to enroll students in a course. 
+    ''' Allows a staff member to enroll students in a course.
 
     This is a short-term hack for Berkeley courses launching fall
     2012. In the long term, we would like functionality like this, but
@@ -417,20 +420,20 @@ def enroll_students(request, course_id):
     else:
         new_students = []
     new_students = [s.strip() for s in new_students]
-    
+
     added_students = []
     rejected_students = []
 
     for student in new_students:
-        try: 
+        try:
             nce = CourseEnrollment(user=User.objects.get(email = student), course_id = course_id)
             nce.save()
             added_students.append(student)
-        except: 
+        except:
             rejected_students.append(student)
- 
-    return render_to_response("enroll_students.html", {'course':course_id, 
-                                                       'existing_students': existing_students, 
+
+    return render_to_response("enroll_students.html", {'course':course_id,
+                                                       'existing_students': existing_students,
                                                        'added_students': added_students,
                                                        'rejected_students': rejected_students,
                                                        'debug':new_students})
