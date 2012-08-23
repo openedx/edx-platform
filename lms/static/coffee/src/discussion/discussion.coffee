@@ -61,17 +61,16 @@ if Backbone?
         $elem = $(event.target)
         url = DiscussionUtil.urlFor 'search_similar_threads', @model.id
         data = { text: @$(".new-post-title").val() }
-        DiscussionUtil.get $elem, url, data, (response, textStatus) =>
-          $similarPosts.empty()
-          if $.type(response) == "array" and response.length
+        DiscussionUtil.safeAjax
+          $elem: $elem
+          url: url
+          data: data
+          dataType: 'json'
+          success: (response, textStatus) =>
+            $wrapper.html(response.html)
             $wrapper.show()
-            for thread in response
-              $similarPost = $("<a>").addClass("similar-post")
-                                     .html(thread["title"])
-                                     .attr("href", "javascript:void(0)") #TODO
-                                     .appendTo($similarPosts)
-          else
-            $wrapper.hide()
+            $wrapper.find(".hide-similar-posts").click =>
+              $wrapper.hide()
       else
         $wrapper.hide()
       $title.attr("prev-text", text)
@@ -131,7 +130,7 @@ if Backbone?
 
           @$(".new-post-similar-posts").empty()
           @$(".new-post-similar-posts-wrapper").hide()
-          @$(".new-post-title").val("")
+          @$(".new-post-title").val("").attr("prev-text", "")
           DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
           @$(".new-post-tags").val("")
           @$(".new-post-tags").importTags("")

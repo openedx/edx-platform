@@ -298,10 +298,13 @@ def search_similar_threads(request, course_id, commentable_id):
             'text': text,
             'commentable_id': commentable_id,
         }
-        result = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
-        return JsonResponse(result)
+        threads = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
     else:
-        return JsonResponse([])
+        theads = []
+    context = { 'threads': map(utils.extend_content, threads) }
+    return JsonResponse({
+        'html': render_to_string('discussion/_similar_posts.html', context)
+    })
 
 @require_GET
 def tags_autocomplete(request, course_id):
