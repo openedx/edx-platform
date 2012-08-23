@@ -18,6 +18,7 @@ if Backbone?
           url = DiscussionUtil.urlFor 'retrieve_discussion', discussion_id
           DiscussionUtil.safeAjax
             $elem: $elem
+            $loading: $elem
             url: url
             type: "GET"
             dataType: 'json'
