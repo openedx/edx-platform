@@ -199,7 +199,10 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                        )
 
     # Fully qualified callback URL for external queueing system
-    xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
+    xqueue_callback_url = '{proto}://{host}'.format(
+        host=request.get_host(),
+        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
+    )
     xqueue_callback_url += reverse('xqueue_callback',
                                   kwargs=dict(course_id=course_id,
                                               userid=str(user.id),
@@ -346,10 +349,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
         if not get.has_key(key):
-            return Http404
+            raise Http404
     header = json.loads(get['xqueue_header'])
     if not isinstance(header, dict) or not header.has_key('lms_key'):
-        return Http404
+        raise Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
