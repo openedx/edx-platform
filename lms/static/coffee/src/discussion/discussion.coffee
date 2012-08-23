@@ -1,190 +1,167 @@
-if not @Discussion?
-  @Discussion = {}
+class @Discussion extends Backbone.Collection
+  model: Thread
 
-Discussion = @Discussion
+  initialize: ->
+    DiscussionUtil.addDiscussion @id, @
+    @bind "add", (item) =>
+      item.discussion = @
 
-initializeFollowDiscussion = (discussion) ->
-  $discussion = $(discussion)
-  id = $following.attr("_id")
-  $local = Discussion.generateLocal()
-  $discussion.children(".discussion-non-content")
-             .find(".discussion-title-wrapper")
-             .append(Discussion.subscriptionLink('discussion', id))
+  find: (id) ->
+    _.first @where(id: id)
 
-@Discussion = $.extend @Discussion,
+  addThread: (thread, options) ->
+    options ||= {}
+    model = new Thread thread
+    @add model
+    model
 
-  initializeDiscussion: (discussion) ->
-    $discussion = $(discussion)
-    $discussion.find(".thread").each (index, thread) ->
-      Discussion.initializeContent(thread)
-      Discussion.bindContentEvents(thread)
-    $discussion.find(".comment").each (index, comment) ->
-      Discussion.initializeContent(comment)
-      Discussion.bindContentEvents(comment)
+class @DiscussionView extends Backbone.View
 
-    #initializeFollowDiscussion(discussion) TODO move this somewhere else
+  $: (selector) ->
+    @$local.find(selector)
 
-  bindDiscussionEvents: (discussion) ->
+  initLocal: ->
+    @$local = @$el.children(".local")
+    @$delegateElement = @$local
 
-    $discussion = $(discussion)
-    $discussionNonContent = $discussion.children(".discussion-non-content")
-    $local = Discussion.generateLocal($discussion.children(".discussion-local"))
+  initialize: ->
+    @initLocal()
+    @model.id = @$el.attr("_id")
+    @model.view = @
+    @$el.children(".threads").children(".thread").each (index, elem) =>
+      threadView = new ThreadView el: elem, model: @model.find $(elem).attr("_id")
+    if @$el.hasClass("forum-discussion")
+      $(".discussion-sidebar").find(".sidebar-new-post-button")
+                              .unbind('click').click $.proxy @newPost, @
+    else if @$el.hasClass("inline-discussion")
+      @newPost()
 
-    id = $discussion.attr("_id")
+  reload: ($elem, url) ->
+    if not url then return
+    DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
+      $parent = @$el.parent()
+      @$el.replaceWith(response.html)
+      $discussion = $parent.find("section.discussion")
+      @model.reset(response.discussionData, { silent: false })
+      view = new DiscussionView el: $discussion[0], model: @model
+      DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
 
-    handleSubmitNewPost = (elem) ->
-      title = $local(".new-post-title").val()
-      body = Discussion.getWmdContent $discussion, $local, "new-post-body"
-      tags = $local(".new-post-tags").val()
-      url = Discussion.urlFor('create_thread', id)
-      Discussion.safeAjax
-        $elem: $(elem)
-        url: url
-        type: "POST"
-        dataType: 'json'
-        data:
-          title: title
-          body: body
-          tags: tags
-        error: Discussion.formErrorHandler($local(".new-post-form-errors"))
-        success: (response, textStatus) ->
-          Discussion.clearFormErrors($local(".new-post-form-errors"))
-          $thread = $(response.html)
-          $discussion.children(".threads").prepend($thread)
-          $local(".new-post-title").val("")
-          Discussion.setWmdContent $discussion, $local, "new-post-body", ""
-          $local(".new-post-tags").val("")
-          if $discussion.hasClass("inline-discussion")
-            $local(".new-post-form").addClass("collapsed")
-          else if $discussion.hasClass("forum-discussion")
-            $local(".new-post-form").hide()
-
-    handleCancelNewPost = (elem) ->
-      if $discussion.hasClass("inline-discussion")
-        $local(".new-post-form").addClass("collapsed")
-      else if $discussion.hasClass("forum-discussion")
-        $local(".new-post-form").hide()
-
-    handleSimilarPost = (elem) ->
-      $title = $local(".new-post-title")
-      $wrapper = $local(".new-post-similar-posts-wrapper")
-      $similarPosts = $local(".new-post-similar-posts")
-      prevText = $title.attr("prev-text")
-      text = $title.val()
-      if text == prevText
-        if $local(".similar-post").length
+  loadSimilarPost: (event) ->
+    $title = @$(".new-post-title")
+    $wrapper = @$(".new-post-similar-posts-wrapper")
+    $similarPosts = @$(".new-post-similar-posts")
+    prevText = $title.attr("prev-text")
+    text = $title.val()
+    if text == prevText
+      if @$(".similar-post").length
+        $wrapper.show()
+    else if $.trim(text).length
+      $elem = $(event.target)
+      url = DiscussionUtil.urlFor 'search_similar_threads', @model.id
+      data = { text: @$(".new-post-title").val() }
+      DiscussionUtil.get $elem, url, data, (response, textStatus) =>
+        $similarPosts.empty()
+        if $.type(response) == "array" and response.length
           $wrapper.show()
-      else if $.trim(text).length
-        Discussion.safeAjax
-          $elem: $(elem)
-          url: Discussion.urlFor 'search_similar_threads', id
-          type: "GET"
-          dateType: 'json'
-          data:
-            text: $local(".new-post-title").val()
-          success: (response, textStatus) ->
-            $similarPosts.empty()
-            console.log response
-            if $.type(response) == "array" and response.length
-              $wrapper.show()
-              for thread in response
-                #singleThreadUrl = Discussion.urlFor 'retrieve_single_thread 
-                $similarPost = $("<a>").addClass("similar-post")
-                                       .html(thread["title"])
-                                       .attr("href", "javascript:void(0)") #TODO
-                                       .appendTo($similarPosts)
-            else
-              $wrapper.hide()
-      else
-        $wrapper.hide()
-      $title.attr("prev-text", text)
+          for thread in response
+            $similarPost = $("<a>").addClass("similar-post")
+                                   .html(thread["title"])
+                                   .attr("href", "javascript:void(0)") #TODO
+                                   .appendTo($similarPosts)
+        else
+          $wrapper.hide()
+    else
+      $wrapper.hide()
+    $title.attr("prev-text", text)
 
-    initializeNewPost = ->
-      view = { discussion_id: id }
-      $discussionNonContent = $discussion.children(".discussion-non-content")
 
-      if not $local(".wmd-panel").length
-        $discussionNonContent.append Mustache.render Discussion.newPostTemplate, view
-        $newPostBody = $local(".new-post-body")
-        Discussion.makeWmdEditor $discussion, $local, "new-post-body"
+  newPost: ->
+    if not @$(".wmd-panel").length
+      view = { discussion_id: @model.id }
+      @$el.children(".discussion-non-content").append Mustache.render DiscussionUtil.getTemplate("_new_post"), view
+      $newPostBody = @$(".new-post-body")
+      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
 
-        $input = Discussion.getWmdInput($discussion, $local, "new-post-body")
-        $input.attr("placeholder", "post a new topic...")
-        if $discussion.hasClass("inline-discussion")
-          $input.bind 'focus', (e) ->
-            $local(".new-post-form").removeClass('collapsed')
-        else if $discussion.hasClass("forum-discussion")
-          $local(".new-post-form").removeClass('collapsed')
+      $input = DiscussionUtil.getWmdInput @$el, $.proxy(@$, @), "new-post-body"
+      $input.attr("placeholder", "post a new topic...")
+      if @$el.hasClass("inline-discussion")
+        $input.bind 'focus', (e) =>
+          @$(".new-post-form").removeClass('collapsed')
+      else if @$el.hasClass("forum-discussion")
+        @$(".new-post-form").removeClass('collapsed')
 
-        $local(".new-post-tags").tagsInput Discussion.tagsInputOptions()
+      @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
 
-        $local(".new-post-title").blur ->
-          handleSimilarPost(this)
+      @$(".new-post-title").blur $.proxy(@loadSimilarPost, @)
 
-        $local(".hide-similar-posts").click ->
-          $local(".new-post-similar-posts-wrapper").hide()
+      @$(".hide-similar-posts").click =>
+        @$(".new-post-similar-posts-wrapper").hide()
 
-        $local(".discussion-submit-post").click ->
-          handleSubmitNewPost(this)
-        $local(".discussion-cancel-post").click ->
-          handleCancelNewPost(this)
+      @$(".discussion-submit-post").click $.proxy(@submitNewPost, @)
+      @$(".discussion-cancel-post").click $.proxy(@cancelNewPost, @)
+      
 
-      $local(".new-post-form").show()
+    @$(".new-post-form").show()
 
-    handleAjaxReloadDiscussion = (elem, url) ->
-      if not url then return
-      $elem = $(elem)
-      $discussion = $elem.parents("section.discussion")
-      Discussion.safeAjax
-        $elem: $elem
-        url: url
-        type: "GET"
-        dataType: 'html'
-        success: (data, textStatus) ->
-          $data = $(data)
-          $parent = $discussion.parent()
-          $discussion.replaceWith($data)
-          $discussion = $parent.children(".discussion")
-          Discussion.initializeDiscussion($discussion)
-          Discussion.bindDiscussionEvents($discussion)
+  submitNewPost: (event) ->
+    title = @$(".new-post-title").val()
+    body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "new-post-body"
+    tags = @$(".new-post-tags").val()
+    anonymous = false || @$(".discussion-post-anonymously").is(":checked")
+    autowatch = false || @$(".discussion-auto-watch").is(":checked")
+    url = DiscussionUtil.urlFor('create_thread', @model.id)
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        title: title
+        body: body
+        tags: tags
+        anonymous: anonymous
+        auto_subscribe: autowatch
+      error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
+      success: (response, textStatus) =>
+        DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
+        $thread = $(response.html)
+        @$el.children(".threads").prepend($thread)
 
-    handleAjaxSearch = (elem) ->
-      $elem = $(elem)
-      url = URI($elem.attr("action")).addSearch({text: $local(".search-input").val()})
-      handleAjaxReloadDiscussion($elem, url)
+        @$(".new-post-title").val("")
+        DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
+        @$(".new-post-tags").val("")
+        @$(".new-post-tags").importTags("")
 
-    handleAjaxSort = (elem) ->
-      $elem = $(elem)
-      url = $elem.attr("sort-url")
-      handleAjaxReloadDiscussion($elem, url)
+        thread = @model.addThread response.content
+        threadView = new ThreadView el: $thread[0], model: thread
+        thread.updateInfo response.annotated_content_info
+        @cancelNewPost()
+        
 
-    handleAjaxPage = (elem) ->
-      $elem = $(elem)
-      url = $elem.attr("page-url")
-      handleAjaxReloadDiscussion($elem, url)
+  cancelNewPost: (event) ->
+    if @$el.hasClass("inline-discussion")
+      @$(".new-post-form").addClass("collapsed")
+    else if @$el.hasClass("forum-discussion")
+      @$(".new-post-form").hide()
 
-    if $discussion.hasClass("inline-discussion")
-      initializeNewPost()
+  search: (event) ->
+    event.preventDefault()
+    $elem = $(event.target)
+    url = URI($elem.attr("action")).addSearch({text: @$(".search-input").val()})
+    @reload($elem, url)
 
-    if $discussion.hasClass("forum-discussion")
-      $discussionSidebar = $(".discussion-sidebar")
-      if $discussionSidebar.length
-        $sidebarLocal = Discussion.generateLocal($discussionSidebar)
-        Discussion.bindLocalEvents $sidebarLocal,
-          "click .sidebar-new-post-button": (event) ->
-            initializeNewPost()
+  sort: ->
+    $elem = $(event.target)
+    url = $elem.attr("sort-url")
+    @reload($elem, url)
 
-    Discussion.bindLocalEvents $local,
+  page: (event) ->
+    $elem = $(event.target)
+    url = $elem.attr("page-url")
+    @reload($elem, url)
 
-      "submit .search-wrapper>.discussion-search-form": (event) ->
-        event.preventDefault()
-        handleAjaxSearch(this)
-
-      "click .discussion-search-link": ->
-        handleAjaxSearch($local(".search-wrapper>.discussion-search-form"))
-
-      "click .discussion-sort-link": ->
-        handleAjaxSort(this)
-
-    $discussion.children(".discussion-paginator").find(".discussion-page-link").unbind('click').click ->
-      handleAjaxPage(this)
+  events:
+    "submit .search-wrapper>.discussion-search-form": "search"
+    "click .discussion-search-link": "search"
+    "click .discussion-sort-link": "sort"
+    "click .discussion-page-link": "page"

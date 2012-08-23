@@ -43,6 +43,9 @@ class Model(object):
             raise KeyError("Field {0} does not exist".format(key))
         self.attributes.__setitem__(key, value)
 
+    def items(self, *args, **kwargs):
+        return self.attributes.items(*args, **kwargs)
+
     def get(self, *args, **kwargs):
         return self.attributes.get(*args, **kwargs)
 
