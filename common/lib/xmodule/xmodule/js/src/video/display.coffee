@@ -44,7 +44,7 @@ class @Video
   fetchMetadata: (url) ->
     @metadata = {}
     $.each @videos, (speed, url) =>
-      $.get "http://gdata.youtube.com/feeds/api/videos/#{url}?v=2&alt=jsonc", ((data) => @metadata[data.data.id] = data.data) , 'jsonp'
+      $.get "https://gdata.youtube.com/feeds/api/videos/#{url}?v=2&alt=jsonc", ((data) => @metadata[data.data.id] = data.data) , 'jsonp'
 
   getDuration: ->
     @metadata[@youtubeId()].duration
