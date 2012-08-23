@@ -462,6 +462,12 @@ class CapaModule(XModule):
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
+        # Problem queued. Student should not be able to submit
+        '''
+        if self.lcp.is_queued():
+            return {'success': False, 'html': 'Already queued'} 
+        '''
+
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id

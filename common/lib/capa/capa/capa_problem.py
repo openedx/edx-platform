@@ -202,11 +202,7 @@ class LoncapaProblem(object):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         '''
-        queued = False
-        for answer_id in self.correct_map:
-            if self.correct_map.is_queued(answer_id):
-                queued = True
-        return queued
+        return any([self.correct_map.is_queued(answer_id) for answer_id in self.correct_map])
 
     def grade_answers(self, answers):
         '''
