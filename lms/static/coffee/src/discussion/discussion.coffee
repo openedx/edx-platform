@@ -39,14 +39,19 @@ if Backbone?
 
     reload: ($elem, url) ->
       if not url then return
-      DiscussionUtil.get $elem, url, {}, (response, textStatus) =>
-        $parent = @$el.parent()
-        @$el.replaceWith(response.html)
-        $discussion = $parent.find("section.discussion")
-        @model.reset(response.discussionData, { silent: false })
-        view = new DiscussionView el: $discussion[0], model: @model
-        DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
-        $("html, body").animate({ scrollTop: 0 }, 0)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        $loading: $elem
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          $parent = @$el.parent()
+          @$el.replaceWith(response.html)
+          $discussion = $parent.find("section.discussion")
+          @model.reset(response.discussionData, { silent: false })
+          view = new DiscussionView el: $discussion[0], model: @model
+          DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
+          $("html, body").animate({ scrollTop: 0 }, 0)
 
     loadSimilarPost: (event) ->
       $title = @$(".new-post-title")
@@ -114,6 +119,7 @@ if Backbone?
       url = DiscussionUtil.urlFor('create_thread', @model.id)
       DiscussionUtil.safeAjax
         $elem: $(event.target)
+        $loading: $(event.target) if event
         url: url
         type: "POST"
         dataType: 'json'

@@ -49,6 +49,14 @@ $tag-text-color: #5b614f;
     margin-top: 0;
   }
 
+  .loading {
+    background-image: url(../images/discussion/loading.gif);
+    width: 15px;
+    height: 15px;
+    margin-left: 2px;
+    display: inline-block;
+  }
+
 
 
   /*** Sidebar ***/
