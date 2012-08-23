@@ -71,6 +71,9 @@ def get_courseware_with_tabs(course_id):
   top three levels of navigation. Same as get_courseware() except include 
   the tabs on the right hand main navigation page.
 
+  This hides the appropriate courseware as defined by the XML flag test:
+  chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+
   Example:
  
   [{
@@ -122,8 +125,9 @@ def get_courseware_with_tabs(course_id):
   """
 
   course = get_course_by_id(course_id)
-  chapters = course.get_children()
-  courseware = [{'chapter_name':c.display_name, 'sections':[{'section_name':s.display_name, 'clickable_tab_count': len(s.get_children()) if (type(s)==xmodule.seq_module.SequenceDescriptor) else 0, 'tab_classes':[t.__class__.__name__ for t in s.get_children() ]} for s in c.get_children()]} for c in chapters ]
+  chapters = [ chapter for chapter in course.get_children() if chapter.metadata.get('hide_from_toc','false').lower() != 'true' ]
+  courseware = [{'chapter_name':c.display_name, 'sections':[{'section_name':s.display_name, 'clickable_tab_count': len(s.get_children()) if (type(s)==xmodule.seq_module.SequenceDescriptor) else 0, 'tab_classes':[t.__class__.__name__ for t in s.get_children() ]} for s in c.get_children() if s.metadata.get('hide_from_toc', 'false').lower() != 'true']} for c in chapters ]
+  
   return courseware
 
 ## course listing step
