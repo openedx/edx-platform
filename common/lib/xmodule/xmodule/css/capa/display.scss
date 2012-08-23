@@ -280,4 +280,42 @@ section.problem {
       @extend .blue-button;
     }
   }
+
+  .hints {
+    border: 1px solid #ccc;
+
+    h3 {
+      border-bottom: 1px solid #e3e3e3;
+      text-shadow: 0 1px 0 #fff;
+      padding: 9px;
+      background: #eee;
+      font-weight: bold;
+      font-size: em(16);
+    }
+
+    div {
+      border-bottom: 1px solid #ddd;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      p {
+        margin-bottom: 0;
+      }
+
+      header {
+        a {
+          display: block;
+          padding: 9px;
+          background: #f3f3f3;
+          @include box-shadow(inset 0 0 0 1px #fff);
+        }
+      }
+
+      section {
+        padding: 9px;
+      }
+    }
+  }
 }
