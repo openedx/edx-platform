@@ -567,11 +567,30 @@ section.wiki {
     background: #f00 !important;
   }
 
-  
+  #cheatsheetLink {
+   text-align:right;
+   display: float;
+  }
 
+  #cheatsheetModal {
+   width: 350px;
+   margin-left: 100px;
+   margin-top: -100px;
+   }
 
+  #cheatsheet-body {
+   background: #FFF;
+   text-align: left;
+   padding: 10px;
+  }
 
-
+  #cheatsheet-body pre{
+   color: #000;
+   text-align: left;
+   background: #EEE;
+   margin:10px;
+   padding: 10px;
+  }
 
   /*-----------------
 
