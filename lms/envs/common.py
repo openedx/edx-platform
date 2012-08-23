@@ -420,6 +420,8 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
+discussion_js = glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
+
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
 from xmodule.x_module import XModuleDescriptor
@@ -490,7 +492,7 @@ PIPELINE_JS = {
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
-            if pth not in courseware_only_js
+            if pth not in courseware_only_js and pth not in discussion_js
         ] + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -514,6 +516,10 @@ PIPELINE_JS = {
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/lms-spec.js'
+    },
+    'discussion' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in discussion_js],
+        'output_filename': 'js/discussion.js'
     }
 }
 
