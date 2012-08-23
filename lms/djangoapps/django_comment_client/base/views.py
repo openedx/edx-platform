@@ -51,7 +51,7 @@ def ajax_content_response(request, course_id, content, template_name):
         'content': content,
     }
     html = render_to_string(template_name, context)
-    user_info = cc.User.from_django_user(request.user).safe_attributes()
+    user_info = cc.User.from_django_user(request.user).to_dict()
     annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
     return JsonResponse({
         'html': html,
