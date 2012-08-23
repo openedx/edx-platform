@@ -7,12 +7,14 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.db import connection
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django_comment_client.permissions import check_permissions_by_view
 from mitxmako import middleware
 
 import logging
 import operator
 import itertools
+import urllib
 import pystache_custom as pystache
 
 
@@ -187,6 +189,10 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
             annotate(child)
     annotate(thread)
     return infos
+
+# put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
+def url_for_tags(course_id, tags):
+    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
