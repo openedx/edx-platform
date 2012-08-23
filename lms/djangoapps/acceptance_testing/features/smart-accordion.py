@@ -49,7 +49,7 @@ def i_verify_all_the_content_of_each_course(step):
 	i = 0
 	while i < registered_courses:
 		world.browser.find_element_by_xpath("//section[@class='my-courses']//article["+str(i+1)+"]//a").click()
-		wait_until_class_renders('my-courses',1)
+		#wait_until_class_renders('my-courses',2)
 		check_for_errors()
 		current_course = re.sub('/info','',re.sub('.*/courses/','',world.browser.current_url))
 		
