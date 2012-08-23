@@ -72,12 +72,10 @@ class @DiscussionUtil
     params["beforeSend"] = ->
       $elem.attr("disabled", "disabled")
       if params["$loading"]
-        console.log "loading"
         params["$loading"].loading()
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
       if params["$loading"]
-        console.log "loaded"
         params["$loading"].loaded()
 
   @get: ($elem, url, data, success) ->
