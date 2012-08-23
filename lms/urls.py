@@ -10,7 +10,7 @@ if settings.DEBUG:
     admin.autodiscover()
 
 urlpatterns = ('',
-    url(r'^$', 'student.views.index', name="root"), # Main marketing page, or redirect to courseware
+    url(r'^$', 'branding.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
@@ -100,7 +100,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^masquerade/', include('masquerade.urls')),
         url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
@@ -115,7 +115,7 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
-        url(r'^courses/?$', 'courseware.views.courses', name="courses"),
+        url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment_view', name="change_enrollment"),
 
@@ -126,9 +126,11 @@ if settings.COURSEWARE_ENABLED:
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
+            'courseware.views.syllabus', name="syllabus"), # TODO arjun remove when custom tabs in place, see courseware/courses.py
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
             'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<page>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
             'staticbook.views.index'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$',
             'staticbook.views.index_shifted'),
@@ -138,38 +140,50 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile$',
-            'courseware.views.profile', name="profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
+            'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/profile/(?P<student_id>[^/]*)/$',
-            'courseware.views.profile', name="student_profile"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress/(?P<student_id>[^/]*)/$',
+            'courseware.views.progress', name="student_progress"),
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'courseware.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'courseware.views.grade_summary', name='grade_summary'),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
+            'courseware.views.enroll_students', name='enroll_students'),
     )
+
+    # discussion forums live within courseware, so courseware must be enabled first
+    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+                'courseware.views.news', name="news"),
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
+                include('django_comment_client.urls'))
+            )
 
     # Multicourse wiki
 if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
     from django_notify.urls import get_pattern as notify_pattern
-    
+
     # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
     # them together.
-    urlpatterns += (        
+    urlpatterns += (
         # First we include views from course_wiki that we use to override the default views.
         # They come first in the urlpatterns so they get resolved first
         url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
 
-        
+
         url(r'^wiki/', include(wiki_pattern())),
         url(r'^notify/', include(notify_pattern())),
-        
+
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
@@ -189,6 +203,8 @@ if settings.ASKBOT_ENABLED:
 #                       url(r'^robots.txt$', include('robots.urls')),
                               )
 
+
+
 if settings.DEBUG:
     ## Jasmine
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
@@ -204,11 +220,14 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^gitreload$', 'lms_migration.migrate.gitreload'),
+        url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
         )
 
 if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += (
         url(r'^event_logs$', 'track.views.view_tracking_log'),
+        url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
         )
 
 urlpatterns = patterns(*urlpatterns)

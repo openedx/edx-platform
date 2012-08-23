@@ -65,7 +65,7 @@ class XQueueInterface(object):
         self.auth = django_auth
         self.session = requests.session(auth=requests_auth)
         
-    def send_to_queue(self, header, body, file_to_upload=None):
+    def send_to_queue(self, header, body, files_to_upload=None):
         '''
         Submit a request to xqueue.
         
@@ -74,16 +74,19 @@ class XQueueInterface(object):
         body: Serialized data for the receipient behind the queueing service. The operation of
                 xqueue is agnostic to the contents of 'body'
 
-        file_to_upload: File object to be uploaded to xqueue along with queue request
+        files_to_upload: List of file objects to be uploaded to xqueue along with queue request
 
         Returns (error_code, msg) where error_code != 0 indicates an error
         '''
         # Attempt to send to queue
-        (error, msg) = self._send_to_queue(header, body, file_to_upload)
+        (error, msg) = self._send_to_queue(header, body, files_to_upload)
 
         if error and (msg == 'login_required'): # Log in, then try again
             self._login()
-            (error, msg) = self._send_to_queue(header, body, file_to_upload)
+            if files_to_upload is not None:
+                for f in files_to_upload: # Need to rewind file pointers
+                    f.seek(0)
+            (error, msg) = self._send_to_queue(header, body, files_to_upload)
 
         return (error, msg)
 
@@ -94,13 +97,15 @@ class XQueueInterface(object):
         return self._http_post(self.url+'/xqueue/login/', payload)
 
 
-    def _send_to_queue(self, header, body, file_to_upload=None):
+    def _send_to_queue(self, header, body, files_to_upload):
         payload = {'xqueue_header': header,
                    'xqueue_body'  : body}
-        files = None
-        if file_to_upload is not None:
-            files = { file_to_upload.name: file_to_upload }
-        return self._http_post(self.url+'/xqueue/submit/', payload, files)
+        files = {} 
+        if files_to_upload is not None:
+            for f in files_to_upload:
+                files.update({ f.name: f })
+
+        return self._http_post(self.url+'/xqueue/submit/', payload, files=files)
 
 
     def _http_post(self, url, data, files=None):

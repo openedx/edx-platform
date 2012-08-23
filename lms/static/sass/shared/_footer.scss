@@ -48,7 +48,6 @@ footer {
 
           a:link, a:visited {
             color: $lighter-base-font-color;
-            letter-spacing: 1px;
             padding: 6px 0px;
           }
         }
@@ -70,6 +69,7 @@ footer {
           position: relative;
           width: 47px;
           vertical-align: middle;
+          @include transition(none);
 
           &:hover {
             background-position: 0 0;
@@ -90,7 +90,6 @@ footer {
         a {
           color: $lighter-base-font-color;
           @include inline-block;
-          letter-spacing: 1px;
           margin-right: 20px;
           padding-top: 2px;
           vertical-align: middle;
@@ -165,7 +164,6 @@ footer {
           color: $lighter-base-font-color;
           font-family: $serif;
           font-style: italic;
-          letter-spacing: 1px;
           line-height: 1.6em;
           margin-left: 20px;
           text-transform: lowercase;

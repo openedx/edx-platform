@@ -39,7 +39,7 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
     if course:
         dictionary['course'] = course
         if 'namespace' not in dictionary:
-            dictionary['namespace'] = course.wiki_namespace
+            dictionary['namespace'] = "edX"
     else:
         dictionary['course'] = None
 
@@ -99,7 +99,7 @@ def root_redirect(request, course_id=None):
     course = get_opt_course_with_access(request.user, course_id, 'load')
 
     #TODO: Add a default namespace to settings.
-    namespace = course.wiki_namespace if course else "edX"
+    namespace = "edX"
 
     try:
         root = Article.get_root(namespace)
@@ -479,7 +479,7 @@ def not_found(request, article_path, course):
     """Generate a NOT FOUND message for some URL"""
     d = {'wiki_err_notfound': True,
          'article_path': article_path,
-         'namespace': course.wiki_namespace}
+         'namespace': "edX"}
     update_template_dictionary(d, request, course)
     return render_to_response('simplewiki/simplewiki_error.html', d)
 

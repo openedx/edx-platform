@@ -22,7 +22,6 @@ from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
-from django.core.urlresolvers import reverse
 from bs4 import BeautifulSoup
 from django.core.cache import cache
 
@@ -30,7 +29,6 @@ from django_future.csrf import ensure_csrf_cookie
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment)
-from util.cache import cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
@@ -54,23 +52,7 @@ def csrf_token(context):
             ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
-@ensure_csrf_cookie
-@cache_if_anonymous
-def index(request):
-
-    ''' Redirects to main page -- info page if user authenticated, or marketing if not
-    '''
-
-    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
-
-    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
-        from external_auth.views import edXauth_ssl_login
-        return edXauth_ssl_login(request)
-
-    return main_index(request, user=request.user)
-
-def main_index(request, extra_context={}, user=None):
+def index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
 
@@ -102,7 +84,7 @@ def main_index(request, extra_context={}, user=None):
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""
     course_loc = CourseDescriptor.id_to_location(course_id)
-    return modulestore().get_item(course_loc)
+    return modulestore().get_instance(course_id, course_loc)
 
 
 def press(request):
@@ -140,7 +122,20 @@ def dashboard(request):
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
 
-    context = {'courses': courses, 'message': message}
+
+    # Global staff can see what courses errored on their dashboard
+    staff_access = False
+    errored_courses = {}
+    if has_access(user, 'global', 'staff'):
+        # Show any courses that errored on load
+        staff_access = True
+        errored_courses = modulestore().get_errored_courses()
+
+    context = {'courses': courses,
+               'message': message,
+               'staff_access': staff_access,
+               'errored_courses': errored_courses,}
+
     return render_to_response('dashboard.html', context)
 
 

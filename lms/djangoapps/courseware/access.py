@@ -13,7 +13,6 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 
-
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -63,9 +62,12 @@ def has_access(user, obj, action):
     if isinstance(obj, Location):
         return _has_access_location(user, obj, action)
 
+    if isinstance(obj, basestring):
+        return _has_access_string(user, obj, action)
+
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError("Unknown object type in has_access(): '{}'"
+    raise TypeError("Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
 
@@ -238,6 +240,30 @@ def _has_access_location(user, location, action):
     return _dispatch(checkers, action, user, location)
 
 
+def _has_access_string(user, perm, action):
+    """
+    Check if user has certain special access, specified as string.  Valid strings:
+
+    'global'
+
+    Valid actions:
+
+    'staff' -- global staff access.
+    """
+
+    def check_staff():
+        if perm != 'global':
+            debug("Deny: invalid permission '%s'", perm)
+            return False
+        return _has_global_staff_access(user)
+
+    checkers = {
+        'staff': check_staff
+        }
+
+    return _dispatch(checkers, action, user, perm)
+
+
 #####  Internal helper methods below
 
 def _dispatch(table, action, user, obj):
@@ -255,7 +281,7 @@ def _dispatch(table, action, user, obj):
               action)
         return result
 
-    raise ValueError("Unknown action for object type '{}': '{}'".format(
+    raise ValueError("Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
 def _course_staff_group_name(location):
@@ -265,6 +291,15 @@ def _course_staff_group_name(location):
     location: something that can passed to Location.
     """
     return 'staff_%s' % Location(location).course
+
+def _has_global_staff_access(user):
+    if user.is_staff:
+        debug("Allow: user.is_staff")
+        return True
+    else:
+        debug("Deny: not user.is_staff")
+        return False
+
 
 def _has_staff_access_to_location(user, location):
     '''

@@ -30,12 +30,17 @@ import djcelery
 from path import path
 
 from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
+from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = True
+ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
+
+DISCUSSION_SETTINGS = {
+    'MAX_COMMENT_DEPTH': 2,
+}
 
 # Features
 MITX_FEATURES = {
@@ -54,13 +59,19 @@ MITX_FEATURES = {
     # course_ids (see dev_int.py for an example)
     'SUBDOMAIN_COURSE_LISTINGS' : False,
 
+    # When True, will override certain branding with university specific values
+    # Expects a SUBDOMAIN_BRANDING dictionary that maps the subdomain to the
+    # university to use for branding purposes
+    'SUBDOMAIN_BRANDING': False,
+
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : True,
+    'ENABLE_DISCUSSION' : False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
 
-    'DISABLE_LOGIN_BUTTON': False,	# used in systems where login is automatic, eg MIT SSL
+    'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -120,6 +131,9 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 # still left lying around.
 TEMPLATE_DIRS = (
     PROJECT_ROOT / "templates",
+    COMMON_ROOT / 'templates',
+    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -141,6 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
+MAX_FILEUPLOADS_PER_INPUT = 10
 
 # FIXME:
 # We should have separate S3 staged URLs in case we need to make changes to
@@ -188,6 +203,11 @@ COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number' : '6.002x',
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+######################## subdomain specific settings ###########################
+COURSE_LISTINGS = {}
+SUBDOMAIN_BRANDING = {}
+
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -254,6 +274,14 @@ USE_L10N = True
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+#################################### GITHUB #######################################
+# gitreload is used in LMS-workflow to pull content from github
+# gitreload requests are only allowed from these IP addresses, which are
+# the advertised public IPs of the github WebHook servers.
+# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+
+ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
+
 #################################### AWS #######################################
 # S3BotoStorage insists on a timeout for uploaded assets. We should make it
 # permanent instead, but rather than trying to figure out exactly where that
@@ -297,6 +325,15 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
+WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
+WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
+WIKI_ANONYMOUS = False # Don't allow anonymous access until the styling is figured out
+WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
+WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
+
+WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
+WIKI_LINK_LIVE_LOOKUPS = False
+WIKI_LINK_DEFAULT_LEVEL = 2 
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -322,6 +359,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -344,6 +382,9 @@ MIDDLEWARE_CLASSES = (
     'askbot.middleware.spaceless.SpacelessMiddleware',
     # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'django_comment_client.utils.ViewNameMiddleware',
+    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -384,6 +425,8 @@ main_vendor_js = [
   'js/vendor/jquery.cookie.js',
   'js/vendor/jquery.qtip.min.js',
 ]
+
+discussion_js = glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -455,7 +498,7 @@ PIPELINE_JS = {
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
-            if pth not in courseware_only_js
+            if pth not in courseware_only_js and pth not in discussion_js
         ] + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -479,6 +522,10 @@ PIPELINE_JS = {
     'spec': {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
         'output_filename': 'js/lms-spec.js'
+    },
+    'discussion' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in discussion_js],
+        'output_filename': 'js/discussion.js'
     }
 }
 
@@ -554,15 +601,20 @@ INSTALLED_APPS = (
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
-    'course_wiki', # Our customizations
     'django_notify',
+    'course_wiki', # Our customizations
     'mptt',
     'sekizai',
-    'wiki.plugins.attachments',
+    #'wiki.plugins.attachments',
+    'wiki.plugins.links',
     'wiki.plugins.notifications',
+    'course_wiki.plugins.markdownedx',
 
     # For testing
     'django_jasmine',
+
+    # Discussion
+    'django_comment_client',
 
     # For Askbot
     'django.contrib.sitemaps',

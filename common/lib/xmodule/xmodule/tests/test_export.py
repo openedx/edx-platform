@@ -84,20 +84,22 @@ class RoundTripTestCase(unittest.TestCase):
         strip_filenames(exported_course)
 
         self.assertEquals(initial_course, exported_course)
+        self.assertEquals(initial_course.id, exported_course.id)
+        course_id = initial_course.id
 
         print "Checking key equality"
-        self.assertEquals(sorted(initial_import.modules.keys()),
-                          sorted(second_import.modules.keys()))
+        self.assertEquals(sorted(initial_import.modules[course_id].keys()),
+                          sorted(second_import.modules[course_id].keys()))
 
         print "Checking module equality"
-        for location in initial_import.modules.keys():
+        for location in initial_import.modules[course_id].keys():
             print "Checking", location
             if location.category == 'html':
                 print ("Skipping html modules--they can't import in"
                        " final form without writing files...")
                 continue
-            self.assertEquals(initial_import.modules[location],
-                              second_import.modules[location])
+            self.assertEquals(initial_import.modules[course_id][location],
+                              second_import.modules[course_id][location])
 
 
     def setUp(self):

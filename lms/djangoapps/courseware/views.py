@@ -3,6 +3,10 @@ import logging
 import urllib
 import itertools
 
+from functools import partial
+
+from functools import partial
+
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -21,6 +25,11 @@ from courseware.courses import (get_course_with_access, get_courses_by_universit
 from models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_section
 from student.models import UserProfile
+
+from multicourse import multicourse_settings
+
+from django_comment_client.utils import get_discussion_title
+
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
@@ -28,6 +37,11 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+
+import comment_client
+
+
+
 
 log = logging.getLogger("mitx.courseware")
 
@@ -64,7 +78,7 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user, 
+    universities = get_courses_by_university(request.user,
                                              domain=request.META.get('HTTP_HOST'))
     return render_to_response("courses.html", {'universities': universities})
 
@@ -135,11 +149,10 @@ def index(request, course_id, chapter=None, section=None,
             section_descriptor = get_section(course, chapter, section)
             if section_descriptor is not None:
                 student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                                                          request.user,
-                                                          section_descriptor)
+                    course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id=course_id)
+                                    student_module_cache, course_id)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -154,7 +167,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Add a list of all the errors...
                 context['course_errors'] = modulestore().get_item_errors(course.location)
 
-        result = render_to_response('courseware.html', context)
+        result = render_to_response('courseware/courseware.html', context)
     except:
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
@@ -170,10 +183,14 @@ def index(request, course_id, chapter=None, section=None,
                               position=position
                               ))
             try:
-                result = render_to_response('courseware-error.html',
-                                            {'staff_access': staff_access})
+                result = render_to_response('courseware/courseware-error.html',
+                                            {'staff_access': staff_access,
+                                            'course' : course})
             except:
-                result = HttpResponse("There was an unrecoverable error")
+                # Let the exception propagate, relying on global config to at
+                # at least return a nice error message
+                log.exception("Error while rendering courseware-error page")
+                raise
 
     return result
 
@@ -215,9 +232,22 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('info.html', {'course': course,
+    return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
+# TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
+@ensure_csrf_cookie
+def syllabus(request, course_id):
+    """
+    Display the course's syllabus.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    return render_to_response('courseware/syllabus.html', {'course': course,
+                                            'staff_access': staff_access,})
 
 def registered_for_course(course, user):
     '''Return CourseEnrollment if user is registered for course, else False'''
@@ -255,14 +285,33 @@ def university_profile(request, org_id):
 
     return render_to_response(template_file, context)
 
+def render_notifications(request, course, notifications):
+    context = {
+        'notifications': notifications,
+        'get_discussion_title': partial(get_discussion_title, request=request, course=course),
+        'course': course,
+    }
+    return render_to_string('notifications.html', context)
+
+@login_required
+def news(request, course_id):
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    notifications = comment_client.get_notifications(request.user.id)
+
+    context = {
+        'course': course,
+        'content': render_notifications(request, course, notifications),
+    }
+
+    return render_to_response('news.html', context)
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile(request, course_id, student_id=None):
-    """ User profile. Show username, location, etc, as well as grades .
-        We need to allow the user to change some of these settings.
+def progress(request, course_id, student_id=None):
+    """ User progress. We show the grade bar and every problem score.
 
-    Course staff are allowed to see the profiles of students in their class.
+    Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
@@ -276,28 +325,23 @@ def profile(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
-    user_info = UserProfile.objects.get(user=student)
+    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        course_id, request.user, course)
+    course_module = get_module(request.user, request, course.location,
+                               student_module_cache, course_id)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(request.user, course)
-    course_module = get_module(request.user, request, course.location, student_module_cache, course_id=course_id)
-
-    courseware_summary = grades.progress_summary(student, course_module, course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, course_module,
+                                                 course.grader, student_module_cache)
     grade_summary = grades.grade(request.user, request, course, student_module_cache)
 
-    context = {'name': user_info.name,
-               'username': student.username,
-               'location': user_info.location,
-               'language': user_info.language,
-               'email': student.email,
-               'course': course,
-               'csrf': csrf(request)['csrf_token'],
+    context = {'course': course,
                'courseware_summary': courseware_summary,
                'grade_summary': grade_summary,
                'staff_access': staff_access,
                }
     context.update()
 
-    return render_to_response('profile.html', context)
+    return render_to_response('courseware/progress.html', context)
 
 
 
@@ -325,7 +369,7 @@ def gradebook(request, course_id):
                      }
                      for student in enrolled_students]
 
-    return render_to_response('gradebook.html', {'students': student_info,
+    return render_to_response('courseware/gradebook.html', {'students': student_info,
                                                  'course': course,
                                                  'course_id': course_id,
                                                  # Checked above
@@ -340,7 +384,7 @@ def grade_summary(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('grade_summary.html', context)
+    return render_to_response('courseware/grade_summary.html', context)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -351,5 +395,46 @@ def instructor_dashboard(request, course_id):
     # For now, just a static page
     context = {'course': course,
                'staff_access': True,}
-    return render_to_response('instructor_dashboard.html', context)
 
+    return render_to_response('courseware/instructor_dashboard.html', context)
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def enroll_students(request, course_id):
+    ''' Allows a staff member to enroll students in a course.
+
+    This is a short-term hack for Berkeley courses launching fall
+    2012. In the long term, we would like functionality like this, but
+    we would like both the instructor and the student to agree. Right
+    now, this allows any instructor to add students to their course,
+    which we do not want.
+
+    It is poorly written and poorly tested, but it's designed to be
+    stripped out.
+    '''
+
+    course = get_course_with_access(request.user, course_id, 'staff')
+    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id = course_id)]
+
+    if 'new_students' in request.POST:
+        new_students = request.POST['new_students'].split('\n')
+    else:
+        new_students = []
+    new_students = [s.strip() for s in new_students]
+
+    added_students = []
+    rejected_students = []
+
+    for student in new_students:
+        try:
+            nce = CourseEnrollment(user=User.objects.get(email = student), course_id = course_id)
+            nce.save()
+            added_students.append(student)
+        except:
+            rejected_students.append(student)
+
+    return render_to_response("enroll_students.html", {'course':course_id,
+                                                       'existing_students': existing_students,
+                                                       'added_students': added_students,
+                                                       'rejected_students': rejected_students,
+                                                       'debug':new_students})

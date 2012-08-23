@@ -45,6 +45,16 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django_countries import CountryField
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from functools import partial
+
+import comment_client as cc
+from django_comment_client.models import Role, Permission
+
+import logging
+
 from xmodule.modulestore.django import modulestore
 
 #from cache_toolbox import cache_model, cache_relation
@@ -165,7 +175,6 @@ class PendingEmailChange(models.Model):
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
-
 class CourseEnrollment(models.Model):
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, db_index=True)
@@ -174,6 +183,16 @@ class CourseEnrollment(models.Model):
 
     class Meta:
         unique_together = (('user', 'course_id'), )
+
+@receiver(post_save, sender=CourseEnrollment)
+def assign_default_role(sender, instance, **kwargs):
+    if instance.user.is_staff:
+        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
+    else:
+        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
+
+    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
+    instance.user.roles.add(role)
 
 #cache_relation(User.profile)
 
@@ -254,8 +273,18 @@ def add_user_to_default_group(user, group):
     utg.users.add(User.objects.get(username=user))
     utg.save()
 
+# @receiver(post_save, sender=User)
+def update_user_information(sender, instance, created, **kwargs):
+    try:
+        cc_user = cc.User.from_django_user(instance)
+        cc_user.save()
+    except Exception as e:
+        log = logging.getLogger("mitx.discussion")
+        log.error(unicode(e))
+        log.error("update user info to discussion failed for user with id: " + str(instance.id))
+
 ########################## REPLICATION SIGNALS #################################
-@receiver(post_save, sender=User)
+# @receiver(post_save, sender=User)
 def replicate_user_save(sender, **kwargs):
     user_obj = kwargs['instance']
     if not should_replicate(user_obj):
@@ -263,7 +292,7 @@ def replicate_user_save(sender, **kwargs):
     for course_db_name in db_names_to_replicate_to(user_obj.id):
         replicate_user(user_obj, course_db_name)
 
-@receiver(post_save, sender=CourseEnrollment)
+# @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
     """This is called when a Student enrolls in a course. It has to do the 
     following:
@@ -279,7 +308,8 @@ def replicate_enrollment_save(sender, **kwargs):
 
     enrollment_obj = kwargs['instance']
     log.debug("Replicating user because of new enrollment")
-    replicate_user(enrollment_obj.user, enrollment_obj.course_id)
+    for course_db_name in db_names_to_replicate_to(enrollment_obj.user.id):
+        replicate_user(enrollment_obj.user, course_db_name)
 
     log.debug("Replicating enrollment because of new enrollment")
     replicate_model(CourseEnrollment.save, enrollment_obj, enrollment_obj.user_id)
@@ -288,12 +318,12 @@ def replicate_enrollment_save(sender, **kwargs):
     user_profile = UserProfile.objects.get(user_id=enrollment_obj.user_id)
     replicate_model(UserProfile.save, user_profile, enrollment_obj.user_id)
  
-@receiver(post_delete, sender=CourseEnrollment)
+# @receiver(post_delete, sender=CourseEnrollment)
 def replicate_enrollment_delete(sender, **kwargs):
     enrollment_obj = kwargs['instance']
     return replicate_model(CourseEnrollment.delete, enrollment_obj, enrollment_obj.user_id)
  
-@receiver(post_save, sender=UserProfile)
+# @receiver(post_save, sender=UserProfile)
 def replicate_userprofile_save(sender, **kwargs):
     """We just updated the UserProfile (say an update to the name), so push that
     change to all Course DBs that we're enrolled in."""
@@ -403,4 +433,3 @@ def should_replicate(instance):
                   .format(instance))
         return False
     return True
-

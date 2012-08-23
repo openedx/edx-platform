@@ -2,7 +2,7 @@ django>=1.4,<1.5
 pip
 numpy
 scipy
-markdown
+Markdown<2.3.0
 pygments
 lxml
 boto
@@ -11,8 +11,6 @@ python-memcached
 python-openid 
 path.py
 django_debug_toolbar
--e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
-django-staticfiles>=1.2.1
 fs
 beautifulsoup 
 beautifulsoup4
@@ -30,6 +28,7 @@ django-override-settings
 mock>=0.8, <0.9
 PyYAML
 South
+pytz
 django-celery
 django-countries
 django-kombu
@@ -44,5 +43,7 @@ django-ses
 django-storages
 django-threaded-multihost
 django-sekizai<0.7
-git+git://github.com/benjaoming/django-wiki.git@484ff1ce49
+django-mptt>=0.5.3
+sorl-thumbnail
+networkx
 -r repo-requirements.txt

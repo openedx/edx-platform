@@ -12,8 +12,11 @@ $bright-blue: #3c8ebf;
 $orange: #f96e5b;
 $yellow: #fff8af;
 $cream: #F6EFD4;
-$mit-red: #933;
 $border-color: #ddd;
+
+// edX colors
+$blue: rgb(29,157,217);
+$pink: rgb(182,37,104);
 
 @mixin hide-text {
   background-color: transparent;

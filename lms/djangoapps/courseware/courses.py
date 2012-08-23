@@ -13,6 +13,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
+import branding
 
 log = logging.getLogger(__name__)
 
@@ -25,10 +26,9 @@ def get_course_by_id(course_id):
     """
     try:
         course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_item(course_loc)
+        return modulestore().get_instance(course_id, course_loc)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
-
 
 
 def get_course_with_access(user, course_id, action):
@@ -143,6 +143,36 @@ def get_course_info_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
+# TODO: Fix this such that these are pulled in as extra course-specific tabs.
+#       arjun will address this by the end of October if no one does so prior to
+#       then.
+def get_course_syllabus_section(course, section_key):
+    """
+    This returns the snippet of html to be rendered on the syllabus page,
+    given the key for the section.
+
+    Valid keys:
+    - syllabus
+    - guest_syllabus
+    """
+
+    # Many of these are stored as html files instead of some semantic
+    # markup. This can change without effecting this interface when we find a
+    # good format for defining so many snippets of text/html.
+
+    if section_key in ['syllabus', 'guest_syllabus']:
+        try:
+            with course.system.resources_fs.open(path("syllabus") / section_key + ".html") as htmlFile:
+                return replace_urls(htmlFile.read().decode('utf-8'),
+                                    course.metadata['data_dir'])
+        except ResourceNotFoundError:
+            log.exception("Missing syllabus section {key} in course {url}".format(
+                key=section_key, url=course.location.url()))
+            return "! Syllabus missing !"
+
+    raise KeyError("Invalid about key " + str(section_key))
+
+
 def get_courses_by_university(user, domain=None):
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).
@@ -150,24 +180,11 @@ def get_courses_by_university(user, domain=None):
     '''
     # TODO: Clean up how 'error' is done.
     # filter out any courses that errored.
-    courses = [c for c in modulestore().get_courses()
-               if isinstance(c, CourseDescriptor)]
-    courses = sorted(courses, key=lambda course: course.number)
-
-    if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-        subdomain = domain.split(".")[0]
-        if subdomain not in settings.COURSE_LISTINGS:
-            subdomain = 'default'
-        visible_courses = frozenset(settings.COURSE_LISTINGS[subdomain])
-    else:
-        visible_courses = frozenset(c.id for c in courses)
+    visible_courses = branding.get_visible_courses(domain)
 
     universities = defaultdict(list)
-    for course in courses:
+    for course in visible_courses:
         if not has_access(user, course, 'see_exists'):
-            continue
-        if course.id not in visible_courses:
             continue
         universities[course.org].append(course)
     return universities
-

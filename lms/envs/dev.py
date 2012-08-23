@@ -15,6 +15,8 @@ TEMPLATE_DEBUG = True
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
+MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
+MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 
 WIKI_ENABLED = True
 
@@ -68,10 +70,36 @@ CACHE_TIMEOUT = 0
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+COURSE_LISTINGS = {
+    'default': ['BerkeleyX/CS169.1x/2012_Fall',
+                'BerkeleyX/CS188.1x/2012_Fall',
+                'HarvardX/CS50x/2012',
+                'HarvardX/PH207x/2012_Fall',
+                'MITx/3.091x/2012_Fall',
+                'MITx/6.002x/2012_Fall',
+                'MITx/6.00x/2012_Fall'],
+    'berkeley': ['BerkeleyX/CS169.1x/Cal_2012_Fall',
+                 'BerkeleyX/CS188.1x/Cal_2012_Fall'],
+    'harvard': ['HarvardX/CS50x/2012H'],
+    'mit': [],
+    'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
+}
+
+SUBDOMAIN_BRANDING = {
+    'sjsu': 'MITx',
+    'mit': 'MITx',
+    'berkeley': 'BerkeleyX',
+    'harvard': 'HarvardX',
+}
+
+COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
+
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
+
+INSTALLED_APPS += ('lms_migration',)
 
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 

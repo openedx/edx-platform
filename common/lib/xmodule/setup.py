@@ -10,7 +10,6 @@ setup(
     },
     requires=[
         'capa',
-        'mitxmako'
     ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
@@ -35,6 +34,7 @@ setup(
             "video = xmodule.video_module:VideoDescriptor",
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
+            "discussion = xmodule.discussion_module:DiscussionDescriptor",
         ]
     }
 )
