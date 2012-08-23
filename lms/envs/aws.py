@@ -47,7 +47,8 @@ LOGGING = get_logger_config(LOG_DIR,
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False)
 
-COURSE_LISTINGS = ENV_TOKENS['COURSE_LISTINGS']
+COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
+SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
