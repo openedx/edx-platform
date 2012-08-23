@@ -21,6 +21,8 @@ import pystache_custom as pystache
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
+
+
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
