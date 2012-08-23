@@ -1,5 +1,6 @@
+import comment_client as cc
+
 from .models import Role, Permission
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from student.models import CourseEnrollment
@@ -7,16 +8,6 @@ from student.models import CourseEnrollment
 import logging
 from util.cache import cache
 
-
-@receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
-    instance.user.roles.add(role)
 
 def cached_has_permission(user, permission, course_id=None):
     """
