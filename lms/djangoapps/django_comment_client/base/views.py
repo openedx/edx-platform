@@ -282,7 +282,7 @@ def update_moderator_status(request, course_id, user_id):
             'course_id': course_id,
             'user': request.user,
             'django_user': user,
-            'discussion_user': discussion_user.to_dict(),
+            'profiled_user': discussion_user.to_dict(),
         }
         return JsonResponse({
             'html': render_to_string('discussion/ajax_user_profile.html', context)

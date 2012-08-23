@@ -37,7 +37,7 @@
               anonymous
             {{/content.anonymous}}
             {{^content.anonymous}}
-              {{content.username}}
+              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
           <div class="show-comments-wrapper">
