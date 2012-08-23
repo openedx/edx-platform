@@ -346,10 +346,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
         if not get.has_key(key):
-            return Http404
+            raise Http404
     header = json.loads(get['xqueue_header'])
     if not isinstance(header, dict) or not header.has_key('lms_key'):
-        return Http404
+        raise Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
