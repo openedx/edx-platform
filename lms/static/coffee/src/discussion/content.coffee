@@ -365,9 +365,6 @@ if Backbone?
     initTimeago: ->
       @$("span.timeago").timeago()
 
-    initPermalink: ->
-      @$(".discussion-permanent-link").attr "href", @model.permalink()
-
     renderPartial: ->
       for attr, value of @model.changedAttributes()
         if @partial[attr]
@@ -402,10 +399,6 @@ if Backbone?
       @set('thread', @)
       super()
 
-    permalink: ->
-      discussion_id = @get('commentable_id')
-      return Discussion.urlFor("permanent_link_thread", discussion_id, @id)
-
   class @ThreadView extends @ContentView
 
   class @Comment extends @Content
@@ -417,11 +410,6 @@ if Backbone?
       'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
       'update': -> DiscussionUtil.urlFor('update_comment', @id)
       'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
-
-    permalink: ->
-      thread_id = @get('thread').id
-      discussion_id = @get('thread').get('commentable_id')
-      return Discussion.urlFor("permanent_link_comment", discussion_id, thread_id, @id)
 
     getCommentsCount: ->
       count = 0
