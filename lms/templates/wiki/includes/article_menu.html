@@ -1,5 +1,8 @@
 ## mako
-<%! from django.core.urlresolvers import reverse %>
+<%! 
+  from django.core.urlresolvers import reverse
+  from wiki.core.permissions import can_change_permissions
+%>
 
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
@@ -37,9 +40,10 @@
 
 
 <%doc>
-The settings link has been disabled because the notifications app hasn't been integrated yet and those are the only useful settings.
+This should be enabled for all non-anonymous users once the notifications app has been integrated and styled.
+</%doc>
 
-%if not user.is_anonymous():
+%if can_change_permissions(article,user):
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-settings icon"></span>
@@ -47,6 +51,6 @@ The settings link has been disabled because the notifications app hasn't been in
   </a>
 </li>
 %endif
-</%doc>
+
 
 

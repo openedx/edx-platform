@@ -318,7 +318,10 @@ WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0 # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False # Don't allow anonymous access until the styling is figured out
-WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.has_perm('wiki.assign')
+WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
+WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
+
+WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
