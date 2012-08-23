@@ -29,7 +29,7 @@ $(document).ready(function(){
       ${get_course_info_section(course, 'updates')}
     </section>
     <section aria-label="Handout Navigation" class="handouts">
-      <h1>Course Handouts</h1>
+      <h1>${course.info_sidebar_name}</h1>
       ${get_course_info_section(course, 'handouts')}
     </section>
     % else:
