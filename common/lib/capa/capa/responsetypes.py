@@ -1149,7 +1149,10 @@ class CodeResponse(LoncapaResponse):
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 
-        queuestate = (queuekey,'')
+        # State associated with the queueing request
+        qtime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        queuestate = (queuekey, qtime)
+
         cmap = CorrectMap() 
         if error:
             cmap.set(self.answer_id, queuestate=None,

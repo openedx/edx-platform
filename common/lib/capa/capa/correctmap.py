@@ -73,6 +73,9 @@ class CorrectMap(object):
     def is_right_queuekey(self, answer_id, test_key):
         return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate'][0] == test_key
 
+    def get_queuetime_str(self, answer_id):
+        return self.cmap[answer_id]['queuestate'][1] if self.is_queued(answer_id) else None 
+
     def get_npoints(self, answer_id):
         npoints = self.get_property(answer_id, 'npoints')
         if npoints is not None:
