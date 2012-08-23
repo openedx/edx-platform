@@ -12,4 +12,5 @@ $ ->
     discussion.reset(discussionData, {silent: false})
     view = new DiscussionView(el: elem, model: discussion)
 
-  DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
+  if window.$$annotated_content_info?
+    DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
