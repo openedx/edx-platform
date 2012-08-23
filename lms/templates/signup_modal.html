@@ -118,8 +118,18 @@
   </div>
 </section>
 
+<script src="${static.url('js/jQuery.validity.min.js')}"></script>
 <script type="text/javascript">
   (function() {
+
+   $(document).delegate('#register_form', 'ajax:before', function() {
+     var username = $("input[name=username]").value();
+     console.log(username)
+     return false;
+   });
+
+
+
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
        location.href="${reverse('dashboard')}";
