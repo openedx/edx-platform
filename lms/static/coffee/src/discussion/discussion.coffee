@@ -45,6 +45,7 @@ class @DiscussionView extends Backbone.View
       @model.reset(response.discussionData, { silent: false })
       view = new DiscussionView el: $discussion[0], model: @model
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
+      $("html, body").animate({ scrollTop: 0 }, 0)
 
   loadSimilarPost: (event) ->
     $title = @$(".new-post-title")
