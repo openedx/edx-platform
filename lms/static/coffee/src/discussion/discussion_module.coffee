@@ -16,7 +16,7 @@ if Backbone?
           $elem = $(event.target)
           discussion_id = $elem.attr("discussion_id")
           url = DiscussionUtil.urlFor 'retrieve_discussion', discussion_id
-          Discussion.safeAjax
+          DiscussionUtil.safeAjax
             $elem: $elem
             url: url
             type: "GET"
