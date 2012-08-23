@@ -7,7 +7,8 @@ import inspect
 
 def pluralize(content, text):
     num, word = text.split(' ')
-    if int(num or '0') >= 2:
+    num = int(num or '0')
+    if num >= 2 or num == 0:
         return word + 's'
     else:
         return word

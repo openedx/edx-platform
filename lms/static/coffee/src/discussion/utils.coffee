@@ -1,3 +1,10 @@
+$ ->
+  $.fn.extend
+    loading: ->
+      $(this).after("<span class='discussion-loading'></span>")
+    loaded: ->
+      $(this).parent().children(".discussion-loading").remove()
+
 class @DiscussionUtil
 
   @wmdEditors: {}
@@ -62,9 +69,16 @@ class @DiscussionUtil
     $elem = params.$elem
     if $elem.attr("disabled")
       return
-    $elem.attr("disabled", "disabled")
+    params["beforeSend"] = ->
+      $elem.attr("disabled", "disabled")
+      if params["$loading"]
+        console.log "loading"
+        params["$loading"].loading()
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
+      if params["$loading"]
+        console.log "loaded"
+        params["$loading"].loaded()
 
   @get: ($elem, url, data, success) ->
     @safeAjax

@@ -1,0 +1,9 @@
+% if len(threads) > 0:
+  Similar Posts: 
+  <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
+  <div class="new-post-similar-posts">
+    % for thread in threads:
+      <a class="similar-post" href="${thread['permalink']}">${thread['title']}</a>
+    % endfor
+  </div>
+% endif

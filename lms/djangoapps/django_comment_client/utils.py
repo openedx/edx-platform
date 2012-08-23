@@ -21,6 +21,8 @@ import pystache_custom as pystache
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
+
+
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
@@ -197,3 +199,20 @@ def url_for_tags(course_id, tags):
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
+
+def permalink(content):
+    if content['type'] == 'thread':
+        return reverse('django_comment_client.forum.views.single_thread',
+                       args=[content['course_id'], content['commentable_id'], content['id']])
+    else:
+        return reverse('django_comment_client.forum.views.single_thread',
+                       args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
+
+def extend_content(content):
+    content_info = {
+        'displayed_title': content.get('highlighted_title') or content.get('title', ''),
+        'displayed_body': content.get('highlighted_body') or content.get('body', ''),
+        'raw_tags': ','.join(content.get('tags', [])),
+        'permalink': permalink(content),
+    }
+    return merge_dict(content, content_info)
