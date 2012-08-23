@@ -90,7 +90,9 @@ if Backbone?
       ability: (ability) ->
         for action, elemSelector of @model.actions
           if not ability[action]
-            @$(elemSelector).parent().remove()
+            @$(elemSelector).parent().hide()
+          else
+            @$(elemSelector).parent().show()
 
     $discussionContent: ->
       @_discussionContent ||= @$el.children(".discussion-content")
@@ -271,6 +273,7 @@ if Backbone?
         data: data
         success: (response, textStatus) =>
           @model.set('closed', not closed)
+          @model.set('ability', response.ability)
 
     edit: (event) ->
       @$(".discussion-content-wrapper").hide()
