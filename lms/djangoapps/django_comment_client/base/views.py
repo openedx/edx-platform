@@ -8,6 +8,8 @@ import functools
 
 import comment_client as cc
 import django_comment_client.utils as utils
+import django_comment_client.settings as cc_settings
+
 
 from django.core import exceptions
 from django.contrib.auth.decorators import login_required
@@ -15,7 +17,6 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -114,6 +115,9 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
 @login_required
 @permitted
 def create_comment(request, course_id, thread_id):
+    if cc_settings.MAX_COMMENT_DEPTH is not None:
+        if cc_settings.MAX_COMMENT_DEPTH < 0:
+            return JsonError("Comment level too deep")
     return _create_comment(request, course_id, thread_id=thread_id)
 
 @require_POST
@@ -158,6 +162,9 @@ def openclose_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def create_sub_comment(request, course_id, comment_id):
+    if cc_settings.MAX_COMMENT_DEPTH is not None:
+        if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
+            return JsonError("Comment level too deep")
     return _create_comment(request, course_id, parent_id=comment_id)
 
 @require_POST
