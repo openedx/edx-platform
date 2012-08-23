@@ -273,7 +273,7 @@ def add_user_to_default_group(user, group):
     utg.users.add(User.objects.get(username=user))
     utg.save()
 
-# @receiver(post_save, sender=User)
+@receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
     try:
         cc_user = cc.User.from_django_user(instance)
