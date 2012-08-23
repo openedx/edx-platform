@@ -80,11 +80,16 @@ var Gradebook = function($element) {
 	var filter = function(e) {
 		var term = $(this).val();
 		if(term.length > 0) {
-			$studentTable.find('tr').hide();
-			$studentTable.find('tbody tr').not(':contains(' + term + '), :nth-child(1)').hide();	
+			$studentTable.find('tbody tr').hide();
+			$gradeTable.find('tbody tr').hide();
+			$studentTable.find('tbody tr:contains(' + term + ')').each(function(i) {
+				$(this).show();
+				$gradeTable.find('tr').eq($(this).index() + 1).show();
+			});
 		} else {
 			$studentTable.find('tbody tr').show();
-		}		
+			$gradeTable.find('tbody tr').show();
+		}
 	}
 
 	$leftShadow.css('height', tableHeight + 'px');
