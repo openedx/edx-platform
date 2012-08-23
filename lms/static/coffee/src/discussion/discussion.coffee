@@ -109,6 +109,7 @@ if Backbone?
         @$(".discussion-cancel-post").click $.proxy(@cancelNewPost, @)
         
 
+      @$el.children(".blank").hide()
       @$(".new-post-form").show()
 
     submitNewPost: (event) ->
@@ -136,6 +137,8 @@ if Backbone?
           $thread = $(response.html)
           @$el.children(".threads").prepend($thread)
 
+          @$el.children(".blank").remove()
+
           @$(".new-post-similar-posts").empty()
           @$(".new-post-similar-posts-wrapper").hide()
           @$(".new-post-title").val("").attr("prev-text", "")
@@ -154,6 +157,7 @@ if Backbone?
         @$(".new-post-form").addClass("collapsed")
       else if @$el.hasClass("forum-discussion")
         @$(".new-post-form").hide()
+      @$el.children(".blank").show()
 
     search: (event) ->
       event.preventDefault()
