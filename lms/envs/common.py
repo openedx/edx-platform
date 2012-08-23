@@ -408,6 +408,10 @@ courseware_only_js += [
     pth for pth
     in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
 ]
+courseware_only_js += [
+    pth for pth
+    in glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
+]
 
 main_vendor_js = [
   'js/vendor/jquery.min.js',
