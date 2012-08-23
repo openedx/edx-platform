@@ -1,0 +1,32 @@
+body.cs188 {
+
+    .course-content{
+
+        .project {
+            ul, ol {
+                margin-top: 3px;
+                list-style: disc;
+                ul, ol {
+                    margin: 0px;
+                }
+            }
+        }
+
+        h3, h4 {
+            font-weight: bold;
+            a {
+                color: inherit;
+            }
+        }
+
+        h4 {
+            font-size: 1em;
+        }
+
+        p, .code_snippet {
+            margin-bottom: 1.416em;
+        }
+
+    }
+
+}
