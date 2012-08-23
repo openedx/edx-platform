@@ -759,6 +759,10 @@ section.wiki {
       padding: 8px;
       overflow: hidden;
     }
+    
+    a.list-children {
+      margin-left: 3px;
+    }
 
     tr:nth-child(even) {
       background: #F6F6F6;
