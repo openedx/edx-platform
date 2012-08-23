@@ -54,3 +54,10 @@ def unregister_for_course(coursename):
 	world.browser.get(url+'dashboard')
 	world.browser.find_element_by_xpath("//a[@data-course-id='"+coursename+"']").click()
 	find_element_by_name_in_selection('unenroll_form','submit').click()
+
+def check_for_errors():
+	e = world.browser.find_elements_by_class_name('outside-app')
+	if len(e) > 0:
+		assert False, 'there was a server error at %s' % (world.browser.current_url)
+	else:
+		assert True

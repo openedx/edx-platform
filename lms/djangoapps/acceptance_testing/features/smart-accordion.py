@@ -50,15 +50,18 @@ def i_verify_all_the_content_of_each_course(step):
 	while i < registered_courses:
 		world.browser.find_element_by_xpath("//section[@class='my-courses']//article["+str(i+1)+"]//a").click()
 		wait_until_class_renders('my-courses',1)
+		check_for_errors()
 		current_course = re.sub('/info','',re.sub('.*/courses/','',world.browser.current_url))
 		
 		validate_course(current_course,ids)
 		
 		world.browser.find_element_by_link_text('Courseware').click()
 		wait_until_id_renders('accordion',2)
+		check_for_errors()
 		browse_course(current_course)
 
 		world.browser.find_element_by_xpath("//a[@class='user-link']").click()
+		check_for_errors()
 		i += 1
 
 
@@ -66,6 +69,8 @@ def browse_course(course_id):
 	world.browser.find_element_by_xpath("//div[@id='accordion']//nav//div[1]").click()
 
 	wait_until_id_renders('accordion',2)
+	check_for_errors()
+
 	chapters = get_courseware_with_tabs(course_id)
 	num_chapters = len(chapters)
 	rendered_chapters = len(world.browser.find_elements_by_class_name("chapter"))
@@ -77,6 +82,8 @@ def browse_course(course_id):
 	## Iterate the chapters
 	while chapter_it < num_chapters:
 		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//h3").click()
+		check_for_errors()
+
 		sections = chapters[chapter_it]['sections']
 		num_sections = len(sections)
 		accordion_class = "ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active"
@@ -89,6 +96,8 @@ def browse_course(course_id):
 		while section_it < num_sections:
 			world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//ul[@class='"+accordion_class+"']//li["+str(section_it+1)+"]//a").click()
 			wait_until_class_renders('course-content',3)
+			check_for_errors()
+
 			#tab = current_course.get_children()[0].get_children()[0]
 			num_tabs = sections[section_it]['clickable_tab_count']
 			if num_tabs != 0:
@@ -103,6 +112,8 @@ def browse_course(course_id):
 			while tab_it < num_tabs:
 				tab = world.browser.find_element_by_xpath("//ol[@id='sequence-list']//li["+str(tab_it+1)+"]//a[@data-element='"+str(tab_it+1)+"']")
 				tab.click()
+				check_for_errors()
+				
 				tab_it += 1
 
 			section_it += 1
