@@ -209,16 +209,28 @@ def single_thread(request, course_id, discussion_id, thread_id):
     else:
         course = get_course_with_access(request.user, course_id, 'load')
 
+        recent_active_threads = cc.search_recent_active_threads(
+            course_id,
+            recursive=False,
+            query_params={'follower_id': request.user.id},
+        )
+
+        trending_tags = cc.search_trending_tags(
+            course_id,
+        )
+
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',
             'content': render_single_thread(request, discussion_id, course_id, thread_id),
             'course': course,
+            'recent_active_threads': recent_active_threads,
+            'trending_tags': trending_tags,
             'course_id': course.id,
         }
 
-        return render_to_response('discussion/index.html', context)
+        return render_to_response('discussion/single_thread.html', context)
 
 def user_profile(request, course_id, user_id):
 

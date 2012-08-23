@@ -1,3 +1,5 @@
+<%! import django_comment_client.helpers as helpers %>
+
 % if trending_tags:
   <article class="discussion-sidebar-tags sidebar-module">
       <header>
@@ -5,7 +7,7 @@
       </header>
       <ol class="discussion-sidebar-tags-list">
         % for tag, count in trending_tags:
-          <li><a href="#" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
+          <li><a href="${helpers.url_for_tags(course.id, tag)}" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
         % endfor
       <ol>
   </article>
