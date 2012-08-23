@@ -129,6 +129,8 @@ if Backbone?
           $thread = $(response.html)
           @$el.children(".threads").prepend($thread)
 
+          @$(".new-post-similar-posts").empty()
+          @$(".new-post-similar-posts-wrapper").hide()
           @$(".new-post-title").val("")
           DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
           @$(".new-post-tags").val("")
