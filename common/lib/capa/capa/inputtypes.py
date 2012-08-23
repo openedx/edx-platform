@@ -185,7 +185,7 @@ def choicegroup(element, value, status, render_template, msg=''):
         if choice.text is not None:
             ctext += choice.text		# TODO: fix order?
         choices.append((choice.get("name"), ctext))
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': type, 'choices': choices, 'inline': True, 'name_array_suffix': ''}
+    context = {'id': eid, 'value': value, 'state': status, 'input_type': type, 'choices': choices, 'name_array_suffix': ''}
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
 
@@ -226,7 +226,7 @@ def radiogroup(element, value, status, render_template, msg=''):
 
     choices = extract_choices(element)
 
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'radio', 'choices': choices, 'inline': False, 'name_array_suffix': '[]'}
+    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'radio', 'choices': choices, 'name_array_suffix': '[]'}
 
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
@@ -244,7 +244,7 @@ def checkboxgroup(element, value, status, render_template, msg=''):
 
     choices = extract_choices(element)
 
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'checkbox', 'choices': choices, 'inline': False, 'name_array_suffix': '[]'}
+    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'checkbox', 'choices': choices, 'name_array_suffix': '[]'}
 
     html = render_template("choicegroup.html", context)
     return etree.XML(html)
