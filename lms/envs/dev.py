@@ -92,6 +92,8 @@ SUBDOMAIN_BRANDING = {
     'harvard': 'HarvardX',
 }
 
+COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
+
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
