@@ -1,5 +1,3 @@
-import comment_client as cc
-
 from .models import Role, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
