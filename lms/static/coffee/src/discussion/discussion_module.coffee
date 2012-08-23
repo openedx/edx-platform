@@ -1,42 +1,32 @@
-if not @Discussion?
-  @Discussion = {}
-
-Discussion = @Discussion
-
-@Discussion = $.extend @Discussion,
-  initializeDiscussionModule: (elem) ->
-    $discussionModule = $(elem)
-    $local = Discussion.generateLocal($discussionModule)
-    handleShowDiscussion = (elem) ->
-      $elem = $(elem)
-      if not $local("section.discussion").length
+class @DiscussionModuleView extends Backbone.View
+  events:
+    "click .discussion-show": "toggleDiscussion"
+  toggleDiscussion: (event) ->
+    if @showed
+      @$("section.discussion").hide()
+      $(event.target).html("Show Discussion")
+      @showed = false
+    else
+      if @retrieved
+        @$("section.discussion").show()
+        $(event.target).html("Hide Discussion")
+        @showed = true
+      else
+        $elem = $(event.target)
         discussion_id = $elem.attr("discussion_id")
-        url = Discussion.urlFor 'retrieve_discussion', discussion_id
+        url = DiscussionUtil.urlFor 'retrieve_discussion', discussion_id
         Discussion.safeAjax
           $elem: $elem
           url: url
           type: "GET"
-          success: (data, textStatus, xhr) ->
-            $discussionModule.append(data)
-            discussion = $local("section.discussion")
-            Discussion.initializeDiscussion(discussion)
-            Discussion.bindDiscussionEvents(discussion)
-            $elem.html("Hide Discussion")
-            $elem.unbind('click').click ->
-              handleHideDiscussion(this)
-          dataType: 'html'
-      else
-        $local("section.discussion").show()
-        $elem.html("Hide Discussion")
-        $elem.unbind('click').click ->
-          handleHideDiscussion(this)
-
-    handleHideDiscussion = (elem) ->
-      $local("section.discussion").hide()
-      $elem = $(elem)
-      $elem.html("Show Discussion")
-      $elem.unbind('click').click ->
-        handleShowDiscussion(this)
-
-    $local(".discussion-show").click ->
-      handleShowDiscussion(this)
+          dataType: 'json'
+          success: (response, textStatus) =>
+            @$el.append(response.html)
+            $discussion = @$el.find("section.discussion")
+            $(event.target).html("Hide Discussion")
+            discussion = new Discussion()
+            discussion.reset(response.discussionData, {silent: false})
+            view = new DiscussionView(el: $discussion[0], model: discussion)
+            DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
+            @retrieved = true
+            @showed = true
