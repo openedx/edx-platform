@@ -7,7 +7,8 @@ import traceback
 import re
 import sys
 
-from datetime import timedelta
+from datetime import datetime, timedelta
+from django.conf import settings
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -462,11 +463,13 @@ class CapaModule(XModule):
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
-        # Problem queued. Student should not be able to submit
-        '''
+        # Problem queued. Students must wait XQUEUE_WAITTIME_BETWEEN_REQUESTS
         if self.lcp.is_queued():
-            return {'success': False, 'html': 'Already queued'} 
-        '''
+            current_time = datetime.now()
+            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            if (current_time-prev_submit_time).total_seconds() < settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS:
+                msg = 'You must wait %d seconds between queueing requests' % settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+                return {'success': msg, 'html': ''}
 
         try:
             old_state = self.lcp.get_state()
