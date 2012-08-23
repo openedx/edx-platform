@@ -21,6 +21,12 @@
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
 
+
+// course-specific courseware (all styles in these files should be gated by a
+// course-specific class). This should be replaced with a better way of
+// providing course-specific styling.
+@import "course/courseware/courses/_cs188.scss";
+
 // wiki
 @import "course/wiki/basic-html";
 @import "course/wiki/sidebar";
