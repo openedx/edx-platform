@@ -55,6 +55,7 @@ class @Sequence
       element.removeClass('progress-none')
              .removeClass('progress-some')
              .removeClass('progress-done')
+      
       switch progress
         when 'none' then element.addClass('progress-none')
         when 'in_progress' then element.addClass('progress-some')
