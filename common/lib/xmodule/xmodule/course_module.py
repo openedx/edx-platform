@@ -229,6 +229,10 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('css_class', '')
 
     @property
+    def info_sidebar_name(self):
+        return self.metadata.get('info_sidebar_name', 'Course Handouts')
+
+    @property
     def title(self):
         return self.display_name
 
