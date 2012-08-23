@@ -152,7 +152,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
 
   function blockNormal(stream, state) {
     var match;
-    if (stream.match(circuitRE)) {
+    if (stream.sol() && stream.match(circuitRE)) {
       stream.skipToEnd();
       return circuit_formatter;
     } else if (state.indentationDiff >= 4) {
