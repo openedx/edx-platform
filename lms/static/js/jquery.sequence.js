@@ -27,11 +27,6 @@ var SequenceNav = function($element) {
 		var offset = e.pageX - mouseOrigin;
 		var targetLeft = clamp(listOrigin + offset, -maxScroll, 0);
 
-		console.log('---------------');
-		console.log('offset: ' + offset);
-		console.log('target left: ' + targetLeft);
-		console.log('max: ' + maxScroll);
-
 		updateHorizontalPosition(targetLeft);
 
 		setShadows(targetLeft);
