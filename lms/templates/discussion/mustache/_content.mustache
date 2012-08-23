@@ -37,7 +37,7 @@
               anonymous
             {{/content.anonymous}}
             {{^content.anonymous}}
-              {{content.username}}
+              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
           <div class="show-comments-wrapper">
@@ -51,7 +51,9 @@
             {{/thread}}
           </div>
           <ul class="discussion-actions">
-            <li><a class="discussion-link discussion-reply discussion-reply-{{content.type}}" href="javascript:void(0)">Reply</a></li>
+            {{^max_depth}}
+              <li><a class="discussion-link discussion-reply discussion-reply-{{content.type}}" href="javascript:void(0)">Reply</a></li>
+            {{/max_depth}}
             {{#thread}}
               <li><div class="follow-wrapper"><a class="discussion-link discussion-follow-thread" href="javascript:void(0)">Follow</a></div></li>
             {{/thread}}

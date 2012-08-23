@@ -1,12 +1,12 @@
-<%namespace name="renderer" file="_thread.html"/>
+<%namespace name="renderer" file="_content_renderer.html"/>
 
-<section class="discussion user-active-discussion">
+<section class="discussion user-active-discussion" _id="${user_id}">
 
-  <div class="discussion-non-content discussion-local"></div>
+  <div class="discussion-non-content local"></div>
 
   <div class="threads">
     % for thread in threads:
-      ${renderer.render_thread(course_id, thread, show_comments=True)}
+      ${renderer.render_content_with_comments(thread, {'partial_comments': True})}
     % endfor
   </div>
 
