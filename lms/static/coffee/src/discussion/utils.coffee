@@ -72,11 +72,17 @@ class @DiscussionUtil
     params["beforeSend"] = ->
       $elem.attr("disabled", "disabled")
       if params["$loading"]
-        params["$loading"].loading()
+        if params["loadingCallback"]?
+          params["loadingCallback"].apply(params["$loading"])
+        else
+          params["$loading"].loading()
     $.ajax(params).always ->
       $elem.removeAttr("disabled")
       if params["$loading"]
-        params["$loading"].loaded()
+        if params["loadedCallback"]?
+          params["loadedCallback"].apply(params["$loading"])
+        else
+          params["$loading"].loaded()
 
   @get: ($elem, url, data, success) ->
     @safeAjax
