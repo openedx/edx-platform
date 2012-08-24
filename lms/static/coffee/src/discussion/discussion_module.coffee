@@ -27,7 +27,7 @@ if Backbone?
               $discussion = @$el.find("section.discussion")
               $(event.target).html("Hide Discussion")
               discussion = new Discussion()
-              discussion.reset(response.discussionData, {silent: false})
+              discussion.reset(response.discussion_data, {silent: false})
               view = new DiscussionView(el: $discussion[0], model: discussion)
               DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
               @retrieved = true
