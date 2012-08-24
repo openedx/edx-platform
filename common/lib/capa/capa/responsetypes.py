@@ -1202,7 +1202,7 @@ class CodeResponse(LoncapaResponse):
         '''
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
-             'score': # TODO -- Partial grading
+             'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg }
 
         Returns (valid_score_msg, correct, score, msg):
