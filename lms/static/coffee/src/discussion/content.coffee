@@ -284,11 +284,11 @@ if Backbone?
         view = {}
         view.id = @model.id
         if @model.get('type') == 'thread'
-          view.title = @$(".thread-raw-title").html()
-          view.body = @$(".thread-raw-body").html()
-          view.tags = @$(".thread-raw-tags").html()
+          view.title = @model.get('title')
+          view.body = @model.get('body')
+          view.tags = @model.get('tags')
         else
-          view.body = @$(".comment-raw-body").html()
+          view.body = @model.get('body')
         @$discussionContent().append Mustache.render DiscussionUtil.getTemplate("_edit_#{@model.get('type')}"), view
         DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "#{@model.get('type')}-body-edit"
         @$(".thread-tags-edit").tagsInput DiscussionUtil.tagsInputOptions()
