@@ -384,7 +384,7 @@ def textbox(element, value, status, render_template, msg=''):
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
         status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+        msg = 'Submitted to grader.'
 
     # For CodeMirror
     mode = element.get('mode','python')
