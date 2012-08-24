@@ -133,18 +133,6 @@ div.gradebook-wrapper {
 			box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
 			border-left: 1px solid #ccc;
 
-			// &:before {
-			// 	content: '';
-			// 	display: block;
-			// 	position: absolute;
-			// 	left: 0;
-			// 	top: 0;
-			// 	z-index: 9999;
-			// 	width: 1px;
-			// 	height: 50px;
-			// 	@include linear-gradient(top, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, .15));
-			// }
-
 			&:first-child {
 				border-radius: 5px 0 0 0;
 				box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
@@ -205,6 +193,19 @@ div.gradebook-wrapper {
       @extend .top-header;
     }
   }
+
+	.student-table tr:hover td,
+	.grade-table tr:hover td,
+	.student-table tr.highlight td,
+	.grade-table tr.highlight td {
+		border-color: #74b7d6;
+		@include linear-gradient(#8ed6f7, #76cbf4);
+		color: #333;
+
+		a {
+			color: #333;
+		}
+	}
 }
 
 
