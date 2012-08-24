@@ -9,7 +9,7 @@
 %>
 
 <%def name="link_to_page(_page, text)">
-  <a class="discussion-page-link" href="javascript:void(0)" page-url="${url_for_page(_page)}">${text}</a>
+  <a class="discussion-page-link" href="javascript:void(0)" page-url="${url_for_page(_page) | h}">${text}</a>
 </%def>
 
 <%def name="div_page(_page)">
@@ -36,7 +36,7 @@
   % endfor
 </%def>
 
-<div class="discussion-${discussion_type}-paginator discussion-paginator local">
+<div class="discussion-${discussion_type | h}-paginator discussion-paginator local">
   <div class="prev-page">
     % if page > 1:
       ${link_to_page(page - 1, "&lt; Previous page")}
