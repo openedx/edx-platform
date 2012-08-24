@@ -36,9 +36,14 @@ class Command(BaseCommand):
         # users in group
         
         uall = User.objects.all()
-        print "----"
-        print "List of All Users: %s" % [str(x.username) for x in uall]
-        print "----"
+        if uall.count()<50:
+            print "----"
+            print "List of All Users: %s" % [str(x.username) for x in uall]
+            print "----"
+        else:
+            print "----"
+            print "There are %d users, which is too many to list" % uall.count()
+            print "----"
         
         while True:
         
