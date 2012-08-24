@@ -316,8 +316,12 @@ if Backbone?
         success: (response, textStatus) =>
           DiscussionUtil.clearFormErrors @$(".discussion-update-errors")
           @$discussionContent().replaceWith(response.html)
-          @model.set response.content
-          @model.updateInfo response.annotated_content_info
+          if @model.get('type') == 'thread'
+            @model = new Thread response.content
+          else
+            @model = new Comment $.extend {}, response.content, { thread: @model.get('thread') }
+          @reconstruct()
+          @model.updateInfo response.annotated_content_info, { forceUpdate: true }
 
     cancelEdit: (event) ->
       @$(".discussion-content-edit").hide()
@@ -388,6 +392,14 @@ if Backbone?
       @initTitle()
       @initBody()
       @initCommentViews()
+
+    reconstruct: ->
+      @initBindings()
+      @initLocal()
+      @initTimeago()
+      @initTitle()
+      @initBody()
+      @delegateEvents()
       
   class @Thread extends @Content
     urlMappers:

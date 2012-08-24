@@ -222,7 +222,7 @@ def extend_content(content):
 
 def safe_content(content):
     fields = [
-        'id', 'body', 'course_id', 'anonymous', 'endorsed',
+        'id', 'title', 'body', 'course_id', 'anonymous', 'endorsed',
         'parent_id', 'thread_id', 'votes', 'closed',
         'created_at', 'updated_at', 'depth', 'type',
         'commentable_id', 'comments_count', 'at_position_list',
