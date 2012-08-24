@@ -68,8 +68,8 @@
           @include clearfix;
           border-bottom: 1px dotted rgb(220,220,220);
           list-style: none;
-          margin-bottom: 20px;
-          padding-bottom: 10px;
+          margin-bottom: 15px;
+          padding-bottom: 17px;
 
           &:hover {
             .title .icon {
@@ -77,16 +77,20 @@
             }
           }
 
+          span {
+            display: block;
+          }
+
           span.title {
             color: $lighter-base-font-color;
-            float: left;
             font-family: $sans-serif;
+            font-size: 13px;
 
             .icon {
               background-size: cover;
               float: left;
               height: 19px;
-              margin: 2px 8px 0 0;
+              margin: 0 6px 0 0;
               opacity: 0.6;
               @include transition(all, 0.15s, linear);
               width: 19px;
@@ -112,7 +116,10 @@
           span.data {
             color: $lighter-base-font-color;
             font-weight: 700;
-            margin-left: 12px;
+            margin-left: 26px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
         }
       }

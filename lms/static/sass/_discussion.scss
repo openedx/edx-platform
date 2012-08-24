@@ -150,7 +150,8 @@ $tag-text-color: #5b614f;
 
 //user profile
 
-     .user-profile{
+    .user-profile {
+      @extend .sidebar;
        margin-top: 24px;
      }
 
@@ -158,6 +159,7 @@ $tag-text-color: #5b614f;
       font-size: 1.5em;
       font-weight: bold;
       line-height: 1.5em;
+      margin-top: 20px;
     }
 
     .sidebar-user-roles {
