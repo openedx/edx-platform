@@ -5,6 +5,7 @@ import logging
 
 from path import path
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404
 
 from xmodule.course_module import CourseDescriptor
@@ -137,7 +138,7 @@ def get_course_info_section(course, section_key):
                 info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
 
                 # Replace '/course/' urls
-                course_root = '/courses/' + course.location.course_id
+                course_root = reverse('course_root', args=[course.id])[:-1] # Remove trailing slash
                 info_html = replace_urls(info_html, course_root, '/course/')
                 return info_html
         except ResourceNotFoundError:
