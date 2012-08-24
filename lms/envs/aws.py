@@ -32,6 +32,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
+
 with open(ENV_ROOT / "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
@@ -55,6 +56,8 @@ LOGGING = get_logger_config(LOG_DIR,
 
 COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
 SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
+COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL",'')
+COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY",'')
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
@@ -73,5 +76,3 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
 
-COMMENTS_SERVICE_URL = ENV_TOKENS["COMMENTS_SERVICE_URL"]
-COMMENTS_SERVICE_KEY = ENV_TOKENS["COMMENTS_SERVICE_KEY"]
