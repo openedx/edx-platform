@@ -58,7 +58,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
