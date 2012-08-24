@@ -23,6 +23,12 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
+# IMPORTANT: With this enabled, the server must always be behind a proxy that 
+# strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
+# a user can fool our server into thinking it was an https connection.
+# See https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
+# for other warnings.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
