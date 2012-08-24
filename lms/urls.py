@@ -124,6 +124,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_about', name="about_course"),
 
         #Inside the course
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'courseware.views.course_info', name="course_root"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',

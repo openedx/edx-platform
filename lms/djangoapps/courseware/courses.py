@@ -5,6 +5,7 @@ import logging
 
 from path import path
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import Http404
 
 from xmodule.course_module import CourseDescriptor
@@ -133,8 +134,13 @@ def get_course_info_section(course, section_key):
     if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
         try:
             with course.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'])
+                # Replace '/static/' urls
+                info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
+
+                # Replace '/course/' urls
+                course_root = reverse('course_root', args=[course.id])[:-1] # Remove trailing slash
+                info_html = replace_urls(info_html, course_root, '/course/')
+                return info_html
         except ResourceNotFoundError:
             log.exception("Missing info section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
