@@ -42,13 +42,17 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         $loading: $elem
+        loadingCallback: ->
+          $(this).parent().append("<span class='discussion-loading'></span>")
+        loadedCallback: ->
+          $(this).parent().children(".discussion-loading").remove()
         url: url
         type: "GET"
         success: (response, textStatus) =>
           $parent = @$el.parent()
           @$el.replaceWith(response.html)
           $discussion = $parent.find("section.discussion")
-          @model.reset(response.discussionData, { silent: false })
+          @model.reset(response.discussion_data, { silent: false })
           view = new DiscussionView el: $discussion[0], model: @model
           DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
           $("html, body").animate({ scrollTop: 0 }, 0)
@@ -109,6 +113,7 @@ if Backbone?
         @$(".discussion-cancel-post").click $.proxy(@cancelNewPost, @)
         
 
+      @$el.children(".blank").hide()
       @$(".new-post-form").show()
 
     submitNewPost: (event) ->
@@ -136,6 +141,8 @@ if Backbone?
           $thread = $(response.html)
           @$el.children(".threads").prepend($thread)
 
+          @$el.children(".blank").remove()
+
           @$(".new-post-similar-posts").empty()
           @$(".new-post-similar-posts-wrapper").hide()
           @$(".new-post-title").val("").attr("prev-text", "")
@@ -154,6 +161,7 @@ if Backbone?
         @$(".new-post-form").addClass("collapsed")
       else if @$el.hasClass("forum-discussion")
         @$(".new-post-form").hide()
+      @$el.children(".blank").show()
 
     search: (event) ->
       event.preventDefault()

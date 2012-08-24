@@ -197,7 +197,6 @@ if settings.QUICKEDIT:
 
 if settings.ASKBOT_ENABLED:
     urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
-                    url(r'^admin/', include(admin.site.urls)), \
                     url(r'^settings/', include('askbot.deps.livesettings.urls')), \
                     url(r'^followit/', include('followit.urls')), \
 #                       url(r'^robots.txt$', include('robots.urls')),
@@ -206,8 +205,10 @@ if settings.ASKBOT_ENABLED:
 
 
 if settings.DEBUG:
-    ## Jasmine
-    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+    ## Jasmine and admin
+    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),
+                    url(r'^admin/', include(admin.site.urls)),
+                    )
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (

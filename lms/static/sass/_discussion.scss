@@ -152,7 +152,8 @@ $tag-text-color: #5b614f;
 
     .user-profile {
       @extend .sidebar;
-    }    
+       margin-top: 24px;
+     }
 
     .sidebar-username {
       font-size: 1.5em;
