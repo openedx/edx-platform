@@ -4,10 +4,10 @@ Feature: Login
   We'll see if I can log in to my account and perform user actions
 
     Scenario: Login to an existing account and logout
-    Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/"
+    Given I visit "http://www.edx.org/"
     #"http://anant:agarwal@stage-edx-001.m.edx.org/"
     When I click "LOG IN"
-      And I login with "ddieker@gmail.com" in the "email" field
+      And I login with "ddieker+admin@gmail.com" in the "email" field
       And I login with "password" in the "password" field
       And I press "Access My Courses"
     Then I should see an element with class of "user" within "3" seconds

@@ -67,10 +67,12 @@ def i_verify_all_the_content_of_each_course(step):
 
 def browse_course(course_id):
 	world.browser.find_element_by_xpath("//div[@id='accordion']//nav//div[1]").click()
-
+	## sometimes the browser looks for the accordion before it has rendered
 	wait_until_id_renders('accordion',2)
+	## look for the non-404 server error page
 	check_for_errors()
 
+	## count chapters from xml and page and compare
 	chapters = get_courseware_with_tabs(course_id)
 	num_chapters = len(chapters)
 	rendered_chapters = len(world.browser.find_elements_by_class_name("chapter"))
@@ -81,9 +83,12 @@ def browse_course(course_id):
 
 	## Iterate the chapters
 	while chapter_it < num_chapters:
-		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//h3").click()
-		check_for_errors()
 
+		## click into a chapter
+		world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//h3").click()
+		## look for the "there was a server error" div
+		check_for_errors()
+		## count sections from xml and page and compare
 		sections = chapters[chapter_it]['sections']
 		num_sections = len(sections)
 		accordion_class = "ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active"
@@ -92,13 +97,21 @@ def browse_course(course_id):
 		assert num_sections == rendered_sections, '%d sections expected, %d sections found on page, iteration number %d on %s' % (num_sections, rendered_sections, chapter_it, course_id)
 		
 		section_it = 0
+		
 		## Iterate the sections
 		while section_it < num_sections:
+
+			## click on a section
 			world.browser.find_element_by_xpath("//*[@id='accordion']//nav//div["+str(chapter_it+1)+"]//ul[@class='"+accordion_class+"']//li["+str(section_it+1)+"]//a").click()
+			## sometimes the course-content takes a long time to load
 			wait_until_class_renders('course-content',3)
+			## look for server error div
 			check_for_errors()
 
-			#tab = current_course.get_children()[0].get_children()[0]
+			## count tabs from xml and page and compare
+
+			## count the number of tabs. If number of tabs is 0, there won't be anything rendered
+			## so we explicitly set rendered_tabs because otherwise find_elements returns a None object with no length
 			num_tabs = sections[section_it]['clickable_tab_count']
 			if num_tabs != 0:
 				rendered_tabs = len(world.browser.find_elements_by_xpath("//ol[@id='sequence-list']//li"))
@@ -107,11 +120,13 @@ def browse_course(course_id):
 
 			assert num_tabs == rendered_tabs ,'%d tabs expected, %d tabs found, iteration number %d, on %s' % (num_tabs,rendered_tabs,section_it, course_id)
 			
-			## Iterate the tabs
 			tab_it = 0
+
+			## Iterate the tabs
 			while tab_it < num_tabs:
 				tab = world.browser.find_element_by_xpath("//ol[@id='sequence-list']//li["+str(tab_it+1)+"]//a[@data-element='"+str(tab_it+1)+"']")
 				tab.click()
+				## do something with the tab sections[section_it]
 				check_for_errors()
 
 				tab_it += 1

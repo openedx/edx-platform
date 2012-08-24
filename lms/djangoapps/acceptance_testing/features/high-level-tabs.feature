@@ -4,7 +4,7 @@ Feature: All the high level tabs should work
   I want to click Courseware, Course Info, Discussion, Wiki, Progress, Instructor
 
   Scenario: Login to an existing staff account
-  Given I visit "http://anant:agarwal@stage-edx-001.m.edx.org/dashboard"
+  Given I visit "http://www.edx.org"
   When I click "LOG IN"
     And I login with "ddieker+admin@gmail.com" in the "email" field
     And I login with "password" in the "password" field

@@ -14,7 +14,7 @@ url = 'http://anant:agarwal@stage-edx-001.m.edx.org/'
 ## Utility method for finding elements in a selection
 
 def find_element_by_name_in_selection(selection_id, field):
-	e = world.browser.find_element_by_xpath("//*[@id='"+selection_id+"']").find_element_by_name(field)
+	e = world.browser.find_element_by_css_selector("#"+selection_id+" input[name="+field+"]")
 	return e
 
 ## Utility methods for waiting for elements to render
@@ -43,7 +43,8 @@ def has_courses():
 def register_for_course(coursename):
 	world.browser.get(url+'courses')
 	world.browser.find_element_by_xpath("//*[@id='"+coursename+"']//a[1]").click()
-	wait_until_class_renders('register',3).click()
+	wait_until_class_renders('register',3)
+	world.browser.find_element_by_class_name('register').click()
 
 def check_if_registered(coursename):
 	world.browser.get(url+'dashboard')
@@ -59,4 +60,18 @@ def check_for_errors():
 	if len(e) > 0:
 		assert False, 'there was a server error at %s' % (world.browser.current_url)
 	else:
+		assert True
+
+def check_for_502(url):
+
+	'''
+	Look for those pesky bad gateway errors
+	'''
+	try: 
+		e = world.browser.find_element_by_css_selector("body+h1")
+		if len(e) > 0:
+			assert False, 'There was a 502 error at %s' % (url)
+		else:
+			assert True
+	except:
 		assert True

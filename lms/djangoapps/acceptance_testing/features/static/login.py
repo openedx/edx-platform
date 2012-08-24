@@ -7,7 +7,7 @@ from helpers import *
 
 ## Login
 
-url = 'http://anant:agarwal@sandbox-test-001.m.edx.org/'
+url = 'http://www.edx.org/'
 #url = 'http://anant:agarwal@stage-edx-001.m.edx.org/'
 
 @step(u'I login with "(.*)" in the "(.*)" field')
