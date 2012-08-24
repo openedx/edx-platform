@@ -7,12 +7,12 @@
   <%
     role_names = sorted(map(attrgetter('name'), django_user.roles.all()))
   %>
-  <div class="sidebar-username">${django_user.username}</div>
+  <div class="sidebar-username">${django_user.username | h}</div>
   <div class="sidebar-user-roles">
     ${", ".join(role_names)}
   </div>
-  <div class="sidebar-threads-count"><span>${profiled_user['threads_count']}</span> ${pluralize('discussion', profiled_user['threads_count'])} started</div>
-  <div class="sidebar-comments-count"><span>${profiled_user['comments_count']}</span> ${pluralize('comment', profiled_user['comments_count'])}</div>
+  <div class="sidebar-threads-count"><span>${profiled_user['threads_count'] | h}</span> ${pluralize('discussion', profiled_user['threads_count']) | h} started</div>
+  <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
   % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
     % if "Moderator" in role_names:
       <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">Revoke Moderator provileges</a>

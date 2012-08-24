@@ -7,7 +7,7 @@
       </header>
       <ol class="discussion-sidebar-tags-list">
         % for tag, count in trending_tags:
-          <li><a href="${helpers.url_for_tags(course.id, tag)}" class="thread-tag">${tag}</a><span class="sidebar-tag-count">&times;${count}</span></li>
+          <li><a href="${helpers.url_for_tags(course.id, tag) | h}" class="thread-tag">${tag | h}</a><span class="sidebar-tag-count">&times;${count | h}</span></li>
         % endfor
       <ol>
   </article>

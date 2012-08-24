@@ -284,11 +284,11 @@ if Backbone?
         view = {}
         view.id = @model.id
         if @model.get('type') == 'thread'
-          view.title = @$(".thread-raw-title").html()
-          view.body = @$(".thread-raw-body").html()
-          view.tags = @$(".thread-raw-tags").html()
+          view.title = @model.get('title')
+          view.body = @model.get('body')
+          view.tags = @model.get('tags')
         else
-          view.body = @$(".comment-raw-body").html()
+          view.body = @model.get('body')
         @$discussionContent().append Mustache.render DiscussionUtil.getTemplate("_edit_#{@model.get('type')}"), view
         DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "#{@model.get('type')}-body-edit"
         @$(".thread-tags-edit").tagsInput DiscussionUtil.tagsInputOptions()
@@ -316,8 +316,12 @@ if Backbone?
         success: (response, textStatus) =>
           DiscussionUtil.clearFormErrors @$(".discussion-update-errors")
           @$discussionContent().replaceWith(response.html)
-          @model.set response.content
-          @model.updateInfo response.annotated_content_info
+          if @model.get('type') == 'thread'
+            @model = new Thread response.content
+          else
+            @model = new Comment $.extend {}, response.content, { thread: @model.get('thread') }
+          @reconstruct()
+          @model.updateInfo response.annotated_content_info, { forceUpdate: true }
 
     cancelEdit: (event) ->
       @$(".discussion-content-edit").hide()
@@ -388,6 +392,14 @@ if Backbone?
       @initTitle()
       @initBody()
       @initCommentViews()
+
+    reconstruct: ->
+      @initBindings()
+      @initLocal()
+      @initTimeago()
+      @initTitle()
+      @initBody()
+      @delegateEvents()
       
   class @Thread extends @Content
     urlMappers:

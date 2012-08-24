@@ -42,13 +42,17 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         $loading: $elem
+        loadingCallback: ->
+          $(this).parent().append("<span class='discussion-loading'></span>")
+        loadedCallback: ->
+          $(this).parent().children(".discussion-loading").remove()
         url: url
         type: "GET"
         success: (response, textStatus) =>
           $parent = @$el.parent()
           @$el.replaceWith(response.html)
           $discussion = $parent.find("section.discussion")
-          @model.reset(response.discussionData, { silent: false })
+          @model.reset(response.discussion_data, { silent: false })
           view = new DiscussionView el: $discussion[0], model: @model
           DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
           $("html, body").animate({ scrollTop: 0 }, 0)

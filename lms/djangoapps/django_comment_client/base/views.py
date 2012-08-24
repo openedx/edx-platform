@@ -55,7 +55,7 @@ def ajax_content_response(request, course_id, content, template_name):
     annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
     return JsonResponse({
         'html': html,
-        'content': content,
+        'content': utils.safe_content(content),
         'annotated_content_info': annotated_content_info,
     })
 
@@ -78,7 +78,7 @@ def create_thread(request, course_id, commentable_id):
     if request.is_ajax():
         return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_create_thread.html')
     else:
-        return JsonResponse(thread.to_dict())
+        return JsonResponse(utils.safe_content(thread.to_dict()))
 
 @require_POST
 @login_required
@@ -90,7 +90,7 @@ def update_thread(request, course_id, thread_id):
     if request.is_ajax():
         return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
     else:
-        return JsonResponse(thread.to_dict())
+        return JsonResponse(utils.safe_content(thread.to_dict()))
 
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
@@ -109,7 +109,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     if request.is_ajax():
         return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_create_comment.html')
     else:
-        return JsonResponse(comment.to_dict())
+        return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -126,7 +126,7 @@ def create_comment(request, course_id, thread_id):
 def delete_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     thread.delete()
-    return JsonResponse(thread.to_dict())
+    return JsonResponse(utils.safe_content(thread.to_dict()))
 
 @require_POST
 @login_required
@@ -138,7 +138,7 @@ def update_comment(request, course_id, comment_id):
     if request.is_ajax():
         return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_update_comment.html')
     else:
-        return JsonResponse(comment.to_dict()),
+        return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -147,7 +147,7 @@ def endorse_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
     comment.save()
-    return JsonResponse(comment.to_dict())
+    return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -158,7 +158,7 @@ def openclose_thread(request, course_id, thread_id):
     thread.save()
     thread = thread.to_dict()
     return JsonResponse({
-        'content': thread,
+        'content': utils.safe_content(thread),
         'ability': utils.get_ability(course_id, thread, request.user),
     })
 
@@ -177,7 +177,7 @@ def create_sub_comment(request, course_id, comment_id):
 def delete_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     comment.delete()
-    return JsonResponse(comment.to_dict())
+    return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -186,7 +186,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.vote(comment, value)
-    return JsonResponse(comment.to_dict())
+    return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -195,7 +195,7 @@ def undo_vote_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.unvote(comment)
-    return JsonResponse(comment.to_dict())
+    return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST
 @login_required
@@ -204,7 +204,7 @@ def vote_for_thread(request, course_id, thread_id, value):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
-    return JsonResponse(thread.to_dict())
+    return JsonResponse(utils.safe_content(thread.to_dict()))
 
 @require_POST
 @login_required
@@ -213,7 +213,7 @@ def undo_vote_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
-    return JsonResponse(thread.to_dict())
+    return JsonResponse(utils.safe_content(thread.to_dict()))
     
 
 @require_POST
