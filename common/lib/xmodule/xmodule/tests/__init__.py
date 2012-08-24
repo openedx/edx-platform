@@ -292,7 +292,9 @@ class CodeResponseTest(unittest.TestCase):
         answer_ids = sorted(test_lcp.get_question_answers().keys())
         numAnswers = len(answer_ids)
         for i in range(numAnswers):
-            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuekey=1000 + i))
+            queuekey = 1000 + i
+            queuestate = (queuekey, '')
+            old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
         # TODO: Message format inherited from ExternalResponse
         #correct_score_msg = "<edxgrade><awarddetail>EXACT_ANS</awarddetail><message>MESSAGE</message></edxgrade>"
@@ -326,7 +328,7 @@ class CodeResponseTest(unittest.TestCase):
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
                 npoints = 1 if correctness=='correct' else 0
-                new_cmap.set(answer_id=answer_ids[i], npoints=npoints, correctness=correctness, msg='MESSAGE', queuekey=None)
+                new_cmap.set(answer_id=answer_ids[i], npoints=npoints, correctness=correctness, msg='MESSAGE', queuestate=None)
 
                 test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
