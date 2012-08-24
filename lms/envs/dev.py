@@ -63,7 +63,6 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 # Make the keyedcache startup warnings go away
 CACHE_TIMEOUT = 0
