@@ -3,7 +3,7 @@
   <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
   <div class="new-post-similar-posts">
     % for thread in threads:
-      <a class="similar-post" href="${thread['permalink']}">${thread['title']}</a>
+      <a class="similar-post" href="${thread['permalink'] | h}">${thread['title'] | h}</a>
     % endfor
   </div>
 % endif

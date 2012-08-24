@@ -48,7 +48,7 @@ if Backbone?
           $parent = @$el.parent()
           @$el.replaceWith(response.html)
           $discussion = $parent.find("section.discussion")
-          @model.reset(response.discussionData, { silent: false })
+          @model.reset(response.discussion_data, { silent: false })
           view = new DiscussionView el: $discussion[0], model: @model
           DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
           $("html, body").animate({ scrollTop: 0 }, 0)

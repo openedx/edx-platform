@@ -1,6 +1,6 @@
 <%namespace name="renderer" file="_content_renderer.html"/>
 
-<section class="discussion" _id="${discussion_id}">
+<section class="discussion" _id="${discussion_id | h}">
   <a class="discussion-title" href="javascript:void(0)">Discussion</a>
   <div class="threads">
     ${renderer.render_content_with_comments(thread)}
