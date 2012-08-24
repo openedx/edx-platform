@@ -42,9 +42,14 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         $loading: $elem
+        loadingCallback: ->
+          $(this).parent().append("<span class='discussion-loading'></span>")
+        loadedCallback: ->
+          $(this).parent().children(".discussion-loading").remove()
         url: url
         type: "GET"
         success: (response, textStatus) =>
+          return
           $parent = @$el.parent()
           @$el.replaceWith(response.html)
           $discussion = $parent.find("section.discussion")
