@@ -49,7 +49,6 @@ if Backbone?
         url: url
         type: "GET"
         success: (response, textStatus) =>
-          return
           $parent = @$el.parent()
           @$el.replaceWith(response.html)
           $discussion = $parent.find("section.discussion")
