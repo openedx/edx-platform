@@ -175,7 +175,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         return None
 
     # Anonymized student identifier
-    h = hashlib.md5() # TODO: Seed with LMS secret key
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
     h.update(str(user.id))
     anonymous_student_id = h.hexdigest()
 
