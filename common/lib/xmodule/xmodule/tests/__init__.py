@@ -35,8 +35,9 @@ i4xs = ModuleSystem(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
-    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'student_identifier': 0},
-    node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
+    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
+    node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
+    anonymous_student_id = 'student'
 )
 
 
