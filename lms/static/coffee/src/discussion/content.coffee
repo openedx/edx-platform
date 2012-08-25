@@ -124,7 +124,7 @@ if Backbone?
         url = @model.urlFor('retrieve')
         DiscussionUtil.safeAjax
           $elem: $elem
-          $loading: $(event.target) if event
+          $loading: @$(".discussion-show-comments")
           type: "GET"
           url: url
           success: (response, textStatus) =>
