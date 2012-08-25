@@ -1123,10 +1123,11 @@ class CodeResponse(LoncapaResponse):
         # Prepare xqueue request
         #------------------------------------------------------------ 
         qinterface = self.system.xqueue['interface']
+        anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + str(time.time()) +
-                                                 str(self.system.xqueue['student_identifier']) + 
+                                                 anonymous_student_id +  
                                                  self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
@@ -1134,15 +1135,14 @@ class CodeResponse(LoncapaResponse):
 
         # Generate body
         if is_list_of_files(submission):
-            self.context.update({'submission': queuekey}) # For tracking. TODO: May want to record something else here
+            self.context.update({'submission': ''}) # TODO: Get S3 pointer from the Queue
         else:
             self.context.update({'submission': submission})
 
         contents = self.payload.copy() 
 
         # Anonymized student identifier to the external grader
-        student_identifier_hash = xqueue_interface.make_hashkey(self.system.xqueue['student_identifier'])
-        student_info = {'student_identifier_hash': student_identifier_hash}
+        student_info = {'anonymous_student_id': anonymous_student_id}
         contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
