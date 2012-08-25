@@ -217,7 +217,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     xqueue = {'interface': xqueue_interface,
               'callback_url': xqueue_callback_url,
-              'default_queuename': xqueue_default_queuename.replace(' ', '_')}
+              'default_queuename': xqueue_default_queuename.replace(' ', '_'),
+              'student_identifier': user.id,
+             }
 
     def inner_get_module(location):
         """

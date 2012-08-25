@@ -16,6 +16,7 @@ import numpy
 import random
 import re
 import requests
+import time
 import traceback
 import hashlib
 import abc
@@ -1124,7 +1125,9 @@ class CodeResponse(LoncapaResponse):
         qinterface = self.system.xqueue['interface']
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed)+self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + str(time.time()) +
+                                                 str(self.system.xqueue['student_identifier']) + 
+                                                 self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
@@ -1136,6 +1139,11 @@ class CodeResponse(LoncapaResponse):
             self.context.update({'submission': submission})
 
         contents = self.payload.copy() 
+
+        # Anonymized student identifier to the external grader
+        student_identifier_hash = xqueue_interface.make_hashkey(self.system.xqueue['student_identifier'])
+        student_info = {'student_identifier_hash': student_identifier_hash}
+        contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         if is_list_of_files(submission):
