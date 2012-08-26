@@ -1210,11 +1210,14 @@ class CodeResponse(LoncapaResponse):
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
+            log.error("External grader message should be a JSON-serialized dict")
             return fail
         if not isinstance(score_result, dict):
+            log.error("External grader message should be a JSON-serialized dict")
             return fail
         for tag in ['correct', 'score', 'msg']:
             if not score_result.has_key(tag):
+                log.error("External grader message is missing one or more required tags: 'correct', 'score', 'msg'")
                 return fail
 
         # Next, we need to check that the contents of the external grader message 
