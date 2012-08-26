@@ -1165,7 +1165,7 @@ class CodeResponse(LoncapaResponse):
 
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg) 
         if not valid_score_msg:
-            oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
+            oldcmap.set(self.answer_id, msg='Invalid grader reply. Please contact the course staff.')
             return oldcmap
         
         correctness = 'correct' if correct else 'incorrect'
@@ -1203,10 +1203,10 @@ class CodeResponse(LoncapaResponse):
         Returns (valid_score_msg, correct, score, msg):
             valid_score_msg: Flag indicating valid score_msg format (Boolean)
             correct:         Correctness of submission (Boolean)
-            score:           # TODO: Implement partial grading
+            score:           Points to be assigned (numeric, can be float)
             msg:             Message from grader to display to student (string)
         '''
-        fail = (False, False, -1, '')
+        fail = (False, False, 0, '')
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -1216,7 +1216,19 @@ class CodeResponse(LoncapaResponse):
         for tag in ['correct', 'score', 'msg']:
             if not score_result.has_key(tag):
                 return fail
-        return (True, score_result['correct'], score_result['score'], score_result['msg'])
+
+        # Next, we need to check that the contents of the external grader message 
+        #   is safe for the LMS.
+        # 1) Make sure that the message is valid XML (proper opening/closing tags)
+        # 2) TODO: Is the message actually HTML?
+        msg = score_result['msg']
+        try:
+            etree.fromstring(msg)
+        except etree.XMLSyntaxError as err:
+            log.error("Unable to parse external grader message as valid XML: score_msg['msg']=%s" % msg)
+            return fail
+            
+        return (True, score_result['correct'], score_result['score'], msg)
         
 
 #-----------------------------------------------------------------------------
