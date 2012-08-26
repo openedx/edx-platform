@@ -27,6 +27,7 @@ import xml.sax.saxutils as saxutils
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from correctmap import CorrectMap
+from datetime import datetime
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
@@ -1141,8 +1142,11 @@ class CodeResponse(LoncapaResponse):
 
         contents = self.payload.copy() 
 
-        # Anonymized student identifier to the external grader
-        student_info = {'anonymous_student_id': anonymous_student_id}
+        # Metadata related to the student submission revealed to the external grader
+        current_time = datetime.now()
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': str(current_time),
+                       }
         contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
