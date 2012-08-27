@@ -27,21 +27,32 @@
       });
     }
   </script>
-  
-  
+
+
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
-  
+
     <script src="{% static 'js/bootstrap-alert.js' %}"></script>
     <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
     <script src="{% static 'js/bootstrap-modal.js' %}"></script>
-    
+
     {% with mathjax_mode='wiki' %}
       {% include "mathjax_include.html" %}
     {% endwith %}
-    
+    <script type="text/javascript">
+	    $(document).ready(function () {
+          editor = $('#div_id_content div.controls');
+          cs = editor.prepend('<p class="cheatsheet">Markdown syntax is allowed. See the <a id="cheatsheetLink" href="#">cheatsheet</a> for help.</p>');
+          cs.find('#cheatsheetLink').click(function() {
+              $('#cheatsheetModal').modal('show');
+          });
+          $('#cheatsheetModal .close-btn').click(function(e) {
+            $('#cheatsheetModal').modal('hide');
+          });
+	    });
+    </script>
   {% endaddtoblock %}
-  
+
 {% endblock %}
 
 
@@ -64,11 +75,14 @@
             </div>
           {% endfor %}
         {% endif %}
-        
+
         {% block wiki_contents %}{% endblock %}
-        
+
       {% endblock %}
     </div>
+
+    {% include "wiki/includes/cheatsheet.html" %}
+
   </section>
 
 {% endblock %}
