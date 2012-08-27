@@ -82,11 +82,11 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def fallback_name():
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
+                    # use the hash of the content--the first 12 bytes should be plenty.
                     return tag + "_" + hashlib.sha1(xml).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
-                    # use the hash of the content--the first 12 bytes should be plenty.
                     url_name = fallback_name()
                     # Don't log a warning--we don't need this in the log.  Do
                     # put it in the error tracker--content folks need to see it.
