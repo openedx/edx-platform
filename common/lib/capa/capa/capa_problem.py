@@ -205,7 +205,7 @@ class LoncapaProblem(object):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         '''
-        return any([self.correct_map.is_queued(answer_id) for answer_id in self.correct_map])
+        return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
 
 
     def get_recentmost_queuetime(self):
