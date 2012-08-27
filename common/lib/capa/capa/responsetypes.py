@@ -1151,7 +1151,9 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         qtime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
-        queuestate = (queuekey, qtime)
+        queuestate = {'key': queuekey,
+                      'time': qtime,
+                     }
 
         cmap = CorrectMap() 
         if error:
