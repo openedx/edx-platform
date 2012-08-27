@@ -1,137 +1,141 @@
-.discussion-wrapper {
-  display: table;
-  table-layout: fixed;
-  width: 100%;
-  height: 500px;
-  background: #fff;
-  border-radius: 3px;
-  border: 1px solid #aaa;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-  }
-}
-
-.discussion-sidebar {
-  display: table-cell;
-  vertical-align: top;
-  width: 27.7%;
-  background: #f6f6f6;
-  border-radius: 3px 0 0 3px;
-  border-right: 3px solid #bcbcbc;
-}
-
-.board-drop-btn {
-  display: block;
-  height: 60px;
-  border-bottom: 1px solid #a3a3a3;
-  border-radius: 3px 0 0 0;
-  background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 58px;
-  text-align: center;
-  color: #333;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
-}
-
-.sort-bar {
-  height: 27px;
-  border-bottom: 1px solid #a3a3a3;
-  background: -webkit-linear-gradient(top, #cdcdcd, #b6b6b6);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset;
-
-  a {
-    display: block;
-    float: right;
-    height: 27px;
-    margin-right: 10px;
-    font-size: 11px;
-    font-weight: bold;
-    line-height: 23px;
-    color: #333;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-
-    .sort-label {
-      font-size: 9px;
-      text-transform: uppercase;
-    }
-  }
-}
-.post-list {
-  a {
-    display: block;
-    height: 36px;
-    padding: 0 10px;
-    border-bottom: 1px solid #ddd;
+.container {
+  .discussion-wrapper {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    height: 500px;
     background: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 34px;
-    color: #333;
-
-    &.read .title {
-      font-weight: 400;
-      color: #737373;
-    }
-  }
-
-  .title {
-    display: block;
-    float: left;
-    width: 70%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .votes,
-  .comments {
-    display: block;
-    float: right;
-    width: 32px;
-    height: 16px;
-    margin-top: 9px;
-    border-radius: 2px;
-    background: -webkit-linear-gradient(top, #d4d4d4, #dfdfdf);
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 16px;
-    text-align: center;
-    color: #767676;
-  }
-
-  .comments {
-    position: relative;
-    margin-left: 4px;
-
-    &:after {
-      content: '◥';
-      display: block;
-      position: absolute;
-      top: 11px;
-      right: 3px;
-      font-size: 6px;
-      color: #dfdfdf;
+    border-radius: 3px;
+    border: 1px solid #aaa;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
     }
 
-    &.new {
-      background: -webkit-linear-gradient(top, #84d7fe, #99e0fe);
-      color: #333;
+    .discussion-sidebar {
 
-      &:after {
-        color: #99e0fe;
+      display: table-cell;
+      vertical-align: top;
+      width: 27.7%;
+      background: #f6f6f6;
+      border-radius: 3px 0 0 3px;
+      border-right: 3px solid #bcbcbc;
+
+      .sort-bar {
+        height: 27px;
+        border-bottom: 1px solid #a3a3a3;
+        background: -webkit-linear-gradient(top, #cdcdcd, #b6b6b6);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset;
+
+        a {
+          display: block;
+          float: right;
+          height: 27px;
+          margin-right: 10px;
+          font-size: 11px;
+          font-weight: bold;
+          line-height: 23px;
+          color: #333;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+
+          .sort-label {
+            font-size: 9px;
+            text-transform: uppercase;
+          }
+        }
+      }
+
+      .board-drop-btn {
+        display: block;
+        height: 60px;
+        border-bottom: 1px solid #a3a3a3;
+        border-radius: 3px 0 0 0;
+        background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 58px;
+        text-align: center;
+        color: #333 !important;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
+      }
+    }
+    .post-list {
+      a {
+        display: block;
+        height: 36px;
+        padding: 0 10px;
+        border-bottom: 1px solid #ddd;
+        background: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 34px;
+        color: #333;
+
+        &.read .title {
+          font-weight: 400;
+          color: #737373;
+        }
+      }
+
+      .title {
+        display: block;
+        float: left;
+        width: 70%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .votes,
+      .comments {
+        display: block;
+        float: right;
+        width: 32px;
+        height: 16px;
+        margin-top: 9px;
+        border-radius: 2px;
+        background: -webkit-linear-gradient(top, #d4d4d4, #dfdfdf);
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+        color: #767676;
+      }
+
+      .comments {
+        position: relative;
+        margin-left: 4px;
+
+        &:after {
+          content: '◥';
+          display: block;
+          position: absolute;
+          top: 11px;
+          right: 3px;
+          font-size: 6px;
+          color: #dfdfdf;
+        }
+
+        &.new {
+          background: -webkit-linear-gradient(top, #84d7fe, #99e0fe);
+          color: #333;
+
+          &:after {
+            color: #99e0fe;
+          }
+        }
       }
     }
   }
 }
+
 
 
 
