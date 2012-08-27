@@ -34,6 +34,7 @@ from datetime import datetime
 import eia
 import inputtypes
 from util import contextualize_text, convert_files_to_filenames
+import xqueue_interface
 
 # to be replaced with auto-registering
 import responsetypes
@@ -215,8 +216,10 @@ class LoncapaProblem(object):
             return None
 
         # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
-        queuetimes = [self.correct_map.get_queuetime_str(answer_id) for answer_id in self.correct_map if self.correct_map.is_queued(answer_id)]
-        queuetimes = [datetime.strptime(qt,'%Y%m%d%H%M%S') for qt in queuetimes]
+        queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
+                          for answer_id in self.correct_map 
+                          if self.correct_map.is_queued(answer_id)]
+        queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat) for qt_str in queuetime_strs]
 
         return max(queuetimes)
 
