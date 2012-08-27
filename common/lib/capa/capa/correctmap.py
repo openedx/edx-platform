@@ -32,6 +32,7 @@ class CorrectMap(object):
     def __iter__(self):
         return self.cmap.__iter__()
 
+    # See the documentation for 'set_dict' for the use of kwargs
     def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuestate=None, **kwargs):
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
@@ -53,9 +54,19 @@ class CorrectMap(object):
 
     def set_dict(self, correct_map):
         '''
-        set internal dict to provided correct_map dict
-        for graceful migration, if correct_map is a one-level dict, then convert it to the new
-        dict of dicts format.
+        Set internal dict of CorrectMap to provided correct_map dict
+
+        correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This means that
+        when the definition of CorrectMap (e.g. its properties) are altered, existing correct_map dict
+        not coincide with the newest CorrectMap format as defined by self.set.
+
+        For graceful migration, feed the contents of each correct map to self.set, rather than
+        making a direct copy of the given correct_map dict. This way, the common keys between 
+        the incoming correct_map dict and the new CorrectMap instance will be written, while
+        mismatched keys will be gracefully ignored.
+
+        Special migration case:
+            If correct_map is a one-level dict, then convert it to the new dict of dicts format.
         '''
         if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
             self.__init__()	                                  # empty current dict
