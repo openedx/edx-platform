@@ -295,33 +295,34 @@ class CodeResponseTest(unittest.TestCase):
         Simple test of whether LoncapaProblem knows when it's been queued
         '''
         problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
-        test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
-        
-        answer_ids = sorted(test_lcp.get_question_answers().keys())
-        num_answers = len(answer_ids)
+        with open(problem_file) as input_file:
+            test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
+            
+            answer_ids = sorted(test_lcp.get_question_answers().keys())
+            num_answers = len(answer_ids)
 
-        # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
-        cmap = CorrectMap()
-        for i in range(num_answers):
-            cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=None))
-        test_lcp.correct_map.update(cmap)
+            # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
+            cmap = CorrectMap()
+            for i in range(num_answers):
+                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=None))
+            test_lcp.correct_map.update(cmap)
 
-        self.assertEquals(test_lcp.is_queued(), False)
+            self.assertEquals(test_lcp.is_queued(), False)
 
-        # Now we queue the LCP
-        cmap = CorrectMap()
-        for i in range(num_answers):
-            queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
-            cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
-        test_lcp.correct_map.update(cmap)
+            # Now we queue the LCP
+            cmap = CorrectMap()
+            for i in range(num_answers):
+                queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
+                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+            test_lcp.correct_map.update(cmap)
 
-        self.assertEquals(test_lcp.is_queued(), True)
+            self.assertEquals(test_lcp.is_queued(), True)
 
     def test_update_score(self):
         '''
         Test whether LoncapaProblem.update_score can deliver queued result to the right subproblem
         '''
-        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
         test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
 
         answer_ids = sorted(test_lcp.get_question_answers().keys())
@@ -377,7 +378,7 @@ class CodeResponseTest(unittest.TestCase):
         '''
         Test whether the LoncapaProblem knows about the time of queue requests
         '''
-        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
         test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
 
         answer_ids = sorted(test_lcp.get_question_answers().keys())
@@ -411,7 +412,7 @@ class CodeResponseTest(unittest.TestCase):
         '''
         Test whether file objects are converted to filenames without altering other structures
         '''
-        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
         fp = open(problem_file)
         answers_with_file = {'1_2_1': 'String-based answer',
                              '1_3_1': ['answer1', 'answer2', 'answer3'],
