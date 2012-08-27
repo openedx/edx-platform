@@ -15,7 +15,7 @@ class CorrectMap(object):
     - msg         : string (may have HTML) giving extra message response (displayed below textline or textbox)
     - hint        : string (may have HTML) giving optional hint (displayed below textline or textbox, above msg)
     - hintmode    : one of (None,'on_request','always') criteria for displaying hint
-    - queuestate  : Tuple (key, time) where key is a secret string, and time is a string dump
+    - queuestate  : Dict {key:'', time:''} where key is a secret string, and time is a string dump
                     of a DateTime object in the format '%Y%m%d%H%M%S'. Is None when not queued
 
     Behaves as a dict.
@@ -83,10 +83,10 @@ class CorrectMap(object):
         return answer_id in self.cmap and self.cmap[answer_id]['queuestate'] is not None
 
     def is_right_queuekey(self, answer_id, test_key):
-        return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate'][0] == test_key
+        return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate']['key'] == test_key
 
     def get_queuetime_str(self, answer_id):
-        return self.cmap[answer_id]['queuestate'][1] if self.is_queued(answer_id) else None 
+        return self.cmap[answer_id]['queuestate']['time'] if self.is_queued(answer_id) else None 
 
     def get_npoints(self, answer_id):
         npoints = self.get_property(answer_id, 'npoints')
