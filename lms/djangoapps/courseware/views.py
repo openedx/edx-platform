@@ -325,14 +325,17 @@ def progress(request, course_id, student_id=None):
             raise Http404
         student = User.objects.get(id=int(student_id))
 
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
+
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course_id, request.user, course)
-    course_module = get_module(request.user, request, course.location,
+        course_id, student, course)
+    course_module = get_module(student, request, course.location,
                                student_module_cache, course_id)
 
     courseware_summary = grades.progress_summary(student, course_module,
                                                  course.grader, student_module_cache)
-    grade_summary = grades.grade(request.user, request, course, student_module_cache)
+    grade_summary = grades.grade(student, request, course, student_module_cache)
 
     context = {'course': course,
                'courseware_summary': courseware_summary,

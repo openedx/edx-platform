@@ -64,7 +64,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
 
-    user_info = cc.User.from_django_user(request.user).safe_attributes()
+    user_info = cc.User.from_django_user(request.user).to_dict()
 
     def infogetter(thread):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
@@ -83,7 +83,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'base_url': base_url,
         'query_params': strip_blank(strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text']))),
         'annotated_content_info': json.dumps(annotated_content_info),
-        'discussion_data': json.dumps({ (discussion_id or user_id): threads })
+        'discussion_data': json.dumps({ (discussion_id or user_id): map(utils.safe_content, threads) })
     }
     context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
@@ -128,7 +128,7 @@ def inline_discussion(request, course_id, discussion_id):
     
     return utils.JsonResponse({
         'html': html,
-        'discussionData': threads,
+        'discussion_data': map(utils.safe_content, threads),
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
@@ -149,7 +149,7 @@ def forum_form_discussion(request, course_id):
     if request.is_ajax():
         return utils.JsonResponse({
             'html': content,
-            'discussionData': threads,
+            'discussion_data': map(utils.safe_content, threads),
         })
     else:
         recent_active_threads = cc.search_recent_active_threads(
@@ -176,7 +176,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
 
-    user_info = cc.User.from_django_user(request.user).safe_attributes()
+    user_info = cc.User.from_django_user(request.user).to_dict()
 
     annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
 
@@ -186,7 +186,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
         'annotated_content_info': json.dumps(annotated_content_info),
         'course_id': course_id,
         'request': request,
-        'discussion_data': json.dumps({ discussion_id: [thread] }),
+        'discussion_data': json.dumps({ discussion_id: [utils.safe_content(thread)] }),
     }
     return render_to_string('discussion/_single_thread.html', context)
 
@@ -194,7 +194,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
         
-        user_info = cc.User.from_django_user(request.user).safe_attributes()
+        user_info = cc.User.from_django_user(request.user).to_dict()
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
@@ -202,7 +202,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return utils.JsonResponse({
             'html': html,
-            'content': thread.to_dict(),
+            'content': utils.safe_content(thread.to_dict()),
             'annotated_content_info': annotated_content_info,
         })
 
@@ -252,7 +252,7 @@ def user_profile(request, course_id, user_id):
     if request.is_ajax():
         return utils.JsonResponse({
             'html': content,
-            'discussionData': threads,
+            'discussion_data': map(utils.safe_content, threads),
         })
     else:
         context = {

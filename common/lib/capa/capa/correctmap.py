@@ -73,10 +73,12 @@ class CorrectMap(object):
         return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] == test_key
 
     def get_npoints(self, answer_id):
-        if self.is_correct(answer_id):
-            npoints = self.cmap[answer_id].get('npoints', 1)	 # default to 1 point if correct
-            return npoints or 1
-        return 0						# if not correct, return 0
+        npoints = self.get_property(answer_id, 'npoints')
+        if npoints is not None:
+            return npoints
+        elif self.is_correct(answer_id):
+            return 1
+        return 0 # if not correct and no points have been assigned, return 0
 
     def set_property(self, answer_id, property, value):
         if answer_id in self.cmap: self.cmap[answer_id][property] = value

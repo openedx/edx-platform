@@ -75,6 +75,10 @@ section.course-index {
       @include box-shadow(0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset);
       @include transition(background-color .1s);
 
+      &.is-open {
+        background: #fff;
+      }
+
       &:first-child {
         border-radius: 3px 0 0 0;
       }
