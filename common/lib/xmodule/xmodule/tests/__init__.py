@@ -19,6 +19,7 @@ import capa.calc as calc
 import capa.capa_problem as lcp
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
+from capa.xqueue_interface import dateformat
 from datetime import datetime
 from xmodule import graders, x_module
 from xmodule.x_module import ModuleSystem
@@ -36,7 +37,7 @@ i4xs = ModuleSystem(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.dirname(os.path.realpath(__file__))+"/test_files"),
     debug=True,
-    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue'},
+    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")
 )
 
@@ -286,14 +287,14 @@ class CodeResponseTest(unittest.TestCase):
     '''
     @staticmethod
     def make_queuestate(key, time):
-        timestr = datetime.strftime(time,'%Y%m%d%H%M%S')
-        return (key, timestr)
+        timestr = datetime.strftime(time, dateformat)
+        return {'key': key, 'time': timestr}
 
     def test_is_queued(self):
         ''' 
         Simple test of whether LoncapaProblem knows when it's been queued
         '''
-        problem_file = os.path.dirname(__file__) + "/test_files/coderesponse.xml"
+        problem_file = os.path.join(os.path.dirname(__file__), "test_files/coderesponse.xml")
         test_lcp = lcp.LoncapaProblem(open(problem_file).read(), '1', system=i4xs)
         
         answer_ids = sorted(test_lcp.get_question_answers().keys())
