@@ -298,7 +298,7 @@ class CodeResponseTest(unittest.TestCase):
         with open(problem_file) as input_file:
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
             
-            answer_ids = sorted(test_lcp.get_question_answers().keys())
+            answer_ids = sorted(test_lcp.get_question_answers())
             num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
@@ -326,7 +326,7 @@ class CodeResponseTest(unittest.TestCase):
         with open(problem_file) as input_file:
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
 
-            answer_ids = sorted(test_lcp.get_question_answers().keys())
+            answer_ids = sorted(test_lcp.get_question_answers())
             num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the queued state
@@ -383,7 +383,7 @@ class CodeResponseTest(unittest.TestCase):
         with open(problem_file) as input_file:
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
 
-            answer_ids = sorted(test_lcp.get_question_answers().keys())
+            answer_ids = sorted(test_lcp.get_question_answers())
             num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
@@ -396,7 +396,6 @@ class CodeResponseTest(unittest.TestCase):
 
             # CodeResponse requires internal CorrectMap state. Build it now in the queued state
             cmap = CorrectMap()
-            answer_ids = sorted(test_lcp.get_question_answers().keys())
             num_answers = len(answer_ids)
             for i in range(num_answers):
                 queuekey = 1000 + i
