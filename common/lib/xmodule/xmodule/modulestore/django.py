@@ -43,3 +43,7 @@ def modulestore(name='default'):
         )
 
     return _MODULESTORES[name]
+
+# Initialize the modulestores immediately
+for store_name in settings.MODULESTORE:
+    modulestore(store_name)
