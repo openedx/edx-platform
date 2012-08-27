@@ -98,10 +98,7 @@ class LoncapaProblem(object):
             if 'student_answers' in state:
                 self.student_answers = state['student_answers']
             if 'correct_map' in state:
-                print 'THK: LoncapaProblem.__init__'
-                print json.dumps(state['correct_map'], indent=4)
                 self.correct_map.set_dict(state['correct_map'])
-                print json.dumps(self.correct_map.get_dict(), indent=4)
             if 'done' in state:
                 self.done = state['done']
 
