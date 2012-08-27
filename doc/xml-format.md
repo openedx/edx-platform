@@ -189,7 +189,13 @@ This video has been encoded at 4 different speeds: 0.75x, 1x, 1.25x, and 1.5x.
 
 ## More on `url_name`s
 
-Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, dot (.) and _.  This is what appears in urls that point to this object.
+Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, dot (.), underscore (_), and ':'.  This is what appears in urls that point to this object.
+
+Colon (':') is special--when looking for the content definition in an xml, ':' will be replaced with '/'.  This allows organizing content into folders.  For example, given the pointer tag
+
+    <problem url_name="conceptual:add_apples_and_oranges"/>
+
+we would look for the problem definition in `problem/conceptual/add_apples_and_oranges.xml`.   (There is a technical reason why we can't just allow '/' in the url_name directly.)
 
 __IMPORTANT__: A student's state for a particular content element is tied to the element id, so the automatic id generation if only ok for elements that do not need to store any student state (e.g. verticals or customtags).  For problems, sequentials, and videos, and any other element where we keep track of what the student has done and where they are at, you should specify a unique `url_name`.  Of course, any content element that is split out into a file will need a `url_name` to specify where to find the definition.  When the CMS comes online, it will use these ids to enable content reuse, so if there is a logical name for something, please do specify it.
 

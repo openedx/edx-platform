@@ -12,6 +12,12 @@ import sys
 
 log = logging.getLogger(__name__)
 
+def name_to_pathname(name):
+    """
+    Convert a location name for use in a path: replace ':' with '/'.
+    This allows users of the xml format to organize content into directories
+    """
+    return name.replace(':', '/')
 
 def is_pointer_tag(xml_obj):
     """
@@ -245,8 +251,8 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] -- detect new-style each-in-a-file mode
         if is_pointer_tag(xml_object):
             # new style:
-            # read the actual definition file--named using url_name
-            filepath = cls._format_filepath(xml_object.tag, url_name)
+            # read the actual definition file--named using url_name.replace(':','/')
+            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
             definition_xml = xml_object	# this is just a pointer, not the real definition content
@@ -292,7 +298,8 @@ class XmlDescriptor(XModuleDescriptor):
         """If this returns True, write the definition of this descriptor to a separate
         file.
 
-        NOTE: Do not override this without a good reason.  It is here specifically for customtag...
+        NOTE: Do not override this without a good reason.  It is here
+        specifically for customtag...
         """
         return True
 
@@ -335,7 +342,8 @@ class XmlDescriptor(XModuleDescriptor):
 
         if self.export_to_file():
             # Write the definition to a file
-            filepath = self.__class__._format_filepath(self.category, self.url_name)
+            url_path = name_to_pathname(self.url_name)
+            filepath = self.__class__._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))
