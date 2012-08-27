@@ -17,7 +17,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
-from . import ModuleStoreBase, Location
+from . import ModuleStoreBase, Location, monitor
+
 from .exceptions import ItemNotFoundError
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
@@ -26,6 +27,26 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger('mitx.' + __name__)
+
+# Need to start the monitoring thread somewhere.  On import of this module seems
+# like the best available place.
+
+
+def start_monitor():
+    """
+    Fire up the monitoring thread.
+
+    Architectural note: there is only one monitoring thread, and so the
+    monitoring will only work properly if there is a single modulestore per
+    course per process.
+    """
+    log.info("Starting change monitor.")
+    monitor.start(interval=1.0)
+
+start_monitor()
+
+
+
 
 # VS[compat]
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
@@ -249,8 +270,39 @@ class XMLModuleStore(ModuleStoreBase):
             course_dirs = [d for d in os.listdir(self.data_dir) if
                            os.path.exists(self.data_dir / d / "course.xml")]
 
+        self.course_dir_by_id = dict()    # course_id -> course_dir
+        self.monitoring_event = dict()    # course_id -> threading.Event monitoring this path.
+
         for course_dir in course_dirs:
             self.try_load_course(course_dir)
+
+    def watch_file(self, course_dir):
+        """Return path to watch for modification to trigger course reloads."""
+        return self.data_dir / course_dir + ".reload"
+
+    def reload_if_needed(self, course_id):
+        """
+        Integration point with thread monitoring for content changes.  Returns
+        true if the content needs reloading.
+        """
+        # Does it need reloading?
+        course_dir = self.course_dir_by_id.get(course_id)
+        if not course_dir:
+            # courses we don't know about don't need reloading
+            return
+
+        if self.monitoring_event[course_id].is_set():
+            # reset monitoring and reload
+            self.monitoring_event[course_id].clear()
+            self.try_load_course(course_dir)
+
+    def register_course_dir(self, course_id, course_dir):
+        """
+        Register a mapping between course_id and course_dir, and ask the monitor
+        module to watch the watch file for that dir.
+        """
+        self.course_dir_by_id[course_id] = course_dir
+        self.monitoring_event[course_id] = monitor.watch(self.watch_file(course_dir))
 
     def try_load_course(self, course_dir):
         '''
@@ -390,6 +442,10 @@ class XMLModuleStore(ModuleStoreBase):
 
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
+
+            # Save the course dir so we can look it up by id later (to reload the course)
+            self.register_course_dir(course_id, course_dir)
+
             system = ImportSystem(self, course_id, course_dir, policy, tracker, self.parent_tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
@@ -429,6 +485,8 @@ class XMLModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         """
         location = Location(location)
+        if location.category == 'course':
+            self.reload_if_needed(course_id)
         try:
             return self.modules[course_id][location]
         except KeyError:
