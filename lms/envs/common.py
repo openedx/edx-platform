@@ -247,6 +247,7 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
+DEFAULT_DISCUSSION_EMAIL = 'registration@edx.org' # TODO
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )

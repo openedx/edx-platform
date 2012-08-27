@@ -1,0 +1,16 @@
+<ul>
+{{#notifications}}
+{{#post_reply}}
+<li>{{replies_count}} user(s) replied to the post <a href="{{thread_url}}">{{thread_title}}</a></li>
+{{/post_reply}}
+{{#post_topic}}
+<li>{{username}} wrote a new post: <a href="{{thread_url}}">{{thread_title}}</a></li>
+{{/post_topic}}
+{{#at_user_in_comment}}
+<li>{{username}} mentioned you in the comment to the post <a href="{{comment_url}}">{{thread_title}}</a></li>
+{{/at_user_in_comment}}
+{{#at_user_in_thread}}
+<li>{{username}} mentioned you in the comment to the post <a href="{{thread_url}}">{{thread_title}}</a></li>
+{{/at_user_in_thread}}
+{{/notifications}}
+</ul>
