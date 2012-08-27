@@ -14,6 +14,7 @@ This is used by capa_module.
 
 from __future__ import division
 
+import json
 import logging
 import math
 import numpy
@@ -97,6 +98,8 @@ class LoncapaProblem(object):
             if 'student_answers' in state:
                 self.student_answers = state['student_answers']
             if 'correct_map' in state:
+                print 'THK: LoncapaProblem.__init__'
+                print json.dumps(state['correct_map'], indent=4)
                 self.correct_map.set_dict(state['correct_map'])
             if 'done' in state:
                 self.done = state['done']
