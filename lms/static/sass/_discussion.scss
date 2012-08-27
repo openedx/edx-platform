@@ -1,3 +1,141 @@
+.discussion-wrapper {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  height: 500px;
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #aaa;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+  }
+}
+
+.discussion-sidebar {
+  display: table-cell;
+  vertical-align: top;
+  width: 27.7%;
+  background: #f6f6f6;
+  border-radius: 3px 0 0 3px;
+  border-right: 3px solid #bcbcbc;
+}
+
+.board-drop-btn {
+  display: block;
+  height: 60px;
+  border-bottom: 1px solid #a3a3a3;
+  border-radius: 3px 0 0 0;
+  background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 58px;
+  text-align: center;
+  color: #333;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
+}
+
+.sort-bar {
+  height: 27px;
+  border-bottom: 1px solid #a3a3a3;
+  background: -webkit-linear-gradient(top, #cdcdcd, #b6b6b6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset;
+
+  a {
+    display: block;
+    float: right;
+    height: 27px;
+    margin-right: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 23px;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+
+    .sort-label {
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+  }
+}
+.post-list {
+  a {
+    display: block;
+    height: 36px;
+    padding: 0 10px;
+    border-bottom: 1px solid #ddd;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 34px;
+    color: #333;
+
+    &.read .title {
+      font-weight: 400;
+      color: #737373;
+    }
+  }
+
+  .title {
+    display: block;
+    float: left;
+    width: 70%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .votes,
+  .comments {
+    display: block;
+    float: right;
+    width: 32px;
+    height: 16px;
+    margin-top: 9px;
+    border-radius: 2px;
+    background: -webkit-linear-gradient(top, #d4d4d4, #dfdfdf);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    color: #767676;
+  }
+
+  .comments {
+    position: relative;
+    margin-left: 4px;
+
+    &:after {
+      content: '◥';
+      display: block;
+      position: absolute;
+      top: 11px;
+      right: 3px;
+      font-size: 6px;
+      color: #dfdfdf;
+    }
+
+    &.new {
+      background: -webkit-linear-gradient(top, #84d7fe, #99e0fe);
+      color: #333;
+
+      &:after {
+        color: #99e0fe;
+      }
+    }
+  }
+}
+
+
+
+/*** OLD STUFF ***/
 /*** Variables ***/
 
 $comment-margin-left: 30px;
@@ -57,10 +195,10 @@ $tag-text-color: #5b614f;
 
   /*** Sidebar ***/
 
-  .sidebar-module {    
+  .sidebar-module {
     @include clearfix;
     padding: 0 26px 24px;
-    margin-bottom: 24px;    
+    margin-bottom: 24px;
     border-bottom: 1px solid #d3d3d3;
     font-size: 13px;
 
@@ -115,7 +253,7 @@ $tag-text-color: #5b614f;
         border: none;
       }
 
-      a {        
+      a {
         @include standard-discussion-link;
         background: none;
 
@@ -169,7 +307,7 @@ $tag-text-color: #5b614f;
     }
 
     .sidebar-threads-count, .sidebar-comments-count {
-      
+
       span {
         font-size: 1.5em;
         font-weight: bold;
@@ -218,12 +356,12 @@ $tag-text-color: #5b614f;
     }
 
     a {
-      display: block;      
+      display: block;
       height: 25px;
       padding-left: 25px;
       border-radius: 50%;
       background: url(../images/admin-actions-sprite.png) no-repeat;
-      font-size: .8em;      
+      font-size: .8em;
       line-height: 25px;
       color: #b8b8b8;
       @include transition(color, .1s);
@@ -233,7 +371,7 @@ $tag-text-color: #5b614f;
       }
 
       &.admin-endorse {
-        background-position: 0 0;        
+        background-position: 0 0;
 
         &:hover {
           color: #63b141;
@@ -307,7 +445,7 @@ $tag-text-color: #5b614f;
 
 
   /*** thread ***/
-  
+
   .thread {
     //display: none;
 
@@ -360,12 +498,12 @@ $tag-text-color: #5b614f;
         margin-right: 1em;
       }
 
-      .show-comments-wrapper {        
+      .show-comments-wrapper {
         display: inline;
         margin-right: 20px;
       }
 
-      .discussion-actions {        
+      .discussion-actions {
         display: inline;
         margin: 0;
         padding: 0;
@@ -538,7 +676,7 @@ $tag-text-color: #5b614f;
     background-color: #959595;
     @include background-image(linear-gradient(top, #959595, #7B7B7B));
     border: 1px solid #6F6F6F;
-    @include box-shadow(inset 0 1px 0 #A2A2A2, 0 0 3px #CCC);    
+    @include box-shadow(inset 0 1px 0 #A2A2A2, 0 0 3px #CCC);
     color: white;
     display: inline-block;
     font-size: inherit;
@@ -569,8 +707,8 @@ $tag-text-color: #5b614f;
     margin-top: 18px;
     text-align: center;
 
-    .discussion-vote {      
-      display: block;      
+    .discussion-vote {
+      display: block;
       width: 50px;
       height: 17px;
       margin: auto;
@@ -584,7 +722,7 @@ $tag-text-color: #5b614f;
 
     .discussion-vote-up {
       margin-bottom: 5px;
-      background-position: -50px -3px;      
+      background-position: -50px -3px;
 
       &:hover {
         background-position: -50px -5px;
@@ -612,7 +750,7 @@ $tag-text-color: #5b614f;
         color: #1C71DD;
         @include transition-duration(0);
       }
-    }   
+    }
 
     .discussion-vote-count {
       @include discussion-font;
@@ -625,12 +763,12 @@ $tag-text-color: #5b614f;
       color: #9a9a9a;
     }
   }
-  
-  
+
+
   /*** new post ***/
-  
+
   .new-post-form, .discussion-thread-edit {
-    
+
     .title-input, .body-input {
       display: block !important;
       font: inherit;
@@ -646,11 +784,11 @@ $tag-text-color: #5b614f;
       margin-top: 1%;
       padding: 1% 1.5%;
     }
-    
+
     .hide-similar-posts {
       float: right;
     }
-    
+
     .new-post-similar-posts {
       font: inherit;
       .similar-post {
@@ -690,7 +828,7 @@ $tag-text-color: #5b614f;
 
   .discussion-content-edit, .discussion-reply-new, .new-post-form {
     margin: 10px 0 10px 0;
-    
+
     .discussion-errors {
       color: #8F0E0E;
       display: block;
@@ -700,7 +838,7 @@ $tag-text-color: #5b614f;
       margin-left: -3%;
       padding-left: 2em;
     }
-    
+
     a:hover {
       color: #1C71DD;
       text-decoration: none;
@@ -757,7 +895,7 @@ $tag-text-color: #5b614f;
 
      .discussion-cancel-post {
         margin-right: 1.5%;
-      } 
+      }
     }
 
     .reply-post-control {
@@ -766,7 +904,7 @@ $tag-text-color: #5b614f;
         margin-right: 1.5%;
       }
     }
-    
+
     .edit-post-control {
       margin-top: 1%;
 
@@ -786,7 +924,7 @@ $tag-text-color: #5b614f;
       font-weight: bold;
       text-decoration: none;
       width: inherit;
-      
+
       &:hover {
         color: white;
       }
@@ -810,7 +948,7 @@ $tag-text-color: #5b614f;
   }
 
   .discussion-reply-new {
-    
+
     .discussion-auto-watch {
       margin-left: 2%;
     }
@@ -900,7 +1038,7 @@ $tag-text-color: #5b614f;
 
 .wmd-button-bar  {
   width: 100%;
-  background-color: Silver; 
+  background-color: Silver;
 }
 
 .wmd-input {
@@ -947,25 +1085,25 @@ $tag-text-color: #5b614f;
 }
 
 .wmd-button-row {
-  position: relative; 
+  position: relative;
   margin-left: 5px;
   margin-right: 5px;
   margin-bottom: 5px;
   margin-top: 10px;
-  padding: 0px;  
+  padding: 0px;
   height: 20px;
   overflow: hidden;
   @include transition(all, .2s, easeOut);
 }
 
 .wmd-spacer {
-  width: 1px; 
-  height: 20px; 
+  width: 1px;
+  height: 20px;
   margin-left: 14px;
-  
+
   position: absolute;
   background-color: Silver;
-  display: inline-block; 
+  display: inline-block;
   list-style: none;
 }
 
