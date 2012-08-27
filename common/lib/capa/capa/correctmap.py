@@ -32,7 +32,7 @@ class CorrectMap(object):
     def __iter__(self):
         return self.cmap.__iter__()
 
-    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuestate=None):
+    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuestate=None, **kwargs):
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
                                     'npoints': npoints,
