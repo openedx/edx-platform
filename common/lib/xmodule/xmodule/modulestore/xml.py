@@ -350,10 +350,10 @@ class XMLModuleStore(ModuleStoreBase):
 
             if org is None:
                 msg = ("No 'org' attribute set for course in {dir}. "
-                          "Using default 'edx'".format(dir=course_dir))
+                          "Using default 'edX'".format(dir=course_dir))
                 log.warning(msg)
                 tracker(msg)
-                org = 'edx'
+                org = 'edX'
 
             course = course_data.get('course')
 
@@ -386,8 +386,7 @@ class XMLModuleStore(ModuleStoreBase):
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
                 else:
-                    raise ValueError("Can't load a course without a 'url_name' "
-                                     "(or 'name') set.  Set url_name.")
+                    raise ValueError("Can't load a course without a 'url_name' set")
 
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
