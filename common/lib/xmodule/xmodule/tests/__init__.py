@@ -303,8 +303,8 @@ class CodeResponseTest(unittest.TestCase):
 
             # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
             cmap = CorrectMap()
-            for i in range(num_answers):
-                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=None))
+            for answer_id in answer_ids:
+                cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
             test_lcp.correct_map.update(cmap)
 
             self.assertEquals(test_lcp.is_queued(), False)
