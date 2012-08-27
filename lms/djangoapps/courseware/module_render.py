@@ -144,8 +144,8 @@ def get_module(user, request, location, student_module_cache, course_id, positio
 
     Arguments:
       - user                  : User for whom we're getting the module
-      - request               : current django HTTPrequest -- used in particular for auth
-                                (This is important e.g. for prof impersonation of students in progress view)
+      - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
+                                and such works based on user.
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - course_id             : the course_id in the context of which to load module
@@ -171,12 +171,10 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
-    # NOTE: Do access check on request.user -- that's who actually needs access (e.g. could be prof
-    # impersonating a user)
-    if not has_access(request.user, descriptor, 'load'):
+    if not has_access(user, descriptor, 'load'):
         return None
 
-    #TODO Only check the cache if this module can possibly have state
+    # Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
     if user.is_authenticated():
