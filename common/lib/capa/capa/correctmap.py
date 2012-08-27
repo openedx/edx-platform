@@ -58,10 +58,11 @@ class CorrectMap(object):
         dict of dicts format.
         '''
         if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
-            self.__init__()							# empty current dict
-            for k in correct_map: self.set(k, correct_map[k])			# create new dict entries
+            self.__init__()	                                  # empty current dict
+            for k in correct_map: self.set(k, correct_map[k]) # create new dict entries
         else:
-            self.cmap = correct_map
+            self.__init__()
+            for k in correct_map: self.set(k, **correct_map[k])
 
     def is_correct(self, answer_id):
         if answer_id in self.cmap: return self.cmap[answer_id]['correctness'] == 'correct'
