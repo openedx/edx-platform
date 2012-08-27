@@ -143,8 +143,9 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     exists.
 
     Arguments:
-      - user                  : current django User
-      - request               : current django HTTPrequest
+      - user                  : User for whom we're getting the module
+      - request               : current django HTTPrequest -- used in particular for auth
+                                (This is important e.g. for prof impersonation of students in progress view)
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - course_id             : the course_id in the context of which to load module
@@ -170,7 +171,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
-    if not has_access(user, descriptor, 'load'):
+    # NOTE: Do access check on request.user -- that's who actually needs access (e.g. could be prof
+    # impersonating a user)
+    if not has_access(request.user, descriptor, 'load'):
         return None
 
     #TODO Only check the cache if this module can possibly have state
@@ -199,7 +202,10 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                        )
 
     # Fully qualified callback URL for external queueing system
-    xqueue_callback_url  = request.build_absolute_uri('/')[:-1] # Trailing slash provided by reverse
+    xqueue_callback_url = '{proto}://{host}'.format(
+        host=request.get_host(),
+        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
+    )
     xqueue_callback_url += reverse('xqueue_callback',
                                   kwargs=dict(course_id=course_id,
                                               userid=str(user.id),
@@ -346,10 +352,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
         if not get.has_key(key):
-            return Http404
+            raise Http404
     header = json.loads(get['xqueue_header'])
     if not isinstance(header, dict) or not header.has_key('lms_key'):
-        return Http404
+        raise Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)

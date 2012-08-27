@@ -8,7 +8,7 @@
     </header>
     <ol class="discussion-sidebar-following-list">
       % for thread in recent_active_threads:
-        <li><a href="${helpers.permalink(thread)}"><span class="sidebar-following-name">${thread['title']}</span> <span class="sidebar-vote-count">${thread['votes']['point']}</span></a></li>
+        <li><a href="${helpers.permalink(thread) | h}"><span class="sidebar-following-name">${thread['title'] | h}</span> <span class="sidebar-vote-count">${thread['votes']['point'] | h}</span></a></li>
       % endfor
     <ol>
   </article>

@@ -26,7 +26,7 @@
     else:
       return base_url + '?' + urlencode(merge(query_params, {'page': 1, 'sort_key': key, 'sort_order': order}))
   %>
-  <a class="discussion-sort-link ${cls}" href="javascript:void(0)" sort-url="${url_for_sort(key, order)}">${title}</a>
+  <a class="discussion-sort-link ${cls | h}" href="javascript:void(0)" sort-url="${url_for_sort(key, order) | h}">${title}</a>
 </%def>
 
 <div class="discussion-sort local">

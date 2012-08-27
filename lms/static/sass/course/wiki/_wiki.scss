@@ -954,8 +954,7 @@ section.wiki {
 
   .alert {
     position: relative;
-    top: -15px;
-    margin-bottom: 24px;
+    margin: 24px 40px;
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
@@ -970,6 +969,10 @@ section.wiki {
       color: #999;
       text-decoration: none;
     }
+  }
+
+  .main-article .alert {
+    margin: 0 0 24px;
   }
 
   .missing {

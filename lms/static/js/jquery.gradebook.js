@@ -4,13 +4,16 @@
 var Gradebook = function($element) {
 	var _this = this;
 	var $element = $element;
+	var $body = $('body');
 	var $grades = $element.find('.grades');
+	var $studentTable = $element.find('.student-table');
 	var $gradeTable = $element.find('.grade-table');
+	var $search = $element.find('.student-search-field');
 	var $leftShadow = $('<div class="left-shadow"></div>');
 	var $rightShadow = $('<div class="right-shadow"></div>');
 	var tableHeight = $gradeTable.height();
 	var maxScroll = $gradeTable.width() - $grades.width();
-	var $body = $('body');
+	
 	var mouseOrigin;
 	var tableOrigin;
 
@@ -58,12 +61,35 @@ var Gradebook = function($element) {
 		var targetLeft = clamp($gradeTable.position().left, -maxScroll, 0);
 		updateHorizontalPosition(targetLeft);
 		setShadows(targetLeft);
-	}
+	};
 
 	var updateHorizontalPosition = function(left) {
 		$gradeTable.css({
 			'left': left + 'px'
 		});
+	};
+
+	var highlightRow = function(e) {
+		$element.find('.highlight').removeClass('highlight');
+
+		var index = $(this).index();
+		$studentTable.find('tr').eq(index + 1).addClass('highlight');
+		$gradeTable.find('tr').eq(index + 1).addClass('highlight');
+	};
+
+	var filter = function(e) {
+		var term = $(this).val();
+		if(term.length > 0) {
+			$studentTable.find('tbody tr').hide();
+			$gradeTable.find('tbody tr').hide();
+			$studentTable.find('tbody tr:contains(' + term + ')').each(function(i) {
+				$(this).show();
+				$gradeTable.find('tr').eq($(this).index() + 1).show();
+			});
+		} else {
+			$studentTable.find('tbody tr').show();
+			$gradeTable.find('tbody tr').show();
+		}
 	}
 
 	$leftShadow.css('height', tableHeight + 'px');
@@ -72,5 +98,11 @@ var Gradebook = function($element) {
 	setShadows(0);
 	$grades.css('height', tableHeight);
 	$gradeTable.bind('mousedown', startDrag);
+	$element.find('tr').bind('mouseover', highlightRow);
+	$search.bind('keyup', filter);
 	$(window).bind('resize', updateWidths);
 }
+
+
+
+

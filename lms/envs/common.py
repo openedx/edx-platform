@@ -332,6 +332,8 @@ WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_sup
 WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
+WIKI_LINK_LIVE_LOOKUPS = False
+WIKI_LINK_DEFAULT_LEVEL = 2 
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

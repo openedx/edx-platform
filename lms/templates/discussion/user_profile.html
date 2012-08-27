@@ -3,7 +3,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
-<%block name="title"><title>Discussion – ${course.number}</title></%block>
+<%block name="title"><title>Discussion – ${course.number | h}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -36,6 +36,6 @@
 </section>
 
 <script type="text/javascript">
-  var $$profiled_user_id = "${user.id | escapejs}";
+  var $$profiled_user_id = "${django_user.id | escapejs}";
   var $$course_id = "${course.id | escapejs}";
 </script>

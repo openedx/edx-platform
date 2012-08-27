@@ -10,9 +10,9 @@ def base_url_for_search():
 
 <form action="${base_url_for_search()}" method="get" class="discussion-search-form">
   % if query_params.get('tags', None):
-    <input class="search-input" type="text" value="[${tags}]${text}" id="keywords" autocomplete="off"/>
+    <input class="search-input" type="text" value="[${tags | h}]${text | h}" id="keywords" autocomplete="off"/>
   % else:
-    <input class="search-input" type="text" value="${text}" id="keywords" autocomplete="off"/>
+    <input class="search-input" type="text" value="${text | h}" id="keywords" autocomplete="off"/>
   % endif
   <div class="discussion-link discussion-search-link" href="javascript:void(0)">Search posts</div>
 </form>

@@ -13,9 +13,10 @@ class @Navigation
         active: active
         header: 'h3'
         autoHeight: false
+      $('#accordion .ui-state-active').closest('.chapter').addClass('is-open')
       $('#open_close_accordion a').click @toggle
-
       $('#accordion').show()
+      $('#accordion a').click @setChapter
 
   log: (event, ui) ->
     log_event 'accordion',
@@ -24,3 +25,8 @@ class @Navigation
 
   toggle: ->
     $('.course-wrapper').toggleClass('closed')
+
+  setChapter: ->
+    $('#accordion .is-open').removeClass('is-open')
+    $(this).closest('.chapter').addClass('is-open')
+    
