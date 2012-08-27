@@ -176,6 +176,7 @@ def forum_form_discussion(request, course_id):
 def render_single_thread(request, discussion_id, course_id, thread_id):
     
     thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
+    threads, query_params = get_threads(request, course_id)
 
     user_info = cc.User.from_django_user(request.user).to_dict()
 
@@ -188,6 +189,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
         'course_id': course_id,
         'request': request,
         'discussion_data': json.dumps({ discussion_id: [utils.safe_content(thread)] }),
+        'threads': threads,
     }
     return render_to_string('discussion/_single_thread.html', context)
 
@@ -209,6 +211,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     else:
         course = get_course_with_access(request.user, course_id, 'load')
+        threads, query_params = get_threads(request, course_id)
 
         recent_active_threads = cc.search_recent_active_threads(
             course_id,
@@ -229,6 +232,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
             'course_id': course.id,
+            'threads': threads,
         }
 
         return render_to_response('discussion/single_thread.html', context)
