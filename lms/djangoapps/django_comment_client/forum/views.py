@@ -202,12 +202,12 @@ def forum_form_discussion(request, course_id):
                 'recent_active_threads': recent_active_threads,
                 'trending_tags': trending_tags,
                 'staff_access' : has_access(request.user, course, 'staff'),
+                'threads': threads,
             }
             # print "start rendering.."
             return render_to_response('discussion/index.html', context)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
-
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
 
