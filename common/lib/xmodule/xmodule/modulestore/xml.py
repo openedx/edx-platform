@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -43,14 +44,76 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         xmlstore: the XMLModuleStore to store the loaded modules in
         """
-        self.unnamed_modules = 0
-        self.used_slugs = set()
+        self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
+        self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
 
         def process_xml(xml):
             """Takes an xml string, and returns a XModuleDescriptor created from
             that xml.
             """
+
+            def make_name_unique(xml_data):
+                """
+                Make sure that the url_name of xml_data is unique.  If a previously loaded
+                unnamed descriptor stole this element's url_name, create a new one.
+
+                Removes 'slug' attribute if present, and adds or overwrites the 'url_name' attribute.
+                """
+                # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
+
+                attr = xml_data.attrib
+                tag = xml_data.tag
+                id = lambda x: x
+                # Things to try to get a name, in order  (key, cleaning function, remove key after reading?)
+                lookups = [('url_name', id, False),
+                           ('slug', id, True),
+                           ('name', Location.clean, False),
+                           ('display_name', Location.clean, False)]
+
+                url_name = None
+                for key, clean, remove in lookups:
+                    if key in attr:
+                        url_name = clean(attr[key])
+                        if remove:
+                            del attr[key]
+                        break
+
+                def fallback_name():
+                    """Return the fallback name for this module.  This is a function instead of a variable
+                    because we want it to be lazy."""
+                    # use the hash of the content--the first 12 bytes should be plenty.
+                    return tag + "_" + hashlib.sha1(xml).hexdigest()[:12]
+
+                # Fallback if there was nothing we could use:
+                if url_name is None or url_name == "":
+                    url_name = fallback_name()
+                    # Don't log a warning--we don't need this in the log.  Do
+                    # put it in the error tracker--content folks need to see it.
+                    need_uniq_names = ('problem', 'sequence', 'video', 'course', 'chapter')
+
+                    if tag in need_uniq_names:
+                        error_tracker("ERROR: no name of any kind specified for {tag}.  Student "
+                                      "state won't work right.  Problem xml: '{xml}...'".format(tag=tag, xml=xml[:100]))
+                    else:
+                        # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
+                        # (or we may want to give up on the requirement for non-state-relevant issues...)
+                        #error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        pass
+
+                # Make sure everything is unique
+                if url_name in self.used_names[tag]:
+                    msg = ("Non-unique url_name in xml.  This may break content.  url_name={0}.  Content={1}"
+                                .format(url_name, xml[:100]))
+                    error_tracker("ERROR: " + msg)
+                    log.warning(msg)
+                    # Just set name to fallback_name--if there are multiple things with the same fallback name,
+                    # they are actually identical, so it's fragile, but not immediately broken.
+                    url_name = fallback_name()
+
+                self.used_names[tag].add(url_name)
+                xml_data.set('url_name', url_name)
+
             try:
                 # VS[compat]
                 # TODO (cpennington): Remove this once all fall 2012 courses
@@ -62,32 +125,11 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     err=str(err), xml=xml))
                 raise
 
-            # VS[compat]. Take this out once course conversion is done
-            if xml_data.get('slug') is None and xml_data.get('url_name') is None:
-                if xml_data.get('name'):
-                    slug = Location.clean(xml_data.get('name'))
-                elif xml_data.get('display_name'):
-                    slug = Location.clean(xml_data.get('display_name'))
-                else:
-                    self.unnamed_modules += 1
-                    slug = '{tag}_{count}'.format(tag=xml_data.tag,
-                                                  count=self.unnamed_modules)
-
-                while slug in self.used_slugs:
-                    self.unnamed_modules += 1
-                    slug = '{slug}_{count}'.format(slug=slug,
-                                                   count=self.unnamed_modules)
-
-                self.used_slugs.add(slug)
-                # log.debug('-> slug=%s' % slug)
-                xml_data.set('url_name', slug)
+            make_name_unique(xml_data)
 
             descriptor = XModuleDescriptor.load_from_xml(
                 etree.tostring(xml_data), self, self.org,
                 self.course, xmlstore.default_class)
-
-            #log.debug('==> importing descriptor location %s' %
-            #          repr(descriptor.location))
             descriptor.metadata['data_dir'] = course_dir
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
