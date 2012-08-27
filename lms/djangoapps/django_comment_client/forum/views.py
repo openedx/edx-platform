@@ -168,6 +168,7 @@ def forum_form_discussion(request, course_id):
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
+            'threads': threads,
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
