@@ -466,7 +466,7 @@ class CapaModule(XModule):
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
             prev_submit_time = self.lcp.get_recentmost_queuetime() 
-            waittime_between_requests = self.system.xqueue.waittime
+            waittime_between_requests = self.system.xqueue['waittime']
             if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
                 return {'success': msg, 'html': ''}
