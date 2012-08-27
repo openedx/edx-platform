@@ -99,3 +99,15 @@ Note that the gitreload-based workflow is not meant for deployments on AWS (or e
 
 Also, the gitreload feature needs MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True in the django settings.
 
+## Running under gunicorn
+
+If you need to develop something specific to our production setup, you may need to run under gunicorn locally.  It's simple:
+
+    $ pip install gunicorn
+    $ gunicorn_django -b 127.0.0.1:8000 -w 4 --pythonpath=. --settings=lms.envs.dev
+
+The `-w 4` specifies the number of worker threads.  
+
+gunicorn won't serve static files like the django-admin site will, so if you need that, you'll also need to set up nginx and run collectstatic.
+
+### Installing nginx : TODO ???
