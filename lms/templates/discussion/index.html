@@ -1,3 +1,4 @@
+<%! import django_comment_client.helpers as helpers %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -30,13 +31,13 @@
       <div class="post-list-wrapper">
         <ul class="post-list">
           % for thread in threads:
-          <li><a href="#"><span class="title">${thread['title'] | h}</span> <span class="comments">${thread['comments_count'] | h}</span><span class="votes">+${thread['votes']['up_count'] | h}</span></a></li>
+          <li><a href="${helpers.permalink(thread) | h}"><span class="title">${thread['title'] | h}</span> <span class="comments">${thread['comments_count'] | h}</span><span class="votes">+${thread['votes']['up_count'] | h}</span></a></li>
           % endfor
         </ul>
       </div>
     </article>
     <section class="discussion-content">
-      Oh
+      This page intentionally left blank
     </section>
   </div>
 

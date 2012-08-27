@@ -19,6 +19,28 @@
       vertical-align: baseline;
     }
 
+    .discussion {
+        display: table-cell;
+        vertical-align: top;
+        width: 72.3%;
+        padding: 40px;
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .posted-details {
+            font-size: 12px;
+            font-style: italic;
+            color: #737373;
+        }
+
+        p + p {
+            margin-top: 20px;
+        }
+    }
+
     .discussion-sidebar {
 
       display: table-cell;
