@@ -43,7 +43,7 @@
 	    $(document).ready(function () {
           editor = $('#div_id_content div.controls');
           cs = editor.prepend('<p class="cheatsheet">Markdown syntax is allowed. See the <a id="cheatsheetLink" href="#">cheatsheet</a> for help.</p>');
-          cs.click(function() {
+          cs.find('#cheatsheetLink').click(function() {
               $('#cheatsheetModal').modal('show');
           });
           $('#cheatsheetModal .close-btn').click(function(e) {
