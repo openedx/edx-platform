@@ -335,7 +335,7 @@ def progress(request, course_id, student_id=None):
 
     # The course_module should be accessible, but check anyway just in case something went wrong:
     if course_module is None:
-        raise Http404("No access to this course")
+        raise Http404("Course does not exist")
 
     courseware_summary = grades.progress_summary(student, course_module,
                                                  course.grader, student_module_cache)
