@@ -464,7 +464,13 @@ class CapaModule(XModule):
             raise NotFoundError('Problem must be reset before it can be checked again')
 
         # Problem queued. Students must wait XQUEUE_WAITTIME_BETWEEN_REQUESTS
-        if self.lcp.is_queued():
+        try:
+            is_queued = self.lcp.is_queued()
+        except KeyError:
+            log.info("Caught KeyError arising from 'queuekey'-->'queuestate' conversion for CapaModule name=%s" % self.name)
+            is_queued = False
+
+        if is_queued:
             current_time = datetime.datetime.now()
             prev_submit_time = self.lcp.get_recentmost_queuetime() 
             waittime_between_requests = settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
