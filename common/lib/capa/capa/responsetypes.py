@@ -1150,7 +1150,7 @@ class CodeResponse(LoncapaResponse):
                                                     body=json.dumps(contents))
 
         # State associated with the queueing request
-        qtime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
         queuestate = {'key': queuekey,
                       'time': qtime,
                      }
