@@ -14,6 +14,7 @@ This is used by capa_module.
 
 from __future__ import division
 
+from datetime import datetime
 import json
 import logging
 import math
@@ -30,7 +31,6 @@ from xml.sax.saxutils import unescape
 
 import calc
 from correctmap import CorrectMap
-from datetime import datetime
 import eia
 import inputtypes
 from util import contextualize_text, convert_files_to_filenames
