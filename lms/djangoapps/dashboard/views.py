@@ -24,7 +24,8 @@ def dashboard(request):
     queries=[]
     queries.append("select count(user_id) as students, course_id from student_courseenrollment group by course_id order by students desc;")
     queries.append("select count(distinct user_id) as unique_students from student_courseenrollment;")
-
+    queries.append("select registrations, count(registrations) from (select count(user_id) as registrations from student_courseenrollment group by user_id) as registrations_per_user group by registrations;")
+    
     from django.db import connection
     cursor = connection.cursor()
     results =[]
