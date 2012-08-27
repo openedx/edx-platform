@@ -148,7 +148,7 @@ That's basically all there is to the organizational structure.  Read the next se
 * `problem` -- a problem.  See elsewhere in edx4edx for documentation on the format.
 * `problemset` -- logically, a series of related problems.  Currently displayed vertically.  May contain explanatory html, videos, etc.
 * `sequential` -- a sequence of content, currently displayed with a horizontal list of tabs.  If possible, use a more semantically meaningful tag (currently, we only have `videosequence`).
-* `vertical` -- a sequence of content, displayed vertically.  If possible, use a more semantically meaningful tag (currently, we only have `problemset`).
+* `vertical` -- a sequence of content, displayed vertically.  Content will be accessed all at once, on the right part of the page. No navigational bar. May have to use browser scroll bars. Content split with separators.   If possible, use a more semantically meaningful tag (currently, we only have `problemset`).
 * `video`  -- a link to a video, currently expected to be hosted on youtube.
 * `videosequence` -- a sequence of videos.  This can contain various non-video content; it just signals to the system that this is logically part of an explanatory sequence of content, as opposed to say an exam sequence.
 
@@ -223,18 +223,23 @@ Values are dictionaries of the form {"metadata-key" : "metadata-value"}.
 __Not inherited:__
 
 * `display_name` - name that will appear when this content is displayed in the courseware.  Useful for all tag types.
-*	`format` - subheading under display name -- currently only displayed for chapter sub-sections.
+*	`format` - subheading under display name -- currently only displayed for chapter sub-sections.  Also used by the the grader to know how to process students assessments that the
+    section contains. New formats can be defined as a 'type' in the GRADER variable in course_settings.json. Optional.  (TODO: double check this--what's the current behavior?)
 * `hide_from_toc` -- If set to true for a chapter or chapter subsection, will hide that element from the courseware navigation accordion.  This is useful if you'd like to link to the content directly instead (e.g. for tutorials)
 * `ispublic` -- specify whether the course is public.  You should be able to use start dates instead (?)
 
 __Inherited:__
 
 * `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
-*	`showanswer` - only for psets, is binary (closed/open).
-*	`graded` - Tutorial vs. grade, again binary (true/false). If true, will be used in calculation of student grade.
-*	`rerandomise` - Provide different numbers/variables for problems to prevent cheating. Provide different answers from questions bank?
-*	`due` - Due date for assignment. Assignment will be closed after that. This is a very important function of a policy file.
-* `graceperiod` -
+*	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
+*	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
+*	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+                                                            'never' (all students see the same version of the problem)
+                                                            'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
+                                                            Default: 'always'. Optional.
+*	`due` - Due date for assignment. Assignment will be closed after that.  Values: valid date. Default: none. Optional.
+* attempts: Number of allowed attempts. Values: integer. Default: infinite. Optional.
+* `graceperiod` - A default length of time that the problem is still accessible after the due date in the format "2 days 3 hours" or "1 day 15 minutes".  Note, graceperiods are currently the easiest way to handle time zones. Due dates are all expressed in UCT.
 * `xqa_key` -- for integration with Ike's content QA server. -- should typically be specified at the course level.
 
 __Inheritance example:__
@@ -258,6 +263,7 @@ Metadata can also live in the xml files, but anything defined in the policy file
    - note, some xml attributes are not metadata.  e.g. in `<video youtube="xyz987293487293847"/>`, the `youtube` attribute specifies what video this is, and is logically part of the content, not the policy, so it should stay in the xml.
 
 Another example policy file:
+
     {
         "course/2012": {
             "graceperiod": "1 day",
@@ -309,3 +315,7 @@ before the week 1 material to make it easy to find in the file.
 * A heads up: our content management system will allow you to develop content through a web browser, but will be backed by this same xml at first.  Once that happens, every element will be in its own file to make access and updates faster.
 
 * Prefer the most "semantic" name for containers: e.g., use problemset rather than vertical for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
+
+----
+
+(Dev note: This file is generated from the mitx repo, in `doc/xml-format.md`.  Please make edits there.)
