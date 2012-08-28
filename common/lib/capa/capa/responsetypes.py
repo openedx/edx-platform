@@ -412,7 +412,7 @@ class JavascriptResponse(LoncapaResponse):
                                         id=self.xml.get('id')):
 
             raw_param = param.get("value")
-            params[param.get("name")] = contextualize_text(raw_param, self.context)
+            params[param.get("name")] = json.loads(contextualize_text(raw_param, self.context))
         
         return params
 
