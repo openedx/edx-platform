@@ -182,6 +182,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
 
     annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
 
+    log.debug(annotated_content_info)
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
@@ -191,6 +192,7 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
         'discussion_data': json.dumps({ discussion_id: [utils.safe_content(thread)] }),
         'threads': threads,
     }
+
     return render_to_string('discussion/_single_thread.html', context)
 
 def single_thread(request, course_id, discussion_id, thread_id):
@@ -223,10 +225,18 @@ def single_thread(request, course_id, discussion_id, thread_id):
             course_id,
         )
 
+
+        user_info = cc.User.from_django_user(request.user).to_dict()
+        thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+        annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
+
+
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',
+            'thread': json.dumps(utils.safe_content(thread)),
+            'annotated_content_info': json.dumps(annotated_content_info),
             'content': render_single_thread(request, discussion_id, course_id, thread_id),
             'course': course,
             'recent_active_threads': recent_active_threads,
