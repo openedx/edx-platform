@@ -1273,7 +1273,7 @@ main()
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://qisx.mit.edu:8889/pyloncapa"	 # FIXME - hardcoded URL # or "http://127.0.0.1:8080"
+        self.url = xml.get('url') or "http://127.0.0.1:8080"	 # FIXME - hardcoded URL # or "http://qisx.mit.edu:8889/pyloncapa"
 
         # answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
         answer = xml.find('answer')
