@@ -19,7 +19,7 @@ URL_RE = re.compile("""
     (?P<org>[^/]+)/
     (?P<course>[^/]+)/
     (?P<category>[^/]+)/
-    (?P<name>[^@]+)
+    (?P<name>[^@/]+)
     (@(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
