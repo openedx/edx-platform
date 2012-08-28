@@ -293,6 +293,9 @@ class @Problem
       problemState  = data.data("problem_state")
       displayClass  = window[data.data('display_class')]
 
+      if evaluation == ''
+          evaluation = null
+
       container = $(element).find(".javascriptinput_container")
       submissionField = $(element).find(".javascriptinput_input")
 
