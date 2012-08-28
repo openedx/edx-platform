@@ -10,13 +10,15 @@ it :)
 
 Basic structure:
 
-- for each path being monitoring, maintain a threading.Event object that is signalled when the file is changed.
+- for each path being monitored, maintain a threading.Event object that is
+  signalled when the file is changed.
+
 - the client interface is the following:
 
 1) Call watch(path) -> returns an Event object e.
 2) call e.is_set() to tell whether the file has been modified.
 3) call e.clear() to clear the state to start looking for the next modification.
-4) go back to step 2 to look for the next modification.
+4) go back to step 2 to ask about the next modification.
 """
 
 import os
