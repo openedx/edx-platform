@@ -391,6 +391,18 @@ section.wiki {
     line-height: 1.4em;
   }
 
+  #div_id_content {
+    position: relative;
+  }
+
+  #hint_id_content {
+    position: absolute;
+    top: 10px;
+    right: 0%;
+    font-size: 12px;
+    text-align:right;
+  }
+
   .CodeMirror {
     background: #fafafa;
     border: 1px solid #c8c8c8;
@@ -565,13 +577,6 @@ section.wiki {
 
   #previewWindow body {
     background: #f00 !important;
-  }
-
-  .cheatsheet {
-    float: right;
-    position: relative;
-    top: -26px;
-    font-size: 12px;
   }
 
   #cheatsheetLink {
