@@ -1127,11 +1127,14 @@ class CodeResponse(LoncapaResponse):
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
+
         qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
         anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + str(time.time()) +
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                  anonymous_student_id +  
                                                  self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
@@ -1147,9 +1150,8 @@ class CodeResponse(LoncapaResponse):
         contents = self.payload.copy() 
 
         # Metadata related to the student submission revealed to the external grader
-        current_time = datetime.now()
         student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': str(current_time),
+                        'submission_time': qtime,
                        }
         contents.update({'student_info': json.dumps(student_info)})
 
@@ -1165,7 +1167,6 @@ class CodeResponse(LoncapaResponse):
                                                     body=json.dumps(contents))
 
         # State associated with the queueing request
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
         queuestate = {'key': queuekey,
                       'time': qtime,
                      }
