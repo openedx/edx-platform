@@ -4,8 +4,11 @@ from django.utils.encoding import force_unicode
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
+from django.template.loader import render_to_string
+
 from wiki.editors.base import BaseEditor
 from wiki.editors.markitup import MarkItUpAdminWidget
+
 
 class CodeMirrorWidget(forms.Widget):
     def __init__(self, attrs=None):
@@ -18,9 +21,15 @@ class CodeMirrorWidget(forms.Widget):
     
     def render(self, name, value, attrs=None):
         if value is None: value = ''
+
         final_attrs = self.build_attrs(attrs, name=name)
-        return mark_safe(u'<div><textarea%s>%s</textarea></div>' % (flatatt(final_attrs),
-                conditional_escape(force_unicode(value))))
+
+        # TODO use the help_text field of edit form instead of rendering a template
+
+        return render_to_string('wiki/includes/editor_widget.html',
+                                {'attrs': mark_safe(flatatt(final_attrs)),
+                                 'content': conditional_escape(force_unicode(value)),
+                                 })
 
 
 class CodeMirror(BaseEditor):
@@ -50,5 +59,6 @@ class CodeMirror(BaseEditor):
               "js/vendor/CodeMirror/xml.js",
               "js/vendor/CodeMirror/mitx_markdown.js",
               "js/wiki/CodeMirror.init.js",
+              "js/wiki/cheatsheet.js",
               )
 

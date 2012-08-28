@@ -13,18 +13,21 @@ from xmodule.errortracker import ErrorLog, make_error_tracker
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
+
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://
     (?P<org>[^/]+)/
     (?P<course>[^/]+)/
     (?P<category>[^/]+)/
-    (?P<name>[^/]+)
-    (/(?P<revision>[^/]+))?
+    (?P<name>[^@]+)
+    (@(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
 INVALID_CHARS = re.compile(r"[^\w.-]")
+# Names are allowed to have colons.
+INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
 
@@ -34,7 +37,7 @@ class Location(_LocationBase):
     Encodes a location.
 
     Locations representations of URLs of the
-    form {tag}://{org}/{course}/{category}/{name}[/{revision}]
+    form {tag}://{org}/{course}/{category}/{name}[@{revision}]
 
     However, they can also be represented a dictionaries (specifying each component),
     tuples or list (specified in order), or as strings of the url
@@ -81,7 +84,7 @@ class Location(_LocationBase):
 
         location - Can be any of the following types:
             string: should be of the form
-                    {tag}://{org}/{course}/{category}/{name}[/{revision}]
+                    {tag}://{org}/{course}/{category}/{name}[@{revision}]
 
             list: should be of the form [tag, org, course, category, name, revision]
 
@@ -99,10 +102,11 @@ class Location(_LocationBase):
         ommitted.
 
         Components must be composed of alphanumeric characters, or the
-        characters '_', '-', and '.'
+        characters '_', '-', and '.'.  The name component is additionally allowed to have ':',
+        which is interpreted specially for xml storage.
 
-        Components may be set to None, which may be interpreted by some contexts
-        to mean wildcard selection
+        Components may be set to None, which may be interpreted in some contexts
+        to mean wildcard selection.
         """
 
 
@@ -116,13 +120,22 @@ class Location(_LocationBase):
             return _LocationBase.__new__(_cls, *([None] * 6))
 
         def check_dict(dict_):
-            check_list(dict_.itervalues())
+            # Order matters, so flatten out into a list
+            keys = ['tag', 'org', 'course', 'category', 'name', 'revision']
+            list_ = [dict_[k] for k in keys]
+            check_list(list_)
 
         def check_list(list_):
-            for val in list_:
-                if val is not None and INVALID_CHARS.search(val) is not None:
+            def check(val, regexp):
+                if val is not None and regexp.search(val) is not None:
                     log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
                     raise InvalidLocationError(location)
+
+            list_ = list(list_)
+            for val in list_[:4] + [list_[5]]:
+                check(val, INVALID_CHARS)
+            # names allow colons
+            check(list_[4], INVALID_CHARS_NAME)
 
         if isinstance(location, basestring):
             match = URL_RE.match(location)
@@ -162,7 +175,7 @@ class Location(_LocationBase):
         """
         url = "{tag}://{org}/{course}/{category}/{name}".format(**self.dict())
         if self.revision:
-            url += "/" + self.revision
+            url += "@" + self.revision
         return url
 
     def html_id(self):
@@ -170,6 +183,7 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
+        # TODO: is ':' ok in html ids?
         return "-".join(str(v) for v in self.list()
                         if v is not None).replace('.', '_')
 
