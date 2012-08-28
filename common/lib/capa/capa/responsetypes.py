@@ -318,30 +318,37 @@ class JavascriptResponse(LoncapaResponse):
     
     def compile_display_javascript(self):
 
-        latestTimestamp = 0
-        basepath = self.system.filestore.root_path + '/js/'
-        for filename in (self.display_dependencies + [self.display]):
-            filepath = basepath + filename
-            timestamp = os.stat(filepath).st_mtime
-            if timestamp > latestTimestamp:
-                latestTimestamp = timestamp
-        
-        h = hashlib.md5()
-        h.update(self.answer_id + str(self.display_dependencies))
-        compiled_filename = 'compiled/' + h.hexdigest() + '.js'
-        compiled_filepath = basepath + compiled_filename
+        # TODO FIXME
+        # arjun: removing this behavior for now (and likely forever). Keeping
+        # until we decide on exactly how to solve this issue. For now, files are
+        # manually being compiled to DATA_DIR/js/compiled.
 
-        if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
-            outfile = open(compiled_filepath, 'w')
-            for filename in (self.display_dependencies + [self.display]):
-                filepath = basepath + filename
-                infile = open(filepath, 'r')
-                outfile.write(infile.read())
-                outfile.write(';\n')
-                infile.close()
-            outfile.close()
+        #latestTimestamp = 0
+        #basepath = self.system.filestore.root_path + '/js/'
+        #for filename in (self.display_dependencies + [self.display]):
+        #    filepath = basepath + filename
+        #    timestamp = os.stat(filepath).st_mtime
+        #    if timestamp > latestTimestamp:
+        #        latestTimestamp = timestamp
+        #
+        #h = hashlib.md5()
+        #h.update(self.answer_id + str(self.display_dependencies))
+        #compiled_filename = 'compiled/' + h.hexdigest() + '.js'
+        #compiled_filepath = basepath + compiled_filename
 
-        self.display_filename = compiled_filename
+        #if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
+        #    outfile = open(compiled_filepath, 'w')
+        #    for filename in (self.display_dependencies + [self.display]):
+        #        filepath = basepath + filename
+        #        infile = open(filepath, 'r')
+        #        outfile.write(infile.read())
+        #        outfile.write(';\n')
+        #        infile.close()
+        #    outfile.close()
+
+        # TODO this should also be fixed when the above is fixed.
+        filename = self.system.ajax_url.split('/')[-1] + '.js'
+        self.display_filename = 'compiled/' + filename
 
     def parse_xml(self):
         self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
