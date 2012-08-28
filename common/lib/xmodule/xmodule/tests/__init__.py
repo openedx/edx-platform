@@ -299,7 +299,6 @@ class CodeResponseTest(unittest.TestCase):
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
             
             answer_ids = sorted(test_lcp.get_question_answers())
-            num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
             cmap = CorrectMap()
@@ -311,7 +310,7 @@ class CodeResponseTest(unittest.TestCase):
 
             # Now we queue the LCP
             cmap = CorrectMap()
-            for i in range(num_answers):
+            for i, answer_id in enumerate(answer_ids): 
                 queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
                 cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
             test_lcp.correct_map.update(cmap)
@@ -327,11 +326,10 @@ class CodeResponseTest(unittest.TestCase):
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
 
             answer_ids = sorted(test_lcp.get_question_answers())
-            num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the queued state
             old_cmap = CorrectMap()
-            for i in range(num_answers):
+            for i, answer_id in enumerate(answer_ids):
                 queuekey = 1000 + i
                 queuestate = CodeResponseTest.make_queuestate(1000+i, datetime.now())
                 old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
@@ -351,28 +349,28 @@ class CodeResponseTest(unittest.TestCase):
                 test_lcp.update_score(xserver_msgs[correctness], queuekey=0)
                 self.assertEquals(test_lcp.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
 
-                for i in range(num_answers):
-                    self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[i]))  # Should be still queued, since message undelivered
+                for answer_id in answer_ids:
+                    self.assertTrue(test_lcp.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
 
             # Correct queuekey, state should be updated
             for correctness in ['correct', 'incorrect']:
-                for i in range(num_answers):  # Target specific answer_id's
+                for i, answer_id in enumerate(answer_ids):
                     test_lcp.correct_map = CorrectMap()
                     test_lcp.correct_map.update(old_cmap)
 
                     new_cmap = CorrectMap()
                     new_cmap.update(old_cmap)
                     npoints = 1 if correctness=='correct' else 0
-                    new_cmap.set(answer_id=answer_ids[i], npoints=npoints, correctness=correctness, msg='MESSAGE', queuestate=None)
+                    new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg='MESSAGE', queuestate=None)
 
                     test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                     self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
 
-                    for j in range(num_answers):
+                    for j, test_id in enumerate(answer_ids):
                         if j == i:
-                            self.assertFalse(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be dequeued, message delivered
+                            self.assertFalse(test_lcp.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
                         else:
-                            self.assertTrue(test_lcp.correct_map.is_queued(answer_ids[j]))  # Should be queued, message undelivered
+                            self.assertTrue(test_lcp.correct_map.is_queued(test_id))  # Should be queued, message undelivered
     
 
     def test_recentmost_queuetime(self):
@@ -384,28 +382,26 @@ class CodeResponseTest(unittest.TestCase):
             test_lcp = lcp.LoncapaProblem(input_file.read(), '1', system=i4xs)
 
             answer_ids = sorted(test_lcp.get_question_answers())
-            num_answers = len(answer_ids)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the unqueued state
             cmap = CorrectMap()
-            for i in range(num_answers):
-                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=None))
+            for answer_id in answer_ids:
+                cmap.update(CorrectMap(answer_id=answer_id, queuestate=None))
             test_lcp.correct_map.update(cmap)
             
             self.assertEquals(test_lcp.get_recentmost_queuetime(), None)
 
             # CodeResponse requires internal CorrectMap state. Build it now in the queued state
             cmap = CorrectMap()
-            num_answers = len(answer_ids)
-            for i in range(num_answers):
+            for i, answer_id in enumerate(answer_ids):
                 queuekey = 1000 + i
                 latest_timestamp = datetime.now()
                 queuestate = CodeResponseTest.make_queuestate(1000+i, latest_timestamp)
-                cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
+                cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
             test_lcp.correct_map.update(cmap)
 
             # Queue state only tracks up to second
-            latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp,'%Y%m%d%H%M%S'),'%Y%m%d%H%M%S')
+            latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat)
 
             self.assertEquals(test_lcp.get_recentmost_queuetime(), latest_timestamp)
 
