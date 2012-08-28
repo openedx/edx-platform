@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import has_access
+from courseware.access import has_access, has_started
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from static_replace import replace_urls
@@ -98,12 +98,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
                                  'url_name': section.url_name,
                                  'format': section.metadata.get('format', ''),
                                  'due': section.metadata.get('due', ''),
-                                 'active': active})
+                                 'active': active,
+                                 'started': has_started(section),})
 
         chapters.append({'display_name': chapter.display_name,
                          'url_name': chapter.url_name,
                          'sections': sections,
-                         'active': chapter.url_name == active_chapter})
+                         'active': chapter.url_name == active_chapter,
+                         'started': has_started(chapter),})
     return chapters
 
 

@@ -71,6 +71,44 @@ def has_access(user, obj, action):
                     .format(type(obj)))
 
 
+def has_started(mod_or_desc):
+    """
+    A helper function that checks whether a particular xmodule or descriptor is visible to
+    students, as far as start dates are concerned.
+
+    This is used to determine what elements to highlight to instructors as
+    students-can't-see-this, since we don't have a student user handy in the
+    view to do a true access check.
+    """
+    if isinstance(mod_or_desc, XModuleDescriptor):
+        descriptor = mod_or_desc
+    elif isinstance(mod_or_desc, XModule):
+        descriptor = mod_or_desc.descriptor
+    else:
+        raise TypeError("Unknown object type in has_started(): '{0}'"
+                        .format(type(mod_or_desc)))
+
+    # If start dates are off, can always load
+    if settings.MITX_FEATURES['DISABLE_START_DATES']:
+        debug("Allow: DISABLE_START_DATES")
+        return True
+
+    # Check start date
+    if descriptor.start is not None:
+        now = time.gmtime()
+        if now > descriptor.start:
+            # after start date, everyone can see it
+            debug("Allow: now > start date")
+            return True
+        else:
+            debug("Deny to non-staff: now < start date")
+    else:
+        # No start date, so can always load.
+        debug("Allow: no start date")
+        return True
+
+
+
 # ================ Implementation helpers ================================
 
 def _has_access_course_desc(user, course, action):
@@ -182,24 +220,12 @@ def _has_access_descriptor(user, descriptor, action):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        # If start dates are off, can always load
-        if settings.MITX_FEATURES['DISABLE_START_DATES']:
-            debug("Allow: DISABLE_START_DATES")
+        if has_started(descriptor):
+            debug("Allow: has_started() is True")
             return True
-
-        # Check start date
-        if descriptor.start is not None:
-            now = time.gmtime()
-            if now > descriptor.start:
-                # after start date, everyone can see it
-                debug("Allow: now > start date")
-                return True
+        else:
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor)
-
-        # No start date, so can always load.
-        debug("Allow: no start date")
-        return True
 
     checkers = {
         'load': can_load,
