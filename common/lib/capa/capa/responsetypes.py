@@ -1010,7 +1010,7 @@ class CodeResponse(LoncapaResponse):
     '''
     Grade student code using an external queueing server, called 'xqueue'
 
-    Expects 'xqueue' dict in ModuleSystem with the following keys:
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
         system.xqueue = { 'interface': XqueueInterface object,
                           'callback_url': Per-StudentModule callback URL where results are posted (string),
                           'default_queuename': Default queuename to submit request (string)
