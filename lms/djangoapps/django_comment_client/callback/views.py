@@ -48,7 +48,7 @@ def process_replies(replies):
 def process_topics(topics):
     def process(notification):
         thread_id = notification['info']['thread_id']
-        course_id = notification['info']['course_id']
+        course_id = notification['course_id']
         commentable_id = notification['info']['commentable_id']
         return {
             'post_topic': True,
@@ -64,7 +64,7 @@ def process_topics(topics):
 def process_at_users(at_users):
     def process(notification):
         thread_id = notification['info']['thread_id']
-        course_id = notification['info']['course_id']
+        course_id = notification['course_id']
         commentable_id = notification['info']['commentable_id']
         content_type = notification['info']['content_type']
         data = {
@@ -107,8 +107,6 @@ def notifications_callback(request):
 
     since_time = notifications[0]['happened_at'].strftime("%H:%M %p")
 
-    import pdb; pdb.set_trace()
-
     for user_id in user_ids:
         try:
             user = User.objects.get(id=user_id)
@@ -119,8 +117,7 @@ def notifications_callback(request):
                 'since_time': since_time,
             }
             # composes notifications email
-            message = utils.render_mustache('discussion/emails/notifications_email.txt.mustache', context)
-            print message
+            message = utils.render_mustache('discussion/emails/notifications_email.html.mustache', context)
             subject = utils.render_mustache('discussion/emails/notifications_email_subject.txt.mustache', context)
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
