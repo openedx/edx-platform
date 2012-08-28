@@ -1010,7 +1010,7 @@ class CodeResponse(LoncapaResponse):
     '''
     Grade student code using an external queueing server, called 'xqueue'
 
-    Expects 'xqueue' dict in ModuleSystem with the following keys:
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
         system.xqueue = { 'interface': XqueueInterface object,
                           'callback_url': Per-StudentModule callback URL where results are posted (string),
                           'default_queuename': Default queuename to submit request (string)
@@ -1126,21 +1126,33 @@ class CodeResponse(LoncapaResponse):
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
+
         qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
+        anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed)+self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +  
+                                                 self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
         
         # Generate body
         if is_list_of_files(submission):
-            self.context.update({'submission': queuekey}) # For tracking. TODO: May want to record something else here
+            self.context.update({'submission': ''}) # TODO: Get S3 pointer from the Queue
         else:
             self.context.update({'submission': submission})
 
         contents = self.payload.copy() 
+
+        # Metadata related to the student submission revealed to the external grader
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                       }
+        contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         if is_list_of_files(submission):
@@ -1154,7 +1166,6 @@ class CodeResponse(LoncapaResponse):
                                                     body=json.dumps(contents))
 
         # State associated with the queueing request
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
         queuestate = {'key': queuekey,
                       'time': qtime,
                      }
