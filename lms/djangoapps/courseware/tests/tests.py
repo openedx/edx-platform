@@ -411,8 +411,6 @@ class TestViewAuth(PageLoader):
             """list of urls that only instructors/staff should be able to see"""
             urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
                                 course)
-            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
-                                                     'student_id': user(self.student).id}))
             return urls
 
         def check_non_staff(course):
@@ -434,6 +432,17 @@ class TestViewAuth(PageLoader):
                         light_student_urls(course)):
                 print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
+
+            # The student progress tab is not accessible to a student
+            # before launch, so the instructor view-as-student feature should return a 404 as well.
+            # TODO (vshnayder): If this is not the behavior we want, will need
+            # to make access checking smarter and understand both the effective
+            # user (the student), and the requesting user (the prof)
+            url = reverse('student_progress', kwargs={'course_id': course.id,
+                                                     'student_id': user(self.student).id})
+            print 'checking for 404 on view-as-student: {0}'.format(url)
+            self.check_for_get_code(404, url)
+
 
         # First, try with an enrolled student
         print '=== Testing student access....'

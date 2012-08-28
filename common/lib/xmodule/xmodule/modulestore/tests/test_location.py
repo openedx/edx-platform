@@ -10,7 +10,7 @@ def check_string_roundtrip(url):
 
 def test_string_roundtrip():
     check_string_roundtrip("tag://org/course/category/name")
-    check_string_roundtrip("tag://org/course/category/name/revision")
+    check_string_roundtrip("tag://org/course/category/name@revision")
 
 
 input_dict = {
@@ -21,18 +21,28 @@ input_dict = {
     'org': 'org'
 }
 
+
+also_valid_dict = {
+    'tag': 'tag',
+    'course': 'course',
+    'category': 'category',
+    'name': 'name:more_name',
+    'org': 'org'
+}
+
+
 input_list = ['tag', 'org', 'course', 'category', 'name']
 
 input_str = "tag://org/course/category/name"
-input_str_rev = "tag://org/course/category/name/revision"
+input_str_rev = "tag://org/course/category/name@revision"
 
-valid = (input_list, input_dict, input_str, input_str_rev)
+valid = (input_list, input_dict, input_str, input_str_rev, also_valid_dict)
 
 invalid_dict = {
     'tag': 'tag',
     'course': 'course',
     'category': 'category',
-    'name': 'name/more_name',
+    'name': 'name@more_name',
     'org': 'org'
 }
 
@@ -45,8 +55,9 @@ invalid_dict2 = {
 }
 
 invalid = ("foo", ["foo"], ["foo", "bar"],
-           ["foo", "bar", "baz", "blat", "foo/bar"],
-           "tag://org/course/category/name with spaces/revision",
+           ["foo", "bar", "baz", "blat:blat", "foo:bar"],  # ':' ok in name, not in category
+           "tag://org/course/category/name with spaces@revision",
+           "tag://org/course/category/name/with/slashes@revision",
            invalid_dict,
            invalid_dict2)
 
@@ -62,16 +73,15 @@ def test_dict():
     assert_equals(dict(revision=None, **input_dict), Location(input_dict).dict())
 
     input_dict['revision'] = 'revision'
-    assert_equals("tag://org/course/category/name/revision", Location(input_dict).url())
+    assert_equals("tag://org/course/category/name@revision", Location(input_dict).url())
     assert_equals(input_dict, Location(input_dict).dict())
-
 
 def test_list():
     assert_equals("tag://org/course/category/name", Location(input_list).url())
     assert_equals(input_list + [None], Location(input_list).list())
 
     input_list.append('revision')
-    assert_equals("tag://org/course/category/name/revision", Location(input_list).url())
+    assert_equals("tag://org/course/category/name@revision", Location(input_list).url())
     assert_equals(input_list, Location(input_list).list())
 
 
@@ -87,8 +97,10 @@ def test_none():
 def test_invalid_locations():
     assert_raises(InvalidLocationError, Location, "foo")
     assert_raises(InvalidLocationError, Location, ["foo", "bar"])
+    assert_raises(InvalidLocationError, Location, ["foo", "bar", "baz", "blat/blat", "foo"])
     assert_raises(InvalidLocationError, Location, ["foo", "bar", "baz", "blat", "foo/bar"])
-    assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces/revision")
+    assert_raises(InvalidLocationError, Location, "tag://org/course/category/name with spaces@revision")
+    assert_raises(InvalidLocationError, Location, "tag://org/course/category/name/revision")
 
 
 def test_equality():

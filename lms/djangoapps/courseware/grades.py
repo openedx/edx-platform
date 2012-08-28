@@ -17,6 +17,7 @@ log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
     stack = module.get_display_items()
+    stack.reverse()
 
     while len(stack) > 0:
         next_module = stack.pop()

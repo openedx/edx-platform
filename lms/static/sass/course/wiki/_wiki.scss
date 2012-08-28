@@ -391,6 +391,18 @@ section.wiki {
     line-height: 1.4em;
   }
 
+  #div_id_content {
+    position: relative;
+  }
+
+  #hint_id_content {
+    position: absolute;
+    top: 10px;
+    right: 0%;
+    font-size: 12px;
+    text-align:right;
+  }
+
   .CodeMirror {
     background: #fafafa;
     border: 1px solid #c8c8c8;
@@ -567,11 +579,73 @@ section.wiki {
     background: #f00 !important;
   }
 
-  
+  #cheatsheetLink {
+    text-align: right;
+    display: float;
+  }
 
+  #cheatsheetModal {
+    width: 950px;
+    margin-left: -450px;
+    margin-top: -100px;
 
+    .left-column {
+      margin-right: 10px;
+    }
 
+    .left-column,
+    .right-column {
+      float: left;
+      width: 450px;
+    }
 
+    .close-btn {
+      display: block;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 30px;
+      border: 1px solid #ccc;
+      @include linear-gradient(top, #eee, #d2d2d2);
+      font-size: 22px;
+      line-height: 28px;    
+      color: #333;
+      text-align: center;
+      @include box-shadow(0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, .2));
+    }
+  }
+
+  #cheatsheet-body {
+    background: #fff;
+    text-align: left;
+    padding: 20px;
+    font-size: 14px;
+    @include clearfix;
+
+    h3 {
+      font-weight: bold;
+    }
+
+    ul {
+      list-style: circle;
+      line-height: 1.4;
+      color: #333;
+    }
+  }
+
+  #cheatsheet-body section + section {
+    margin-top: 40px;
+  }
+
+  #cheatsheet-body pre{
+    color: #000;
+    text-align: left;
+    background: #eee;
+    padding: 10px;
+    font-size: 12px;
+  }
 
   /*-----------------
 
