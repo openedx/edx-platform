@@ -435,7 +435,11 @@ class JavascriptResponse(LoncapaResponse):
         (all_correct, evaluation, solution) = self.run_grader(json_submission)
         self.solution = solution
         correctness = 'correct' if all_correct else 'incorrect'
-        return CorrectMap(self.answer_id, correctness, msg=evaluation)
+        if all_correct:
+            points = self.get_max_score()
+        else:
+            points = 0
+        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
     
     def run_grader(self, submission):
         if submission is None or submission == '':
