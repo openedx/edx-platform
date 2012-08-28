@@ -15,7 +15,8 @@ class CorrectMap(object):
     - msg         : string (may have HTML) giving extra message response (displayed below textline or textbox)
     - hint        : string (may have HTML) giving optional hint (displayed below textline or textbox, above msg)
     - hintmode    : one of (None,'on_request','always') criteria for displaying hint
-    - queuekey    : a random integer for xqueue_callback verification
+    - queuestate  : Dict {key:'', time:''} where key is a secret string, and time is a string dump
+                    of a DateTime object in the format '%Y%m%d%H%M%S'. Is None when not queued
 
     Behaves as a dict.
     '''
@@ -31,14 +32,15 @@ class CorrectMap(object):
     def __iter__(self):
         return self.cmap.__iter__()
 
-    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuekey=None):
+    # See the documentation for 'set_dict' for the use of kwargs
+    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuestate=None, **kwargs):
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
                                     'npoints': npoints,
                                     'msg': msg,
                                     'hint': hint,
                                     'hintmode': hintmode,
-                                    'queuekey': queuekey,
+                                    'queuestate': queuestate,
                                     }
 
     def __repr__(self):
@@ -52,25 +54,39 @@ class CorrectMap(object):
 
     def set_dict(self, correct_map):
         '''
-        set internal dict to provided correct_map dict
-        for graceful migration, if correct_map is a one-level dict, then convert it to the new
-        dict of dicts format.
+        Set internal dict of CorrectMap to provided correct_map dict
+
+        correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This means that
+        when the definition of CorrectMap (e.g. its properties) are altered, existing correct_map dict
+        not coincide with the newest CorrectMap format as defined by self.set.
+
+        For graceful migration, feed the contents of each correct map to self.set, rather than
+        making a direct copy of the given correct_map dict. This way, the common keys between 
+        the incoming correct_map dict and the new CorrectMap instance will be written, while
+        mismatched keys will be gracefully ignored.
+
+        Special migration case:
+            If correct_map is a one-level dict, then convert it to the new dict of dicts format.
         '''
         if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
-            self.__init__()							# empty current dict
-            for k in correct_map: self.set(k, correct_map[k])			# create new dict entries
+            self.__init__()	                                  # empty current dict
+            for k in correct_map: self.set(k, correct_map[k]) # create new dict entries
         else:
-            self.cmap = correct_map
+            self.__init__()
+            for k in correct_map: self.set(k, **correct_map[k])
 
     def is_correct(self, answer_id):
         if answer_id in self.cmap: return self.cmap[answer_id]['correctness'] == 'correct'
         return None
 
     def is_queued(self, answer_id):
-        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] is not None
+        return answer_id in self.cmap and self.cmap[answer_id]['queuestate'] is not None
 
     def is_right_queuekey(self, answer_id, test_key):
-        return answer_id in self.cmap and self.cmap[answer_id]['queuekey'] == test_key
+        return self.is_queued(answer_id) and self.cmap[answer_id]['queuestate']['key'] == test_key
+
+    def get_queuetime_str(self, answer_id):
+        return self.cmap[answer_id]['queuestate']['time']
 
     def get_npoints(self, answer_id):
         npoints = self.get_property(answer_id, 'npoints')
