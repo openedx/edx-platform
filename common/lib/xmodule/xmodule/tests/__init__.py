@@ -285,6 +285,7 @@ class StringResponseWithHintTest(unittest.TestCase):
 class CodeResponseTest(unittest.TestCase):
     '''
     Test CodeResponse
+    TODO: Add tests for external grader messages
     '''
     @staticmethod
     def make_queuestate(key, time):
@@ -318,6 +319,7 @@ class CodeResponseTest(unittest.TestCase):
 
             self.assertEquals(test_lcp.is_queued(), True)
 
+
     def test_update_score(self):
         '''
         Test whether LoncapaProblem.update_score can deliver queued result to the right subproblem
@@ -336,8 +338,9 @@ class CodeResponseTest(unittest.TestCase):
                 old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
             # Message format common to external graders
-            correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg':'MESSAGE'})
-            incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg':'MESSAGE'})
+            grader_msg = '<span>MESSAGE</span>' # Must be valid XML
+            correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg': grader_msg})
+            incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg': grader_msg})
 
             xserver_msgs = {'correct': correct_score_msg,
                             'incorrect': incorrect_score_msg,}
@@ -362,7 +365,7 @@ class CodeResponseTest(unittest.TestCase):
                     new_cmap = CorrectMap()
                     new_cmap.update(old_cmap)
                     npoints = 1 if correctness=='correct' else 0
-                    new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg='MESSAGE', queuestate=None)
+                    new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
 
                     test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                     self.assertEquals(test_lcp.correct_map.get_dict(), new_cmap.get_dict())
