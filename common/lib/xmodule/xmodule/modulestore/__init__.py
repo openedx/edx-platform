@@ -19,7 +19,7 @@ URL_RE = re.compile("""
     (?P<org>[^/]+)/
     (?P<course>[^/]+)/
     (?P<category>[^/]+)/
-    (?P<name>[^@/]+)
+    (?P<name>[^@]+)
     (@(?P<revision>[^/]+))?
     """, re.VERBOSE)
 
@@ -138,6 +138,8 @@ class Location(_LocationBase):
             check(list_[4], INVALID_CHARS_NAME)
 
         if isinstance(location, basestring):
+            if location.endswith('/'):
+                location = location[:-1]
             match = URL_RE.match(location)
             if match is None:
                 log.debug('location is instance of %s but no URL match' % basestring)
