@@ -1,4 +1,7 @@
 class @VideoCaption extends Subview
+  initialize: ->
+    @loaded = false  
+
   bind: ->
     $(window).bind('resize', @resize)
     @$('.hide-subtitles').click @toggle
@@ -24,6 +27,8 @@ class @VideoCaption extends Subview
       @captions = captions.text
       @start = captions.start
 
+      @loaded = true
+
       if onTouchBasedDevice()
         $('.subtitles li').html "Caption will be displayed when you start playing the video."
       else
@@ -47,37 +52,40 @@ class @VideoCaption extends Subview
     @rendered = true
 
   search: (time) ->
-    min = 0
-    max = @start.length - 1
+    if @loaded
+      min = 0
+      max = @start.length - 1
 
-    while min < max
-      index = Math.ceil((max + min) / 2)
-      if time < @start[index]
-        max = index - 1
-      if time >= @start[index]
-        min = index
-
-    return min
+      while min < max
+        index = Math.ceil((max + min) / 2)
+        if time < @start[index]
+          max = index - 1
+        if time >= @start[index]
+          min = index
+      return min
 
   play: ->
-    @renderCaption() unless @rendered
-    @playing = true
+    if @loaded
+      @renderCaption() unless @rendered
+      @playing = true
 
   pause: ->
-    @playing = false
+    if @loaded
+      @playing = false
 
   updatePlayTime: (time) ->
-    # This 250ms offset is required to match the video speed
-    time = Math.round(Time.convert(time, @currentSpeed, '1.0') * 1000 + 250)
-    newIndex = @search time
+    if @loaded
+      # This 250ms offset is required to match the video speed
+      time = Math.round(Time.convert(time, @currentSpeed, '1.0') * 1000 + 250)
+      newIndex = @search time
 
-    if newIndex != undefined && @currentIndex != newIndex
-      if @currentIndex
-        @$(".subtitles li.current").removeClass('current')
-      @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
+      if newIndex != undefined && @currentIndex != newIndex
+        if @currentIndex
+          @$(".subtitles li.current").removeClass('current')
+        @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
 
-      @currentIndex = newIndex
-      @scrollCaption()
+        @currentIndex = newIndex
+        @scrollCaption()
 
   resize: =>
     @$('.subtitles').css maxHeight: @captionHeight()
