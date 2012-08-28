@@ -198,6 +198,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                    location=descriptor.location.url(),
                                    dispatch=''),
                        )
+    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
+    ajax_url = ajax_url.rstrip('/')
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url = '{proto}://{host}'.format(
@@ -409,6 +411,10 @@ def modx_dispatch(request, dispatch, location, course_id):
       - course_id -- defines the course context for this request.
     '''
     # ''' (fix emacs broken parsing)
+
+    # Check parameters and fail fast if there's a problem
+    if not Location.is_valid(location):
+        raise Http404("Invalid location")
 
     # Check for submitted files and basic file size checks
     p = request.POST.copy()
