@@ -1,5 +1,5 @@
 <sequential>
-  <video youtube="0.75:izygArpw-Qo,1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" slug="Welcome" format="Video" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Welcome"/>
+  <video url_name="welcome"/>
   <sequential filename="System_Usage_Sequence" slug="System_Usage_Sequence" format="Lecture Sequence" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="System Usage Sequence"/>
   <vertical slug="Lab0_Using_the_tools" format="Lab" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never" name="Lab0: Using the tools">
     <html slug="html_19" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"> See the <a href="/section/labintro"> Lab Introduction </a> or <a href="/static/handouts/schematic_tutorial.pdf">Interactive Lab Usage Handout </a> for information on how to do the lab </html>
