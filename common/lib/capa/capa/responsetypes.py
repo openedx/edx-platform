@@ -385,19 +385,23 @@ class JavascriptResponse(LoncapaResponse):
         node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
         return tmp_env
+    
+    def call_node(self, args):
+
+        subprocess_args = ["node"]
+        subprocess_args.extend(args)
+
+        return subprocess.check_output(subprocess_args, env=self.get_node_env())
 
 
     def generate_problem_state(self):
 
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
-        output = subprocess.check_output(["node",
-                                          generator_file, 
-                                          self.generator, 
-                                          json.dumps(self.generator_dependencies),
-                                          json.dumps(str(self.system.seed)), 
-                                          json.dumps(self.params)
-                                          ],
-                                          env=self.get_node_env()).strip()
+        output = self.call_node([generator_file,
+                                 self.generator, 
+                                 json.dumps(self.generator_dependencies),
+                                 json.dumps(str(self.system.seed)), 
+                                 json.dumps(self.params)]).strip()
 
         return json.loads(output)
 
@@ -408,7 +412,8 @@ class JavascriptResponse(LoncapaResponse):
         for param in self.xml.xpath('//*[@id=$id]//responseparam', 
                                         id=self.xml.get('id')):
 
-            params[param.get("name")] = json.loads(param.get("value"))
+            raw_param = param.get("value")
+            params[param.get("name")] = json.loads(contextualize_text(raw_param, self.context))
         
         return params
 
@@ -447,15 +452,12 @@ class JavascriptResponse(LoncapaResponse):
             submission = json.dumps(None)
 
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
-        outputs = subprocess.check_output(["node",
-                                           grader_file, 
-                                           self.grader, 
-                                           json.dumps(self.grader_dependencies),
-                                           submission, 
-                                           json.dumps(self.problem_state), 
-                                           json.dumps(self.params)
-                                          ],
-                                          env=self.get_node_env()).split('\n')
+        outputs = self.call_node([grader_file, 
+                                  self.grader, 
+                                  json.dumps(self.grader_dependencies),
+                                  submission, 
+                                  json.dumps(self.problem_state), 
+                                  json.dumps(self.params)]).split('\n')
 
         all_correct = json.loads(outputs[0].strip())
         evaluation  = outputs[1].strip()
