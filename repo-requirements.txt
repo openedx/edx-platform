@@ -1,6 +1,6 @@
 -e git://github.com/MITx/django-staticfiles.git@6d2504e5c8#egg=django-staticfiles
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
--e git://github.com/benjaoming/django-wiki.git@cd1c23e1#egg=django-wiki
+-e git://github.com/MITx/django-wiki.git@e2e84558#egg=django-wiki
 -e git://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e common/lib/capa
 -e common/lib/xmodule

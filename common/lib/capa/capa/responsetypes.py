@@ -27,6 +27,7 @@ import xml.sax.saxutils as saxutils
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from correctmap import CorrectMap
+from datetime import datetime
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
@@ -436,7 +437,11 @@ class JavascriptResponse(LoncapaResponse):
         (all_correct, evaluation, solution) = self.run_grader(json_submission)
         self.solution = solution
         correctness = 'correct' if all_correct else 'incorrect'
-        return CorrectMap(self.answer_id, correctness, msg=evaluation)
+        if all_correct:
+            points = self.get_max_score()
+        else:
+            points = 0
+        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
     
     def run_grader(self, submission):
         if submission is None or submission == '':
@@ -1027,7 +1032,7 @@ class CodeResponse(LoncapaResponse):
         TODO: Determines whether in synchronous or asynchronous (queued) mode
         '''
         xml = self.xml
-        self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
+        self.url = xml.get('url', None) # TODO: XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
         # VS[compat]:
@@ -1132,7 +1137,7 @@ class CodeResponse(LoncapaResponse):
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
-
+        
         # Generate body
         if is_list_of_files(submission):
             self.context.update({'submission': ''}) # TODO: Get S3 pointer from the Queue
@@ -1156,16 +1161,22 @@ class CodeResponse(LoncapaResponse):
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 
+        # State associated with the queueing request
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        queuestate = {'key': queuekey,
+                      'time': qtime,
+                     }
+
         cmap = CorrectMap() 
         if error:
-            cmap.set(self.answer_id, queuekey=None,
+            cmap.set(self.answer_id, queuestate=None,
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
             # Queueing mechanism flags:
-            #   1) Backend: Non-null CorrectMap['queuekey'] indicates that the problem has been queued
+            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that the problem has been queued
             #   2) Frontend: correctness='incomplete' eventually trickles down through inputtypes.textbox 
             #       and .filesubmission to inform the browser to poll the LMS
-            cmap.set(self.answer_id, queuekey=queuekey, correctness='incomplete', msg=msg)
+            cmap.set(self.answer_id, queuestate=queuestate, correctness='incomplete', msg=msg)
 
         return cmap
 
@@ -1188,7 +1199,7 @@ class CodeResponse(LoncapaResponse):
                 points = 0
             elif points > self.maxpoints[self.answer_id]:
                 points = self.maxpoints[self.answer_id]
-            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)  # Queuestate is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
@@ -1205,7 +1216,7 @@ class CodeResponse(LoncapaResponse):
         '''
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
-             'score': # TODO -- Partial grading
+             'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg }
 
         Returns (valid_score_msg, correct, score, msg):

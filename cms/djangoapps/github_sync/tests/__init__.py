@@ -61,7 +61,7 @@ class GithubSyncTestCase(TestCase):
         self.assertIn(
             Location('i4x://edX/toy/chapter/Overview'),
             [child.location for child in self.import_course.get_children()])
-        self.assertEquals(1, len(self.import_course.get_children()))
+        self.assertEquals(2, len(self.import_course.get_children()))
 
     @patch('github_sync.sync_with_github')
     def test_sync_all_with_github(self, sync_with_github):

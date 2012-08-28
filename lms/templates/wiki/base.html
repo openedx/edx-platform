@@ -27,21 +27,20 @@
       });
     }
   </script>
-  
-  
+
+
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
-  
+
     <script src="{% static 'js/bootstrap-alert.js' %}"></script>
     <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
     <script src="{% static 'js/bootstrap-modal.js' %}"></script>
-    
+
     {% with mathjax_mode='wiki' %}
       {% include "mathjax_include.html" %}
     {% endwith %}
-    
   {% endaddtoblock %}
-  
+
 {% endblock %}
 
 
@@ -64,11 +63,12 @@
             </div>
           {% endfor %}
         {% endif %}
-        
+
         {% block wiki_contents %}{% endblock %}
-        
+
       {% endblock %}
     </div>
+
   </section>
 
 {% endblock %}
