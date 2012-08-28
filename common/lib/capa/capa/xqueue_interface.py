@@ -9,7 +9,7 @@ import time
 
 
 log = logging.getLogger('mitx.' + __name__)
-
+dateformat = '%Y%m%d%H%M%S'
 
 def make_hashkey(seed=None):
     '''
