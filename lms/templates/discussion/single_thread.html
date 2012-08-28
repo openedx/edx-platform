@@ -1,4 +1,5 @@
 <%! import django_comment_client.helpers as helpers %>
+<%! from django.template.defaultfilters import escapejs %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -16,48 +17,47 @@
 
 <%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
 
-<section class="container">
-  <div class="discussion-wrapper">
-    <article class="discussion-sidebar">
+<div class="discussion container">
+  <div class="discussion-body">
+    <div class="sidebar">
       <div class="board-selector">
         <a href="#" class="board-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
         <div class="board-drop-menu">
         </div>
       </div>
       <div class="sort-bar">
-<a href="#"><span class="sort-label">Sort by:</span> most recent <span class="drop-arrow">▾</span></a>
+        <a href="#"><span class="sort-label">Sort by:</span> most recent <span class="drop-arrow">▾</span></a>
       </div>
       <div class="post-list-wrapper">
         <ul class="post-list">
-          % for thread in threads:
-          <li><a href="${helpers.permalink(thread) | h}"><span class="title">${thread['title'] | h}</span> <span class="comments">${thread['comments_count'] | h}</span><span class="votes">+${thread['votes']['up_count'] | h}</span></a></li>
+          % for discussion_thread in threads:
+          <li><a href="${helpers.permalink(discussion_thread) | h}"><span class="title">${discussion_thread['title'] | h}</span> <span class="comments-count">${discussion_thread['comments_count'] | h}</span><span class="votes-count">+${discussion_thread['votes']['up_count'] | h}</span></a></li>
           % endfor
         </ul>
       </div>
-    </article>
-    <section class="discussion-content">
+    </div>
+
+    <div class="discussion-column">
+      <div class="global-discussion-actions">
+        <a href="#" class="new-post-btn"><span class="new-post-icon"></span>New Post</a>
+        <form class="post-search">
+          <input type="text" placeholder="Search discussions" class="post-search-field">
+        </form>
+      </div>
+
       ${content.decode('utf-8')}
-    </section>
+
+    </div>
   </div>
+</div>
 
-</section>
-
-<section class="container">
-  <div class="course-wrapper">
-    <section aria-label="Course Navigation" class="course-index">
-      <nav>
-        
-        <article class="sidebar-module discussion-sidebar">
-        </article>
-        <%include file="_recent_active_posts.html" />
-
-        <%include file="_trending_tags.html" />
-        
-      </nav>
-    </section>
-
-    <section class="course-content">
-      ${content.decode('utf-8')}
-    </section>
-  </div>
-</section>
+<script>
+    $$contents = {}
+    $$discussions = {}
+    $(document).ready(function() {
+        var user = new DiscussionUser(JSON.parse("${annotated_content_info | escapejs}"));
+        var thread = new Thread(JSON.parse("${thread | escapejs}"));
+        view = new DiscussionThreadView({el: $(".discussion-article"), model: thread, user: user})
+        view.render()
+    });
+</script>

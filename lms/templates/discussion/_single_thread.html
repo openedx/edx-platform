@@ -1,12 +1,33 @@
 <%namespace name="renderer" file="_content_renderer.html"/>
 
-<section class="discussion" _id="${discussion_id | h}">
-    <a class="discussion-title" href="javascript:void(0)">${thread['title'] | h}</a>
-    <p class="posted-details"><span class="timeago" title="${thread['created_at'] | h}">sometime</span> by <a href="#">Foo</a></p>
-  <div class="threads">
-    ${renderer.render_content_with_comments(thread)}
+<article class="discussion-article" data-id="${discussion_id| h}">
+  <a href="#" class="dogear"></a>
+  <div class="discussion-post">
+    <header>
+        <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${thread['votes']['up_count']}</span></a>
+      <h1>${thread['title']}</h1>
+      <p class="posted-details">
+        <span class="timeago" title="${thread['created_at'] | h}">sometime</span> by
+        <a href="${thread['user_id']}">${thread['username']}</a>
+      </p>
+    </header>
+    <div class="post-body">
+      ${thread['body']}
+    </div>
   </div>
-</section>
+  <ol class="responses">
+    % for reply in thread.get("children", []):
+    <li>
+      <div class="response-body">${reply['body']}</div>
+      <ol class="comments">
+        % for comment in reply.get("children", []):
+        <li><p>${comment['body']}</p></li>
+        % endfor
+      </ol>
+    </li>
+    % endfor
+  </ol>
+</article>
 
 <%include file="_js_data.html" />
 <script type="text/javascript">$(document).ready(function() { $("span.timeago").timeago() })</script>

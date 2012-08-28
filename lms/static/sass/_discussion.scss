@@ -1,99 +1,148 @@
-.container {
-  .discussion-wrapper {
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-    height: 500px;
-    background: #fff;
-    border-radius: 3px;
-    border: 1px solid #aaa;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      outline: 0;
-      font-size: 100%;
-      font: inherit;
-      vertical-align: baseline;
+@mixin blue-button {
+  display: block;
+  height: 33px;
+  margin: 12px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #4697c1;
+  background: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    border-color: #297095;
+    background: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+  }
+}
+
+.discussion-body {
+
+  .vote-btn {
+    float: right;
+    display: block;
+    height: 27px;
+    padding: 0 8px;
+    border-radius: 5px;
+    border: 1px solid #b2b2b2;
+    background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .15);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #333;
+
+    .plus-icon {
+      float: left;
+      margin-right: 6px;
+      font-size: 18px;
+      color: #17b429;
     }
 
-    .discussion {
-        display: table-cell;
-        vertical-align: top;
-        width: 72.3%;
-        padding: 40px;
+    &.is-cast {
+      border-color: #379a42;
+      background: -webkit-linear-gradient(top, #50cc5e, #3db84b);
+      color: #fff;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset, 0 1px 2px rgba(0, 0, 0, .2);
 
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .posted-details {
-            font-size: 12px;
-            font-style: italic;
-            color: #737373;
-        }
-
-        p + p {
-            margin-top: 20px;
-        }
-    }
-
-    .discussion-sidebar {
-
-      display: table-cell;
-      vertical-align: top;
-      width: 27.7%;
-      background: #f6f6f6;
-      border-radius: 3px 0 0 3px;
-      border-right: 3px solid #bcbcbc;
-
-      .sort-bar {
-        height: 27px;
-        border-bottom: 1px solid #a3a3a3;
-        background: -webkit-linear-gradient(top, #cdcdcd, #b6b6b6);
-        box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset;
-
-        a {
-          display: block;
-          float: right;
-          height: 27px;
-          margin-right: 10px;
-          font-size: 11px;
-          font-weight: bold;
-          line-height: 23px;
-          color: #333;
-          text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-
-          .sort-label {
-            font-size: 9px;
-            text-transform: uppercase;
-          }
-        }
-      }
-
-      .board-drop-btn {
-        display: block;
-        height: 60px;
-        border-bottom: 1px solid #a3a3a3;
-        border-radius: 3px 0 0 0;
-        background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
-        font-size: 16px;
-        font-weight: 700;
-        line-height: 58px;
-        text-align: center;
-        color: #333 !important;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
+      .plus-icon {
+        color: #336a39;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
       }
     }
+  }
+
+
+  .new-post-btn {
+    @include blue-button;
+    float: right;
+  }
+
+  .new-post-icon {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 17px;
+    margin: 7px 7px 0 0;
+    background: url(../images/new-post-icon.png) no-repeat;
+  }
+
+  .post-search {
+    float: right;
+  }
+
+  .post-search-field {
+    width: 280px;
+    height: 30px;
+    padding: 0 15px 0 30px;
+    margin-top: 14px;
+    border: 1px solid #acacac;
+    border-radius: 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset, 0 1px 0 rgba(255, 255, 255, .5);
+    background: url(../images/search-icon.png) no-repeat 8px center #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 30px;
+    color: #333;
+    outline: 0;
+    -webkit-transition: border-color .1s;
+
+    &:focus {
+      border-color: #4697c1;
+    }
+  }
+
+  h1, ul, li, a, ol {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+  }
+  ul, li {
+    list-style-type: none;
+  }
+  a {
+    text-decoration: none;
+    color: #009fe2;
+  }
+
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  height: 500px;
+  background: #fff;
+  border-radius: 3px;
+  border: 1px solid #aaa;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  .sidebar {
+    display: table-cell;
+    vertical-align: top;
+    width: 27.7%;
+    background: #f6f6f6;
+    border-radius: 3px 0 0 3px;
+    border-right: 1px solid #bcbcbc;
     .post-list {
+      background-color: #ddd;
+
+      li:last-child a {
+        border-bottom: 1px solid #ddd;
+      }
+
       a {
+        position: relative;
         display: block;
         height: 36px;
         padding: 0 10px;
-        border-bottom: 1px solid #ddd;
+        margin-bottom: 1px;
         background: #fff;
         font-size: 13px;
         font-weight: 700;
@@ -103,6 +152,40 @@
         &.read .title {
           font-weight: 400;
           color: #737373;
+        }
+
+        &.followed:after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 12px;
+          height: 12px;
+          background: url(../images/following-flag.png) no-repeat;
+        }
+
+        &.active {
+          background: -webkit-linear-gradient(top, #96e0fd, #61c7fc);
+          border-color: #4697c1;
+          box-shadow: 0 1px 0 #4697c1, 0 -1px 0 #4697c1;
+
+          .title {
+            color: #333;  
+          }
+
+          .votes-count,
+          .comments-count {
+            background: -webkit-linear-gradient(top, #3994c7, #4da7d3);
+            color: #fff;
+
+            &:after {
+              color: #4da7d3;
+            }
+          }
+
+          &.followed:after {
+            background-position: 0 -12px;
+          }
         }
       }
 
@@ -115,8 +198,8 @@
         overflow: hidden;
       }
 
-      .votes,
-      .comments {
+      .votes-count,
+      .comments-count {
         display: block;
         float: right;
         width: 32px;
@@ -131,7 +214,7 @@
         color: #767676;
       }
 
-      .comments {
+      .comments-count {
         position: relative;
         margin-left: 4px;
 
@@ -156,898 +239,41 @@
       }
     }
   }
-}
 
-
-
-
-/*** OLD STUFF ***/
-/*** Variables ***/
-
-$comment-margin-left: 30px;
-$discussion-title-size: 1.6em;
-$comment-title-size: 1.0em;
-$post-font-size: 0.9em;
-$comment-info-size: 0.75em;
-$comment-font-size: 0.8em;
-$discussion-input-width: 100%;
-
-$tag-background-color: #e7ecdd;
-$tag-border-color: #babdb3;
-$tag-text-color: #5b614f;
-
-
-
-/*** Mixins ***/
-
-@mixin discussion-font {
-  font-family: inherit;
-}
-
-@mixin discussion-clickable {
-  color: black;
-  &:hover {
-    text-decoration: none;
-  }
-}
-
-@mixin standard-discussion-link {
-  text-decoration: none;
-  &:hover {
-    color: #1C71DD;
-    text-decoration: none;
-  }
-}
-
-.discussion-loading {
-  background-image: url(../images/discussion/loading.gif);
-  width: 15px;
-  height: 15px;
-  margin-left: 2px;
-  display: inline-block;
-}
-
-/*** Discussions ***/
-
-.discussion {
-
-  #open_close_accordion {
-    display: none;
+  .board-drop-btn {
+    display: block;
+    height: 60px;
+    border-bottom: 1px solid #a3a3a3;
+    border-radius: 3px 0 0 0;
+    background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 58px;
+    text-align: center;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
   }
 
-  p + p, ul + p, ol + p {
-    margin-top: 0;
-  }
-
-  /*** Sidebar ***/
-
-  .sidebar-module {
-    @include clearfix;
-    padding: 0 26px 24px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid #d3d3d3;
-    font-size: 13px;
-
-    header {
-      margin-bottom: 14px;
-      @include clearfix;
-    }
-
-    h4 {
-      float: left;
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .sidebar-new-post-button, .sidebar-promote-moderator-button {
-      @include button;
-    }
-
-    .sidebar-revoke-moderator-button {
-      @include button(simple, gray);
-    }
-
-    .sidebar-new-post-button, .sidebar-promote-moderator-button, .sidebar-revoke-moderator-button {
-      display: block;
-      box-sizing: border-box;
-      width: 100%;
-      margin: 20px 0;
-      padding: 11px;
-      font-size: 1.1em;
-      text-align: center;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
-
-    .sidebar-new-post-button {
-      margin: 40px 0 20px 0;
-    }
-
-    .sidebar-view-all {
-      float: right;
-      font-size: 13px;
-      line-height: 1.6em;
-      @include standard-discussion-link;
-    }
-
-    .discussion-sidebar-following-list {
-      li {
-        @include clearfix;
-        margin-bottom: 8px;
-        border: none;
-      }
-
-      a {
-        @include standard-discussion-link;
-        background: none;
-
-        span {
-          line-height: 1.3;
-        }
-      }
-    }
-
-    .discussion-sidebar-tags-list li {
-      @include clearfix;
-      border-bottom: none;
-    }
-
-    .sidebar-tag-count {
-      color: #9a9a9a;
-      font-size: .85em;
-      line-height: 3em;
-    }
-
-    .sidebar-following-name {
-      float: left;
-      width: 80%;
-    }
-
-    .sidebar-vote-count {
-      float: right;
-      width: 20%;
-      text-align: right;
-      color: #9a9a9a;
-    }
-
-//user profile
-
-    .user-profile {
-      @extend .sidebar;
-       margin-top: 24px;
-     }
-
-    .sidebar-username {
-      font-size: 1.5em;
-      font-weight: bold;
-      line-height: 1.5em;
-      margin-top: 20px;
-    }
-
-    .sidebar-user-roles {
-      color: darkGray;
-      font-style: italic;
-      margin-bottom: 15px;
-    }
-
-    .sidebar-threads-count, .sidebar-comments-count {
-
-      span {
-        font-size: 1.5em;
-        font-weight: bold;
-        line-height: 1.5em;
-        margin-right: 10px;
-      }
-    }
-  }
-
-  .discussion-non-content {
-    margin-left: flex-gutter();
-  }
-
-  /*** Post ***/
-
-  .discussion-title {
-    @include discussion-font;
-    @include discussion-clickable;
-    display: inline-block;
-    font-size: $discussion-title-size;
-    font-weight: bold;
-    margin-bottom: flex-gutter(6);
-  }
-
-  .discussion-title-wrapper {
-    .discussion-watch-discussion, .discussion-unwatch-discussion {
-      @include discussion-font;
-      display: none;
-      font-size: $comment-info-size;
-      margin-left: 5px;
-    }
-  }
-
-  .discussion-right-wrapper {
-    min-height: 40px;
-    margin: 24px 0 24px 68px;
-  }
-
-  .admin-actions {
-    float: right;
-    margin: 0.4em 1em 0 2em;
-    padding: 0;
-
-    li {
-      margin-bottom: 6px !important;
-    }
+  .sort-bar {
+    height: 27px;
+    border-bottom: 1px solid #a3a3a3;
+    background: -webkit-linear-gradient(top, #cdcdcd, #b6b6b6);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset;
 
     a {
       display: block;
-      height: 25px;
-      padding-left: 25px;
-      border-radius: 50%;
-      background: url(../images/admin-actions-sprite.png) no-repeat;
-      font-size: .8em;
-      line-height: 25px;
-      color: #b8b8b8;
-      @include transition(color, .1s);
-
-      &:hover {
-        text-decoration: none;
-      }
-
-      &.admin-endorse {
-        background-position: 0 0;
-
-        &:hover {
-          color: #63b141;
-          background-position: 0 -75px;
-        }
-      }
-
-      &.admin-edit {
-        background-position: 0 -25px;
-
-        &:hover {
-          color: #009fe2;
-          background-position: 0 -100px;
-        }
-      }
-
-      &.admin-delete {
-        background-position: 0 -50px;
-
-        &:hover {
-          color: #d45050;
-           background-position: 0 -125px;
-        }
-      }
-    }
-  }
-
-  .comments {
-    .admin-actions {
-      margin-top: 0;
-
-      li {
-        margin-bottom: 2px !important;
-      }
-
-      a {
-        width: 20px;
-        height: 20px;
-        padding-left: 0;
-        overflow: hidden;
-        text-indent: -9999px;
-
-        &.admin-endorse {
-          background-position: 0 -150px;
-
-          &:hover {
-            background-position: 0 -225px;
-          }
-        }
-
-        &.admin-edit {
-          background-position: 0 -175px;
-
-          &:hover {
-            background-position: 0 -250px;
-          }
-        }
-
-        &.admin-delete {
-          background-position: 0 -200px;
-
-          &:hover {
-            background-position: 0 -275px;
-          }
-        }
-      }
-    }
-  }
-
-
-
-
-  /*** thread ***/
-
-  .thread {
-    //display: none;
-
-    .search-highlight {
-      display: inline;
-      font-weight: bold;
-      background-color: lightyellow;
-    }
-
-    .thread-title {
-      @include discussion-font;
-      @include discussion-clickable;
-      display: block;
-      margin-bottom: 1em;
-      font-size: $comment-title-size;
-      font-weight: bold;
-      line-height: 1.4em;
-    }
-
-    .thread-body, .content-body {
-      @include discussion-font;
-      font-size: $post-font-size;
-      margin-bottom: 4px;
-      margin-top: 3px;
-
-      p {
-        @include discussion-font;
-      }
-    }
-
-    .thread-tags {
-      display: inline-block;
-    }
-
-    .info {
-      @include discussion-font;
-      color: gray;
-      font-size: $comment-info-size;
-      font-style: italic;
-      margin-top: 1em;
-
-      a:hover {
-        text-decoration: none;
-        color: #1C71DD;
-      }
-
-      .comment-time {
-        display: inline;
-        float: right;
-        margin-right: 1em;
-      }
-
-      .show-comments-wrapper {
-        display: inline;
-        margin-right: 20px;
-      }
-
-      .discussion-actions {
-        display: inline;
-        margin: 0;
-        padding: 0;
-
-        li {
-          display: inline;
-          margin-right: 20px;
-        }
-      }
-
-      .discussion-link {
-        @include discussion-font;
-        color: #1d9dd9;
-        display: inline;
-
-        &.discussion-unfollow-thread {
-          color: #dea03e;
-        }
-      }
-    }
-
-    .discussion-content {
-      border-top: lightgray 1px solid;
-      overflow: hidden;
-      // padding: 1.5% 0;
-
-      .discussion-reply-new {
-        @include discussion-font;
-        margin-left: 68px;
-
-        .reply-body {
-          @include discussion-font;
-          display: block;
-          font-size: $post-font-size;
-          margin-top: 10px;
-          width: 95%;
-        }
-
-        .reply-post-control {
-          margin-top: 1%;
-        }
-      }
-    }
-
-    //COMMENT STYLES
-    .comments {
-      overflow: hidden;
-
-      .discussion-votes {
-        margin-top: 8px;
-      }
-
-      .discussion-right-wrapper {
-        margin: 10px 0 10px 68px;
-      }
-
-      .comment {
-        margin-left: 68px;
-        .comment-body, .content-body {
-          @include discussion-font;
-          color: black;
-          display: block;
-          font-size: $comment-font-size;
-          margin-top: 3px;
-        }
-
-        &.endorsed {
-          > .discussion-content {
-            background-color: #fcfcea;
-          }
-        }
-      }
-    }
-  }
-
-
-
-
-  /*** Sorting ***/
-
-  .discussion-sort {
-    float: right;
-    font-size: 0.8em;
-    margin-top: -36px;
-
-    .discussion-label {
-      display: block;
-      float: left;
-      padding: 0 14px;
-      line-height: 34px;
-    }
-
-    .discussion-sort-link {
-      display: block;
-      float: left;
-      padding: 0 14px;
-      line-height: 34px;
-
-      &:hover {
-        color: #1C71DD;
-        text-decoration: none;
-      }
-    }
-
-    .discussion-sort-link.sorted {
-      color: #000;
-      border-bottom: 2px solid #000;
-    }
-  }
-
-  /*** Search ***/
-
-  .search-wrapper-inline {
-    display: inline-block;
-    margin-top: 3%;
-    width: 80%;
-  }
-
-  .search-wrapper {
-    margin-bottom: 50px;
-    margin-left: .5%;
-  }
-
-  .discussion-search-form {
-    display: inline-block;
-    margin-bottom: 1%;
-    width: flex-grid(12);
-
-    .discussion-link {
-      @include button(simple, #999);
-      color: white;
-      display: inline-block;
-      font-size: inherit;
-      font-weight: bold;
-      margin-left: 1%;
-      padding-top: 9px;
-      text-decoration: none;
-    }
-
-    .discussion-search-text {
-      @include discussion-font;
-    }
-
-    .search-input {
-      float: left;
-      font: inherit;
-      font-style: normal;
-      // width: 72%;
-      width: flex-grid(8);
-      margin-left: flex-grid(1);
-    }
-  }
-
-  .search-within {
-    display: block;
-    margin-bottom: 3%;
-  }
-
-  .discussion-search-within-board {
-    font: inherit;
-    font-size: $post-font-size;
-    font-style: normal;
-  }
-
-  /*** buttons ***/
-
-  .control-button {
-    @include button;
-    @include discussion-font;
-    background-color: #959595;
-    @include background-image(linear-gradient(top, #959595, #7B7B7B));
-    border: 1px solid #6F6F6F;
-    @include box-shadow(inset 0 1px 0 #A2A2A2, 0 0 3px #CCC);
-    color: white;
-    display: inline-block;
-    font-size: inherit;
-    font-weight: bold;
-    margin-bottom: 3%;
-    padding-top: 9px;
-    width: inherit;
-    text-decoration: none;
-    text-shadow: none;
-
-    &:hover {
-      background-color: #A2A2A2;
-      @include background-image(linear-gradient(top, #A2A2A2, #7B7B7B));
-      border: 1px solid #555;
-      @include box-shadow(inset 0 1px 0 #BBB, 0 0 3px #CCC);
-    }
-  }
-
-  .follow-wrapper {
-    display: inline;
-  }
-
-  /*** votes ***/
-
-  .discussion-votes {
-    float: left;
-    width: 60px;
-    margin-top: 18px;
-    text-align: center;
-
-    .discussion-vote {
-      display: block;
-      width: 50px;
-      height: 17px;
-      margin: auto;
-      background: url(../images/vote-arrows.png) no-repeat;
-      font-size: 15px;
-      font-weight: bold;
-      color: black;
-      @include hide-text;
-      @include transition(all, 0, easeOut);
-    }
-
-    .discussion-vote-up {
-      margin-bottom: 5px;
-      background-position: -50px -3px;
-
-      &:hover {
-        background-position: -50px -5px;
-        @include transition-duration(0.05s);
-      }
-
-      &.voted {
-        background-position: 0 -3px;
-        color: #1C71DD;
-        @include transition-duration(0);
-      }
-    }
-
-    .discussion-vote-down {
-      margin-top: 7px;
-      background-position: -50px -30px;
-
-      &:hover {
-        background-position: -50px -28px;
-        @include transition-duration(0.05s);
-      }
-
-      &.voted {
-        background-position: 0 -30px;
-        color: #1C71DD;
-        @include transition-duration(0);
-      }
-    }
-
-    .discussion-vote-count {
-      @include discussion-font;
-      font-size: $post-font-size;
-    }
-
-    .discussion-votes-point {
-      font-size: 1.1em;
-      font-weight: bold;
-      color: #9a9a9a;
-    }
-  }
-
-
-  /*** new post ***/
-
-  .new-post-form, .discussion-thread-edit {
-
-    .title-input, .body-input {
-      display: block !important;
-      font: inherit;
-      font-style: normal;
-      //width: $discussion-input-width !important;
-    }
-
-    .new-post-similar-posts-wrapper {
-      @include border-radius(3px);
-      border: 1px solid #EEE;
-      font-size: $post-font-size;
-      line-height: 150%;
-      margin-top: 1%;
-      padding: 1% 1.5%;
-    }
-
-    .hide-similar-posts {
       float: right;
-    }
-
-    .new-post-similar-posts {
-      font: inherit;
-      .similar-post {
-        display: block;
-        line-height: 150%;
-      }
-    }
-
-    .discussion-errors {
-      color: #8F0E0E;
-      display: block;
-      margin-left: -5%;
-    }
-
-    .new-post-body {
-    }
-
-    .tagsinput {
-      background: #FAFAFA;
-      border: 1px solid #C8C8C8;
-      -webkit-border-radius: 3px;
-      -moz-border-radius: 3px;
-      -ms-border-radius: 3px;
-      -o-border-radius: 3px;
-      border-radius: 3px;
-      -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
-      -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
-      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      margin-top: flex-gutter();
-      vertical-align: top;
-      -webkit-font-smoothing: antialiased;
-    }
-  }
-
-  .discussion-content-edit, .discussion-reply-new, .new-post-form {
-    margin: 10px 0 10px 0;
-
-    .discussion-errors {
-      color: #8F0E0E;
-      display: block;
-      font: inherit;
-      font-size: $post_font_size;
-      list-style: none;
-      margin-left: -3%;
-      padding-left: 2em;
-    }
-
-    a:hover {
-      color: #1C71DD;
-      text-decoration: none;
-    }
-
-    .new-post-title {
-      display: block;
-      padding: 5px 12px;
-      border-width: 1px;
-      width: 100%;
-    }
-
-    .thread-title-edit {
-      width: 100%;
-    }
-
-    &.collapsed {
-      .new-post-title {
-        display: none;
-        visibility: hidden;
-      }
-
-      .wmd-button-row {
-        height: 0;
-      }
-
-      .wmd-input {
-        height: 100px;
-        @include border-radius(3px);
-      }
-
-      .wmd-preview {
-        height: 0;
-        padding: 0;
-        border-width: 0;
-      }
-
-      .post-options {
-        height: 0;
-      }
-
-      .post-control {
-        display: none;
-      }
-
-      .tagsinput {
-        display: none;
-      }
-    }
-
-    .new-post-control {
-      margin-left: 75%;
-      margin-top: 1%;
-
-     .discussion-cancel-post {
-        margin-right: 1.5%;
-      }
-    }
-
-    .reply-post-control {
-
-      .discussion-cancel-post {
-        margin-right: 1.5%;
-      }
-    }
-
-    .edit-post-control {
-      margin-top: 1%;
-
-      .discussion-cancel-update {
-        margin-right: 1.5%;
-      }
-    }
-
-    .control-button {
-      @include button;
-      @include discussion-font;
-      margin-right: 16px;
-      padding-top: 9px;
-      color: white;
-      display: inline-block;
-      font-size: inherit;
+      height: 27px;
+      margin-right: 10px;
+      font-size: 11px;
       font-weight: bold;
-      text-decoration: none;
-      width: inherit;
+      line-height: 23px;
+      color: #333;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 
-      &:hover {
-        color: white;
-      }
-    }
-
-    label {
-      display: inline;
-      font-family: $sans-serif;
-      font-size: .8em;
-      font-style: normal;
-      font-weight: 400;
-    }
-  }
-
-  .discussion-content-edit {
-    margin: 3%;
-  }
-
-  .new-post-form {
-    margin: 10px 0 40px 0;
-  }
-
-  .discussion-reply-new {
-
-    .discussion-auto-watch {
-      margin-left: 2%;
-    }
-  }
-
-  .thread-tag {
-    background: $tag-background-color;
-    border: 1px solid $tag-border-color;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    color: $tag-text-color;
-    float: left;
-    font-size: 13px;
-    margin: 5px 7px 5px 0;
-    padding: 5px 7px;
-    text-decoration: none;
-
-    &:hover {
-      border-color: #7b8761;
-      color: #2f381c;
-      text-decoration: none;
-    }
-  }
-
-  /*** pagination ***/
-
-  .discussion-paginator {
-    font-size: $post-font-size;
-    margin-bottom: 10px;
-    margin-top: 20px;
-    text-align: center;
-
-    div {
-      display: inline-block;
-      font-weight: bold;
-      margin: 0 5px;
-
-      a {
-        background: #EEE;
-        -webkit-border-radius: 3px;
-        -moz-border-radius: 3px;
-        -ms-border-radius: 3px;
-        -o-border-radius: 3px;
-        border-radius: 3px;
-        color: black;
-        font-weight: normal;
-        padding: 4px 10px;
-        text-decoration: none;
-
-        &:hover {
-          background: #DDD;
-        }
-      }
-    }
-  }
-
-  &.inline-discussion, .forum-discussion, .user-discussion {
-    .new-post-form {
-      margin: 24px 60px;
-
-      .post-options {
-        margin: 8px 0 16px 0;
-        overflow: hidden;
-
-        label {
-          margin-right: 15px;
-          display: inline;
-        }
-      }
-
-      .post-control {
-        overflow: hidden;
-        margin: 0 0 5% 0;
+      .sort-label {
+        font-size: 9px;
+        text-transform: uppercase;
       }
     }
   }
@@ -1055,138 +281,197 @@ $tag-text-color: #5b614f;
 
 
 
-/*** base editor styles ***/
 
-.wmd-panel {
-  width: 100%;
-  min-width: 500px;
+
+
+
+
+
+
+
+
+.global-discussion-actions {
+  height: 60px;
+  background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+  border-radius: 0 3px 0 0;
+  border-bottom: 1px solid #bcbcbc;
 }
 
-.wmd-button-bar  {
-  width: 100%;
-  background-color: Silver;
-}
 
-.wmd-input {
-  height: 150px;
-  width: 100%;
-  background-color: #e9e9e9;
-  border: 1px solid #c8c8c8;
-  font-family: Monaco, 'Lucida Console', monospace;
-  font-style: normal;
-  font-size: 0.8em;
-  line-height: 1.6em;
-  @include border-radius(3px 3px 0 0);
 
-  &::-webkit-input-placeholder {
+
+
+
+
+
+
+
+
+.discussion-article {
+  position: relative;
+  display: table-cell;
+  vertical-align: top;
+  width: 72.3%;
+  padding: 40px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .posted-details {
+    font-size: 12px;
+    font-style: italic;
     color: #888;
   }
+
+  p + p {
+    margin-top: 20px;
+  }
+
+  .dogear {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 52px;
+    height: 51px;
+    background: url(../images/follow-dog-ear.png) 0 -51px no-repeat;
+
+    &.is-followed {
+      background-position: 0 0;
+    }
+  }
 }
 
-.wmd-preview {
-  position: relative;
-  font-family: $sans-serif;
-  padding: 25px 20px 10px 20px;
-  margin-bottom: 5px;
-  box-sizing: border-box;
-  border: 1px solid #c8c8c8;
-  border-top-width: 0;
-  @include border-radius(0 0 3px 3px);
-  overflow: hidden;
-  @include transition(all, .2s, easeOut);
+.discussion-post header,
+.responses li header {
+  margin-bottom: 20px;
+}
 
-  &:before {
-    content: 'PREVIEW';
-    position: absolute;
-    top: 3px;
-    left: 5px;
-    font-size: 11px;
-    color: #bbb;
+.responses {
+  margin-top: 40px;
+
+  > li {
+    margin: 0 -10px;
+    padding: 30px;
+    border-radius: 3px;
+    border: 1px solid #b2b2b2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+  }
+
+  .posted-by {
+    font-weight: 700;
+  }
+}
+
+.endorse-btn {
+  display: block;
+  float: right;
+  width: 27px;
+  height: 27px;
+  margin-right: 10px;
+  border-radius: 27px;
+  border: 1px solid #a0a0a0;
+  background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+
+  .check-icon {
+    display: block;
+    width: 13px;
+    height: 12px;
+    margin: 8px auto;
+    background: url(../images/endorse-icon.png) no-repeat;
+  }
+
+  &.is-endorsed {
+    border: 1px solid #4697c1;
+    background: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, .4) inset;
+
+    .check-icon {
+      background-position: 0 -12px;
+    }
+  }
+}
+
+.comments {
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+
+  li {
+    background: #f6f6f6;
+    border-bottom: 1px solid #ddd;
   }
 
   p {
-    font-family: $sans-serif;
+    font-size: 13px;
+    padding: 10px 20px;
+
+    .posted-details {
+      font-size: 11px;
+      white-space: nowrap;
+    }
   }
-  background-color: #fafafa;
 }
 
-.wmd-button-row {
-  position: relative;
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  margin-top: 10px;
-  padding: 0px;
-  height: 20px;
-  overflow: hidden;
-  @include transition(all, .2s, easeOut);
+.comment-form {
+  padding: 8px 20px;
 }
 
-.wmd-spacer {
-  width: 1px;
-  height: 20px;
-  margin-left: 14px;
+.comment-form-input {
+  width: 100%;
+  height: 31px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid #b2b2b2;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
+  -webkit-transition: border-color .1s;
+  outline: 0;
 
-  position: absolute;
-  background-color: Silver;
-  display: inline-block;
-  list-style: none;
+  &:focus {
+    border-color: #4697c1;
+  }
 }
 
-.wmd-button {
-  width: 20px;
-  height: 20px;
-  padding-left: 2px;
-  padding-right: 3px;
-  position: absolute;
-  display: inline-block;
-  list-style: none;
-  cursor: pointer;
-}
+.moderator-actions {
+  margin-top: 20px;
+  @include clearfix;
 
-.wmd-button > span {
-  background-image: url('/static/images/wmd-buttons.png');
-  background-repeat: no-repeat;
-  background-position: 0px 0px;
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-}
+  li {
+    float: left;
+    margin-right: 8px;
+  }
 
-.wmd-spacer1 {
-  left: 50px;
-}
-.wmd-spacer2 {
-  left: 175px;
-}
+  a {
+    display: block;
+    height: 26px;
+    padding: 0 12px;
+    border-radius: 3px;
+    border: 1px solid #b2b2b2;
+    background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    font-size: 13px;
+    line-height: 24px;
+    color: #737373;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
-.wmd-spacer3 {
-  left: 300px;
-}
+    .delete-icon {
+      display: block;
+      float: left;
+      width: 10px;
+      height: 10px;
+      margin: 8px 4px 0 0;
+      background: url(../images/moderator-delete-icon.png) no-repeat;
+    }
 
-.wmd-prompt-background {
-  background-color: Black;
-}
-
-.wmd-prompt-dialog {
-  border: 1px solid #999999;
-  background-color: #F5F5F5;
-}
-
-.wmd-prompt-dialog > div {
-  font-size: 0.8em;
-  font-family: arial, helvetica, sans-serif;
-}
-
-
-.wmd-prompt-dialog > form > input[type="text"] {
-  border: 1px solid #999999;
-  color: black;
-}
-
-.wmd-prompt-dialog > form > input[type="button"] {
-  border: 1px solid #888888;
-  font-family: trebuchet MS, helvetica, sans-serif;
-  font-size: 0.8em;
-  font-weight: bold;
+    .edit-icon {
+      display: block;
+      float: left;
+      width: 10px;
+      height: 10px;
+      margin: 7px 4px 0 0;
+      background: url(../images/moderator-edit-icon.png) no-repeat;
+    }
+  }
 }
