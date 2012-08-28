@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import sys
@@ -174,6 +175,12 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     if not has_access(user, descriptor, 'load'):
         return None
 
+    # Anonymized student identifier
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    anonymous_student_id = h.hexdigest()
+
     # Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
@@ -246,7 +253,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          node_path=settings.NODE_PATH
+                          node_path=settings.NODE_PATH,
+                          anonymous_student_id=anonymous_student_id
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
