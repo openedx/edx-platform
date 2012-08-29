@@ -37,6 +37,7 @@ class @DiscussionThreadView extends Backbone.View
       @vote()
     else
       @unvote()
+    false
 
   toggleFollowing: (event) ->
     $elem = $(event.target)
