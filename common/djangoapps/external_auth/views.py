@@ -4,6 +4,7 @@ import logging
 import random
 import re
 import string
+import fnmatch
 
 from external_auth.models import ExternalAuthMap
 
@@ -37,21 +38,30 @@ import student.views as student_views
 log = logging.getLogger("mitx.external_auth")
 
 
+# -----------------------------------------------------------------------------
+# OpenID Common
+# -----------------------------------------------------------------------------
+
+
 @csrf_exempt
 def default_render_failure(request,
                            message,
                            status=403,
                            template_name='extauth_failure.html',
                            exception=None):
-    """Render an Openid error page to the user."""
-    message = "In openid_failure " + message
-    log.debug(message)
+    """Render an Openid error page to the user"""
+
+    log.debug("In openid_failure " + message)
+
     data = render_to_string(template_name,
                             dict(message=message, exception=exception))
+
     return HttpResponse(data, status=status)
 
-#-----------------------------------------------------------------------------
-# Openid
+
+# -----------------------------------------------------------------------------
+# OpenID Authentication
+# -----------------------------------------------------------------------------
 
 
 def edXauth_generate_password(length=12, chars=string.letters + string.digits):
@@ -65,11 +75,7 @@ def edXauth_openid_login_complete(request,
                                   render_failure=None):
     """Complete the openid login process"""
 
-    redirect_to = request.REQUEST.get(redirect_field_name, '')  # TODO: [rocha] redirect_to never used?
-
-    render_failure = (render_failure or
-                      getattr(settings, 'OPENID_RENDER_FAILURE', None) or
-                      default_render_failure)
+    render_failure = (render_failure or default_render_failure)
 
     openid_response = openid_views.parse_openid_response(request)
     if not openid_response:
@@ -83,7 +89,8 @@ def edXauth_openid_login_complete(request,
 
         log.debug('openid success, details=%s' % details)
 
-        external_domain = "openid:%s" % settings.OPENID_SSO_SERVER_URL
+        url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
+        external_domain = "openid:%s" % url
         fullname = '%s %s' % (details.get('first_name', ''),
                               details.get('last_name', ''))
 
@@ -92,14 +99,10 @@ def edXauth_openid_login_complete(request,
                                                 external_domain,
                                                 details,
                                                 details.get('email', ''),
-                                                fullname,
-                                                )
+                                                fullname)
 
     return render_failure(request, 'Openid failure')
 
-
-#-----------------------------------------------------------------------------
-# generic external auth login or signup
 
 def edXauth_external_login_or_signup(request,
                                      external_id,
@@ -108,29 +111,28 @@ def edXauth_external_login_or_signup(request,
                                      email,
                                      fullname,
                                      retfun=None):
+    """Generic external auth login or signup"""
+
     # see if we have a map from this external_id to an edX username
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id,
-                                            external_domain=external_domain,
-                                            )
+                                            external_domain=external_domain)
         log.debug('Found eamap=%s' % eamap)
     except ExternalAuthMap.DoesNotExist:
         # go render form for creating edX user
         eamap = ExternalAuthMap(external_id=external_id,
                                 external_domain=external_domain,
-                                external_credentials=json.dumps(credentials),
-                                )
+                                external_credentials=json.dumps(credentials))
         eamap.external_email = email
         eamap.external_name = fullname
         eamap.internal_password = edXauth_generate_password()
-        log.debug('created eamap=%s' % eamap)
+        log.debug('Created eamap=%s' % eamap)
 
         eamap.save()
 
     internal_user = eamap.user
     if internal_user is None:
-        log.debug('ExtAuth: no user for %s yet, doing signup' %
-                  eamap.external_email)
+        log.debug('No user for %s yet, doing signup' % eamap.external_email)
         return edXauth_signup(request, eamap)
 
     uname = internal_user.username
@@ -141,10 +143,10 @@ def edXauth_external_login_or_signup(request,
         return edXauth_signup(request, eamap)
 
     if not user.is_active:
-        log.warning("External Auth: user %s is not active" % (uname))
+        log.warning("User %s is not active" % (uname))
         # TODO: improve error page
         msg = 'Account not yet activated: please look for link in your email'
-        return render_failure(request, msg)  # TODO: [rocha] render_failure not defined?
+        return default_render_failure(request, msg)
 
     login(request, user)
     request.session.set_expiry(0)
@@ -154,9 +156,6 @@ def edXauth_external_login_or_signup(request,
         return redirect('/')
     return retfun()
 
-
-#-----------------------------------------------------------------------------
-# generic external auth signup
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -187,20 +186,22 @@ def edXauth_signup(request, eamap=None):
                'extauth_name': eamap.external_name,
                }
 
-    log.debug('ExtAuth: doing signup for %s' % eamap.external_email)
+    log.debug('Doing signup for %s' % eamap.external_email)
 
     return student_views.index(request, extra_context=context)
 
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # MIT SSL
+# -----------------------------------------------------------------------------
+
 
 def ssl_dn_extract_info(dn):
-    '''
+    """
     Extract username, email address (may be anyuser@anydomain.com) and
     full name from the SSL DN string.  Return (user,email,fullname) if
     successful, and None otherwise.
-    '''
+    """
     ss = re.search('/emailAddress=(.*)@([^/]+)', dn)
     if ss:
         user = ss.group(1)
@@ -259,6 +260,11 @@ def edXauth_ssl_login(request):
                                             retfun=retfun)
 
 
+# -----------------------------------------------------------------------------
+# OpenID Provider
+# -----------------------------------------------------------------------------
+
+
 def get_dict_for_openid(data):
     """
     Return a dictionary suitable for the OpenID library
@@ -281,12 +287,7 @@ def get_xrds_url(resource, request):
     return url
 
 
-def provider_respond(server, request, response, data):
-    """
-    Respond to an OpenID request
-    """
-
-    # get simple registration request
+def add_openid_simple_registration(request, response, data):
     sreg_data = {}
     sreg_request = sreg.SRegRequest.fromOpenIDRequest(request)
     sreg_fields = sreg_request.allRequestedFields()
@@ -304,26 +305,37 @@ def provider_respond(server, request, response, data):
                                                           sreg_data)
         sreg_response.toMessage(response.fields)
 
-    # get attribute exchange request
+
+def add_openid_attribute_exchange(request, response, data):
     try:
         ax_request = ax.FetchRequest.fromOpenIDRequest(request)
-
     except ax.AXError:
+        #  not using OpenID attribute exchange extension
         pass
-
     else:
         ax_response = ax.FetchResponse()
 
         # if consumer requested attribute exchange fields, add them
         if ax_request and ax_request.requested_attributes:
             for type_uri in ax_request.requested_attributes.iterkeys():
-                if type_uri == 'http://axschema.org/contact/email' and 'email' in data:
-                    ax_response.addValue('http://axschema.org/contact/email', data['email'])
-                elif type_uri == 'http://axschema.org/namePerson' and 'fullname' in data:
-                    ax_response.addValue('http://axschema.org/namePerson', data['fullname'])
+                email_schema = 'http://axschema.org/contact/email'
+                name_schema = 'http://axschema.org/namePerson'
+                if type_uri == email_schema and 'email' in data:
+                    ax_response.addValue(email_schema, data['email'])
+                elif type_uri == name_schema and 'fullname' in data:
+                    ax_response.addValue(name_schema, data['fullname'])
 
             # construct ax response
             ax_response.toMessage(response.fields)
+
+
+def provider_respond(server, request, response, data):
+    """
+    Respond to an OpenID request
+    """
+    # get and add extensions
+    add_openid_simple_registration(request, response, data)
+    add_openid_attribute_exchange(request, response, data)
 
     # create http response from OpenID response
     webresponse = server.encodeResponse(response)
@@ -342,25 +354,44 @@ def validate_trust_root(openid_request):
     Only allow OpenID requests from valid trust roots
     """
 
+    trusted_roots = getattr(settings, 'OPENID_PROVIDER_TRUSTED_ROOT', None)
+
+    if trusted_roots is None:
+        log.debug('not using trusted roots')
+        # not using trusted roots
+        return True
+
+    log.debug('validating trusted roots')
+
     # don't allow empty trust roots
-    if openid_request.trust_root is None:
+    if (not hasattr(openid_request, 'trust_root') or
+            openid_request.trust_root is None):
+        log.debug('no trust_root')
         return False
 
     # ensure trust root parses cleanly (one wildcard, of form *.foo.com, etc.)
     trust_root = TrustRoot.parse(openid_request.trust_root)
     if trust_root is None:
+        log.debug('invalid trust_root')
         return False
 
     # don't allow empty return tos
-    if openid_request.return_to is None:
+    if (not hasattr(openid_request, 'return_to') or
+            openid_request.return_to is None):
+        log.debug('empty return_to')
         return False
 
     # ensure return to is within trust root
     if not trust_root.validateURL(openid_request.return_to):
+        log.debug('invalid return_to')
         return False
 
-    # only allow *.cs50.net for now
-    return trust_root.host.endswith('cs50.net')
+    # check that the root matches the ones we trust
+    if not any(r for r in trusted_roots if fnmatch.fnmatch(trust_root, r)):
+        log.debug('non-trusted root')
+        return False
+
+    return True
 
 
 @csrf_exempt
@@ -381,7 +412,7 @@ def provider_login(request):
         # decode request
         openid_request = server.decodeRequest(query)
 
-        # don't allow invalid and non-*.cs50.net trust roots
+        # don't allow invalid and non-trusted trust roots
         if not validate_trust_root(openid_request):
             return default_render_failure(request, "Invalid OpenID trust root")
 
@@ -420,8 +451,7 @@ def provider_login(request):
             return default_render_failure(request, "Invalid OpenID trust root")
 
         # check if user with given email exists
-        email = request.POST['email']
-        password = request.POST['password']
+        email = request.POST.get('email', None)
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
@@ -432,10 +462,12 @@ def provider_login(request):
 
         # attempt to authenticate user
         username = user.username
+        password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
         if user is None:
             request.session['openid_error'] = True
-            msg = "OpenID login failed - password for {0} is invalid".format(email)
+            msg = "OpenID login failed - password for {0} is invalid"
+            msg = msg.format(email)
             log.warning(msg)
             return HttpResponseRedirect(openid_request['url'])
 
@@ -451,7 +483,8 @@ def provider_login(request):
                                                                user.email))
 
             # redirect user to return_to location
-            response = openid_request['request'].answer(True, None, endpoint + urlquote(user.username))
+            url = endpoint + urlquote(user.username)
+            response = openid_request['request'].answer(True, None, url)
 
             return provider_respond(server,
                                     openid_request['request'],
@@ -462,13 +495,15 @@ def provider_login(request):
                                     })
 
         request.session['openid_error'] = True
-        log.warning("Login failed - Account not active for user {0}".format(username))
+        msg = "Login failed - Account not active for user {0}".format(username)
+        log.warning(msg)
         return HttpResponseRedirect(openid_request['url'])
 
     # determine consumer domain if applicable
     return_to = ''
     if 'openid.return_to' in request.REQUEST:
-        matches = re.match(r'\w+:\/\/([\w\.-]+)', request.REQUEST['openid.return_to'])
+        return_to = request.REQUEST['openid.return_to']
+        matches = re.match(r'\w+:\/\/([\w\.-]+)', return_to)
         return_to = matches.group(1)
 
     # display login page
@@ -487,9 +522,9 @@ def provider_identity(request):
     XRDS for identity discovery
     """
 
-    response = render_to_response('identity.xml', {
-        'url': get_xrds_url('login', request)
-    }, mimetype='text/xml')
+    response = render_to_response('identity.xml',
+                                  {'url': get_xrds_url('login', request)},
+                                  mimetype='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('identity', request)
@@ -501,9 +536,9 @@ def provider_xrds(request):
     XRDS for endpoint discovery
     """
 
-    response = render_to_response('xrds.xml', {
-        'url': get_xrds_url('login', request)
-    }, mimetype='text/xml')
+    response = render_to_response('xrds.xml',
+                                  {'url': get_xrds_url('login', request)},
+                                  mimetype='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)
