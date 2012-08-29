@@ -257,7 +257,11 @@ class @Problem
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       if response.success
-        alert 'Saved'
+        if @el.find('.save_message').length
+            @el.find('.save_message').animate(opacity: 0, 500).animate(opacity: 1, 500)
+        else
+            saveMessage = "<div class='save_message'>Your answers have been saved but not graded. Hit 'Check' to grade them.</div>"
+            @el.find('.action').after(saveMessage)
       @updateProgress response
 
   refreshMath: (event, element) =>
