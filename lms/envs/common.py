@@ -120,6 +120,10 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
               ]
 NODE_PATH = ':'.join(node_paths)
 
+
+############################ OpenID Provider  ##################################
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
+
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
