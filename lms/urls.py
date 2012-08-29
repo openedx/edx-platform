@@ -215,7 +215,7 @@ if settings.DEBUG:
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
-        url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
+        url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
