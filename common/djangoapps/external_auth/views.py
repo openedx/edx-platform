@@ -64,15 +64,15 @@ def default_render_failure(request,
 # -----------------------------------------------------------------------------
 
 
-def edXauth_generate_password(length=12, chars=string.letters + string.digits):
+def generate_password(length=12, chars=string.letters + string.digits):
     """Generate internal password for externally authenticated user"""
     return ''.join([random.choice(chars) for i in range(length)])
 
 
 @csrf_exempt
-def edXauth_openid_login_complete(request,
-                                  redirect_field_name=REDIRECT_FIELD_NAME,
-                                  render_failure=None):
+def openid_login_complete(request,
+                          redirect_field_name=REDIRECT_FIELD_NAME,
+                          render_failure=None):
     """Complete the openid login process"""
 
     render_failure = (render_failure or default_render_failure)
@@ -94,23 +94,23 @@ def edXauth_openid_login_complete(request,
         fullname = '%s %s' % (details.get('first_name', ''),
                               details.get('last_name', ''))
 
-        return edXauth_external_login_or_signup(request,
-                                                external_id,
-                                                external_domain,
-                                                details,
-                                                details.get('email', ''),
-                                                fullname)
+        return external_login_or_signup(request,
+                                        external_id,
+                                        external_domain,
+                                        details,
+                                        details.get('email', ''),
+                                        fullname)
 
     return render_failure(request, 'Openid failure')
 
 
-def edXauth_external_login_or_signup(request,
-                                     external_id,
-                                     external_domain,
-                                     credentials,
-                                     email,
-                                     fullname,
-                                     retfun=None):
+def external_login_or_signup(request,
+                             external_id,
+                             external_domain,
+                             credentials,
+                             email,
+                             fullname,
+                             retfun=None):
     """Generic external auth login or signup"""
 
     # see if we have a map from this external_id to an edX username
@@ -125,7 +125,7 @@ def edXauth_external_login_or_signup(request,
                                 external_credentials=json.dumps(credentials))
         eamap.external_email = email
         eamap.external_name = fullname
-        eamap.internal_password = edXauth_generate_password()
+        eamap.internal_password = generate_password()
         log.debug('Created eamap=%s' % eamap)
 
         eamap.save()
@@ -133,14 +133,14 @@ def edXauth_external_login_or_signup(request,
     internal_user = eamap.user
     if internal_user is None:
         log.debug('No user for %s yet, doing signup' % eamap.external_email)
-        return edXauth_signup(request, eamap)
+        return signup(request, eamap)
 
     uname = internal_user.username
     user = authenticate(username=uname, password=eamap.internal_password)
     if user is None:
         log.warning("External Auth Login failed for %s / %s" %
                     (uname, eamap.internal_password))
-        return edXauth_signup(request, eamap)
+        return signup(request, eamap)
 
     if not user.is_active:
         log.warning("User %s is not active" % (uname))
@@ -159,7 +159,7 @@ def edXauth_external_login_or_signup(request,
 
 @ensure_csrf_cookie
 @cache_if_anonymous
-def edXauth_signup(request, eamap=None):
+def signup(request, eamap=None):
     """
     Present form to complete for signup via external authentication.
     Even though the user has external credentials, he/she still needs
@@ -217,7 +217,7 @@ def ssl_dn_extract_info(dn):
 
 
 @csrf_exempt
-def edXauth_ssl_login(request):
+def ssl_login(request):
     """
     This is called by student.views.index when
     MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
@@ -251,13 +251,13 @@ def edXauth_ssl_login(request):
     (user, email, fullname) = ssl_dn_extract_info(cert)
 
     retfun = functools.partial(student_views.index, request)
-    return edXauth_external_login_or_signup(request,
-                                            external_id=email,
-                                            external_domain="ssl:MIT",
-                                            credentials=cert,
-                                            email=email,
-                                            fullname=fullname,
-                                            retfun=retfun)
+    return external_login_or_signup(request,
+                                    external_id=email,
+                                    external_domain="ssl:MIT",
+                                    credentials=cert,
+                                    email=email,
+                                    fullname=fullname,
+                                    retfun=retfun)
 
 
 # -----------------------------------------------------------------------------
