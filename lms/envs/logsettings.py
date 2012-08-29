@@ -29,7 +29,7 @@ def get_logger_config(log_dir,
                      " %(process)d] [%(filename)s:%(lineno)d] - %(message)s").format(
                         logging_env=logging_env, hostname=hostname)
 
-    handlers = ['console'] if debug else ['console', 'syslogger', 'newrelic']
+    handlers = ['console'] if debug else ['console', 'syslogger-remote', 'syslogger-local', 'newrelic']
 
     return {
         'version': 1,
@@ -48,16 +48,24 @@ def get_logger_config(log_dir,
                 'formatter' : 'standard',
                 'stream' : sys.stdout,
             },
-            'syslogger' : {
+            'syslogger-remote' : {
                 'level' : 'INFO',
                 'class' : 'logging.handlers.SysLogHandler',
                 'address' : syslog_addr,
                 'formatter' : 'syslog_format',
             },
+            'syslogger-local' : {
+                'level' : 'DEBUG',
+                'class' : 'logging.handlers.SysLogHandler',
+                'address' : '/dev/log',
+                'formatter' : 'syslog_format',
+                'facility': SysLogHandler.LOG_LOCAL0,
+            },
             'tracking' : {
                 'level' : 'DEBUG',
-                'class' : 'logging.handlers.WatchedFileHandler',
-                'filename' : tracking_file_loc,
+                'class' : 'logging.handlers.SysLogHandler',
+                'address' : '/dev/log',
+                'facility' : SysLogHandler.LOG_LOCAL1,
                 'formatter' : 'raw',
             },
             'newrelic' : {
