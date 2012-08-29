@@ -18,8 +18,19 @@ class @DiscussionThreadView extends Backbone.View
 
     if @user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
-
+    @$("span.timeago").timeago()
+    @renderResponses()
     @
+
+  renderResponses: ->
+    $.ajax @model.id, success: (data, textStatus, xhr) =>
+      comments = new Comments(data['content']['children'])
+      comments.each @renderResponse
+
+  renderResponse: (response) =>
+      view = new ThreadResponseView(model: response)
+      view.render()
+      @$(".responses").append(view.el)
 
   toggleVote: ->
     @$(".vote-btn").toggleClass("is-cast")

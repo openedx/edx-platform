@@ -125,8 +125,18 @@
   </article>
 </script>
 
+<script type="text/template" id="thread-response-template">
+  <div class="response-body">${"<%= body %>"}</div>
+  <ol class="comments">
+  </ol>
+</script>
+
+<script type="text/template" id="response-comment-template">
+  <p>${'<%= body %>'}</p>
+</script>
+
 <script type="text/template" id="thread-list-item-template">
-    <a href="${'<%= id %>'}"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
+    <a href="${'<%= id %>'}" data-id="${'<%= id %>'}"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
 </script>
 
 <script>
