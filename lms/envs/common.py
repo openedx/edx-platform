@@ -429,7 +429,7 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
-discussion_js = glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
+discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee'))
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -497,10 +497,10 @@ PIPELINE_JS = {
         'source_filenames': [
             pth.replace(COMMON_ROOT / 'static/', '')
             for pth
-            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+            in sorted(glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee'))
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
-            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
             if pth not in courseware_only_js and pth not in discussion_js
         ] + [
             'js/form.ext.js',
