@@ -146,7 +146,7 @@ class CourseDescriptor(SequenceDescriptor):
                     could possibly be in the section, for any student
 
         all_descriptors - This contains a list of all xmodules that can
-            effect grading a student. This is used to efficiently fetch
+            affect grading a student. This is used to efficiently fetch
             all the xmodule state for a StudentModuleCache without walking
             the descriptor tree again.
 
