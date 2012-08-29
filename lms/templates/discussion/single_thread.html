@@ -58,7 +58,7 @@
         <div class="browse is-open">
           <a href="#" class="board-drop-icon"></a>
           <a href="#" class="board-drop-btn"><span class="current-board">Homework / Week 1</span> <span class="drop-arrow">▾</span></a>
-        </div>            
+        </div>
         <ul class="board-drop-menu">
           <li><a href="#"><span class="board-name">All</span> <span class="unread">1,248</span></a></li>
           <li><a href="#"><span class="board-name">Following</span></a></li>
@@ -97,30 +97,46 @@
       </div>
     </div>
 
-    <div class="discussion-column">      
+    <div class="discussion-column">
 
-      ${content.decode('utf-8')}
 
     </div>
   </div>
 </div>
 
+<script type="text/template" id="thread-template">
+  <article class="discussion-article" data-id="${'<%= id %>'}">
+    <a href="#" class="dogear"></a>
+    <div class="discussion-post">
+      <header>
+        <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%= votes["up_count"] %>'}</span></a>
+        <h1>${'<%= title %>'}</h1>
+        <p class="posted-details">
+          <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by
+          <a href="${'<%= user_id %>'}">${'<%= username %>'}</a>
+        </p>
+      </header>
+      <div class="post-body">
+        ${'<%= body %>'}
+      </div>
+    </div>
+    <ol class="responses">
+    </ol>
+  </article>
+</script>
+
 <script type="text/template" id="thread-list-item-template">
-    <a href="#"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
+    <a href="${'<%= id %>'}"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
 </script>
 
 <script>
     $$contents = {}
     $$discussions = {}
     $(document).ready(function() {
-        var user = new DiscussionUser(JSON.parse("${annotated_content_info | escapejs}"));
+        var user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
         var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
 
-        list_view = new DiscussionThreadListView({collection: discussion, el: $(".post-list")});
-        list_view.render();
-
-        var thread = discussion.get("${thread_id | escapejs}")
-        view = new DiscussionThreadView({el: $(".discussion-article"), model: thread, user: user});
-        view.render();
+        var app = new DiscussionRouter({user: user, discussion: discussion})
+        Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"})
     });
 </script>
