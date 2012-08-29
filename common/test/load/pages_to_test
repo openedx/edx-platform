@@ -1,0 +1,13 @@
+# A dumb file specifying pages to test, with abtest options: page\s+(options)?
+/
+/jobs
+/courses/
+/wiki/
+/courses/BerkeleyX/CS188/fa12/wiki
+/courses/BerkeleyX/CS188/fa12/discussion/forum
+/courses/BerkeleyX/CS188/fa12/progress
+/courses/BerkeleyX/CS188/fa12/info
+/courses/BerkeleyX/CS188/fa12/courseware
+
+# Berkeley-specific.  Perhaps generate these automatically.
+/courses/BerkeleyX/CS188/fa12/courseware/Week_1/Project_0_Tutorial/
