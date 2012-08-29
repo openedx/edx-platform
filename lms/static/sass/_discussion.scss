@@ -27,6 +27,7 @@ body.discussion {
 
     .new-post-btn {
       @include blue-button;
+      margin-right: 4px;
     }
 
     .new-post-icon {
@@ -278,12 +279,16 @@ body.discussion {
     border-bottom: 1px solid #a3a3a3;
     background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) #aeaeae;
     box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
-    font-size: 9px;
-    font-weight: bold;
-    line-height: 25px;
-    color: #333;
-    text-transform: uppercase;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
+
+    span,
+    a {
+      font-size: 9px;
+      font-weight: bold;
+      line-height: 25px;
+      color: #333;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
+    }
 
     .sort-label {
       display: block;
@@ -306,6 +311,7 @@ body.discussion {
 
       &:hover {
         background: -webkit-linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .2));
+        color: #333;
       }
 
       &.active {
@@ -321,7 +327,7 @@ body.discussion {
     background-color: #ddd;
 
     li:last-child a {
-      border-bottom: 1px solid #ddd;
+      // border-bottom: 1px solid #ddd;
     }
 
     a {
@@ -330,11 +336,20 @@ body.discussion {
       height: 36px;
       padding: 0 10px;
       margin-bottom: 1px;
-      background: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 34px;
-      color: #333;
+      @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
+      background-color: #fff;
+
+      &:hover {
+        @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
+        background-color: #eee;
+      }
+
+      .title {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 34px;
+        color: #333;
+      }
 
       &.read .title {
         font-weight: 400;
@@ -352,13 +367,15 @@ body.discussion {
       }
 
       &.followed:after {
-        content: '';
+        content: '◥';
         position: absolute;
-        top: 0;
+        top: -4px;
         right: 0;
-        width: 12px;
-        height: 12px;
-        background: url(../images/following-flag.png) no-repeat;
+        width: 10px;
+        height: 10px;
+        font-size: 10px;
+        color: #53bdfb;
+        text-align: right;
       }
 
       &.active {
@@ -381,7 +398,7 @@ body.discussion {
         }
 
         &.followed:after {
-          background-position: 0 -12px;
+          color: #2d79aa;
         }
 
         &.resolved:before {
