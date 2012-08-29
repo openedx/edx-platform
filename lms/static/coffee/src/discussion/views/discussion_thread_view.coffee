@@ -2,21 +2,34 @@ class @DiscussionThreadView extends Backbone.View
   events:
     "click .discussion-vote-up": "toggleVote"
     "click .dogear": "toggleFollowing"
+  template: _.template($("#thread-template").html())
+
   initialize: (options) ->
-    @user = options['user']
     @model.bind "change", @updateModelDetails
+    @$el.html(@template(@model.toJSON()))
 
   updateModelDetails: =>
     @$(".votes-count-number").html(@model.get("votes")["up_count"])
 
   render: ->
-    if @user.following(@model)
+    if window.user.following(@model)
       @$(".dogear").addClass("is-followed")
 
-    if @user.voted(@model)
+    if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
-
+    @$("span.timeago").timeago()
+    @renderResponses()
     @
+
+  renderResponses: ->
+    $.ajax @model.id, success: (data, textStatus, xhr) =>
+      comments = new Comments(data['content']['children'])
+      comments.each @renderResponse
+
+  renderResponse: (response) =>
+      view = new ThreadResponseView(model: response)
+      view.render()
+      @$(".responses").append(view.el)
 
   toggleVote: ->
     @$(".vote-btn").toggleClass("is-cast")
