@@ -43,6 +43,7 @@ p {
 span {
   font: normal 1em/1.6em $sans-serif;
 }
+
 /* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */
 .CodeMirror span {
   font: inherit;
