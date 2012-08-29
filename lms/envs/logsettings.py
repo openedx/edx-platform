@@ -2,6 +2,7 @@ import os
 import os.path
 import platform
 import sys
+from logging.handlers import SysLogHandler
 
 def get_logger_config(log_dir,
                       logging_env="no_env",
