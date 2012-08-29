@@ -33,8 +33,18 @@ class @DiscussionThreadView extends Backbone.View
     else
       @unvote()
 
-  toggleFollowing: ->
+  toggleFollowing: (event) ->
+    $elem = $(event.target)
     @$(".dogear").toggleClass("is-followed")
+    url = null
+    if @$(".dogear").hasClass("is-followed")
+      url = @model.urlFor("follow")
+    else
+      url = @model.urlFor("unfollow")
+    DiscussionUtil.safeAjax
+      $elem: $elem
+      url: url
+      type: "POST"
 
   vote: ->
     url = @model.urlFor("upvote")
