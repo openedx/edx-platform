@@ -4,7 +4,7 @@
   padding: 0 15px;
   border-radius: 3px;
   border: 1px solid #2d81ad;
-  background: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+  @include linear-gradient(top, #6dccf1, #38a8e5);
   font-size: 13px;
   font-weight: 700;
   line-height: 32px;
@@ -14,7 +14,7 @@
 
   &:hover {
     border-color: #297095;
-    background: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    @include linear-gradient(top, #4fbbe4, #2090d0);
   }
 }
 
@@ -47,7 +47,7 @@ body.discussion {
   .sidebar {
     display: table-cell;
     vertical-align: top;
-    width: 27.7%;
+    width: 32%;
     background: #f6f6f6;
     border-radius: 3px 0 0 3px;
     border-right: 1px solid #bcbcbc;
@@ -67,8 +67,9 @@ body.discussion {
       float: left;
       width: 20%;
       height: 100%;
-      background: -webkit-linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0)) #dcdcdc;
-      -webkit-transition: all .2s ease-out;
+      @include linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
+      background-color: #dcdcdc;
+      @include transition(all .2s ease-out);
 
       &:hover {
         background-color: #e9e9e9;
@@ -94,8 +95,12 @@ body.discussion {
 
         &.is-dropped {
           .board-drop-btn {
-            color: #fff;
-            text-shadow: none;
+
+            span {
+              color: #fff;
+              text-shadow: none;
+            }
+
             border-color: #4b4b4b;
           }
         }
@@ -129,7 +134,9 @@ body.discussion {
           cursor: text;
           pointer-events: auto;
 
-          &::-webkit-input-placeholder {
+          &::-webkit-input-placeholder,
+          &:-moz-placeholder,
+          &:-ms-input-placeholder {
             opacity: 1;
           }
         }
@@ -148,6 +155,7 @@ body.discussion {
       border: 1px solid transparent;
       text-align: center;
       overflow: hidden;
+      @include transition(none);
 
       .current-board {
         white-space: nowrap;
@@ -160,7 +168,7 @@ body.discussion {
         color: #333;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         opacity: 0;
-        -webkit-transition: opacity .2s;
+        @include transition(opacity .2s);
       }
     }
 
@@ -175,7 +183,7 @@ body.discussion {
       margin-left: -12px;
       background: url(../images/browse-icon.png) no-repeat;
       opacity: 1;
-      -webkit-transition: opacity .2s;
+      @include transition(opacity .2s);
     }
 
     .board-drop-menu {
@@ -214,7 +222,7 @@ body.discussion {
           font-size: 11px;
           line-height: 22px;
           border-radius: 2px;
-          background: -webkit-linear-gradient(top, #4c4c4c, #5a5a5a);
+          @include linear-gradient(top, #4c4c4c, #5a5a5a);
         }
       }
 
@@ -237,8 +245,8 @@ body.discussion {
       width: 100%;
       max-width: 30px;
       margin: auto;
-      box-sizing: border-box;
-      -webkit-transition: all .2s;
+      @include box-sizing(border-box);
+      @include transition(all .2s);
     }
 
     .post-search-field {
@@ -247,7 +255,7 @@ body.discussion {
       height: 30px;
       padding: 0;
       margin: 14px auto;
-      box-sizing: border-box;
+      @include box-sizing(border-box);
       border: 1px solid #acacac;
       border-radius: 30px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset, 0 1px 0 rgba(255, 255, 255, .5);
@@ -261,11 +269,13 @@ body.discussion {
       outline: 0;
       cursor: pointer;
       pointer-events: none;
-      -webkit-transition: all .2s ease-out;
+      @include transition(all .2s ease-out);
 
-      &::-webkit-input-placeholder {
+      &::-webkit-input-placeholder,
+      &:-moz-placeholder,
+      &:-ms-input-placeholder {
         opacity: 0;
-        -webkit-transition: opacity .2s;
+        @include transition(opacity .2s);
       }
 
       &:focus {
@@ -277,7 +287,8 @@ body.discussion {
   .sort-bar {
     height: 27px;
     border-bottom: 1px solid #a3a3a3;
-    background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) #aeaeae;
+    @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+    background-color: #aeaeae;
     box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
 
     span,
@@ -310,12 +321,13 @@ body.discussion {
       line-height: 17px;
 
       &:hover {
-        background: -webkit-linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .2));
+        @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .2));
         color: #333;
       }
 
       &.active {
-        background: -webkit-linear-gradient(top, rgba(0, 0, 0, .3), rgba(0, 0, 0, 0)) #999;
+        @include linear-gradient(top, rgba(0, 0, 0, .3), rgba(0, 0, 0, 0));
+        background-color: #999;
         color: #fff;
         text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
@@ -323,12 +335,12 @@ body.discussion {
     }
   }
 
+  .post-list-wrapper {
+    overflow-y: scroll;
+  }
+
   .post-list {
     background-color: #ddd;
-
-    li:last-child a {
-      // border-bottom: 1px solid #ddd;
-    }
 
     a {
       position: relative;
@@ -379,7 +391,7 @@ body.discussion {
       }
 
       &.active {
-        background: -webkit-linear-gradient(top, #96e0fd, #61c7fc);
+        @include linear-gradient(top, #96e0fd, #61c7fc);
         border-color: #4697c1;
         box-shadow: 0 1px 0 #4697c1, 0 -1px 0 #4697c1;
 
@@ -389,7 +401,7 @@ body.discussion {
 
         .votes-count,
         .comments-count {
-          background: -webkit-linear-gradient(top, #3994c7, #4da7d3);
+          @include linear-gradient(top, #3994c7, #4da7d3);
           color: #fff;
 
           &:after {
@@ -424,7 +436,7 @@ body.discussion {
       height: 16px;
       margin-top: 9px;
       border-radius: 2px;
-      background: -webkit-linear-gradient(top, #d4d4d4, #dfdfdf);
+      @include linear-gradient(top, #d4d4d4, #dfdfdf);
       font-size: 9px;
       font-weight: 700;
       line-height: 16px;
@@ -448,7 +460,7 @@ body.discussion {
       }
 
       &.new {
-        background: -webkit-linear-gradient(top, #84d7fe, #99e0fe);
+       @include linear-gradient(top, #84d7fe, #99e0fe);
         color: #333;
 
         &:after {
@@ -464,7 +476,7 @@ body.discussion {
   .discussion-column {
     display: table-cell;
     vertical-align: top;
-    width: 72.3%;
+    width: 68%;
   }
 
   .discussion-article {
@@ -542,7 +554,7 @@ body.discussion {
         width: 100%;
         height: 14px;
         padding: 1px 5px;
-        box-sizing: border-box;
+        @include box-sizing(border-box);
         border-radius: 2px 2px 0 0;
         background: #009fe2;
         font-size: 9px;
@@ -564,7 +576,7 @@ body.discussion {
     padding: 0 8px;
     border-radius: 5px;
     border: 1px solid #b2b2b2;
-    background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    @include linear-gradient(top, #fff 35%, #ebebeb);
     box-shadow: 0 1px 1px rgba(0, 0, 0, .15);
     font-size: 12px;
     font-weight: 700;
@@ -586,7 +598,7 @@ body.discussion {
 
     &.is-cast {
       border-color: #379a42;
-      background: -webkit-linear-gradient(top, #50cc5e, #3db84b);
+      @include linear-gradient(top, #50cc5e, #3db84b);
       color: #fff;
       text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset, 0 1px 2px rgba(0, 0, 0, .2);
@@ -607,7 +619,7 @@ body.discussion {
     margin-right: 10px;
     border-radius: 27px;
     border: 1px solid #a0a0a0;
-    background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    @include linear-gradient(top, #fff 35%, #ebebeb);
     box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
 
     .check-icon {
@@ -620,7 +632,7 @@ body.discussion {
 
     &.is-endorsed {
       border: 1px solid #4697c1;
-      background: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+      @include linear-gradient(top, #6dccf1, #38a8e5);
       box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, .4) inset;
 
       .check-icon {
@@ -675,11 +687,11 @@ body.discussion {
     width: 100%;
     height: 31px;
     padding: 0 10px;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border: 1px solid #b2b2b2;
     border-radius: 3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
-    -webkit-transition: border-color .1s;
+    @include transition(border-color .1s);
     outline: 0;
 
     &:focus {
@@ -702,7 +714,7 @@ body.discussion {
       padding: 0 12px;
       border-radius: 3px;
       border: 1px solid #b2b2b2;
-      background: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+      @include linear-gradient(top, #fff 35%, #ebebeb);
       font-size: 13px;
       line-height: 24px;
       color: #737373;
@@ -746,7 +758,7 @@ body.discussion {
     color: #fff;
     pointer-events: none;
     opacity: 0;
-    -webkit-transition: opacity .1s;
+    @include transition(opacity .1s);
 
     &:after {
       content: '▾';
@@ -802,7 +814,7 @@ body.discussion {
 
 .global-discussion-actions {
   height: 60px;
-  background: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+  @include linear-gradient(top, #ebebeb, #d9d9d9);
   border-radius: 0 3px 0 0;
   border-bottom: 1px solid #bcbcbc;
 }
