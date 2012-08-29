@@ -9,4 +9,10 @@ class @DiscussionThreadListView extends Backbone.View
     @$el.append(view.el)
 
   threadSelected: (thread_id) =>
+    @setActiveThread(thread_id)
     @trigger("thread:selected", thread_id)
+
+  setActiveThread: (thread_id) ->
+    @$("a").removeClass("active")
+    @$("a[data-id='#{thread_id}']").addClass("active")
+
