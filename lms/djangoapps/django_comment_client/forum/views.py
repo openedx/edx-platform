@@ -241,7 +241,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
             'course_id': course.id,
-            'threads': threads,
+            'thread_id': thread_id,
+            'threads': json.dumps(threads),
         }
 
         return render_to_response('discussion/single_thread.html', context)

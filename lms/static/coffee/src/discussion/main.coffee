@@ -8,6 +8,23 @@ class @DiscussionUser
     voted: (thread) ->
         @content_info[thread.id]['voted'] == 'up'
 
+class @ThreadListItemView extends Backbone.View
+  tagName: "li"
+  template: _.template($("#thread-list-item-template").html())
+  initialize: ->
+    @model.on "change", @render
+  render: =>
+    @$el.html(@template(@model.toJSON()))
+    @
+
+class @DiscussionThreadListView extends Backbone.View
+  render: ->
+    @collection.each @renderThreadListItem
+  renderThreadListItem: (thread) =>
+    view = new ThreadListItemView(model: thread)
+    view.render()
+    @$el.append(view.el)
+
 class @DiscussionThreadView extends Backbone.View
   events:
     "click .discussion-vote-up": "toggleVote"
