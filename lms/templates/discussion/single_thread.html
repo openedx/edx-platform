@@ -127,13 +127,23 @@
 </script>
 
 <script type="text/template" id="thread-response-template">
+  <header>
+  <a href="#" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%= votes['up_count'] %>"}</span></a>
+    <a href="#" class="posted-by">${"<%= username %>"}</a>
+    <p class="posted-details" title="${'<%= created_at %>'}">Sometime</p>
+  </header>
   <div class="response-body">${"<%= body %>"}</div>
   <ol class="comments">
+    <li>
+      <form class="comment-form">
+        <input type="text" placeholder="Comment…" class="comment-form-input">
+      </form>
+    </li>
   </ol>
 </script>
 
 <script type="text/template" id="response-comment-template">
-  <p>${'<%= body %>'}</p>
+    <p>${'<%= body %>'}<span class="posted-details">–posted <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by <a href="#">${'<%= username %>'}</a></span></p>
 </script>
 
 <script type="text/template" id="thread-list-item-template">
@@ -141,13 +151,14 @@
 </script>
 
 <script>
-    $$contents = {}
-    $$discussions = {}
+    $$contents = {};
+    $$discussions = {};
+    $$course_id = "${course_id}";
     $(document).ready(function() {
         window.user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
         var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
 
-        var app = new DiscussionRouter({discussion: discussion})
-        Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"})
+        var app = new DiscussionRouter({discussion: discussion});
+        Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"});
     });
 </script>
