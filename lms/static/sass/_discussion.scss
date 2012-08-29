@@ -22,17 +22,21 @@
 
 
 body.discussion {
-  .new-post-btn {
-    @include blue-button;
-  }
+  .course-tabs .right {
+    float: right;
 
-  .new-post-icon {
-    display: block;
-    float: left;
-    width: 16px;
-    height: 17px;
-    margin: 8px 7px 0 0;
-    background: url(../images/new-post-icon.png) no-repeat;
+    .new-post-btn {
+      @include blue-button;
+    }
+
+    .new-post-icon {
+      display: block;
+      float: left;
+      width: 16px;
+      height: 17px;
+      margin: 8px 7px 0 0;
+      background: url(../images/new-post-icon.png) no-repeat;
+    }
   }
 }
 
