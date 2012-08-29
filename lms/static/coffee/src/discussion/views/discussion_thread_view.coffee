@@ -2,9 +2,12 @@ class @DiscussionThreadView extends Backbone.View
   events:
     "click .discussion-vote-up": "toggleVote"
     "click .dogear": "toggleFollowing"
+  template: _.template($("#thread-template").html())
+
   initialize: (options) ->
     @user = options['user']
     @model.bind "change", @updateModelDetails
+    @$el.html(@template(@model.toJSON()))
 
   updateModelDetails: =>
     @$(".votes-count-number").html(@model.get("votes")["up_count"])
