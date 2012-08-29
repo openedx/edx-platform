@@ -46,4 +46,5 @@ django-sekizai<0.7
 django-mptt>=0.5.3
 sorl-thumbnail
 networkx
+pygraphviz
 -r repo-requirements.txt
