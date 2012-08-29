@@ -421,6 +421,12 @@ if Backbone?
       @set('thread', @)
       super()
 
+    follow: ->
+      @trigger "thread:follow"
+
+    unfollow: ->
+      @trigger "thread:unfollow"
+
   class @ThreadView extends @ContentView
 
   class @Comment extends @Content

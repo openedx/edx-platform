@@ -44,8 +44,10 @@ class @DiscussionThreadView extends Backbone.View
     @$(".dogear").toggleClass("is-followed")
     url = null
     if @$(".dogear").hasClass("is-followed")
+      @model.follow()
       url = @model.urlFor("follow")
     else
+      @model.unfollow()
       url = @model.urlFor("unfollow")
     DiscussionUtil.safeAjax
       $elem: $elem
