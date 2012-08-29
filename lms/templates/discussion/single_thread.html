@@ -15,11 +15,41 @@
 <%static:js group='discussion'/>
 </%block>
 
-<%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
+<%! from django.core.urlresolvers import reverse %>
+<%! from courseware.access import has_access %>
 
-<div class="">
-  <a href="#" class="new-post-btn"><span class="new-post-icon"></span>New Post</a>
-</div>
+<nav class="course-material">
+  <div class="inner-wrapper">
+    <ol class="course-tabs">
+      <li class="courseware"><a href="${reverse('courseware', args=[course.id])}">Courseware</a></li>
+      <li class="info"><a href="${reverse('info', args=[course.id])}">Course Info</a></li>
+% if hasattr(course,'syllabus_present') and course.syllabus_present:
+      <li class="syllabus"><a href="${reverse('syllabus', args=[course.id])}">Syllabus</a></li>
+% endif
+% if user.is_authenticated():
+  % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
+        % for index, textbook in enumerate(course.textbooks):
+            <li class="book"><a href="${reverse('book', args=[course.id, index])}">${textbook.title}</a></li>
+        % endfor
+  % endif
+  % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+        <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])}" class="active">Discussion</a></li>
+  % endif
+% endif
+% if settings.WIKI_ENABLED:
+      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}">Wiki</a></li>
+% endif
+% if user.is_authenticated():
+      <li class="profile"><a href="${reverse('progress', args=[course.id])}">Progress</a></li>
+% endif
+% if staff_access:
+      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}">Instructor</a></li>
+% endif
+      <li class="right"><a href="#" class="new-post-btn"><span class="new-post-icon"></span>New Post</a></li>
+    </ol>
+
+  </div>
+</nav>
 
 <div class="discussion container">
   <div class="discussion-body">
