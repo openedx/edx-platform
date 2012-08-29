@@ -3,8 +3,7 @@ class @DiscussionUser
         @content_info = content_info
 
     following: (thread) ->
-        @content_info[thread.id]['subscribed'] == true
+        _.include(@content_info['subscribed_thread_ids'], thread.id)
 
     voted: (thread) ->
-        @content_info[thread.id]['voted'] == 'up'
-
+        _.include(@content_info['upvoted_ids'], thread.id)
