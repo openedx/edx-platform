@@ -1,9 +1,6 @@
-class @DiscussionUser
-    constructor: (content_info) ->
-        @content_info = content_info
-
+class @DiscussionUser extends Backbone.Model
     following: (thread) ->
-        _.include(@content_info['subscribed_thread_ids'], thread.id)
+        _.include(@get('subscribed_thread_ids'), thread.id)
 
     voted: (thread) ->
-        _.include(@content_info['upvoted_ids'], thread.id)
+        _.include(@get('upvoted_ids'), thread.id)

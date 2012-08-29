@@ -3,6 +3,8 @@ class @ThreadResponseView extends Backbone.View
   template: _.template($("#thread-response-template").html())
   events:
       "click .vote-btn": "toggleVote"
+      "submit form": "submitComment"
+
   render: ->
     @$el.html(@template(@model.toJSON()))
     if window.user.voted(@model)
@@ -48,3 +50,19 @@ class @ThreadResponseView extends Backbone.View
       success: (response, textStatus) =>
         if textStatus == 'success'
           @model.set(response)
+
+  submitComment: ->
+    url = @model.urlFor('reply')
+    body = @$(".comment-form-input").val()
+    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"))
+    @renderComment(comment)
+    @trigger "comment:add"
+
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        body: body
+    false
