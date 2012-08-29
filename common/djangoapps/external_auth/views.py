@@ -342,10 +342,6 @@ def validate_trust_root(openid_request):
     Only allow OpenID requests from valid trust roots
     """
 
-    # verify the trust root/return to
-    trust_root = openid_request.trust_root
-    return_to = openid_request.return_to  # TODO: [rocha] never used?
-
     # don't allow empty trust roots
     if openid_request.trust_root is None:
         return False
