@@ -234,7 +234,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',
-            'thread': json.dumps(utils.safe_content(thread)),
             'annotated_content_info': json.dumps(annotated_content_info),
             'content': render_single_thread(request, discussion_id, course_id, thread_id),
             'course': course,
