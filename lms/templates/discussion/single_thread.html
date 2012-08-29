@@ -143,10 +143,10 @@
     $$contents = {}
     $$discussions = {}
     $(document).ready(function() {
-        var user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
+        window.user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
         var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
 
-        var app = new DiscussionRouter({user: user, discussion: discussion})
+        var app = new DiscussionRouter({discussion: discussion})
         Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"})
     });
 </script>
