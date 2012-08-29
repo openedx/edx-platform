@@ -7,6 +7,7 @@ class @ThreadListItemView extends Backbone.View
     @model.on "change", @render
     @model.on "thread:follow", @follow
     @model.on "thread:unfollow", @unfollow
+    @model.on "comment:add", @addComment
   render: =>
     @$el.html(@template(@model.toJSON()))
     if window.user.following(@model)
@@ -19,3 +20,5 @@ class @ThreadListItemView extends Backbone.View
     @$("a").addClass("followed")
   unfollow: =>
     @$("a").removeClass("followed")
+  addComment: =>
+    @$(".comments-count").html(parseInt(@$(".comments-count").html()) + 1)

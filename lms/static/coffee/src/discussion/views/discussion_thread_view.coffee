@@ -28,8 +28,12 @@ class @DiscussionThreadView extends Backbone.View
 
   renderResponse: (response) =>
       view = new ThreadResponseView(model: response)
+      view.on "comment:add", @addComment
       view.render()
       @$(".responses").append(view.el)
+
+  addComment: =>
+    @model.trigger "comment:add"
 
   toggleVote: ->
     @$(".vote-btn").toggleClass("is-cast")
