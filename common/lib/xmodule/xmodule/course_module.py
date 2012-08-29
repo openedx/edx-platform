@@ -132,20 +132,6 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get("show_calculator", None) == "Yes"
 
     @lazyproperty
-    def __grading_policy(self):
-        policy_string = ""
-
-        try:
-            with self.system.resources_fs.open("grading_policy.json") as grading_policy_file:
-                policy_string = grading_policy_file.read()
-        except (IOError, ResourceNotFoundError):
-            log.warning("Unable to load course settings file from grading_policy.json in course " + self.id)
-
-        grading_policy = load_grading_policy(policy_string)
-
-        return grading_policy
-
-    @lazyproperty
     def grading_context(self):
         """
         This returns a dictionary with keys necessary for quickly grading
