@@ -13,8 +13,12 @@ class @VideoCaption extends Subview
     "/static/#{@captionDataDir}/subs/#{@youtubeId}.srt.sjson"
 
   render: ->
+    # TODO: make it so you can have a video with no captions.
+    #@$('.video-wrapper').after """
+    #  <ol class="subtitles"><li>Attempting to load captions...</li></ol>
+    #  """
     @$('.video-wrapper').after """
-      <ol class="subtitles"><li>Attempting to load captions...</li></ol>
+      <ol class="subtitles"></ol>
       """
     @$('.video-controls .secondary-controls').append """
       <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>

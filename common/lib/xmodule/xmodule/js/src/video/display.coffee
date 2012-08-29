@@ -3,6 +3,7 @@ class @Video
     @el = $(element).find('.video')
     @id = @el.attr('id').replace(/video_/, '')
     @caption_data_dir = @el.data('caption-data-dir')
+    @show_captions = @el.data('show-captions') == "true"
     window.player = null
     @el = $("#video_#{@id}")
     @parseVideos @el.data('streams')
