@@ -7,6 +7,8 @@ class @ThreadListItemView extends Backbone.View
     @model.on "change", @render
   render: =>
     @$el.html(@template(@model.toJSON()))
+    if window.user.following(@model)
+      @$("a").addClass("followed")
     @
   threadSelected: ->
     @trigger("thread:selected", @model.id)

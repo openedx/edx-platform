@@ -5,7 +5,6 @@ class @DiscussionThreadView extends Backbone.View
   template: _.template($("#thread-template").html())
 
   initialize: (options) ->
-    @user = options['user']
     @model.bind "change", @updateModelDetails
     @$el.html(@template(@model.toJSON()))
 
@@ -13,10 +12,10 @@ class @DiscussionThreadView extends Backbone.View
     @$(".votes-count-number").html(@model.get("votes")["up_count"])
 
   render: ->
-    if @user.following(@model)
+    if window.user.following(@model)
       @$(".dogear").addClass("is-followed")
 
-    if @user.voted(@model)
+    if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
     @$("span.timeago").timeago()
     @renderResponses()
