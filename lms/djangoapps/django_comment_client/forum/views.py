@@ -264,7 +264,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             user_info = cc.User.from_django_user(request.user).to_dict()
             thread = cc.Thread.find(thread_id).retrieve(recursive=True)
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
-    
+
             context = {
                 'discussion_id': discussion_id,
                 'csrf': csrf(request)['csrf_token'],
@@ -276,7 +276,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
                 'recent_active_threads': recent_active_threads,
                 'trending_tags': trending_tags,
                 'course_id': course.id,
-                'threads': threads,
+                'thread_id': thread_id,
+                'threads': json.dumps(threads),
             }
 
             return render_to_response('discussion/single_thread.html', context)

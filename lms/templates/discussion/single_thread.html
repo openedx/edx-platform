@@ -30,9 +30,6 @@
       </div>
       <div class="post-list-wrapper">
         <ul class="post-list">
-          % for discussion_thread in threads:
-          <li><a href="${helpers.permalink(discussion_thread) | h}"><span class="title">${discussion_thread['title'] | h}</span> <span class="comments-count">${discussion_thread['comments_count'] | h}</span><span class="votes-count">+${discussion_thread['votes']['up_count'] | h}</span></a></li>
-          % endfor
         </ul>
       </div>
     </div>
@@ -51,13 +48,22 @@
   </div>
 </div>
 
+<script type="text/template" id="thread-list-item-template">
+    <a href="#"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
+</script>
+
 <script>
     $$contents = {}
     $$discussions = {}
     $(document).ready(function() {
         var user = new DiscussionUser(JSON.parse("${annotated_content_info | escapejs}"));
-        var thread = new Thread(JSON.parse("${thread | escapejs}"));
-        view = new DiscussionThreadView({el: $(".discussion-article"), model: thread, user: user})
-        view.render()
+        var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
+
+        list_view = new DiscussionThreadListView({collection: discussion, el: $(".post-list")});
+        list_view.render();
+
+        var thread = discussion.get("${thread_id | escapejs}")
+        view = new DiscussionThreadView({el: $(".discussion-article"), model: thread, user: user});
+        view.render();
     });
 </script>
