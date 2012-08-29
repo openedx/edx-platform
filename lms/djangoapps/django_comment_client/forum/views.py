@@ -182,7 +182,6 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
 
     annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
 
-    log.debug(annotated_content_info)
     context = {
         'discussion_id': discussion_id,
         'thread': thread,
