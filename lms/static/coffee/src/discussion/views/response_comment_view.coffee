@@ -3,4 +3,5 @@ class @ResponseCommentView extends Backbone.View
   template: _.template($("#response-comment-template").html())
   render: ->
     @$el.html(@template(@model.toJSON()))
+    @$(".timeago").timeago()
     @
