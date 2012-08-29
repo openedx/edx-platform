@@ -69,7 +69,7 @@ Very handy: if you uncomment the `--pdb` argument in `NOSE_ARGS` in `lms/envs/te
 
 ## Content development
 
-If you change course content, while running the LMS in dev mode, it is unnecessary to restart to refresh the modulestore.  
+If you change course content, while running the LMS in dev mode, it is unnecessary to restart to refresh the modulestore.
 
 Instead, hit /migrate/modules to see a list of all modules loaded, and click on links (eg /migrate/reload/edx4edx) to reload a course.
 
@@ -106,7 +106,7 @@ If you need to develop something specific to our production setup, you may need 
     $ pip install gunicorn
     $ gunicorn_django -b 127.0.0.1:8000 -w 4 --pythonpath=. --settings=lms.envs.dev
 
-The `-w 4` specifies the number of worker threads.  
+The `-w 4` specifies the number of worker threads.  Note that each thread will have a copy of the modulestore in memory, so don't run with too many workers on a small box, especially if you have a lot of classes.
 
 gunicorn won't serve static files like the django-admin site will, so if you need that, you'll also need to set up nginx and run collectstatic.
 

@@ -20,13 +20,15 @@ Basic structure:
 3) call e.clear() to clear the state to start looking for the next modification.
 4) go back to step 2 to ask about the next modification.
 """
-
+import logging
 import os
-import sys
 import time
 import threading
 import atexit
 import Queue
+
+log = logging.getLogger(__name__)
+
 
 _interval = 1.0
 _times = {}   # path -> modification time
@@ -35,11 +37,6 @@ _events = {}   # path -> event for that path
 _queue = Queue.Queue()   # used only for thread-local sleeping
 _running = False
 _lock = threading.Lock()   # protects _running and writes to the _events dictionary
-
-def _restart(path):
-    _queue.put(True)
-    prefix = 'monitor (pid=%d):' % os.getpid()
-    print >> sys.stderr, '%s Change detected to \'%s\'.' % (prefix, path)
 
 def _modified(path):
     """
@@ -78,10 +75,10 @@ def _monitor():
     while True:
         # Check modification times on files which have
         # specifically been registered for monitoring.
-        #print >> sys.stderr, "Watching %s" % (_events.keys())
+        #log.debug("Watching %s", _events.keys())
         for path, event in _events.items():
             if _modified(path):
-                # print >> sys.stderr, "%s modified" % (path)
+                # log.debug("%s modified", path)
                 event.set()
 
         # Sleep for specified interval.
@@ -128,7 +125,7 @@ def start(interval=1.0):
     _lock.acquire()
     if not _running:
         prefix = 'monitor (pid=%d):' % os.getpid()
-        print >> sys.stderr, '%s Starting change monitor.' % prefix
+        log.info('{0}: Starting change monitor.'.format(prefix))
         _running = True
         _thread.start()
     _lock.release()

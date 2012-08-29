@@ -289,6 +289,7 @@ class XMLModuleStore(ModuleStoreBase):
         course_dir = self.course_dir_by_id.get(course_id)
         if not course_dir:
             # courses we don't know about don't need reloading
+            log.debug("unknown course_id {0}.  Not reloading.".format(course_id))
             return
 
         if self.monitoring_event[course_id].is_set():
