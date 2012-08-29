@@ -8,12 +8,18 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       tracking_filename=None,
                       syslog_addr=None,
-                      debug=False):
+                      debug=False,
+                      local_loglevel='INFO'):
+
     """Return the appropriate logging config dictionary. You should assign the
     result of this to the LOGGING var in your settings. The reason it's done
     this way instead of registering directly is because I didn't want to worry
     about resetting the logging state if this is called multiple times when
     settings are extended."""
+
+    # Revert to INFO if an invalid string is passed in
+    if local_loglevel not in ['DEBUG','INFO','WARNING','ERROR','CRITICAL']:
+        local_loglevel = 'INFO'
 
     # If we're given an explicit place to put tracking logs, we do that (say for
     # debugging). However, logging is not safe for multiple processes hitting
@@ -56,7 +62,7 @@ def get_logger_config(log_dir,
                 'formatter' : 'syslog_format',
             },
             'syslogger-local' : {
-                'level' : 'DEBUG',
+                'level' : local_loglevel,
                 'class' : 'logging.handlers.SysLogHandler',
                 'address' : '/dev/log',
                 'formatter' : 'syslog_format',
