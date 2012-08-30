@@ -64,9 +64,7 @@ class @DiscussionThreadListView extends Backbone.View
         url: url
         type: "GET"
         success: (response, textStatus) =>
-          console.log textStatus
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
-            console.log(@collection)
 
     @delay(callback, 300)
