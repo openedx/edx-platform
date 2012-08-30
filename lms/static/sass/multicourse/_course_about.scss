@@ -115,6 +115,12 @@
             }
           }
 
+          a {
+            &:hover, &:visited {
+              text-decoration: none;
+            }
+          }
+
           span.register {
             background: lighten($blue, 20%);
             border: 1px solid $blue;
@@ -126,6 +132,14 @@
             text-transform: uppercase;
             text-align: center;
             width: flex-grid(12);
+            @include transition();
+
+            &:hover {
+              background: lighten($pink, 20%);
+              border: 1px solid $pink;
+              color: darken($pink, 20%);
+              text-decoration: none;
+            }
           }
         }
       }
