@@ -1,5 +1,5 @@
-<div class="discussion-content local">
-  <div class="discussion-content-wrapper{{#content.roles}} role-{{name}}{{/content.roles}}">
+<div class="discussion-content local{{#content.roles}} role-{{name}}{{/content.roles}}">
+  <div class="discussion-content-wrapper">
     <div class="discussion-votes">
       <a class="discussion-vote discussion-vote-up" href="javascript:void(0)" value="up">&#9650;</a>
       <div class="discussion-votes-point">{{content.votes.point}}</div>
@@ -34,7 +34,7 @@
               anonymous
             {{/content.anonymous}}
             {{^content.anonymous}}
-              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
+              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}" class="{{#content.roles}}author-{{name}} {{/content.roles}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
           <div class="show-comments-wrapper">
