@@ -9,6 +9,8 @@ var $newPost;
 var $thread;
 var $sidebar;
 var $sidebarWidthStyles;
+var $formTopicDropBtn;
+var $formTopicDropMenu;
 var sidebarWidth;
 var tooltipTimer;
 var tooltipCoords;
@@ -22,7 +24,10 @@ $(document).ready(function() {
 	$topicDrop = $('.board-drop-menu');
 	$currentBoard = $('.current-board');
 	$tooltip = $('<div class="tooltip"></div>');
+	$newPost = $('.new-post-article');
 	$sidebar = $('.sidebar');
+	$formTopicDropBtn = $('.new-post-article .topic-drop-btn');
+	$formTopicDropMenu = $('.new-post-article .topic-drop-menu');
 	$sidebarWidthStyles = $('<style></style>');
 	$body.append($sidebarWidthStyles);
 
@@ -31,6 +36,9 @@ $(document).ready(function() {
 	$browse.bind('click', showTopicDrop);
 	$search.bind('click', showSearch);
 	$topicDrop.bind('click', setTopic);
+	$formTopicDropBtn.bind('click', showFormTopicDrop);
+	$formTopicDropMenu.bind('click', setFormTopic);
+	$('.new-post-btn').bind('click', newPost);
 
 	$('[data-tooltip]').bind({
 		'mouseover': showTooltip,
@@ -145,4 +153,40 @@ function updateSidebarWidth(e) {
 	var titleWidth = sidebarWidth - 115;
 	console.log(titleWidth);
 	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
+}
+
+function newPost(e) {
+	$newPost.slideDown(300);
+}
+
+function showFormTopicDrop(e) {
+	$formTopicDropBtn.addClass('is-dropped');
+	$formTopicDropMenu.show();
+	$formTopicDropBtn.unbind('click', showFormTopicDrop);
+	$formTopicDropBtn.bind('click', hideFormTopicDrop);
+
+	setTimeout(function() {
+		$body.bind('click', hideFormTopicDrop);
+	}, 0);
+	
+}
+
+function hideFormTopicDrop(e) {
+	$formTopicDropBtn.removeClass('is-dropped');
+	$formTopicDropMenu.hide();
+	$body.unbind('click', hideFormTopicDrop);
+	$formTopicDropBtn.unbind('click', hideFormTopicDrop);
+	$formTopicDropBtn.bind('click', showFormTopicDrop);
+}
+
+function setFormTopic(e) {
+	$formTopicDropBtn.removeClass('is-dropped');
+	hideFormTopicDrop();
+
+	var $item = $(e.target);
+	var boardName = $item.html();
+	$item.parents('ul').not('.topic-drop-menu').each(function(i) {
+		boardName = $(this).siblings('a').html() + ' / ' + boardName;
+	});
+	$formTopicDropBtn.html(boardName + ' <span class="drop-arrow">▾</span>');
 }
