@@ -2,6 +2,7 @@ class @DiscussionThreadView extends Backbone.View
   events:
     "click .discussion-vote-up": "toggleVote"
     "click .dogear": "toggleFollowing"
+    "click .discussion-submit-post": "submitComment"
   template: _.template($("#thread-template").html())
 
   initialize: (options) ->
@@ -80,3 +81,18 @@ class @DiscussionThreadView extends Backbone.View
       success: (response, textStatus) =>
         if textStatus == 'success'
           @model.set(response)
+
+  submitComment: ->
+    url = @model.urlFor('reply')
+    body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "reply-body"
+    response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
+    @renderResponse(response)
+
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        body: body
+    false
