@@ -18,6 +18,25 @@
   }
 }
 
+@mixin white-button {
+  display: block;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #444;
+  background: -webkit-linear-gradient(top, #eee, #ccc);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #333;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    background: -webkit-linear-gradient(top, #fff, #ddd);
+  }
+}
+
 
 
 
@@ -37,6 +56,205 @@ body.discussion {
       height: 17px;
       margin: 8px 7px 0 0;
       background: url(../images/new-post-icon.png) no-repeat;
+    }
+  }
+
+  .new-post-article {
+    display: none;
+    margin-top: 20px;
+
+    .inner-wrapper {
+      max-width: 1180px;
+      min-width: 760px;
+      margin: auto;
+    }
+
+    .left-column {
+      float: left;
+      width: 32%;
+      padding: 40px;
+      box-sizing: border-box;
+
+      label {
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        text-shadow: none;
+      }
+
+      .topic-drop {
+        position: relative;
+
+        ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+      }
+
+      .topic-drop-btn {
+        position: relative;
+        z-index: 10000;
+        @include white-button;
+        height: 40px;
+        margin-top: 15px;
+        line-height: 36px;
+
+        .drop-arrow {
+          float: right;
+          color: #999;
+          line-height: 36px;
+        }
+      }
+
+      .topic-drop-menu {
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: 0;
+        z-index: 9999;
+        width: 100%;
+        box-sizing: border-box;
+        background: #737373;
+        border: 1px solid #333;
+        box-shadow: 0 2px 50px rgba(0, 0, 0, .4);
+
+        a {
+          display: block;
+          padding: 10px 15px;
+          border-top: 1px solid #5f5f5f;
+          font-size: 14px;
+          font-weight: 700;
+          color: #eee;        
+
+          &:hover {
+            background-color: #666;
+          }
+        }
+
+        li li {
+          a {
+            padding-left: 39px;
+            background: url(../images/nested-icon.png) no-repeat 17px 10px;
+          }
+        }
+
+        li li li {
+          a {
+            padding-left: 63px;
+            background: url(../images/nested-icon.png) no-repeat 41px 10px;
+          }
+        }
+      }
+    }
+
+    .right-column {
+      float: left;
+      width: 68%;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+  }
+
+  .new-post-form {
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, .55);
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+    @include clearfix;
+
+    .form-row {
+      margin-bottom: 20px;
+    }
+
+    .new-post-body {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      z-index: 1;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      border-radius: 3px 3px 0 0;
+      background: #fff;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    }
+
+    .new-post-preview {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      margin-top: -1px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      border-radius: 0 0 3px 3px;
+      background: #e6e6e6;    
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    }
+
+    .new-post-preview-label {
+      position: absolute;
+      top: 4px;
+      left: 4px;    
+      font-size: 11px;
+      color: #aaa;
+      text-transform: uppercase;    
+    }
+
+    .new-post-title,
+    .new-post-tags {
+      width: 100%;
+      height: 40px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      border-radius: 3px;
+      border: 1px solid #333;
+      font-size: 16px;
+      font-family: 'Open Sans', sans-serif;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    }
+
+    .new-post-title {
+      font-weight: 700;
+    }
+
+    .submit {
+      @include blue-button;
+      float: left;
+      height: 37px;
+      margin-top: 10px;
+      padding-bottom: 2px;
+      border-color: #333;
+
+      &:hover {
+        border-color: #222;
+      }
+    }
+
+    .new-post-cancel {
+      @include white-button;
+      float: left;
+      margin: 10px 0 0 15px;
+    }
+
+    .options {
+      margin-top: 40px;
+
+      label {
+        display: inline;
+        margin-left: 8px;
+        font-size: 15px;
+        color: #fff;
+        text-shadow: none;
+      }
     }
   }
 }
