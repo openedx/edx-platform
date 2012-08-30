@@ -195,7 +195,6 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                                         descriptor.category,
                                                         shared_state_key)
 
-
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
@@ -254,7 +253,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
                           node_path=settings.NODE_PATH,
-                          anonymous_student_id=anonymous_student_id
+                          anonymous_student_id=anonymous_student_id,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
