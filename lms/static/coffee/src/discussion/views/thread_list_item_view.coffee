@@ -16,9 +16,12 @@ class @ThreadListItemView extends Backbone.View
   threadSelected: ->
     @trigger("thread:selected", @model.id)
     false
+
   follow: =>
     @$("a").addClass("followed")
+
   unfollow: =>
     @$("a").removeClass("followed")
+
   addComment: =>
     @$(".comments-count").html(parseInt(@$(".comments-count").html()) + 1)
