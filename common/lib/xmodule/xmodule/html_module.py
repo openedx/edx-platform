@@ -4,9 +4,10 @@ import logging
 import os
 import sys
 from lxml import etree
+from path import path
 
 from .x_module import XModule
-from .xml_module import XmlDescriptor
+from .xml_module import XmlDescriptor, name_to_pathname
 from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .html_checker import check_html
@@ -75,9 +76,19 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             cls.clean_metadata_from_xml(definition_xml)
             return {'data': stringify_children(definition_xml)}
         else:
-            # html is special.  cls.filename_extension is 'xml', but if 'filename' is in the definition,
-            # that means to load from .html
-            filepath = "{category}/{name}.html".format(category='html', name=filename)
+            # html is special.  cls.filename_extension is 'xml', but
+            # if 'filename' is in the definition, that means to load
+            # from .html
+            # 'filename' in html pointers is a relative path
+            # (not same as 'html/blah.html' when the pointer is in a directory itself)
+            pointer_path = "{category}/{url_path}".format(category='html',
+                                                  url_path=name_to_pathname(location.name))
+            base = path(pointer_path).dirname()
+            #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
+            filepath = "{base}/{name}.html".format(base=base, name=filename)
+            #log.debug("looking for html file for {0} at {1}".format(location, filepath))
+
+
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
@@ -128,13 +139,18 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             pass
 
         # Not proper format.  Write html to file, return an empty tag
-        filepath = u'{category}/{name}.html'.format(category=self.category,
-                                                    name=self.url_name)
+        pathname = name_to_pathname(self.url_name)
+        pathdir = path(pathname).dirname()
+        filepath = u'{category}/{pathname}.html'.format(category=self.category,
+                                                    pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
             file.write(self.definition['data'])
 
+        # write out the relative name
+        relname = path(pathname).basename()
+
         elt = etree.Element('html')
-        elt.set("filename", self.url_name)
+        elt.set("filename", relname)
         return elt

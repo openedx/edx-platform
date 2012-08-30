@@ -717,7 +717,8 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 node_path=""):
+                 node_path="",
+                 anonymous_student_id=''):
         '''
         Create a closure around the system environment.
 
@@ -742,11 +743,16 @@ class ModuleSystem(object):
                          at settings.DATA_DIR.
 
         xqueue - Dict containing XqueueInterface object, as well as parameters
-                    for the specific StudentModule
+                    for the specific StudentModule:
+                    xqueue = {'interface': XQueueInterface object,
+                              'callback_url': Callback into the LMS,
+                              'queue_name': Target queuename in Xqueue}
 
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        anonymous_student_id - Used for tracking modules with student id
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -758,6 +764,7 @@ class ModuleSystem(object):
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
+        self.anonymous_student_id = anonymous_student_id
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

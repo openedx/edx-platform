@@ -1,4 +1,5 @@
 from lxml import etree
+from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -6,6 +7,11 @@ from xmodule.raw_module import RawDescriptor
 import json
 
 class DiscussionModule(XModule):
+    js = {'coffee':
+            [resource_string(__name__, 'js/src/time.coffee'),
+            resource_string(__name__, 'js/src/discussion/display.coffee')]
+        }
+    js_module_name = "InlineDiscussion"
     def get_html(self):
         context = {
             'discussion_id': self.discussion_id,

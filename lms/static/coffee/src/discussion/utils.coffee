@@ -1,9 +1,10 @@
 $ ->
   $.fn.extend
     loading: ->
-      $(this).after("<span class='discussion-loading'></span>")
+      @$_loading = $("<span class='discussion-loading'></span>")
+      $(this).after(@$_loading)
     loaded: ->
-      $(this).parent().children(".discussion-loading").remove()
+      @$_loading.remove()
 
 class @DiscussionUtil
 

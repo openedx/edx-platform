@@ -192,8 +192,11 @@ class @Problem
     if file_not_selected
       errors.push 'You did not select any files to submit'
 
-    if errors.length > 0
-        alert errors.join("\n")
+    error_html = '<ul>\n'
+    for error in errors
+      error_html += '<li>' + error + '</li>\n'
+    error_html += '</ul>'
+    @gentle_alert error_html
 
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
 
@@ -208,7 +211,7 @@ class @Problem
             @render(response.contents)
             @updateProgress response
           else
-            alert(response.success)
+            @gentle_alert response.success
     
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -220,8 +223,10 @@ class @Problem
         when 'incorrect', 'correct'
           @render(response.contents)
           @updateProgress response
+          if @el.hasClass 'showed'
+            @el.removeClass 'showed'
         else
-          alert(response.success)
+          @gentle_alert response.success
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -253,11 +258,19 @@ class @Problem
       @el.removeClass 'showed'
       @$('.show').val 'Show Answer'
 
+  gentle_alert: (msg) =>
+    if @el.find('.capa_alert').length
+      @el.find('.capa_alert').remove()
+    alert_elem = "<div class='capa_alert'>" + msg + "</div>"
+    @el.find('.action').after(alert_elem)
+    @el.find('.capa_alert').animate(opacity: 0, 500).animate(opacity: 1, 500)
+    
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       if response.success
-        alert 'Saved'
+        saveMessage = "Your answers have been saved but not graded. Hit 'Check' to grade them."
+        @gentle_alert saveMessage
       @updateProgress response
 
   refreshMath: (event, element) =>
@@ -292,6 +305,9 @@ class @Problem
       evaluation    = data.data("evaluation")
       problemState  = data.data("problem_state")
       displayClass  = window[data.data('display_class')]
+
+      if evaluation == ''
+          evaluation = null
 
       container = $(element).find(".javascriptinput_container")
       submissionField = $(element).find(".javascriptinput_input")
