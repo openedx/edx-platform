@@ -18,6 +18,7 @@ class @DiscussionThreadView extends Backbone.View
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
     @$("span.timeago").timeago()
+    DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "reply-body"
     @renderResponses()
     @
 
