@@ -9,7 +9,7 @@
   font-weight: 700;
   line-height: 32px;
   color: #fff;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
   &:hover {
@@ -39,6 +39,15 @@
 
 
 
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
+
+
+
 
 body.discussion {
   .course-tabs .right {
@@ -46,6 +55,7 @@ body.discussion {
 
     .new-post-btn {
       @include blue-button;
+      font-size: 13px;
       margin-right: 4px;
     }
 
@@ -259,13 +269,30 @@ body.discussion {
   }
 }
 
-.discussion-body {
+
+
+
+
+
+
+
+
+.container .discussion-body {
+  display: block;
   line-height: 1.4;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  @include clearfix;
 
   .sidebar {
-    display: table-cell;
-    vertical-align: top;
+    float: left;
+    @include box-sizing(border-box);
     width: 32%;
+    height: 550px;
+    border: 1px solid #aaa;
+    border-right: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
     background: #f6f6f6;
     border-radius: 3px 0 0 3px;
     border-right: 1px solid #bcbcbc;
@@ -555,6 +582,7 @@ body.discussion {
 
   .post-list-wrapper {
     overflow-y: scroll;
+    border-right: 1px solid transparent;
   }
 
   .post-list {
@@ -692,8 +720,12 @@ body.discussion {
 
 
   .discussion-column {
-    display: table-cell;
-    vertical-align: top;
+    float: left;
+    @include box-sizing(border-box);
+    border: 1px solid #aaa;
+    border-radius: 0 3px 3px 0;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
     width: 68%;
   }
 
@@ -710,6 +742,7 @@ body.discussion {
     }
 
     .posted-details {
+      margin-left: 8px;
       font-size: 12px;
       font-style: italic;
       color: #888;
@@ -760,6 +793,7 @@ body.discussion {
       border-radius: 3px;
       border: 1px solid #b2b2b2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      @include animation(fadeIn .3s);
 
       &.staff {
         padding-top: 38px;
@@ -780,6 +814,11 @@ body.discussion {
         font-weight: 700;
         color: #fff;
         text-transform: uppercase;
+      }
+
+      &.loading {
+        border: none;
+        box-shadow: none;
       }
     }
 
@@ -1025,6 +1064,61 @@ body.discussion {
     label {
       margin-left: 4px;
     }
+  }
+
+
+
+
+
+  .discussion-reply-new {
+    padding: 20px;
+    @include clearfix;
+
+    h4 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+  }
+
+  #wmd-button-bar {
+    border: none;
+  }
+
+  #wmd-input {
+    width: 100%;
+    height: 240px;
+    margin-top: 0;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-radius: 3px 3px 0 0;
+    background: #fff;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+  }
+
+  #wmd-preview {
+    width: 100%;
+    min-height: 40px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background: #eee;    
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+  }
+
+  .reply-post-control {
+    margin-top: 20px;
+  }
+
+  .discussion-submit-post {
+    @include blue-button;
+    float: left;
   }
 }
 

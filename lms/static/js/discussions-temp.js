@@ -11,9 +11,15 @@ var $sidebar;
 var $sidebarWidthStyles;
 var $formTopicDropBtn;
 var $formTopicDropMenu;
+var $postListWrapper;
 var sidebarWidth;
+var sidebarHeight;
+var sidebarHeaderHeight;
+var sidebarXOffset;
+var scrollTop;
 var tooltipTimer;
 var tooltipCoords;
+var SIDEBAR_PADDING = -1;
 
 
 $(document).ready(function() {
@@ -26,12 +32,15 @@ $(document).ready(function() {
 	$tooltip = $('<div class="tooltip"></div>');
 	$newPost = $('.new-post-article');
 	$sidebar = $('.sidebar');
+	$postListWrapper = $('.post-list-wrapper');
 	$formTopicDropBtn = $('.new-post-article .topic-drop-btn');
 	$formTopicDropMenu = $('.new-post-article .topic-drop-menu');
 	$sidebarWidthStyles = $('<style></style>');
 	$body.append($sidebarWidthStyles);
 
 	sidebarWidth = $('.sidebar').width();
+	sidebarHeaderHeight = $sidebar.find('.browse-search').height() + $sidebar.find('.sort-bar').height();
+	sidebarXOffset = $sidebar.offset().top;
 
 	$browse.bind('click', showTopicDrop);
 	// $search.bind('click', showSearch);
@@ -48,8 +57,10 @@ $(document).ready(function() {
 		'click': hideTooltip
 	});
 
-	$(window).bind('resize', updateSidebarWidth);
-	updateSidebarWidth();
+	$(window).bind('resize', updateSidebarDimensions);
+	$(window).bind('scroll', updateSidebarCoordinates);
+	updateSidebarCoordinates();
+	updateSidebarDimensions();
 });
 
 function showTooltip(e) {
@@ -147,13 +158,6 @@ function setTopic(e) {
 	}
 
 	showBrowse();
-}
-
-function updateSidebarWidth(e) {
-	sidebarWidth = $sidebar.width();
-	var titleWidth = sidebarWidth - 115;
-	console.log(titleWidth);
-	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
 }
 
 function newPost(e) {
