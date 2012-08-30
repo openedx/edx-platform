@@ -14,6 +14,18 @@
 <%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 <script type="text/javascript" src="${static.url('js/discussions-temp.js')}"></script>
+<script>
+    $$contents = {};
+    $$discussions = {};
+    $$course_id = "${course_id}";
+    $(document).ready(function() {
+        window.user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
+        var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
+
+        new DiscussionRouter({discussion: discussion});
+        Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"});
+    });
+</script>
 </%block>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -151,15 +163,3 @@
     <a href="${'<%= id %>'}" data-id="${'<%= id %>'}"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
 </script>
 
-<script>
-    $$contents = {};
-    $$discussions = {};
-    $$course_id = "${course_id}";
-    $(document).ready(function() {
-        window.user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
-        var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
-
-        var app = new DiscussionRouter({discussion: discussion});
-        Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"});
-    });
-</script>
