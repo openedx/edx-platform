@@ -139,7 +139,7 @@ def gitreload(request, reload_dir=None):
 
     ALLOWED_IPS = []	# allow none by default
     if hasattr(settings,'ALLOWED_GITRELOAD_IPS'):	# allow override in settings
-        ALLOWED_IPS = ALLOWED_GITRELOAD_IPS
+        ALLOWED_IPS = settings.ALLOWED_GITRELOAD_IPS
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
         if request.user and request.user.is_staff:
