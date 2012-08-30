@@ -429,13 +429,13 @@ if Backbone?
 
     display_body: ->
       if @has("highlighted_body")
-        @get("highlighted_body")
+        String(@get("highlighted_body")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
       else
         @get("body")
 
     display_title: ->
       if @has("highlighted_title")
-        @get("highlighted_title")
+        String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
       else
         @get("title")
 

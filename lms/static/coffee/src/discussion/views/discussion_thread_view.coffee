@@ -6,6 +6,7 @@ class @DiscussionThreadView extends Backbone.View
   template: _.template($("#thread-template").html())
 
   render: ->
+    console.log(@model)
     @$el.html(@template(@model.toJSON()))
     @model.bind "change", @updateModelDetails
     if window.user.following(@model)
@@ -24,7 +25,7 @@ class @DiscussionThreadView extends Backbone.View
 
   convertMath: ->
     element = @$(".post-body")
-    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+    element.html DiscussionUtil.postMathJaxProcessor(element.html())
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
 
   renderResponses: ->
