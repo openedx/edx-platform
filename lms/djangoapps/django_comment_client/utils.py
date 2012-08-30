@@ -222,6 +222,7 @@ def extend_content(content):
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
+        'updated': content['created_at']!=content['updated_at'],
     }
     return merge_dict(content, content_info)
 
