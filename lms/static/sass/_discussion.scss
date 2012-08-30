@@ -24,7 +24,7 @@
   padding: 0 15px;
   border-radius: 3px;
   border: 1px solid #444;
-  background: -webkit-linear-gradient(top, #eee, #ccc);
+  @include linear-gradient(top, #eee, #ccc);
   font-size: 13px;
   font-weight: 700;
   line-height: 32px;
@@ -33,7 +33,7 @@
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
   &:hover {
-    background: -webkit-linear-gradient(top, #fff, #ddd);
+    @include linear-gradient(top, #fff, #ddd);
   }
 }
 
@@ -705,6 +705,7 @@ body.discussion {
       margin-bottom: 10px;
       font-size: 28px;
       font-weight: 700;
+      letter-spacing: 0;
       line-height: 1.2;
     }
 
@@ -868,9 +869,15 @@ body.discussion {
     li {
       background: #f6f6f6;
       border-bottom: 1px solid #ddd;
+    }
 
-      &.new-comment-form {
-        background: #eee;
+    .comment-form {
+      background: #eee;
+
+      .comment-form-input {
+        padding: 5px 10px;
+        background-color: #fff;
+        font-size: 14px;
       }
     }
 
