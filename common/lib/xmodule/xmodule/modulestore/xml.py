@@ -195,8 +195,7 @@ class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, eager=False,
-                 course_dirs=None):
+    def __init__(self, data_dir, default_class=None, course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -205,15 +204,11 @@ class XMLModuleStore(ModuleStoreBase):
         default_class: dot-separated string defining the default descriptor
             class to use if none is specified in entry_points
 
-        eager: If true, load the modules children immediately to force the
-            entire course tree to be parsed
-
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
         ModuleStoreBase.__init__(self)
 
-        self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
@@ -225,11 +220,6 @@ class XMLModuleStore(ModuleStoreBase):
             module_path, _, class_name = default_class.rpartition('.')
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
-
-        # TODO (cpennington): We need a better way of selecting specific sets of
-        # debug messages to enable. These were drowning out important messages
-        #log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
-        #log.debug('default_class = %s' % self.default_class)
 
         self.parent_tracker = ParentTracker()
 

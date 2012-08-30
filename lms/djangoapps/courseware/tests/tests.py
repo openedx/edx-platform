@@ -68,7 +68,6 @@ def xml_store_config(data_dir):
         'OPTIONS': {
             'data_dir': data_dir,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }
