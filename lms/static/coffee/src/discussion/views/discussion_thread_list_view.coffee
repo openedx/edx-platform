@@ -37,12 +37,16 @@ class @DiscussionThreadListView extends Backbone.View
     @$(".browse").removeClass('is-open')
     setTimeout (-> @$(".post-search-field").focus()), 200
 
-  toggleTopicDrop: ->
+  toggleTopicDrop: =>
     @$(".browse").toggleClass('is-dropped')
     if @$(".browse").hasClass('is-dropped')
       @$(".board-drop-menu").show()
+      setTimeout((=>
+        $("body").bind("click", @toggleTopicDrop)
+      ), 0)
     else
       @$(".board-drop-menu").hide()
+      $("body").unbind("click", @toggleTopicDrop)
 
 
   sortThreads: (event) ->
