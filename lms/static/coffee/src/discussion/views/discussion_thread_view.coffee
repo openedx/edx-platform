@@ -91,6 +91,7 @@ class @DiscussionThreadView extends Backbone.View
     body = @$("#wmd-input").val()
     response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
     @renderResponse(response)
+    @addComment()
 
     DiscussionUtil.safeAjax
       $elem: $(event.target)
