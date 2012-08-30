@@ -264,7 +264,7 @@ class @Problem
     alert_elem = "<div class='capa_alert'>" + msg + "</div>"
     @el.find('.action').after(alert_elem)
     @el.find('.capa_alert').animate(opacity: 0, 500).animate(opacity: 1, 500)
-    
+
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>

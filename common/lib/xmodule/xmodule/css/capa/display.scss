@@ -195,8 +195,30 @@ section.problem {
         margin-bottom: 0;
         float: left;
       }
+
+      &.file {
+        background: #FFF;
+        margin-top: 20px;
+        padding: 20px 0 0 0;
+
+        border: {
+          top: 1px solid #eee;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+
+        p.debug {
+          display: none;
+        }
+
+        input {
+          float: left;
+        }
+      }
     }
   }
+
 
   ul {
     list-style: disc outside none;
@@ -408,18 +430,27 @@ section.problem {
   }
 
   .test {
-    border-top: 1px solid #aaa;
     padding-top: 18px;
 
     header {
       margin-bottom: 12px;
+
+      h3 {
+        font-size: 0.9em;
+        font-weight: bold;
+        font-style: normal;
+        text-transform: uppercase;
+        color: #AAA;
+      }
     }
 
-    .shortform, .longform {
-      border: 1px solid #d3d3d3;
+    .longform, .shortform {
+      border: 1px solid #ddd;
       padding: 9px;
-      margin-bottom: 12px;
-      @include box-shadow(inset 0 0 0 1px #f3f3f3);
+      margin-bottom: 10px;
+      background: #FFF;
+      @include box-shadow(inset 0 0 0 1px #eee);
+      @include border-radius(3px);
 
       p:last-of-type {
         margin-bottom: 0;
@@ -427,7 +458,7 @@ section.problem {
     }
 
     a.full {
-      @include position(absolute,  0 0 0px 0px);
+      @include position(absolute,  0 0 1px 0px);
       font-size: .8em;
       padding: 4px;
       text-align: right;
@@ -443,7 +474,7 @@ section.problem {
     }
 
     .longform-header {
-      margin-bottom: lh();
+      margin-bottom: .6em;
     }
   }
 }
