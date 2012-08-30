@@ -2,6 +2,7 @@ class @DiscussionThreadListView extends Backbone.View
   template: _.template($("#thread-list-template").html())
   events:
     "click .search": "showSearch"
+    "click .browse": "toggleTopicDrop"
     "keyup .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
 
@@ -32,9 +33,17 @@ class @DiscussionThreadListView extends Backbone.View
     @$("a[data-id='#{thread_id}']").addClass("active")
 
   showSearch: ->
-    @$(".search").addClass('is-open');
-    @$(".browse").removeClass('is-open');
+    @$(".search").addClass('is-open')
+    @$(".browse").removeClass('is-open')
     setTimeout (-> @$(".post-search-field").focus()), 200
+
+  toggleTopicDrop: ->
+    @$(".browse").toggleClass('is-dropped')
+    if @$(".browse").hasClass('is-dropped')
+      @$(".board-drop-menu").show()
+    else
+      @$(".board-drop-menu").hide()
+
 
   sortThreads: (event) ->
     @$(".sort-bar a").removeClass("active")
