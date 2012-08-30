@@ -5,14 +5,9 @@ class @DiscussionThreadView extends Backbone.View
     "click .discussion-submit-post": "submitComment"
   template: _.template($("#thread-template").html())
 
-  initialize: (options) ->
-    @model.bind "change", @updateModelDetails
-    @$el.html(@template(@model.toJSON()))
-
-  updateModelDetails: =>
-    @$(".discussion-vote .votes-count-number").html(@model.get("votes")["up_count"])
-
   render: ->
+    @$el.html(@template(@model.toJSON()))
+    @model.bind "change", @updateModelDetails
     if window.user.following(@model)
       @$(".dogear").addClass("is-followed")
 
@@ -23,6 +18,9 @@ class @DiscussionThreadView extends Backbone.View
     @convertMath()
     @renderResponses()
     @
+
+  updateModelDetails: =>
+    @$(".discussion-vote .votes-count-number").html(@model.get("votes")["up_count"])
 
   convertMath: ->
     element = @$(".post-body")
