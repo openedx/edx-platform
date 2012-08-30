@@ -219,7 +219,6 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }

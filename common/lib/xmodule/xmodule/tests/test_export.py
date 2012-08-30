@@ -49,7 +49,7 @@ class RoundTripTestCase(unittest.TestCase):
         copytree(data_dir / course_dir, root_dir / course_dir)
 
         print "Starting import"
-        initial_import = XMLModuleStore(root_dir, eager=True, course_dirs=[course_dir])
+        initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -66,7 +66,7 @@ class RoundTripTestCase(unittest.TestCase):
             course_xml.write(xml)
 
         print "Starting second import"
-        second_import = XMLModuleStore(root_dir, eager=True, course_dirs=[course_dir])
+        second_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)

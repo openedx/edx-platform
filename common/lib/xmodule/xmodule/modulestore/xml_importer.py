@@ -6,7 +6,7 @@ from .exceptions import DuplicateItemError
 log = logging.getLogger(__name__)
 
 
-def import_from_xml(store, data_dir, course_dirs=None, eager=True,
+def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor'):
     """
     Import the specified xml data_dir into the "store" modulestore,
@@ -19,7 +19,6 @@ def import_from_xml(store, data_dir, course_dirs=None, eager=True,
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
-        eager=eager,
         course_dirs=course_dirs
     )
     for course_id in module_store.modules.keys():

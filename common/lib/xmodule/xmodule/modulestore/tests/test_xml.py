@@ -10,7 +10,7 @@ class TestXMLModuleStore(object):
         """Make sure that path_to_location works properly"""
 
         print "Starting import"
-        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy', 'simple'])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
         print "finished import"
         
         check_path_to_location(modulestore)
