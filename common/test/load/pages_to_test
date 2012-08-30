@@ -1,4 +1,5 @@
 # A dumb file specifying pages to test, with abtest options: page\s+(options)?
+# lines that start with '\s*#' ignored
 /
 /jobs
 /courses/
