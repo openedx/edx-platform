@@ -78,10 +78,10 @@ COURSE_LISTINGS = {
                 'MITx/3.091x/2012_Fall',
                 'MITx/6.002x/2012_Fall',
                 'MITx/6.00x/2012_Fall'],
-    'berkeley': ['BerkeleyX/CS169.1x/Cal_2012_Fall',
-                 'BerkeleyX/CS188.1x/Cal_2012_Fall'],
+    'berkeley': ['BerkeleyX/CS169/fa12',
+                 'BerkeleyX/CS188/fa12'],
     'harvard': ['HarvardX/CS50x/2012H'],
-    'mit': [],
+    'mit': ['MITx/3.091/MIT_2012_Fall'],
     'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
 }
 
