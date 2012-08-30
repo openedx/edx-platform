@@ -7,18 +7,23 @@ class @DiscussionRouter extends Backbone.Router
       @discussion = options['discussion']
       @nav = new DiscussionThreadListView(collection: @discussion, el: $(".sidebar"))
       @nav.on "thread:selected", @navigateToThread
+      @nav.on "threads:rendered", @setActiveThread
       @nav.render()
 
   allThreads: ->
       true
 
+  setActiveThread: =>
+    if @thread
+      @nav.setActiveThread(@thread.get("id"))
+
   showThread: (forum_name, thread_id) ->
-    @nav.setActiveThread(thread_id)
-    thread = @discussion.get(thread_id)
+    @thread = @discussion.get(thread_id)
+    @setActiveThread()
     if(@main)
       @main.undelegateEvents()
 
-    @main = new DiscussionThreadView(el: $(".discussion-column"), model: thread)
+    @main = new DiscussionThreadView(el: $(".discussion-column"), model: @thread)
     @main.render()
 
   navigateToThread: (thread_id) =>

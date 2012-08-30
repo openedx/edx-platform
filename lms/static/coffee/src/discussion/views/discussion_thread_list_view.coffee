@@ -15,6 +15,7 @@ class @DiscussionThreadListView extends Backbone.View
   renderThreads: =>
     @$(".post-list").html("")
     @collection.each @renderThreadListItem
+    @trigger "threads:rendered"
 
   renderThreadListItem: (thread) =>
     view = new ThreadListItemView(model: thread)
