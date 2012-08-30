@@ -6,6 +6,7 @@ if Backbone?
       DiscussionUtil.addDiscussion @id, @
       @bind "add", (item) =>
         item.discussion = @
+      @comparator = @sortByDate
 
     find: (id) ->
       _.first @where(id: id)
@@ -15,6 +16,19 @@ if Backbone?
       model = new Thread thread
       @add model
       model
+
+    sortByDate: (thread) ->
+      thread.get("created_at")
+
+    sortByVotes: (thread1, thread2) ->
+      thread1_count = parseInt(thread1.get("votes")['up_count'])
+      thread2_count = parseInt(thread2.get("votes")['up_count'])
+      thread2_count - thread1_count
+
+    sortByComments: (thread1, thread2) ->
+      thread1_count = parseInt(thread1.get("comments_count"))
+      thread2_count = parseInt(thread2.get("comments_count"))
+      thread2_count - thread1_count
 
   class @DiscussionView extends Backbone.View
 

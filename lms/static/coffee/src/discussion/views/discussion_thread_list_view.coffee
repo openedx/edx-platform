@@ -3,6 +3,7 @@ class @DiscussionThreadListView extends Backbone.View
   events:
     "click .search": "showSearch"
     "keyup .post-search-field": "performSearch"
+    "click .sort-bar a": "sortThreads"
 
   render: ->
     @timer = 0;
@@ -26,13 +27,27 @@ class @DiscussionThreadListView extends Backbone.View
     @trigger("thread:selected", thread_id)
 
   setActiveThread: (thread_id) ->
-    @$("a").removeClass("active")
+    @$(".post-list a").removeClass("active")
     @$("a[data-id='#{thread_id}']").addClass("active")
 
   showSearch: ->
     @$(".search").addClass('is-open');
     @$(".browse").removeClass('is-open');
     setTimeout (-> @$(".post-search-field").focus()), 200
+
+  sortThreads: (event) ->
+    @$(".sort-bar a").removeClass("active")
+    $(event.target).addClass("active")
+    sortBy = $(event.target).data("sort")
+    if sortBy == "date"
+      @collection.comparator = @collection.sortByDate
+    else if sortBy == "votes"
+      @collection.comparator = @collection.sortByVotes
+    else if sortBy == "comments"
+      @collection.comparator = @collection.sortByComments
+    @collection.sort()
+
+
 
   delay: (callback, ms) =>
     clearTimeout(@timer)
