@@ -2,6 +2,7 @@ class @Sequence
   constructor: (element) ->
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
+    @num_contents = @contents.length
     @id = @el.data('id')
     @modx_url = @el.data('course_modx_root')
     @initProgress()
@@ -90,18 +91,29 @@ class @Sequence
       @toggleArrows()
       @hookUpProgressEvent()
 
+      sequence_links = @$('#seq_content a.seqnav')
+      sequence_links.click @goto
+
   goto: (event) =>
     event.preventDefault()
-    new_position = $(event.target).data('element')
-    Logger.log "seq_goto", old: @position, new: new_position, id: @id
-    
-    # On Sequence chage, destroy any existing polling thread 
-    #   for queued submissions, see ../capa/display.coffee
-    if window.queuePollerID
-      window.clearTimeout(window.queuePollerID)
-      delete window.queuePollerID
+    # Links from within the coureware uses <a class='seqnav' href="n">...</a>
+    if $(event.target).hasClass 'seqnav'
+      new_position = $(event.target).attr('href')
+    else
+      new_position = $(event.target).data('element')
 
-    @render new_position
+    if (1 <= new_position) and (new_position <= @num_contents)
+      Logger.log "seq_goto", old: @position, new: new_position, id: @id
+    
+      # On Sequence chage, destroy any existing polling thread 
+      #   for queued submissions, see ../capa/display.coffee
+      if window.queuePollerID
+        window.clearTimeout(window.queuePollerID)
+        delete window.queuePollerID
+
+      @render new_position
+    else
+      alert 'Sequence error! Cannot navigate to tab ' + new_position + 'in the current SequenceModule. Please contact the course staff.'
 
   next: (event) =>
     event.preventDefault()
