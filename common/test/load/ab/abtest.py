@@ -89,8 +89,10 @@ def loadtest(server, pages, ab_options, args):
 def main():
     """
     Run tests
+
+    machine: load-test-001.m.edx.org
+    elb: load-test.edx.org
     """
-    target = "prod-edx-001.m.edx.org"
 
     parser = argparse.ArgumentParser(description='Run load tests on an edx server.')
     parser.add_argument('server',
