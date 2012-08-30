@@ -72,30 +72,34 @@
           else:
             course_target = reverse('about_course', args=[course.id])
           %>
-          <a href="${course_target}" class="cover" style="background-image: url('${course_image_url(course)}')">
-            <div class="shade"></div>
-            <div class="arrow">&#10095;</div>
-          </a>
-          <section class="info">
-            <hgroup>
-              <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
-              <h3><a href="${course_target}">${course.number} ${course.title}</a></h3>
-            </hgroup>
-            <section class="course-status">
-              <p>Class Starts - <span>${course.start_date_text}</span></div>
+
+          <a href="${course_target}">
+            <section class="cover" style="background-image: url('${course_image_url(course)}')">
+              <div class="shade"></div>
+              <div class="arrow">&#10095;</div>
             </section>
-            <section class="meta">
-              <div class="course-work-icon"></div>
-              <div class="progress">
-                <div class="meter">
-                  <div class="meter-fill"></div>
+
+            <section class="info">
+              <hgroup>
+                <h2 class="university">${get_course_about_section(course, 'university')}</h2>
+                <h3>${course.number} ${course.title}</h3>
+              </hgroup>
+              <section class="course-status">
+                <p>Class Starts - <span>${course.start_date_text}</span></div>
+              </section>
+              <section class="meta">
+                <div class="course-work-icon"></div>
+                <div class="progress">
+                  <div class="meter">
+                    <div class="meter-fill"></div>
+                  </div>
                 </div>
-              </div>
-              <div class="complete">
-                ##<p><span class="completeness">60%</span> complete</p>
-              </div>
+                <div class="complete">
+                  ##<p><span class="completeness">60%</span> complete</p>
+                </div>
+              </section>
             </section>
-          </section>
+          </a>
         </article>
         <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
 
