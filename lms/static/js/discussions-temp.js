@@ -39,6 +39,7 @@ $(document).ready(function() {
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
 	$('.new-post-btn').bind('click', newPost);
+	$('.new-post-cancel').bind('click', closeNewPost);
 
 	$('[data-tooltip]').bind({
 		'mouseover': showTooltip,
@@ -157,6 +158,10 @@ function updateSidebarWidth(e) {
 
 function newPost(e) {
 	$newPost.slideDown(300);
+}
+
+function closeNewPost(e) {
+	$newPost.slideUp(300);	
 }
 
 function showFormTopicDrop(e) {
