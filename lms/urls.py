@@ -98,8 +98,9 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
+            'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),

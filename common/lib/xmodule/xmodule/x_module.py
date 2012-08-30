@@ -544,7 +544,13 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
             msg = "Error loading from xml."
-            log.warning(msg + " " + str(err))
+            log.warning(msg + " " + str(err)[:200])
+
+            # Normally, we don't want lots of exception traces in our logs from common
+            # content problems.  But if you're debugging the xml loading code itself,
+            # uncomment the next line.
+            # log.exception(msg)
+
             system.error_tracker(msg)
             err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
             descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
