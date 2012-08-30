@@ -29,6 +29,7 @@ class @DiscussionThreadView extends Backbone.View
 
   renderResponses: ->
     $.ajax @model.id, success: (data, textStatus, xhr) =>
+      @$(".loading").remove()
       comments = new Comments(data['content']['children'])
       comments.each @renderResponse
 
