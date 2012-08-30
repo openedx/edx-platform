@@ -427,6 +427,22 @@ if Backbone?
     unfollow: ->
       @trigger "thread:unfollow"
 
+    display_body: ->
+      if @has("highlighted_body")
+        @get("highlighted_body")
+      else
+        @get("body")
+
+    display_title: ->
+      if @has("highlighted_title")
+        @get("highlighted_title")
+      else
+        @get("title")
+
+    toJSON: ->
+      json_attributes = _.clone(@attributes)
+      _.extend(json_attributes, { title: @display_title(), body: @display_body() })
+
   class @ThreadView extends @ContentView
 
   class @Comment extends @Content

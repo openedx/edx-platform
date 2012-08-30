@@ -20,7 +20,7 @@ import django_comment_client.utils as utils
 import comment_client as cc
 
 
-THREADS_PER_PAGE = 5
+THREADS_PER_PAGE = 50000
 PAGES_NEARBY_DELTA = 2
 
 

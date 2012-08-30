@@ -20,13 +20,14 @@ var scrollTop;
 var tooltipTimer;
 var tooltipCoords;
 var SIDEBAR_PADDING = -1;
+var SIDEBAR_HEADER_HEIGHT = 87;
 
 
 $(document).ready(function() {
 	$body = $('body');
 	$browse = $('.browse-search .browse');
-	$search = $('.browse-search .search');
-	$searchField = $('.post-search-field');
+	// $search = $('.browse-search .search');
+	// $searchField = $('.post-search-field');
 	$topicDrop = $('.board-drop-menu');
 	$currentBoard = $('.current-board');
 	$tooltip = $('<div class="tooltip"></div>');
@@ -39,11 +40,10 @@ $(document).ready(function() {
 	$body.append($sidebarWidthStyles);
 
 	sidebarWidth = $('.sidebar').width();
-	sidebarHeaderHeight = $sidebar.find('.browse-search').height() + $sidebar.find('.sort-bar').height();
 	sidebarXOffset = $sidebar.offset().top;
 
 	$browse.bind('click', showTopicDrop);
-	$search.bind('click', showSearch);
+	// $search.bind('click', showSearch);
 	$topicDrop.bind('click', setTopic);
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
@@ -111,13 +111,13 @@ function showBrowse(e) {
 	$searchField.val('');
 }
 
-function showSearch(e) {
-	$search.addClass('is-open');
-	$browse.removeClass('is-open');
-	setTimeout(function() {
-		$searchField.focus();
-	}, 200);
-}
+// function showSearch(e) {
+// 	$search.addClass('is-open');
+// 	$browse.removeClass('is-open');
+// 	setTimeout(function() {
+// 		$searchField.focus();
+// 	}, 200);
+// }
 
 function showTopicDrop(e) {
 	e.preventDefault();
@@ -200,10 +200,6 @@ function setFormTopic(e) {
 	$formTopicDropBtn.html(boardName + ' <span class="drop-arrow">▾</span>');
 }
 
-
-
-
-
 function updateSidebarCoordinates(e) {
 	scrollTop = $(window).scrollTop();
 
@@ -226,12 +222,11 @@ function updateSidebarDimensions(e) {
 	var titleWidth = sidebarWidth - 115;
 
 	$sidebar.css('height', sidebarHeight + 'px');
-	$postListWrapper.css('height', (sidebarHeight - sidebarHeaderHeight - 4) + 'px');
+
+	if(!$postListWrapper[0]) {
+		$postListWrapper = $('.post-list-wrapper');
+	}
+
+	$postListWrapper.css('height', (sidebarHeight - SIDEBAR_HEADER_HEIGHT - 4) + 'px');
 	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
 }
-
-
-
-
-
-
