@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import cgi
 import inspect
 import json
 import logging
@@ -725,7 +726,8 @@ class NumericalResponse(LoncapaResponse):
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError('Invalid input -- please use a number only')
+            raise StudentInputError("Invalid input: could not parse '%s' as a number" %\
+                                    cgi.escape(student_answer))
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -1517,11 +1519,12 @@ class FormulaResponse(LoncapaResponse):
                                            cs=self.case_sensitive)
             except UndefinedVariable as uv:
                 log.debug('formularesponse: undefined variable in given=%s' % given)
-                raise StudentInputError(uv.message + " not permitted in answer")
+                raise StudentInputError("Invalid input: " + uv.message + " not permitted in answer")
             except Exception as err:
                 #traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
-                raise StudentInputError("Error in formula")
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %\
+                                        cgi.escape(given))
             if numpy.isnan(student_result) or numpy.isinf(student_result):
                 return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
