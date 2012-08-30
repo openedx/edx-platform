@@ -1,6 +1,6 @@
 class @DiscussionThreadView extends Backbone.View
   events:
-    "click .discussion-vote-up": "toggleVote"
+    "click .discussion-vote": "toggleVote"
     "click .dogear": "toggleFollowing"
     "click .discussion-submit-post": "submitComment"
   template: _.template($("#thread-template").html())
@@ -10,7 +10,7 @@ class @DiscussionThreadView extends Backbone.View
     @$el.html(@template(@model.toJSON()))
 
   updateModelDetails: =>
-    @$(".votes-count-number").html(@model.get("votes")["up_count"])
+    @$(".discussion-vote .votes-count-number").html(@model.get("votes")["up_count"])
 
   render: ->
     if window.user.following(@model)
@@ -44,8 +44,8 @@ class @DiscussionThreadView extends Backbone.View
     @model.trigger "comment:add"
 
   toggleVote: ->
-    @$(".vote-btn").toggleClass("is-cast")
-    if @$(".vote-btn").hasClass("is-cast")
+    @$(".discussion-vote").toggleClass("is-cast")
+    if @$(".discussion-vote").hasClass("is-cast")
       @vote()
     else
       @unvote()
@@ -68,7 +68,7 @@ class @DiscussionThreadView extends Backbone.View
 
   vote: ->
     url = @model.urlFor("upvote")
-    @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) + 1)
+    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) + 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -79,7 +79,7 @@ class @DiscussionThreadView extends Backbone.View
 
   unvote: ->
     url = @model.urlFor("unvote")
-    @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) - 1)
+    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) - 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
