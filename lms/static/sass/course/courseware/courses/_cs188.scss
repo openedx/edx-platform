@@ -27,6 +27,12 @@ body.cs188 {
             margin-bottom: 1.416em;
         }
 
+        .choicegroup {
+            input[type=checkbox], input[type=radio] {
+                margin-right: 5px;
+            }
+        }
+
     }
 
 }

@@ -7,11 +7,11 @@
     </div>
     <div class="discussion-right-wrapper">
       <ul class="admin-actions">
-        <li><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
-        <li><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
-        <li><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
+        <li style="display: none;"><a href="javascript:void(0)" class="admin-endorse">Endorse</a></li>
+        <li style="display: none;"><a href="javascript:void(0)" class="admin-edit">Edit</a></li>
+        <li style="display: none;"><a href="javascript:void(0)" class="admin-delete">Delete</a></li>
         {{#thread}}
-          <li><a href="javascript:void(0)" class="admin-openclose">{{close_thread_text}}</a></li>
+          <li style="display: none;"><a href="javascript:void(0)" class="admin-openclose">{{close_thread_text}}</a></li>
         {{/thread}}
       </ul>
       {{#thread}}

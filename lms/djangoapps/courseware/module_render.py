@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import sys
@@ -143,8 +144,9 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     exists.
 
     Arguments:
-      - user                  : current django User
-      - request               : current django HTTPrequest
+      - user                  : User for whom we're getting the module
+      - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
+                                and such works based on user.
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - course_id             : the course_id in the context of which to load module
@@ -173,7 +175,13 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     if not has_access(user, descriptor, 'load'):
         return None
 
-    #TODO Only check the cache if this module can possibly have state
+    # Anonymized student identifier
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    anonymous_student_id = h.hexdigest()
+
+    # Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
     if user.is_authenticated():
@@ -197,6 +205,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                    location=descriptor.location.url(),
                                    dispatch=''),
                        )
+    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
+    ajax_url = ajax_url.rstrip('/')
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url = '{proto}://{host}'.format(
@@ -217,7 +227,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     xqueue = {'interface': xqueue_interface,
               'callback_url': xqueue_callback_url,
-              'default_queuename': xqueue_default_queuename.replace(' ', '_')}
+              'default_queuename': xqueue_default_queuename.replace(' ', '_'),
+              'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+             }
 
     def inner_get_module(location):
         """
@@ -241,7 +253,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          node_path=settings.NODE_PATH
+                          node_path=settings.NODE_PATH,
+                          anonymous_student_id=anonymous_student_id
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -408,6 +421,10 @@ def modx_dispatch(request, dispatch, location, course_id):
       - course_id -- defines the course context for this request.
     '''
     # ''' (fix emacs broken parsing)
+
+    # Check parameters and fail fast if there's a problem
+    if not Location.is_valid(location):
+        raise Http404("Invalid location")
 
     # Check for submitted files and basic file size checks
     p = request.POST.copy()

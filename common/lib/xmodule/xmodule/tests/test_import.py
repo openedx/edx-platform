@@ -255,3 +255,37 @@ class ImportTestCase(unittest.TestCase):
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
         self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
+
+
+    def test_colon_in_url_name(self):
+        """Ensure that colons in url_names convert to file paths properly"""
+
+        print "Starting import"
+        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+
+        courses = modulestore.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+        course_id = course.id
+
+        print "course errors:"
+        for (msg, err) in modulestore.get_item_errors(course.location):
+            print msg
+            print err
+
+        chapters = course.get_children()
+        self.assertEquals(len(chapters), 2)
+
+        ch2 = chapters[1]
+        self.assertEquals(ch2.url_name, "secret:magic")
+
+        print "Ch2 location: ", ch2.location
+
+        also_ch2 = modulestore.get_instance(course_id, ch2.location)
+        self.assertEquals(ch2, also_ch2)
+
+        print "making sure html loaded"
+        cloc = course.location
+        loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
+        html = modulestore.get_instance(course_id, loc)
+        self.assertEquals(html.display_name, "Toy lab")
