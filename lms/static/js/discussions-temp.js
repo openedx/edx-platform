@@ -11,9 +11,15 @@ var $sidebar;
 var $sidebarWidthStyles;
 var $formTopicDropBtn;
 var $formTopicDropMenu;
+var $postListWrapper;
 var sidebarWidth;
+var sidebarHeight;
+var sidebarHeaderHeight;
+var sidebarXOffset;
+var scrollTop;
 var tooltipTimer;
 var tooltipCoords;
+var SIDEBAR_PADDING = -1;
 
 
 $(document).ready(function() {
@@ -26,12 +32,15 @@ $(document).ready(function() {
 	$tooltip = $('<div class="tooltip"></div>');
 	$newPost = $('.new-post-article');
 	$sidebar = $('.sidebar');
+	$postListWrapper = $('.post-list-wrapper');
 	$formTopicDropBtn = $('.new-post-article .topic-drop-btn');
 	$formTopicDropMenu = $('.new-post-article .topic-drop-menu');
 	$sidebarWidthStyles = $('<style></style>');
 	$body.append($sidebarWidthStyles);
 
 	sidebarWidth = $('.sidebar').width();
+	sidebarHeaderHeight = $sidebar.find('.browse-search').height() + $sidebar.find('.sort-bar').height();
+	sidebarXOffset = $sidebar.offset().top;
 
 	$browse.bind('click', showTopicDrop);
 	$search.bind('click', showSearch);
@@ -48,8 +57,10 @@ $(document).ready(function() {
 		'click': hideTooltip
 	});
 
-	$(window).bind('resize', updateSidebarWidth);
-	updateSidebarWidth();
+	$(window).bind('resize', updateSidebarDimensions);
+	$(window).bind('scroll', updateSidebarCoordinates);
+	updateSidebarCoordinates();
+	updateSidebarDimensions();
 });
 
 function showTooltip(e) {
@@ -149,13 +160,6 @@ function setTopic(e) {
 	showBrowse();
 }
 
-function updateSidebarWidth(e) {
-	sidebarWidth = $sidebar.width();
-	var titleWidth = sidebarWidth - 115;
-	console.log(titleWidth);
-	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
-}
-
 function newPost(e) {
 	$newPost.slideDown(300);
 }
@@ -195,3 +199,39 @@ function setFormTopic(e) {
 	});
 	$formTopicDropBtn.html(boardName + ' <span class="drop-arrow">▾</span>');
 }
+
+
+
+
+
+function updateSidebarCoordinates(e) {
+	scrollTop = $(window).scrollTop();
+
+	var marginTop = scrollTop + SIDEBAR_PADDING > sidebarXOffset ? scrollTop + SIDEBAR_PADDING - sidebarXOffset : 0;
+
+	var discussionColumnHeight = $('.discussion-column').height();
+	marginTop = marginTop + sidebarHeight > discussionColumnHeight ? discussionColumnHeight - sidebarHeight + 2 : marginTop;
+
+	$sidebar.css('margin-top', marginTop);
+	updateSidebarDimensions();
+}
+
+function updateSidebarDimensions(e) {
+	sidebarWidth = $sidebar.width();
+
+	var visibleHeader = sidebarXOffset - scrollTop > 0 ? sidebarXOffset - scrollTop : 0;
+	sidebarHeight = $(window).height() - (visibleHeader + SIDEBAR_PADDING * 2);
+	sidebarHeight = sidebarHeight > 500 ? sidebarHeight : 500;
+
+	var titleWidth = sidebarWidth - 115;
+
+	$sidebar.css('height', sidebarHeight + 'px');
+	$postListWrapper.css('height', (sidebarHeight - sidebarHeaderHeight - 4) + 'px');
+	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
+}
+
+
+
+
+
+
