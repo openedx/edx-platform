@@ -263,7 +263,7 @@ class @Problem
       @el.find('.capa_alert').remove()
     alert_elem = "<div class='capa_alert'>" + msg + "</div>"
     @el.find('.action').after(alert_elem)
-    @el.find('.capa_alert').animate(opacity: 0, 500).animate(opacity: 1, 500)
+    @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 
   save: =>
     Logger.log 'problem_save', @answers
