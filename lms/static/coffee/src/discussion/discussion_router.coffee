@@ -8,7 +8,6 @@ class @DiscussionRouter extends Backbone.Router
       @nav = new DiscussionThreadListView(collection: @discussion, el: $(".sidebar"))
       @nav.on "thread:selected", @navigateToThread
       @nav.render()
-      @main = new DiscussionThreadView(el: $(".discussion-column"))
 
   allThreads: ->
       true
@@ -16,7 +15,10 @@ class @DiscussionRouter extends Backbone.Router
   showThread: (forum_name, thread_id) ->
     @nav.setActiveThread(thread_id)
     thread = @discussion.get(thread_id)
-    @main.model = thread
+    if(@main)
+      @main.undelegateEvents()
+
+    @main = new DiscussionThreadView(el: $(".discussion-column"), model: thread)
     @main.render()
 
   navigateToThread: (thread_id) =>

@@ -18,12 +18,17 @@
     $$contents = {};
     $$discussions = {};
     $$course_id = "${course_id}";
-    $(document).ready(function() {
+    DiscussionApp = {
+      start: function() {
         window.user = new DiscussionUser(JSON.parse("${user_info | escapejs}"));
         var discussion = new Discussion(JSON.parse("${threads | escapejs}"));
 
         new DiscussionRouter({discussion: discussion});
         Backbone.history.start({pushState: true, root: "/courses/${course_id}/discussion/forum/"});
+       }
+    }
+    $(document).ready(function() {
+        DiscussionApp.start();
     });
 </script>
 </%block>
