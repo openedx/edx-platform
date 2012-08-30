@@ -1,7 +1,8 @@
 class @DiscussionThreadView extends Backbone.View
   events:
-    "click .discussion-vote-up": "toggleVote"
+    "click .discussion-vote": "toggleVote"
     "click .dogear": "toggleFollowing"
+    "click .discussion-submit-post": "submitComment"
   template: _.template($("#thread-template").html())
 
   initialize: (options) ->
@@ -9,7 +10,7 @@ class @DiscussionThreadView extends Backbone.View
     @$el.html(@template(@model.toJSON()))
 
   updateModelDetails: =>
-    @$(".votes-count-number").html(@model.get("votes")["up_count"])
+    @$(".discussion-vote .votes-count-number").html(@model.get("votes")["up_count"])
 
   render: ->
     if window.user.following(@model)
@@ -18,9 +19,15 @@ class @DiscussionThreadView extends Backbone.View
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
     @$("span.timeago").timeago()
-    DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "reply-body"
+    Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
+    @convertMath()
     @renderResponses()
     @
+
+  convertMath: ->
+    element = @$(".post-body")
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
 
   renderResponses: ->
     $.ajax @model.id, success: (data, textStatus, xhr) =>
@@ -37,8 +44,8 @@ class @DiscussionThreadView extends Backbone.View
     @model.trigger "comment:add"
 
   toggleVote: ->
-    @$(".vote-btn").toggleClass("is-cast")
-    if @$(".vote-btn").hasClass("is-cast")
+    @$(".discussion-vote").toggleClass("is-cast")
+    if @$(".discussion-vote").hasClass("is-cast")
       @vote()
     else
       @unvote()
@@ -61,7 +68,7 @@ class @DiscussionThreadView extends Backbone.View
 
   vote: ->
     url = @model.urlFor("upvote")
-    @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) + 1)
+    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) + 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -72,7 +79,7 @@ class @DiscussionThreadView extends Backbone.View
 
   unvote: ->
     url = @model.urlFor("unvote")
-    @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) - 1)
+    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) - 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -80,3 +87,18 @@ class @DiscussionThreadView extends Backbone.View
       success: (response, textStatus) =>
         if textStatus == 'success'
           @model.set(response)
+
+  submitComment: ->
+    url = @model.urlFor('reply')
+    body = @$("#wmd-input").val()
+    response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
+    @renderResponse(response)
+
+    DiscussionUtil.safeAjax
+      $elem: $(event.target)
+      url: url
+      type: "POST"
+      dataType: 'json'
+      data:
+        body: body
+    false
