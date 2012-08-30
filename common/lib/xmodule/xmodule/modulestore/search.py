@@ -6,15 +6,14 @@ from .exceptions import (ItemNotFoundError, NoPathToItem)
 from . import ModuleStore, Location
 
 
-def path_to_location(modulestore, location, course_name=None):
+def path_to_location(modulestore, course_id, location):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
     chapter, but any kind of module can be a "section".
 
     location: something that can be passed to Location
-    course_name: [optional].  If not None, restrict search to paths
-        in that course.
+    course_id: Search for paths in this course.
 
     raise ItemNotFoundError if the location doesn't exist.
 
@@ -41,7 +40,7 @@ def path_to_location(modulestore, location, course_name=None):
             xs = xs[1]
         return p
 
-    def find_path_to_course(location, course_name=None):
+    def find_path_to_course():
         '''Find a path up the location graph to a node with the
         specified category.
 
@@ -69,7 +68,8 @@ def path_to_location(modulestore, location, course_name=None):
 
             # print 'Processing loc={0}, path={1}'.format(loc, path)
             if loc.category == "course":
-                if course_name is None or course_name == loc.name:
+                # confirm that this is the right course
+                if course_id == CourseDescriptor.location_to_id(loc):
                     # Found it!
                     path = (loc, path)
                     return flatten(path)
@@ -81,7 +81,7 @@ def path_to_location(modulestore, location, course_name=None):
         # If we're here, there is no path
         return None
 
-    path = find_path_to_course(location, course_name)
+    path = find_path_to_course()
     if path is None:
         raise(NoPathToItem(location))
 

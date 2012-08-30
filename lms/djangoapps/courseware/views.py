@@ -194,7 +194,7 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
-def jump_to(request, location):
+def jump_to(request, course_id, location):
     '''
     Show the page that contains a specific location.
 
@@ -211,7 +211,7 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
