@@ -29,7 +29,10 @@
         {{/thread}}
         <div class="info">
           <div class="comment-time">
-            <span class="timeago" title="{{content.updated_at}}">sometime</span> by
+            {{#content.updated}}
+              updated
+            {{/content.updated}}
+            <span class="timeago" title="{{content.updated_at}}">{{content.created_at}}</span> by
             {{#content.anonymous}}
               anonymous
             {{/content.anonymous}}
