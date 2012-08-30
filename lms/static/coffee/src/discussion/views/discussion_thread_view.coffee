@@ -20,8 +20,14 @@ class @DiscussionThreadView extends Backbone.View
       @$(".vote-btn").addClass("is-cast")
     @$("span.timeago").timeago()
     Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
+    @convertMath()
     @renderResponses()
     @
+
+  convertMath: ->
+    element = @$(".post-body")
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
 
   renderResponses: ->
     $.ajax @model.id, success: (data, textStatus, xhr) =>
@@ -84,7 +90,7 @@ class @DiscussionThreadView extends Backbone.View
 
   submitComment: ->
     url = @model.urlFor('reply')
-    body = DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), "reply-body"
+    body = @$("#wmd-input").val()
     response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
     @renderResponse(response)
 

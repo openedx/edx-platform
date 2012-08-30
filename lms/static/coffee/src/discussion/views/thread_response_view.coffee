@@ -10,8 +10,14 @@ class @ThreadResponseView extends Backbone.View
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
     @$(".posted-details").timeago()
+    @convertMath()
     @renderComments()
     @
+
+  convertMath: ->
+    element = @$(".response-body")
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
 
   renderComments: ->
       @model.get("comments").each @renderComment
