@@ -5,8 +5,6 @@ import itertools
 
 from functools import partial
 
-from functools import partial
-
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -152,7 +150,7 @@ def index(request, course_id, chapter=None, section=None,
                     course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id)
+                                    student_module_cache, course_id, position)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
