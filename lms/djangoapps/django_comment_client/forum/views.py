@@ -174,7 +174,7 @@ def forum_form_discussion(request, course_id):
         return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
-    
+
     thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
     threads, query_params = get_threads(request, course_id)
 
@@ -212,6 +212,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     else:
         course = get_course_with_access(request.user, course_id, 'load')
+        category_map = utils.get_discussion_category_map(course)
         threads, query_params = get_threads(request, course_id)
 
         recent_active_threads = cc.search_recent_active_threads(
@@ -238,6 +239,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'course_id': course.id,
             'thread_id': thread_id,
             'threads': json.dumps(threads),
+            'category_map': category_map,
         }
 
         return render_to_response('discussion/single_thread.html', context)

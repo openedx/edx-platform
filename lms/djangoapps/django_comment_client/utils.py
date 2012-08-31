@@ -1,3 +1,4 @@
+from collections import defaultdict
 from importlib import import_module
 from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
@@ -21,8 +22,6 @@ import pystache_custom as pystache
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
-
-
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
@@ -40,80 +39,101 @@ def merge_dict(dic1, dic2):
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:
-        class_path = settings.MODULESTORE['default']['ENGINE']
-        module_path, _, class_name = class_path.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
-        modulestore = class_(**dict(settings.MODULESTORE['default']['OPTIONS'].items() + [('eager', True)]))
-        _FULLMODULES = modulestore.modules
+        _FULLMODULES = modulestore().modules
     return _FULLMODULES
 
-def get_categorized_discussion_info(request, course):
+def get_discussion_id_map(course):
     """
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO:
-        initialize_discussion_info(request, course)
-    return _DISCUSSIONINFO['categorized']
+        initialize_discussion_info(course)
+    return _DISCUSSIONINFO['id_map']
 
-def get_discussion_title(request, course, discussion_id):
+def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO:
-        initialize_discussion_info(request, course)
+        initialize_discussion_info(course)
     title = _DISCUSSIONINFO['by_id'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
-def initialize_discussion_info(request, course):
+def get_discussion_category_map(course):
+
+    global _DISCUSSIONINFO
+    if not _DISCUSSIONINFO:
+        initialize_discussion_info(course)
+    return _DISCUSSIONINFO['category_map']
+
+def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
     if _DISCUSSIONINFO:
         return
 
     course_id = course.id
-    _, course_name, _ = course_id.split('/')
-    user = request.user
     url_course_id = course_id.replace('/', '_').replace('.', '_')
 
-    _is_course_discussion = lambda x: x[0].dict()['category'] == 'discussion' \
-                         and x[0].dict()['course'] == course_name
-    
-    _get_module_descriptor = operator.itemgetter(1)
+    all_modules = get_full_modules()[course_id]
 
-    def _get_module(module_descriptor):
-        print module_descriptor
-        module = get_module(user, request, module_descriptor.location, student_module_cache)
-        return module
+    discussion_id_map = {}
+    unexpanded_category_map = defaultdict(list)
+    for location, module in all_modules.items():
+        if location.category == 'discussion':
+            id = module.metadata['id']
+            category = module.metadata['discussion_category']
+            title = module.metadata['for']
+            sort_key = module.metadata.get('sort_key', title)
+            discussion_id_map[id] = {"location": location, "title": title}
+            category = " / ".join([x.strip() for x in category.split("/")])
+            unexpanded_category_map[category].append({"title": title, "id": id,
+                "sort_key": sort_key})
 
-    def _extract_info(module):
-        return {
-            'title': module.title,
-            'discussion_id': module.discussion_id,
-            'category': module.discussion_category,
-        }
+    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)} 
+    for category_path, entries in unexpanded_category_map.items():
+        node = category_map["subcategories"]
+        path = [x.strip() for x in category_path.split("/")]
+        for level in path[:-1]:
+            if level not in node:
+                node[level] = {"subcategories": defaultdict(dict), 
+                               "entries": defaultdict(dict),
+                               "sort_key": level} 
+            node = node[level]["subcategories"]
 
-    def _pack_with_id(info):
-        return (info['discussion_id'], info)
+        level = path[-1]
+        if level not in node:
+            node[level] = {"subcategories": defaultdict(dict), 
+                            "entries": defaultdict(dict), 
+                            "sort_key": level}
+        for entry in entries:
+            node[level]["entries"][entry["title"]] = {"id": entry["id"], 
+                                                      "sort_key": entry["sort_key"]}
 
-    discussion_module_descriptors = map(_get_module_descriptor,
-                                        filter(_is_course_discussion,
-                                               get_full_modules().items()))
+    def sort_map_entries(map):
+        things = []
+        for title, entry in map["entries"].items():
+            things.append((title, entry))
+        for title, category in map["subcategories"].items():
+            things.append((title, category))
+            sort_map_entries(map["subcategories"][title])
+        map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course)
-
-    discussion_info = map(_extract_info, map(_get_module, discussion_module_descriptors))
+    sort_map_entries(category_map)
+    #for level in category_map["subcategories"].values():
+    #    sort_map_entries(level)
 
     _DISCUSSIONINFO = {}
 
-    _DISCUSSIONINFO['by_id'] = dict(map(_pack_with_id, discussion_info))
+    _DISCUSSIONINFO['id_map'] = discussion_id_map
 
-    _DISCUSSIONINFO['categorized'] = dict((category, list(l)) \
-                for category, l in itertools.groupby(discussion_info, operator.itemgetter('category')))
+    _DISCUSSIONINFO['category_map'] = category_map
 
-    _DISCUSSIONINFO['categorized']['General'] = [{
-        'title': 'General discussion',
-        'discussion_id': url_course_id,
-        'category': 'General',
-    }]
+    # TODO delete me when you've used me
+    #_DISCUSSIONINFO['categorized']['General'] = [{
+    #    'title': 'General',
+    #    'discussion_id': url_course_id,
+    #    'category': 'General',
+    #}]
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
