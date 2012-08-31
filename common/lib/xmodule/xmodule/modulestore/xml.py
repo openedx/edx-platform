@@ -37,7 +37,7 @@ def clean_out_mako_templating(xml_string):
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 policy, error_tracker, **kwargs):
+                 policy, error_tracker, parent_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -143,8 +143,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
-            if xmlstore.eager:
-                descriptor.get_children()
+            for child in descriptor.get_children():
+                parent_tracker.add_parent(child.location, descriptor.location)
             return descriptor
 
         render_template = lambda: ''
@@ -160,12 +160,51 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                                   error_tracker, process_xml, policy, **kwargs)
 
 
+class ParentTracker(object):
+    """A simple class to factor out the logic for tracking location parent pointers."""
+    def __init__(self):
+        """
+        Init
+        """
+        # location -> set(parents).  Not using defaultdict because we care about the empty case.
+        self._parents = dict()
+
+    def add_parent(self, child, parent):
+        """
+        Add a parent of child location to the set of parents.  Duplicate calls have no effect.
+
+        child and parent must be something that can be passed to Location.
+        """
+        child = Location(child)
+        parent = Location(parent)
+        s = self._parents.setdefault(child, set())
+        s.add(parent)
+
+    def is_known(self, child):
+        """
+        returns True iff child has some parents.
+        """
+        child = Location(child)
+        return child in self._parents
+
+    def make_known(self, location):
+        """Tell the parent tracker about an object, without registering any
+        parents for it.  Used for the top level course descriptor locations."""
+        self._parents.setdefault(location, set())
+
+    def parents(self, child):
+        """
+        Return a list of the parents of this child.  If not is_known(child), will throw a KeyError
+        """
+        child = Location(child)
+        return list(self._parents[child])
+
+
 class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, eager=False,
-                 course_dirs=None):
+    def __init__(self, data_dir, default_class=None, course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -174,15 +213,11 @@ class XMLModuleStore(ModuleStoreBase):
         default_class: dot-separated string defining the default descriptor
             class to use if none is specified in entry_points
 
-        eager: If true, load the modules children immediately to force the
-            entire course tree to be parsed
-
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
         ModuleStoreBase.__init__(self)
 
-        self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
@@ -195,10 +230,7 @@ class XMLModuleStore(ModuleStoreBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        # TODO (cpennington): We need a better way of selecting specific sets of
-        # debug messages to enable. These were drowning out important messages
-        #log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
-        #log.debug('default_class = %s' % self.default_class)
+        self.parent_tracker = ParentTracker()
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -230,6 +262,7 @@ class XMLModuleStore(ModuleStoreBase):
         if course_descriptor is not None:
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
+            self.parent_tracker.make_known(course_descriptor.location)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -348,7 +381,7 @@ class XMLModuleStore(ModuleStoreBase):
 
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
-            system = ImportSystem(self, course_id, course_dir, policy, tracker)
+            system = ImportSystem(self, course_id, course_dir, policy, tracker, self.parent_tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
 
@@ -459,3 +492,19 @@ class XMLModuleStore(ModuleStoreBase):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError("XMLModuleStores are read-only")
+
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
+
+        If there is no data at location in this modulestore, raise
+            ItemNotFoundError.
+
+        returns an iterable of things that can be passed to Location.  This may
+        be empty if there are no parents.
+        '''
+        location = Location.ensure_fully_specified(location)
+        if not self.parent_tracker.is_known(location):
+            raise ItemNotFoundError(location)
+
+        return self.parent_tracker.parents(location)
