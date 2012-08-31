@@ -98,7 +98,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
                                  'url_name': section.url_name,
                                  'format': section.metadata.get('format', ''),
                                  'due': section.metadata.get('due', ''),
-                                 'active': active})
+                                 'active': active,
+                                 'graded': section.metadata.get('graded', False),
+                                 })
 
         chapters.append({'display_name': chapter.display_name,
                          'url_name': chapter.url_name,
