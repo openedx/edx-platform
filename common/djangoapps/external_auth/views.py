@@ -244,7 +244,8 @@ def ssl_login(request):
             # try the direct apache2 SSL key
             cert = request._req.subprocess_env.get(certkey, '')
         except Exception:
-            pass
+            cert = None
+
     if not cert:
         # no certificate information - go onward to main index
         return student_views.index(request)
