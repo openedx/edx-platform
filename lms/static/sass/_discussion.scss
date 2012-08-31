@@ -742,7 +742,6 @@ body.discussion {
     }
 
     .posted-details {
-      margin-left: 8px;
       font-size: 12px;
       font-style: italic;
       color: #888;
@@ -940,6 +939,10 @@ body.discussion {
       font-style: normal;   
       color: white;   
       text-transform: uppercase;
+    }
+
+    .posted-details {
+      margin-left: 8px;
     }
   }
 
