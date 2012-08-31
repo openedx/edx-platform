@@ -7,26 +7,28 @@
 
   <span id="answer_${id}"></span>
 
-  % if state == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct':
-  <span class="correct" id="status_${id}"></span>
-  % elif state == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
-  % elif state == 'queued':
-  <span class="processing" id="status_${id}"></span>
-  <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
-  % endif
-  % if hidden:
-  <div style="display:none;" name="${hidden}" inputid="input_${id}" />
-  % endif
-  <br/>
-  <span style="display:none;" class="debug">(${state})</span>
-  <br/>
-  <span class="message">${msg|n}</span>
-  <br/>
+  <div class="grader-status">
+    % if state == 'unsubmitted':
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+    % elif state == 'correct':
+      <span class="correct" id="status_${id}">Correct</span>
+    % elif state == 'incorrect':
+      <span class="incorrect" id="status_${id}">Incorrect</span>
+    % elif state == 'queued':
+      <span class="processing" id="status_${id}">Queued</span>
+      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+    % endif
 
-  <br/>
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+
+    <p class="debug">${state}</p>
+  </div>
+
+  <div class="external-grader-message">
+    ${msg|n}
+  </div>
 
   <script>
     // Note: We need to make the area follow the CodeMirror for this to work.
@@ -45,12 +47,4 @@
       });
     });
   </script>
-  <style type="text/css">
-    .CodeMirror {
-        border: 1px solid black;
-        font-size: 14px;
-        line-height: 18px;
-        resize: both;
-    }
-  </style>
 </section>

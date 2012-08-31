@@ -16,6 +16,7 @@ h2 {
   }
 }
 
+
 section.problem {
   @media print {
     display: block;
@@ -171,7 +172,53 @@ section.problem {
         top: 6px;
       }
     }
+
+    .grader-status {
+      padding: 9px;
+      background: #F6F6F6;
+      border: 1px solid #ddd;
+      border-top: 0;
+      margin-bottom: 20px;
+      @include clearfix;
+
+      span {
+        text-indent: -9999px;
+        overflow: hidden;
+        display: block;
+        float: left;
+        margin: -7px 7px 0 0;
+      }
+
+      p {
+        line-height: 20px;
+        text-transform: capitalize;
+        margin-bottom: 0;
+        float: left;
+      }
+
+      &.file {
+        background: #FFF;
+        margin-top: 20px;
+        padding: 20px 0 0 0;
+
+        border: {
+          top: 1px solid #eee;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+
+        p.debug {
+          display: none;
+        }
+
+        input {
+          float: left;
+        }
+      }
+    }
   }
+
 
   ul {
     list-style: disc outside none;
@@ -246,6 +293,69 @@ section.problem {
 
   }
 
+  code {
+    margin: 0 2px;
+    padding: 0px 5px;
+    white-space: nowrap;
+    border: 1px solid #EAEAEA;
+    background-color: #F8F8F8;
+    @include border-radius(3px);
+    font-size: .9em;
+  }
+
+  pre {
+    background-color: #F8F8F8;
+    border: 1px solid #CCC;
+    font-size: .9em;
+    line-height: 1.4;
+    overflow: auto;
+    padding: 6px 10px;
+    @include border-radius(3px);
+
+    > code {
+      margin: 0;
+      padding: 0;
+      white-space: pre;
+      border: none;
+      background: transparent;
+    }
+  }
+
+  .CodeMirror {
+    border: 1px solid black;
+    font-size: 14px;
+    line-height: 18px;
+    resize: both;
+
+    pre {
+      @include border-radius(0);
+      border-radius: 0;
+      border-width: 0;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      white-space: pre;
+      word-wrap: normal;
+      overflow: hidden;
+      resize: none;
+
+      &.CodeMirror-cursor {
+        z-index: 10;
+        position: absolute;
+        visibility: hidden;
+        border-left: 1px solid black;
+        border-right: none;
+        width: 0;
+      }
+    }
+  }
+
+  .CodeMirror-focused pre.CodeMirror-cursor {
+    visibility: visible;
+  }
+
   hr {
     background: #ddd;
     border: none;
@@ -278,6 +388,98 @@ section.problem {
   section.action {
     input.save {
       @extend .blue-button;
+    }
+  }
+
+  div.capa_alert {
+    padding: 8px 12px;
+    border: 1px solid #EBE8BF;
+    border-radius: 3px;
+    background: #FFFCDD;
+    font-size: 0.9em;
+    margin-top: 10px;
+  }
+
+  .hints {
+    border: 1px solid #ccc;
+
+    h3 {
+      border-bottom: 1px solid #e3e3e3;
+      text-shadow: 0 1px 0 #fff;
+      padding: 9px;
+      background: #eee;
+      font-weight: bold;
+      font-size: em(16);
+    }
+
+    div {
+      border-bottom: 1px solid #ddd;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      p {
+        margin-bottom: 0;
+      }
+
+      header {
+        a {
+          display: block;
+          padding: 9px;
+          background: #F6F6F6;
+          @include box-shadow(inset 0 0 0 1px #fff);
+        }
+      }
+
+      section {
+        padding: 9px;
+      }
+    }
+  }
+
+  .test {
+    padding-top: 18px;
+
+    header {
+      margin-bottom: 12px;
+
+      h3 {
+        font-size: 0.9em;
+        font-weight: bold;
+        font-style: normal;
+        text-transform: uppercase;
+        color: #AAA;
+      }
+    }
+
+    > section {
+      border: 1px solid #ddd;
+      padding: 9px 9px 20px;
+      margin-bottom: 10px;
+      background: #FFF;
+      position: relative;
+      @include box-shadow(inset 0 0 0 1px #eee);
+      @include border-radius(3px);
+
+      p:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .shortform {
+        margin-bottom: .6em;
+      }
+
+      a.full {
+        @include position(absolute,  0 0 1px 0px);
+        font-size: .8em;
+        padding: 4px;
+        text-align: right;
+        width: 100%;
+        display: block;
+        background: #F3F3F3;
+        @include box-sizing(border-box);
+      }
     }
   }
 }

@@ -32,3 +32,27 @@
   </section>
 </section>
 
+<%block name="js_extra">
+<script type="text/javascript" charset="utf-8">
+  $(function(){
+      // this should be brought back into problems
+      $('.longform').hide();
+      $('.shortform').append('<a href="#" class="full">See full output</a>');
+
+      $('.full').click(function() {
+        $(this).parent().siblings().slideToggle();
+        $(this).parent().parent().toggleClass('open');
+        var text = $(this).text() == 'See full output' ? 'Hide output' : 'See full output';
+        $(this).text(text);
+        return false;
+      });
+
+      $('.collapsible section').hide()
+      $('.collapsible header a').click(function() {
+        $(this).parent().siblings().slideToggle();
+        $(this).parent().parent().toggleClass('open');
+        return false
+      });
+    });
+</script>
+</%block>
