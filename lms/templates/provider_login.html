@@ -1,0 +1,52 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="headextra">
+<style type="text/css">
+.openid-login {
+    display: block;
+    position: relative;
+    left: 0;
+    margin: 100px auto;
+    top: 0;
+    z-index: 200;
+}
+
+.openid-login input[type=submit] {
+    white-space: normal;
+    height: auto !important;
+}
+
+#lean_overlay {
+  display: block;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  z-index: 100;
+  width:100%;
+  height:100%;
+}
+</style>
+</%block>
+
+<section id="login-modal" class="modal login-modal openid-login">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Log In</h2>
+      <hr>
+    </header>
+    <form id="login_form" class="login_form" method="post" action="/openid/provider/login/">
+%if error:
+      <div id="login_error" class="modal-form-error" style="display: block;">Email or password is incorrect.</div>
+%endif
+      <label>E-mail</label>
+      <input type="text" name="email" placeholder="E-mail" tabindex="1" />
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Password" tabindex="2" />
+      <div class="submit">
+        <input name="submit" type="submit" value="Access My Courses and Return To ${return_to}" tabindex="3" />
+      </div>
+    </form>
+  </div>
+</section>
+<div id="lean_overlay"></div>

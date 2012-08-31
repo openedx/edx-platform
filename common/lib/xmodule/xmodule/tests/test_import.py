@@ -193,7 +193,7 @@ class ImportTestCase(unittest.TestCase):
         """Make sure that metadata is inherited properly"""
 
         print "Starting import"
-        initial_import = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+        initial_import = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -216,7 +216,7 @@ class ImportTestCase(unittest.TestCase):
         def get_course(name):
             print "Importing {0}".format(name)
 
-            modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=[name])
+            modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
             courses = modulestore.get_courses()
             self.assertEquals(len(courses), 1)
             return courses[0]
@@ -245,7 +245,7 @@ class ImportTestCase(unittest.TestCase):
         happen--locations should uniquely name definitions.  But in
         our imperfect XML world, it can (and likely will) happen."""
 
-        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy', 'two_toys'])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'two_toys'])
 
         toy_id = "edX/toy/2012_Fall"
         two_toy_id = "edX/toy/TT_2012_Fall"
@@ -261,7 +261,7 @@ class ImportTestCase(unittest.TestCase):
         """Ensure that colons in url_names convert to file paths properly"""
 
         print "Starting import"
-        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)

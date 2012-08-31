@@ -37,7 +37,7 @@ def clean_out_mako_templating(xml_string):
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 policy, error_tracker, **kwargs):
+                 policy, error_tracker, parent_tracker, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -79,11 +79,12 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                             del attr[key]
                         break
 
-                def fallback_name():
+                def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
-                    # use the hash of the content--the first 12 bytes should be plenty.
-                    return tag + "_" + hashlib.sha1(xml).hexdigest()[:12]
+                    # append the hash of the content--the first 12 bytes should be plenty.
+                    orig_name = "_" + orig_name if orig_name is not None else ""
+                    return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
@@ -93,8 +94,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     need_uniq_names = ('problem', 'sequence', 'video', 'course', 'chapter')
 
                     if tag in need_uniq_names:
-                        error_tracker("ERROR: no name of any kind specified for {tag}.  Student "
-                                      "state won't work right.  Problem xml: '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      "state will not be properly tracked for this module.  Problem xml:"
+                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -103,13 +105,20 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # Make sure everything is unique
                 if url_name in self.used_names[tag]:
-                    msg = ("Non-unique url_name in xml.  This may break content.  url_name={0}.  Content={1}"
-                                .format(url_name, xml[:100]))
-                    error_tracker("ERROR: " + msg)
+                    msg = ("Non-unique url_name in xml.  This may break state tracking for content."
+                           "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                    error_tracker("PROBLEM: " + msg)
                     log.warning(msg)
                     # Just set name to fallback_name--if there are multiple things with the same fallback name,
                     # they are actually identical, so it's fragile, but not immediately broken.
-                    url_name = fallback_name()
+
+                    # TODO (vshnayder): if the tag is a pointer tag, this will
+                    # break the content because we won't have the right link.
+                    # That's also a legitimate attempt to reuse the same content
+                    # from multiple places.  Once we actually allow that, we'll
+                    # need to update this to complain about non-unique names for
+                    # definitions, but allow multiple uses.
+                    url_name = fallback_name(url_name)
 
                 self.used_names[tag].add(url_name)
                 xml_data.set('url_name', url_name)
@@ -134,8 +143,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
-            if xmlstore.eager:
-                descriptor.get_children()
+            for child in descriptor.get_children():
+                parent_tracker.add_parent(child.location, descriptor.location)
             return descriptor
 
         render_template = lambda: ''
@@ -151,12 +160,51 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                                   error_tracker, process_xml, policy, **kwargs)
 
 
+class ParentTracker(object):
+    """A simple class to factor out the logic for tracking location parent pointers."""
+    def __init__(self):
+        """
+        Init
+        """
+        # location -> set(parents).  Not using defaultdict because we care about the empty case.
+        self._parents = dict()
+
+    def add_parent(self, child, parent):
+        """
+        Add a parent of child location to the set of parents.  Duplicate calls have no effect.
+
+        child and parent must be something that can be passed to Location.
+        """
+        child = Location(child)
+        parent = Location(parent)
+        s = self._parents.setdefault(child, set())
+        s.add(parent)
+
+    def is_known(self, child):
+        """
+        returns True iff child has some parents.
+        """
+        child = Location(child)
+        return child in self._parents
+
+    def make_known(self, location):
+        """Tell the parent tracker about an object, without registering any
+        parents for it.  Used for the top level course descriptor locations."""
+        self._parents.setdefault(location, set())
+
+    def parents(self, child):
+        """
+        Return a list of the parents of this child.  If not is_known(child), will throw a KeyError
+        """
+        child = Location(child)
+        return list(self._parents[child])
+
+
 class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, eager=False,
-                 course_dirs=None):
+    def __init__(self, data_dir, default_class=None, course_dirs=None):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -165,15 +213,11 @@ class XMLModuleStore(ModuleStoreBase):
         default_class: dot-separated string defining the default descriptor
             class to use if none is specified in entry_points
 
-        eager: If true, load the modules children immediately to force the
-            entire course tree to be parsed
-
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
         ModuleStoreBase.__init__(self)
 
-        self.eager = eager
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
@@ -186,10 +230,7 @@ class XMLModuleStore(ModuleStoreBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        # TODO (cpennington): We need a better way of selecting specific sets of
-        # debug messages to enable. These were drowning out important messages
-        #log.debug('XMLModuleStore: eager=%s, data_dir = %s' % (eager, self.data_dir))
-        #log.debug('default_class = %s' % self.default_class)
+        self.parent_tracker = ParentTracker()
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -221,6 +262,7 @@ class XMLModuleStore(ModuleStoreBase):
         if course_descriptor is not None:
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
+            self.parent_tracker.make_known(course_descriptor.location)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -339,7 +381,7 @@ class XMLModuleStore(ModuleStoreBase):
 
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
-            system = ImportSystem(self, course_id, course_dir, policy, tracker)
+            system = ImportSystem(self, course_id, course_dir, policy, tracker, self.parent_tracker)
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
 
@@ -450,3 +492,19 @@ class XMLModuleStore(ModuleStoreBase):
         metadata: A nested dictionary of module metadata
         """
         raise NotImplementedError("XMLModuleStores are read-only")
+
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
+
+        If there is no data at location in this modulestore, raise
+            ItemNotFoundError.
+
+        returns an iterable of things that can be passed to Location.  This may
+        be empty if there are no parents.
+        '''
+        location = Location.ensure_fully_specified(location)
+        if not self.parent_tracker.is_known(location):
+            raise ItemNotFoundError(location)
+
+        return self.parent_tracker.parents(location)

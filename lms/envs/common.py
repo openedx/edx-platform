@@ -77,7 +77,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
-
+    'AUTH_USE_OPENID_PROVIDER': False,
 }
 
 # Used for A/B testing
@@ -119,6 +119,10 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
               system_node_path
               ]
 NODE_PATH = ':'.join(node_paths)
+
+
+############################ OpenID Provider  ##################################
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -219,7 +223,6 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }
