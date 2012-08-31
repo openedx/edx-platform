@@ -66,7 +66,8 @@ def default_render_failure(request,
 
 def generate_password(length=12, chars=string.letters + string.digits):
     """Generate internal password for externally authenticated user"""
-    return ''.join([random.choice(chars) for i in range(length)])
+    choice = random.SystemRandom().choice
+    return ''.join([choice(chars) for i in range(length)])
 
 
 @csrf_exempt
