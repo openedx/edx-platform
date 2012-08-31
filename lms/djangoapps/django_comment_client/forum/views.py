@@ -71,6 +71,16 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
+    if discussion_type != 'inline':
+        course = get_course_with_access(request.user, course_id, 'load')
+
+        for thread in threads:
+            courseware_context = get_courseware_context(thread, course)
+            if courseware_context:
+                thread['courseware_location']  = courseware_context['courseware_location']
+                thread['courseware_title']  = courseware_context['courseware_title']
+
+
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
@@ -99,8 +109,6 @@ def render_user_discussion(*args, **kwargs):
 
 def get_threads(request, course_id, discussion_id=None):
 
-    course = get_course_with_access(request.user, course_id, 'load')
-
     default_query_params = {
         'page': 1,
         'per_page': THREADS_PER_PAGE,
@@ -116,13 +124,6 @@ def get_threads(request, course_id, discussion_id=None):
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
-
-    for thread in threads:
-        courseware_context = get_courseware_context(thread, course)
-        if courseware_context:
-            thread['courseware_location']  = courseware_context['courseware_location']
-            thread['courseware_title']  = courseware_context['courseware_title']
-
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
