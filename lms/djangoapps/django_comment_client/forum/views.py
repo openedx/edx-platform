@@ -114,7 +114,8 @@ def get_threads(request, course_id, discussion_id=None):
         # If the user did not select a sort key, use their last used sort key
         user = cc.User.from_django_user(request.user)
         user.retrieve()
-        default_query_params['sort_key'] = user.default_sort_key
+        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
+        default_query_params['sort_key'] = user.get('default_sort_key') or default_query_params['sort_key']
     else:
         # If the user clicked a sort key, update their default sort key
         user = cc.User.from_django_user(request.user)
