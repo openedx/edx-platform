@@ -5,8 +5,6 @@ import itertools
 
 from functools import partial
 
-from functools import partial
-
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -152,7 +150,7 @@ def index(request, course_id, chapter=None, section=None,
                     course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id)
+                                    student_module_cache, course_id, position)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -196,7 +194,7 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
-def jump_to(request, location):
+def jump_to(request, course_id, location):
     '''
     Show the page that contains a specific location.
 
@@ -213,15 +211,18 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
     # Rely on index to do all error handling and access control.
-    return index(request, course_id, chapter, section, position)
-
+    return redirect('courseware_position',
+                    course_id=course_id, 
+                    chapter=chapter, 
+                    section=section, 
+                    position=position)
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """

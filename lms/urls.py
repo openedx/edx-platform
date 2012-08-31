@@ -98,8 +98,9 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
+            'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
@@ -142,6 +143,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$',
+            'courseware.views.index', name="courseware_position"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
             'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -164,7 +167,7 @@ if settings.COURSEWARE_ENABLED:
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
 
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
