@@ -145,7 +145,7 @@ def forum_form_discussion(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     threads, query_params = get_threads(request, course_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
-
+    user_info = cc.User.from_django_user(request.user).to_dict()
     if request.is_ajax():
         return utils.JsonResponse({
             'html': content,
@@ -168,7 +168,9 @@ def forum_form_discussion(request, course_id):
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
-            'threads': threads,
+            'threads': json.dumps(threads),
+            'course_id': course.id,
+            'user_info': json.dumps(user_info),
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
