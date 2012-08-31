@@ -19,9 +19,9 @@ import urllib
 import pystache_custom as pystache
 
 
+# TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
 _DISCUSSIONINFO = None
-
 
 
 def extract(dic, keys):
@@ -67,6 +67,16 @@ def get_discussion_category_map(course):
         initialize_discussion_info(course)
     return _DISCUSSIONINFO['category_map']
 
+def sort_map_entries(category_map):
+    things = []
+    for title, entry in category_map["entries"].items():
+        things.append((title, entry))
+    for title, category in category_map["subcategories"].items():
+        things.append((title, category))
+        sort_map_entries(category_map["subcategories"][title])
+    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+
+
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
@@ -110,15 +120,6 @@ def initialize_discussion_info(course):
         for entry in entries:
             node[level]["entries"][entry["title"]] = {"id": entry["id"], 
                                                       "sort_key": entry["sort_key"]}
-
-    def sort_map_entries(map):
-        things = []
-        for title, entry in map["entries"].items():
-            things.append((title, entry))
-        for title, category in map["subcategories"].items():
-            things.append((title, category))
-            sort_map_entries(map["subcategories"][title])
-        map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
     sort_map_entries(category_map)
 
