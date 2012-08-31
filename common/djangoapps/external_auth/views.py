@@ -353,39 +353,36 @@ def validate_trust_root(openid_request):
 
     trusted_roots = getattr(settings, 'OPENID_PROVIDER_TRUSTED_ROOT', None)
 
-    if trusted_roots is None:
-        log.debug('not using trusted roots')
+    if not trusted_roots:
         # not using trusted roots
         return True
 
-    log.debug('validating trusted roots')
-
     # don't allow empty trust roots
     if (not hasattr(openid_request, 'trust_root') or
-            openid_request.trust_root is None):
-        log.debug('no trust_root')
+            not openid_request.trust_root):
+        log.error('no trust_root')
         return False
 
     # ensure trust root parses cleanly (one wildcard, of form *.foo.com, etc.)
     trust_root = TrustRoot.parse(openid_request.trust_root)
-    if trust_root is None:
-        log.debug('invalid trust_root')
+    if not trust_root:
+        log.error('invalid trust_root')
         return False
 
     # don't allow empty return tos
     if (not hasattr(openid_request, 'return_to') or
-            openid_request.return_to is None):
-        log.debug('empty return_to')
+            not openid_request.return_to):
+        log.error('empty return_to')
         return False
 
     # ensure return to is within trust root
     if not trust_root.validateURL(openid_request.return_to):
-        log.debug('invalid return_to')
+        log.error('invalid return_to')
         return False
 
     # check that the root matches the ones we trust
     if not any(r for r in trusted_roots if fnmatch.fnmatch(trust_root, r)):
-        log.debug('non-trusted root')
+        log.error('non-trusted root')
         return False
 
     return True
