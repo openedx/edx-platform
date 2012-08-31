@@ -1,4 +1,4 @@
-from collections import defaultdict 
+from collections import defaultdict
 from importlib import import_module
 from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
@@ -24,7 +24,6 @@ import pystache_custom as pystache
 # TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
 _DISCUSSIONINFO = None
-
 
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
@@ -55,11 +54,11 @@ def get_discussion_id_map(course):
         initialize_discussion_info(course)
     return _DISCUSSIONINFO['id_map']
 
-def get_discussion_title(request, course, discussion_id):
+def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO:
         initialize_discussion_info(course)
-    title = _DISCUSSIONINFO['id_map'].get(discussion_id, {}).get('title', '(no title)')
+    title = _DISCUSSIONINFO['by_id'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 def get_discussion_category_map(course):
@@ -68,16 +67,6 @@ def get_discussion_category_map(course):
     if not _DISCUSSIONINFO:
         initialize_discussion_info(course)
     return _DISCUSSIONINFO['category_map']
-
-def sort_map_entries(category_map):
-    things = []
-    for title, entry in category_map["entries"].items():
-        things.append((title, entry))
-    for title, category in category_map["subcategories"].items():
-        things.append((title, category))
-        sort_map_entries(category_map["subcategories"][title])
-    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
-
 
 def initialize_discussion_info(course):
 
@@ -123,13 +112,40 @@ def initialize_discussion_info(course):
             node[level]["entries"][entry["title"]] = {"id": entry["id"], 
                                                       "sort_key": entry["sort_key"]}
 
+<<<<<<< HEAD
     sort_map_entries(category_map)
+=======
+    def sort_map_entries(map):
+        things = []
+        for title, entry in map["entries"].items():
+            things.append((title, entry))
+        for title, category in map["subcategories"].items():
+            things.append((title, category))
+            sort_map_entries(map["subcategories"][title])
+        map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+
+    sort_map_entries(category_map)
+    #for level in category_map["subcategories"].values():
+    #    sort_map_entries(level)
+>>>>>>> populate dropdown
 
     _DISCUSSIONINFO = {}
 
     _DISCUSSIONINFO['id_map'] = discussion_id_map
+<<<<<<< HEAD
 
     _DISCUSSIONINFO['category_map'] = category_map
+=======
+
+    _DISCUSSIONINFO['category_map'] = category_map
+
+    # TODO delete me when you've used me
+    #_DISCUSSIONINFO['categorized']['General'] = [{
+    #    'title': 'General',
+    #    'discussion_id': url_course_id,
+    #    'category': 'General',
+    #}]
+>>>>>>> populate dropdown
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
