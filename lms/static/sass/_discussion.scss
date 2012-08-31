@@ -92,7 +92,7 @@ body.discussion {
         text-shadow: none;
       }
 
-      .topic-drop {
+      .form-topic-drop {
         position: relative;
 
         ul {
@@ -102,7 +102,7 @@ body.discussion {
         }
       }
 
-      .topic-drop-btn {
+      .form-topic-drop-btn {
         position: relative;
         z-index: 10000;
         @include white-button;
@@ -117,7 +117,7 @@ body.discussion {
         }
       }
 
-      .topic-drop-menu {
+      .form-topic-drop-menu-wrapper {
         display: none;
         position: absolute;
         top: 40px;
@@ -128,6 +128,11 @@ body.discussion {
         background: #737373;
         border: 1px solid #333;
         box-shadow: 0 2px 50px rgba(0, 0, 0, .4);
+      }
+
+      .form-topic-drop-menu {
+        max-height: 400px;
+        overflow-y: scroll;
 
         a {
           display: block;
@@ -155,6 +160,25 @@ body.discussion {
             background: url(../images/nested-icon.png) no-repeat 41px 10px;
           }
         }
+      }
+
+      .form-topic-drop-search {
+        padding: 10px;
+      }
+
+      .form-topic-drop-search-input {
+        width: 100%;
+        height: 30px;
+        padding: 0 15px;
+        box-sizing: border-box;   
+        border-radius: 30px;
+        border: 1px solid #333;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .25) inset;
+        background: -webkit-linear-gradient(top, #eee, #fff);
+        font-size: 11px;
+        line-height: 16px;
+        color: #333;
+        outline: 0;
       }
     }
 
@@ -330,16 +354,16 @@ body.discussion {
       box-shadow: -1px 0 0 #aaa inset;
 
       &.is-open {
-        .board-drop-btn span {
+        .browse-topic-drop-btn span {
           opacity: 1;
         }
 
-        .board-drop-icon {
+        .browse-topic-drop-icon {
           opacity: 0;
         }
 
         &.is-dropped {
-          .board-drop-btn {
+          .browse-topic-drop-btn {
 
             span {
               color: #fff;
@@ -352,13 +376,13 @@ body.discussion {
       }
 
       &.is-dropped {
-        .board-drop-btn {
+        .browse-topic-drop-btn {
           background-color: #616161;
         }
       }
 
       &.is-dropped {
-        .board-drop-icon {
+        .browse-topic-drop-icon {
           background-position: 0 -16px;
         }
       }
@@ -388,7 +412,7 @@ body.discussion {
       }
     }
 
-    .board-drop-btn {
+    .browse-topic-drop-btn {
       display: block;
       position: absolute;
       top: -1px;
@@ -417,7 +441,7 @@ body.discussion {
       }
     }
 
-    .board-drop-icon {
+    .browse-topic-drop-icon {
       display: block;
       position: absolute;
       top: 21px;
@@ -428,10 +452,10 @@ body.discussion {
       margin-left: -12px;
       background: url(../images/browse-icon.png) no-repeat;
       opacity: 1;
-      @include transition(opacity .2s);
+      @include transition(none);
     }
 
-    .board-drop-menu {
+    .browse-topic-drop-menu-wrapper {
       display: none;
       position: absolute;
       top: 60px;
@@ -441,6 +465,11 @@ body.discussion {
       background: #737373;
       border: 1px solid #4b4b4b;
       border-radius: 0 0 3px 3px;
+
+      .browse-topic-drop-menu {
+        max-height: 400px;
+        overflow-y: scroll;
+      }
 
       > li:first-child a {
         border-top: none;
@@ -484,6 +513,25 @@ body.discussion {
           background: url(../images/nested-icon.png) no-repeat 46px 14px;
         }
       }
+    }
+
+    .browse-topic-drop-search {
+      padding: 10px;
+    }
+
+    .browse-topic-drop-search-input {
+      width: 100%;
+      height: 30px;
+      padding: 0 15px;
+      box-sizing: border-box;   
+      border-radius: 30px;
+      border: 1px solid #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .25) inset;
+      background: -webkit-linear-gradient(top, #eee, #fff);
+      font-size: 11px;
+      line-height: 16px;
+      color: #333;
+      outline: 0;
     }
 
     .post-search {

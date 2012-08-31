@@ -21,6 +21,11 @@
     </li>
 </%def>
 
-<ul class="board-drop-menu">
-    ${render_dropdown(category_map)}
-</ul>
+<div class="browse-topic-drop-menu-wrapper">
+    <div class="browse-topic-drop-search">
+        <input type="text" class="browse-topic-drop-search-input" placeholder="filter topics">
+    </div>
+    <ul class="browse-topic-drop-menu">        
+        ${render_dropdown(category_map)}
+    </ul>
+</div>
