@@ -43,7 +43,8 @@ def get_full_modules():
         class_path = settings.MODULESTORE['default']['ENGINE']
         module_path, _, class_name = class_path.rpartition('.')
         class_ = getattr(import_module(module_path), class_name)
-        modulestore = class_(**dict(settings.MODULESTORE['default']['OPTIONS'].items() + [('eager', True)]))
+        # TODO (vshnayder): wth is this doing???
+        modulestore = class_(**dict(settings.MODULESTORE['default']['OPTIONS'].items()))
         _FULLMODULES = modulestore.modules
     return _FULLMODULES
 
@@ -76,7 +77,7 @@ def initialize_discussion_info(request, course):
 
     _is_course_discussion = lambda x: x[0].dict()['category'] == 'discussion' \
                          and x[0].dict()['course'] == course_name
-    
+
     _get_module_descriptor = operator.itemgetter(1)
 
     def _get_module(module_descriptor):
@@ -135,8 +136,8 @@ class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
-class ViewNameMiddleware(object):  
-    def process_view(self, request, view_func, view_args, view_kwargs):  
+class ViewNameMiddleware(object):
+    def process_view(self, request, view_func, view_args, view_kwargs):
         request.view_name = view_func.__name__
 
 class QueryCountDebugMiddleware(object):
