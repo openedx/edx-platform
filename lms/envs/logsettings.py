@@ -43,8 +43,8 @@ def get_logger_config(log_dir,
             'standard': {
                 'format': '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
             },
-            'syslog_format': {'format': syslog_format ,}
-            'raw': {'format': '%(message)s'},
+            'syslog_format': {'format': syslog_format },
+            'raw': {'format': '%(message)s' },
         },
         'handlers': {
             'console': {
