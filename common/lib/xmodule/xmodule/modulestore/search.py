@@ -92,10 +92,18 @@ def path_to_location(modulestore, course_id, location):
     section = path[2].name if n > 2 else None
     # Figure out the position
     position = None
+
+    # This block of code will find the position of a module within a nested tree
+    # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
+    # sequence, the resulting position is 3_2. However, no positional modules
+    # (e.g. sequential and videosequence) currently deal with this form of
+    # representing nested positions. This needs to happen before jumping to a
+    # module nested in more than one positional module will work.
     if n > 3:
         position_list = []
         for path_index in range(2, n-1):
-            if path[path_index].category == 'sequential':
+            category = path[path_index].category
+            if  category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_instance(course_id, path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
