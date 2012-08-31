@@ -57,7 +57,6 @@ def import_with_checks(course_dir, verbose=True):
     # module.
     modulestore = XMLModuleStore(data_dir,
                    default_class=None,
-                   eager=True,
                    course_dirs=course_dirs)
 
     def str_of_err(tpl):

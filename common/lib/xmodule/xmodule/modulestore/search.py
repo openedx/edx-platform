@@ -6,15 +6,14 @@ from .exceptions import (ItemNotFoundError, NoPathToItem)
 from . import ModuleStore, Location
 
 
-def path_to_location(modulestore, location, course_name=None):
+def path_to_location(modulestore, course_id, location):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
     chapter, but any kind of module can be a "section".
 
     location: something that can be passed to Location
-    course_name: [optional].  If not None, restrict search to paths
-        in that course.
+    course_id: Search for paths in this course.
 
     raise ItemNotFoundError if the location doesn't exist.
 
@@ -27,7 +26,7 @@ def path_to_location(modulestore, location, course_name=None):
     A location may be accessible via many paths. This method may
     return any valid path.
 
-    If the section is a sequence, position will be the position
+    If the section is a sequential or vertical, position will be the position
     of this location in that sequence.  Otherwise, position will
     be None. TODO (vshnayder): Not true yet.
     '''
@@ -41,7 +40,7 @@ def path_to_location(modulestore, location, course_name=None):
             xs = xs[1]
         return p
 
-    def find_path_to_course(location, course_name=None):
+    def find_path_to_course():
         '''Find a path up the location graph to a node with the
         specified category.
 
@@ -69,7 +68,8 @@ def path_to_location(modulestore, location, course_name=None):
 
             # print 'Processing loc={0}, path={1}'.format(loc, path)
             if loc.category == "course":
-                if course_name is None or course_name == loc.name:
+                # confirm that this is the right course
+                if course_id == CourseDescriptor.location_to_id(loc):
                     # Found it!
                     path = (loc, path)
                     return flatten(path)
@@ -81,17 +81,34 @@ def path_to_location(modulestore, location, course_name=None):
         # If we're here, there is no path
         return None
 
-    path = find_path_to_course(location, course_name)
+    path = find_path_to_course()
     if path is None:
-        raise(NoPathToItem(location))
+        raise NoPathToItem(location)
 
     n = len(path)
     course_id = CourseDescriptor.location_to_id(path[0])
     # pull out the location names
     chapter = path[1].name if n > 1 else None
     section = path[2].name if n > 2 else None
-
-    # TODO (vshnayder): not handling position at all yet...
+    # Figure out the position
     position = None
+
+    # This block of code will find the position of a module within a nested tree
+    # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
+    # sequence, the resulting position is 3_2. However, no positional modules
+    # (e.g. sequential and videosequence) currently deal with this form of
+    # representing nested positions. This needs to happen before jumping to a
+    # module nested in more than one positional module will work.
+    if n > 3:
+        position_list = []
+        for path_index in range(2, n-1):
+            category = path[path_index].category
+            if  category == 'sequential' or category == 'videosequence':
+                section_desc = modulestore.get_instance(course_id, path[path_index])
+                child_locs = [c.location for c in section_desc.get_children()]
+                # positions are 1-indexed, and should be strings to be consistent with
+                # url parsing.
+                position_list.append(str(child_locs.index(path[path_index+1]) + 1))
+        position = "_".join(position_list)
 
     return (course_id, chapter, section, position)
