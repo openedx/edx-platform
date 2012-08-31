@@ -453,37 +453,33 @@ section.problem {
       }
     }
 
-    .longform, .shortform {
+    > section {
       border: 1px solid #ddd;
-      padding: 9px;
+      padding: 9px 9px 20px;
       margin-bottom: 10px;
       background: #FFF;
+      position: relative;
       @include box-shadow(inset 0 0 0 1px #eee);
       @include border-radius(3px);
 
       p:last-of-type {
         margin-bottom: 0;
       }
-    }
 
-    a.full {
-      @include position(absolute,  0 0 1px 0px);
-      font-size: .8em;
-      padding: 4px;
-      text-align: right;
-      width: 100%;
-      display: block;
-      background: #F3F3F3;
-      @include box-sizing(border-box);
-    }
+      .shortform {
+        margin-bottom: .6em;
+      }
 
-    .longform {
-      position: relative;
-      padding-bottom: 20px;
-    }
-
-    .longform-header {
-      margin-bottom: .6em;
+      a.full {
+        @include position(absolute,  0 0 1px 0px);
+        font-size: .8em;
+        padding: 4px;
+        text-align: right;
+        width: 100%;
+        display: block;
+        background: #F3F3F3;
+        @include box-sizing(border-box);
+      }
     }
   }
 }
