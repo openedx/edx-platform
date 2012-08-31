@@ -13,6 +13,7 @@ from .logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
@@ -55,6 +56,7 @@ CACHES = {
     }
 }
 
+
 XQUEUE_INTERFACE = {
     "url": "https://sandbox-xqueue.edx.org",
     "django_auth": {
@@ -69,6 +71,7 @@ CACHE_TIMEOUT = 0
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 
 COURSE_LISTINGS = {
     'default': ['BerkeleyX/CS169.1x/2012_Fall',
@@ -85,6 +88,7 @@ COURSE_LISTINGS = {
     'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
 }
 
+
 SUBDOMAIN_BRANDING = {
     'sjsu': 'MITx',
     'mit': 'MITx',
@@ -93,6 +97,8 @@ SUBDOMAIN_BRANDING = {
 }
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
+
+
 
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
@@ -116,6 +122,7 @@ OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept m
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 ################################ MIT Certificates SSL Auth #################################
+
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
 ################################ DEBUG TOOLBAR #################################
