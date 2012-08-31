@@ -218,8 +218,11 @@ def jump_to(request, course_id, location):
         raise Http404("This location is not in any class: {0}".format(location))
 
     # Rely on index to do all error handling and access control.
-    return index(request, course_id, chapter, section, position)
-
+    return redirect('courseware_position',
+                    course_id=course_id, 
+                    chapter=chapter, 
+                    section=section, 
+                    position=position)
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
