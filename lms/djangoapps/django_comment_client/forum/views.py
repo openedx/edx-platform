@@ -13,7 +13,7 @@ from courseware.access import has_access
 from urllib import urlencode
 from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank
+from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank, get_courseware_context
 
 import json
 import django_comment_client.utils as utils
@@ -99,6 +99,8 @@ def render_user_discussion(*args, **kwargs):
 
 def get_threads(request, course_id, discussion_id=None):
 
+    course = get_course_with_access(request.user, course_id, 'load')
+
     default_query_params = {
         'page': 1,
         'per_page': THREADS_PER_PAGE,
@@ -114,6 +116,13 @@ def get_threads(request, course_id, discussion_id=None):
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
+
+    for thread in threads:
+        courseware_context = get_courseware_context(thread, course)
+        if courseware_context:
+            thread['courseware_location']  = courseware_context['courseware_location']
+            thread['courseware_title']  = courseware_context['courseware_title']
+
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
