@@ -2,8 +2,10 @@ class @DiscussionThreadListView extends Backbone.View
   template: _.template($("#thread-list-template").html())
   events:
     "click .search": "showSearch"
+    "click .browse": "toggleTopicDrop"
     "keyup .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
+    "click .board-drop-menu": "setTopic"
 
   render: ->
     @timer = 0;
@@ -32,9 +34,37 @@ class @DiscussionThreadListView extends Backbone.View
     @$("a[data-id='#{thread_id}']").addClass("active")
 
   showSearch: ->
-    @$(".search").addClass('is-open');
-    @$(".browse").removeClass('is-open');
+    @$(".search").addClass('is-open')
+    @$(".browse").removeClass('is-open')
     setTimeout (-> @$(".post-search-field").focus()), 200
+
+  toggleTopicDrop: =>
+    @$(".browse").toggleClass('is-dropped')
+    if @$(".browse").hasClass('is-dropped')
+      @$(".board-drop-menu").show()
+      setTimeout((=>
+        $("body").bind("click", @toggleTopicDrop)
+      ), 0)
+    else
+      @$(".board-drop-menu").hide()
+      $("body").unbind("click", @toggleTopicDrop)
+
+  setTopic: (e) ->
+    item = $(e.target).closest('a')
+    boardName = item.find(".board-name").html()
+    _.each item.parents('ul').not('.board-drop-menu'), (parent) ->
+      console.log(parent)
+      boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+    @$(".current-board").html(boardName)
+    fontSize = 16;
+    @$(".current-board").css('font-size', '16px');
+
+    while @$(".current-board").width() > (@$el.width() * .8) - 40
+      fontSize--;
+      if fontSize < 11
+        break;
+      @$(".current-board").css('font-size', fontSize + 'px');
+
 
   sortThreads: (event) ->
     @$(".sort-bar a").removeClass("active")
@@ -64,9 +94,7 @@ class @DiscussionThreadListView extends Backbone.View
         url: url
         type: "GET"
         success: (response, textStatus) =>
-          console.log textStatus
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
-            console.log(@collection)
 
     @delay(callback, 300)

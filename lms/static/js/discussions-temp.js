@@ -26,8 +26,8 @@ var SIDEBAR_HEADER_HEIGHT = 87;
 $(document).ready(function() {
 	$body = $('body');
 	$browse = $('.browse-search .browse');
-	// $search = $('.browse-search .search');
-	// $searchField = $('.post-search-field');
+	$search = $('.browse-search .search');
+	$searchField = $('.post-search-field');
 	$topicDrop = $('.board-drop-menu');
 	$currentBoard = $('.current-board');
 	$tooltip = $('<div class="tooltip"></div>');
@@ -43,7 +43,7 @@ $(document).ready(function() {
 	sidebarXOffset = $sidebar.offset().top;
 
 	$browse.bind('click', showTopicDrop);
-	// $search.bind('click', showSearch);
+	$search.bind('click', showSearch);
 	$topicDrop.bind('click', setTopic);
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
@@ -111,13 +111,13 @@ function showBrowse(e) {
 	$searchField.val('');
 }
 
-// function showSearch(e) {
-// 	$search.addClass('is-open');
-// 	$browse.removeClass('is-open');
-// 	setTimeout(function() {
-// 		$searchField.focus();
-// 	}, 200);
-// }
+function showSearch(e) {
+	$search.addClass('is-open');
+	$browse.removeClass('is-open');
+	setTimeout(function() {
+		$searchField.focus();
+	}, 200);
+}
 
 function showTopicDrop(e) {
 	e.preventDefault();
