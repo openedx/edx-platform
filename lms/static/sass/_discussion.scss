@@ -294,6 +294,30 @@ body.discussion {
 
 
 
+  .thread-tags {
+    margin-top: 20px;
+  }
+
+  .thread-tag {
+    padding: 3px 10px 6px;
+    border-radius: 3px;
+    color: #333;
+    background: #c5eeff;
+    border: 1px solid #90c4d7;
+    font-size: 13px;  
+  }
+
+  .thread-title {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 21px;
+    color: #333;
+    font-weight: 700;
+  }
+  
+
+
+
 
 
   section.user-profile {
@@ -673,6 +697,7 @@ body.discussion {
 
   .post-list-wrapper {
     overflow-y: scroll;
+    overflow-x: hidden;
     border-right: 1px solid transparent;
   }
 
@@ -685,6 +710,7 @@ body.discussion {
       height: 36px;
       padding: 0 10px;
       margin-bottom: 1px;
+      margin-right: -1px;
       @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
       background-color: #fff;
 
@@ -716,15 +742,13 @@ body.discussion {
       }
 
       &.followed:after {
-        content: '◥';
+        content: '';
         position: absolute;
-        top: -4px;
-        right: 0;
+        top: 0;
+        right: 1px;
         width: 10px;
-        height: 10px;
-        font-size: 10px;
-        color: #53bdfb;
-        text-align: right;
+        height: 12px;
+        background: url(../images/following-flag.png) no-repeat;
       }
 
       &.active {
@@ -742,12 +766,12 @@ body.discussion {
           color: #fff;
 
           &:after {
-            color: #4da7d3;
+            background-position: 0 0;
           }
         }
 
         &.followed:after {
-          color: #2d79aa;
+          background-position: 0 -12px;
         }
 
         &.resolved:before {
@@ -787,13 +811,15 @@ body.discussion {
       margin-left: 4px;
 
       &:after {
-        content: '◥';
+        content: '';
         display: block;
         position: absolute;
-        top: 11px;
+        top: 16px;
         right: 3px;
-        font-size: 6px;
-        color: #dfdfdf;
+        width: 5px;
+        height: 5px;
+        background: url(../images/comment-icon-bottoms.png) no-repeat;
+        background-position: 0 -5px;
       }
 
       &.new {
