@@ -321,7 +321,7 @@ def _has_staff_access_to_location(user, location):
         return True
 
     # If not global staff, is the user in the Auth group for this class?
-    user_groups = [x[1] for x in user.groups.values_list()]
+    user_groups = [g.name for g in user.groups.all()]
     staff_group = _course_staff_group_name(location)
     if staff_group in user_groups:
         debug("Allow: user in group %s", staff_group)
