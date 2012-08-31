@@ -291,6 +291,49 @@ body.discussion {
       }
     }
   }
+
+
+
+
+
+  section.user-profile {
+    @extend .sidebar;
+    display: table-cell;
+    @include border-radius(3px 0 0 3px);
+    border-right: 1px solid #ddd;
+    @include box-shadow(none);
+    background-color: $sidebar-color;
+
+    .user-profile {
+      padding: 32px 36px;
+    }
+
+    .sidebar-username {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .sidebar-user-roles {
+      margin-top: 6px;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .sidebar-threads-count {
+      margin-top: 14px;
+    }
+
+    .sidebar-threads-count span,
+    .sidebar-comments-count span {
+      font-weight: 700;
+    }
+
+    .sidebar-toggle-moderator-button {
+      @include blue-button;
+      text-align: center;
+      margin-top: 20px;
+    }
+  }
 }
 
 
