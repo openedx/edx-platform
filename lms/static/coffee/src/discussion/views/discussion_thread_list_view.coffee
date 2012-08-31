@@ -5,6 +5,7 @@ class @DiscussionThreadListView extends Backbone.View
     "click .browse": "toggleTopicDrop"
     "keyup .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
+    "click .board-drop-menu": "setTopic"
 
   render: ->
     @timer = 0;
@@ -47,6 +48,22 @@ class @DiscussionThreadListView extends Backbone.View
     else
       @$(".board-drop-menu").hide()
       $("body").unbind("click", @toggleTopicDrop)
+
+  setTopic: (e) ->
+    item = $(e.target).closest('a')
+    boardName = item.find(".board-name").html()
+    _.each item.parents('ul').not('.board-drop-menu'), (parent) ->
+      console.log(parent)
+      boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+    @$(".current-board").html(boardName)
+    fontSize = 16;
+    @$(".current-board").css('font-size', '16px');
+
+    while @$(".current-board").width() > (@$el.width() * .8) - 40
+      fontSize--;
+      if fontSize < 11
+        break;
+      @$(".current-board").css('font-size', fontSize + 'px');
 
 
   sortThreads: (event) ->
