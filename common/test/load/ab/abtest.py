@@ -96,12 +96,18 @@ def loadtest(args):
     server = args.server
     name = args.name
     ab_options = args.abopt if args.abopt else []
-    ab_options += ["-Aanant:agarwal"]
+    ab_options.append("-Aanant:agarwal")
+
+    cookies = []
     if args.sessionid:
-        ab_options += ["-C 'sessionid={0}'".format(args.sessionid)]
+        cookies.append("sessionid={0}".format(args.sessionid))
 
     if args.csrftoken:
-        ab_options += ["-C 'csrftoken={0}'".format(args.csrftoken)]
+        cookies.append("csrftoken={0}".format(args.csrftoken))
+
+    if len(cookies) > 0:
+        cookie_str = "; ".join(cookies)
+        ab_options.append("-C '{0}'".format(cookie_str))
 
     pages = args.pages if args.pages else []
     if args.pagelist:
@@ -114,8 +120,6 @@ def loadtest(args):
     # want a string
     ab_options = ' '.join(str(s) for s in ab_options) if ab_options is not None else ""
 
-    reqs_per_thread = 2
-
     # If there are already results for this run, just delete them.  (TODO: Desired behavior?)
     os.system("rm -rf {name}".format(name=name))
     for page in pages:
@@ -123,8 +127,8 @@ def loadtest(args):
         outdir = "{name}/page_{page}".format(name=name, page=page.replace('/', '-'))
         print "Testing {0}. Output in {1}".format(url, outdir)
         os.makedirs(outdir)
-        for conc in [1]: #[1, 2, 3, 10]:
-            requests = conc * reqs_per_thread
+        for conc in args.concurrency:
+            requests = conc * args.reqs_per_thread
             logpath = outdir + '/{requests}-{conc}.results'.format(requests=requests, conc=conc)
             test_url(url, requests, conc, ab_options, logpath)
 
@@ -145,6 +149,9 @@ def main():
                         help='if testing non-anonymously, specify session id')
     parser.add_argument('--csrftoken',
                         help='if posting forms, specify csrftoken')
+    parser.add_argument('-c', dest='concurrency', action='append', type=int, default=[1],
+                        help="try this number of simultaneous threads.  May be specified more than once.")
+    parser.add_argument('-r', type=int, default=2, help="Number of requests per thread", dest='reqs_per_thread')
 
     parser.add_argument('--name',
                         help='test name--results will be in {name}/',
