@@ -45,25 +45,6 @@
         indentWithTabs: true,
         smartIndent: false
       });
-
-      // this should be brought back into problems
-      $('.longform-body').hide();
-      $('.longform-header').append('<a href="" class="full">See full output</a>');
-
-      $('.full').click(function() {
-        $(this).parent().siblings().slideToggle();
-        $(this).parent().parent().toggleClass('open');
-        var text = $(this).text() == 'See full output' ? 'Hide output' : 'See full output';
-        $(this).text(text);
-        return false;
-      });
-
-      $('.collapsible section').hide()
-      $('.collapsible header a').click(function() {
-        $(this).parent().siblings().slideToggle();
-        $(this).parent().parent().toggleClass('open');
-        return false
-      });
     });
   </script>
 </section>
