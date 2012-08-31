@@ -1,0 +1,38 @@
+@mixin blue-button {
+  display: block;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #2d81ad;
+  @include linear-gradient(top, #6dccf1, #38a8e5);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    border-color: #297095;
+    @include linear-gradient(top, #4fbbe4, #2090d0);
+  }
+}
+
+@mixin white-button {
+  display: block;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #444;
+  @include linear-gradient(top, #eee, #ccc);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #333;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    @include linear-gradient(top, #fff, #ddd);
+  }
+}
