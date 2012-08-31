@@ -32,6 +32,7 @@ section.problem {
       display: inline;
   }
 
+
   div {
     p {
       &.answer {
@@ -319,6 +320,10 @@ section.problem {
       border: none;
       background: transparent;
     }
+  }
+
+  .problem-and-answer {
+    margin-bottom: lh();
   }
 
   .CodeMirror {
