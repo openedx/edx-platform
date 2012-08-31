@@ -12,6 +12,8 @@ var $sidebarWidthStyles;
 var $formTopicDropBtn;
 var $formTopicDropMenu;
 var $postListWrapper;
+var $dropFilter;
+var $topicFilter;
 var sidebarWidth;
 var sidebarHeight;
 var sidebarHeaderHeight;
@@ -28,14 +30,16 @@ $(document).ready(function() {
 	$browse = $('.browse-search .browse');
 	$search = $('.browse-search .search');
 	$searchField = $('.post-search-field');
-	$topicDrop = $('.board-drop-menu');
+	$topicDrop = $('.browse-topic-drop-menu-wrapper');
 	$currentBoard = $('.current-board');
 	$tooltip = $('<div class="tooltip"></div>');
 	$newPost = $('.new-post-article');
 	$sidebar = $('.sidebar');
 	$postListWrapper = $('.post-list-wrapper');
-	$formTopicDropBtn = $('.new-post-article .topic-drop-btn');
-	$formTopicDropMenu = $('.new-post-article .topic-drop-menu');
+	$formTopicDropBtn = $('.new-post-article .form-topic-drop-btn');
+	$formTopicDropMenu = $('.new-post-article .form-topic-drop-menu-wrapper');
+	// $dropFilter = $('.browse-topic-drop-search-input');
+	// $topicFilter = $('.topic-drop-search-input');
 	$sidebarWidthStyles = $('<style></style>');
 	$body.append($sidebarWidthStyles);
 
@@ -44,7 +48,7 @@ $(document).ready(function() {
 
 	$browse.bind('click', showTopicDrop);
 	$search.bind('click', showSearch);
-	$topicDrop.bind('click', setTopic);
+	// $topicDrop.bind('click', setTopic);
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
 	$('.new-post-btn').bind('click', newPost);
@@ -57,11 +61,54 @@ $(document).ready(function() {
 		'click': hideTooltip
 	});
 
+	$body.delegate('.browse-topic-drop-btn', 'click', showTopicDrop);
+	$body.delegate('.browse-topic-drop-search-input', 'keyup', filterDrop);
+	$body.delegate('.form-topic-drop-search-input', 'keyup', filterDrop);
+	$body.delegate('.browse-topic-drop-menu-wrapper', 'click', setTopic);
+
 	$(window).bind('resize', updateSidebarDimensions);
 	$(window).bind('scroll', updateSidebarCoordinates);
 	updateSidebarCoordinates();
 	updateSidebarDimensions();
 });
+
+function filterDrop(e) {
+	var $drop = $(e.target).parents('.form-topic-drop-menu-wrapper, .browse-topic-drop-menu-wrapper');
+	var queries = $(this).val().split(' ');
+	var $items = $drop.find('a');
+
+	if(queries.length == 0) {
+		$items.show();
+		return;
+	}
+
+	$items.hide();
+	$items.each(function(i) {
+		var thisText = $(this).not('.urnread').text();
+		$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
+			thisText = thisText  + ' ' + $(this).text();
+		});
+
+		var test = true;
+		var terms = thisText.split(' ');
+
+		for(var i = 0; i < queries.length; i++) {
+			if(thisText.toLowerCase().search(queries[i].toLowerCase()) == -1) {
+				test = false;
+			}
+		}
+
+		if(test) {
+			$(this).show();
+
+			// show children
+			$(this).parent().find('a').show();
+
+			// show parents
+			$(this).parents('ul').siblings('a').show();
+		}
+	});
+}
 
 function showTooltip(e) {
 	var tooltipText = $(this).attr('data-tooltip');
@@ -123,6 +170,11 @@ function showTopicDrop(e) {
 	e.preventDefault();
 
 	$browse.addClass('is-dropped');
+
+	if(!$topicDrop[0]) {
+		$topicDrop = $('.browse-topic-drop-menu-wrapper');
+	}
+
 	$topicDrop.show();
 	$browse.unbind('click', showTopicDrop);
 	$browse.bind('click', hideTopicDrop);
@@ -132,6 +184,10 @@ function showTopicDrop(e) {
 }
 
 function hideTopicDrop(e) {
+	if(e.target == $('.browse-topic-drop-search-input')[0]) {
+		return;
+	}
+
 	$browse.removeClass('is-dropped');
 	$topicDrop.hide();
 	$body.unbind('click', hideTopicDrop);
@@ -139,11 +195,20 @@ function hideTopicDrop(e) {
 }
 
 function setTopic(e) {
+	if(e.target == $('.browse-topic-drop-search-input')[0]) {
+		return;
+	}
+
 	var $item = $(e.target).closest('a');
 	var boardName = $item.find('.board-name').html();
-	$item.parents('ul').not('.board-drop-menu').each(function(i) {
+
+	$item.parents('ul').not('.browse-topic-drop-menu').each(function(i) {
 		boardName = $(this).siblings('a').find('.board-name').html() + ' / ' + boardName;
 	});
+
+	if(!$currentBoard[0]) {
+		$currentBoard = $('.current-board');
+	}
 	$currentBoard.html(boardName);
 
 	var fontSize = 16;
@@ -181,6 +246,10 @@ function showFormTopicDrop(e) {
 }
 
 function hideFormTopicDrop(e) {
+	if(e.target == $('.topic-drop-search-input')[0]) {
+		return;
+	}
+
 	$formTopicDropBtn.removeClass('is-dropped');
 	$formTopicDropMenu.hide();
 	$body.unbind('click', hideFormTopicDrop);
@@ -189,12 +258,15 @@ function hideFormTopicDrop(e) {
 }
 
 function setFormTopic(e) {
+	if(e.target == $('.topic-drop-search-input')[0]) {
+		return;
+	}
 	$formTopicDropBtn.removeClass('is-dropped');
-	hideFormTopicDrop();
+	hideFormTopicDrop(e);
 
 	var $item = $(e.target);
 	var boardName = $item.html();
-	$item.parents('ul').not('.topic-drop-menu').each(function(i) {
+	$item.parents('ul').not('.form-topic-drop-menu').each(function(i) {
 		boardName = $(this).siblings('a').html() + ' / ' + boardName;
 	});
 	$formTopicDropBtn.html(boardName + ' <span class="drop-arrow">▾</span>');
@@ -202,6 +274,7 @@ function setFormTopic(e) {
 
 function updateSidebarCoordinates(e) {
 	scrollTop = $(window).scrollTop();
+	sidebarXOffset = $('.discussion-column').offset().top;
 
 	var marginTop = scrollTop + SIDEBAR_PADDING > sidebarXOffset ? scrollTop + SIDEBAR_PADDING - sidebarXOffset : 0;
 

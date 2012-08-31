@@ -74,26 +74,31 @@
     <form class="new-post-form">
       <div class="left-column">
         <label>Create new post in:</label>
-        <div class="topic-drop">
-          <a href="#" class="topic-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
-          <ul class="topic-drop-menu">
-            <li><a href="#">All</a></li>
-            <li><a href="#">Following</a></li>
-            <li><a href="#">General</a></li>
-            <li>
-              <a href="#">Homework</a>
-              <ul>
-                <li><a href="#">Week 1</a></li>
-                <li>
-                  <a href="#">Week 2</a>
-                  <ul>
-                    <li><a href="#">Problem 1</a></li>
-                    <li><a href="#">Problem 2</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
+        <div class="form-topic-drop">
+          <a href="#" class="form-topic-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
+          <div class="form-topic-drop-menu-wrapper">
+            <div class="form-topic-drop-search">
+              <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
+            </div>
+            <ul class="form-topic-drop-menu">
+              <li><a href="#">All</a></li>
+              <li><a href="#">Following</a></li>
+              <li><a href="#">General</a></li>
+              <li>
+                <a href="#">Homework</a>
+                <ul>
+                  <li><a href="#">Week 1</a></li>
+                  <li>
+                    <a href="#">Week 2</a>
+                    <ul>
+                      <li><a href="#">Problem 1</a></li>
+                      <li><a href="#">Problem 2</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="options">
           <input type="checkbox" name="follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
@@ -129,8 +134,8 @@
 <script type="text/template" id="thread-list-template">
   <div class="browse-search">
     <div class="browse is-open">
-      <a href="#" class="board-drop-icon"></a>
-      <a href="#" class="board-drop-btn"><span class="current-board">Homework / Week 1</span> <span class="drop-arrow">▾</span></a>
+      <a href="#" class="browse-topic-drop-icon"></a>
+      <a href="#" class="browse-topic-drop-btn"><span class="current-board">Homework / Week 1</span> <span class="drop-arrow">▾</span></a>
     </div>
     <%include file="_filter_dropdown.html" />
     <div class="search">
