@@ -62,7 +62,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
 
     where SECTIONS is a list
     [ {'display_name': name, 'url_name': url_name,
-       'format': format, 'due': due, 'active' : bool}, ...]
+       'format': format, 'due': due, 'active' : bool, 'graded': bool}, ...]
 
     active is set for the section and chapter corresponding to the passed
     parameters, which are expected to be url_names of the chapter+section.
