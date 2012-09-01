@@ -1,4 +1,7 @@
 <%! import django_comment_client.helpers as helpers %>
+<%! from django.template.defaultfilters import escapejs %>
+<%! from django.core.urlresolvers import reverse %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -16,51 +19,15 @@
 
 <%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
 
+<%include file="_new_post.html" />
 
-<section class="container">
-  <div class="discussion-wrapper">
-    <article class="discussion-sidebar">
-      <div class="board-selector">
-        <a href="#" class="board-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
-        <div class="board-drop-menu">
-        </div>
-      </div>
-      <div class="sort-bar">
-<a href="#"><span class="sort-label">Sort by:</span> most recent <span class="drop-arrow">▾</span></a>
-      </div>
-      <div class="post-list-wrapper">
-        <ul class="post-list">
-          % for thread in threads:
-          <li><a href="${helpers.permalink(thread) | h}"><span class="title">${thread['title'] | h}</span> <span class="comments">${thread['comments_count'] | h}</span><span class="votes">+${thread['votes']['up_count'] | h}</span></a></li>
-          % endfor
-        </ul>
-      </div>
-    </article>
-    <section class="discussion-content">
-      This page intentionally left blank
-    </section>
-  </div>
+<script type="text/javascript" src="${static.url('js/discussions-temp.js')}"></script>
 
+<section class="discussion container" id="discussion-container" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}">
+    <div class="discussion-body">
+        <div class="sidebar"></div>
+        <div class="discussion-column"></div>
+    </div>
 </section>
 
-<section class="container">
-  <div class="course-wrapper">
-    <section aria-label="Course Navigation" class="course-index">
-      <nav>
-
-        <article class="sidebar-module discussion-sidebar">
-          <a href="#" class="sidebar-new-post-button">New Post</a>
-        </article>
-
-        <%include file="_recent_active_posts.html" />
-
-        <%include file="_trending_tags.html" />
-
-      </nav>
-    </section>
-
-    <section class="course-content">
-      ${content.decode('utf-8')}
-    </section>
-  </div>
-</section>
+<%include file="_underscore_templates.html" />

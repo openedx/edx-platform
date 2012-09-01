@@ -3,7 +3,6 @@ if Backbone?
     model: Thread
 
     initialize: ->
-      DiscussionUtil.addDiscussion @id, @
       @bind "add", (item) =>
         item.discussion = @
       @comparator = @sortByDate
