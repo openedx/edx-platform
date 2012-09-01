@@ -1,3 +1,26 @@
+<%def name="render_form_filter_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${render_entry(map["entries"], child)}
+        %else:
+            ${render_category(map["subcategories"], child)}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li><a href="#" data-discussion_id="${entries[entry]}">${entry}</a></li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li>
+        <a href="#">${category}</a>
+        <ul>
+            ${render_form_filter_dropdown(categories[category])}
+        </ul>
+    </li>
+</%def>
+
 <article class="new-post-article">
     <div class="inner-wrapper">
         <form class="new-post-form">
@@ -10,22 +33,7 @@
                             <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
                         </div>
                         <ul class="form-topic-drop-menu">
-                            <li><a href="#">All</a></li>
-                            <li><a href="#">Following</a></li>
-                            <li><a href="#">General</a></li>
-                            <li>
-                                <a href="#">Homework</a>
-                                <ul>
-                                    <li><a href="#">Week 1</a></li>
-                                    <li>
-                                        <a href="#">Week 2</a>
-                                        <ul>
-                                            <li><a href="#">Problem 1</a></li>
-                                            <li><a href="#">Problem 2</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
+                            ${render_form_filter_dropdown(category_map)}
                         </ul>
                     </div>
                 </div>
