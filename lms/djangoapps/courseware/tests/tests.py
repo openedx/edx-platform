@@ -218,7 +218,7 @@ class PageLoader(ActivateLoginTestCase):
                                            'location': descriptor.location.url()}))
             msg = str(resp.status_code)
 
-            if resp.status_code != 200:
+            if resp.status_code != 302:
                 msg = "ERROR " + msg
                 all_ok = False
                 num_bad += 1
