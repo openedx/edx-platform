@@ -29,10 +29,12 @@ class @DiscussionThreadView extends Backbone.View
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
 
   renderResponses: ->
-    $.ajax @model.id, success: (data, textStatus, xhr) =>
-      @$(".loading").remove()
-      comments = new Comments(data['content']['children'])
-      comments.each @renderResponse
+    DiscussionUtil.safeAjax
+      url: @model.id
+      success: (data, textStatus, xhr) =>
+        @$(".loading").remove()
+        comments = new Comments(data['content']['children'])
+        comments.each @renderResponse
 
   renderResponse: (response) =>
       view = new ThreadResponseView(model: response)
