@@ -47,6 +47,7 @@ if Backbone?
 
     initialize: ->
       DiscussionUtil.addContent @id, @
+      @set 'user_url', DiscussionUtil.urlFor('user_profile', @get('user_id'))
       @resetComments(@get('children'))
       
 
