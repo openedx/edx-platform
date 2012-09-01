@@ -87,7 +87,9 @@
               <section class="course-status">
                 <p>Class Starts - <span>${course.start_date_text}</span></p>
               </section>
-              <p class="enter-course">View Courseware</p>
+              % if course.id in show_courseware_links_for:
+                <p class="enter-course">View Courseware</p>
+              % endif
             </section>
           </a>
         </article>
