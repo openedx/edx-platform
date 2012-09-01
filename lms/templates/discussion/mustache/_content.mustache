@@ -27,6 +27,11 @@
             {{/content.tags}}
           </div>
         {{/thread}}
+        <div class="context">
+            {{#content.courseware_location}}
+               (this post is about <a href="../../jump_to/{{content.courseware_location}}">{{content.courseware_title}}</a>)
+            {{/content.courseware_location}}
+        </div>
         <div class="info">
           <div class="comment-time">
             <span class="timeago" title="{{content.updated_at}}">sometime</span> by

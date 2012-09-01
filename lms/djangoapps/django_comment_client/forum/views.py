@@ -13,7 +13,7 @@ from courseware.access import has_access
 from urllib import urlencode
 from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank
+from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank, get_courseware_context
 
 import json
 import django_comment_client.utils as utils
@@ -70,6 +70,16 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
+    if discussion_type != 'inline':
+        course = get_course_with_access(request.user, course_id, 'load')
+
+        for thread in threads:
+            courseware_context = get_courseware_context(thread, course)
+            if courseware_context:
+                thread['courseware_location']  = courseware_context['courseware_location']
+                thread['courseware_title']  = courseware_context['courseware_title']
+
 
     context = {
         'threads': threads,
