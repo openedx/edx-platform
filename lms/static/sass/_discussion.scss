@@ -102,7 +102,7 @@ body.discussion {
         }
       }
 
-      .form-topic-drop-btn {
+      .topic_dropdown_button {
         position: relative;
         z-index: 10000;
         @include white-button;
@@ -117,7 +117,7 @@ body.discussion {
         }
       }
 
-      .form-topic-drop-menu-wrapper {
+      .topic_menu_wrapper {
         display: none;
         position: absolute;
         top: 40px;
@@ -130,7 +130,7 @@ body.discussion {
         box-shadow: 0 2px 50px rgba(0, 0, 0, .4);
       }
 
-      .form-topic-drop-menu {
+      .topic_menu {
         max-height: 400px;
         overflow-y: scroll;
 
@@ -162,8 +162,9 @@ body.discussion {
         }
       }
 
-      .form-topic-drop-search {
+      .topic_menu_search {
         padding: 10px;
+        border-bottom: 1px solid black;
       }
 
       .form-topic-drop-search-input {
