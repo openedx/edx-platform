@@ -109,6 +109,7 @@ class @NewPostView extends Backbone.View
 
 
     createPost: (event) ->
+        event.preventDefault()
         title   = @$(".new-post-title").val()
         body    = @$(".new-post-body").val()
         tags    = @$(".new-post-tags").val()
@@ -136,16 +137,21 @@ class @NewPostView extends Backbone.View
                 auto_subscribe: follow
             error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
             success: (response, textStatus) =>
-                console.log "SUCCESS"
-                #DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
-                #$thread = $(response.html)
-                #@$(".new-post-title").val("").attr("prev-text", "")
-                #@$(".new-post-body").val("").attr("prev-text", "")
-                #@$(".new-post-tags").val("")
-                #@$(".new-post-tags").importTags("")
-                #@$el.children(".threads").prepend($thread)
-                #@$el.children(".blank").remove()
+                console.log response
+                thread = new Thread response['content']
+                DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
+                @$el.hide()
+                @$(".new-post-title").val("").attr("prev-text", "")
+                @$(".new-post-body").val("").attr("prev-text", "")
+                @$(".new-post-tags").val("")
+                @$(".new-post-tags").importTags("")
+                @collection.add thread
+                @collection.trigger "reset"
+                @trigger "thread:created", thread.id
 
+                #@$el.children(".threads").prepend($thread)
+                # no idea what this is
+                #@$el.children(".blank").remove()
                 #@$(".new-post-similar-posts").empty()
                 #@$(".new-post-similar-posts-wrapper").hide()
                 #DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
