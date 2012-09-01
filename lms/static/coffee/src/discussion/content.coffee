@@ -367,11 +367,16 @@ if Backbone?
 
     initTitle: ->
       $contentTitle = @$(".thread-title")
+      if @model.get('marked_title')
+        $contentTitle.html _.escape @model.get('marked_title')
       if $contentTitle.length
         $contentTitle.html DiscussionUtil.unescapeHighlightTag DiscussionUtil.stripLatexHighlight $contentTitle.html()
 
     initBody: ->
+      
       $contentBody = @$(".content-body")
+      if @model.get('marked_body')
+        $contentBody.html _.escape @model.get('marked_body')
       $contentBody.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight $contentBody.html()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
 
@@ -387,16 +392,10 @@ if Backbone?
       @model.view = @
       @model.bind('change', @renderPartial, @)
 
-    initAtUsers: ->
-      
-      #@model.get('title').replace AT_NOTIFICATION_REGEX
-      
-      #console.log @model.get('at_position_list')
-    
     S_LT = "\\&lt\\;"
     S_GT = "\\&gt\\;"
-    S_QUOTE = "\\&\\#x27\\;"
-    S_BKSLASH = "\\&\\#x2F\\;"
+    S_QUOTE = "\\'"
+    S_BKSLASH = "\\/"
     RE_MENTIONED_USER = ///
       #{S_LT} span \s* class= #{S_QUOTE} mentioned_user #{S_QUOTE}
       \s* user_id= #{S_QUOTE} (\w+) #{S_QUOTE} #{S_GT}
@@ -405,14 +404,12 @@ if Backbone?
     ///g
 
     initMarkedContent: ->
-      console.log "initializing"
-      _escape = (text) ->
-        _.escape(text).replace RE_MENTIONED_USER, ($0, $1, $2) ->
+      unescape = (text) ->
+        text.replace RE_MENTIONED_USER, ($0, $1, $2) ->
           "<span class='mentioned_user' user_id='#{$1}'>#{$2}</span>"
-      if @model.get('marked_title')
-        @$(".thread-title").html(_escape(@model.get('marked_title')))
-      if @model.get('marked_body')
-        @$(".content-body").html(_escape(@model.get('marked_body')))
+      if @$(".thread-title").length
+        @$(".thread-title").html unescape(@$(".thread-title").html())
+      @$(".content-body").html unescape(@$(".content-body").html())
       @$(".mentioned_user").each (index, elem) =>
         userId = $(elem).attr("user_id")
         href = DiscussionUtil.urlFor('user_profile', userId)
@@ -425,7 +422,6 @@ if Backbone?
       @initTitle()
       @initBody()
       @initMarkedContent()
-      @initAtUsers()
       @initCommentViews()
 
     reconstruct: ->
@@ -437,7 +433,6 @@ if Backbone?
       @initTitle()
       @initBody()
       @initMarkedContent()
-      @initAtUsers()
       @delegateEvents()
       
   class @Thread extends @Content
