@@ -429,7 +429,7 @@ body.discussion {
           opacity: 0;
         }
 
-        &.is-dropped {
+        &.dropped {
           .browse-topic-drop-btn {
 
             span {
@@ -442,13 +442,13 @@ body.discussion {
         }
       }
 
-      &.is-dropped {
+      &.dropped {
         .browse-topic-drop-btn {
           background-color: #616161;
         }
       }
 
-      &.is-dropped {
+      &.dropped {
         .browse-topic-drop-icon {
           background-position: 0 -16px;
         }
