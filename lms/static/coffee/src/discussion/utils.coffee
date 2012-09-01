@@ -13,16 +13,9 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
-  @getDiscussionData: (id) ->
-    return $$discussion_data[id]
-
   @addContent: (id, content) -> window.$$contents[id] = content
 
   @getContent: (id) -> window.$$contents[id]
-
-  @addDiscussion: (id, discussion) -> window.$$discussions[id] = discussion
-
-  @getDiscussion: (id) -> window.$$discussions[id]
   
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
