@@ -84,7 +84,7 @@ function filterDrop(e) {
 
 	$items.hide();
 	$items.each(function(i) {
-		var thisText = $(this).not('.urnread').text();
+		var thisText = $(this).children().not('.unread').text();
 		$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
 			thisText = thisText  + ' ' + $(this).text();
 		});
