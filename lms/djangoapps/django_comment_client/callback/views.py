@@ -28,20 +28,32 @@ def shared_key_auth_required(fn):
             return fn(request, *args, **kwargs)
     return wrapper
 
+def format_time(t):
+    return t.strftime("%m/%d/%y %H:%M %p")
+
+def users_description(grouped_replies):
+    first_user = grouped_replies[0]['info']['actor_username'] or 'Anonymous'
+    if len(grouped_replies) == 1:
+        return first_user
+    else:
+        return "{0} and {1} other user(s)".format(first_user, len(grouped_replies) - 1)
+
 def process_replies(replies):
     def processor(wrapped_info):
         thread_id, grouped_replies = wrapped_info
         grouped_replies = list(grouped_replies)
         course_id = grouped_replies[0]['course_id']
         commentable_id = grouped_replies[0]['info']['commentable_id']
-        return {
+        processed = {
             'post_reply': True,
-            'replies_count': len(grouped_replies),
+            'users_description': users_description(grouped_replies),
             'thread_url': reverse('django_comment_client.forum.views.single_thread',
                                   args=[course_id, commentable_id, thread_id]),
             'happened_at': min(map(lambda x: x['happened_at'], grouped_replies)),
             'thread_title': grouped_replies[0]['info']['thread_title'],
         }
+        processed['str_time'] = format_time(processed['happened_at'])
+        return processed
     replies = groupby(replies, lambda x: x['info']['thread_id'])
     return map(processor, [(k, list(v)) for k, v in replies])
 
@@ -50,15 +62,16 @@ def process_topics(topics):
         thread_id = notification['info']['thread_id']
         course_id = notification['course_id']
         commentable_id = notification['info']['commentable_id']
-        return {
+        processed = {
             'post_topic': True,
-            'user_id': notification['info']['actor_id'],
-            'username': notification['info']['actor_username'],
+            'users_description': notification['info']['actor_username'] or 'Anonymous',
             'thread_url': reverse('django_comment_client.forum.views.single_thread',
                                 args=[course_id, commentable_id, thread_id]),
             'happened_at': notification['happened_at'],
             'thread_title': notification['info']['thread_title'],
         }
+        processed['str_time'] = format_time(processed['happened_at'])
+        return processed
     return map(process, topics)
 
 def process_at_users(at_users):
@@ -67,18 +80,18 @@ def process_at_users(at_users):
         course_id = notification['course_id']
         commentable_id = notification['info']['commentable_id']
         content_type = notification['info']['content_type']
-        data = {
+        processed = {
             'at_user_in_' + content_type: True,
-            'user_id': notification['info']['actor_id'],
-            'username': notification['info']['actor_username'],
+            'users_description': notification['info']['actor_username'] or 'Anonymous',
             'thread_url': reverse('django_comment_client.forum.views.single_thread',
                                   args=[course_id, commentable_id, thread_id]),
             'happened_at': notification['happened_at'],
             'thread_title': notification['info']['thread_title'],
         }
         if content_type == "comment":
-            data['comment_url'] = data['thread_url'] + "#" + notification['info']['comment_id']
-        return data
+            processed['comment_url'] = processed['thread_url'] + "#" + notification['info']['comment_id']
+        processed['str_time'] = format_time(processed['happened_at'])
+        return processed
     return map(process, at_users)
 
 @require_POST
@@ -91,7 +104,7 @@ def notifications_callback(request):
     raw_notifications = json.loads(request.POST['json_notifications'])
 
     if len(raw_notifications) == 0:
-        return
+        return JsonResponse({'status': 'success'})
 
     timezone = pytz.timezone(settings.TIME_ZONE)
 
@@ -105,7 +118,7 @@ def notifications_callback(request):
     notifications = process_replies(replies) + process_topics(topics) + process_at_users(at_users)
     notifications = sorted(notifications, key=lambda x: x['happened_at'])
 
-    since_time = notifications[0]['happened_at'].strftime("%H:%M %p")
+    since_time = format_time(notifications[0]['happened_at'])
 
     for user_id in user_ids:
         try:

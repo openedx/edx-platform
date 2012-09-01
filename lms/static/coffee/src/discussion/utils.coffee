@@ -64,6 +64,7 @@ class @DiscussionUtil
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
+      user_profile            : "/courses/#{$$course_id}/discussion/forum/users/#{param}"
     }[name]
 
   @safeAjax: (params) ->

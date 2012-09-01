@@ -252,6 +252,7 @@ def safe_content(content):
         'created_at', 'updated_at', 'depth', 'type',
         'commentable_id', 'comments_count', 'at_position_list',
         'children', 'highlighted_title', 'highlighted_body',
+        'marked_title', 'marked_body',
     ]
 
     if content.get('anonymous') is False:

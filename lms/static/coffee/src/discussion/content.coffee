@@ -277,10 +277,12 @@ if Backbone?
 
     edit: (event) ->
       @$(".discussion-content-wrapper").hide()
+      console.log @$el
       $editView = @$(".discussion-content-edit")
       if $editView.length
         $editView.show()
       else
+        console.log "regenerating edit view"
         view = {}
         view.id = @model.id
         if @model.get('type') == 'thread'
@@ -385,20 +387,57 @@ if Backbone?
       @model.view = @
       @model.bind('change', @renderPartial, @)
 
+    initAtUsers: ->
+      
+      #@model.get('title').replace AT_NOTIFICATION_REGEX
+      
+      #console.log @model.get('at_position_list')
+    
+    S_LT = "\\&lt\\;"
+    S_GT = "\\&gt\\;"
+    S_QUOTE = "\\&\\#x27\\;"
+    S_BKSLASH = "\\&\\#x2F\\;"
+    RE_MENTIONED_USER = ///
+      #{S_LT} span \s* class= #{S_QUOTE} mentioned_user #{S_QUOTE}
+      \s* user_id= #{S_QUOTE} (\w+) #{S_QUOTE} #{S_GT}
+      (@[A-Za-z0-9_]+)
+      #{S_LT} #{S_BKSLASH} span #{S_GT} 
+    ///g
+
+    initMarkedContent: ->
+      console.log "initializing"
+      _escape = (text) ->
+        _.escape(text).replace RE_MENTIONED_USER, ($0, $1, $2) ->
+          "<span class='mentioned_user' user_id='#{$1}'>#{$2}</span>"
+      if @model.get('marked_title')
+        @$(".thread-title").html(_escape(@model.get('marked_title')))
+      if @model.get('marked_body')
+        @$(".content-body").html(_escape(@model.get('marked_body')))
+      @$(".mentioned_user").each (index, elem) =>
+        userId = $(elem).attr("user_id")
+        href = DiscussionUtil.urlFor('user_profile', userId)
+        $(elem).replaceWith($("<a>").attr("href", href).html($(elem).html()))
+
     initialize: ->
       @initBindings()
       @initLocal()
       @initTimeago()
       @initTitle()
       @initBody()
+      @initMarkedContent()
+      @initAtUsers()
       @initCommentViews()
 
     reconstruct: ->
+      @_discussionContent = null
+      @_showComments = null
       @initBindings()
       @initLocal()
       @initTimeago()
       @initTitle()
       @initBody()
+      @initMarkedContent()
+      @initAtUsers()
       @delegateEvents()
       
   class @Thread extends @Content

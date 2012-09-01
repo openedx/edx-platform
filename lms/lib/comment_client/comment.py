@@ -12,6 +12,7 @@ class Comment(models.Model):
         'username', 'votes', 'user_id', 'closed',
         'created_at', 'updated_at', 'depth',
         'at_position_list', 'type', 'commentable_id',
+        'marked_body',
     ]
 
     updatable_fields = [
