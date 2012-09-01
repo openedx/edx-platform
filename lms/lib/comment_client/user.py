@@ -8,6 +8,7 @@ class User(models.Model):
     accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
                          'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
                          'subscribed_thread_ids', 'subscribed_commentable_ids',
+                         'default_sort_key',
                          'threads_count', 'comments_count',
                         ]
 

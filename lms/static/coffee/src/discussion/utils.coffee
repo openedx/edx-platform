@@ -64,21 +64,25 @@ class @DiscussionUtil
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
+      user_profile            : "/courses/#{$$course_id}/discussion/forum/users/#{param}"
     }[name]
 
   @safeAjax: (params) ->
     $elem = params.$elem
-    if $elem.attr("disabled")
+    if $elem and $elem.attr("disabled")
       return
+    params["url"] = URI(params["url"]).addSearch ajax: 1
     params["beforeSend"] = ->
-      $elem.attr("disabled", "disabled")
+      if $elem
+        $elem.attr("disabled", "disabled")
       if params["$loading"]
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
           params["$loading"].loading()
     $.ajax(params).always ->
-      $elem.removeAttr("disabled")
+      if $elem
+        $elem.removeAttr("disabled")
       if params["$loading"]
         if params["loadedCallback"]?
           params["loadedCallback"].apply(params["$loading"])
