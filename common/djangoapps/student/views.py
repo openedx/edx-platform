@@ -131,10 +131,14 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
+    show_courseware_links_for = frozenset(course.id for course in courses
+                                          if has_access(request.user, course, 'load'))
+
     context = {'courses': courses,
                'message': message,
                'staff_access': staff_access,
-               'errored_courses': errored_courses,}
+               'errored_courses': errored_courses,
+               'show_courseware_links_for' : show_courseware_links_for}
 
     return render_to_response('dashboard.html', context)
 
