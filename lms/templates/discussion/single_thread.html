@@ -1,5 +1,8 @@
 <%! import django_comment_client.helpers as helpers %>
 <%! from django.template.defaultfilters import escapejs %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from courseware.access import has_access %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -32,9 +35,6 @@
     });
 </script>
 </%block>
-
-<%! from django.core.urlresolvers import reverse %>
-<%! from courseware.access import has_access %>
 
 <nav class="course-material">
   <div class="inner-wrapper">
@@ -69,60 +69,7 @@
   </div>
 </nav>
 
-<article class="new-post-article">
-  <div class="inner-wrapper">
-    <form class="new-post-form">
-      <div class="left-column">
-        <label>Create new post in:</label>
-        <div class="form-topic-drop">
-          <a href="#" class="form-topic-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
-          <div class="form-topic-drop-menu-wrapper">
-            <div class="form-topic-drop-search">
-              <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
-            </div>
-            <ul class="form-topic-drop-menu">
-              <li><a href="#">All</a></li>
-              <li><a href="#">Following</a></li>
-              <li><a href="#">General</a></li>
-              <li>
-                <a href="#">Homework</a>
-                <ul>
-                  <li><a href="#">Week 1</a></li>
-                  <li>
-                    <a href="#">Week 2</a>
-                    <ul>
-                      <li><a href="#">Problem 1</a></li>
-                      <li><a href="#">Problem 2</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="options">
-          <input type="checkbox" name="follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
-          <br>
-          <input type="checkbox" name="follow" id="new-post-anonymous" checked><label for="new-post-anonymous">post anonymously</label>
-        </div>
-      </div>
-      <div class="right-column">
-        <div class="form-row">
-          <input type="text" class="new-post-title" name="title" placeholder="Title">
-        </div>
-        <div class="form-row">
-          <textarea class="new-post-body" name="body" placeholder="Enter your question or comment…"></textarea>
-          <div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>
-        </div>
-        <div class="form-row">
-          <input type="text" class="new-post-tags" name="tags" placeholder="Tags">
-        </div>
-        <input type="submit" class="submit" value="Add post">
-        <a href="#" class="new-post-cancel">Cancel</a>
-      </div>
-    </form>
-  </div>
-</article>
+<%include file="_new_post.html" />
 
 <div class="discussion container">
   <div class="discussion-body">
@@ -131,84 +78,4 @@
   </div>
 </div>
 
-<script type="text/template" id="thread-list-template">
-  <div class="browse-search">
-    <div class="browse is-open">
-      <a href="#" class="browse-topic-drop-icon"></a>
-      <a href="#" class="browse-topic-drop-btn"><span class="current-board">Homework / Week 1</span> <span class="drop-arrow">▾</span></a>
-    </div>
-    <%include file="_filter_dropdown.html" />
-    <div class="search">
-      <form class="post-search">
-        <input type="text" placeholder="Search all discussions" class="post-search-field">
-      </form>
-    </div>
-  </div>
-  <div class="sort-bar">
-    <span class="sort-label">Sort by:</span>
-    <ul>
-      <li><a href="#" class="active" data-sort="date">date</a></li>
-      <li><a href="#" data-sort="votes">votes</a></li>
-      <li><a href="#" data-sort="comments">comments</a></li>
-    </ul>
-  </div>
-  <div class="post-list-wrapper">
-    <ul class="post-list">
-    </ul>
-  </div>
-</script>
-
-<script type="text/template" id="thread-template">
-  <article class="discussion-article" data-id="${'<%= id %>'}">
-    <a href="#" class="dogear"></a>
-    <div class="discussion-post">
-      <header>
-        <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%= votes["up_count"] %>'}</span></a>
-        <h1>${'<%= title %>'}</h1>
-        <p class="posted-details">
-          <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by
-          <a href="${'<%= user_id %>'}">${'<%= username %>'}</a>
-        </p>
-      </header>
-      <div class="post-body">
-        ${'<%= body %>'}
-      </div>
-    </div>
-    <ol class="responses">
-      <li class="loading"><div class="loading-animation"></div></li>
-    </ol>
-    <form class="discussion-reply-new">
-      <h4>Post a response:</h4>
-      <ul class="discussion-errors"></ul>
-      <div class="reply-body"></div>
-      <div class="reply-post-control">
-        <a class="discussion-submit-post control-button" href="#">Submit</a>
-      </div>
-    </form>
-  </article>
-</script>
-
-<script type="text/template" id="thread-response-template">
-  <header>
-  <a href="#" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%= votes['up_count'] %>"}</span></a>
-    <a href="#" class="posted-by">${"<%= username %>"}</a>
-    <p class="posted-details" title="${'<%= created_at %>'}">Sometime</p>
-  </header>
-  <div class="response-body">${"<%= body %>"}</div>
-  <ol class="comments">
-    <li>
-      <form class="comment-form">
-        <input type="text" placeholder="Comment…" class="comment-form-input">
-      </form>
-    </li>
-  </ol>
-</script>
-
-<script type="text/template" id="response-comment-template">
-    <p>${'<%= body %>'}<span class="posted-details">–posted <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by <a href="#">${'<%= username %>'}</a></span></p>
-</script>
-
-<script type="text/template" id="thread-list-item-template">
-    <a href="${'<%= id %>'}" data-id="${'<%= id %>'}"><span class="title">${"<%= title %>"}</span> <span class="comments-count">${"<%= comments_count %>"}</span><span class="votes-count">+${"<%= votes['up_count'] %>"}</span></a>
-</script>
-
+<%include file="_underscore_templates.html" />
