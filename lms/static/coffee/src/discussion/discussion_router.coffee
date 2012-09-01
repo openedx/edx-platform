@@ -10,6 +10,8 @@ class @DiscussionRouter extends Backbone.Router
       @nav.on "threads:rendered", @setActiveThread
       @nav.render()
 
+      @newPostView = new NewPostView(el: $(".new-post-article"))
+
   allThreads: ->
     # TODO: Do something reasonable here
     $(".discussion-column").html("No thread selected.")
