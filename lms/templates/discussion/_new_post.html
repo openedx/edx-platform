@@ -9,7 +9,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" data-discussion_id="${entries[entry]}">${entry}</a></li>
+    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}">${entry}</a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
@@ -23,16 +23,18 @@
 
 <article class="new-post-article">
     <div class="inner-wrapper">
+        <div class="new-post-form-errors">
+        </div>
         <form class="new-post-form">
             <div class="left-column">
                 <label>Create new post in:</label>
                 <div class="form-topic-drop">
-                    <a href="#" class="form-topic-drop-btn">Homework / Week 1 <span class="drop-arrow">▾</span></a>
-                    <div class="form-topic-drop-menu-wrapper">
-                        <div class="form-topic-drop-search">
+                    <a href="#" class="topic_dropdown_button">Homework / Week 1 <span class="drop-arrow">▾</span></a>
+                    <div class="topic_menu_wrapper">
+                        <div class="topic_menu_search">
                             <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
                         </div>
-                        <ul class="form-topic-drop-menu">
+                        <ul class="topic_menu">
                             ${render_form_filter_dropdown(category_map)}
                         </ul>
                     </div>
