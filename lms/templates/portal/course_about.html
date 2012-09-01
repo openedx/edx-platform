@@ -74,7 +74,10 @@
 	        %if show_link:
                 <a href="${course_target}">
                 %endif
-                <span class="register disabled">You are registered for this course (${course.number})</span> <strong>View Courseware</strong>
+                <span class="register disabled">You are registered for this course (${course.number})</span>
+                % if show_courseware_link:
+                  <strong>View Courseware</strong>
+                % endif
 	        %if show_link:
                 </a>
                 %endif
