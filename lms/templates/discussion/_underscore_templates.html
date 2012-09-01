@@ -34,7 +34,7 @@
                 <h1>${'<%= title %>'}</h1>
                 <p class="posted-details">
                     <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by
-                    <a href="${'<%= user_id %>'}">${'<%= username %>'}</a>
+                    <a href="${'<%= user_url %>'}">${'<%= username %>'}</a>
                 </p>
             </header>
             <div class="post-body">
@@ -58,7 +58,7 @@
 <script type="text/template" id="thread-response-template">
     <header>
         <a href="#" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%= votes['up_count'] %>"}</span></a>
-        <a href="#" class="posted-by">${"<%= username %>"}</a>
+        <a href="${'<%= user_url %>'}" class="posted-by">${"<%= username %>"}</a>
         <p class="posted-details" title="${'<%= created_at %>'}">Sometime</p>
     </header>
     <div class="response-body">${"<%= body %>"}</div>
@@ -72,7 +72,7 @@
 </script>
 
 <script type="text/template" id="response-comment-template">
-    <p>${'<%= body %>'}<span class="posted-details">–posted <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by <a href="#">${'<%= username %>'}</a></span></p>
+  <p>${'<%= body %>'}<span class="posted-details">–posted <span class="timeago" title="${'<%= created_at %>'}">sometime</span> by <a href="${'<%= user_url %>'}">${'<%= username %>'}</a></span></p>
 </script>
 
 <script type="text/template" id="thread-list-item-template">
