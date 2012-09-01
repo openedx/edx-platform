@@ -11,7 +11,8 @@ class @DiscussionRouter extends Backbone.Router
       @nav.render()
 
   allThreads: ->
-      true
+    # TODO: Do something reasonable here
+    $(".discussion-column").html("No thread selected.")
 
   setActiveThread: =>
     if @thread
