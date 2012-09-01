@@ -57,12 +57,15 @@ class @ThreadResponseView extends Backbone.View
         if textStatus == 'success'
           @model.set(response)
 
-  submitComment: ->
+  submitComment: (event) ->
     url = @model.urlFor('reply')
     body = @$(".comment-form-input").val()
+    if not body.trim().length
+      return false
     comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"))
     @renderComment(comment)
     @trigger "comment:add"
+    @$(".comment-form-input").val("")
 
     DiscussionUtil.safeAjax
       $elem: $(event.target)
@@ -71,4 +74,5 @@ class @ThreadResponseView extends Backbone.View
       dataType: 'json'
       data:
         body: body
+       
     false
