@@ -604,6 +604,7 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
+    'instructor',
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming

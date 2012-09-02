@@ -153,14 +153,14 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+            'instructor.views.instructor_dashboard', name="instructor_dashboard"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'courseware.views.gradebook', name='gradebook'),
+            'instructor.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'courseware.views.grade_summary', name='grade_summary'),
+            'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
-            'courseware.views.enroll_students', name='enroll_students'),
+            'instructor.views.enroll_students', name='enroll_students'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
