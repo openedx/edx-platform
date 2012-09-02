@@ -184,6 +184,9 @@ class CourseEnrollment(models.Model):
     class Meta:
         unique_together = (('user', 'course_id'), )
 
+    def __unicode__(self):
+        return "%s: %s (%s)" % (self.user,self.course_id,self.created)
+
 @receiver(post_save, sender=CourseEnrollment)
 def assign_default_role(sender, instance, **kwargs):
     if instance.user.is_staff:
