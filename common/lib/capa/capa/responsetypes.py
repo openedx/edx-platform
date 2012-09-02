@@ -916,6 +916,7 @@ def sympy_check2():
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
+                messages = self.context['messages']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
