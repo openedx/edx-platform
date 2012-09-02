@@ -1,3 +1,5 @@
+<%! import json %>
+
 <%def name="render_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
@@ -9,7 +11,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#"><span class="board-name" data-discussion_id="${entries[entry]}">${entry}</span> <span class="unread">1,248</span></a></li>
+    <li><a href="#"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}'>${entry}</span> <span class="unread">1,248</span></a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
