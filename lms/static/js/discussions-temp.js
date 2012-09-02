@@ -27,10 +27,10 @@ var SIDEBAR_HEADER_HEIGHT = 87;
 
 $(document).ready(function() {
 	$body = $('body');
-	$browse = $('.browse-search .browse');
-	$search = $('.browse-search .search');
+	//$browse = $('.browse-search .browse');
+	//$search = $('.browse-search .search');
 	$searchField = $('.post-search-field');
-	$topicDrop = $('.browse-topic-drop-menu-wrapper');
+	//$topicDrop = $('.browse-topic-drop-menu-wrapper');
 	$currentBoard = $('.current-board');
 	$tooltip = $('<div class="tooltip"></div>');
 	$newPost = $('.new-post-article');
@@ -46,8 +46,8 @@ $(document).ready(function() {
 	sidebarWidth = $('.sidebar').width();
 	sidebarXOffset = $sidebar.offset().top;
 
-	$browse.bind('click', showTopicDrop);
-	$search.bind('click', showSearch);
+	//$browse.bind('click', showTopicDrop);
+	//$search.bind('click', showSearch);
 	// $topicDrop.bind('click', setTopic);
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
@@ -61,10 +61,10 @@ $(document).ready(function() {
 		'click': hideTooltip
 	});
 
-	$body.delegate('.browse-topic-drop-btn', 'click', showTopicDrop);
-	$body.delegate('.browse-topic-drop-search-input', 'keyup', filterDrop);
+	//$body.delegate('.browse-topic-drop-btn', 'click', showTopicDrop);
+	//$body.delegate('.browse-topic-drop-search-input', 'keyup', filterDrop);
 	$body.delegate('.form-topic-drop-search-input', 'keyup', filterDrop);
-	$body.delegate('.browse-topic-drop-menu-wrapper', 'click', setTopic);
+	//$body.delegate('.browse-topic-drop-menu-wrapper', 'click', setTopic);
 
 	$(window).bind('resize', updateSidebarDimensions);
 	$(window).bind('scroll', updateSidebarCoordinates);
