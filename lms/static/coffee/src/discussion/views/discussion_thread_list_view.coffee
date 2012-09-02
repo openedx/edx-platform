@@ -5,18 +5,23 @@ class @DiscussionThreadListView extends Backbone.View
     "click .browse": "toggleTopicDrop"
     "keyup .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
-    "click .board-drop-menu": "setTopic"
+    "click .browse-topic-drop-menu": "filterTopic"
+
+  initialize: ->
+    @displayedCollection = new Discussion(@collection.models)
+    console.log @displayedCollection
 
   render: ->
-    @timer = 0;
+    @timer = 0
     @$el.html(@template())
-    @collection.on "reset", @renderThreads
+    @displayedCollection.on "reset", @renderThreads
     @renderThreads()
     @
 
   renderThreads: =>
+    console.log "rendering"
     @$(".post-list").html("")
-    @collection.each @renderThreadListItem
+    @displayedCollection.each @renderThreadListItem
     @trigger "threads:rendered"
 
   renderThreadListItem: (thread) =>
@@ -38,47 +43,52 @@ class @DiscussionThreadListView extends Backbone.View
     @$(".browse").removeClass('is-open')
     setTimeout (-> @$(".post-search-field").focus()), 200
 
-  toggleTopicDrop: =>    
+  toggleTopicDrop: =>
     @$(".browse").toggleClass('is-dropped')
     if @$(".browse").hasClass('is-dropped')
-      @$(".board-drop-menu").show()
+      @$(".browse-topic-drop-menu-wrapper").show()
       setTimeout((=>
         $("body").bind("click", @toggleTopicDrop)
       ), 0)
     else
-      @$(".board-drop-menu").hide()
+      @$(".browse-topic-drop-menu-wrapper").hide()
       $("body").unbind("click", @toggleTopicDrop)
 
-  setTopic: (e) ->
-    item = $(e.target).closest('a')
+  setTopic: (event) ->
+    item = $(event.target).closest('a')
     boardName = item.find(".board-name").html()
-    _.each item.parents('ul').not('.board-drop-menu'), (parent) ->
-      console.log(parent)
+    _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
       boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
     @$(".current-board").html(boardName)
-    fontSize = 16;
-    @$(".current-board").css('font-size', '16px');
+    fontSize = 16
+    @$(".current-board").css('font-size', '16px')
 
     while @$(".current-board").width() > (@$el.width() * .8) - 40
-      fontSize--;
+      fontSize--
       if fontSize < 11
-        break;
-      @$(".current-board").css('font-size', fontSize + 'px');
+        break
+      @$(".current-board").css('font-size', fontSize + 'px')
 
+  filterTopic: (event) ->
+    @setTopic(event)
+    item = $(event.target).closest('li')
+    discussionIds = _.compact _.map item.find("span.board-name"), (board) -> $(board).data("discussion_id")
+    discussionIds = _.map discussionIds, (info) -> info.id
+    filtered = @collection.filter (thread) =>
+      _.include(discussionIds, thread.get('commentable_id'))
+    @displayedCollection.reset filtered
 
   sortThreads: (event) ->
     @$(".sort-bar a").removeClass("active")
     $(event.target).addClass("active")
     sortBy = $(event.target).data("sort")
     if sortBy == "date"
-      @collection.comparator = @collection.sortByDate
+      @displayedCollection.comparator = @displayedCollection.sortByDate
     else if sortBy == "votes"
-      @collection.comparator = @collection.sortByVotes
+      @displayedCollection.comparator = @displayedCollection.sortByVotes
     else if sortBy == "comments"
-      @collection.comparator = @collection.sortByComments
-    @collection.sort()
-
-
+      @displayedCollection.comparator = @displayedCollection.sortByComments
+    @displayedCollection.sort()
 
   delay: (callback, ms) =>
     clearTimeout(@timer)
@@ -96,5 +106,6 @@ class @DiscussionThreadListView extends Backbone.View
         success: (response, textStatus) =>
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
+            @displayedCollection.reset(@collection)
 
     @delay(callback, 300)
