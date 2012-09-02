@@ -1,6 +1,7 @@
 import re
 import json
 import logging
+import time
 
 from django.conf import settings
 from functools import wraps
@@ -117,6 +118,13 @@ def add_histogram(get_html, module, user):
             data_dir = ""
         source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
 
+        # useful to indicate to staff if problem has been released or not
+        now = time.gmtime()
+        is_released = "unknown"
+        if hasattr(module,'start'):
+            if module.start is not None:
+                is_released = "<font color='red'>Yes!</font>" if (now > module.start) else "<font color='green'>Not yet</font>"
+        
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'location': module.location,
@@ -130,7 +138,9 @@ def add_histogram(get_html, module, user):
                          'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
-                         'module_content': get_html()}
+                         'module_content': get_html(),
+                         'is_released': is_released,
+                         }
         return render_to_string("staff_problem_info.html", staff_context)
 
     return _get_html
