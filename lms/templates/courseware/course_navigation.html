@@ -46,7 +46,7 @@ def url_class(url):
 % if staff_access:
       <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
 % endif
-
+      <%block name="extratabs" />
     </ol>
   </div>
 </nav>
