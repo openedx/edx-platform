@@ -6,7 +6,6 @@ class @DiscussionThreadView extends Backbone.View
   template: _.template($("#thread-template").html())
 
   render: ->
-    console.log(@model)
     @$el.html(@template(@model.toJSON()))
     @model.bind "change", @updateModelDetails
     if window.user.following(@model)
