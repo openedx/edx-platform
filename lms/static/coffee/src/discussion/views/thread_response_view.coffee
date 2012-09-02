@@ -17,7 +17,7 @@ class @ThreadResponseView extends Backbone.View
   convertMath: ->
     element = @$(".response-body")
     element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
   renderComments: ->
       @model.get("comments").each @renderComment
