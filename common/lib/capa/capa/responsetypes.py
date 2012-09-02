@@ -970,7 +970,8 @@ def sympy_check2():
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
         for k in range(len(idset)):
-            correct_map.set(idset[k], correct[k], msg=messages[k])
+            correct_map.set(idset[k], correct[k], msg=messages[k],
+                            npoints=self.maxpoints[idset[k]])
         return correct_map
 
     def get_answers(self):
