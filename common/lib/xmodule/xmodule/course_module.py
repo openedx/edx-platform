@@ -234,7 +234,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def discussion_link(self):
-        """FIXME: This is a quick kludge to allow CS50 (and other courses) to 
+        """TODO: This is a quick kludge to allow CS50 (and other courses) to 
         specify their own discussion forums as external links by specifying a 
         "discussion_link" in their policy JSON file. This should later get
         folded in with Syllabus, Course Info, and additional Custom tabs in a 
