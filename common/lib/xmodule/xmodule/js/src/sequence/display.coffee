@@ -87,6 +87,8 @@ class @Sequence
       XModule.loadModules('display', @$('#seq_content'))
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
+      window.update_schematics() # For embedded circuit simulator exercises in 6.002x
+
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()

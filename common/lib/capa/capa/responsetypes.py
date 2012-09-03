@@ -726,7 +726,7 @@ class NumericalResponse(LoncapaResponse):
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError("Invalid input: could not parse '%s' as a number" %\
+            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %\
                                     cgi.escape(student_answer))
 
         if correct:
@@ -920,6 +920,7 @@ def sympy_check2():
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
                 print traceback.format_exc()
+                raise StudentInputError("Error: Problem could not be evaluated with your input") # Notify student
         else:					# self.code is not a string; assume its a function
 
             # this is an interface to the Tutor2 check functions
