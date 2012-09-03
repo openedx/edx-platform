@@ -103,6 +103,7 @@ class XmlDescriptor(XModuleDescriptor):
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
         'graded': bool_map,
+        'hide_progress_tab': bool_map,
     }
 
 
