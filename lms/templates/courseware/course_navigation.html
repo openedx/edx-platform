@@ -28,11 +28,18 @@ def url_class(url):
             <li class="book"><a href="${reverse('book', args=[course.id, index])}" class="${url_class('book')}">${textbook.title}</a></li>
         % endfor
       % endif
-      % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+
+      ## If they have a discussion link specified, use that even if we feature
+      ## flag discussions off. Disabling that is mostly a server safety feature
+      ## at this point, and we don't need to worry about external sites.
+      % if course.discussion_link:
+        <li class="discussion"><a href="${course.discussion_link}">Discussion</a></li>
+      % elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])}" class="${url_class('discussion')}">Discussion</a></li>
         ## <li class="news"><a href="${reverse('news', args=[course.id])}" class="${url_class('news')}">News</a></li>
       % endif 
 
+      ## This is Askbot, which we should be retiring soon...
       % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
         <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
       % endif
