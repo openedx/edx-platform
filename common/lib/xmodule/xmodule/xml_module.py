@@ -96,10 +96,13 @@ class XmlDescriptor(XModuleDescriptor):
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
+    # Allow json to specify either the string "true", or the bool True.  The string is preferred.
+    to_bool = lambda val: val == 'true' or val == True
+    from_bool = lambda val: str(val).lower()
+    bool_map = AttrMap(to_bool, from_bool)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
-        'graded': AttrMap(lambda val: val == 'true',
-                          lambda val: str(val).lower()),
+        'graded': bool_map,
     }
 
 
@@ -232,6 +235,16 @@ class XmlDescriptor(XModuleDescriptor):
 
 
     @classmethod
+    def apply_policy(cls, metadata, policy):
+        """
+        Add the keys in policy to metadata, after processing them
+        through the attrmap.  Updates the metadata dict in place.
+        """
+        for attr in policy:
+            attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+            metadata[attr] = attr_map.from_xml(policy[attr])
+
+    @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -279,7 +292,7 @@ class XmlDescriptor(XModuleDescriptor):
         # Set/override any metadata specified by policy
         k = policy_key(location)
         if k in system.policy:
-            metadata.update(system.policy[k])
+            cls.apply_policy(metadata, system.policy[k])
 
         return cls(
             system,
