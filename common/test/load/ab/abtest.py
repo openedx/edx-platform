@@ -6,7 +6,8 @@ A script to run some ab load tests.
 import os
 import sys
 import argparse
-
+import subprocess
+import pipes
 
 
 """
@@ -59,11 +60,11 @@ def test_url(url, requests, concurrency, ab_options, logpath):
 
     cmd = "ab -n {requests} -c {concurrency} {opts} {url} | tee -- {log}".format(requests=requests,
                                                                   concurrency=concurrency,
-                                                                  url=url,
+                                                                  url=pipes.quote(url),
                                                                   opts=ab_options,
-                                                                  log=logpath,)
+                                                                  log=pipes.quote(logpath),)
     print "running {0}".format(cmd)
-    os.system(cmd)
+    subprocess.call(cmd, shell=True)
 
 def read_pagelist(filepath):
     """
