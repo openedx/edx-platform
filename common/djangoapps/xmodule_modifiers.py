@@ -121,9 +121,9 @@ def add_histogram(get_html, module, user):
         # useful to indicate to staff if problem has been released or not
         now = time.gmtime()
         is_released = "unknown"
-        if hasattr(module,'start'):
-            if module.start is not None:
-                is_released = "<font color='red'>Yes!</font>" if (now > module.start) else "<font color='green'>Not yet</font>"
+        mstart = getattr(module.descriptor,'start')
+        if mstart is not None:
+            is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
         
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
