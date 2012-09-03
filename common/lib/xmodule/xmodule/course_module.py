@@ -233,6 +233,15 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('info_sidebar_name', 'Course Handouts')
 
     @property
+    def discussion_link(self):
+        """TODO: This is a quick kludge to allow CS50 (and other courses) to 
+        specify their own discussion forums as external links by specifying a 
+        "discussion_link" in their policy JSON file. This should later get
+        folded in with Syllabus, Course Info, and additional Custom tabs in a 
+        more sensible framework later."""
+        return self.metadata.get('discussion_link', None)
+
+    @property
     def title(self):
         return self.display_name
 
