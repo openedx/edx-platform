@@ -38,54 +38,55 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    instructor_access = has_access(request.user, course, 'instructor')	# an instructor can manage staff lists
+    instructor_access = has_access(request.user, course, 'instructor')		# an instructor can manage staff lists
 
     msg = ''
     # msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
 
     def escape(s):
         """escape HTML special characters in string"""
-        return str(s).replace('<','&lt;').replace('>','&gt;')
+        return str(s).replace('<', '&lt;').replace('>', '&gt;')
 
     # assemble some course statistics for output to instructor
-    datatable = {'header': ['Statistic','Value'],
+    datatable = {'header': ['Statistic', 'Value'],
                  'title': 'Course Statistics At A Glance',
                  }
-    data = [ ['# Enrolled' ,CourseEnrollment.objects.filter(course_id=course_id).count()] ]
+    data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
     data += compute_course_stats(course).items()
     if request.user.is_staff:
         data.append(['metadata', escape(str(course.metadata))])
     datatable['data'] = data
 
-    def return_csv(fn,datatable):
+    def return_csv(fn, datatable):
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=%s' % fn
-        writer = csv.writer(response,dialect='excel',quotechar='"', quoting=csv.QUOTE_ALL)
+        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
             writer.writerow(datarow)
         return response
 
     def get_staff_group(course):
-        staffgrp = get_access_group_name(course,'staff')
+        staffgrp = get_access_group_name(course, 'staff')
         try:
             group = Group.objects.get(name=staffgrp)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)	# create the group
+            group = Group(name=staffgrp)		# create the group
             group.save()
         return group
 
     # process actions from form POST
-    action = request.POST.get('action','')
+    action = request.POST.get('action', '')
 
     if 'Reload' in action:
-        log.debug('reloading %s (%s)' % (course_id,course))
+        log.debug('reloading %s (%s)' % (course_id, course))
         try:
             data_dir = course.metadata['data_dir']
             modulestore().try_load_course(data_dir)
@@ -93,7 +94,7 @@ def instructor_dashboard(request, course_id):
         except Exception as err:
             msg += '<br/><p>Error: %s</p>' % escape(err)
 
-    elif action=='Dump list of enrolled students':
+    elif action == 'Dump list of enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
         datatable['title'] = 'List of students enrolled in %s' % course_id
@@ -122,11 +123,11 @@ def instructor_dashboard(request, course_id):
         msg += 'Staff group = %s' % group.name
         log.debug('staffgrp=%s' % group.name)
         uset = group.user_set.all()
-        datatable = {'header': ['Username','Full name']}
-        datatable['data'] = [[ x.username, x.profile.name ] for x in uset]
+        datatable = {'header': ['Username', 'Full name']}
+        datatable['data'] = [[x.username, x.profile.name] for x in uset]
         datatable['title'] = 'List of Staff in course %s' % course_id
 
-    elif action=='Add course staff':
+    elif action == 'Add course staff':
         uname = request.POST['staffuser']
         try:
             user = User.objects.get(username=uname)
@@ -135,11 +136,11 @@ def instructor_dashboard(request, course_id):
             user = None
         if user is not None:
             group = get_staff_group(course)
-            msg += '<font color="green">Added %s to staff group = %s</font>' % (user,group.name)
+            msg += '<font color="green">Added %s to staff group = %s</font>' % (user, group.name)
             log.debug('staffgrp=%s' % group.name)
             user.groups.add(group)
 
-    elif action=='Remove course staff':
+    elif action == 'Remove course staff':
         uname = request.POST['staffuser']
         try:
             user = User.objects.get(username=uname)
@@ -148,20 +149,21 @@ def instructor_dashboard(request, course_id):
             user = None
         if user is not None:
             group = get_staff_group(course)
-            msg += '<font color="green">Removed %s from staff group = %s</font>' % (user,group.name)
+            msg += '<font color="green">Removed %s from staff group = %s</font>' % (user, group.name)
             log.debug('staffgrp=%s' % group.name)
             user.groups.remove(group)
 
     # For now, mostly a static page
     context = {'course': course,
                'staff_access': True,
-               'admin_access' : request.user.is_staff,
-               'instructor_access' : instructor_access,
-               'datatable' : datatable,
-               'msg' : msg,
+               'admin_access': request.user.is_staff,
+               'instructor_access': instructor_access,
+               'datatable': datatable,
+               'msg': msg,
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
 
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
     '''
@@ -171,7 +173,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     course_id = course ID
 
     Note: both are passed in, only because instructor_dashboard already has them already.
-    
+
     returns datatable = dict(header=header, data=data)
     where
 
@@ -183,9 +185,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     '''
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
-    header = ['ID', 'Username','Full Name','edX email','External email']
+    header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
     if get_grades:
-        gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)	# just to construct the header
+        # just to construct the header
+        gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
         # log.debug('student %s gradeset %s' % (enrolled_students[0], gradeset))
         if get_raw_scores:
             header += [score.section for score in gradeset['raw_scores']]
@@ -196,7 +199,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     data = []
 
     for student in enrolled_students:
-        datarow  = [ student.id, student.username, student.profile.name, student.email ]
+        datarow = [ student.id, student.username, student.profile.name, student.email ]
         try:
             datarow.append(student.externalauthmap.external_email)
         except:	# ExternalAuthMap.DoesNotExist
@@ -213,6 +216,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         data.append(datarow)
     datatable['data'] = data
     return datatable
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
@@ -240,7 +244,7 @@ def gradebook(request, course_id):
                                                  'course': course,
                                                  'course_id': course_id,
                                                  # Checked above
-                                                 'staff_access': True,})
+                                                 'staff_access': True, })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -250,8 +254,9 @@ def grade_summary(request, course_id):
 
     # For now, just a static page
     context = {'course': course,
-               'staff_access': True,}
+               'staff_access': True, }
     return render_to_response('courseware/grade_summary.html', context)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -269,7 +274,7 @@ def enroll_students(request, course_id):
     '''
 
     course = get_course_with_access(request.user, course_id, 'staff')
-    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id = course_id)]
+    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
 
     if 'new_students' in request.POST:
         new_students = request.POST['new_students'].split('\n')
@@ -282,19 +287,20 @@ def enroll_students(request, course_id):
 
     for student in new_students:
         try:
-            nce = CourseEnrollment(user=User.objects.get(email = student), course_id = course_id)
+            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
             nce.save()
             added_students.append(student)
         except:
             rejected_students.append(student)
 
-    return render_to_response("enroll_students.html", {'course':course_id,
+    return render_to_response("enroll_students.html", {'course': course_id,
                                                        'existing_students': existing_students,
                                                        'added_students': added_students,
                                                        'rejected_students': rejected_students,
-                                                       'debug':new_students})
+                                                       'debug': new_students})
 
 #-----------------------------------------------------------------------------
+
 
 def compute_course_stats(course):
     '''
@@ -308,23 +314,15 @@ def compute_course_stats(course):
 
     counts = defaultdict(int)
 
-    print "hello world"
-
     def walk(module):
         children = module.get_children()
         if not children:
-            category = module.__class__.__name__	# HtmlDescriptor, CapaDescriptor, ...
+            category = module.__class__.__name__ 	# HtmlDescriptor, CapaDescriptor, ...
             counts[category] += 1
             return
         for c in children:
-            # print c.__class__.__name__
             walk(c)
 
     walk(course)
-
-    print "course %s counts=%s" % (course.display_name,counts)
-    
     stats = dict(counts)	# number of each kind of module
-
     return stats
-
