@@ -7,6 +7,8 @@ import logging
 import os
 import urllib
 
+import track.views
+
 from functools import partial
 from collections import defaultdict
 
@@ -96,6 +98,7 @@ def instructor_dashboard(request, course_id):
             cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
             msg += "git pull on %s:<p>" % data_dir
             msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
+            track.views.server_track(request, 'git pull %s' % data_dir, {}, page='idashboard')
             
     if 'Reload course' in action:
         log.debug('reloading %s (%s)' % (course_id, course))
@@ -103,6 +106,7 @@ def instructor_dashboard(request, course_id):
             data_dir = course.metadata['data_dir']
             modulestore().try_load_course(data_dir)
             msg += "<br/><p>Course reloaded from %s</p>" % data_dir
+            track.views.server_track(request, 'reload %s' % data_dir, {}, page='idashboard')
         except Exception as err:
             msg += '<br/><p>Error: %s</p>' % escape(err)
 
@@ -110,23 +114,28 @@ def instructor_dashboard(request, course_id):
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
         datatable['title'] = 'List of students enrolled in %s' % course_id
+        track.views.server_track(request, 'list-students', {}, page='idashboard')
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
         datatable['title'] = 'Summary Grades of students enrolled in %s' % course_id
+        track.views.server_track(request, 'dump-grades', {}, page='idashboard')
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True)
         datatable['title'] = 'Raw Grades of students enrolled in %s' % course_id
+        track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
 
     elif 'Download CSV of all student grades' in action:
+        track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
         return return_csv('grades_%s.csv' % course_id,
                           get_student_grade_summary_data(request, course, course_id))
 
     elif 'Download CSV of all RAW grades' in action:
+        track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
         return return_csv('grades_%s_raw.csv' % course_id,
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
 
@@ -138,6 +147,7 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['Username', 'Full name']}
         datatable['data'] = [[x.username, x.profile.name] for x in uset]
         datatable['title'] = 'List of Staff in course %s' % course_id
+        track.views.server_track(request, 'list-staff', {}, page='idashboard')
 
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
@@ -151,6 +161,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Added %s to staff group = %s</font>' % (user, group.name)
             log.debug('staffgrp=%s' % group.name)
             user.groups.add(group)
+            track.views.server_track(request, 'add-staff %s' % user, {}, page='idashboard')
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
@@ -164,6 +175,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Removed %s from staff group = %s</font>' % (user, group.name)
             log.debug('staffgrp=%s' % group.name)
             user.groups.remove(group)
+            track.views.server_track(request, 'remove-staff %s' % user, {}, page='idashboard')
 
     # For now, mostly a static page
     context = {'course': course,
