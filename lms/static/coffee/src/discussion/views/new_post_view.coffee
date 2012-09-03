@@ -63,7 +63,8 @@ class @NewPostView extends Backbone.View
             console.log $target
 
     setSelectedTopic: ->
-        @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
+        if @topicText
+            @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
 
     getFullTopicName: (topicElement) ->
         name = topicElement.html()
