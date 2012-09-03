@@ -1,10 +1,11 @@
 # ======== Instructor views =============================================================================
 
 import csv
+import itertools
 import json
 import logging
+import os
 import urllib
-import itertools
 
 from functools import partial
 from collections import defaultdict
@@ -85,7 +86,18 @@ def instructor_dashboard(request, course_id):
     # process actions from form POST
     action = request.POST.get('action', '')
 
-    if 'Reload' in action:
+    if 'GIT pull' in action:
+        data_dir = course.metadata['data_dir']
+        log.debug('git pull %s' % (data_dir))
+        gdir = settings.DATA_DIR / data_dir
+        if not os.path.exists(gdir):
+            msg += "====> ERROR in gitreload - no such directory %s" % gdir
+        else:
+            cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
+            msg += "git pull on %s:<p>" % data_dir
+            msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
+            
+    if 'Reload course' in action:
         log.debug('reloading %s (%s)' % (course_id, course))
         try:
             data_dir = course.metadata['data_dir']
