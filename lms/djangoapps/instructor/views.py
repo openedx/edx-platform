@@ -107,6 +107,11 @@ def instructor_dashboard(request, course_id):
             modulestore().try_load_course(data_dir)
             msg += "<br/><p>Course reloaded from %s</p>" % data_dir
             track.views.server_track(request, 'reload %s' % data_dir, {}, page='idashboard')
+            course_errors = modulestore().get_item_errors(course.location)
+            msg += '<ul>'
+            for cmsg, cerr in course_errors:
+                msg += "<li>%s: <pre>%s</pre>" % (cmsg,escape(cerr))
+            msg += '</ul>'
         except Exception as err:
             msg += '<br/><p>Error: %s</p>' % escape(err)
 
