@@ -9,7 +9,6 @@ class @DiscussionThreadListView extends Backbone.View
 
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
-    console.log @displayedCollection
 
   render: ->
     @timer = 0
@@ -19,7 +18,6 @@ class @DiscussionThreadListView extends Backbone.View
     @
 
   renderThreads: =>
-    console.log "rendering"
     @$(".post-list").html("")
     @displayedCollection.each @renderThreadListItem
     @trigger "threads:rendered"
