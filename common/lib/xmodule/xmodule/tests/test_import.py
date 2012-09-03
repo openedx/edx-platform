@@ -236,6 +236,10 @@ class ImportTestCase(unittest.TestCase):
         # Also check that the grading policy loaded
         self.assertEqual(two_toys.grade_cutoffs['C'], 0.5999)
 
+        # Also check that keys from policy are run through the
+        # appropriate attribute maps -- 'graded' should be True, not 'true'
+        self.assertEqual(toy.metadata['graded'], True)
+
 
     def test_definition_loading(self):
         """When two courses share the same org and course name and
