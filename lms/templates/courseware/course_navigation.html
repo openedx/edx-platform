@@ -37,7 +37,7 @@ def url_class(url):
       % elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])}" class="${url_class('discussion')}">Discussion</a></li>
         ## <li class="news"><a href="${reverse('news', args=[course.id])}" class="${url_class('news')}">News</a></li>
-      % endif 
+      % endif
 
       ## This is Askbot, which we should be retiring soon...
       % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
@@ -48,7 +48,7 @@ def url_class(url):
     % if settings.WIKI_ENABLED:
       <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
     % endif
-    % if user.is_authenticated():
+    % if user.is_authenticated() and not course.hide_progress_tab:
       <li class="profile"><a href="${reverse('progress', args=[course.id])}" class="${url_class('progress')}">Progress</a></li>
     % endif
     % if staff_access:
