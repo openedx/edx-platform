@@ -112,13 +112,25 @@ def get_threads(request, course_id, discussion_id=None):
     default_query_params = {
         'page': 1,
         'per_page': THREADS_PER_PAGE,
-        'sort_key': 'activity',
+        'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
         'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
     }
+
+    if not request.GET.get('sort_key'):
+        # If the user did not select a sort key, use their last used sort key
+        user = cc.User.from_django_user(request.user)
+        user.retrieve()
+        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
+        default_query_params['sort_key'] = user.get('default_sort_key') or default_query_params['sort_key']
+    else:
+        # If the user clicked a sort key, update their default sort key
+        user = cc.User.from_django_user(request.user)
+        user.default_sort_key = request.GET.get('sort_key')
+        user.save()
 
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
