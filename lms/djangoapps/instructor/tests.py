@@ -71,6 +71,7 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         msg += "instructor dashboard download csv grades: resp = '%s'" % resp
 
         respstr = str(resp).replace('\r','')
+        respstr = respstr.replace('TT_2012','2012')	# jenkins course_id is TT_2012_Fall instead of 2012_Fall?
         #open('idtest.out','w').write(respstr)
 
         expected_resp = '''Vary: Cookie
