@@ -30,7 +30,7 @@ def _general_discussion_id(course_id):
 def _should_perform_search(request):
     return bool(request.GET.get('text', False) or \
             request.GET.get('tags', False))
-        
+
 
 def render_accordion(request, course, discussion_id):
 
@@ -59,7 +59,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
     }[discussion_type]
 
     base_url = {
-        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
+        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])),
         'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id])),
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
@@ -123,12 +123,14 @@ def get_threads(request, course_id, discussion_id=None):
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
     threads, query_params = get_threads(request, course_id, discussion_id)
-    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
-                                                                 query_params=query_params)
-    
+    # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
+#    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
+#                                                                 query_params=query_params)
+    user_info = cc.User.from_django_user(request.user).to_dict()
     return utils.JsonResponse({
-        'html': html,
+#        'html': html,
         'discussion_data': map(utils.safe_content, threads),
+        'user_info': user_info,
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
@@ -215,6 +217,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
+        # TODO: Remove completely or switch back to server side rendering
         html = render_to_string('discussion/_ajax_single_thread.html', context)
 
         return utils.JsonResponse({
@@ -287,7 +290,7 @@ def user_profile(request, course_id, user_id):
         })
     else:
         context = {
-            'course': course, 
+            'course': course,
             'user': request.user,
             'django_user': User.objects.get(id=user_id),
             'profiled_user': profiled_user.to_dict(),

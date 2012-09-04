@@ -1,4 +1,6 @@
 $ ->
+  if !window.$$contents
+    window.$$contents = {}
   $.fn.extend
     loading: ->
       @$_loading = $("<span class='discussion-loading'></span>")
