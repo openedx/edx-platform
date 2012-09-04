@@ -65,22 +65,20 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         course = self.toy
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         msg = "url = %s\n" % url
-        resp = self.client.post(url, {
-            'action': 'Download CSV of all student grades for this course',
-            })
-        msg += "instructor dashboard download csv grades: resp = '%s'" % resp
+        response = self.client.post(url, {'action': 'Download CSV of all student grades for this course',
+                                          })
+        msg += "instructor dashboard download csv grades: response = '%s'\n" % response
 
-        respstr = str(resp).replace('\r','')
-        respstr = respstr.replace('TT_2012','2012')	# jenkins course_id is TT_2012_Fall instead of 2012_Fall?
-        #open('idtest.out','w').write(respstr)
+        self.assertEqual(response['Content-Type'],'text/csv',msg)
 
-        expected_resp = '''Vary: Cookie
-Content-Type: text/csv
-Content-Disposition: attachment; filename=grades_edX/toy/2012_Fall.csv
-Cache-Control: no-cache, no-store, must-revalidate
+        cdisp = response['Content-Disposition'].replace('TT_2012','2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
+        msg += "cdisp = '%s'\n" % cdisp
+        self.assertEqual(cdisp,'attachment; filename=grades_edX/toy/2012_Fall.csv',msg)
 
-"ID","Username","Full Name","edX email","External email","HW 01","HW 02","HW 03","HW 04","HW 05","HW 06","HW 07","HW 08","HW 09","HW 10","HW 11","HW 12","HW Avg","Lab 01","Lab 02","Lab 03","Lab 04","Lab 05","Lab 06","Lab 07","Lab 08","Lab 09","Lab 10","Lab 11","Lab 12","Lab Avg","Midterm","Final"
+        body = response.content.replace('\r','')
+        msg += "body = '%s'\n" % body
+
+        expected_body = '''"ID","Username","Full Name","edX email","External email","HW 01","HW 02","HW 03","HW 04","HW 05","HW 06","HW 07","HW 08","HW 09","HW 10","HW 11","HW 12","HW Avg","Lab 01","Lab 02","Lab 03","Lab 04","Lab 05","Lab 06","Lab 07","Lab 08","Lab 09","Lab 10","Lab 11","Lab 12","Lab Avg","Midterm","Final"
 "2","u2","Fred Weasley","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0.0","0.0"
 '''
-
-        self.assertEqual(respstr, expected_resp, msg)
+        self.assertEqual(body, expected_body, msg)
