@@ -135,6 +135,16 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO['category_map'] = category_map
 
+def get_courseware_context(content, course):
+    id_map = get_discussion_id_map(course)
+    id = content['commentable_id'] 
+    content_info = None
+    if id in id_map:
+        location = id_map[id]["location"].url()
+        title = id_map[id]["title"]
+        content_info = { "courseware_location": location, "courseware_title": title}
+    return content_info
+
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
