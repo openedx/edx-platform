@@ -161,6 +161,9 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/answers_export$',
+            'courseware.views.answers_export', name='answers_export'),
+
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

@@ -1,7 +1,9 @@
+import csv
 import json
 import logging
 import urllib
 import itertools
+import StringIO
 
 from functools import partial
 
@@ -219,9 +221,9 @@ def jump_to(request, course_id, location):
 
     # Rely on index to do all error handling and access control.
     return redirect('courseware_position',
-                    course_id=course_id, 
-                    chapter=chapter, 
-                    section=section, 
+                    course_id=course_id,
+                    chapter=chapter,
+                    section=section,
                     position=position)
 @ensure_csrf_cookie
 def course_info(request, course_id):
@@ -342,7 +344,7 @@ def progress(request, course_id, student_id=None):
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
 
-    # The pre-fetching of groups is done to make auth checks not require an 
+    # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
@@ -370,3 +372,24 @@ def progress(request, course_id, student_id=None):
 
 
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def answers_export(request, course_id):
+    """
+    Export the distribution of student answers to all problems as a csv file.
+
+    - only displayed to course staff
+    """
+    course = get_course_with_access(request.user, course_id, 'staff')
+
+    dist = grades.answer_distributions(request, course)
+
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%s' % "answer_distribution.csv"
+
+    writer = csv.writer(response)
+    for (url_name, display_name, answer_id), answers in dist.items():
+        # HEADER? 
+        for a in answers:
+            writer.writerow([url_name, display_name, answer_id, a, answers[a]])
+
+    return response
