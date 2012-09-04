@@ -11,9 +11,44 @@ class @DiscussionThreadListView extends Backbone.View
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
     @collection.on "change", @reloadDisplayedCollection
+    @sidebar_padding = 10
+    @sidebar_header_height = 87
 
   reloadDisplayedCollection: =>
     @displayedCollection.reset(@collection.models)
+    @updateSidebar()
+
+  updateSidebar: =>
+
+    scrollTop = $(window).scrollTop();
+    windowHeight = $(window).height();
+
+    $discussionBody = $(".discussion-body")
+    discussionsBodyTop = $discussionBody.offset().top;
+    discussionsBodyBottom = discussionsBodyTop + $discussionBody.height();
+
+    $sidebar = $(".sidebar")
+    if scrollTop > discussionsBodyTop - @sidebar_padding
+        $sidebar.addClass('fixed');
+        $sidebar.css('top', @sidebar_padding);
+    else
+        $sidebar.removeClass('fixed');
+        $sidebar.css('top', '0');
+
+    sidebarWidth = .32 * $discussionBody.width() - 10;
+    $sidebar.css('width', sidebarWidth + 'px');
+
+    sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
+
+    topAmount = scrollTop + windowHeight
+    bottomAmount = discussionsBodyBottom + @sidebar_padding
+    amount = Math.max(topAmount - bottomAmount, 0)
+
+    sidebarHeight = sidebarHeight - @sidebar_padding - amount
+    $sidebar.css 'height', Math.max(sidebarHeight, 400)
+
+    $postListWrapper = @$('.post-list-wrapper')
+    $postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px');
 
 
   # Because we want the behavior that when the body is clicked the menu is
@@ -25,6 +60,10 @@ class @DiscussionThreadListView extends Backbone.View
   render: ->
     @timer = 0
     @$el.html(@template())
+
+    $(window).bind "scroll", @updateSidebar
+    $(window).bind "resize", @updateSidebar
+
     @displayedCollection.on "reset", @renderThreads
     @renderThreads()
     @

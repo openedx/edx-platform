@@ -67,13 +67,13 @@ $(document).ready(function() {
 
 	$body.delegate('.browse-topic-drop-search-input, .form-topic-drop-search-input', 'keyup', filterDrop);
 
-	$(window).bind('resize', updateSidebar);
-	$(window).bind('scroll', updateSidebar);
-  $('.discussion-column').bind("input", function (e) {
-    console.log("resized");
-	  updateSidebar();
-  })
-	updateSidebar();
+// 	$(window).bind('resize', updateSidebar);
+// 	$(window).bind('scroll', updateSidebar);
+//   $('.discussion-column').bind("input", function (e) {
+//     console.log("resized");
+// 	  updateSidebar();
+//   })
+// 	updateSidebar();
 });
 
 function filterDrop(e) {
