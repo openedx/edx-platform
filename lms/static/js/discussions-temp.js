@@ -68,6 +68,11 @@ $(document).ready(function() {
 
 	$(window).bind('resize', updateSidebarDimensions);
 	$(window).bind('scroll', updateSidebarCoordinates);
+  $('.discussion-column').bind("input", function (e) {
+    console.log("resized");
+	  updateSidebarCoordinates();
+	  updateSidebarDimensions();
+  })
 	updateSidebarCoordinates();
 	updateSidebarDimensions();
 });

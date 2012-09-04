@@ -89,7 +89,7 @@ class @DiscussionThreadListView extends Backbone.View
     $(event.target).addClass("active")
     sortBy = $(event.target).data("sort")
     if sortBy == "date"
-      @displayedCollection.comparator = @displayedCollection.sortByDate
+      @displayedCollection.comparator = @displayedCollection.sortByDateRecentFirst
     else if sortBy == "votes"
       @displayedCollection.comparator = @displayedCollection.sortByVotes
     else if sortBy == "comments"
