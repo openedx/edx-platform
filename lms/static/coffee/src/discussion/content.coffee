@@ -16,7 +16,6 @@ if Backbone?
     urlMappers: {}
 
     urlFor: (name) ->
-      console.log @
       @urlMappers[name].apply(@)
 
     can: (action) ->
@@ -247,7 +246,6 @@ if Backbone?
           @model.set('votes_point', response.votes.point)
 
     toggleVote: (event) ->
-      console.log("HERE")
       $elem = $(event.target)
       value = $elem.attr("value")
       $elem.toggleClass("is-cast")
