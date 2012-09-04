@@ -13,16 +13,6 @@
             <div class="post-body">
                 ${'<%- body %>'}
             </div>
-            ${'<% if (obj.courseware_location) { %>'}
-            <div class="post-context">
-                (this post is about <a href="../../jump_to/${'<%- courseware_location %>'}">${'<%- courseware_title %>'}</a>)
-            </div>
-            ${'<% } %>'}
-            <div class="post-status">
-              ${'<% if (closed) { %>'}
-                This thread is closed.
-              ${'<% } %>'}
-            </div>
             <ul class="moderator-actions">
                 <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
                 <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
@@ -32,6 +22,9 @@
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
         </ol>
+        <div class="post-status-closed bottom-post-status" style="display: none">
+          This thread is closed.
+        </div>
         <form class="discussion-reply-new" data-id="${'<%- id %>'}">
             <h4>Post a response:</h4>
             <ul class="discussion-errors"></ul>
