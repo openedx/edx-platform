@@ -1,4 +1,4 @@
-class @ResponseCommentView extends Backbone.View
+class @ResponseCommentView extends DiscussionContentView
   tagName: "li"
   template: _.template($("#response-comment-template").html())
   render: ->

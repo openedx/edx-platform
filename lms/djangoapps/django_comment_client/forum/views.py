@@ -146,7 +146,14 @@ def forum_form_discussion(request, course_id):
     category_map = utils.get_discussion_category_map(course)
     threads, query_params = get_threads(request, course_id)
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
+
     user_info = cc.User.from_django_user(request.user).to_dict()
+
+    def infogetter(thread):
+        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
     if request.is_ajax():
         return utils.JsonResponse({
             'html': content,
@@ -172,6 +179,7 @@ def forum_form_discussion(request, course_id):
             'staff_access' : has_access(request.user, course, 'staff'),
             'threads': saxutils.escape(json.dumps(threads),escapedict),
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             'course_id': course.id,
             'category_map': category_map,
         }
@@ -232,12 +240,18 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         user_info = cc.User.from_django_user(request.user).to_dict()
         escapedict = {'"': '&quot;'}
+
+        def infogetter(thread):
+            return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-            'content': render_single_thread(request, discussion_id, course_id, thread_id),
+            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             'recent_active_threads': recent_active_threads,
             'trending_tags': trending_tags,

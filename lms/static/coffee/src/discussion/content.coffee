@@ -1,6 +1,9 @@
 if Backbone?
   class @Content extends Backbone.Model
 
+    @contents: {}
+    @contentInfos: {}
+
     template: -> DiscussionUtil.getTemplate('_content')
 
     actions:
@@ -13,15 +16,18 @@ if Backbone?
     urlMappers: {}
 
     urlFor: (name) ->
+      console.log @
       @urlMappers[name].apply(@)
 
     can: (action) ->
-      DiscussionUtil.getContentInfo @id, action
+      (@get('ability') || {})[action]
 
     updateInfo: (info) ->
-      @set('ability', info.ability)
-      @set('voted', info.voted)
-      @set('subscribed', info.subscribed)
+      if info
+        console.log info.ability
+        @set('ability', info.ability)
+        @set('voted', info.voted)
+        @set('subscribed', info.subscribed)
 
     addComment: (comment, options) ->
       options ||= {}
@@ -46,10 +52,24 @@ if Backbone?
         @addComment comment, { silent: true }
 
     initialize: ->
-      DiscussionUtil.addContent @id, @
+      Content.addContent @id, @
+      if Content.getInfo(@id)
+        @updateInfo(Content.getInfo(@id))
       @set 'user_url', DiscussionUtil.urlFor('user_profile', @get('user_id'))
       @resetComments(@get('children'))
-      
+
+    @addContent: (id, content) -> @contents[id] = content
+
+    @getContent: (id) -> @contents[id]
+    
+    @getInfo: (id) ->
+      @contentInfos[id]
+
+    @loadContentInfos: (infos) ->
+      for id, info of infos
+        if @getContent(id)
+          @getContent(id).updateInfo(info)
+      $.extend @contentInfos, infos
 
   class @ContentView extends Backbone.View
 
@@ -423,9 +443,11 @@ if Backbone?
       super()
 
     follow: ->
+      @set('subscribed', true)
       @trigger "thread:follow"
 
     unfollow: ->
+      @set('subscribed', false)
       @trigger "thread:unfollow"
 
     display_body: ->

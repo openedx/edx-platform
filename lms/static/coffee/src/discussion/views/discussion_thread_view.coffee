@@ -1,8 +1,25 @@
-class @DiscussionThreadView extends Backbone.View
+class @DiscussionThreadView extends DiscussionContentView
+
+  abilityRenderer:
+    editable:
+      enable: -> @$(".action-edit").closest("li").show()
+      disable: -> @$(".action-edit").closest("li").hide()
+    can_delete:
+      enable: -> @$(".action-delete").closest("li").show()
+      disable: -> @$(".action-delete").closest("li").hide()
+    can_endorse:
+      enable: ->
+        @$(".action-endorse").css("cursor", "auto")
+      disable: ->
+        @$(".action-endorse").css("cursor", "default")
+
   events:
     "click .discussion-vote": "toggleVote"
-    "click .dogear": "toggleFollowing"
+    "click .action-follow": "toggleFollowing"
     "click .discussion-submit-post": "submitComment"
+    "click .action-edit": "edit"
+    "click .action-delete": "delete"
+
   template: _.template($("#thread-template").html())
 
   render: ->
@@ -32,6 +49,7 @@ class @DiscussionThreadView extends Backbone.View
       url: @model.id
       success: (data, textStatus, xhr) =>
         @$(".loading").remove()
+        Content.loadContentInfos(data['annotated_content_info'])
         comments = new Comments(data['content']['children'])
         comments.each @renderResponse
 
@@ -44,19 +62,17 @@ class @DiscussionThreadView extends Backbone.View
   addComment: =>
     @model.trigger "comment:add"
 
-  toggleVote: ->
-    @$(".discussion-vote").toggleClass("is-cast")
-    if @$(".discussion-vote").hasClass("is-cast")
+  toggleVote: (event) ->
+    event.preventDefault()
+    if not @model.get('voted')#@$(".discussion-vote").hasClass("is-cast")
       @vote()
     else
       @unvote()
-    false
 
   toggleFollowing: (event) ->
     $elem = $(event.target)
-    @$(".dogear").toggleClass("is-followed")
     url = null
-    if @$(".dogear").hasClass("is-followed")
+    if not @model.get('subscribed')
       @model.follow()
       url = @model.urlFor("follow")
     else
@@ -69,7 +85,8 @@ class @DiscussionThreadView extends Backbone.View
 
   vote: ->
     url = @model.urlFor("upvote")
-    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) + 1)
+    @model.set('votes_point', parseInt(@model.get('votes_point')) + 1)
+    #@$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) + 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -80,7 +97,8 @@ class @DiscussionThreadView extends Backbone.View
 
   unvote: ->
     url = @model.urlFor("unvote")
-    @$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) - 1)
+    @model.set('votes_point', parseInt(@model.get('votes_point')) - 1)
+    #@$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) - 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -89,7 +107,8 @@ class @DiscussionThreadView extends Backbone.View
         if textStatus == 'success'
           @model.set(response)
 
-  submitComment: ->
+  submitComment: (event) ->
+    event.preventDefault()
     url = @model.urlFor('reply')
     body = @$("#wmd-input").val()
     response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
@@ -103,4 +122,20 @@ class @DiscussionThreadView extends Backbone.View
       dataType: 'json'
       data:
         body: body
-    false
+
+  edit: ->
+
+  delete: ->
+
+  toggleEndorse: ->
+    $elem = $(event.target)
+    url = @model.urlFor('endorse')
+    endorsed = @model.get('endorsed')
+    data = { endorsed: not endorsed }
+    DiscussionUtil.safeAjax
+      $elem: $elem
+      url: url
+      data: data
+      type: "POST"
+      success: (response, textStatus) =>
+        @model.set('endorsed', not endorsed)
