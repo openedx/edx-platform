@@ -54,6 +54,7 @@ class @DiscussionThreadView extends DiscussionContentView
         Content.loadContentInfos(data['annotated_content_info'])
         comments = new Comments(data['content']['children'])
         comments.each @renderResponse
+        @trigger "thread:responses:rendered"
 
   renderResponse: (response) =>
       view = new ThreadResponseView(model: response)
