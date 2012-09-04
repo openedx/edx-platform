@@ -16,6 +16,10 @@ class @DiscussionContentView extends Backbone.View
     comments_count: (comments_count) ->
       
     subscribed: (subscribed) ->
+      if subscribed
+        @$(".dogear").addClass("is-followed")
+      else
+        @$(".dogear").removeClass("is-followed")
 
     ability: (ability) ->
       for action, selector of @abilityRenderer
