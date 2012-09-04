@@ -13,7 +13,7 @@ from courseware.access import has_access
 from urllib import urlencode
 from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank
+from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank, get_courseware_context
 
 import json
 import django_comment_client.utils as utils
@@ -70,6 +70,15 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
+    if discussion_type != 'inline':
+        course = get_course_with_access(request.user, course_id, 'load')
+
+        for thread in threads:
+            courseware_context = get_courseware_context(thread, course)
+            if courseware_context:
+                thread['courseware_location']  = courseware_context['courseware_location']
+                thread['courseware_title']  = courseware_context['courseware_title']
 
     context = {
         'threads': threads,
@@ -231,15 +240,23 @@ def single_thread(request, course_id, discussion_id, thread_id):
         category_map = utils.get_discussion_category_map(course)
         threads, query_params = get_threads(request, course_id)
 
-        recent_active_threads = cc.search_recent_active_threads(
-            course_id,
-            recursive=False,
-            query_params={'follower_id': request.user.id},
-        )
+        course = get_course_with_access(request.user, course_id, 'load')
 
-        trending_tags = cc.search_trending_tags(
-            course_id,
-        )
+        for thread in threads:
+            courseware_context = get_courseware_context(thread, course)
+            if courseware_context:
+                thread['courseware_location']  = courseware_context['courseware_location']
+                thread['courseware_title']  = courseware_context['courseware_title']
+
+        #recent_active_threads = cc.search_recent_active_threads(
+        #    course_id,
+        #    recursive=False,
+        #    query_params={'follower_id': request.user.id},
+        #)
+
+        #trending_tags = cc.search_trending_tags(
+        #    course_id,
+        #)
 
         user_info = cc.User.from_django_user(request.user).to_dict()
         escapedict = {'"': '&quot;'}
@@ -256,8 +273,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
-            'recent_active_threads': recent_active_threads,
-            'trending_tags': trending_tags,
+            #'recent_active_threads': recent_active_threads,
+            #'trending_tags': trending_tags,
             'course_id': course.id,
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
