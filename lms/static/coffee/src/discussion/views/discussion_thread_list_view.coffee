@@ -59,9 +59,11 @@ class @DiscussionThreadListView extends Backbone.View
     if @$(".browse").hasClass('is-dropped')
       @$(".browse-topic-drop-menu-wrapper").show()
       $('body').bind 'click', @toggleTopicDrop
+      $('body').bind 'keyup', @setActiveItem
     else
       @$(".browse-topic-drop-menu-wrapper").hide()
       $('body').unbind 'click', @toggleTopicDrop
+      $('body').unbind 'keyup', @setActiveItem
 
   setTopic: (event) ->
     item = $(event.target).closest('a')
@@ -115,3 +117,35 @@ class @DiscussionThreadListView extends Backbone.View
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
             @displayedCollection.reset(@collection.models)
+
+
+  setActiveItem: (event) ->
+    if event.which == 13
+      console.log($(".browse-topic-drop-menu-wrapper .focused"))
+      $(".browse-topic-drop-menu-wrapper .focused").click()
+      return
+    if event.which != 40 && event.which != 38
+      return
+    event.preventDefault()
+
+    items = $(".browse-topic-drop-menu-wrapper a").not(".hidden")
+    totalItems = items.length
+    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()
+    # index = parseInt($(".browse-topic-drop-menu-wrapper").attr("data-focused")) || 0
+    
+
+    if event.which == 40
+      index = index + 1
+    else if event.which == 38
+      index = index - 1
+    if index == totalItems
+      index = 0
+
+    console.log(index)
+
+    $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
+    $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
+    # $(items[index]).addClass("focused")
+    $(".browse-topic-drop-menu-wrapper").attr("data-focused", index)
+
+
