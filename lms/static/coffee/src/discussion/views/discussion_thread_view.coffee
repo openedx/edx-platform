@@ -22,22 +22,32 @@ class @DiscussionThreadView extends DiscussionContentView
 
   template: _.template($("#thread-template").html())
 
+  initialize: ->
+    @model.on "change", @updateModelDetails
+
   render: ->
     @$el.html(@template(@model.toJSON()))
-    @model.bind "change", @updateModelDetails
-    if window.user.following(@model)
-      @$(".dogear").addClass("is-followed")
-
-    if window.user.voted(@model)
-      @$(".vote-btn").addClass("is-cast")
+    @renderDogear()
+    @renderVoted()
     @$("span.timeago").timeago()
     Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
     @convertMath()
     @renderResponses()
     @
 
+  renderDogear: ->
+    if window.user.following(@model)
+      @$(".dogear").addClass("is-followed")
+
+  renderVoted: =>
+    if window.user.voted(@model)
+      @$("[data-role=discussion-vote]").addClass("is-cast")
+    else
+      @$("[data-role=discussion-vote]").removeClass("is-cast")
+
   updateModelDetails: =>
-    @$(".discussion-vote .votes-count-number").html(@model.get("votes")["up_count"])
+    @renderVoted()
+    @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
 
   convertMath: ->
     element = @$(".post-body")
@@ -64,10 +74,10 @@ class @DiscussionThreadView extends DiscussionContentView
 
   toggleVote: (event) ->
     event.preventDefault()
-    if not @model.get('voted')#@$(".discussion-vote").hasClass("is-cast")
-      @vote()
-    else
+    if window.user.voted(@model)
       @unvote()
+    else
+      @vote()
 
   toggleFollowing: (event) ->
     $elem = $(event.target)
@@ -84,9 +94,8 @@ class @DiscussionThreadView extends DiscussionContentView
       type: "POST"
 
   vote: ->
+    window.user.vote(@model)
     url = @model.urlFor("upvote")
-    @model.set('votes_point', parseInt(@model.get('votes_point')) + 1)
-    #@$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) + 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
@@ -96,9 +105,8 @@ class @DiscussionThreadView extends DiscussionContentView
           @model.set(response)
 
   unvote: ->
+    window.user.unvote(@model)
     url = @model.urlFor("unvote")
-    @model.set('votes_point', parseInt(@model.get('votes_point')) - 1)
-    #@$(".discussion-vote .votes-count-number").html(parseInt(@$(".discussion-vote .votes-count-number").html()) - 1)
     DiscussionUtil.safeAjax
       $elem: @$(".discussion-vote")
       url: url
