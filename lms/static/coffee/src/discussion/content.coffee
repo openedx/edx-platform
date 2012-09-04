@@ -16,7 +16,6 @@ if Backbone?
     urlMappers: {}
 
     urlFor: (name) ->
-      console.log @
       @urlMappers[name].apply(@)
 
     can: (action) ->
@@ -247,7 +246,6 @@ if Backbone?
           @model.set('votes_point', response.votes.point)
 
     toggleVote: (event) ->
-      console.log("HERE")
       $elem = $(event.target)
       value = $elem.attr("value")
       $elem.toggleClass("is-cast")
@@ -448,6 +446,14 @@ if Backbone?
     unfollow: ->
       @set('subscribed', false)
       @trigger "thread:unfollow"
+
+    vote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
+      @trigger "change"
+
+    unvote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
+      @trigger "change"
 
     display_body: ->
       if @has("highlighted_body")

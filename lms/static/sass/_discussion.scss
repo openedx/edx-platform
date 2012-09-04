@@ -55,12 +55,12 @@
 @mixin discussion-wmd-preview {
   width: 100%;
   min-height: 40px;
-  padding: 10px;
+  padding: 25px 20px 10px 20px;
   box-sizing: border-box;
   border: 1px solid #aaa;
   border-top: none;
   border-radius: 0 0 3px 3px;
-  background: #eee;    
+  background: #eee;
   color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
 }
@@ -82,7 +82,7 @@
 
 .wmd-button-bar  {
   width: 100%;
-  background-color: Silver; 
+  background-color: Silver;
 }
 
 .wmd-input {
@@ -129,25 +129,25 @@
 }
 
 .wmd-button-row {
-  position: relative; 
+  position: relative;
   margin-left: 5px;
   margin-right: 5px;
   margin-bottom: 5px;
   margin-top: 10px;
-  padding: 0px;  
+  padding: 0px;
   height: 20px;
   overflow: hidden;
   @include transition(all, .2s, easeOut);
 }
 
 .wmd-spacer {
-  width: 1px; 
-  height: 20px; 
+  width: 1px;
+  height: 20px;
   margin-left: 14px;
-  
+
   position: absolute;
   background-color: Silver;
-  display: inline-block; 
+  display: inline-block;
   list-style: none;
 }
 
@@ -301,7 +301,8 @@ body.discussion {
           border-top: 1px solid #5f5f5f;
           font-size: 14px;
           font-weight: 700;
-          color: #eee;        
+          line-height: 18px;
+          color: #eee;
 
           &:hover {
             background-color: #666;
@@ -332,7 +333,7 @@ body.discussion {
         width: 100%;
         height: 30px;
         padding: 0 15px;
-        box-sizing: border-box;   
+        box-sizing: border-box;
         border-radius: 30px;
         border: 1px solid #333;
         box-shadow: 0 1px 3px rgba(0, 0, 0, .25) inset;
@@ -349,6 +350,14 @@ body.discussion {
       width: 68%;
       padding: 40px;
       box-sizing: border-box;
+    }
+
+    .wmd-button {
+      background: none;
+    }
+
+    .wmd-button span {
+      background: url(../images/new-post-icons-full.png) no-repeat;
     }
   }
 
@@ -388,11 +397,11 @@ body.discussion {
       width: 100%;
       //height: 50px;
       margin-top: -1px;
-      padding: 10px;
+      padding: 25px 20px 10px 20px;
       box-sizing: border-box;
       border: 1px solid #333;
       border-radius: 0 0 3px 3px;
-      background: #e6e6e6;    
+      background: #e6e6e6;
       color: #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
@@ -400,10 +409,10 @@ body.discussion {
     .new-post-preview-label {
       position: absolute;
       top: 4px;
-      left: 4px;    
+      left: 4px;
       font-size: 11px;
       color: #aaa;
-      text-transform: uppercase;    
+      text-transform: uppercase;
     }
 
     .new-post-title,
@@ -468,7 +477,7 @@ body.discussion {
     color: #333;
     background: #c5eeff;
     border: 1px solid #90c4d7;
-    font-size: 13px;  
+    font-size: 13px;
   }
 
   .thread-title {
@@ -478,7 +487,7 @@ body.discussion {
     color: #333;
     font-weight: 700;
   }
-  
+
 
 
 
@@ -567,7 +576,7 @@ body.discussion {
     height: 60px;
     border-bottom: 1px solid #a3a3a3;
     border-radius: 3px 0 0 0;
-    
+
 
     .browse,
     .search {
@@ -716,16 +725,22 @@ body.discussion {
 
       a {
         display: block;
-        height: 50px;
         padding: 0 20px;
         border-top: 1px solid #5f5f5f;
         font-size: 14px;
         font-weight: 700;
-        line-height: 48px;
+        line-height: 22px;
         color: #fff;
+        @include clearfix;
 
         &:hover {
           background-color: #636363;
+        }
+
+        .board-name {
+          float: left;
+          width: 80%;
+          margin: 13px 0;
         }
 
         .unread {
@@ -762,7 +777,7 @@ body.discussion {
       width: 100%;
       height: 30px;
       padding: 0 15px;
-      box-sizing: border-box;   
+      box-sizing: border-box;
       border-radius: 30px;
       border: 1px solid #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .25) inset;
@@ -929,7 +944,7 @@ body.discussion {
         box-shadow: 0 1px 0 #4697c1, 0 -1px 0 #4697c1;
 
         .title {
-          color: #333;  
+          color: #333;
         }
 
         .votes-count,
@@ -1077,7 +1092,7 @@ body.discussion {
   .responses {
     list-style: none;
     margin-top: 40px;
-    padding: 0;    
+    padding: 0;
 
     > li {
       position: relative;
@@ -1230,8 +1245,8 @@ body.discussion {
       background: #009FE2;
       font-size: 9px;
       font-weight: 700;
-      font-style: normal;   
-      color: white;   
+      font-style: normal;
+      color: white;
       text-transform: uppercase;
     }
 
@@ -1386,7 +1401,7 @@ body.discussion {
   }
 
   #wmd-input {
-    @include discussion-wmd-input; 
+    @include discussion-wmd-input;
   }
 
   #wmd-preview {
@@ -1400,6 +1415,10 @@ body.discussion {
   .discussion-submit-post {
     @include blue-button;
     float: left;
+  }
+
+  .wmd-button {
+    width: 15px;
   }
 }
 
@@ -1418,7 +1437,53 @@ body.discussion {
 
 /* For some reason I have to do this to get the SCSS to compile, can't stick it under the above .discussion-module */
 .discussion-module {
-  .discussion-reply-new {
-    display:none
+  section.discussion {
+    /* Course content p has a default margin-bottom of 1.416, this is just to reset that */
+
+    .discussion-thread {
+      padding: 0.5em;
+
+      p {
+        margin-bottom: 0em;
+      }
+      .discussion-article {
+        border: 1px solid;
+        border-radius: 3px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+        .discussion-post {
+          header {
+            padding-bottom: 0.1em;
+            margin-bottom: 10px;
+
+          }
+          .post-body {
+            font-size: 14px;
+          }
+        }
+
+        .responses {
+          margin-top: 10px;
+
+          header {
+            padding-bottom: 0em;
+            margin-bottom: 5px;
+            .posted-by {
+              font-size: 0.8em;
+            }
+          }
+          .response-body {
+            margin-bottom: 0.2em;
+            font-size: 14px;
+          }
+
+        }
+      }
+    }
   }
+
+  .discussion-reply-new {
+    display:none;
+  }
+
 }
