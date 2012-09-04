@@ -9,6 +9,7 @@ class @NewPostView extends Backbone.View
         @topicId    = @$(".topic").first().data("discussion_id")
         @topicText  = @getFullTopicName(@$(".topic").first())
 
+        @maxNameWidth = 100
         @setSelectedTopic()
 
         DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
@@ -34,7 +35,6 @@ class @NewPostView extends Backbone.View
             @showTopicDropdown()
     
     showTopicDropdown: () ->
-        console.log "showing"
         @menuOpen = true
         @dropdownButton.addClass('dropped')
         @topicMenu.show()
@@ -61,13 +61,9 @@ class @NewPostView extends Backbone.View
             @topicText  = @getFullTopicName($target)
             @topicId   = $target.data('discussion_id')
             @setSelectedTopic()
-        else
-            console.log "NOTHING IN "
-            console.log $target
 
     setSelectedTopic: ->
-        if @topicText
-            @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
+        @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
 
     getFullTopicName: (topicElement) ->
         name = topicElement.html()
@@ -90,7 +86,6 @@ class @NewPostView extends Backbone.View
         return width
     
     fitName: (name) ->
-        console.log name
         width = @getNameWidth(name)
         if width < @maxNameWidth
             return name
@@ -141,7 +136,6 @@ class @NewPostView extends Backbone.View
                 auto_subscribe: follow
             error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
             success: (response, textStatus) =>
-                console.log response
                 thread = new Thread response['content']
                 DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
                 @$el.hide()
