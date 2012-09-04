@@ -1038,9 +1038,17 @@ body.discussion {
     }
   }
 
+  .blank-slate h1 {
+    margin-top: 195px;
+    text-align: center;
+    color: #ccc;
+  }
+
+  .blank-slate,
   .discussion-article {
     position: relative;
     padding: 40px;
+    min-height: 468px;
 
     h1 {
       margin-bottom: 10px;
