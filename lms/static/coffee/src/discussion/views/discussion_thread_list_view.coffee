@@ -10,6 +10,11 @@ class @DiscussionThreadListView extends Backbone.View
 
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
+    @collection.on "change", @reloadDisplayedCollection
+
+  reloadDisplayedCollection: =>
+    @displayedCollection.reset(@collection.models)
+
 
   # Because we want the behavior that when the body is clicked the menu is
   # closed, we need to ignore clicks in the search field and stop propagation.
@@ -95,10 +100,6 @@ class @DiscussionThreadListView extends Backbone.View
     else if sortBy == "comments"
       @displayedCollection.comparator = @displayedCollection.sortByComments
     @displayedCollection.sort()
-
-  delay: (callback, ms) =>
-    clearTimeout(@timer)
-    @timer = setTimeout(callback, ms)
 
   performSearch: (event) ->
     if event.which == 13
