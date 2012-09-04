@@ -1,24 +1,12 @@
 class @DiscussionThreadView extends DiscussionContentView
 
-  abilityRenderer:
-    editable:
-      enable: -> @$(".action-edit").closest("li").show()
-      disable: -> @$(".action-edit").closest("li").hide()
-    can_delete:
-      enable: -> @$(".action-delete").closest("li").show()
-      disable: -> @$(".action-delete").closest("li").hide()
-    can_endorse:
-      enable: ->
-        @$(".action-endorse").css("cursor", "auto")
-      disable: ->
-        @$(".action-endorse").css("cursor", "default")
-
   events:
     "click .discussion-vote": "toggleVote"
     "click .action-follow": "toggleFollowing"
     "click .discussion-submit-post": "submitComment"
     "click .action-edit": "edit"
     "click .action-delete": "delete"
+    "click .action-openclose": "toggleClosed"
 
   template: _.template($("#thread-template").html())
 
@@ -137,7 +125,21 @@ class @DiscussionThreadView extends DiscussionContentView
 
   delete: ->
 
-  toggleEndorse: ->
+  toggleClosed: (event) ->
+    $elem = $(event.target)
+    url = @model.urlFor('close')
+    closed = @model.get('closed')
+    data = { closed: not closed }
+    DiscussionUtil.safeAjax
+      $elem: $elem
+      url: url
+      data: data
+      type: "POST"
+      success: (response, textStatus) =>
+        @model.set('closed', not closed)
+        @model.set('ability', response.ability)
+
+  toggleEndorse: (event) ->
     $elem = $(event.target)
     url = @model.urlFor('endorse')
     endorsed = @model.get('endorsed')
