@@ -148,7 +148,6 @@ def get_threads(request, course_id, discussion_id=None):
 
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
-<<<<<<< HEAD
     try:
         threads, query_params = get_threads(request, course_id, discussion_id)
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -185,41 +184,26 @@ def forum_form_discussion(request, course_id):
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
-        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
-
-        if request.is_ajax():
-            return utils.JsonResponse({
-                'html': content,
-                'discussion_data': map(utils.safe_content, threads),
-            })
-        else:
-            recent_active_threads = cc.search_recent_active_threads(
-                course_id,
-                recursive=False,
-                query_params={'follower_id': request.user.id},
-            )
-
-            trending_tags = cc.search_trending_tags(
-                course_id,
-            )
-            escapedict = {'"': '&quot;'}
-            context = {
-                'csrf': csrf(request)['csrf_token'],
-                'course': course,
-                'content': content,
-                'recent_active_threads': recent_active_threads,
-                'trending_tags': trending_tags,
-                'staff_access' : has_access(request.user, course, 'staff'),
-                'threads': saxutils.escape(json.dumps(threads),escapedict),
-                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
-                'course_id': course.id,
-                'category_map': category_map,
-            }
-            # print "start rendering.."
-            return render_to_response('discussion/index.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        raise Http404
+    if request.is_ajax():
+        return utils.JsonResponse({
+            'html': content,
+            'discussion_data': map(utils.safe_content, threads),
+        })
+    else:
+        escapedict = {'"': '&quot;'}
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            'content': content,
+            'staff_access' : has_access(request.user, course, 'staff'),
+            'threads': saxutils.escape(json.dumps(threads),escapedict),
+            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+            'course_id': course.id,
+            'category_map': category_map,
+        }
+        # print "start rendering.."
+        return render_to_response('discussion/index.html', context)
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
 
@@ -244,7 +228,6 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
 
 def single_thread(request, course_id, discussion_id, thread_id):
 
-<<<<<<< HEAD
     try:
         if request.is_ajax():
 
@@ -276,80 +259,31 @@ def single_thread(request, course_id, discussion_id, thread_id):
             )
 
             user_info = cc.User.from_django_user(request.user).to_dict()
+            escapedict = {'"': '&quot;'}
+
+            def infogetter(thread):
+                return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+            annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
             context = {
                 'discussion_id': discussion_id,
                 'csrf': csrf(request)['csrf_token'],
                 'init': '',
-                'user_info': json.dumps(user_info),
-                'content': render_single_thread(request, discussion_id, course_id, thread_id),
+                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
                 'course': course,
                 'recent_active_threads': recent_active_threads,
                 'trending_tags': trending_tags,
                 'course_id': course.id,
                 'thread_id': thread_id,
-                'threads': json.dumps(threads),
+                'threads': saxutils.escape(json.dumps(threads), escapedict),
                 'category_map': category_map,
             }
 
             return render_to_response('discussion/single_thread.html', context)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
-=======
-    if request.is_ajax():
-
-        user_info = cc.User.from_django_user(request.user).to_dict()
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-        annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        context = {'thread': thread.to_dict(), 'course_id': course_id}
-        html = render_to_string('discussion/_ajax_single_thread.html', context)
-
-        return utils.JsonResponse({
-            'html': html,
-            'content': utils.safe_content(thread.to_dict()),
-            'annotated_content_info': annotated_content_info,
-        })
-
-    else:
-        course = get_course_with_access(request.user, course_id, 'load')
-        category_map = utils.get_discussion_category_map(course)
-        threads, query_params = get_threads(request, course_id)
-
-        recent_active_threads = cc.search_recent_active_threads(
-            course_id,
-            recursive=False,
-            query_params={'follower_id': request.user.id},
-        )
-
-        trending_tags = cc.search_trending_tags(
-            course_id,
-        )
-
-        user_info = cc.User.from_django_user(request.user).to_dict()
-        escapedict = {'"': '&quot;'}
-
-        def infogetter(thread):
-            return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
-
-        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
-
-        context = {
-            'discussion_id': discussion_id,
-            'csrf': csrf(request)['csrf_token'],
-            'init': '',
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
-            'course': course,
-            'recent_active_threads': recent_active_threads,
-            'trending_tags': trending_tags,
-            'course_id': course.id,
-            'thread_id': thread_id,
-            'threads': saxutils.escape(json.dumps(threads), escapedict),
-            'category_map': category_map,
-        }
-
-        return render_to_response('discussion/single_thread.html', context)
->>>>>>> fit permission into new discussion view structure; admin actions not working yet
 
 def user_profile(request, course_id, user_id):
 
