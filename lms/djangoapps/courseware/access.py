@@ -153,7 +153,7 @@ def _has_access_course_desc(user, course, action):
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course),
-        'instructor': lambda: _has_staff_access_to_descriptor(user, course, require_instructor=True),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
         }
 
     return _dispatch(checkers, action, user, course)
@@ -314,6 +314,7 @@ def _course_staff_group_name(location):
     """
     return 'staff_%s' % Location(location).course
 
+
 def _course_instructor_group_name(location):
     """
     Get the name of the instructor group for a location.  Right now, that's instructor_COURSE.
@@ -322,6 +323,7 @@ def _course_instructor_group_name(location):
     location: something that can passed to Location.
     """
     return 'instructor_%s' % Location(location).course
+
 
 def _has_global_staff_access(user):
     if user.is_staff:
@@ -332,19 +334,28 @@ def _has_global_staff_access(user):
         return False
 
 
-def _has_staff_access_to_location(user, location, require_instructor=False):
+def _has_instructor_access_to_location(user, location):
+    return _has_access_to_location(user, location, 'instructor')
+
+
+def _has_staff_access_to_location(user, location):
+    return _has_access_to_location(user, location, 'staff')
+
+
+def _has_access_to_location(user, location, access_level):
     '''
-    Returns True if the given user has staff access to a location.  For now this
-    is equivalent to having staff access to the course location.course.
+    Returns True if the given user has access_level (= staff or
+    instructor) access to a location.  For now this is equivalent to
+    having staff / instructor access to the course location.course.
 
-    If require_instructor=True, then user must be in instructor_* group.
-
-    This means that user is in the staff_* group, or is an overall admin.
+    This means that user is in the staff_* group or instructor_* group, or is an overall admin.
 
     TODO (vshnayder): this needs to be changed to allow per-course_id permissions, not per-course
     (e.g. staff in 2012 is different from 2013, but maybe some people always have access)
 
     course is a string: the course field of the location being accessed.
+    location = location
+    access_level = string, either "staff" or "instructor"
     '''
     if user is None or (not user.is_authenticated()):
         debug("Deny: no user or anon user")
@@ -355,17 +366,26 @@ def _has_staff_access_to_location(user, location, require_instructor=False):
 
     # If not global staff, is the user in the Auth group for this class?
     user_groups = [g.name for g in user.groups.all()]
-    staff_group = _course_staff_group_name(location)
-    if not require_instructor:
+
+    if access_level == 'staff':
+        staff_group = _course_staff_group_name(location)
         if staff_group in user_groups:
             debug("Allow: user in group %s", staff_group)
             return True
-    instructor_group = _course_instructor_group_name(location)
-    if instructor_group in user_groups:
-        debug("Allow: user in group %s", instructor_group)
-        return True
-    debug("Deny: user not in group %s", staff_group)
+        debug("Deny: user not in group %s", staff_group)
+
+    if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
+        instructor_group = _course_instructor_group_name(location)
+        if instructor_group in user_groups:
+            debug("Allow: user in group %s", instructor_group)
+            return True
+        debug("Deny: user not in group %s", instructor_group)
+
+    else:
+        log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
+
     return False
+
 
 def _has_staff_access_to_course_id(user, course_id):
     """Helper method that takes a course_id instead of a course name"""
@@ -373,11 +393,19 @@ def _has_staff_access_to_course_id(user, course_id):
     return _has_staff_access_to_location(user, loc)
 
 
-def _has_staff_access_to_descriptor(user, descriptor, require_instructor=False):
+def _has_instructor_access_to_descriptor(user, descriptor):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
-    location: something that can be passed to Location
+    descriptor: something that has a location attribute
     """
-    return _has_staff_access_to_location(user, descriptor.location, require_instructor=require_instructor)
+    return _has_instructor_access_to_location(user, descriptor.location)
+
+def _has_staff_access_to_descriptor(user, descriptor):
+    """Helper method that checks whether the user has staff access to
+    the course of the location.
+
+    descriptor: something that has a location attribute
+    """
+    return _has_staff_access_to_location(user, descriptor.location)
 
