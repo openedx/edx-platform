@@ -187,7 +187,7 @@ class CourseEnrollment(models.Model):
         unique_together = (('user', 'course_id'), )
 
     def __unicode__(self):
-        return "%s: %s (%s)" % (self.user, self.course_id, self.created)
+        return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
 
 
 @receiver(post_save, sender=CourseEnrollment)
