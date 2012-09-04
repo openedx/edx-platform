@@ -12,6 +12,7 @@ class @ThreadListItemView extends Backbone.View
     @$el.html(@template(@model.toJSON()))
     if window.user.following(@model)
       @follow()
+    @highlight @$(".title")
     @
   threadSelected: (event) ->
     event.preventDefault()
@@ -25,3 +26,6 @@ class @ThreadListItemView extends Backbone.View
 
   addComment: =>
     @$(".comments-count").html(parseInt(@$(".comments-count").html()) + 1)
+
+  highlight: (el) ->
+    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
