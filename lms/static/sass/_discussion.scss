@@ -351,6 +351,14 @@ body.discussion {
       padding: 40px;
       box-sizing: border-box;
     }
+
+    .wmd-button {
+      background: none;
+    }
+
+    .wmd-button span {
+      background: url(../images/new-post-icons-full.png) no-repeat;
+    }
   }
 
   .new-post-form {
@@ -1407,6 +1415,10 @@ body.discussion {
   .discussion-submit-post {
     @include blue-button;
     float: left;
+  }
+
+  .wmd-button {
+    width: 15px;
   }
 }
 
