@@ -1,29 +1,23 @@
 class @DiscussionContentView extends Backbone.View
   
-  partialRenderer:
+  attrRenderer:
     endorsed: (endorsed) ->
+      if endorsed
+        @$(".action-endorse").addClass("is-endorsed")
+      else
+        @$(".action-endorse").removeClass("is-endorsed")
 
-    closed: (closed) -> # we should just re-render the whole thread, or update according to new abilities
+    closed: (closed) ->
 
     voted: (voted) ->
-      if voted
-        @$(".discussion-vote").addClass("is-cast")
-      else
-        @$(".discussion-vote").removeClass("is-cast")
 
     votes_point: (votes_point) ->
-      @$(".discussion-vote .votes-count-number").html(votes_point)
 
     comments_count: (comments_count) ->
       
     subscribed: (subscribed) ->
-      if subscribed
-        @$(".dogear").addClass("is-followed")
-      else
-        @$(".dogear").removeClass("is-followed")
 
     ability: (ability) ->
-      console.log "ability changed"
       for action, selector of @abilityRenderer
         if not ability[action]
           selector.disable.apply(@)
@@ -41,11 +35,15 @@ class @DiscussionContentView extends Backbone.View
       enable: -> @$(".action-endorse").css("cursor", "auto")
       disable: -> @$(".action-endorse").css("cursor", "default")
 
-  renderPartial: ->
-    console.log "changed"
+  renderPartialAttrs: ->
     for attr, value of @model.changedAttributes()
-      if @partialRenderer[attr]
-        @partialRenderer[attr].apply(@, [value])
+      if @attrRenderer[attr]
+        @attrRenderer[attr].apply(@, [value])
+
+  renderAttrs: ->
+    for attr, value of @model.attributes
+      if @attrRenderer[attr]
+        @attrRenderer[attr].apply(@, [value])
 
   initialize: ->
-    @model.bind('change', @renderPartial, @)
+    @model.bind('change', @renderPartialAttrs, @)
