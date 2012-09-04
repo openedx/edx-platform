@@ -42,7 +42,6 @@ class @NewPostView extends Backbone.View
         # change and 2) can't set in initialize because the button is hidden
         @maxNameWidth = @dropdownButton.width() * 0.9
 
-
     # Need a fat arrow because hideTopicDropdown is passed as a callback to bind
     hideTopicDropdown: () =>
         @menuOpen = false

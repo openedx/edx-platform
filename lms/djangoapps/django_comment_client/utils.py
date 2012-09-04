@@ -120,7 +120,7 @@ def initialize_discussion_info(course):
             node[level]["entries"][entry["title"]] = {"id": entry["id"], 
                                                       "sort_key": entry["sort_key"]}
 
-    for topic, entry in course.metadata['discussion_topics'].items():
+    for topic, entry in course.metadata.get('discussion_topics', {}).items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic)}
 
