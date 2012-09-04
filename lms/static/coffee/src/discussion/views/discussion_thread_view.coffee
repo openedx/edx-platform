@@ -111,7 +111,7 @@ class @DiscussionThreadView extends DiscussionContentView
     event.preventDefault()
     url = @model.urlFor('reply')
     body = @$("#wmd-input").val()
-    response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 })
+    response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false)
     @renderResponse(response)
     @addComment()
 
