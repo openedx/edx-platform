@@ -162,22 +162,22 @@ def forum_form_discussion(request, course_id):
             'discussion_data': map(utils.safe_content, threads),
         })
     else:
-        recent_active_threads = cc.search_recent_active_threads(
-            course_id,
-            recursive=False,
-            query_params={'follower_id': request.user.id},
-        )
+        #recent_active_threads = cc.search_recent_active_threads(
+        #    course_id,
+        #    recursive=False,
+        #    query_params={'follower_id': request.user.id},
+        #)
 
-        trending_tags = cc.search_trending_tags(
-            course_id,
-        )
+        #trending_tags = cc.search_trending_tags(
+        #    course_id,
+        #)
         escapedict = {'"': '&quot;'}
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'content': content,
-            'recent_active_threads': recent_active_threads,
-            'trending_tags': trending_tags,
+            #'recent_active_threads': recent_active_threads,
+            #'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
             'threads': saxutils.escape(json.dumps(threads),escapedict),
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
