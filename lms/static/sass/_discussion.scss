@@ -732,8 +732,14 @@ body.discussion {
         line-height: 22px;
         color: #fff;
         @include clearfix;
+        @include transition(none);
 
-        &:hover {
+        &.hidden {
+          display: none;
+        }
+
+        &:hover,
+        &.focused {
           background-color: #636363;
         }
 

@@ -132,7 +132,7 @@ function filterDrop(e) {
 		return;
 	}
 
-	$items.hide();
+	$items.addClass('hidden');
 	$items.each(function(i) {
 		var thisText = $(this).children().not('.unread').text();
 		$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
@@ -147,7 +147,7 @@ function filterDrop(e) {
 		}
 
 		if(test) {
-			$(this).show();
+			$(this).removeClass('hidden');
 
 			// show children
 			$(this).parent().find('a').show();
@@ -225,6 +225,7 @@ function showTopicDrop(e) {
 
 	$topicDrop.show();
 	$browse.unbind('click', showTopicDrop);
+	$body.bind('keyup', setActiveDropItem);
 	$browse.bind('click', hideTopicDrop);
 	setTimeout(function() {
 		$body.bind('click', hideTopicDrop);
