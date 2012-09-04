@@ -37,7 +37,33 @@
   }
 }
 
+@mixin discussion-wmd-input {
+  width: 100%;
+  height: 240px;
+  margin-top: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  border-radius: 3px 3px 0 0;
+  background: #fff;
+  font-family: 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
 
+@mixin discussion-wmd-preview {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  background: #eee;    
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
 
 @-webkit-keyframes fadeIn {
   0% { opacity: 0; }
@@ -47,6 +73,141 @@
 
 
 
+/*** base editor styles ***/
+
+.wmd-panel {
+  width: 100%;
+  min-width: 500px;
+}
+
+.wmd-button-bar  {
+  width: 100%;
+  background-color: Silver; 
+}
+
+.wmd-input {
+  height: 150px;
+  width: 100%;
+  background-color: #e9e9e9;
+  border: 1px solid #c8c8c8;
+  font-family: Monaco, 'Lucida Console', monospace;
+  font-style: normal;
+  font-size: 0.8em;
+  line-height: 1.6em;
+  @include border-radius(3px 3px 0 0);
+
+  &::-webkit-input-placeholder {
+    color: #888;
+  }
+}
+
+.wmd-preview {
+  position: relative;
+  font-family: $sans-serif;
+  padding: 25px 20px 10px 20px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  border: 1px solid #c8c8c8;
+  border-top-width: 0;
+  @include border-radius(0 0 3px 3px);
+  overflow: hidden;
+  @include transition(all, .2s, easeOut);
+
+  &:before {
+    content: 'PREVIEW';
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    font-size: 11px;
+    color: #bbb;
+  }
+
+  p {
+    font-family: $sans-serif;
+  }
+  background-color: #fafafa;
+}
+
+.wmd-button-row {
+  position: relative; 
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  padding: 0px;  
+  height: 20px;
+  overflow: hidden;
+  @include transition(all, .2s, easeOut);
+}
+
+.wmd-spacer {
+  width: 1px; 
+  height: 20px; 
+  margin-left: 14px;
+  
+  position: absolute;
+  background-color: Silver;
+  display: inline-block; 
+  list-style: none;
+}
+
+.wmd-button {
+  width: 20px;
+  height: 20px;
+  padding-left: 2px;
+  padding-right: 3px;
+  position: absolute;
+  display: inline-block;
+  list-style: none;
+  cursor: pointer;
+}
+
+.wmd-button > span {
+  background-image: url('/static/images/wmd-buttons.png');
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.wmd-spacer1 {
+  left: 50px;
+}
+.wmd-spacer2 {
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  left: 300px;
+}
+
+.wmd-prompt-background {
+  background-color: Black;
+}
+
+.wmd-prompt-dialog {
+  border: 1px solid #999999;
+  background-color: #F5F5F5;
+}
+
+.wmd-prompt-dialog > div {
+  font-size: 0.8em;
+  font-family: arial, helvetica, sans-serif;
+}
+
+
+.wmd-prompt-dialog > form > input[type="text"] {
+  border: 1px solid #999999;
+  color: black;
+}
+
+.wmd-prompt-dialog > form > input[type="button"] {
+  border: 1px solid #888888;
+  font-family: trebuchet MS, helvetica, sans-serif;
+  font-size: 0.8em;
+  font-weight: bold;
+}
 
 
 body.discussion {
@@ -204,7 +365,8 @@ body.discussion {
       margin-bottom: 20px;
     }
 
-    .new-post-body {
+    .new-post-body .wmd-input {
+      @include discussion-wmd-input;
       position: relative;
       width: 100%;
       height: 200px;
@@ -220,10 +382,11 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
-    .new-post-preview {
+    .new-post-body .wmd-preview {
+      @include discussion-wmd-preview;
       position: relative;
       width: 100%;
-      height: 50px;
+      //height: 50px;
       margin-top: -1px;
       padding: 10px;
       box-sizing: border-box;
@@ -1207,31 +1370,11 @@ body.discussion {
   }
 
   #wmd-input {
-    width: 100%;
-    height: 240px;
-    margin-top: 0;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #aaa;
-    border-radius: 3px 3px 0 0;
-    background: #fff;
-    font-family: 'Monaco', monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    @include discussion-wmd-input; 
   }
 
   #wmd-preview {
-    width: 100%;
-    min-height: 40px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #aaa;
-    border-top: none;
-    border-radius: 0 0 3px 3px;
-    background: #eee;    
-    color: #333;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    @include discussion-wmd-preview;
   }
 
   .reply-post-control {
