@@ -465,6 +465,16 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
         return self._child_instances
 
+
+    def get_child_by_url_name(self, url_name):
+        """
+        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
+        """
+        for c in self.get_children():
+            if c.url_name == url_name:
+                return c
+        return None
+
     def xmodule_constructor(self, system):
         """
         Returns a constructor for an XModule. This constructor takes two

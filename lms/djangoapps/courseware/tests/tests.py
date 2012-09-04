@@ -7,6 +7,7 @@ import time
 from nose import SkipTest
 from path import path
 from pprint import pprint
+from urlparse import urlsplit, urlunsplit
 
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
@@ -82,6 +83,27 @@ REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
+
+    def assertRedirectsNoFollow(self, response, expected_url):
+        """
+        http://devblog.point2.com/2010/04/23/djangos-assertredirects-little-gotcha/
+
+        Don't check that the redirected-to page loads--there should be other tests for that.
+
+        Some of the code taken from django.test.testcases.py
+        """
+        self.assertEqual(response.status_code, 302,
+                         'Response status code was {0} instead of 302'.format(response.status_code))
+        url = response['Location']
+
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(
+                                                              expected_url)
+        if not (e_scheme or e_netloc):
+            expected_url = urlunsplit(('http', 'testserver', e_path,
+                e_query, e_fragment))
+
+        self.assertEqual(url, expected_url, "Response redirected to '{0}', expected '{1}'".format(
+            url, expected_url))
 
     def setUp(self):
         email = 'view@test.com'
@@ -193,6 +215,25 @@ class PageLoader(ActivateLoginTestCase):
         data = parse_json(resp)
         self.assertTrue(data['success'])
 
+
+    def check_for_get_code(self, code, url):
+        """
+        Check that we got the expected code.  Hacks around our broken 404
+        handling.
+        """
+        resp = self.client.get(url)
+        # HACK: workaround the bug that returns 200 instead of 404.
+        # TODO (vshnayder): once we're returning 404s, get rid of this if.
+        if code != 404:
+            self.assertEqual(resp.status_code, code)
+            # And 'page not found' shouldn't be in the returned page
+            self.assertTrue(resp.content.lower().find('page not found') == -1)
+        else:
+            # look for "page not found" instead of the status code
+            #print resp.content
+            self.assertTrue(resp.content.lower().find('page not found') != -1)
+
+
     def check_pages_load(self, course_name, data_dir, modstore):
         """Make all locations in course load"""
         print "Checking course {0} in {1}".format(course_name, data_dir)
@@ -204,7 +245,7 @@ class PageLoader(ActivateLoginTestCase):
         course = courses[0]
         self.enroll(course)
         course_id = course.id
-        
+
         n = 0
         num_bad = 0
         all_ok = True
@@ -246,6 +287,54 @@ class TestCoursesLoadTestCase(PageLoader):
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestNavigation(PageLoader):
+    """Check that navigation state is saved properly"""
+
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+        courses = modulestore().get_courses()
+
+        def find_course(name):
+            """Assumes the course is present"""
+            return [c for c in courses if c.location.course==name][0]
+
+        self.full = find_course("full")
+        self.toy = find_course("toy")
+
+        # Create two accounts
+        self.student = 'view@test.com'
+        self.student2 = 'view2@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.create_account('u2', self.student2, self.password)
+        self.activate_user(self.student)
+        self.activate_user(self.student2)
+
+    def test_accordion_state(self):
+        """Make sure that the accordion remembers where you were properly"""
+        self.login(self.student, self.password)
+        self.enroll(self.toy)
+        self.enroll(self.full)
+
+        # First request should redirect to Overview
+        resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
+
+        self.assertRedirectsNoFollow(resp, reverse(
+            'courseware_chapter', kwargs={'course_id': self.toy.id, 'chapter': 'Overview'}))
+
+        # Now we directly navigate to a section in a different chapter
+        self.check_for_get_code(200, reverse('courseware_section',
+                                             kwargs={'course_id': self.toy.id,
+                                                     'chapter':'secret:magic', 'section':'toyvideo'}))
+
+        # And now hitting the courseware tab should redirect to 'secret:magic'
+        resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
+        self.assertRedirects(resp, reverse('courseware_chapter',
+                                           kwargs={'course_id': self.toy.id, 'chapter': 'secret:magic'}),
+                                           status_code = 302, target_status_code = 200)
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestViewAuth(PageLoader):
     """Check that view authentication works properly"""
 
@@ -271,19 +360,6 @@ class TestViewAuth(PageLoader):
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
-
-    def check_for_get_code(self, code, url):
-        resp = self.client.get(url)
-        # HACK: workaround the bug that returns 200 instead of 404.
-        # TODO (vshnayder): once we're returning 404s, get rid of this if.
-        if code != 404:
-            self.assertEqual(resp.status_code, code)
-            # And 'page not found' shouldn't be in the returned page
-            self.assertTrue(resp.content.lower().find('page not found') == -1)
-        else:
-            # look for "page not found" instead of the status code
-            #print resp.content
-            self.assertTrue(resp.content.lower().find('page not found') != -1)
 
     def test_instructor_pages(self):
         """Make sure only instructors for the course or staff can load the instructor

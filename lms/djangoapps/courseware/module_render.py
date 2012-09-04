@@ -52,7 +52,7 @@ def make_track_function(request):
     return f
 
 
-def toc_for_course(user, request, course, active_chapter, active_section, course_id=None):
+def toc_for_course(user, request, course, active_chapter, active_section):
     '''
     Create a table of contents from the module store
 
@@ -75,13 +75,13 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course_id, user, course, depth=2)
-    course = get_module(user, request, course.location, student_module_cache, course_id)
-    if course is None:
+        course.id, user, course, depth=2)
+    course_module = get_module(user, request, course.location, student_module_cache, course.id)
+    if course_module is None:
         return None
 
     chapters = list()
-    for chapter in course.get_display_items():
+    for chapter in course_module.get_display_items():
         hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
         if hide_from_toc:
             continue
@@ -108,36 +108,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
                          'active': chapter.url_name == active_chapter})
     return chapters
 
-
-def get_section(course_module, chapter, section):
-    """
-    Returns the xmodule descriptor for the name course > chapter > section,
-    or None if this doesn't specify a valid section
-
-    course: Course url
-    chapter: Chapter url_name
-    section: Section url_name
-    """
-
-    if course_module is None:
-        return
-
-    chapter_module = None
-    for _chapter in course_module.get_children():
-        if _chapter.url_name == chapter:
-            chapter_module = _chapter
-            break
-
-    if chapter_module is None:
-        return
-
-    section_module = None
-    for _section in chapter_module.get_children():
-        if _section.url_name == section:
-            section_module = _section
-            break
-
-    return section_module
 
 def get_module(user, request, location, student_module_cache, course_id, position=None):
     """
@@ -293,9 +263,10 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     return module
 
+# TODO (vshnayder): Rename this?  It's very confusing.
 def get_instance_module(course_id, user, module, student_module_cache):
     """
-    Returns instance_module is a StudentModule specific to this module for this student,
+    Returns the StudentModule specific to this module for this student,
         or None if this is an anonymous user
     """
     if user.is_authenticated():
