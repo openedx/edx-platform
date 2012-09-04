@@ -80,7 +80,6 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
                 thread['courseware_location']  = courseware_context['courseware_location']
                 thread['courseware_title']  = courseware_context['courseware_title']
 
-
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
