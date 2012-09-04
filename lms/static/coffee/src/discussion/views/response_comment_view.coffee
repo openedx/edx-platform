@@ -3,6 +3,7 @@ class @ResponseCommentView extends DiscussionContentView
   template: _.template($("#response-comment-template").html())
   render: ->
     @$el.html(@template(@model.toJSON()))
+    @renderAttrs()
     @$(".timeago").timeago()
     @convertMath()
     @

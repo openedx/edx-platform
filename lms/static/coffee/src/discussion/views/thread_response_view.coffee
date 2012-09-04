@@ -11,6 +11,7 @@ class @ThreadResponseView extends DiscussionContentView
     @$el.html(@template(@model.toJSON()))
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
+    @renderAttrs()
     @$(".posted-details").timeago()
     @convertMath()
     @renderComments()

@@ -23,12 +23,14 @@ class @DiscussionThreadView extends DiscussionContentView
   template: _.template($("#thread-template").html())
 
   initialize: ->
+    super()
     @model.on "change", @updateModelDetails
 
   render: ->
     @$el.html(@template(@model.toJSON()))
     @renderDogear()
     @renderVoted()
+    @renderAttrs()
     @$("span.timeago").timeago()
     Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
     @convertMath()
