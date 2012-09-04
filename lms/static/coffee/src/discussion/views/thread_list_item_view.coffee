@@ -1,13 +1,15 @@
 class @ThreadListItemView extends Backbone.View
   tagName: "li"
   template: _.template($("#thread-list-item-template").html())
+
   events:
     "click a": "threadSelected"
+
   initialize: ->
     @model.on "change", @render
     @model.on "thread:follow", @follow
     @model.on "thread:unfollow", @unfollow
-    @model.on "comment:add", @addComment
+
   render: =>
     @$el.html(@template(@model.toJSON()))
     if window.user.following(@model)

@@ -439,6 +439,9 @@ if Backbone?
       @set('thread', @)
       super()
 
+    comment: ->
+      @set("comments_count", parseInt(@get("comments_count")) + 1)
+
     follow: ->
       @set('subscribed', true)
       @trigger "thread:follow"

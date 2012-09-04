@@ -62,7 +62,7 @@ class @DiscussionThreadView extends DiscussionContentView
       @$(".responses").append(view.el)
 
   addComment: =>
-    @model.trigger "comment:add"
+    @model.comment()
 
   toggleVote: (event) ->
     event.preventDefault()
