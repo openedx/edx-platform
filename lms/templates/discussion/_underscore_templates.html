@@ -13,9 +13,9 @@
             <div class="post-body">
                 ${'<%- body %>'}
             </div>
-            ${'<% if (courseware_location) { %>'}
+            ${'<% if (obj.courseware_location) { %>'}
             <div class="post-context">
-                (this post is about <a href="../../jump_to/<% courseware_location %>"><% courseware_title %></a>)
+                (this post is about <a href="../../jump_to/${'<%- courseware_location %>'}">${'<%- courseware_title %>'}</a>)
             </div>
             ${'<% } %>'}
             <div class="post-status">

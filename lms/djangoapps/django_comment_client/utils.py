@@ -124,10 +124,7 @@ def initialize_discussion_info(course):
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic)}
 
-
     sort_map_entries(category_map)
-    #for level in category_map["subcategories"].values():
-    #    sort_map_entries(level)
 
     _DISCUSSIONINFO = {}
 
@@ -135,12 +132,15 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO['category_map'] = category_map
 
-    # TODO delete me when you've used me
-    #_DISCUSSIONINFO['categorized']['General'] = [{
-    #    'title': 'General',
-    #    'discussion_id': url_course_id,
-    #    'category': 'General',
-    #}]
+def get_courseware_context(content, course):
+    id_map = get_discussion_id_map(course)
+    id = content['commentable_id'] 
+    content_info = None
+    if id in id_map:
+        location = id_map[id]["location"].url()
+        title = id_map[id]["title"]
+        content_info = { "courseware_location": location, "courseware_title": title}
+    return content_info
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
