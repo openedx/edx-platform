@@ -14,14 +14,17 @@ var $formTopicDropMenu;
 var $postListWrapper;
 var $dropFilter;
 var $topicFilter;
+var $discussionBody;
 var sidebarWidth;
 var sidebarHeight;
 var sidebarHeaderHeight;
 var sidebarXOffset;
 var scrollTop;
+var discussionsBodyTop;
+var discussionsBodyBottom;
 var tooltipTimer;
 var tooltipCoords;
-var SIDEBAR_PADDING = -1;
+var SIDEBAR_PADDING = 10;
 var SIDEBAR_HEADER_HEIGHT = 87;
 
 
@@ -35,6 +38,7 @@ $(document).ready(function() {
 	$tooltip = $('<div class="tooltip"></div>');
 	$newPost = $('.new-post-article');
 	$sidebar = $('.sidebar');
+	$discussionBody = $('.discussion-body');
 	$postListWrapper = $('.post-list-wrapper');
 	$formTopicDropBtn = $('.new-post-article .form-topic-drop-btn');
 	$formTopicDropMenu = $('.new-post-article .form-topic-drop-menu-wrapper');
@@ -61,28 +65,69 @@ $(document).ready(function() {
 		'click': hideTooltip
 	});
 
-	//$body.delegate('.browse-topic-drop-btn', 'click', showTopicDrop);
-	//$body.delegate('.browse-topic-drop-search-input', 'keyup', filterDrop);
-	$body.delegate('.form-topic-drop-search-input', 'keyup', filterDrop);
-	//$body.delegate('.browse-topic-drop-menu-wrapper', 'click', setTopic);
+	$body.delegate('.browse-topic-drop-search-input, .form-topic-drop-search-input', 'keyup', filterDrop);
 
-	$(window).bind('resize', updateSidebarDimensions);
-	$(window).bind('scroll', updateSidebarCoordinates);
+	$(window).bind('resize', updateSidebar);
+	$(window).bind('scroll', updateSidebar);
   $('.discussion-column').bind("input", function (e) {
     console.log("resized");
-	  updateSidebarCoordinates();
-	  updateSidebarDimensions();
+	  updateSidebar();
   })
-	updateSidebarCoordinates();
-	updateSidebarDimensions();
+	updateSidebar();
 });
 
 function filterDrop(e) {
+	/*
+	 * multiple queries
+	 */
+
+	// var $drop = $(e.target).parents('.form-topic-drop-menu-wrapper, .browse-topic-drop-menu-wrapper');
+	// var queries = $(this).val().split(' ');
+	// var $items = $drop.find('a');
+
+	// if(queries.length == 0) {
+	// 	$items.show();
+	// 	return;
+	// }
+
+	// $items.hide();
+	// $items.each(function(i) {
+	// 	var thisText = $(this).children().not('.unread').text();
+	// 	$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
+	// 		thisText = thisText  + ' ' + $(this).text();
+	// 	});
+
+	// 	var test = true;
+	// 	var terms = thisText.split(' ');
+
+	// 	for(var i = 0; i < queries.length; i++) {
+	// 		if(thisText.toLowerCase().search(queries[i].toLowerCase()) == -1) {
+	// 			test = false;
+	// 		}
+	// 	}
+
+	// 	if(test) {
+	// 		$(this).show();
+
+	// 		// show children
+	// 		$(this).parent().find('a').show();
+
+	// 		// show parents
+	// 		$(this).parents('ul').siblings('a').show();
+	// 	}
+	// });
+
+
+
+	/*
+	 * single query
+	 */
+
 	var $drop = $(e.target).parents('.form-topic-drop-menu-wrapper, .browse-topic-drop-menu-wrapper');
-	var queries = $(this).val().split(' ');
+	var query = $(this).val();
 	var $items = $drop.find('a');
 
-	if(queries.length == 0) {
+	if(query.length == 0) {
 		$items.show();
 		return;
 	}
@@ -97,10 +142,8 @@ function filterDrop(e) {
 		var test = true;
 		var terms = thisText.split(' ');
 
-		for(var i = 0; i < queries.length; i++) {
-			if(thisText.toLowerCase().search(queries[i].toLowerCase()) == -1) {
-				test = false;
-			}
+		if(thisText.toLowerCase().search(query.toLowerCase()) == -1) {
+			test = false;
 		}
 
 		if(test) {
@@ -277,92 +320,37 @@ function setFormTopic(e) {
 	$formTopicDropBtn.html(boardName + ' <span class="drop-arrow">▾</span>');
 }
 
-//function updateSidebarCoordinates(e) {
-//	scrollTop = $(window).scrollTop();
-//	sidebarXOffset = $('.discussion-column').offset().top;
-//
-//	var marginTop = scrollTop + SIDEBAR_PADDING > sidebarXOffset ? scrollTop + SIDEBAR_PADDING - sidebarXOffset : 0;
-//
-//	var discussionColumnHeight = $('.discussion-column').height();
-//	marginTop = marginTop + sidebarHeight > discussionColumnHeight ? discussionColumnHeight - sidebarHeight + 2 : marginTop;
-//
-//	$sidebar.css('margin-top', marginTop);
-//	updateSidebarDimensions();
-//}
-//
-//function updateSidebarDimensions(e) {
-//	sidebarWidth = $sidebar.width();
-//
-//	var visibleHeader = sidebarXOffset - scrollTop > 0 ? sidebarXOffset - scrollTop : 0;
-//	sidebarHeight = $(window).height() - (visibleHeader + SIDEBAR_PADDING * 2);
-//	sidebarHeight = sidebarHeight > 500 ? sidebarHeight : 500;
-//
-//	var titleWidth = sidebarWidth - 115;
-//
-//	$sidebar.css('height', sidebarHeight + 'px');
-//
-//	if(!$postListWrapper[0]) {
-//		$postListWrapper = $('.post-list-wrapper');
-//	}
-//
-//	$postListWrapper.css('height', (sidebarHeight - SIDEBAR_HEADER_HEIGHT - 4) + 'px');
-//	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
-//}
+function updateSidebar(e) {
+	// determine page scroll attributes
+	scrollTop = $(window).scrollTop();
+	discussionsBodyTop = $discussionBody.offset().top;
+	discussionsBodyBottom = discussionsBodyTop + $discussionBody.height();
+	var windowHeight = $(window).height();
 
-function updateSidebarCoordinates(e) {
-  if (!$('.sidebar').attr('data-top')){
-    if ($('.sidebar').hasClass('fixed')){
-      return;
-    }
-    var offset = $('.sidebar').offset();
-    $('.sidebar').attr('data-top', offset.top);
-  }
-  $('.sidebar').css('width', .32 * $('.discussion-body').width() + 'px');
+	// toggle fixed positioning
+	if(scrollTop > discussionsBodyTop - SIDEBAR_PADDING) {
+		$sidebar.addClass('fixed');
+		$sidebar.css('top', SIDEBAR_PADDING + 'px');
+	} else {
+		$sidebar.removeClass('fixed');
+		$sidebar.css('top', '0');
+	}
 
-  scrollTop = $(window).scrollTop();
-  offset = $('.sidebar').attr('data-top');
+	// set sidebar width
+	var sidebarWidth = .32 * $discussionBody.width() - 10;
+	$sidebar.css('width', sidebarWidth + 'px');
 
-  if ((offset <= scrollTop)){
-    $('.sidebar').addClass('fixed');
-    $('.discussion-column').addClass('sidebar-fixed');
-  }else{
-    $('.sidebar').removeClass('fixed');
-    $('.discussion-column').removeClass('sidebar-fixed');
-  }
+	// show the entire sidebar at all times
+	var sidebarHeight = windowHeight - (scrollTop < discussionsBodyTop - SIDEBAR_PADDING ? discussionsBodyTop - scrollTop : SIDEBAR_PADDING) - SIDEBAR_PADDING - (scrollTop + windowHeight > discussionsBodyBottom + SIDEBAR_PADDING ? scrollTop + windowHeight - discussionsBodyBottom - SIDEBAR_PADDING : 0);
+	$sidebar.css('height', sidebarHeight > 400 ? sidebarHeight : 400 + 'px');
 
-  discussionColumnHeight = $('.discussion-column').outerHeight();
-  discussionColumnBottom = $('.discussion-column').offset().top + discussionColumnHeight;
+	// update the list height
+	if(!$postListWrapper[0]) {
+		$postListWrapper = $('.post-list-wrapper');
+	}
+	$postListWrapper.css('height', (sidebarHeight - SIDEBAR_HEADER_HEIGHT - 4) + 'px');
 
-  windowHeight = $(window).height();
-
-  if((discussionColumnBottom - scrollTop) < windowHeight){
-    //difference = minHeight - (discussionColumnBottom - scrollTop);
-    //$('.sidebar').height(minHeight);
-    //console.log(minHeight);
-    //$('.sidebar').css('top', -difference);
-    //$('.post-list-wrapper').height(minHeight - SIDEBAR_HEADER_HEIGHT - 4);
-    $('.sidebar').removeClass('fixed');
-    $('.discussion-column').removeClass('sidebar-fixed');
-  }
-
-	updateSidebarDimensions();
-}
-
-function updateSidebarDimensions(e) {
-
-  discussionColumnHeight = $('.discussion-column').outerHeight();
-  discussionColumnBottom = $('.discussion-column').offset().top + discussionColumnHeight;
-  windowHeight = $(window).height();
-  sidebarHeight = Math.min(windowHeight, discussionColumnHeight);
-  $('.sidebar').height(sidebarHeight);
-  $('.post-list-wrapper').height(sidebarHeight - SIDEBAR_HEADER_HEIGHT - 4);
-  $('.sidebar').css('width', .32 * $('.discussion-body').width() + 'px');
-
-  //$('.sidebar').height(discussionColumnBottom - scrollTop);
-  //$('.post-list-wrapper').height(discussionColumnBottom - scrollTop - SIDEBAR_HEADER_HEIGHT - 4);
-
-  if((discussionColumnBottom - scrollTop) < windowHeight){
-    $('.sidebar').height(discussionColumnHeight);
-    $('.post-list-wrapper').height(discussionColumnHeight - SIDEBAR_HEADER_HEIGHT - 4);
-  }
+	// update title wrappers
+	var titleWidth = sidebarWidth - 115;	
+	$sidebarWidthStyles.html('.discussion-body .post-list a .title { width: ' + titleWidth + 'px !important; }');
 }
