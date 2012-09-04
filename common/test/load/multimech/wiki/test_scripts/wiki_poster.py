@@ -26,7 +26,7 @@ pages_to_get = ['/courses/BerkeleyX/CS188/fa12/wiki/CS188/',
                 ]
 
 def randstr(len, chrs='abcdef123456 '):
-    return ''.join(random.choice('abcdefg12345') for r in range(len))
+    return ''.join(random.choice(chrs) for r in range(len))
 
 def randslug(len):
     # same as random string, but without spaces

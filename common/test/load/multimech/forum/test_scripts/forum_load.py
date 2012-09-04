@@ -41,6 +41,8 @@ class Transaction(object):
 
         s = self.session
         r = s.get(url('/courses/BerkeleyX/CS188/fa12/discussion/forum/'))
+        #r = s.get(url('/courses/BerkeleyX/CS188/fa12/info'))
+        
         assert r.status_code == requests.codes.ok
         r.raw.read()
 
