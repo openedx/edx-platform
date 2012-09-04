@@ -14,6 +14,7 @@ class @DiscussionRouter extends Backbone.Router
       @newPostView.on "thread:created", @navigateToThread
 
   allThreads: ->
+    @nav.updateSidebar()
     # TODO: Do something reasonable here
     # $(".discussion-column").html($('#blank-slate-template').html())
 
@@ -29,6 +30,8 @@ class @DiscussionRouter extends Backbone.Router
 
     @main = new DiscussionThreadView(el: $(".discussion-column"), model: @thread)
     @main.render()
+    @main.on "thread:responses:rendered", =>
+      @nav.updateSidebar()
 
   navigateToThread: (thread_id) =>
     thread = @discussion.get(thread_id)
