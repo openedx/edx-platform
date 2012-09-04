@@ -348,15 +348,16 @@ function updateSidebarDimensions(e) {
   discussionColumnHeight = $('.discussion-column').outerHeight();
   discussionColumnBottom = $('.discussion-column').offset().top + discussionColumnHeight;
   windowHeight = $(window).height();
-  $('.sidebar').height(discussionColumnHeight);
-  $('.post-list-wrapper').height(discussionColumnHeight - SIDEBAR_HEADER_HEIGHT - 4);
+  sidebarHeight = Math.min(windowHeight, discussionColumnHeight);
+  $('.sidebar').height(sidebarHeight);
+  $('.post-list-wrapper').height(sidebarHeight - SIDEBAR_HEADER_HEIGHT - 4);
   $('.sidebar').css('width', .32 * $('.discussion-body').width() + 'px');
 
   //$('.sidebar').height(discussionColumnBottom - scrollTop);
   //$('.post-list-wrapper').height(discussionColumnBottom - scrollTop - SIDEBAR_HEADER_HEIGHT - 4);
 
-  //if((discussionColumnBottom - scrollTop) < windowHeight){
-  //  $('.sidebar').height(discussionColumnHeight);
-  //  $('.post-list-wrapper').height(discussionColumnHeight - SIDEBAR_HEADER_HEIGHT - 4);
-  //}
+  if((discussionColumnBottom - scrollTop) < windowHeight){
+    $('.sidebar').height(discussionColumnHeight);
+    $('.post-list-wrapper').height(discussionColumnHeight - SIDEBAR_HEADER_HEIGHT - 4);
+  }
 }
