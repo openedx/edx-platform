@@ -1,18 +1,27 @@
 class @DiscussionContentView extends Backbone.View
   
-  partialRenderer:
+  attrRenderer:
     endorsed: (endorsed) ->
+      if endorsed
+        @$(".action-endorse").addClass("is-endorsed")
+      else
+        @$(".action-endorse").removeClass("is-endorsed")
 
-    closed: (closed) -> # we should just re-render the whole thread, or update according to new abilities
+    closed: (closed) ->
+      return if not @$(".action-openclose").length
+      return if not @$(".post-status-closed").length
+      if closed
+        @$(".post-status-closed").show()
+        @$(".action-openclose").html(@$(".action-openclose").html().replace("Close", "Open"))
+        @$(".discussion-reply-new").hide()
+      else
+        @$(".post-status-closed").hide()
+        @$(".action-openclose").html(@$(".action-openclose").html().replace("Open", "Close"))
+        @$(".discussion-reply-new").show()
 
     voted: (voted) ->
-      if voted
-        @$(".discussion-vote").addClass("is-cast")
-      else
-        @$(".discussion-vote").removeClass("is-cast")
 
     votes_point: (votes_point) ->
-      @$(".discussion-vote .votes-count-number").html(votes_point)
 
     comments_count: (comments_count) ->
       
@@ -23,7 +32,6 @@ class @DiscussionContentView extends Backbone.View
         @$(".dogear").removeClass("is-followed")
 
     ability: (ability) ->
-      console.log "ability changed"
       for action, selector of @abilityRenderer
         if not ability[action]
           selector.disable.apply(@)
@@ -40,12 +48,19 @@ class @DiscussionContentView extends Backbone.View
     can_endorse:
       enable: -> @$(".action-endorse").css("cursor", "auto")
       disable: -> @$(".action-endorse").css("cursor", "default")
+    can_openclose:
+      enable: -> @$(".action-openclose").closest("li").show()
+      disable: -> @$(".action-openclose").closest("li").hide()
 
-  renderPartial: ->
-    console.log "changed"
+  renderPartialAttrs: ->
     for attr, value of @model.changedAttributes()
-      if @partialRenderer[attr]
-        @partialRenderer[attr].apply(@, [value])
+      if @attrRenderer[attr]
+        @attrRenderer[attr].apply(@, [value])
+
+  renderAttrs: ->
+    for attr, value of @model.attributes
+      if @attrRenderer[attr]
+        @attrRenderer[attr].apply(@, [value])
 
   initialize: ->
-    @model.bind('change', @renderPartial, @)
+    @model.bind('change', @renderPartialAttrs, @)
