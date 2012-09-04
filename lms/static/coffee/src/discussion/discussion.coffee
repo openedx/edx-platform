@@ -5,7 +5,7 @@ if Backbone?
     initialize: ->
       @bind "add", (item) =>
         item.discussion = @
-      @comparator = @sortByDate
+      @comparator = @sortByDateRecentFirst
 
     find: (id) ->
       _.first @where(id: id)
@@ -18,6 +18,13 @@ if Backbone?
 
     sortByDate: (thread) ->
       thread.get("created_at")
+
+    sortByDateRecentFirst: (thread) ->
+      -(new Date(thread.get("created_at")).getTime())
+      #return String.fromCharCode.apply(String, 
+      #  _.map(thread.get("created_at").split(""), 
+      #        ((c) -> return 0xffff - c.charChodeAt()))
+      #)
 
     sortByVotes: (thread1, thread2) ->
       thread1_count = parseInt(thread1.get("votes")['up_count'])

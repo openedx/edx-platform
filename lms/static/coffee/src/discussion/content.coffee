@@ -24,7 +24,6 @@ if Backbone?
 
     updateInfo: (info) ->
       if info
-        console.log info.ability
         @set('ability', info.ability)
         @set('voted', info.voted)
         @set('subscribed', info.subscribed)
