@@ -30,7 +30,7 @@ def _general_discussion_id(course_id):
 def _should_perform_search(request):
     return bool(request.GET.get('text', False) or \
             request.GET.get('tags', False))
-        
+
 
 def render_accordion(request, course, discussion_id):
 
@@ -59,7 +59,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
     }[discussion_type]
 
     base_url = {
-        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])), 
+        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])),
         'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id])),
         'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
     }[discussion_type]()
@@ -210,10 +210,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
-#        html = render_to_string('discussion/_ajax_single_thread.html', context)
+        html = render_to_string('discussion/_ajax_single_thread.html', context)
 
         return utils.JsonResponse({
-#            'html': html,
+            'html': html,
             'content': utils.safe_content(thread.to_dict()),
             'annotated_content_info': annotated_content_info,
         })
@@ -276,7 +276,7 @@ def user_profile(request, course_id, user_id):
         })
     else:
         context = {
-            'course': course, 
+            'course': course,
             'user': request.user,
             'django_user': User.objects.get(id=user_id),
             'profiled_user': profiled_user.to_dict(),
