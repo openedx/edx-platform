@@ -450,6 +450,14 @@ if Backbone?
       @set('subscribed', false)
       @trigger "thread:unfollow"
 
+    vote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
+      @trigger "change"
+
+    unvote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
+      @trigger "change"
+
     display_body: ->
       if @has("highlighted_body")
         String(@get("highlighted_body")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
