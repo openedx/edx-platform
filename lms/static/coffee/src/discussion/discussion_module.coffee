@@ -23,12 +23,17 @@ if Backbone?
             type: "GET"
             dataType: 'json'
             success: (response, textStatus) =>
-              @$el.append(response.html)
-              $discussion = @$el.find("section.discussion")
+              #@$el.append(response.html)
+              window.user = new DiscussionUser(response.user_info)
               $(event.target).html("Hide Discussion")
               discussion = new Discussion()
               discussion.reset(response.discussion_data, {silent: false})
-              view = new DiscussionView(el: $discussion[0], model: discussion)
+              $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data})
+              $(".discussion-module").append($discussion)
+              discussion.each (thread) ->
+                element = $("article#thread_#{thread.id}")
+                dtv = new DiscussionThreadView el: element, model: thread
+                dtv.render()
               DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
               @retrieved = true
               @showed = true
