@@ -35,6 +35,11 @@ def make_error_tracker():
         if in_exception_handler():
             exc_str = exc_info_to_str(sys.exc_info())
 
+            # don't display irrelevant gunicorn sync error
+            if (('mitx_all/python/local/lib/python2.7/site-packages/gunicorn/workers/sync.py' in exc_str) and
+                ('[Errno 11] Resource temporarily unavailable' in exc_str)):
+                exc_str = ''
+
         errors.append((msg, exc_str))
 
     return ErrorLog(error_tracker, errors)
