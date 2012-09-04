@@ -345,10 +345,8 @@ def compute_course_stats(course):
 
     def walk(module):
         children = module.get_children()
-        if not children:
-            category = module.__class__.__name__ 	# HtmlDescriptor, CapaDescriptor, ...
-            counts[category] += 1
-            return
+        category = module.__class__.__name__ 	# HtmlDescriptor, CapaDescriptor, ...
+        counts[category] += 1
         for c in children:
             walk(c)
 
