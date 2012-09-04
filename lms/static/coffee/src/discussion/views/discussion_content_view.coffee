@@ -8,6 +8,16 @@ class @DiscussionContentView extends Backbone.View
         @$(".action-endorse").removeClass("is-endorsed")
 
     closed: (closed) ->
+      return if not @$(".action-openclose").length
+      return if not @$(".post-status-closed").length
+      if closed
+        @$(".post-status-closed").show()
+        @$(".action-openclose").html(@$(".action-openclose").html().replace("Close", "Open"))
+        @$(".discussion-reply-new").hide()
+      else
+        @$(".post-status-closed").hide()
+        @$(".action-openclose").html(@$(".action-openclose").html().replace("Open", "Close"))
+        @$(".discussion-reply-new").show()
 
     voted: (voted) ->
 
@@ -38,6 +48,9 @@ class @DiscussionContentView extends Backbone.View
     can_endorse:
       enable: -> @$(".action-endorse").css("cursor", "auto")
       disable: -> @$(".action-endorse").css("cursor", "default")
+    can_openclose:
+      enable: -> @$(".action-openclose").closest("li").show()
+      disable: -> @$(".action-openclose").closest("li").hide()
 
   renderPartialAttrs: ->
     for attr, value of @model.changedAttributes()
