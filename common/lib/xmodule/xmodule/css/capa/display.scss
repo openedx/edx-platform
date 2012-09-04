@@ -32,6 +32,12 @@ section.problem {
       display: inline;
   }
 
+  .choicegroup {
+    label.choicegroup_correct:after {
+      content: url('../images/correct-icon.png');
+    }
+  }
+
 
   div {
     p {
