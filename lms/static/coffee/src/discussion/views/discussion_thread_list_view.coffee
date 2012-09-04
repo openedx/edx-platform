@@ -6,9 +6,16 @@ class @DiscussionThreadListView extends Backbone.View
     "keyup .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
     "click .browse-topic-drop-menu": "filterTopic"
+    "click .browse-topic-drop-search-input": "ignoreClick"
 
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
+
+  # Because we want the behavior that when the body is clicked the menu is
+  # closed, we need to ignore clicks in the search field and stop propagation.
+  # Without this, clicking the search field would also close the menu.
+  ignoreClick: (event) ->
+      event.stopPropagation()
 
   render: ->
     @timer = 0
@@ -41,16 +48,15 @@ class @DiscussionThreadListView extends Backbone.View
     @$(".browse").removeClass('is-open')
     setTimeout (-> @$(".post-search-field").focus()), 200
 
-  toggleTopicDrop: =>
+  toggleTopicDrop: (event) =>
+    event.stopPropagation()
     @$(".browse").toggleClass('is-dropped')
     if @$(".browse").hasClass('is-dropped')
       @$(".browse-topic-drop-menu-wrapper").show()
-      setTimeout((=>
-        $("body").bind("click", @toggleTopicDrop)
-      ), 0)
+      $('body').bind 'click', @toggleTopicDrop
     else
       @$(".browse-topic-drop-menu-wrapper").hide()
-      $("body").unbind("click", @toggleTopicDrop)
+      $('body').unbind 'click', @toggleTopicDrop
 
   setTopic: (event) ->
     item = $(event.target).closest('a')
@@ -70,6 +76,8 @@ class @DiscussionThreadListView extends Backbone.View
   filterTopic: (event) ->
     @setTopic(event)
     item = $(event.target).closest('li')
+    if item.find("span.board-name").data("discussion_id") == "#all"
+      item = item.parent()
     discussionIds = _.compact _.map item.find("span.board-name"), (board) -> $(board).data("discussion_id")
     discussionIds = _.map discussionIds, (info) -> info.id
     filtered = @collection.filter (thread) =>
