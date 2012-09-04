@@ -123,12 +123,14 @@ def get_threads(request, course_id, discussion_id=None):
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
     threads, query_params = get_threads(request, course_id, discussion_id)
-    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
-                                                                 query_params=query_params)
-    
+    # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
+#    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
+#                                                                 query_params=query_params)
+    user_info = cc.User.from_django_user(request.user).to_dict()
     return utils.JsonResponse({
-        'html': html,
+#        'html': html,
         'discussion_data': map(utils.safe_content, threads),
+        'user_info': user_info,
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
@@ -207,10 +209,11 @@ def single_thread(request, course_id, discussion_id, thread_id):
         thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
-        html = render_to_string('discussion/_ajax_single_thread.html', context)
+        # TODO: Remove completely or switch back to server side rendering
+#        html = render_to_string('discussion/_ajax_single_thread.html', context)
 
         return utils.JsonResponse({
-            'html': html,
+#            'html': html,
             'content': utils.safe_content(thread.to_dict()),
             'annotated_content_info': annotated_content_info,
         })

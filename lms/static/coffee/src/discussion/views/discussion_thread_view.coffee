@@ -29,7 +29,7 @@ class @DiscussionThreadView extends Backbone.View
 
   renderResponses: ->
     DiscussionUtil.safeAjax
-      url: @model.id
+      url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
       success: (data, textStatus, xhr) =>
         @$(".loading").remove()
         comments = new Comments(data['content']['children'])
