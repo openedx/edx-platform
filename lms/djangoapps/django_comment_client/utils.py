@@ -68,6 +68,15 @@ def get_discussion_category_map(course):
         initialize_discussion_info(course)
     return _DISCUSSIONINFO['category_map']
 
+def sort_map_entries(category_map):
+    things = []
+    for title, entry in category_map["entries"].items():
+        things.append((title, entry))
+    for title, category in category_map["subcategories"].items():
+        things.append((title, category))
+        sort_map_entries(category_map["subcategories"][title])
+    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
@@ -80,7 +89,9 @@ def initialize_discussion_info(course):
     all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}
+
     unexpanded_category_map = defaultdict(list)
+
     for location, module in all_modules.items():
         if location.category == 'discussion':
             id = module.metadata['id']
@@ -112,40 +123,17 @@ def initialize_discussion_info(course):
             node[level]["entries"][entry["title"]] = {"id": entry["id"], 
                                                       "sort_key": entry["sort_key"]}
 
-<<<<<<< HEAD
-    sort_map_entries(category_map)
-=======
-    def sort_map_entries(map):
-        things = []
-        for title, entry in map["entries"].items():
-            things.append((title, entry))
-        for title, category in map["subcategories"].items():
-            things.append((title, category))
-            sort_map_entries(map["subcategories"][title])
-        map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    for topic, entry in course.metadata['discussion_topics'].items():
+        category_map['entries'][topic] = {"id": entry["id"],
+                                          "sort_key": entry.get("sort_key", topic)}
 
     sort_map_entries(category_map)
-    #for level in category_map["subcategories"].values():
-    #    sort_map_entries(level)
->>>>>>> populate dropdown
 
     _DISCUSSIONINFO = {}
 
     _DISCUSSIONINFO['id_map'] = discussion_id_map
-<<<<<<< HEAD
 
     _DISCUSSIONINFO['category_map'] = category_map
-=======
-
-    _DISCUSSIONINFO['category_map'] = category_map
-
-    # TODO delete me when you've used me
-    #_DISCUSSIONINFO['categorized']['General'] = [{
-    #    'title': 'General',
-    #    'discussion_id': url_course_id,
-    #    'category': 'General',
-    #}]
->>>>>>> populate dropdown
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
