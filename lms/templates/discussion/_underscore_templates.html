@@ -1,6 +1,6 @@
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <a href="#" class="dogear"></a>
+        <a href="javascript:void(0)" class="dogear action-follow"></a>
         <div class="discussion-post">
             <header>
                 <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
@@ -13,6 +13,15 @@
             <div class="post-body">
                 ${'<%- body %>'}
             </div>
+            <div class="post-status">
+              ${'<% if (closed) { %>'}
+                This thread is closed.
+              ${'<% } %>'}
+            </div>
+            <ul class="moderator-actions">
+                <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
+                <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
+            </ul>
         </div>
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
@@ -30,7 +39,8 @@
 
 <script type="text/template" id="thread-response-template">
     <header>
-        <a href="#" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
+        <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
+        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         <a href="${'<%- user_url %>'}" class="posted-by">${"<%- username %>"}</a>
         <p class="posted-details" title="${'<%- created_at %>'}">Sometime</p>
     </header>

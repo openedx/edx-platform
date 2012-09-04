@@ -1249,12 +1249,16 @@ body.discussion {
   }
 
   .moderator-actions {
+    margin: 0;
     margin-top: 20px;
+    padding: 0;
     @include clearfix;
+
 
     li {
       float: left;
       margin-right: 8px;
+      list-style: none;
     }
 
     a {
