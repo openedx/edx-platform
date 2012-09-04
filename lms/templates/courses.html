@@ -19,12 +19,6 @@
   <section class="container">
     ## I'm removing this for now since we aren't using it for the fall.
     ## <%include file="course_filter.html" />
-
-<%!
-from django.core.urlresolvers import reverse
-%>    
-   <h1>For 8.01 Reading Questions, click on     <a href="${reverse('courses')}">Find Courses</a></h1>
-
     <section class="courses">
       <section class='university-column'>
         %for course in universities['MITx']:
