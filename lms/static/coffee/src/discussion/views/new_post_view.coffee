@@ -11,6 +11,9 @@ class @NewPostView extends Backbone.View
 
         @setSelectedTopic()
 
+        DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
+        @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
+
     events:
         "submit .new-post-form":            "createPost"
         "click  .topic_dropdown_button":    "toggleTopicDropdown"
@@ -74,7 +77,7 @@ class @NewPostView extends Backbone.View
 
     getNameWidth: (name) ->
         test = $("<div>")
-        test.css 
+        test.css
             "font-size": @dropdownButton.css('font-size')
             opacity: 0
             position: 'absolute'
@@ -112,14 +115,14 @@ class @NewPostView extends Backbone.View
     createPost: (event) ->
         event.preventDefault()
         title   = @$(".new-post-title").val()
-        body    = @$(".new-post-body").val()
+        body    = @$(".new-post-body").find(".wmd-input").val()
         tags    = @$(".new-post-tags").val()
 
         anonymous = false || @$("input.discussion-anonymous").is(":checked")
         follow    = false || @$("input.discussion-follow").is(":checked")
 
-        $formTopicDropBtn.bind('click', showFormTopicDrop);
-        $formTopicDropMenu.bind('click', setFormTopic);
+        $formTopicDropBtn.bind('click', showFormTopicDrop)
+        $formTopicDropMenu.bind('click', setFormTopic)
 
         url = DiscussionUtil.urlFor('create_thread', @topicId)
 
