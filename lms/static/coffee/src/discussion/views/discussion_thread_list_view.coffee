@@ -23,32 +23,32 @@ class @DiscussionThreadListView extends Backbone.View
     scrollTop = $(window).scrollTop();
     windowHeight = $(window).height();
 
-    $discussionBody = $(".discussion-body")
-    discussionsBodyTop = $discussionBody.offset().top;
-    discussionsBodyBottom = discussionsBodyTop + $discussionBody.height();
+    discussionBody = $(".discussion-article")
+    discussionsBodyTop = discussionBody.offset().top;
+    discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight();
 
-    $sidebar = $(".sidebar")
+    sidebar = $(".sidebar")
     if scrollTop > discussionsBodyTop - @sidebar_padding
-        $sidebar.addClass('fixed');
-        $sidebar.css('top', @sidebar_padding);
+      sidebar.addClass('fixed');
+      sidebar.css('top', @sidebar_padding);
     else
-        $sidebar.removeClass('fixed');
-        $sidebar.css('top', '0');
+      sidebar.removeClass('fixed');
+      sidebar.css('top', '0');
 
-    sidebarWidth = .32 * $discussionBody.width() - 10;
-    $sidebar.css('width', sidebarWidth + 'px');
+    sidebarWidth = .32 * $(".discussion-body").width() - 10;
+    sidebar.css('width', sidebarWidth + 'px');
 
     sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
 
-    topAmount = scrollTop + windowHeight
-    bottomAmount = discussionsBodyBottom + @sidebar_padding
-    amount = Math.max(topAmount - bottomAmount, 0)
+    topOffset = scrollTop + windowHeight
+    discussionBottomOffset = discussionsBodyBottom + @sidebar_padding
+    amount = Math.max(topOffset - discussionBottomOffset, 0)
 
     sidebarHeight = sidebarHeight - @sidebar_padding - amount
-    $sidebar.css 'height', Math.max(sidebarHeight, 400)
+    sidebar.css 'height', Math.min(Math.max(sidebarHeight, 400), discussionBody.outerHeight())
 
-    $postListWrapper = @$('.post-list-wrapper')
-    $postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px');
+    postListWrapper = @$('.post-list-wrapper')
+    postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px');
 
 
   # Because we want the behavior that when the body is clicked the menu is
