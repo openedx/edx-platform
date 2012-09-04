@@ -15,7 +15,7 @@ class @DiscussionRouter extends Backbone.Router
 
   allThreads: ->
     # TODO: Do something reasonable here
-    $(".discussion-column").html("No thread selected.")
+    # $(".discussion-column").html($('#blank-slate-template').html())
 
   setActiveThread: =>
     if @thread
