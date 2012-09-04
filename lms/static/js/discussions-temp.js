@@ -69,6 +69,10 @@ $(document).ready(function() {
 
 	$(window).bind('resize', updateSidebar);
 	$(window).bind('scroll', updateSidebar);
+  $('.discussion-column').bind("input", function (e) {
+    console.log("resized");
+	  updateSidebar();
+  })
 	updateSidebar();
 });
 
