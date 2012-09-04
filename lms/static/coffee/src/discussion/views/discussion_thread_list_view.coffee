@@ -3,7 +3,7 @@ class @DiscussionThreadListView extends Backbone.View
   events:
     "click .search": "showSearch"
     "click .browse": "toggleTopicDrop"
-    "keyup .post-search-field": "performSearch"
+    "keydown .post-search-field": "performSearch"
     "click .sort-bar a": "sortThreads"
     "click .browse-topic-drop-menu": "filterTopic"
     "click .browse-topic-drop-search-input": "ignoreClick"
@@ -89,7 +89,7 @@ class @DiscussionThreadListView extends Backbone.View
     $(event.target).addClass("active")
     sortBy = $(event.target).data("sort")
     if sortBy == "date"
-      @displayedCollection.comparator = @displayedCollection.sortByDate
+      @displayedCollection.comparator = @displayedCollection.sortByDateRecentFirst
     else if sortBy == "votes"
       @displayedCollection.comparator = @displayedCollection.sortByVotes
     else if sortBy == "comments"
@@ -100,8 +100,9 @@ class @DiscussionThreadListView extends Backbone.View
     clearTimeout(@timer)
     @timer = setTimeout(callback, ms)
 
-  performSearch: ->
-    callback = =>
+  performSearch: (event) ->
+    if event.which == 13
+      event.preventDefault()
       url = DiscussionUtil.urlFor("search")
       text = @$(".post-search-field").val()
       DiscussionUtil.safeAjax
@@ -112,6 +113,4 @@ class @DiscussionThreadListView extends Backbone.View
         success: (response, textStatus) =>
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
-            @displayedCollection.reset(@collection)
-
-    @delay(callback, 300)
+            @displayedCollection.reset(@collection.models)
