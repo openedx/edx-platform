@@ -119,6 +119,7 @@ def add_histogram(get_html, module, user):
         source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
 
         # useful to indicate to staff if problem has been released or not
+        # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
         now = time.gmtime()
         is_released = "unknown"
         mstart = getattr(module.descriptor,'start')
