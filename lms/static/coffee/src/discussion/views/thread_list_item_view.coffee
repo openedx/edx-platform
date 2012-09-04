@@ -13,9 +13,9 @@ class @ThreadListItemView extends Backbone.View
     if window.user.following(@model)
       @follow()
     @
-  threadSelected: ->
+  threadSelected: (event) ->
+    event.preventDefault()
     @trigger("thread:selected", @model.id)
-    false
 
   follow: =>
     @$("a").addClass("followed")
