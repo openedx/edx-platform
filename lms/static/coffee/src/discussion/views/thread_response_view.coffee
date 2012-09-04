@@ -8,8 +8,6 @@ class @ThreadResponseView extends DiscussionContentView
       "click .action-endorse": "toggleEndorse"
 
   render: ->
-    console.log @model
-    console.log @model.toJSON()
     @$el.html(@template(@model.toJSON()))
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
