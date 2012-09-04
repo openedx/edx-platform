@@ -1389,13 +1389,6 @@ body.discussion {
 
 
 
-
-
-
-
-
-
-
 .global-discussion-actions {
   height: 60px;
   @include linear-gradient(top, #ebebeb, #d9d9d9);
@@ -1403,21 +1396,13 @@ body.discussion {
   border-bottom: 1px solid #bcbcbc;
 }
 
+.discussion-module {
+  @extend .discussion-body
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* For some reason I have to do this to get the SCSS to compile, can't stick it under the above .discussion-module */
+.discussion-module {
+  .discussion-reply-new {
+    display:none
+  }
+}
