@@ -8,6 +8,8 @@ class @ThreadResponseView extends DiscussionContentView
       "click .action-endorse": "toggleEndorse"
 
   render: ->
+    console.log @model
+    console.log @model.toJSON()
     @$el.html(@template(@model.toJSON()))
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")
@@ -65,7 +67,7 @@ class @ThreadResponseView extends DiscussionContentView
     body = @$(".comment-form-input").val()
     if not body.trim().length
       return
-    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"))
+    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"))
     @renderComment(comment)
     @trigger "comment:add"
     @$(".comment-form-input").val("")

@@ -8,6 +8,7 @@ DiscussionApp =
     threads = element.data("threads")
     content_info = element.data("content-info")
     window.user = new DiscussionUser(user_info)
+    console.log content_info
     Content.loadContentInfos(content_info)
     discussion = new Discussion(threads)
     new DiscussionRouter({discussion: discussion})
