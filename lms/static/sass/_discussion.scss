@@ -301,6 +301,7 @@ body.discussion {
           border-top: 1px solid #5f5f5f;
           font-size: 14px;
           font-weight: 700;
+          line-height: 18px;
           color: #eee;
 
           &:hover {
@@ -716,16 +717,22 @@ body.discussion {
 
       a {
         display: block;
-        height: 50px;
         padding: 0 20px;
         border-top: 1px solid #5f5f5f;
         font-size: 14px;
         font-weight: 700;
-        line-height: 48px;
+        line-height: 22px;
         color: #fff;
+        @include clearfix;
 
         &:hover {
           background-color: #636363;
+        }
+
+        .board-name {
+          float: left;
+          width: 80%;
+          margin: 13px 0;
         }
 
         .unread {
