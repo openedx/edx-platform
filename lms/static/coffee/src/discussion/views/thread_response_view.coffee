@@ -1,9 +1,11 @@
-class @ThreadResponseView extends Backbone.View
+class @ThreadResponseView extends DiscussionContentView
   tagName: "li"
   template: _.template($("#thread-response-template").html())
+
   events:
       "click .vote-btn": "toggleVote"
       "submit form": "submitComment"
+      "click .action-endorse": "toggleEndorse"
 
   render: ->
     @$el.html(@template(@model.toJSON()))
@@ -27,13 +29,13 @@ class @ThreadResponseView extends Backbone.View
     view.render()
     @$(".comments li:last").before(view.el)
 
-  toggleVote: ->
+  toggleVote: (event) ->
+    event.preventDefault()
     @$(".vote-btn").toggleClass("is-cast")
     if @$(".vote-btn").hasClass("is-cast")
       @vote()
     else
       @unvote()
-    false
 
   vote: ->
     url = @model.urlFor("upvote")
@@ -58,10 +60,11 @@ class @ThreadResponseView extends Backbone.View
           @model.set(response)
 
   submitComment: (event) ->
+    event.preventDefault()
     url = @model.urlFor('reply')
     body = @$(".comment-form-input").val()
     if not body.trim().length
-      return false
+      return
     comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"))
     @renderComment(comment)
     @trigger "comment:add"
@@ -74,5 +77,18 @@ class @ThreadResponseView extends Backbone.View
       dataType: 'json'
       data:
         body: body
-       
-    false
+
+  toggleEndorse: (event) ->
+    event.preventDefault()
+    if not @model.can('can_endorse')
+      return
+    $elem = $(event.target)
+    url = @model.urlFor('endorse')
+    endorsed = @model.get('endorsed')
+    data = { endorsed: not endorsed }
+    @model.set('endorsed', not endorsed)
+    DiscussionUtil.safeAjax
+      $elem: $elem
+      url: url
+      data: data
+      type: "POST"
