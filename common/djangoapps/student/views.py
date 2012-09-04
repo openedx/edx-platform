@@ -75,8 +75,11 @@ def index(request, extra_context={}, user=None):
         entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
+    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
+    if not domain:
+        domain = request.META.get('HTTP_HOST')
     universities = get_courses_by_university(None,
-                                             domain=request.META.get('HTTP_HOST'))
+                                             domain=domain)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
