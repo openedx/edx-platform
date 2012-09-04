@@ -1,5 +1,3 @@
-import os
-import os.path
 import platform
 import sys
 from logging.handlers import SysLogHandler
@@ -22,12 +20,6 @@ def get_logger_config(log_dir,
     if local_loglevel not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
         local_loglevel = 'INFO'
 
-    # If we're given an explicit place to put tracking logs,
-    # we do that (say for debugging). However, logging is not
-    # safe for multiple processes hitting the same file.
-    # So if it's left blank, we dynamically create the filename
-    # based on the PID of this worker process.
-
     hostname = platform.node().split(".")[0]
     syslog_format = ("[%(name)s][env:{logging_env}] %(levelname)s [{hostname} " +
                      " %(process)d] [%(filename)s:%(lineno)d] - %(message)s").format(
@@ -43,8 +35,8 @@ def get_logger_config(log_dir,
             'standard': {
                 'format': '%(asctime)s %(levelname)s %(process)d [%(name)s] %(filename)s:%(lineno)d - %(message)s',
             },
-            'syslog_format': {'format': syslog_format },
-            'raw': {'format': '%(message)s' },
+            'syslog_format': {'format': syslog_format},
+            'raw': {'format': '%(message)s'},
         },
         'handlers': {
             'console': {
