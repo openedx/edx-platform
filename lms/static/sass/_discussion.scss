@@ -551,6 +551,14 @@ body.discussion {
     background: #f6f6f6;
     border-radius: 3px 0 0 3px;
     border-right: 1px solid #bcbcbc;
+
+    &.fixed {
+      @include box-sizing(border-box);
+      position: fixed;
+      top: 0px;
+      width: 32%;
+    }
+
   }
 
   .browse-search {
@@ -1008,7 +1016,11 @@ body.discussion {
     background: #fff;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
     width: 68%;
-    min-height: 500px
+    min-height: 500px;
+
+    &.sidebar-fixed {
+      margin-left: 32%;
+    }
   }
 
   .discussion-article {
