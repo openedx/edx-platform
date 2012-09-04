@@ -71,6 +71,15 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
+    if discussion_type != 'inline':
+        course = get_course_with_access(request.user, course_id, 'load')
+
+        for thread in threads:
+            courseware_context = get_courseware_context(thread, course)
+            if courseware_context:
+                thread['courseware_location']  = courseware_context['courseware_location']
+                thread['courseware_title']  = courseware_context['courseware_title']
+
     context = {
         'threads': threads,
         'discussion_id': discussion_id,
