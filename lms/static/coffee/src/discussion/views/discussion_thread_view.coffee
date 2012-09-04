@@ -23,6 +23,8 @@ class @DiscussionThreadView extends DiscussionContentView
     Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
     @convertMath()
     @renderResponses()
+    @highlight @$(".post-body")
+    @highlight @$("h1")
     @
 
   renderDogear: ->
@@ -151,3 +153,6 @@ class @DiscussionThreadView extends DiscussionContentView
       type: "POST"
       success: (response, textStatus) =>
         @model.set('endorsed', not endorsed)
+
+  highlight: (el) ->
+    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
