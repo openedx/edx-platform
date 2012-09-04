@@ -44,6 +44,11 @@
         <p class="posted-details" title="${'<%- created_at %>'}">Sometime</p>
     </header>
     <div class="response-body">${"<%- body %>"}</div>
+    <ul class="moderator-actions">
+        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
+        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
+        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
+    </ul>
     <ol class="comments">
         <li>
             <form class="comment-form">
