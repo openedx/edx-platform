@@ -4,11 +4,14 @@ from __future__ import division
 import random
 import logging
 
+from collections import defaultdict
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from models import StudentModuleCache
 from module_render import get_module, get_instance_module
 from xmodule import graders
+from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
 from models import StudentModule
@@ -23,6 +26,73 @@ def yield_module_descendents(module):
         next_module = stack.pop()
         stack.extend( next_module.get_display_items() )
         yield next_module
+
+def yield_problems(request, course, student):
+    """
+    Return an iterator over capa_modules that this student has
+    potentially answered.  (all that student has answered will definitely be in
+    the list, but there may be others as well).
+    """
+    grading_context = course.grading_context
+    student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
+
+    for section_format, sections in grading_context['graded_sections'].iteritems():
+        for section in sections:
+
+            section_descriptor = section['section_descriptor']
+
+            # If the student hasn't seen a single problem in the section, skip it.
+            skip = True
+            for moduledescriptor in section['xmoduledescriptors']:
+                if student_module_cache.lookup(
+                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
+                    skip = False
+                    break
+
+            if skip:
+                continue
+
+            section_module = get_module(student, request,
+                                        section_descriptor.location, student_module_cache,
+                                        course.id)
+            if section_module is None:
+                # student doesn't have access to this module, or something else
+                # went wrong.
+                log.debug("couldn't get module for student {0} for section location {1}"
+                          .format(student.username, section_descriptor.location))
+                continue
+
+            for problem in yield_module_descendents(section_module):
+                if isinstance(problem, CapaModule):
+                    yield problem
+
+def answer_distributions(request, course):
+    """
+    Given a course_descriptor, compute frequencies of answers for each problem:
+
+    Format is:
+
+    dict: (problem url_name, problem display_name, problem_id) -> (dict : answer ->  count)
+
+    TODO (vshnayder): this is currently doing a full linear pass through all
+    students and all problems.  This will be just a little slow.
+    """
+
+    counts = defaultdict(lambda: defaultdict(int))
+
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course.id)
+
+    for student in enrolled_students:
+        for capa_module in yield_problems(request, course, student):
+            log.debug("looking at problem {0} for {1}. answers {2}".format(
+                capa_module.display_name, student.username, capa_module.lcp.student_answers))
+            for problem_id in capa_module.lcp.student_answers:
+                answer = capa_module.lcp.student_answers[problem_id]
+                key = (capa_module.url_name, capa_module.display_name, problem_id)
+                counts[key][answer] += 1
+
+    return counts
+
 
 def grade(student, request, course, student_module_cache=None, keep_raw_scores=False):
     """
