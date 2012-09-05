@@ -35,7 +35,6 @@ class @DiscussionThreadListView extends Backbone.View
       sidebar.removeClass('fixed');
       sidebar.css('top', '0');
 
-    # sidebarWidth = .32 * $(".discussion-body").width() - 10;
     sidebarWidth = .31 * $(".discussion-body").width();
     sidebar.css('width', sidebarWidth + 'px');
 
