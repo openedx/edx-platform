@@ -155,7 +155,7 @@ class @DiscussionThreadView extends DiscussionContentView
       url: url
       type: "POST"
       success: (response, textStatus) =>
-        
+
   toggleClosed: (event) ->
     $elem = $(event.target)
     url = @model.urlFor('close')

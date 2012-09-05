@@ -1,5 +1,5 @@
 class @DiscussionThreadInlineView extends DiscussionContentView
-
+  expanded = false
   events:
     "click .discussion-vote": "toggleVote"
     "click .action-follow": "toggleFollowing"
@@ -7,7 +7,8 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     "click .action-edit": "edit"
     "click .action-delete": "delete"
     "click .action-openclose": "toggleClosed"
-    "click .show-reply": "toggleReply"
+    "click .expand-post": "expandPost"
+    "click .collapse-post": "collapsePost"
 
   template: -> DiscussionUtil.getTemplate("_inline_thread")
 
@@ -24,16 +25,19 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     if not window.$disc
       window.$disc = []
     window.$disc.push(@)
-    @$el.html(Mustache.render(@template(), @model.toJSON()))
+    if not @model.has('abbreviatedBody')
+      @abbreviateBody()
+    @$el.html(Mustache.render(@template(), $.extend(@model.toJSON(),{expanded: @expanded}) ))
     @initLocal()
     @delegateEvents()
     @renderDogear()
     @renderVoted()
     @renderAttrs()
     @$("span.timeago").timeago()
-    @makeWmdEditor "reply-body"
     @convertMath()
-    # @renderResponses()
+    if @expanded
+      @makeWmdEditor "reply-body"
+      @renderResponses()
 #    @highlight @$(".post-body")
 #    @highlight @$("h1")
     @
@@ -190,9 +194,24 @@ class @DiscussionThreadInlineView extends DiscussionContentView
 
   highlight: (el) ->
     el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-  toggleReply: ->
-    $('.discussion-reply-new').each (index, elem)->
-      $(elem).hide()
-      $(elem).find('.reply-body').empty()
-    @$el.find('.discussion-reply-new').show()
-    Markdown.makeWmdEditor @$el.find(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
+
+  abbreviateBody: ->
+    abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140 # Because twitter
+    @model.set('abbreviatedBody', abbreviated)
+
+  expandPost: (event) ->
+    @expanded = true
+    @$el.find('.post-body').html(@model.get('body'))
+    @$el.find('.expand-post').hide()
+    @$el.find('.collapse-post').show()
+    @$el.find('.post-extended-content').show()
+    @makeWmdEditor "reply-body"
+    if @$el.find('.loading').length
+      @renderResponses()
+
+  collapsePost: (event) ->
+    @expanded = false
+    @$el.find('.post-body').html(@model.get('abbreviatedBody'))
+    @$el.find('.collapse-post').hide()
+    @$el.find('.post-extended-content').hide()
+    @$el.find('.expand-post').show()

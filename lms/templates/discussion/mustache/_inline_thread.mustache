@@ -8,15 +8,19 @@
                 <span class="timeago" title="{{created_at}}">sometime</span> by
                 <a href="{{user_url}}">{{username}}</a>
             </p>
+            <div class="local post-tools">
+                <a href="javascript:void(0)" class="expand-post">Expand...</a>
+                <a href="javascript:void(0)" class="collapse-post">Collapse...</a>
+            </div>
         </header>
         <div class="post-body">
-            {{body}}
+            {{abbreviatedBody}}
         </div>
     </div>
-    <ol class="responses">
+    <ol class="responses post-extended-content">
         <li class="loading"><div class="loading-animation"></div></li>
     </ol>
-    <form class="local discussion-reply-new"  data-id="{{id}}">
+    <form class="local discussion-reply-new post-extended-content"  data-id="{{id}}">
         <h4>Post a response:</h4>
         <ul class="discussion-errors"></ul>
         <div class="reply-body" data-id="{{id}}"></div>
@@ -24,4 +28,5 @@
             <a class="discussion-submit-post control-button" href="#">Submit</a>
         </div>
     </form>
+
 </article>
