@@ -916,6 +916,7 @@ def sympy_check2():
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
+                messages = self.context['messages']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
@@ -970,7 +971,8 @@ def sympy_check2():
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
         for k in range(len(idset)):
-            correct_map.set(idset[k], correct[k], msg=messages[k])
+            correct_map.set(idset[k], correct[k], msg=messages[k],
+                            npoints=self.maxpoints[idset[k]])
         return correct_map
 
     def get_answers(self):
