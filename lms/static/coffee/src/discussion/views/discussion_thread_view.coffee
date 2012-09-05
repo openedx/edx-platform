@@ -63,6 +63,7 @@ class @DiscussionThreadView extends DiscussionContentView
         @trigger "thread:responses:rendered"
 
   renderResponse: (response) =>
+      response.set('thread', @model)
       view = new ThreadResponseView(model: response)
       view.on "comment:add", @addComment
       view.render()
@@ -136,6 +137,8 @@ class @DiscussionThreadView extends DiscussionContentView
 
   delete: (event) ->
     url = @model.urlFor('delete')
+    if not @model.can('can_delete')
+      return
     if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
       return
     @model.remove()
