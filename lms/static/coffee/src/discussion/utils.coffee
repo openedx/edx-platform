@@ -18,7 +18,7 @@ class @DiscussionUtil
   @addContent: (id, content) -> window.$$contents[id] = content
 
   @getContent: (id) -> window.$$contents[id]
-  
+
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
       @getContent(id).updateInfo(info)
@@ -28,7 +28,7 @@ class @DiscussionUtil
             .attr("href", "javascript:void(0)")
             .addClass(cls).html(txt)
             .click -> handler(this)
-    
+
   @urlFor: (name, param, param1, param2) ->
     {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
@@ -127,7 +127,7 @@ class @DiscussionUtil
 
   @clearFormErrors: (errorsField) ->
     errorsField.empty()
-    
+
   @postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
     RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g
@@ -144,6 +144,7 @@ class @DiscussionUtil
   @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
     id = $content.attr("_id")
+    #TODO: I think this is kind of a hack. At the least it should use data-id instead of _id
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
     _processor = (_this) ->
@@ -198,9 +199,9 @@ class @DiscussionUtil
         unfollowLink()
     else
       followLink()
-    
+
   @processEachMathAndCode: (text, processor) ->
-  
+
     codeArchive = []
 
     RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]*?)\$\$(.*)$/m

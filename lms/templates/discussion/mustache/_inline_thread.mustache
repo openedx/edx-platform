@@ -1,0 +1,27 @@
+<article class="discussion-article" data-id="{{id}}">
+    <div class="local"><a href="#" class="dogear action-follow"></a></div>
+    <div class="discussion-post local">
+        <header>
+            <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span></a>
+            <h1>{{title}}</h1>
+            <p class="posted-details">
+                <span class="timeago" title="{{created_at}}">sometime</span> by
+                <a href="{{user_url}}">{{username}}</a>
+            </p>
+        </header>
+        <div class="post-body">
+            {{body}}
+        </div>
+    </div>
+    <ol class="responses">
+        <li class="loading"><div class="loading-animation"></div></li>
+    </ol>
+    <form class="local discussion-reply-new"  data-id="{{id}}">
+        <h4>Post a response:</h4>
+        <ul class="discussion-errors"></ul>
+        <div class="reply-body" _id="{{id}}"></div>
+        <div class="reply-post-control">
+            <a class="discussion-submit-post control-button" href="#">Submit</a>
+        </div>
+    </form>
+</article>
