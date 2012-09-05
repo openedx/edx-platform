@@ -60,7 +60,7 @@ class @DiscussionThreadView extends DiscussionContentView
       @$(".responses").append(view.el)
 
   addComment: =>
-    @model.trigger "comment:add"
+    
 
   toggleVote: (event) ->
     event.preventDefault()
@@ -110,8 +110,9 @@ class @DiscussionThreadView extends DiscussionContentView
     url = @model.urlFor('reply')
     body = @$("#wmd-input").val()
     response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
+    response.set('thread', @model.get('thread'))
     @renderResponse(response)
-    @addComment()
+    @model.addComment()
 
     DiscussionUtil.safeAjax
       $elem: $(event.target)
@@ -123,8 +124,18 @@ class @DiscussionThreadView extends DiscussionContentView
 
   edit: ->
 
-  delete: ->
-
+  delete: (event) ->
+    url = @model.urlFor('delete')
+    if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
+      return
+    @model.remove()
+    $elem = $(event.target)
+    DiscussionUtil.safeAjax
+      $elem: $elem
+      url: url
+      type: "POST"
+      success: (response, textStatus) =>
+        
   toggleClosed: (event) ->
     $elem = $(event.target)
     url = @model.urlFor('close')

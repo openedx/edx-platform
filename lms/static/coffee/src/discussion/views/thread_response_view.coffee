@@ -68,7 +68,7 @@ class @ThreadResponseView extends DiscussionContentView
       return
     comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"))
     @renderComment(comment)
-    @trigger "comment:add"
+    @trigger "comment:add", comment
     @$(".comment-form-input").val("")
 
     DiscussionUtil.safeAjax

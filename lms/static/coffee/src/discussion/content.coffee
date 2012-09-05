@@ -36,12 +36,14 @@ if Backbone?
       @get('children').push comment
       model = new Comment $.extend {}, comment, { thread: @get('thread') }
       @get('comments').add model
+      @trigger "comment:add"
       model
 
     removeComment: (comment) ->
       thread = @get('thread')
       comments_count = parseInt(thread.get('comments_count'))
       thread.set('comments_count', comments_count - 1 - comment.getCommentsCount())
+      @trigger "comment:remove"
 
     resetComments: (children) ->
       @set 'children', []
@@ -55,6 +57,14 @@ if Backbone?
         @updateInfo(Content.getInfo(@id))
       @set 'user_url', DiscussionUtil.urlFor('user_profile', @get('user_id'))
       @resetComments(@get('children'))
+
+    remove: ->
+      
+      if @get('type') == 'comment'
+        @get('thread').removeComment(@)
+        @get('thread').trigger "comment:remove", @
+      else
+        @trigger "thread:remove", @
 
     @addContent: (id, content) -> @contents[id] = content
 
