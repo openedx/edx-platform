@@ -62,5 +62,15 @@ class @DiscussionContentView extends Backbone.View
       if @attrRenderer[attr]
         @attrRenderer[attr].apply(@, [value])
 
+  $: (selector) ->
+    @$local.find(selector)
+
+  initLocal: ->
+    @$local = @$el.children(".local")
+    if not @$local.length
+      @$local = @$el
+    @$delegateElement = @$local
+
   initialize: ->
+    @initLocal()
     @model.bind('change', @renderPartialAttrs, @)

@@ -75,7 +75,6 @@ class @DiscussionThreadListView extends Backbone.View
     @trigger "threads:rendered"
 
   renderThreadListItem: (thread) =>
-    console.log "rendering"
     view = new ThreadListItemView(model: thread)
     view.on "thread:selected", @threadSelected
     view.on "thread:removed", @threadRemoved

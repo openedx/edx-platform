@@ -1,7 +1,7 @@
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <a href="javascript:void(0)" class="dogear action-follow"></a>
-        <div class="discussion-post">
+        <div class="local"><a href="javascript:void(0)" class="dogear action-follow"></a></div>
+        <div class="discussion-post local">
             <header>
                 <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
                 <h1>${'<%- title %>'}</h1>
@@ -30,10 +30,10 @@
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
         </ol>
-        <div class="post-status-closed bottom-post-status" style="display: none">
+        <div class="local post-status-closed bottom-post-status" style="display: none">
           This thread is closed.
         </div>
-        <form class="discussion-reply-new" data-id="${'<%- id %>'}">
+        <form class="local discussion-reply-new" data-id="${'<%- id %>'}">
             <h4>Post a response:</h4>
             <ul class="discussion-errors"></ul>
             <div class="reply-body"></div>
