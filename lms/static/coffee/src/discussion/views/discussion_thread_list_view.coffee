@@ -7,6 +7,7 @@ class @DiscussionThreadListView extends Backbone.View
     "click .sort-bar a": "sortThreads"
     "click .browse-topic-drop-menu": "filterTopic"
     "click .browse-topic-drop-search-input": "ignoreClick"
+    "click .post-list a": "threadSelected"
 
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
@@ -14,9 +15,14 @@ class @DiscussionThreadListView extends Backbone.View
     @sidebar_padding = 10
     @sidebar_header_height = 87
 
-  reloadDisplayedCollection: =>
-    @displayedCollection.reset(@collection.models)
-    @updateSidebar()
+  reloadDisplayedCollection: (thread) =>
+    thread_id = thread.get('id')
+    content = @renderThread(thread)
+    current_el = @$("a[data-id=#{thread_id}]")
+    active = current_el.hasClass("active")
+    current_el.replaceWith(content)
+    if active
+      @setActiveThread(thread_id)
 
   updateSidebar: =>
 
@@ -71,8 +77,24 @@ class @DiscussionThreadListView extends Backbone.View
 
   renderThreads: =>
     @$(".post-list").html("")
-    @displayedCollection.each @renderThreadListItem
+    rendered = $("<div></div>")
+    for thread in @displayedCollection.models
+      content = @renderThread(thread)
+      rendered.append content
+      content.wrap("<li data-id='#{thread.get('id')}' />")
+
+    @$(".post-list").html(rendered.html())
     @trigger "threads:rendered"
+
+  renderThread: (thread) =>
+    content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
+    if thread.get('subscribed')
+      content.addClass("followed")
+    @highlight(content)
+
+
+  highlight: (el) ->
+    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
 
   renderThreadListItem: (thread) =>
     view = new ThreadListItemView(model: thread)
@@ -81,15 +103,17 @@ class @DiscussionThreadListView extends Backbone.View
     view.render()
     @$(".post-list").append(view.el)
 
-  threadSelected: (thread_id) =>
+  threadSelected: (e) =>
+    thread_id = $(e.target).closest("a").data("id")
     @setActiveThread(thread_id)
     @trigger("thread:selected", thread_id)
+    false
 
   threadRemoved: (thread_id) =>
     @trigger("thread:removed", thread_id)
 
   setActiveThread: (thread_id) ->
-    @$(".post-list a").removeClass("active")
+    @$("a[data-id!='#{thread_id}']").removeClass("active")
     @$("a[data-id='#{thread_id}']").addClass("active")
 
   showSearch: ->
@@ -175,7 +199,7 @@ class @DiscussionThreadListView extends Backbone.View
     firstShownIndex = $($(".browse-topic-drop-menu-wrapper a").not('.hidden')[0]).parent().index()
 
     if event.which == 40
-      index = index + 1      
+      index = index + 1
     else if event.which == 38
       index = index - 1
       while $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').hasClass('hidden')
@@ -189,5 +213,3 @@ class @DiscussionThreadListView extends Backbone.View
     $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
     $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
     $(".browse-topic-drop-menu-wrapper").attr("data-focused", index)
-
-

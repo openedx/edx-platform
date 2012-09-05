@@ -96,7 +96,7 @@ class @DiscussionThreadView extends DiscussionContentView
       type: "POST"
       success: (response, textStatus) =>
         if textStatus == 'success'
-          @model.set(response)
+          @model.set(response, {silent: true})
 
   unvote: ->
     window.user.unvote(@model)
@@ -107,7 +107,7 @@ class @DiscussionThreadView extends DiscussionContentView
       type: "POST"
       success: (response, textStatus) =>
         if textStatus == 'success'
-          @model.set(response)
+          @model.set(response, {silent: true})
 
   submitComment: (event) ->
     event.preventDefault()
