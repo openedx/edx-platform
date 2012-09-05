@@ -16,8 +16,6 @@ class @DiscussionRouter extends Backbone.Router
 
   allThreads: ->
     @nav.updateSidebar()
-    # TODO: Do something reasonable here
-    # $(".discussion-column").html($('#blank-slate-template').html())
 
   setActiveThread: =>
     if @thread
