@@ -170,16 +170,21 @@ class @DiscussionThreadListView extends Backbone.View
       return
     event.preventDefault()
 
-    items = $(".browse-topic-drop-menu-wrapper a").not(".hidden")
-    totalItems = items.length
-    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()    
+    totalItems = $(".browse-topic-drop-menu-wrapper a").length
+    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()
+    firstShownIndex = $($(".browse-topic-drop-menu-wrapper a").not('.hidden')[0]).parent().index()
 
     if event.which == 40
-      index = index + 1
+      index = index + 1      
     else if event.which == 38
       index = index - 1
+      while $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').hasClass('hidden')
+        index--;
     if index == totalItems
       index = 0
+
+    while $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').hasClass('hidden')
+        index++;
 
     $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
     $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
