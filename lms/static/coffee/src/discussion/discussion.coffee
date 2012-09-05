@@ -6,6 +6,9 @@ if Backbone?
       @bind "add", (item) =>
         item.discussion = @
       @comparator = @sortByDateRecentFirst
+      @on "thread:remove", (thread) =>
+        console.log "remove triggered"
+        @remove(thread)
 
     find: (id) ->
       _.first @where(id: id)

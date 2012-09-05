@@ -7,6 +7,7 @@ class @DiscussionRouter extends Backbone.Router
       @discussion = options['discussion']
       @nav = new DiscussionThreadListView(collection: @discussion, el: $(".sidebar"))
       @nav.on "thread:selected", @navigateToThread
+      @nav.on "thread:removed", @navigateToAllThreads
       @nav.on "threads:rendered", @setActiveThread
       @nav.render()
 
@@ -33,3 +34,7 @@ class @DiscussionRouter extends Backbone.Router
   navigateToThread: (thread_id) =>
     thread = @discussion.get(thread_id)
     @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+
+  navigateToAllThreads: =>
+    console.log "navigating"
+    @navigate("", trigger: true)
