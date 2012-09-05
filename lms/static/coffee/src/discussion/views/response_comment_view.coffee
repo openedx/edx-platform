@@ -1,8 +1,14 @@
 class @ResponseCommentView extends DiscussionContentView
   tagName: "li"
   template: _.template($("#response-comment-template").html())
+  initLocal: ->
+    @$local = @$el.find(".response-local")
+    @$delegateElement = @$local
+
   render: ->
     @$el.html(@template(@model.toJSON()))
+    @initLocal()
+    @delegateEvents()
     @renderAttrs()
     @$(".timeago").timeago()
     @convertMath()
