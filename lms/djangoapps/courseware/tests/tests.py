@@ -331,9 +331,8 @@ class TestNavigation(PageLoader):
 
         # And now hitting the courseware tab should redirect to 'secret:magic'
         resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
-        self.assertRedirects(resp, reverse('courseware_chapter',
-                                           kwargs={'course_id': self.toy.id, 'chapter': 'secret:magic'}),
-                                           status_code = 302, target_status_code = 200)
+        self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
+                                                   kwargs={'course_id': self.toy.id, 'chapter': 'secret:magic'}))
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
