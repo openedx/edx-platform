@@ -16,6 +16,9 @@ h2 {
   }
 }
 
+.inline-error {
+  color: darken($error-red, 10%);
+}
 
 section.problem {
   @media print {

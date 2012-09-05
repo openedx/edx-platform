@@ -886,7 +886,7 @@ def sympy_check2():
         if len(idset) == 1 and not submission[0]:
             # default to no error message on empty answer (to be consistent with other responsetypes)
             # but allow author to still have the old behavior by setting empty_answer_err attribute
-            msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
+            msg = '<span class="inline-error">No answer entered!</span>' if self.xml.get('empty_answer_err') else ''
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
         # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are not expecting 'unknown's
@@ -1223,7 +1223,7 @@ class CodeResponse(LoncapaResponse):
         return oldcmap
 
     def get_answers(self):
-        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
+        anshtml = '<span class="code-answer"><pre><code>%s</code></pre></span>' % self.answer
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
@@ -1400,7 +1400,7 @@ main()
             log.error('Error %s' % err)
             if self.system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(self.answer_ids), ['incorrect'] * len(idset))))
-                cmap.set_property(self.answer_ids[0], 'msg', '<font color="red" size="+2">%s</font>' % str(err).replace('<', '&lt;'))
+                cmap.set_property(self.answer_ids[0], 'msg', '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
                 return cmap
 
         ad = rxml.find('awarddetail').text
@@ -1429,7 +1429,7 @@ main()
         except Exception as err:
             log.error('Error %s' % err)
             if self.system.DEBUG:
-                msg = '<font color=red size=+2>%s</font>' % str(err).replace('<', '&lt;')
+                msg = '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;')
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
 
