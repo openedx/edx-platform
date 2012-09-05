@@ -58,8 +58,8 @@ def yield_problems(request, course, student):
             if section_module is None:
                 # student doesn't have access to this module, or something else
                 # went wrong.
-                log.debug("couldn't get module for student {0} for section location {1}"
-                          .format(student.username, section_descriptor.location))
+                # log.debug("couldn't get module for student {0} for section location {1}"
+                #           .format(student.username, section_descriptor.location))
                 continue
 
             for problem in yield_module_descendents(section_module):
@@ -84,8 +84,6 @@ def answer_distributions(request, course):
 
     for student in enrolled_students:
         for capa_module in yield_problems(request, course, student):
-            log.debug("looking at problem {0} for {1}. answers {2}".format(
-                capa_module.display_name, student.username, capa_module.lcp.student_answers))
             for problem_id in capa_module.lcp.student_answers:
                 answer = capa_module.lcp.student_answers[problem_id]
                 key = (capa_module.url_name, capa_module.display_name, problem_id)
