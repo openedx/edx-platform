@@ -454,19 +454,17 @@ if Backbone?
 
     follow: ->
       @set('subscribed', true)
-      @trigger "thread:follow"
 
     unfollow: ->
       @set('subscribed', false)
-      @trigger "thread:unfollow"
 
     vote: ->
       @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
-      @trigger "change"
+      @trigger "change", @
 
     unvote: ->
       @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
-      @trigger "change"
+      @trigger "change", @
 
     display_body: ->
       if @has("highlighted_body")
