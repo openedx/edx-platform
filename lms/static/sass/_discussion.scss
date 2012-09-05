@@ -303,8 +303,10 @@ body.discussion {
           font-weight: 700;
           line-height: 18px;
           color: #eee;
+          @include transition(none);
 
-          &:hover {
+          &:hover,
+          &.focused {
             background-color: #666;
           }
         }

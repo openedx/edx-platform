@@ -123,7 +123,7 @@ function filterDrop(e) {
 	 * single query
 	 */
 
-	var $drop = $(e.target).parents('.form-topic-drop-menu-wrapper, .browse-topic-drop-menu-wrapper');
+	var $drop = $(e.target).parents('.topic_menu_wrapper, .browse-topic-drop-menu-wrapper');
 	var query = $(this).val();
 	var $items = $drop.find('a');
 
@@ -134,7 +134,7 @@ function filterDrop(e) {
 
 	$items.addClass('hidden');
 	$items.each(function(i) {
-		var thisText = $(this).children().not('.unread').text();
+		var thisText = $(this).not('.unread').text();
 		$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
 			thisText = thisText  + ' ' + $(this).text();
 		});
@@ -150,10 +150,10 @@ function filterDrop(e) {
 			$(this).removeClass('hidden');
 
 			// show children
-			$(this).parent().find('a').show();
+			$(this).parent().find('a').removeClass('hidden');
 
 			// show parents
-			$(this).parents('ul').siblings('a').show();
+			$(this).parents('ul').siblings('a').removeClass('hidden');
 		}
 	});
 }
