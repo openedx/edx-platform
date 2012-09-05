@@ -155,7 +155,6 @@ class @NewPostView extends Backbone.View
           return
         event.preventDefault()
 
-        itemHeight = $(".topic_menu_wrapper a").outerHeight()
         items = $.makeArray($(".topic_menu_wrapper a").not(".hidden"))
         index = items.indexOf($('.topic_menu_wrapper .focused')[0])
 
@@ -167,6 +166,9 @@ class @NewPostView extends Backbone.View
         $(".topic_menu_wrapper .focused").removeClass("focused")
         $(items[index]).addClass("focused")
 
-        scrollTarget = Math.min(index * itemHeight, $(".topic_menu").scrollTop())
-        scrollTarget = Math.max(index * itemHeight - $(".topic_menu").height() + itemHeight, scrollTarget)
+        itemTop = $(items[index]).parent().offset().top
+        scrollTop = $(".topic_menu").scrollTop()
+        itemFromTop = $(".topic_menu").offset().top - itemTop  
+        scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
+        scrollTarget = Math.max(scrollTop - itemFromTop - $(".topic_menu").height() + $(items[index]).height() + 20, scrollTarget)
         $(".topic_menu").scrollTop(scrollTarget)

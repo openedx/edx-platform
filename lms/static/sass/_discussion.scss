@@ -720,6 +720,10 @@ body.discussion {
         overflow-y: scroll;
       }
 
+      ul {
+        position: inline;
+      }
+
       > li:first-child a {
         border-top: none;
       }

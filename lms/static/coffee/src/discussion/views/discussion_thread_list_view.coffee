@@ -204,7 +204,6 @@ class @DiscussionThreadListView extends Backbone.View
       return
     event.preventDefault()
 
-    itemHeight = $(".browse-topic-drop-menu a").outerHeight()
     items = $.makeArray($(".browse-topic-drop-menu-wrapper a").not(".hidden"))
     index = items.indexOf($('.browse-topic-drop-menu-wrapper .focused')[0])
 
@@ -216,10 +215,12 @@ class @DiscussionThreadListView extends Backbone.View
     $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
     $(items[index]).addClass("focused")
 
-    scrollTarget = Math.min(index * itemHeight, $(".browse-topic-drop-menu").scrollTop())
-    scrollTarget = Math.max(index * itemHeight - $(".browse-topic-drop-menu").height() + itemHeight, scrollTarget)
+    itemTop = $(items[index]).parent().offset().top
+    scrollTop = $(".browse-topic-drop-menu").scrollTop()
+    itemFromTop = $(".browse-topic-drop-menu").offset().top - itemTop  
+    scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
+    scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
     $(".browse-topic-drop-menu").scrollTop(scrollTarget)
-
 
 
 
