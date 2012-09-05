@@ -16,6 +16,9 @@ h2 {
   }
 }
 
+.inline-error {
+  color: darken($error-red, 10%);
+}
 
 section.problem {
   @media print {
@@ -134,11 +137,19 @@ section.problem {
 
     div.equation {
       clear: both;
-      padding: 6px;
-      background: #eee;
+      margin-top: 3px;
 
       span {
         margin-bottom: 0;
+
+        &.math {
+          padding: 6px;
+          background: #f1f1f1;
+          border: 1px solid #e3e3e3;
+          @include inline-block;
+          @include border-radius(4px);
+          min-width: 300px;
+        }
       }
     }
 
@@ -226,6 +237,15 @@ section.problem {
     }
   }
 
+  form.option-input {
+    margin: -10px 0 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3e3e3;
+
+    select {
+      margin-right: flex-gutter();
+    }
+  }
 
   ul {
     list-style: disc outside none;
@@ -393,6 +413,8 @@ section.problem {
   }
 
   section.action {
+    margin-top: 20px;
+
     input.save {
       @extend .blue-button;
     }
