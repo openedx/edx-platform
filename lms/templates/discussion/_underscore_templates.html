@@ -7,13 +7,13 @@
                 <h1>${'<%- title %>'}</h1>
                 <p class="posted-details">
                     <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
-                    <a href="${'<%- user_url %>'}">${'<%- username %>'}</a> 
+                    <a href="${'<%- user_url %>'}">${'<%- username %>'}</a>
                     <span class="post-status-closed top-post-status" style="display: none">
-                      • This thread is closed.
+                      &bull; This thread is closed.
                     </span>
                 </p>
             </header>
-            
+
             <div class="post-body">
                 ${'<%- body %>'}
             </div>
@@ -22,7 +22,7 @@
                 (this post is about <a href="../../jump_to/${'<%- courseware_location %>'}">${'<%- courseware_title %>'}</a>)
             </div>
             ${'<% } %>'}
-                        
+
             <ul class="moderator-actions">
                 <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
                 <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
@@ -51,7 +51,7 @@
         <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
         <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         <a href="${'<%- user_url %>'}" class="posted-by">${"<%- username %>"}</a>
-        <p class="posted-details" title="${'<%- created_at %>'}">Sometime</p>
+        <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div></div>
     <ul class="moderator-actions response-local">
@@ -62,14 +62,14 @@
     <ol class="comments">
         <li class="response-local">
             <form class="comment-form">
-                <input type="text" placeholder="Comment..." class="comment-form-input">
+                <input type="text" placeholder="Comment&hellip;" class="comment-form-input">
             </form>
         </li>
     </ol>
 </script>
 
 <script type="text/template" id="response-comment-template">
-  <p><span class="response-body">${'<%- body %>'}</span><span class="posted-details">--posted <span class="timeago" title="${'<%- created_at %>'}">sometime</span> by <a href="${'<%- user_url %>'}">${'<%- username %>'}</a></span></p>
+  <p><span class="response-body">${'<%- body %>'}</span><span class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by <a href="${'<%- user_url %>'}">${'<%- username %>'}</a></span></p>
 </script>
 
 <script type="text/template" id="thread-list-item-template">
