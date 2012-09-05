@@ -64,6 +64,9 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
+    'FORCE_UNIVERSITY_DOMAIN': False,	# set this to the university domain to use, as an override to HTTP_HOST
+                                        # set to None to do no university selection
+
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -604,6 +607,7 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
+    'instructor',
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming

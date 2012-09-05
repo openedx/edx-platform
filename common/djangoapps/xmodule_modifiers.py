@@ -1,6 +1,7 @@
 import re
 import json
 import logging
+import time
 
 from django.conf import settings
 from functools import wraps
@@ -75,7 +76,7 @@ def grade_histogram(module_id):
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])          # Add ORDER BY to sql query?
-    if len(grades) == 1 and grades[0][0] is None:
+    if len(grades) >= 1 and grades[0][0] is None:
         return []
     return grades
 
@@ -117,6 +118,14 @@ def add_histogram(get_html, module, user):
             data_dir = ""
         source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
 
+        # useful to indicate to staff if problem has been released or not
+        # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
+        now = time.gmtime()
+        is_released = "unknown"
+        mstart = getattr(module.descriptor,'start')
+        if mstart is not None:
+            is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
+        
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'location': module.location,
@@ -130,7 +139,9 @@ def add_histogram(get_html, module, user):
                          'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
-                         'module_content': get_html()}
+                         'module_content': get_html(),
+                         'is_released': is_released,
+                         }
         return render_to_string("staff_problem_info.html", staff_context)
 
     return _get_html

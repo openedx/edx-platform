@@ -94,3 +94,8 @@ course content can be setup to trigger an automatic reload when changes are push
 
     The mitx server will then do "git reset --hard HEAD; git clean -f -d; git pull origin" in that directory.  After the pull,
     it will reload the modulestore for that course.
+
+Note that the gitreload-based workflow is not meant for deployments on AWS (or elsewhere) which use collectstatic, since collectstatic is not run by a gitreload event.
+
+Also, the gitreload feature needs MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True in the django settings.
+

@@ -30,7 +30,7 @@ def has_access(user, obj, action):
     Things this module understands:
     - start dates for modules
     - DISABLE_START_DATES
-    - different access for staff, course staff, and students.
+    - different access for instructor, staff, course staff, and students.
 
     user: a Django user object. May be anonymous.
 
@@ -70,6 +70,20 @@ def has_access(user, obj, action):
     raise TypeError("Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
+def get_access_group_name(obj,action):
+    '''
+    Returns group name for user group which has "action" access to the given object.
+
+    Used in managing access lists.
+    '''
+
+    if isinstance(obj, CourseDescriptor):
+        return _get_access_group_name_course_desc(obj, action)
+
+    # Passing an unknown object here is a coding error, so rather than
+    # returning a default, complain.
+    raise TypeError("Unknown object type in get_access_group_name(): '{0}'"
+                    .format(type(obj)))
 
 # ================ Implementation helpers ================================
 
@@ -138,11 +152,19 @@ def _has_access_course_desc(user, course, action):
         'load': can_load,
         'enroll': can_enroll,
         'see_exists': see_exists,
-        'staff': lambda: _has_staff_access_to_descriptor(user, course)
+        'staff': lambda: _has_staff_access_to_descriptor(user, course),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, course),
         }
 
     return _dispatch(checkers, action, user, course)
 
+def _get_access_group_name_course_desc(course, action):
+    '''
+    Return name of group which gives staff access to course.  Only understands action = 'staff'
+    '''
+    if not action=='staff':
+        return []
+    return _course_staff_group_name(course.location)
 
 def _has_access_error_desc(user, descriptor, action):
     """
@@ -292,6 +314,17 @@ def _course_staff_group_name(location):
     """
     return 'staff_%s' % Location(location).course
 
+
+def _course_instructor_group_name(location):
+    """
+    Get the name of the instructor group for a location.  Right now, that's instructor_COURSE.
+    A course instructor has all staff privileges, but also can manage list of course staff (add, remove, list).
+
+    location: something that can passed to Location.
+    """
+    return 'instructor_%s' % Location(location).course
+
+
 def _has_global_staff_access(user):
     if user.is_staff:
         debug("Allow: user.is_staff")
@@ -301,17 +334,28 @@ def _has_global_staff_access(user):
         return False
 
 
-def _has_staff_access_to_location(user, location):
-    '''
-    Returns True if the given user has staff access to a location.  For now this
-    is equivalent to having staff access to the course location.course.
+def _has_instructor_access_to_location(user, location):
+    return _has_access_to_location(user, location, 'instructor')
 
-    This means that user is in the staff_* group, or is an overall admin.
+
+def _has_staff_access_to_location(user, location):
+    return _has_access_to_location(user, location, 'staff')
+
+
+def _has_access_to_location(user, location, access_level):
+    '''
+    Returns True if the given user has access_level (= staff or
+    instructor) access to a location.  For now this is equivalent to
+    having staff / instructor access to the course location.course.
+
+    This means that user is in the staff_* group or instructor_* group, or is an overall admin.
 
     TODO (vshnayder): this needs to be changed to allow per-course_id permissions, not per-course
     (e.g. staff in 2012 is different from 2013, but maybe some people always have access)
 
     course is a string: the course field of the location being accessed.
+    location = location
+    access_level = string, either "staff" or "instructor"
     '''
     if user is None or (not user.is_authenticated()):
         debug("Deny: no user or anon user")
@@ -322,12 +366,26 @@ def _has_staff_access_to_location(user, location):
 
     # If not global staff, is the user in the Auth group for this class?
     user_groups = [g.name for g in user.groups.all()]
-    staff_group = _course_staff_group_name(location)
-    if staff_group in user_groups:
-        debug("Allow: user in group %s", staff_group)
-        return True
-    debug("Deny: user not in group %s", staff_group)
+
+    if access_level == 'staff':
+        staff_group = _course_staff_group_name(location)
+        if staff_group in user_groups:
+            debug("Allow: user in group %s", staff_group)
+            return True
+        debug("Deny: user not in group %s", staff_group)
+
+    if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
+        instructor_group = _course_instructor_group_name(location)
+        if instructor_group in user_groups:
+            debug("Allow: user in group %s", instructor_group)
+            return True
+        debug("Deny: user not in group %s", instructor_group)
+
+    else:
+        log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
+
     return False
+
 
 def _has_staff_access_to_course_id(user, course_id):
     """Helper method that takes a course_id instead of a course name"""
@@ -335,11 +393,19 @@ def _has_staff_access_to_course_id(user, course_id):
     return _has_staff_access_to_location(user, loc)
 
 
+def _has_instructor_access_to_descriptor(user, descriptor):
+    """Helper method that checks whether the user has staff access to
+    the course of the location.
+
+    descriptor: something that has a location attribute
+    """
+    return _has_instructor_access_to_location(user, descriptor.location)
+
 def _has_staff_access_to_descriptor(user, descriptor):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
-    location: something that can be passed to Location
+    descriptor: something that has a location attribute
     """
     return _has_staff_access_to_location(user, descriptor.location)
 

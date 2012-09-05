@@ -24,7 +24,7 @@ def yield_module_descendents(module):
         stack.extend( next_module.get_display_items() )
         yield next_module
 
-def grade(student, request, course, student_module_cache=None):
+def grade(student, request, course, student_module_cache=None, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It retuns the
     output from the course grader, augmented with the final letter
@@ -38,11 +38,13 @@ def grade(student, request, course, student_module_cache=None):
         up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
         make up the final grade. (For display)
+    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores for every graded module
 
     More information on the format is in the docstring for CourseGrader.
     """
 
     grading_context = course.grading_context
+    raw_scores = []
 
     if student_module_cache == None:
         student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
@@ -83,7 +85,7 @@ def grade(student, request, course, student_module_cache=None):
                     if correct is None and total is None:
                         continue
 
-                    if settings.GENERATE_PROFILE_SCORES:
+                    if settings.GENERATE_PROFILE_SCORES:	# for debugging!
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
@@ -97,6 +99,8 @@ def grade(student, request, course, student_module_cache=None):
                     scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
+                if keep_raw_scores:
+                    raw_scores += scores
             else:
                 section_total = Score(0.0, 1.0, False, section_name)
                 graded_total = Score(0.0, 1.0, True, section_name)
@@ -117,7 +121,10 @@ def grade(student, request, course, student_module_cache=None):
 
     letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
     grade_summary['grade'] = letter_grade
-
+    grade_summary['totaled_scores'] = totaled_scores	# make this available, eg for instructor download & debugging
+    if keep_raw_scores:
+        grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
+                                                        # so grader can be double-checked
     return grade_summary
 
 def grade_for_percentage(grade_cutoffs, percentage):
