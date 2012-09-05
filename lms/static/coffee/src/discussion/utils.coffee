@@ -143,8 +143,7 @@ class @DiscussionUtil
 
   @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
-    id = $content.attr("_id")
-    #TODO: I think this is kind of a hack. At the least it should use data-id instead of _id
+    id = elem.data("id")
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
     _processor = (_this) ->
