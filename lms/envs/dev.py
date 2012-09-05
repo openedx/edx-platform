@@ -15,8 +15,9 @@ TEMPLATE_DEBUG = True
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
+MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
+MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 
 WIKI_ENABLED = True
 
@@ -78,10 +79,10 @@ COURSE_LISTINGS = {
                 'MITx/3.091x/2012_Fall',
                 'MITx/6.002x/2012_Fall',
                 'MITx/6.00x/2012_Fall'],
-    'berkeley': ['BerkeleyX/CS169.1x/Cal_2012_Fall',
-                 'BerkeleyX/CS188.1x/Cal_2012_Fall'],
+    'berkeley': ['BerkeleyX/CS169/fa12',
+                 'BerkeleyX/CS188/fa12'],
     'harvard': ['HarvardX/CS50x/2012H'],
-    'mit': [],
+    'mit': ['MITx/3.091/MIT_2012_Fall'],
     'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
 }
 
@@ -105,15 +106,18 @@ LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
+MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 
-INSTALLED_APPS += ('external_auth',) 
+INSTALLED_APPS += ('external_auth',)
 INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
+
+OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ################################ MIT Certificates SSL Auth #################################
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True

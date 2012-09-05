@@ -19,34 +19,41 @@ def url_class(url):
     <ol class="course-tabs">
       <li class="courseware"><a href="${reverse('courseware', args=[course.id])}" class="${url_class('courseware')}">Courseware</a></li>
       <li class="info"><a href="${reverse('info', args=[course.id])}" class="${url_class('info')}">Course Info</a></li>
-% if hasattr(course,'syllabus_present') and course.syllabus_present:
+    % if hasattr(course,'syllabus_present') and course.syllabus_present:
       <li class="syllabus"><a href="${reverse('syllabus', args=[course.id])}" class="${url_class('syllabus')}">Syllabus</a></li>
-% endif
-% if user.is_authenticated():
-  % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
+    % endif
+    % if user.is_authenticated():
+      % if settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
         % for index, textbook in enumerate(course.textbooks):
             <li class="book"><a href="${reverse('book', args=[course.id, index])}" class="${url_class('book')}">${textbook.title}</a></li>
         % endfor
-  % endif
-  % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+      % endif
+
+      ## If they have a discussion link specified, use that even if we feature
+      ## flag discussions off. Disabling that is mostly a server safety feature
+      ## at this point, and we don't need to worry about external sites.
+      % if course.discussion_link:
+        <li class="discussion"><a href="${course.discussion_link}">Discussion</a></li>
+      % elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         <li class="discussion"><a href="${reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id])}" class="${url_class('discussion')}">Discussion</a></li>
         ## <li class="news"><a href="${reverse('news', args=[course.id])}" class="${url_class('news')}">News</a></li>
-  % endif 
-        
-  % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
-        <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
-  % endif
-% endif
-% if settings.WIKI_ENABLED:
-      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
-% endif
-% if user.is_authenticated():
-      <li class="profile"><a href="${reverse('progress', args=[course.id])}" class="${url_class('progress')}">Progress</a></li>
-% endif
-% if staff_access:
-      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
-% endif
+      % endif
 
+      ## This is Askbot, which we should be retiring soon...
+      % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
+        <li class="discussion"><a href="${reverse('questions')}">Discussion</a></li>
+      % endif
+    % endif
+
+    % if settings.WIKI_ENABLED:
+      <li class="wiki"><a href="${reverse('course_wiki', args=[course.id])}" class="${url_class('wiki')}">Wiki</a></li>
+    % endif
+    % if user.is_authenticated() and not course.hide_progress_tab:
+      <li class="profile"><a href="${reverse('progress', args=[course.id])}" class="${url_class('progress')}">Progress</a></li>
+    % endif
+    % if staff_access:
+      <li class="instructor"><a href="${reverse('instructor_dashboard', args=[course.id])}" class="${url_class('instructor')}">Instructor</a></li>
+    % endif
     </ol>
   </div>
 </nav>

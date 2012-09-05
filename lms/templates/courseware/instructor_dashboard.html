@@ -8,16 +8,98 @@
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
 
+<style type="text/css">
+table.stat_table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.stat_table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.stat_table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+</style>
+
 <section class="container">
 <div class="instructor-dashboard-wrapper">
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
+
+    <form method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
     <p>
     <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
 
     <p>
     <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">Grade summary</a>
+
+    <p>
+    <input type="submit" name="action" value="Dump list of enrolled students">
+
+    <p>
+    <input type="submit" name="action" value="Dump Grades for all students in this course">
+    <input type="submit" name="action" value="Download CSV of all student grades for this course">
+
+    <p>
+    <input type="submit" name="action" value="Dump all RAW grades for all students in this course">
+    <input type="submit" name="action" value="Download CSV of all RAW grades">
+
+%if instructor_access:
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List course staff members"> 
+    <p>
+    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff"> 
+    <input type="submit" name="action" value="Add course staff"> 
+    <hr width="40%" style="align:left">
+ %endif
+ 
+%if admin_access:
+    <p>
+    <input type="submit" name="action" value="Reload course from XML files"> 
+    <input type="submit" name="action" value="GIT pull and Reload course"> 
+%endif
+
+    </form>
+
+    <br/>
+    <br/>
+    <p>
+      <hr width="100%">
+      <h2>${datatable['title']}</h2>
+      <table class="stat_table">
+        <tr>
+	%for hname in datatable['header']:
+	  <th>${hname}</th>
+	%endfor
+	</tr>
+        %for row in datatable['data']:
+          <tr>
+	    %for value in row:
+	      <td>${value}</td>
+	    %endfor
+	  </tr>
+        %endfor
+      </table>
+    </p>
+
+%if msg:
+    <p>${msg}</p>    
+%endif
 
   </section>
 </div>

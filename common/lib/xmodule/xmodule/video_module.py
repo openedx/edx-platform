@@ -30,6 +30,7 @@ class VideoModule(XModule):
         xmltree = etree.fromstring(self.definition['data'])
         self.youtube = xmltree.get('youtube')
         self.position = 0
+        self.show_captions = xmltree.get('show_captions', 'true')
 
         if instance_state is not None:
             state = json.loads(instance_state)
@@ -75,6 +76,7 @@ class VideoModule(XModule):
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],
+            'show_captions': self.show_captions
         })
 
 

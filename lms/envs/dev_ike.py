@@ -18,6 +18,7 @@ MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = False
+MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 # MITX_FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
@@ -27,6 +28,9 @@ if ('edxvm' in myhost) or ('ocw' in myhost):
     MITX_FEATURES['DISABLE_LOGIN_BUTTON'] = True	# auto-login with MIT certificate
     MITX_FEATURES['USE_XQA_SERVER'] = 'https://qisx.mit.edu/xqa'	# needs to be ssl or browser blocks it
     MITX_FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
+
+if ('ocw' in myhost):
+    MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False
 
 if ('domU' in myhost):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

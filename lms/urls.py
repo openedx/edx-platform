@@ -98,8 +98,9 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
+            'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
@@ -142,6 +143,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$',
+            'courseware.views.index', name="courseware_position"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
             'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -150,21 +153,21 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+            'instructor.views.instructor_dashboard', name="instructor_dashboard"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'courseware.views.gradebook', name='gradebook'),
+            'instructor.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'courseware.views.grade_summary', name='grade_summary'),
+            'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
-            'courseware.views.enroll_students', name='enroll_students'),
+            'instructor.views.enroll_students', name='enroll_students'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
 
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
@@ -215,9 +218,17 @@ if settings.DEBUG:
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
-        url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
+        url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
-        )
+    )
+
+if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
+    urlpatterns += (
+        url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
+        url(r'^openid/provider/login/(?:[\w%\. ]+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
+        url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
+        url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
+    )
 
 if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (

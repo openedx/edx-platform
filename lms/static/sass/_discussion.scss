@@ -342,6 +342,11 @@ $tag-text-color: #5b614f;
       display: inline-block;
     }
 
+    .context{
+        margin-top: 1em;
+        font-size: $comment-font-size;
+    }
+
     .info {
       @include discussion-font;
       color: gray;
@@ -501,7 +506,8 @@ $tag-text-color: #5b614f;
       font-size: inherit;
       font-weight: bold;
       margin-left: 1%;
-      padding-top: 9px;
+      padding-top: 4px;
+      padding-bottom: 2px;
       text-decoration: none;
     }
 

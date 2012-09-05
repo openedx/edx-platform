@@ -5,8 +5,6 @@ import itertools
 
 from functools import partial
 
-from functools import partial
-
 from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -152,7 +150,7 @@ def index(request, course_id, chapter=None, section=None,
                     course_id, request.user, section_descriptor)
                 module = get_module(request.user, request,
                                     section_descriptor.location,
-                                    student_module_cache, course_id)
+                                    student_module_cache, course_id, position)
                 if module is None:
                     # User is probably being clever and trying to access something
                     # they don't have access to.
@@ -196,7 +194,7 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
-def jump_to(request, location):
+def jump_to(request, course_id, location):
     '''
     Show the page that contains a specific location.
 
@@ -213,15 +211,18 @@ def jump_to(request, location):
 
     # Complain if there's not data for this location
     try:
-        (course_id, chapter, section, position) = path_to_location(modulestore(), location)
+        (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
     except ItemNotFoundError:
         raise Http404("No data at this location: {0}".format(location))
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
     # Rely on index to do all error handling and access control.
-    return index(request, course_id, chapter, section, position)
-
+    return redirect('courseware_position',
+                    course_id=course_id, 
+                    chapter=chapter, 
+                    section=section, 
+                    position=position)
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -263,7 +264,20 @@ def registered_for_course(course, user):
 def course_about(request, course_id):
     course = get_course_with_access(request.user, course_id, 'see_exists')
     registered = registered_for_course(course, request.user)
-    return render_to_response('portal/course_about.html', {'course': course, 'registered': registered})
+
+    if has_access(request.user, course, 'load'):
+        course_target = reverse('info', args=[course.id])
+    else:
+        course_target = reverse('about_course', args=[course.id])
+
+    show_courseware_link = (has_access(request.user, course, 'load') or
+                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+
+    return render_to_response('portal/course_about.html',
+                              {'course': course,
+                               'registered': registered,
+                               'course_target': course_target,
+                               'show_courseware_link' : show_courseware_link})
 
 
 @ensure_csrf_cookie
@@ -328,10 +342,18 @@ def progress(request, course_id, student_id=None):
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
 
+    # The pre-fetching of groups is done to make auth checks not require an 
+    # additional DB lookup (this kills the Progress page in particular).
+    student = User.objects.prefetch_related("groups").get(id=student.id)
+
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         course_id, student, course)
     course_module = get_module(student, request, course.location,
                                student_module_cache, course_id)
+
+    # The course_module should be accessible, but check anyway just in case something went wrong:
+    if course_module is None:
+        raise Http404("Course does not exist")
 
     courseware_summary = grades.progress_summary(student, course_module,
                                                  course.grader, student_module_cache)
@@ -348,96 +370,3 @@ def progress(request, course_id, student_id=None):
 
 
 
-# ======== Instructor views =============================================================================
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - only displayed to course staff
-    - shows students who are enrolled.
-    """
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
-
-    # TODO (vshnayder): implement pagination.
-    enrolled_students = enrolled_students[:1000]   # HACK!
-
-    student_info = [{'username': student.username,
-                     'id': student.id,
-                     'email': student.email,
-                     'grade_summary': grades.grade(student, request, course),
-                     'realname': UserProfile.objects.get(user=student).name
-                     }
-                     for student in enrolled_students]
-
-    return render_to_response('courseware/gradebook.html', {'students': student_info,
-                                                 'course': course,
-                                                 'course_id': course_id,
-                                                 # Checked above
-                                                 'staff_access': True,})
-
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def grade_summary(request, course_id):
-    """Display the grade summary for a course."""
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    # For now, just a static page
-    context = {'course': course,
-               'staff_access': True,}
-    return render_to_response('courseware/grade_summary.html', context)
-
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def instructor_dashboard(request, course_id):
-    """Display the instructor dashboard for a course."""
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    # For now, just a static page
-    context = {'course': course,
-               'staff_access': True,}
-
-    return render_to_response('courseware/instructor_dashboard.html', context)
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enroll_students(request, course_id):
-    ''' Allows a staff member to enroll students in a course.
-
-    This is a short-term hack for Berkeley courses launching fall
-    2012. In the long term, we would like functionality like this, but
-    we would like both the instructor and the student to agree. Right
-    now, this allows any instructor to add students to their course,
-    which we do not want.
-
-    It is poorly written and poorly tested, but it's designed to be
-    stripped out.
-    '''
-
-    course = get_course_with_access(request.user, course_id, 'staff')
-    existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id = course_id)]
-
-    if 'new_students' in request.POST:
-        new_students = request.POST['new_students'].split('\n')
-    else:
-        new_students = []
-    new_students = [s.strip() for s in new_students]
-
-    added_students = []
-    rejected_students = []
-
-    for student in new_students:
-        try:
-            nce = CourseEnrollment(user=User.objects.get(email = student), course_id = course_id)
-            nce.save()
-            added_students.append(student)
-        except:
-            rejected_students.append(student)
-
-    return render_to_response("enroll_students.html", {'course':course_id,
-                                                       'existing_students': existing_students,
-                                                       'added_students': added_students,
-                                                       'rejected_students': rejected_students,
-                                                       'debug':new_students})

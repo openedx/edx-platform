@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import cgi
 import inspect
 import json
 import logging
@@ -26,6 +27,7 @@ import xml.sax.saxutils as saxutils
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from correctmap import CorrectMap
+from datetime import datetime
 from util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
@@ -317,30 +319,37 @@ class JavascriptResponse(LoncapaResponse):
     
     def compile_display_javascript(self):
 
-        latestTimestamp = 0
-        basepath = self.system.filestore.root_path + '/js/'
-        for filename in (self.display_dependencies + [self.display]):
-            filepath = basepath + filename
-            timestamp = os.stat(filepath).st_mtime
-            if timestamp > latestTimestamp:
-                latestTimestamp = timestamp
-        
-        h = hashlib.md5()
-        h.update(self.answer_id + str(self.display_dependencies))
-        compiled_filename = 'compiled/' + h.hexdigest() + '.js'
-        compiled_filepath = basepath + compiled_filename
+        # TODO FIXME
+        # arjun: removing this behavior for now (and likely forever). Keeping
+        # until we decide on exactly how to solve this issue. For now, files are
+        # manually being compiled to DATA_DIR/js/compiled.
 
-        if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
-            outfile = open(compiled_filepath, 'w')
-            for filename in (self.display_dependencies + [self.display]):
-                filepath = basepath + filename
-                infile = open(filepath, 'r')
-                outfile.write(infile.read())
-                outfile.write(';\n')
-                infile.close()
-            outfile.close()
+        #latestTimestamp = 0
+        #basepath = self.system.filestore.root_path + '/js/'
+        #for filename in (self.display_dependencies + [self.display]):
+        #    filepath = basepath + filename
+        #    timestamp = os.stat(filepath).st_mtime
+        #    if timestamp > latestTimestamp:
+        #        latestTimestamp = timestamp
+        #
+        #h = hashlib.md5()
+        #h.update(self.answer_id + str(self.display_dependencies))
+        #compiled_filename = 'compiled/' + h.hexdigest() + '.js'
+        #compiled_filepath = basepath + compiled_filename
 
-        self.display_filename = compiled_filename
+        #if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
+        #    outfile = open(compiled_filepath, 'w')
+        #    for filename in (self.display_dependencies + [self.display]):
+        #        filepath = basepath + filename
+        #        infile = open(filepath, 'r')
+        #        outfile.write(infile.read())
+        #        outfile.write(';\n')
+        #        infile.close()
+        #    outfile.close()
+
+        # TODO this should also be fixed when the above is fixed.
+        filename = self.system.ajax_url.split('/')[-1] + '.js'
+        self.display_filename = 'compiled/' + filename
 
     def parse_xml(self):
         self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
@@ -384,19 +393,23 @@ class JavascriptResponse(LoncapaResponse):
         node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
         return tmp_env
+    
+    def call_node(self, args):
+
+        subprocess_args = ["node"]
+        subprocess_args.extend(args)
+
+        return subprocess.check_output(subprocess_args, env=self.get_node_env())
 
 
     def generate_problem_state(self):
 
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
-        output = subprocess.check_output(["node",
-                                          generator_file, 
-                                          self.generator, 
-                                          json.dumps(self.generator_dependencies),
-                                          json.dumps(str(self.system.seed)), 
-                                          json.dumps(self.params)
-                                          ],
-                                          env=self.get_node_env()).strip()
+        output = self.call_node([generator_file,
+                                 self.generator, 
+                                 json.dumps(self.generator_dependencies),
+                                 json.dumps(str(self.system.seed)), 
+                                 json.dumps(self.params)]).strip()
 
         return json.loads(output)
 
@@ -407,7 +420,8 @@ class JavascriptResponse(LoncapaResponse):
         for param in self.xml.xpath('//*[@id=$id]//responseparam', 
                                         id=self.xml.get('id')):
 
-            params[param.get("name")] = json.loads(param.get("value"))
+            raw_param = param.get("value")
+            params[param.get("name")] = json.loads(contextualize_text(raw_param, self.context))
         
         return params
 
@@ -435,22 +449,23 @@ class JavascriptResponse(LoncapaResponse):
         (all_correct, evaluation, solution) = self.run_grader(json_submission)
         self.solution = solution
         correctness = 'correct' if all_correct else 'incorrect'
-        return CorrectMap(self.answer_id, correctness, msg=evaluation)
+        if all_correct:
+            points = self.get_max_score()
+        else:
+            points = 0
+        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
     
     def run_grader(self, submission):
         if submission is None or submission == '':
             submission = json.dumps(None)
 
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
-        outputs = subprocess.check_output(["node",
-                                           grader_file, 
-                                           self.grader, 
-                                           json.dumps(self.grader_dependencies),
-                                           submission, 
-                                           json.dumps(self.problem_state), 
-                                           json.dumps(self.params)
-                                          ],
-                                          env=self.get_node_env()).split('\n')
+        outputs = self.call_node([grader_file, 
+                                  self.grader, 
+                                  json.dumps(self.grader_dependencies),
+                                  submission, 
+                                  json.dumps(self.problem_state), 
+                                  json.dumps(self.params)]).split('\n')
 
         all_correct = json.loads(outputs[0].strip())
         evaluation  = outputs[1].strip()
@@ -711,7 +726,8 @@ class NumericalResponse(LoncapaResponse):
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError('Invalid input -- please use a number only')
+            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %\
+                                    cgi.escape(student_answer))
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -900,10 +916,12 @@ def sympy_check2():
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
+                messages = self.context['messages']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
                 print traceback.format_exc()
+                raise StudentInputError("Error: Problem could not be evaluated with your input") # Notify student
         else:					# self.code is not a string; assume its a function
 
             # this is an interface to the Tutor2 check functions
@@ -953,7 +971,8 @@ def sympy_check2():
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
         for k in range(len(idset)):
-            correct_map.set(idset[k], correct[k], msg=messages[k])
+            correct_map.set(idset[k], correct[k], msg=messages[k],
+                            npoints=self.maxpoints[idset[k]])
         return correct_map
 
     def get_answers(self):
@@ -1005,7 +1024,7 @@ class CodeResponse(LoncapaResponse):
     '''
     Grade student code using an external queueing server, called 'xqueue'
 
-    Expects 'xqueue' dict in ModuleSystem with the following keys:
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
         system.xqueue = { 'interface': XqueueInterface object,
                           'callback_url': Per-StudentModule callback URL where results are posted (string),
                           'default_queuename': Default queuename to submit request (string)
@@ -1026,7 +1045,7 @@ class CodeResponse(LoncapaResponse):
         TODO: Determines whether in synchronous or asynchronous (queued) mode
         '''
         xml = self.xml
-        self.url = xml.get('url', None) # XML can override external resource (grader/queue) URL
+        self.url = xml.get('url', None) # TODO: XML can override external resource (grader/queue) URL
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
         # VS[compat]:
@@ -1121,21 +1140,33 @@ class CodeResponse(LoncapaResponse):
 
         # Prepare xqueue request
         #------------------------------------------------------------ 
+
         qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
+        anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed)+self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +  
+                                                 self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
-
+        
         # Generate body
         if is_list_of_files(submission):
-            self.context.update({'submission': queuekey}) # For tracking. TODO: May want to record something else here
+            self.context.update({'submission': ''}) # TODO: Get S3 pointer from the Queue
         else:
             self.context.update({'submission': submission})
 
         contents = self.payload.copy() 
+
+        # Metadata related to the student submission revealed to the external grader
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                       }
+        contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         if is_list_of_files(submission):
@@ -1148,16 +1179,21 @@ class CodeResponse(LoncapaResponse):
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents))
 
+        # State associated with the queueing request
+        queuestate = {'key': queuekey,
+                      'time': qtime,
+                     }
+
         cmap = CorrectMap() 
         if error:
-            cmap.set(self.answer_id, queuekey=None,
+            cmap.set(self.answer_id, queuestate=None,
                      msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
         else:
             # Queueing mechanism flags:
-            #   1) Backend: Non-null CorrectMap['queuekey'] indicates that the problem has been queued
+            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that the problem has been queued
             #   2) Frontend: correctness='incomplete' eventually trickles down through inputtypes.textbox 
             #       and .filesubmission to inform the browser to poll the LMS
-            cmap.set(self.answer_id, queuekey=queuekey, correctness='incomplete', msg=msg)
+            cmap.set(self.answer_id, queuestate=queuestate, correctness='incomplete', msg=msg)
 
         return cmap
 
@@ -1165,7 +1201,7 @@ class CodeResponse(LoncapaResponse):
 
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg) 
         if not valid_score_msg:
-            oldcmap.set(self.answer_id, msg='Error: Invalid grader reply.')
+            oldcmap.set(self.answer_id, msg='Invalid grader reply. Please contact the course staff.')
             return oldcmap
         
         correctness = 'correct' if correct else 'incorrect'
@@ -1180,7 +1216,7 @@ class CodeResponse(LoncapaResponse):
                 points = 0
             elif points > self.maxpoints[self.answer_id]:
                 points = self.maxpoints[self.answer_id]
-            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuekey=None)  # Queuekey is consumed
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)  # Queuestate is consumed
         else:
             log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
 
@@ -1197,26 +1233,41 @@ class CodeResponse(LoncapaResponse):
         '''
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
-             'score': # TODO -- Partial grading
+             'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg }
 
         Returns (valid_score_msg, correct, score, msg):
             valid_score_msg: Flag indicating valid score_msg format (Boolean)
             correct:         Correctness of submission (Boolean)
-            score:           # TODO: Implement partial grading
+            score:           Points to be assigned (numeric, can be float)
             msg:             Message from grader to display to student (string)
         '''
-        fail = (False, False, -1, '')
+        fail = (False, False, 0, '')
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
+            log.error("External grader message should be a JSON-serialized dict. Received score_msg = %s" % score_msg)
             return fail
         if not isinstance(score_result, dict):
+            log.error("External grader message should be a JSON-serialized dict. Received score_result = %s" % score_result)
             return fail
         for tag in ['correct', 'score', 'msg']:
-            if not score_result.has_key(tag):
+            if tag not in score_result:
+                log.error("External grader message is missing one or more required tags: 'correct', 'score', 'msg'")
                 return fail
-        return (True, score_result['correct'], score_result['score'], score_result['msg'])
+
+        # Next, we need to check that the contents of the external grader message 
+        #   is safe for the LMS.
+        # 1) Make sure that the message is valid XML (proper opening/closing tags)
+        # 2) TODO: Is the message actually HTML?
+        msg = score_result['msg']
+        try:
+            etree.fromstring(msg)
+        except etree.XMLSyntaxError as err:
+            log.error("Unable to parse external grader message as valid XML: score_msg['msg']=%s" % msg)
+            return fail
+            
+        return (True, score_result['correct'], score_result['score'], msg)
         
 
 #-----------------------------------------------------------------------------
@@ -1471,11 +1522,12 @@ class FormulaResponse(LoncapaResponse):
                                            cs=self.case_sensitive)
             except UndefinedVariable as uv:
                 log.debug('formularesponse: undefined variable in given=%s' % given)
-                raise StudentInputError(uv.message + " not permitted in answer")
+                raise StudentInputError("Invalid input: " + uv.message + " not permitted in answer")
             except Exception as err:
                 #traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
-                raise StudentInputError("Error in formula")
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %\
+                                        cgi.escape(given))
             if numpy.isnan(student_result) or numpy.isinf(student_result):
                 return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
