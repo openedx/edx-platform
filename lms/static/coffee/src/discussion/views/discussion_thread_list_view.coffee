@@ -30,7 +30,7 @@ class @DiscussionThreadListView extends Backbone.View
     windowHeight = $(window).height();
 
     discussionBody = $(".discussion-article")
-    discussionsBodyTop = discussionBody.offset().top;
+    discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top;
     discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight();
 
     sidebar = $(".sidebar")
