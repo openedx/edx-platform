@@ -70,9 +70,9 @@ def manage_modulestores(request,reload_dir=None):
 
     if reload_dir is not None:
         if reload_dir not in def_ms.courses:
-            html += "<h2><font color='red'>Error: '%s' is not a valid course directory</font></h2>" % reload_dir
+            html += '<h2 class="inline-error">Error: "%s" is not a valid course directory</h2>' % reload_dir
         else:
-            html += "<h2><font color='blue'>Reloaded course directory '%s'</font></h2>" % reload_dir
+            html += '<h2>Reloaded course directory "%s"</h2>' % reload_dir
             def_ms.try_load_course(reload_dir)
 
     #----------------------------------------
@@ -179,9 +179,9 @@ def gitreload(request, reload_dir=None):
     if reload_dir is not None:
         def_ms = modulestore()
         if reload_dir not in def_ms.courses:
-            html += "<h2><font color='red'>Error: '%s' is not a valid course directory</font></h2>" % reload_dir
+            html += '<h2 class="inline-error">Error: "%s" is not a valid course directory</font></h2>' % reload_dir
         else:
-            html += "<h2><font color='blue'>Reloaded course directory '%s'</font></h2>" % reload_dir
+            html += "<h2>Reloaded course directory '%s'</h2>" % reload_dir
             def_ms.try_load_course(reload_dir)
             track.views.server_track(request, 'reloaded %s' % reload_dir, {}, page='migrate')
 

@@ -155,8 +155,8 @@ class CapaModule(XModule):
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                problem_text = ('<problem><text><font color="red" size="+2">'
-                                'Problem %s has an error:</font>%s</text></problem>' %
+                problem_text = ('<problem><text><span class="inline-error">'
+                                'Problem %s has an error:</span>%s</text></problem>' %
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
