@@ -30,10 +30,10 @@ class @NewPostView extends Backbone.View
     toggleTopicDropdown: (event) ->
         event.stopPropagation()
         if @menuOpen
-            @hideTopicDropdown()            
+            @hideTopicDropdown()
         else
-            @showTopicDropdown()            
-    
+            @showTopicDropdown()
+
     showTopicDropdown: () ->
         @menuOpen = true
         @dropdownButton.addClass('dropped')
@@ -85,7 +85,7 @@ class @NewPostView extends Backbone.View
         width = test.width()
         test.remove()
         return width
-    
+
     fitName: (name) ->
         width = @getNameWidth(name)
         if width < @maxNameWidth
@@ -136,6 +136,7 @@ class @NewPostView extends Backbone.View
                 auto_subscribe: follow
             error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
             success: (response, textStatus) =>
+                # TODO: Move this out of the callback, this makes it feel sluggish
                 thread = new Thread response['content']
                 DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
                 @$el.hide()
@@ -144,20 +145,6 @@ class @NewPostView extends Backbone.View
                 @$(".new-post-tags").val("")
                 @$(".new-post-tags").importTags("")
                 @collection.add thread
-                @collection.trigger "reset"
-                @trigger "thread:created", thread.id
-
-                #@$el.children(".threads").prepend($thread)
-                # no idea what this is
-                #@$el.children(".blank").remove()
-                #@$(".new-post-similar-posts").empty()
-                #@$(".new-post-similar-posts-wrapper").hide()
-                #DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), "new-post-body", ""
-
-                #thread = @model.addThread response.content
-                #threadView = new ThreadView el: $thread[0], model: thread
-                #thread.updateInfo response.annotated_content_info
-                #@cancelNewPost()
 
     setActiveItem: (event) ->
         if event.which == 13
@@ -182,6 +169,3 @@ class @NewPostView extends Backbone.View
         scrollTarget = Math.min(index * itemHeight, $(".topic_menu").scrollTop())
         scrollTarget = Math.max(index * itemHeight - $(".topic_menu").height() + itemHeight, scrollTarget)
         $(".topic_menu").scrollTop(scrollTarget)
-
-
-
