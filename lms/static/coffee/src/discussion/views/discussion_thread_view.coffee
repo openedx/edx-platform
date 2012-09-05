@@ -26,7 +26,7 @@ class @DiscussionThreadView extends DiscussionContentView
     @renderVoted()
     @renderAttrs()
     @$("span.timeago").timeago()
-    Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
+    @makeWmdEditor "reply-body"
     @convertMath()
     @renderResponses()
     @highlight @$(".post-body")
@@ -50,7 +50,7 @@ class @DiscussionThreadView extends DiscussionContentView
   convertMath: ->
     element = @$(".post-body")
     element.html DiscussionUtil.postMathJaxProcessor(element.html())
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element.attr("id")]
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
   renderResponses: ->
     DiscussionUtil.safeAjax
@@ -119,7 +119,9 @@ class @DiscussionThreadView extends DiscussionContentView
   submitComment: (event) ->
     event.preventDefault()
     url = @model.urlFor('reply')
-    body = @$("#wmd-input").val()
+    body = @getWmdContent("reply-body")
+    return if not body.trim().length
+    @setWmdContent("reply-body", "")
     response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
     response.set('thread', @model.get('thread'))
     @renderResponse(response)

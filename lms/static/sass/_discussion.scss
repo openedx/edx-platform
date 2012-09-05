@@ -1426,15 +1426,15 @@ body.discussion {
     }
   }
 
-  #wmd-button-bar {
+  .wmd-button-bar {
     border: none;
   }
 
-  #wmd-input {
+  .wmd-input {
     @include discussion-wmd-input;
   }
 
-  #wmd-preview {
+  .wmd-preview {
     @include discussion-wmd-preview;
   }
 
