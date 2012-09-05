@@ -122,9 +122,9 @@ class @DiscussionThreadView extends DiscussionContentView
     body = @getWmdContent("reply-body")
     return if not body.trim().length
     @setWmdContent("reply-body", "")
-    response = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
-    response.set('thread', @model.get('thread'))
-    @renderResponse(response)
+    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
+    comment.set('thread', @model.get('thread'))
+    @renderResponse(comment)
     @model.addComment()
 
     DiscussionUtil.safeAjax
@@ -134,8 +134,12 @@ class @DiscussionThreadView extends DiscussionContentView
       dataType: 'json'
       data:
         body: body
+      success: (data, textStatus) =>
+        comment.updateInfo(data.annotated_content_info)
+        comment.set(data.content)
 
   edit: ->
+
 
   delete: (event) ->
     url = @model.urlFor('delete')
