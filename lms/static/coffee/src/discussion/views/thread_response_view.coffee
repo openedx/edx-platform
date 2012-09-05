@@ -11,7 +11,6 @@ class @ThreadResponseView extends DiscussionContentView
   render: ->
     @$el.html(@template(@model.toJSON()))
     @initLocal()
-    console.log @$local
     @delegateEvents()
     if window.user.voted(@model)
       @$(".vote-btn").addClass("is-cast")

@@ -45,6 +45,7 @@ $ ->
 
     removeMath: (text) ->
 
+      text = text || ""
       @math = []
       start = end = last = null
       braces = 0
