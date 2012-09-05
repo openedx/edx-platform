@@ -303,8 +303,10 @@ body.discussion {
           font-weight: 700;
           line-height: 18px;
           color: #eee;
+          @include transition(none);
 
-          &:hover {
+          &:hover,
+          &.focused {
             background-color: #666;
           }
         }
@@ -1027,6 +1029,7 @@ body.discussion {
 
 
 
+
   .bottom-post-status {
     padding: 30px;
     font-size: 20px;
@@ -1077,6 +1080,10 @@ body.discussion {
       font-size: 12px;
       font-style: italic;
       color: #888;
+
+      span {
+        font-style: italic;
+      }
     }
 
     .post-context{
