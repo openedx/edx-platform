@@ -99,39 +99,62 @@ def render_accordion(request, course, chapter, section):
     return render_to_string('accordion.html', context)
 
 
-def redirect_to_course_position(course_module):
+def get_current_child(xmodule):
+    """
+    Get the xmodule.position's display item of an xmodule that has a position and
+    children.  Returns None if the xmodule doesn't have a position, or if there
+    are no children.  Otherwise, if position is out of bounds, returns the first child.
+    """
+    if not hasattr(xmodule, 'position'):
+        return None
+
+    children = xmodule.get_display_items()
+    # position is 1-indexed.
+    if 0 <= xmodule.position - 1 < len(children):
+        child = children[xmodule.position - 1]
+    elif len(children) > 0:
+        # Something is wrong.  Default to first child
+        child = children[0]
+    else:
+        child = None
+    return child
+
+
+def redirect_to_course_position(course_module, first_time):
     """
     Load the course state for the user, and return a redirect to the
     appropriate place in the course: either the first element if there
     is no state, or their previous place if there is.
+
+    If this is the user's first time, send them to the first section instead.
     """
-    chapters = course_module.get_display_items()
-    # position is 1-indexed.
-    if course_module.position - 1 < len(chapters):
-        chapter = chapters[course_module.position - 1]
-    elif len(chapters) > 0:
-        # Something is wrong.  Default to first chapter.
-        chapter = chapters[0]
-    else:
+    course_id = course_module.descriptor.id
+    chapter = get_current_child(course_module)
+    if chapter is None:
         # oops.  Something bad has happened.
         raise Http404
+    if not first_time:
+        return redirect(reverse('courseware_chapter', kwargs={'course_id': course_id,
+                                                              'chapter': chapter.url_name}))
+    # Relying on default of returning first child
+    section = get_current_child(chapter)
+    return redirect(reverse('courseware_section', kwargs={'course_id': course_id,
+                                                          'chapter': chapter.url_name,
+                                                          'section': section.url_name}))
 
-    return redirect(reverse('courseware_chapter', kwargs={'course_id': course_module.descriptor.id,
-                                                          'chapter': chapter.url_name}))
-
-def save_course_position(course_module, chapter, instance_module):
+def save_child_position(seq_module, child_name, instance_module):
     """
-    chapter: url_name of the chapter
-    instance_module: the StudentModule object for the course_module
+    child_name: url_name of the child
+    instance_module: the StudentModule object for the seq_module
     """
-    for i, c in enumerate(course_module.get_display_items()):
-        if c.url_name == chapter:
+    for i, c in enumerate(seq_module.get_display_items()):
+        if c.url_name == child_name:
             # Position is 1-indexed
             position = i + 1
             # Only save if position changed
-            if position != course_module.position:
-                course_module.position = position
-                instance_module.state = course_module.get_instance_state()
+            if position != seq_module.position:
+                seq_module.position = position
+                instance_module.state = seq_module.get_instance_state()
                 instance_module.save()
 
 @login_required
@@ -171,7 +194,11 @@ def index(request, course_id, chapter=None, section=None,
 
     try:
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=1)
+            course.id, request.user, course, depth=2)
+
+        # Has this student been in this course before?
+        first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
+
         course_module = get_module(request.user, request, course.location, student_module_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
@@ -179,7 +206,7 @@ def index(request, course_id, chapter=None, section=None,
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None and section is None:
-            return redirect_to_course_position(course_module)
+            return redirect_to_course_position(course_module, first_time)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -194,7 +221,10 @@ def index(request, course_id, chapter=None, section=None,
         chapter_descriptor = course.get_child_by_url_name(chapter)
         if chapter_descriptor is not None:
             instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
-            save_course_position(course_module, chapter, instance_module)
+            save_child_position(course_module, chapter, instance_module)
+
+        chapter_module = get_module(request.user, request, chapter_descriptor.location,
+                                    student_module_cache, course_id)
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by_url_name(section)
@@ -202,21 +232,36 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
-            student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            section_student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
                 course_id, request.user, section_descriptor)
-            module = get_module(request.user, request,
+            section_module = get_module(request.user, request,
                                 section_descriptor.location,
-                                student_module_cache, course_id, position)
-            if module is None:
+                                section_student_module_cache, course_id, position)
+            if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
                 raise Http404
 
-            context['content'] = module.get_html()
+            # Save where we are in the chapter
+            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+            save_child_position(chapter_module, section, instance_module)
 
-        # if request.user.is_staff:
-        #     # Add a list of all the errors...
-        #     context['course_errors'] = modulestore().get_item_errors(course.location)
+
+            context['content'] = section_module.get_html()
+        else:
+            # section is none, so display a message
+            prev_section = get_current_child(chapter_module)
+            if prev_section is None:
+                # Something went wrong -- perhaps this chapter has no sections visible to the user
+                raise Http404
+            prev_section_url = reverse('courseware_section', kwargs={'course_id': course_id,
+                                                                     'chapter': chapter_descriptor.url_name,
+                                                                     'section': prev_section.url_name})
+            context['content'] = render_to_string('courseware/welcome-back.html',
+                                                  {'course': course,
+                                                   'chapter_module': chapter_module,
+                                                   'prev_section': prev_section,
+                                                   'prev_section_url': prev_section_url})
 
         result = render_to_response('courseware/courseware.html', context)
     except:
