@@ -21,7 +21,7 @@
           if(json.success) {
             location.href="${reverse('dashboard')}";
           }else{
-	    $('#register_message').html("<p><font color='red'>" + json.error + "</font></p>");
+          $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
           }
         });
       })(this)

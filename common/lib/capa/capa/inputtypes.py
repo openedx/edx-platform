@@ -470,9 +470,9 @@ def math(element, value, status, render_template, msg=''):
         xhtml = etree.XML(html)
     except Exception as err:
         if False:  # TODO needs to be self.system.DEBUG - but can't access system
-            msg = "<html><font color='red'><p>Error %s</p>" % str(err).replace('<', '&lt;')
+            msg = '<html><div class="inline-error"><p>Error %s</p>' % str(err).replace('<', '&lt;')
             msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<', '&lt;')
-            msg += "</font></html>"
+            msg += "</div></html>"
             log.error(msg)
             return etree.XML(msg)
         else:
