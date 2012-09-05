@@ -137,11 +137,19 @@ section.problem {
 
     div.equation {
       clear: both;
-      padding: 6px;
-      background: #eee;
+      margin-top: 3px;
 
       span {
         margin-bottom: 0;
+
+        &.math {
+          padding: 6px;
+          background: #f1f1f1;
+          border: 1px solid #e3e3e3;
+          @include inline-block;
+          @include border-radius(4px);
+          min-width: 300px;
+        }
       }
     }
 
@@ -227,8 +235,21 @@ section.problem {
         }
       }
     }
-  }
 
+    // .option-problem {
+    //   @include clearfix;
+
+    //   > p {
+    //     float: left;
+    //     width: flex-grid(6,9);
+    //   }
+
+    //   > span {
+    //     float: right;
+    //     width: flex-grid(3,9);
+    //   }
+    // }
+  }
 
   ul {
     list-style: disc outside none;
