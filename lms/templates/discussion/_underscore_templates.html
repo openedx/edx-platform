@@ -7,9 +7,13 @@
                 <h1>${'<%- title %>'}</h1>
                 <p class="posted-details">
                     <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
-                    <a href="${'<%- user_url %>'}">${'<%- username %>'}</a>
+                    <a href="${'<%- user_url %>'}">${'<%- username %>'}</a> 
+                    <span class="post-status-closed top-post-status" style="display: none">
+                      • This thread is closed.
+                    </span>
                 </p>
             </header>
+            
             <div class="post-body">
                 ${'<%- body %>'}
             </div>
@@ -18,9 +22,7 @@
                 (this post is about <a href="../../jump_to/${'<%- courseware_location %>'}">${'<%- courseware_title %>'}</a>)
             </div>
             ${'<% } %>'}
-            <div class="post-status-closed" style="display: none">
-              This thread is closed.
-            </div>
+                        
             <ul class="moderator-actions">
                 <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
                 <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>

@@ -1027,6 +1027,7 @@ body.discussion {
 
 
 
+
   .bottom-post-status {
     padding: 30px;
     font-size: 20px;
@@ -1077,6 +1078,10 @@ body.discussion {
       font-size: 12px;
       font-style: italic;
       color: #888;
+
+      span {
+        font-style: italic;
+      }
     }
 
     .post-context{
