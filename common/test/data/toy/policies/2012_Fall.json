@@ -2,7 +2,8 @@
     "course/2012_Fall": {
         "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
         "start": "2015-07-17T12:00",
-        "display_name": "Toy Course"
+        "display_name": "Toy Course",
+        "graded": "true"
     },
     "chapter/Overview": {
         "display_name": "Overview"
@@ -11,7 +12,7 @@
         "display_name": "Toy Videos",
         "format": "Lecture Sequence"
     },
-    "html/toylab": {
+    "html/secret:toylab": {
         "display_name": "Toy lab"
     },
     "video/Video_Resources": {

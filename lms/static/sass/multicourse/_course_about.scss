@@ -115,6 +115,30 @@
             }
           }
 
+          a {
+            &:hover, &:visited {
+              text-decoration: none;
+            }
+          }
+
+          strong {
+            @include button(shiny, $blue);
+            @include box-sizing(border-box);
+            @include border-radius(3px);
+            display: block;
+            float: left;
+            font: normal 1.2rem/1.6rem $sans-serif;
+            letter-spacing: 1px;
+            padding: 10px 0px;
+            text-transform: uppercase;
+            text-align: center;
+            width: flex-grid(3, 8);
+
+            &:hover {
+              color: rgb(255,255,255);
+            }
+          }
+
           span.register {
             background: lighten($blue, 20%);
             border: 1px solid $blue;
@@ -125,7 +149,10 @@
             padding: 10px 0px 8px;
             text-transform: uppercase;
             text-align: center;
-            width: flex-grid(12);
+            float: left;
+            margin: 1px flex-gutter(8) 0 0;
+            @include transition();
+            width: flex-grid(5, 8);
           }
         }
       }

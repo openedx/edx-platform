@@ -68,7 +68,6 @@ def xml_store_config(data_dir):
         'OPTIONS': {
             'data_dir': data_dir,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }
@@ -204,7 +203,8 @@ class PageLoader(ActivateLoginTestCase):
         self.assertEqual(len(courses), 1)
         course = courses[0]
         self.enroll(course)
-
+        course_id = course.id
+        
         n = 0
         num_bad = 0
         all_ok = True
@@ -214,10 +214,11 @@ class PageLoader(ActivateLoginTestCase):
             print "Checking ", descriptor.location.url()
             #print descriptor.__class__, descriptor.location
             resp = self.client.get(reverse('jump_to',
-                                   kwargs={'location': descriptor.location.url()}))
+                                   kwargs={'course_id': course_id,
+                                           'location': descriptor.location.url()}))
             msg = str(resp.status_code)
 
-            if resp.status_code != 200:
+            if resp.status_code != 302:
                 msg = "ERROR " + msg
                 all_ok = False
                 num_bad += 1
@@ -411,8 +412,6 @@ class TestViewAuth(PageLoader):
             """list of urls that only instructors/staff should be able to see"""
             urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
                                 course)
-            urls.append(reverse('student_progress', kwargs={'course_id': course.id,
-                                                     'student_id': user(self.student).id}))
             return urls
 
         def check_non_staff(course):
@@ -434,6 +433,17 @@ class TestViewAuth(PageLoader):
                         light_student_urls(course)):
                 print 'checking for 200 on {0}'.format(url)
                 self.check_for_get_code(200, url)
+
+            # The student progress tab is not accessible to a student
+            # before launch, so the instructor view-as-student feature should return a 404 as well.
+            # TODO (vshnayder): If this is not the behavior we want, will need
+            # to make access checking smarter and understand both the effective
+            # user (the student), and the requesting user (the prof)
+            url = reverse('student_progress', kwargs={'course_id': course.id,
+                                                     'student_id': user(self.student).id})
+            print 'checking for 404 on view-as-student: {0}'.format(url)
+            self.check_for_get_code(404, url)
+
 
         # First, try with an enrolled student
         print '=== Testing student access....'

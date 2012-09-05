@@ -64,6 +64,9 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
+    'FORCE_UNIVERSITY_DOMAIN': False,	# set this to the university domain to use, as an override to HTTP_HOST
+                                        # set to None to do no university selection
+
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
@@ -77,7 +80,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
-
+    'AUTH_USE_OPENID_PROVIDER': False,
 }
 
 # Used for A/B testing
@@ -85,6 +88,9 @@ DEFAULT_GROUPS = []
 
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
+
+# Used with XQueue
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
@@ -116,6 +122,10 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
               system_node_path
               ]
 NODE_PATH = ':'.join(node_paths)
+
+
+############################ OpenID Provider  ##################################
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -216,7 +226,6 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }
@@ -426,7 +435,7 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
-discussion_js = glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
+discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee'))
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -494,10 +503,10 @@ PIPELINE_JS = {
         'source_filenames': [
             pth.replace(COMMON_ROOT / 'static/', '')
             for pth
-            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+            in sorted(glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee'))
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
-            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
             if pth not in courseware_only_js and pth not in discussion_js
         ] + [
             'js/form.ext.js',
@@ -598,6 +607,7 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
+    'instructor',
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming

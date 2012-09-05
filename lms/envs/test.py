@@ -58,7 +58,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
@@ -122,6 +122,11 @@ CACHES = {
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+################################## OPENID ######################################
+MITX_FEATURES['AUTH_USE_OPENID'] = True
+MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

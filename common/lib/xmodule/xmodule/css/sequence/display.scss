@@ -37,7 +37,6 @@ nav.sequence-nav {
     height: 44px;
     margin: 0 30px;
     @include linear-gradient(top, #ddd, #eee);
-    overflow: hidden;
     @include box-shadow(0 1px 3px rgba(0, 0, 0, .1) inset);
   }
 

@@ -5,8 +5,8 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
 from __future__ import absolute_import
-
 from importlib import import_module
+from os import environ
 
 from django.conf import settings
 
@@ -43,3 +43,8 @@ def modulestore(name='default'):
         )
 
     return _MODULESTORES[name]
+
+# if 'DJANGO_SETTINGS_MODULE' in environ:
+#     # Initialize the modulestores immediately
+#     for store_name in settings.MODULESTORE:
+#         modulestore(store_name)
