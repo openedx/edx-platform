@@ -71,7 +71,7 @@ table.stat_table td {
     <hr width="40%" style="align:left">
  %endif
  
-%if admin_access:
+%if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
     <p>
     <input type="submit" name="action" value="Reload course from XML files"> 
     <input type="submit" name="action" value="GIT pull and Reload course"> 

@@ -18,6 +18,7 @@ MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
+MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 
 WIKI_ENABLED = True
 
