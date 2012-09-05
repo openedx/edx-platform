@@ -732,8 +732,14 @@ body.discussion {
         line-height: 22px;
         color: #fff;
         @include clearfix;
+        @include transition(none);
 
-        &:hover {
+        &.hidden {
+          display: none;
+        }
+
+        &:hover,
+        &.focused {
           background-color: #636363;
         }
 
@@ -1022,6 +1028,16 @@ body.discussion {
 
 
 
+  .bottom-post-status {
+    padding: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ccc;
+    text-align: center;
+  }
+
+
+
 
   .discussion-column {
     float: right;
@@ -1038,9 +1054,17 @@ body.discussion {
     }
   }
 
+  .blank-slate h1 {
+    margin-top: 195px;
+    text-align: center;
+    color: #ccc;
+  }
+
+  .blank-slate,
   .discussion-article {
     position: relative;
     padding: 40px;
+    min-height: 468px;
 
     h1 {
       margin-bottom: 10px;
@@ -1053,6 +1077,12 @@ body.discussion {
     .posted-details {
       font-size: 12px;
       font-style: italic;
+      color: #888;
+    }
+
+    .post-context{
+      margin-top: 20px;
+      font-size: 12px;
       color: #888;
     }
 

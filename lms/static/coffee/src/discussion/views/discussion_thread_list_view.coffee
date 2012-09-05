@@ -10,6 +10,46 @@ class @DiscussionThreadListView extends Backbone.View
 
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
+    @collection.on "change", @reloadDisplayedCollection
+    @sidebar_padding = 10
+    @sidebar_header_height = 87
+
+  reloadDisplayedCollection: =>
+    @displayedCollection.reset(@collection.models)
+    @updateSidebar()
+
+  updateSidebar: =>
+
+    scrollTop = $(window).scrollTop();
+    windowHeight = $(window).height();
+
+    discussionBody = $(".discussion-article")
+    discussionsBodyTop = discussionBody.offset().top;
+    discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight();
+
+    sidebar = $(".sidebar")
+    if scrollTop > discussionsBodyTop - @sidebar_padding
+      sidebar.addClass('fixed');
+      sidebar.css('top', @sidebar_padding);
+    else
+      sidebar.removeClass('fixed');
+      sidebar.css('top', '0');
+
+    sidebarWidth = .32 * $(".discussion-body").width() - 10;
+    sidebar.css('width', sidebarWidth + 'px');
+
+    sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
+
+    topOffset = scrollTop + windowHeight
+    discussionBottomOffset = discussionsBodyBottom + @sidebar_padding
+    amount = Math.max(topOffset - discussionBottomOffset, 0)
+
+    sidebarHeight = sidebarHeight - @sidebar_padding - amount
+    sidebar.css 'height', Math.min(Math.max(sidebarHeight, 400), discussionBody.outerHeight())
+
+    postListWrapper = @$('.post-list-wrapper')
+    postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px');
+
 
   # Because we want the behavior that when the body is clicked the menu is
   # closed, we need to ignore clicks in the search field and stop propagation.
@@ -20,6 +60,10 @@ class @DiscussionThreadListView extends Backbone.View
   render: ->
     @timer = 0
     @$el.html(@template())
+
+    $(window).bind "scroll", @updateSidebar
+    $(window).bind "resize", @updateSidebar
+
     @displayedCollection.on "reset", @renderThreads
     @displayedCollection.on "thread:remove", @renderThreads
     @renderThreads()
@@ -60,9 +104,11 @@ class @DiscussionThreadListView extends Backbone.View
     if @$(".browse").hasClass('is-dropped')
       @$(".browse-topic-drop-menu-wrapper").show()
       $('body').bind 'click', @toggleTopicDrop
+      $('body').bind 'keyup', @setActiveItem
     else
       @$(".browse-topic-drop-menu-wrapper").hide()
       $('body').unbind 'click', @toggleTopicDrop
+      $('body').unbind 'keyup', @setActiveItem
 
   setTopic: (event) ->
     item = $(event.target).closest('a')
@@ -102,10 +148,6 @@ class @DiscussionThreadListView extends Backbone.View
       @displayedCollection.comparator = @displayedCollection.sortByComments
     @displayedCollection.sort()
 
-  delay: (callback, ms) =>
-    clearTimeout(@timer)
-    @timer = setTimeout(callback, ms)
-
   performSearch: (event) ->
     if event.which == 13
       event.preventDefault()
@@ -120,3 +162,35 @@ class @DiscussionThreadListView extends Backbone.View
           if textStatus == 'success'
             @collection.reset(response.discussion_data)
             @displayedCollection.reset(@collection.models)
+
+
+  setActiveItem: (event) ->
+    if event.which == 13
+      console.log($(".browse-topic-drop-menu-wrapper .focused"))
+      $(".browse-topic-drop-menu-wrapper .focused").click()
+      return
+    if event.which != 40 && event.which != 38
+      return
+    event.preventDefault()
+
+    items = $(".browse-topic-drop-menu-wrapper a").not(".hidden")
+    totalItems = items.length
+    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()
+    # index = parseInt($(".browse-topic-drop-menu-wrapper").attr("data-focused")) || 0
+    
+
+    if event.which == 40
+      index = index + 1
+    else if event.which == 38
+      index = index - 1
+    if index == totalItems
+      index = 0
+
+    console.log(index)
+
+    $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
+    $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
+    # $(items[index]).addClass("focused")
+    $(".browse-topic-drop-menu-wrapper").attr("data-focused", index)
+
+
