@@ -10,12 +10,18 @@ class @DiscussionThreadView extends DiscussionContentView
 
   template: _.template($("#thread-template").html())
 
+  initLocal: ->
+    @$local = @$el.children(".discussion-article").children(".local")
+    @$delegateElement = @$local
+
   initialize: ->
     super()
     @model.on "change", @updateModelDetails
 
   render: ->
     @$el.html(@template(@model.toJSON()))
+    @initLocal()
+    @delegateEvents()
     @renderDogear()
     @renderVoted()
     @renderAttrs()
@@ -23,6 +29,8 @@ class @DiscussionThreadView extends DiscussionContentView
     Markdown.makeWmdEditor @$(".reply-body"), "", DiscussionUtil.urlFor("upload"), (text) -> DiscussionUtil.postMathJaxProcessor(text)
     @convertMath()
     @renderResponses()
+    @highlight @$(".post-body")
+    @highlight @$("h1")
     @
 
   renderDogear: ->
@@ -48,19 +56,20 @@ class @DiscussionThreadView extends DiscussionContentView
     DiscussionUtil.safeAjax
       url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
       success: (data, textStatus, xhr) =>
-        @$(".loading").remove()
+        @$el.find(".loading").remove()
         Content.loadContentInfos(data['annotated_content_info'])
         comments = new Comments(data['content']['children'])
         comments.each @renderResponse
+        @trigger "thread:responses:rendered"
 
   renderResponse: (response) =>
       view = new ThreadResponseView(model: response)
       view.on "comment:add", @addComment
       view.render()
-      @$(".responses").append(view.el)
+      @$el.find(".responses").append(view.el)
 
   addComment: =>
-    
+    @model.comment()
 
   toggleVote: (event) ->
     event.preventDefault()
@@ -72,6 +81,7 @@ class @DiscussionThreadView extends DiscussionContentView
   toggleFollowing: (event) ->
     $elem = $(event.target)
     url = null
+    console.log "follow"
     if not @model.get('subscribed')
       @model.follow()
       url = @model.urlFor("follow")
@@ -129,6 +139,7 @@ class @DiscussionThreadView extends DiscussionContentView
     if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
       return
     @model.remove()
+    @$el.empty()
     $elem = $(event.target)
     DiscussionUtil.safeAjax
       $elem: $elem
@@ -162,3 +173,6 @@ class @DiscussionThreadView extends DiscussionContentView
       type: "POST"
       success: (response, textStatus) =>
         @model.set('endorsed', not endorsed)
+
+  highlight: (el) ->
+    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))

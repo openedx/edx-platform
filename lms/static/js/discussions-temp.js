@@ -67,13 +67,13 @@ $(document).ready(function() {
 
 	$body.delegate('.browse-topic-drop-search-input, .form-topic-drop-search-input', 'keyup', filterDrop);
 
-	$(window).bind('resize', updateSidebar);
-	$(window).bind('scroll', updateSidebar);
-  $('.discussion-column').bind("input", function (e) {
-    console.log("resized");
-	  updateSidebar();
-  })
-	updateSidebar();
+// 	$(window).bind('resize', updateSidebar);
+// 	$(window).bind('scroll', updateSidebar);
+//   $('.discussion-column').bind("input", function (e) {
+//     console.log("resized");
+// 	  updateSidebar();
+//   })
+// 	updateSidebar();
 });
 
 function filterDrop(e) {
@@ -132,7 +132,7 @@ function filterDrop(e) {
 		return;
 	}
 
-	$items.hide();
+	$items.addClass('hidden');
 	$items.each(function(i) {
 		var thisText = $(this).children().not('.unread').text();
 		$(this).parents('ul').siblings('a').not('.unread').each(function(i) {
@@ -147,7 +147,7 @@ function filterDrop(e) {
 		}
 
 		if(test) {
-			$(this).show();
+			$(this).removeClass('hidden');
 
 			// show children
 			$(this).parent().find('a').show();
@@ -225,6 +225,7 @@ function showTopicDrop(e) {
 
 	$topicDrop.show();
 	$browse.unbind('click', showTopicDrop);
+	$body.bind('keyup', setActiveDropItem);
 	$browse.bind('click', hideTopicDrop);
 	setTimeout(function() {
 		$body.bind('click', hideTopicDrop);

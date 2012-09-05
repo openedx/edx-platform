@@ -1,8 +1,10 @@
 class @ThreadListItemView extends Backbone.View
   tagName: "li"
   template: _.template($("#thread-list-item-template").html())
+
   events:
     "click a": "threadSelected"
+
   initialize: ->
     @model.on "change", @render
     @model.on "thread:remove", @threadRemoved
@@ -10,10 +12,12 @@ class @ThreadListItemView extends Backbone.View
     @model.on "thread:unfollow", @unfollow
     @model.on "comment:add", @addComment
     @model.on "comment:remove", @removeComment
+
   render: =>
     @$el.html(@template(@model.toJSON()))
     if window.user.following(@model)
       @follow()
+    @highlight @$(".title")
     @
 
   threadSelected: (event) ->
@@ -34,3 +38,9 @@ class @ThreadListItemView extends Backbone.View
 
   removeComment: (comment) =>
     @$(".comments-count").html(@model.get('comments_count'))
+
+  #addComment: =>
+  #  @$(".comments-count").html(parseInt(@$(".comments-count").html()) + 1)
+
+  highlight: (el) ->
+    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
