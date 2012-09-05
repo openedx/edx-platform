@@ -30,15 +30,16 @@ class @NewPostView extends Backbone.View
     toggleTopicDropdown: (event) ->
         event.stopPropagation()
         if @menuOpen
-            @hideTopicDropdown()
+            @hideTopicDropdown()            
         else
-            @showTopicDropdown()
+            @showTopicDropdown()            
     
     showTopicDropdown: () ->
         @menuOpen = true
         @dropdownButton.addClass('dropped')
         @topicMenu.show()
 
+        $('body').bind 'keydown', @setActiveItem
         $('body').bind 'click', @hideTopicDropdown
 
         # Set here because 1) the window might get resized and things could
@@ -51,6 +52,7 @@ class @NewPostView extends Backbone.View
         @dropdownButton.removeClass('dropped')
         @topicMenu.hide()
 
+        $('body').unbind 'keydown', @setActiveItem
         $('body').unbind 'click', @hideTopicDropdown
 
     setTopic: (event) ->
@@ -156,3 +158,30 @@ class @NewPostView extends Backbone.View
                 #threadView = new ThreadView el: $thread[0], model: thread
                 #thread.updateInfo response.annotated_content_info
                 #@cancelNewPost()
+
+    setActiveItem: (event) ->
+        if event.which == 13
+          $(".topic_menu_wrapper .focused").click()
+          return
+        if event.which != 40 && event.which != 38
+          return
+        event.preventDefault()
+
+        itemHeight = $(".topic_menu_wrapper a").outerHeight()
+        items = $.makeArray($(".topic_menu_wrapper a").not(".hidden"))
+        index = items.indexOf($('.topic_menu_wrapper .focused')[0])
+
+        if event.which == 40
+            index = Math.min(index + 1, items.length - 1)
+        if event.which == 38
+            index = Math.max(index - 1, 0)
+
+        $(".topic_menu_wrapper .focused").removeClass("focused")
+        $(items[index]).addClass("focused")
+
+        scrollTarget = Math.min(index * itemHeight, $(".topic_menu").scrollTop())
+        scrollTarget = Math.max(index * itemHeight - $(".topic_menu").height() + itemHeight, scrollTarget)
+        $(".topic_menu").scrollTop(scrollTarget)
+
+
+

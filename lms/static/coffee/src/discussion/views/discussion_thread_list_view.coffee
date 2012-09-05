@@ -30,7 +30,7 @@ class @DiscussionThreadListView extends Backbone.View
     windowHeight = $(window).height();
 
     discussionBody = $(".discussion-article")
-    discussionsBodyTop = discussionBody.offset().top;
+    discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top;
     discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight();
 
     sidebar = $(".sidebar")
@@ -194,22 +194,23 @@ class @DiscussionThreadListView extends Backbone.View
       return
     event.preventDefault()
 
-    totalItems = $(".browse-topic-drop-menu-wrapper a").length
-    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()
-    firstShownIndex = $($(".browse-topic-drop-menu-wrapper a").not('.hidden')[0]).parent().index()
+    itemHeight = $(".browse-topic-drop-menu a").outerHeight()
+    items = $.makeArray($(".browse-topic-drop-menu-wrapper a").not(".hidden"))
+    index = items.indexOf($('.browse-topic-drop-menu-wrapper .focused')[0])
 
     if event.which == 40
-      index = index + 1
-    else if event.which == 38
-      index = index - 1
-      while $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').hasClass('hidden')
-        index--;
-    if index == totalItems
-      index = 0
-
-    while $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').hasClass('hidden')
-        index++;
+        index = Math.min(index + 1, items.length - 1)
+    if event.which == 38
+        index = Math.max(index - 1, 0)
 
     $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
-    $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
-    $(".browse-topic-drop-menu-wrapper").attr("data-focused", index)
+    $(items[index]).addClass("focused")
+
+    scrollTarget = Math.min(index * itemHeight, $(".browse-topic-drop-menu").scrollTop())
+    scrollTarget = Math.max(index * itemHeight - $(".browse-topic-drop-menu").height() + itemHeight, scrollTarget)
+    $(".browse-topic-drop-menu").scrollTop(scrollTarget)
+
+
+
+
+
