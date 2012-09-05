@@ -4,7 +4,7 @@ class @ThreadResponseView extends DiscussionContentView
 
   events:
       "click .vote-btn": "toggleVote"
-      "submit form": "submitComment"
+      "submit .comment-form": "submitComment"
       "click .action-endorse": "toggleEndorse"
       "click .action-delete": "delete"
 
