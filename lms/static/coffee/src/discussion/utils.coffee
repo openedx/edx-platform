@@ -153,11 +153,13 @@ class @DiscussionUtil
     editor
 
   @getWmdEditor: ($content, $local, cls_identifier) ->
-    id = $content.attr("_id")
+    elem = $local(".#{cls_identifier}")
+    id = elem.data("id")
     @wmdEditors["#{cls_identifier}-#{id}"]
 
   @getWmdInput: ($content, $local, cls_identifier) ->
-    id = $content.attr("_id")
+    elem = $local(".#{cls_identifier}")
+    id = elem.data("id")
     $local("#wmd-input-#{cls_identifier}-#{id}")
 
   @getWmdContent: ($content, $local, cls_identifier) ->
@@ -265,3 +267,13 @@ class @DiscussionUtil
   @markdownWithHighlight: (text) ->
     converter = Markdown.getMathCompatibleConverter()
     @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
+
+  @abbreviateString: (text, minLength) ->
+    # Abbreviates a string to at least minLength characters, stopping at word boundaries
+    if text.length<100
+      return text
+    else
+      while minLength < text.length && text[minLength] != ' '
+        minLength++
+      return text.substr(0, minLength) + '...'
+

@@ -1,5 +1,5 @@
 class @DiscussionContentView extends Backbone.View
-  
+
   attrRenderer:
     endorsed: (endorsed) ->
       if endorsed
@@ -24,7 +24,7 @@ class @DiscussionContentView extends Backbone.View
     votes_point: (votes_point) ->
 
     comments_count: (comments_count) ->
-      
+
     subscribed: (subscribed) ->
       if subscribed
         @$(".dogear").addClass("is-followed")
@@ -72,7 +72,8 @@ class @DiscussionContentView extends Backbone.View
     @$delegateElement = @$local
 
   makeWmdEditor: (cls_identifier) =>
-    DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), cls_identifier
+    if not @$el.find(".wmd-panel").length
+      DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), cls_identifier
 
   getWmdEditor: (cls_identifier) =>
     DiscussionUtil.getWmdEditor @$el, $.proxy(@$, @), cls_identifier
