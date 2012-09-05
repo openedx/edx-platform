@@ -347,6 +347,10 @@ class CapaModule(XModule):
         if self.show_answer == "never":
             return False
 
+        # Admins can see the answer, unless the problem explicitly prevents it
+        if self.system.user_is_staff:
+            return True
+
         if self.show_answer == 'attempted':
             return self.attempts > 0
 
