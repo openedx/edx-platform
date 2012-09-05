@@ -71,6 +71,18 @@ class @DiscussionContentView extends Backbone.View
       @$local = @$el
     @$delegateElement = @$local
 
+  makeWmdEditor: (cls_identifier) =>
+    DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), cls_identifier
+
+  getWmdEditor: (cls_identifier) =>
+    DiscussionUtil.getWmdEditor @$el, $.proxy(@$, @), cls_identifier
+
+  getWmdContent: (cls_identifier) =>
+    DiscussionUtil.getWmdContent @$el, $.proxy(@$, @), cls_identifier
+
+  setWmdContent: (cls_identifier, text) =>
+    DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), cls_identifier, text
+
   initialize: ->
     @initLocal()
     @model.bind('change', @renderPartialAttrs, @)
