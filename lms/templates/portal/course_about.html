@@ -71,14 +71,14 @@
                       course_target = reverse('about_course', args=[course.id])
                   show_link = settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION')
                 %>
-	        %if show_link:
+	        %if show_link or show_courseware_link:
                 <a href="${course_target}">
                 %endif
                 <span class="register disabled">You are registered for this course (${course.number})</span>
                 % if show_courseware_link:
                   <strong>View Courseware</strong>
                 % endif
-	        %if show_link:
+	        %if show_link or show_courseware_link:
                 </a>
                 %endif
             %else:
