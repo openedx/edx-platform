@@ -10,7 +10,7 @@ class @ResponseCommentView extends DiscussionContentView
     @initLocal()
     @delegateEvents()
     @renderAttrs()
-    @$(".timeago").timeago()
+    @$el.find(".timeago").timeago()
     @convertMath()
     @
   convertMath: ->
