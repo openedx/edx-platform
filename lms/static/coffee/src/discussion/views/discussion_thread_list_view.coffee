@@ -12,6 +12,7 @@ class @DiscussionThreadListView extends Backbone.View
   initialize: ->
     @displayedCollection = new Discussion(@collection.models)
     @collection.on "change", @reloadDisplayedCollection
+    @collection.on "add", @addAndSelectThread
     @sidebar_padding = 10
     @sidebar_header_height = 87
 
@@ -23,6 +24,16 @@ class @DiscussionThreadListView extends Backbone.View
     current_el.replaceWith(content)
     if active
       @setActiveThread(thread_id)
+
+  addAndSelectThread: (thread) =>
+    commentable_id = thread.get("commentable_id")
+    commentable = @$(".board-name[data-discussion_id]").filter(-> $(this).data("discussion_id").id == commentable_id)
+    commentable.click()
+    @displayedCollection.add thread
+    content = @renderThread(thread)
+    $(".post-list").prepend content
+    content.wrap("<li data-id='#{thread.get('id')}' />")
+    content.click()
 
   updateSidebar: =>
 
@@ -153,8 +164,7 @@ class @DiscussionThreadListView extends Backbone.View
     item = $(event.target).closest('li')
     if item.find("span.board-name").data("discussion_id") == "#all"
       item = item.parent()
-    discussionIds = _.compact _.map item.find("span.board-name"), (board) -> $(board).data("discussion_id")
-    discussionIds = _.map discussionIds, (info) -> info.id
+    discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
     filtered = @collection.filter (thread) =>
       _.include(discussionIds, thread.get('commentable_id'))
     @displayedCollection.reset filtered
