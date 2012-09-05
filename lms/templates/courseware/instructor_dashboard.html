@@ -104,6 +104,19 @@ table.stat_table td {
     <p>${msg}</p>    
 %endif
 
+% if course_errors is not UNDEFINED:
+    <h2>Course errors</h2>
+    <div id="course-errors">
+      <ul>
+        % for (summary, err) in course_errors:
+        <li>${summary | h}
+          <ul><li><pre>${err | h}</pre></li></ul>
+        </li>
+        % endfor
+        </ul>
+      </div>
+% endif
+      
   </section>
 </div>
 </section>
