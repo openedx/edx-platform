@@ -23,7 +23,8 @@ WIKI_ENABLED = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
-                            tracking_filename="tracking.log",
+                            local_loglevel="DEBUG",
+                            dev_env=True,
                             debug=True)
 
 DATABASES = {
