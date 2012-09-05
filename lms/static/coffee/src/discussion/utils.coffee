@@ -270,7 +270,7 @@ class @DiscussionUtil
 
   @abbreviateString: (text, minLength) ->
     # Abbreviates a string to at least minLength characters, stopping at word boundaries
-    if text.length<100
+    if text.length<minLength
       return text
     else
       while minLength < text.length && text[minLength] != ' '
