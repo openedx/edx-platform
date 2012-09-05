@@ -65,6 +65,7 @@ class @DiscussionThreadListView extends Backbone.View
     $(window).bind "resize", @updateSidebar
 
     @displayedCollection.on "reset", @renderThreads
+    @displayedCollection.on "thread:remove", @renderThreads
     @renderThreads()
     @
 
@@ -74,14 +75,19 @@ class @DiscussionThreadListView extends Backbone.View
     @trigger "threads:rendered"
 
   renderThreadListItem: (thread) =>
+    console.log "rendering"
     view = new ThreadListItemView(model: thread)
     view.on "thread:selected", @threadSelected
+    view.on "thread:removed", @threadRemoved
     view.render()
     @$(".post-list").append(view.el)
 
   threadSelected: (thread_id) =>
     @setActiveThread(thread_id)
     @trigger("thread:selected", thread_id)
+
+  threadRemoved: (thread_id) =>
+    @trigger("thread:removed", thread_id)
 
   setActiveThread: (thread_id) ->
     @$(".post-list a").removeClass("active")
