@@ -12,6 +12,9 @@ import sys
 
 log = logging.getLogger(__name__)
 
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
+
 def name_to_pathname(name):
     """
     Convert a location name for use in a path: replace ':' with '/'.
@@ -150,7 +153,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         Returns an lxml Element
         """
-        return etree.parse(file_object).getroot()
+        return etree.parse(file_object, parser=edx_xml_parser).getroot()
 
     @classmethod
     def load_file(cls, filepath, fs, location):
