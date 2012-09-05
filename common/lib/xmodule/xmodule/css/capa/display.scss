@@ -235,20 +235,16 @@ section.problem {
         }
       }
     }
+  }
 
-    // .option-problem {
-    //   @include clearfix;
+  form.option-input {
+    margin: -10px 0 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3e3e3;
 
-    //   > p {
-    //     float: left;
-    //     width: flex-grid(6,9);
-    //   }
-
-    //   > span {
-    //     float: right;
-    //     width: flex-grid(3,9);
-    //   }
-    // }
+    select {
+      margin-right: flex-gutter();
+    }
   }
 
   ul {
@@ -417,6 +413,8 @@ section.problem {
   }
 
   section.action {
+    margin-top: 20px;
+
     input.save {
       @extend .blue-button;
     }
