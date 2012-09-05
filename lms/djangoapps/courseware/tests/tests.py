@@ -316,11 +316,13 @@ class TestNavigation(PageLoader):
         self.enroll(self.toy)
         self.enroll(self.full)
 
-        # First request should redirect to Overview
+        # First request should redirect to ToyVideos
         resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
 
         self.assertRedirectsNoFollow(resp, reverse(
-            'courseware_chapter', kwargs={'course_id': self.toy.id, 'chapter': 'Overview'}))
+            'courseware_section', kwargs={'course_id': self.toy.id,
+                                          'chapter': 'Overview',
+                                          'section': 'Toy_Videos'}))
 
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
@@ -368,11 +370,15 @@ class TestViewAuth(PageLoader):
         # First, try with an enrolled student
         self.login(self.student, self.password)
         # shouldn't work before enroll
-        self.check_for_get_code(302, reverse('courseware', kwargs={'course_id': self.toy.id}))
+        response = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
+        self.assertRedirectsNoFollow(response, reverse('about_course', args=[self.toy.id]))
         self.enroll(self.toy)
         self.enroll(self.full)
-        # should work now
-        self.check_for_get_code(200, reverse('courseware', kwargs={'course_id': self.toy.id}))
+        # should work now -- redirect to first page
+        response = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
+        self.assertRedirectsNoFollow(response, reverse('courseware_section', kwargs={'course_id': self.toy.id,
+                                                                                     'chapter': 'Overview',
+                                                                                     'section': 'Toy_Videos'}))
 
         def instructor_urls(course):
             "list of urls that only instructors/staff should be able to see"
@@ -465,7 +471,7 @@ class TestViewAuth(PageLoader):
             list of urls that students should be able to see only
             after launch, but staff should see before
             """
-            urls = reverse_urls(['info', 'courseware', 'progress'], course)
+            urls = reverse_urls(['info', 'progress'], course)
             urls.extend([
                 reverse('book', kwargs={'course_id': course.id, 'book_index': book.title})
                 for book in course.textbooks
@@ -493,7 +499,7 @@ class TestViewAuth(PageLoader):
         def check_non_staff(course):
             """Check that access is right for non-staff in course"""
             print '=== Checking non-staff access for {0}'.format(course.id)
-            for url in instructor_urls(course) + dark_student_urls(course):
+            for url in instructor_urls(course) + dark_student_urls(course) + reverse_urls(['courseware'], course):
                 print 'checking for 404 on {0}'.format(url)
                 self.check_for_get_code(404, url)
 
@@ -519,6 +525,10 @@ class TestViewAuth(PageLoader):
                                                      'student_id': user(self.student).id})
             print 'checking for 404 on view-as-student: {0}'.format(url)
             self.check_for_get_code(404, url)
+
+            # The courseware url should redirect, not 200
+            url = reverse_urls(['courseware'], course)[0]
+            self.check_for_get_code(302, url)
 
 
         # First, try with an enrolled student
