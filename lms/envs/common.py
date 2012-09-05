@@ -73,6 +73,7 @@ MITX_FEATURES = {
 
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
+    'ENABLE_MANUAL_GIT_RELOAD': False,
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 

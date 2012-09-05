@@ -88,34 +88,35 @@ def instructor_dashboard(request, course_id):
     # process actions from form POST
     action = request.POST.get('action', '')
 
-    if 'GIT pull' in action:
-        data_dir = course.metadata['data_dir']
-        log.debug('git pull %s' % (data_dir))
-        gdir = settings.DATA_DIR / data_dir
-        if not os.path.exists(gdir):
-            msg += "====> ERROR in gitreload - no such directory %s" % gdir
-        else:
-            cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
-            msg += "git pull on %s:<p>" % data_dir
-            msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
-            track.views.server_track(request, 'git pull %s' % data_dir, {}, page='idashboard')
-
-    if 'Reload course' in action:
-        log.debug('reloading %s (%s)' % (course_id, course))
-        try:
+    if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
+        if 'GIT pull' in action:
             data_dir = course.metadata['data_dir']
-            modulestore().try_load_course(data_dir)
-            msg += "<br/><p>Course reloaded from %s</p>" % data_dir
-            track.views.server_track(request, 'reload %s' % data_dir, {}, page='idashboard')
-            course_errors = modulestore().get_item_errors(course.location)
-            msg += '<ul>'
-            for cmsg, cerr in course_errors:
-                msg += "<li>%s: <pre>%s</pre>" % (cmsg,escape(cerr))
-            msg += '</ul>'
-        except Exception as err:
-            msg += '<br/><p>Error: %s</p>' % escape(err)
+            log.debug('git pull %s' % (data_dir))
+            gdir = settings.DATA_DIR / data_dir
+            if not os.path.exists(gdir):
+                msg += "====> ERROR in gitreload - no such directory %s" % gdir
+            else:
+                cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
+                msg += "git pull on %s:<p>" % data_dir
+                msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
+                track.views.server_track(request, 'git pull %s' % data_dir, {}, page='idashboard')
 
-    elif action == 'Dump list of enrolled students':
+        if 'Reload course' in action:
+            log.debug('reloading %s (%s)' % (course_id, course))
+            try:
+                data_dir = course.metadata['data_dir']
+                modulestore().try_load_course(data_dir)
+                msg += "<br/><p>Course reloaded from %s</p>" % data_dir
+                track.views.server_track(request, 'reload %s' % data_dir, {}, page='idashboard')
+                course_errors = modulestore().get_item_errors(course.location)
+                msg += '<ul>'
+                for cmsg, cerr in course_errors:
+                    msg += "<li>%s: <pre>%s</pre>" % (cmsg,escape(cerr))
+                msg += '</ul>'
+            except Exception as err:
+                msg += '<br/><p>Error: %s</p>' % escape(err)
+
+    if action == 'Dump list of enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
         datatable['title'] = 'List of students enrolled in %s' % course_id
