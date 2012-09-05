@@ -1,7 +1,9 @@
+import csv
 import json
 import logging
 import urllib
 import itertools
+import StringIO
 
 from functools import partial
 
@@ -219,9 +221,9 @@ def jump_to(request, course_id, location):
 
     # Rely on index to do all error handling and access control.
     return redirect('courseware_position',
-                    course_id=course_id, 
-                    chapter=chapter, 
-                    section=section, 
+                    course_id=course_id,
+                    chapter=chapter,
+                    section=section,
                     position=position)
 @ensure_csrf_cookie
 def course_info(request, course_id):
@@ -342,7 +344,7 @@ def progress(request, course_id, student_id=None):
     # NOTE: To make sure impersonation by instructor works, use
     # student instead of request.user in the rest of the function.
 
-    # The pre-fetching of groups is done to make auth checks not require an 
+    # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
@@ -367,6 +369,4 @@ def progress(request, course_id, student_id=None):
     context.update()
 
     return render_to_response('courseware/progress.html', context)
-
-
 
