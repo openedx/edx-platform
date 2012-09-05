@@ -76,7 +76,7 @@ def index(request, extra_context={}, user=None):
 
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
-    if not domain:
+    if domain==False:				# do explicit check, because domain=None is valid
         domain = request.META.get('HTTP_HOST')
     universities = get_courses_by_university(None,
                                              domain=domain)
