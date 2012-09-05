@@ -771,6 +771,7 @@ class ModuleSystem(object):
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
+        self.user_is_staff = user.is_staff
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
