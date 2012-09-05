@@ -124,6 +124,7 @@ class @NewPostView extends Backbone.View
 
         DiscussionUtil.safeAjax
             $elem: $(event.target)
+            $loading: $(event.target) if event
             url: url
             type: "POST"
             dataType: 'json'
