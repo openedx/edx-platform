@@ -162,10 +162,8 @@ class @DiscussionThreadListView extends Backbone.View
             @collection.reset(response.discussion_data)
             @displayedCollection.reset(@collection.models)
 
-
   setActiveItem: (event) ->
     if event.which == 13
-      console.log($(".browse-topic-drop-menu-wrapper .focused"))
       $(".browse-topic-drop-menu-wrapper .focused").click()
       return
     if event.which != 40 && event.which != 38
@@ -174,9 +172,7 @@ class @DiscussionThreadListView extends Backbone.View
 
     items = $(".browse-topic-drop-menu-wrapper a").not(".hidden")
     totalItems = items.length
-    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()
-    # index = parseInt($(".browse-topic-drop-menu-wrapper").attr("data-focused")) || 0
-    
+    index = $(".browse-topic-drop-menu-wrapper .focused").parent().index()    
 
     if event.which == 40
       index = index + 1
@@ -185,11 +181,8 @@ class @DiscussionThreadListView extends Backbone.View
     if index == totalItems
       index = 0
 
-    console.log(index)
-
     $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
     $(".browse-topic-drop-menu-wrapper li").eq(index).find('a').addClass("focused")
-    # $(items[index]).addClass("focused")
     $(".browse-topic-drop-menu-wrapper").attr("data-focused", index)
 
 
