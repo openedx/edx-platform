@@ -129,7 +129,7 @@ function filterDrop(e) {
 	var $items = $drop.find('a');
 
 	if(query.length == 0) {
-		$items.show();
+		$items.removeClass('hidden');
 		return;
 	}
 
