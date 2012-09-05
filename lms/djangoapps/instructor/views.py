@@ -48,7 +48,7 @@ def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    instructor_access = has_access(request.user, course, 'instructor')		# an instructor can manage staff lists
+    instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
 
     msg = ''
     # msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
@@ -99,7 +99,7 @@ def instructor_dashboard(request, course_id):
             msg += "git pull on %s:<p>" % data_dir
             msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
             track.views.server_track(request, 'git pull %s' % data_dir, {}, page='idashboard')
-            
+
     if 'Reload course' in action:
         log.debug('reloading %s (%s)' % (course_id, course))
         try:
@@ -143,6 +143,10 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
         return return_csv('grades_%s_raw.csv' % course_id,
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
+
+    elif 'Download CSV of answer distributions' in action:
+        track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
+        return return_csv('answer_dist_%s.csv' % course_id, get_answers_distribution(request, course_id))
 
     elif 'List course staff' in action:
         group = get_staff_group(course)
@@ -290,7 +294,7 @@ def grade_summary(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
-    ''' Allows a staff member to enroll students in a course.
+    """Allows a staff member to enroll students in a course.
 
     This is a short-term hack for Berkeley courses launching fall
     2012. In the long term, we would like functionality like this, but
@@ -300,7 +304,7 @@ def enroll_students(request, course_id):
 
     It is poorly written and poorly tested, but it's designed to be
     stripped out.
-    '''
+    """
 
     course = get_course_with_access(request.user, course_id, 'staff')
     existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
@@ -327,6 +331,28 @@ def enroll_students(request, course_id):
                                                        'added_students': added_students,
                                                        'rejected_students': rejected_students,
                                                        'debug': new_students})
+
+
+def get_answers_distribution(request, course_id):
+    """
+    Get the distribution of answers for all graded problems in the course.
+
+    Return a dict with two keys:
+    'header': a header row
+    'data': a list of rows
+    """
+    course = get_course_with_access(request.user, course_id, 'staff')
+
+    dist = grades.answer_distributions(request, course)
+
+    d = {}
+    d['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
+
+    d['data'] = [[url_name, display_name, answer_id, a, answers[a]]
+                 for (url_name, display_name, answer_id), answers in dist.items()
+                 for a in answers]
+    return d
+
 
 #-----------------------------------------------------------------------------
 

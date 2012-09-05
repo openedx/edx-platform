@@ -370,26 +370,3 @@ def progress(request, course_id, student_id=None):
 
     return render_to_response('courseware/progress.html', context)
 
-
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def answers_export(request, course_id):
-    """
-    Export the distribution of student answers to all problems as a csv file.
-
-    - only displayed to course staff
-    """
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    dist = grades.answer_distributions(request, course)
-
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=%s' % "answer_distribution.csv"
-
-    writer = csv.writer(response)
-    for (url_name, display_name, answer_id), answers in dist.items():
-        # HEADER? 
-        for a in answers:
-            writer.writerow([url_name, display_name, answer_id, a, answers[a]])
-
-    return response
