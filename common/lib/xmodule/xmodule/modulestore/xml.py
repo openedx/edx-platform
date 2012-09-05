@@ -62,6 +62,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 """
                 # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
 
+                # tags that really need unique names--they store (or should store) state.
+                need_uniq_names = ('problem', 'sequence', 'video', 'course', 'chapter')
+
                 attr = xml_data.attrib
                 tag = xml_data.tag
                 id = lambda x: x
@@ -86,12 +89,15 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     orig_name = "_" + orig_name if orig_name is not None else ""
                     return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
 
+                def looks_like_fallback(tag, url_name):
+                    """Does this look like something that came from fallback_name()?"""
+                    return url_name.startswith(tag) and re.search('[0-9a-fA-F]{12}$', url_name)
+
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
                     url_name = fallback_name()
                     # Don't log a warning--we don't need this in the log.  Do
                     # put it in the error tracker--content folks need to see it.
-                    need_uniq_names = ('problem', 'sequence', 'video', 'course', 'chapter')
 
                     if tag in need_uniq_names:
                         error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
@@ -105,20 +111,24 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # Make sure everything is unique
                 if url_name in self.used_names[tag]:
-                    msg = ("Non-unique url_name in xml.  This may break state tracking for content."
-                           "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
-                    error_tracker("PROBLEM: " + msg)
-                    log.warning(msg)
-                    # Just set name to fallback_name--if there are multiple things with the same fallback name,
-                    # they are actually identical, so it's fragile, but not immediately broken.
+                    # Always complain about modules that store state.  If it
+                    # doesn't store state, don't complain about things that are
+                    # hashed.
+                    if tag in need_uniq_names or not looks_like_fallback(tag, url_name):
+                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
+                               "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        error_tracker("PROBLEM: " + msg)
+                        log.warning(msg)
+                        # Just set name to fallback_name--if there are multiple things with the same fallback name,
+                        # they are actually identical, so it's fragile, but not immediately broken.
 
-                    # TODO (vshnayder): if the tag is a pointer tag, this will
-                    # break the content because we won't have the right link.
-                    # That's also a legitimate attempt to reuse the same content
-                    # from multiple places.  Once we actually allow that, we'll
-                    # need to update this to complain about non-unique names for
-                    # definitions, but allow multiple uses.
-                    url_name = fallback_name(url_name)
+                        # TODO (vshnayder): if the tag is a pointer tag, this will
+                        # break the content because we won't have the right link.
+                        # That's also a legitimate attempt to reuse the same content
+                        # from multiple places.  Once we actually allow that, we'll
+                        # need to update this to complain about non-unique names for
+                        # definitions, but allow multiple uses.
+                        url_name = fallback_name(url_name)
 
                 self.used_names[tag].add(url_name)
                 xml_data.set('url_name', url_name)
