@@ -2,7 +2,6 @@ DiscussionApp =
   start: (elem)->
     # TODO: Perhaps eliminate usage of global variables when possible
     element = $(elem)
-    window.$$contents = {}
     window.$$course_id = element.data("course-id")
     user_info = element.data("user-info")
     threads = element.data("threads")
