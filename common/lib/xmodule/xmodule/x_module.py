@@ -212,7 +212,7 @@ class XModule(HTMLSnippet):
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
     def __unicode__(self):
-        return '<x_module(name=%s, category=%s, id=%s)>' % (self.name, self.category, self.id)
+        return '<x_module(id={0})>'.format(self.id)
 
     def get_children(self):
         '''
