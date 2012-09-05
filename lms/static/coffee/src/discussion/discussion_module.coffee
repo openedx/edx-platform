@@ -32,7 +32,7 @@ if Backbone?
               $(".discussion-module").append($discussion)
               discussion.each (thread) ->
                 element = $("article#thread_#{thread.id}")
-                dtv = new DiscussionThreadView el: element, model: thread
+                dtv = new DiscussionThreadInlineView el: element, model: thread
                 dtv.render()
               DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
               @retrieved = true
