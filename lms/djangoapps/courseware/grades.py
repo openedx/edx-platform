@@ -85,7 +85,8 @@ def answer_distributions(request, course):
     for student in enrolled_students:
         for capa_module in yield_problems(request, course, student):
             for problem_id in capa_module.lcp.student_answers:
-                answer = capa_module.lcp.student_answers[problem_id]
+                # Answer can be a list or some other unhashable element.  Convert to string.
+                answer = str(capa_module.lcp.student_answers[problem_id])
                 key = (capa_module.url_name, capa_module.display_name, problem_id)
                 counts[key][answer] += 1
 
