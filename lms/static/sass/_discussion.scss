@@ -751,7 +751,9 @@ body.discussion {
       width: 100%;
       background: #737373;
       border: 1px solid #4b4b4b;
+      border-left: none;
       border-radius: 0 0 3px 3px;
+      @include box-shadow(1px 0 0 #4b4b4b inset);
 
       .browse-topic-drop-menu {
         max-height: 400px;
