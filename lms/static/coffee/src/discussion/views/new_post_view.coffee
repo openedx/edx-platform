@@ -38,9 +38,10 @@ class @NewPostView extends Backbone.View
         @menuOpen = true
         @dropdownButton.addClass('dropped')
         @topicMenu.show()
+        $(".form-topic-drop-search-input").focus()
 
-        $('body').bind 'keydown', @setActiveItem
-        $('body').bind 'click', @hideTopicDropdown
+        $("body").bind "keydown", @setActiveItem
+        $("body").bind "click", @hideTopicDropdown
 
         # Set here because 1) the window might get resized and things could
         # change and 2) can't set in initialize because the button is hidden
@@ -52,8 +53,8 @@ class @NewPostView extends Backbone.View
         @dropdownButton.removeClass('dropped')
         @topicMenu.hide()
 
-        $('body').unbind 'keydown', @setActiveItem
-        $('body').unbind 'click', @hideTopicDropdown
+        $("body").unbind "keydown", @setActiveItem
+        $("body").unbind "click", @hideTopicDropdown
 
     setTopic: (event) ->
         $target = $(event.target)
