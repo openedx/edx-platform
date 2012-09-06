@@ -41,6 +41,16 @@ section.problem {
     }
   }
 
+  ol.enumerate {
+    li {
+      &:before {
+        content: " ";
+        display: block;
+        height: 0;
+        visibility: hidden;
+      }
+    }
+  }
 
   div {
     p {
