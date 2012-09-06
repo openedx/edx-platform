@@ -127,6 +127,10 @@ class CourseDescriptor(SequenceDescriptor):
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
 
+    @property
+    def show_calculator(self):
+        return self.metadata.get("show_calculator", None) == "Yes"
+
     @lazyproperty
     def grading_context(self):
         """
