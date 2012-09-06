@@ -64,6 +64,22 @@ def course_image_url(course):
     path = course.metadata['data_dir'] + "/images/course_image.jpg"
     return try_staticfiles_lookup(path)
 
+def find_file(fs, dirs, filename):
+    """
+    Looks for a filename in a list of dirs on a filesystem, in the specified order.
+
+    fs: an OSFS filesystem
+    dirs: a list of path objects
+    filename: a string
+
+    Returns d / filename if found in dir d, else raises ResourceNotFoundError.
+    """
+    for d in dirs:
+        filepath = path(d) / filename
+        if fs.exists(filepath):
+            return filepath
+    raise ResourceNotFoundError("Could not find {0}".format(filename))
+
 def get_course_about_section(course, section_key):
     """
     This returns the snippet of html to be rendered on the course about page,
@@ -97,8 +113,13 @@ def get_course_about_section(course, section_key):
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
                        'number', 'instructors', 'overview',
                        'effort', 'end_date', 'prerequisites']:
+
         try:
-            with course.system.resources_fs.open(path("about") / section_key + ".html") as htmlFile:
+            fs = course.system.resources_fs
+            # first look for a run-specific version
+            dirs = [path("about") / course.url_name, path("about")]
+            filepath = find_file(fs, dirs, section_key + ".html")
+            with fs.open(filepath) as htmlFile:
                 return replace_urls(htmlFile.read().decode('utf-8'),
                                     course.metadata['data_dir'])
         except ResourceNotFoundError:
@@ -133,7 +154,12 @@ def get_course_info_section(course, section_key):
 
     if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
         try:
-            with course.system.resources_fs.open(path("info") / section_key + ".html") as htmlFile:
+            fs = course.system.resources_fs
+            # first look for a run-specific version
+            dirs = [path("info") / course.url_name, path("info")]
+            filepath = find_file(fs, dirs, section_key + ".html")
+
+            with fs.open(filepath) as htmlFile:
                 # Replace '/static/' urls
                 info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
 
