@@ -202,10 +202,8 @@ class CapaModule(XModule):
             try:
                 return Progress(score, total)
             except Exception as err:
-                # TODO (vshnayder): why is this still here? still needed?
-                if self.system.DEBUG:
-                    return None
-                raise
+                log.exception("Got bad progress")
+                return None
         return None
 
     def get_html(self):
