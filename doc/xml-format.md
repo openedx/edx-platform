@@ -208,7 +208,7 @@ __IMPORTANT__: A student's state for a particular content element is tied to the
 * Note: We will be expanding our understanding and format for metadata in the not-too-distant future, but for now it is simply a set of key-value pairs.
 
 ### Policy file location
-* The policy for a course run `some_url_name` should live in `policies/some_url_name/policy.json`  (NOTE: the old format of putting it in `policies/some_url_name.json` will also work, but we suggest using the subdirectory because that's allows you to organize all the per-course policy files)
+* The policy for a course run `some_url_name` should live in `policies/some_url_name/policy.json`  (NOTE: the old format of putting it in `policies/some_url_name.json` will also work, but we suggest using the subdirectory to have all the per-course policy files in one place)
 * Grading policy files go in `policies/some_url_name/grading_policy.json`   (if there's only one course run, can also put it directly in the course root: `/grading_policy.json`)
 
 ### Policy file contents
