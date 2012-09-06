@@ -2,4 +2,4 @@
 
 We are sorry. Our course staff did not approve your request to change
 your name from ${old_name} to ${new_name}. If you need further
-assistance, please e-mail the course staff at ta@mitx.mit.edu.
+assistance, please e-mail the course staff at ta@edx.org.
