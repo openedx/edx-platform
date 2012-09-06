@@ -704,12 +704,14 @@ class ProgressTest(unittest.TestCase):
         self.assertRaises(ValueError, Progress, 0, 0)
         self.assertRaises(ValueError, Progress, 2, 0)
         self.assertRaises(ValueError, Progress, 1, -2)
-        self.assertRaises(ValueError, Progress, 3, 2)
-        self.assertRaises(ValueError, Progress, -2, 5)
 
         self.assertRaises(TypeError, Progress, 0, "all")
         # check complex numbers just for the heck of it :)
         self.assertRaises(TypeError, Progress, 2j, 3)
+
+    def test_clamp(self):
+        self.assertEqual((2, 2), Progress(3, 2).frac())
+        self.assertEqual((-2, 2), Progress(0, 2).frac())
 
     def test_frac(self):
         p = Progress(1, 2)
