@@ -42,6 +42,9 @@ class Progress(object):
         if a > b:
             a = b
 
+        if a < 0:
+            a = 0
+
         if b <= 0:
             raise ValueError('fraction a/b = {0}/{1} must have b > 0'.format(a, b))
 
