@@ -60,11 +60,16 @@ class @DiscussionThreadView extends DiscussionContentView
       response.set('thread', @model)
       view = new ThreadResponseView(model: response)
       view.on "comment:add", @addComment
+      view.on "comment:endorse", @endorseThread
       view.render()
       @$(".responses").append(view.el)
 
   addComment: =>
     
+
+  endorseThread: (endorsed) =>
+    is_endorsed = @$el.find(".is-endorsed").length
+    @model.set 'endorsed', is_endorsed
 
   toggleVote: (event) ->
     event.preventDefault()

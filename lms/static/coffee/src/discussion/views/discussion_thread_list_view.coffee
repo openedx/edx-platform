@@ -103,6 +103,8 @@ class @DiscussionThreadListView extends Backbone.View
     content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
     if thread.get('subscribed')
       content.addClass("followed")
+    if thread.get('endorsed')
+      content.addClass("resolved")
     @highlight(content)
 
 
