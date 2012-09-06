@@ -49,7 +49,7 @@ class @DiscussionThreadView extends DiscussionContentView
 
   convertMath: ->
     element = @$(".post-body")
-    element.html DiscussionUtil.postMathJaxProcessor(element.html())
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
   renderResponses: ->
