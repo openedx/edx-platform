@@ -109,6 +109,7 @@ class @ThreadResponseView extends DiscussionContentView
     endorsed = @model.get('endorsed')
     data = { endorsed: not endorsed }
     @model.set('endorsed', not endorsed)
+    @trigger "comment:endorse", not endorsed
     DiscussionUtil.safeAjax
       $elem: $elem
       url: url
