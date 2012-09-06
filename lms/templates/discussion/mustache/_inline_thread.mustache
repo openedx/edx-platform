@@ -2,11 +2,14 @@
     <div class="local"><a href="#" class="dogear action-follow"></a></div>
     <div class="discussion-post local">
         <header>
-            <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span></a>
+            <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span></a>
             <h1>{{title}}</h1>
             <p class="posted-details">
-                <span class="timeago" title="{{created_at}}">sometime</span> by
+                <span class="timeago" title="{{created_at}}">{{created_at}}</span> by
                 <a href="{{user_url}}">{{username}}</a>
+                <span class="post-status-closed top-post-status" style="display: none">
+                    &bull; This thread is closed.
+                </span>
             </p>
             <div class="local post-tools">
                 <a href="javascript:void(0)" class="expand-post">Expand...</a>
@@ -16,6 +19,11 @@
         <div class="post-body">
             {{abbreviatedBody}}
         </div>
+        <ul class="moderator-actions">
+            <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
+            <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
+            <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
+        </ul>
     </div>
     <ol class="responses post-extended-content">
         <li class="loading"><div class="loading-animation"></div></li>

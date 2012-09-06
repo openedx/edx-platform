@@ -147,9 +147,14 @@ def get_threads(request, course_id, discussion_id=None):
 
 # discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
+<<<<<<< HEAD
     try:
         threads, query_params = get_threads(request, course_id, discussion_id)
         user_info = cc.User.from_django_user(request.user).to_dict()
+        def infogetter(thread):
+            return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
@@ -159,6 +164,7 @@ def inline_discussion(request, course_id, discussion_id):
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
+        'annotated_content_info': annotated_content_info
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):

@@ -103,24 +103,24 @@ def initialize_discussion_info(course):
             unexpanded_category_map[category].append({"title": title, "id": id,
                 "sort_key": sort_key})
 
-    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)} 
+    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
         node = category_map["subcategories"]
         path = [x.strip() for x in category_path.split("/")]
         for level in path[:-1]:
             if level not in node:
-                node[level] = {"subcategories": defaultdict(dict), 
+                node[level] = {"subcategories": defaultdict(dict),
                                "entries": defaultdict(dict),
-                               "sort_key": level} 
+                               "sort_key": level}
             node = node[level]["subcategories"]
 
         level = path[-1]
         if level not in node:
-            node[level] = {"subcategories": defaultdict(dict), 
-                            "entries": defaultdict(dict), 
+            node[level] = {"subcategories": defaultdict(dict),
+                            "entries": defaultdict(dict),
                             "sort_key": level}
         for entry in entries:
-            node[level]["entries"][entry["title"]] = {"id": entry["id"], 
+            node[level]["entries"][entry["title"]] = {"id": entry["id"],
                                                       "sort_key": entry["sort_key"]}
 
     for topic, entry in course.metadata.get('discussion_topics', {}).items():
@@ -137,7 +137,7 @@ def initialize_discussion_info(course):
 
 def get_courseware_context(content, course):
     id_map = get_discussion_id_map(course)
-    id = content['commentable_id'] 
+    id = content['commentable_id']
     content_info = None
     if id in id_map:
         location = id_map[id]["location"].url()
@@ -152,14 +152,14 @@ class JsonResponse(HttpResponse):
                                            mimetype='application/json; charset=utf8')
 
 class JsonError(HttpResponse):
-    def __init__(self, error_messages=[]):
+    def __init__(self, error_messages=[], status=400):
         if isinstance(error_messages, str):
             error_messages = [error_messages]
         content = simplejson.dumps({'errors': error_messages},
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf8', status=400)
+                                        mimetype='application/json; charset=utf8', status=status)
 
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):

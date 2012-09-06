@@ -21,10 +21,6 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     @model.on "change", @updateModelDetails
 
   render: ->
-    #TODO: Debugging, remove when done
-    if not window.$disc
-      window.$disc = []
-    window.$disc.push(@)
     if not @model.has('abbreviatedBody')
       @abbreviateBody()
     @$el.html(Mustache.render(@template(), $.extend(@model.toJSON(),{expanded: @expanded}) ))
