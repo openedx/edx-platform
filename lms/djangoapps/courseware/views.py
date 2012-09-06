@@ -208,7 +208,7 @@ def index(request, course_id, chapter=None, section=None,
         log.warning("TEMP: course_id {}, chap {}, sec {}, first_time {}, course position = {}"
                   .format(course_id, chapter, section, first_time, course_module.position))
 
-        if chapter is None and section is None:
+        if chapter is None:
             return redirect_to_course_position(course_module, first_time)
 
         context = {
@@ -225,9 +225,14 @@ def index(request, course_id, chapter=None, section=None,
         if chapter_descriptor is not None:
             instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
             save_child_position(course_module, chapter, instance_module)
+        else:
+            raise Http404
 
         chapter_module = get_module(request.user, request, chapter_descriptor.location,
                                     student_module_cache, course_id)
+        if chapter_module is None:
+            # User may be trying to access a chapter that isn't live yet
+            raise Http404
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by_url_name(section)
@@ -267,7 +272,11 @@ def index(request, course_id, chapter=None, section=None,
                                                    'prev_section_url': prev_section_url})
 
         result = render_to_response('courseware/courseware.html', context)
-    except:
+    except Exception as e:
+        if isinstance(e, Http404):
+            # let it propagate
+            raise
+        
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
             raise
