@@ -208,7 +208,8 @@ __IMPORTANT__: A student's state for a particular content element is tied to the
 * Note: We will be expanding our understanding and format for metadata in the not-too-distant future, but for now it is simply a set of key-value pairs.
 
 ### Policy file location
-* The policy for a course run `some_url_name` lives in `policies/some_url_name.json`
+* The policy for a course run `some_url_name` should live in `policies/some_url_name/policy.json`  (NOTE: the old format of putting it in `policies/some_url_name.json` will also work, but we suggest using the subdirectory to have all the per-course policy files in one place)
+* Grading policy files go in `policies/some_url_name/grading_policy.json`   (if there's only one course run, can also put it directly in the course root: `/grading_policy.json`)
 
 ### Policy file contents
 * The file format is "json", and is best shown by example, as in the tutorial above (though also feel free to google :)
@@ -217,6 +218,45 @@ __IMPORTANT__: A student's state for a particular content element is tied to the
 Values are dictionaries of the form {"metadata-key" : "metadata-value"}.
 * The order in which things appear does not matter, though it may be helpful to organize the file in the same order as things appear in the content.
 * NOTE: json is picky about commas.  If you have trailing commas before closing braces, it will complain and refuse to parse the file.  This can be irritating at first.
+
+### Grading policy file contents
+
+TODO: This needs to be improved, but for now here's a sketch of how grading works:
+
+
+* First we grade on individual problems. Correct and total are methods on CapaProblem.
+
+    `problem_score = (correct ,  total)`
+
+* If a problem weight is in the xml, then re-weight the problem to be worth that many points
+
+    `if problem_weight:`
+         `problem_score = (correct * weight / total, weight)`
+
+* Now sum up all of problems in a section to get the percent for that section
+
+    `section_percent = \sum_problems_correct /   \sum_problems_total`
+
+* Now we have all of the percents for all of the graded sections. This is the gradesheet that we pass to to a subclass of CourseGrader.
+
+* A WeightedSubsectionsGrader contains several SingleSectionGraders and AssignmentFormatGraders. Each of those graders is run first before WeightedSubsectionsGrader computes the final grade.
+
+    - SingleSectionGrader (within a WeightedSubsectionsGrader) contains one section
+
+    `grader_percent = section_percent`
+
+    - AssignmentFormatGrader (within a WegithedSubsectionsGrader) contains multiple sections matching a certain format
+drop the lowest X sections
+
+    `grader_percent = \sum_section_percent  /  \count_section`
+
+    - WeightedSubsectionsGrader
+
+    `final_grade_percent = \sum_(grader_percent * grader_weight)`
+
+* Round the final grade up to the nearest percentage point
+
+    `final_grade_percent = round(final_grade_percent * 100 + 0.05) / 100`
 
 ### Available metadata
 
@@ -315,6 +355,22 @@ before the week 1 material to make it easy to find in the file.
 * A heads up: our content management system will allow you to develop content through a web browser, but will be backed by this same xml at first.  Once that happens, every element will be in its own file to make access and updates faster.
 
 * Prefer the most "semantic" name for containers: e.g., use problemset rather than vertical for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
+
+# Other file locations (info and about)
+
+With different course runs, we may want different course info and about materials.  This is now supported by putting files in as follows:
+
+    / 
+      about/
+           foo.html      -- shared default for all runs
+           url_name1/
+                foo.html   -- version used for url_name1
+                bar.html   -- bar for url_name1
+           url_name2/
+                bar.html   -- bar for url_name2
+                           -- url_name2 will use default foo.html
+
+and the same works for the `info` directory.
 
 ----
 
