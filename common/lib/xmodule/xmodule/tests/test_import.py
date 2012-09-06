@@ -293,3 +293,27 @@ class ImportTestCase(unittest.TestCase):
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
         self.assertEquals(html.display_name, "Toy lab")
+
+    def test_url_name_mangling(self):
+        """
+        Make sure that url_names are only mangled once.
+        """
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+
+        toy_id = "edX/toy/2012_Fall"
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 4)
+
+        for i in (2,3):
+            video = sections[i]
+            # Name should be 'video_{hash}'
+            print "video {0} url_name: {1}".format(i, video.url_name)
+
+            self.assertEqual(len(video.url_name), len('video_') + 12)
+
