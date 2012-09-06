@@ -63,7 +63,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
 
                 # tags that really need unique names--they store (or should store) state.
-                need_uniq_names = ('problem', 'sequence', 'video', 'course', 'chapter')
+                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
@@ -82,16 +82,21 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                             del attr[key]
                         break
 
+                def looks_like_fallback(url_name):
+                    """Does this look like something that came from fallback_name()?"""
+                    return (url_name is not None
+                            and url_name.startswith(tag)
+                            and re.search('[0-9a-fA-F]{12}$', url_name))
+
                 def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
+                    if looks_like_fallback(orig_name):
+                        # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
+                        orig_name = orig_name[len(tag)+1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
-                    orig_name = "_" + orig_name if orig_name is not None else ""
+                    orig_name = "_" + orig_name if orig_name not in (None, "") else ""
                     return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
-
-                def looks_like_fallback(tag, url_name):
-                    """Does this look like something that came from fallback_name()?"""
-                    return url_name.startswith(tag) and re.search('[0-9a-fA-F]{12}$', url_name)
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
@@ -114,7 +119,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # Always complain about modules that store state.  If it
                     # doesn't store state, don't complain about things that are
                     # hashed.
-                    if tag in need_uniq_names or not looks_like_fallback(tag, url_name):
+                    if tag in need_uniq_names:
                         msg = ("Non-unique url_name in xml.  This may break state tracking for content."
                                "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
