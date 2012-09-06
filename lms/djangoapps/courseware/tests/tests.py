@@ -319,10 +319,16 @@ class TestNavigation(PageLoader):
         # First request should redirect to ToyVideos
         resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
 
-        self.assertRedirectsNoFollow(resp, reverse(
+        # Don't use no-follow, because state should only be saved once we actually hit the section
+        self.assertRedirects(resp, reverse(
             'courseware_section', kwargs={'course_id': self.toy.id,
                                           'chapter': 'Overview',
                                           'section': 'Toy_Videos'}))
+
+        # Hitting the couseware tab again should redirect to the first chapter: 'Overview'
+        resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
+        self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
+                                                   kwargs={'course_id': self.toy.id, 'chapter': 'Overview'}))
 
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
