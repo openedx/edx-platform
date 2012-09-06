@@ -906,7 +906,7 @@ body.discussion {
       position: relative;
       display: block;
       height: 36px;
-      padding: 0 10px;
+      padding: 0 10px 0 18px;
       margin-bottom: 1px;
       margin-right: -1px;
       @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
@@ -915,6 +915,35 @@ body.discussion {
       &:hover {
         @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
         background-color: #eee;
+      }
+
+      &.staff-post.staff-response {
+        .staff-post-icon {
+          top: 5px;
+        }
+
+        .staff-response-icon {
+          top: 18px;
+        }
+      }
+
+      .staff-post-icon,
+      .staff-response-icon {
+        position: absolute;
+        top: 11px;
+        left: 3px;
+        width: 13px;
+        height: 13px;
+        background: url(../images/staff-icons.png) no-repeat;
+      }
+
+      .staff-post-icon {
+        left: 2px;
+        background-position: 0 0;
+      }
+
+      .staff-response-icon {
+        background-position: -13px 0;
       }
 
       .title {
@@ -956,6 +985,14 @@ body.discussion {
 
         .title {
           color: #333;
+        }
+
+        .staff-post-icon {
+          background-position: 0 -13px;
+        }
+
+        .staff-response-icon {
+          background-position: -13px -13px;
         }
 
         .votes-count,
