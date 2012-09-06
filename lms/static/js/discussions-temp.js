@@ -268,6 +268,7 @@ function setTopic(e) {
 
 function newPost(e) {
 	$newPost.slideDown(300);
+	$('.new-post-title').focus();
 }
 
 function closeNewPost(e) {
