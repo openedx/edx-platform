@@ -107,6 +107,9 @@ class @DiscussionUtil
       [event, selector] = eventSelector.split(' ')
       $local(selector).unbind(event)[event] handler
 
+  @processTag: (text) ->
+    text.toLowerCase()
+
   @tagsInputOptions: ->
     autocomplete_url: @urlFor('tags_autocomplete')
     autocomplete:
@@ -116,6 +119,7 @@ class @DiscussionUtil
     width: '100%'
     defaultText: "Tag your post: press enter after each tag"
     removeWithBackspace: true
+    preprocessTag: @processTag
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
