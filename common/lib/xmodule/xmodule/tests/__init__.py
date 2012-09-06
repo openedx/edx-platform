@@ -711,7 +711,7 @@ class ProgressTest(unittest.TestCase):
 
     def test_clamp(self):
         self.assertEqual((2, 2), Progress(3, 2).frac())
-        self.assertEqual((-2, 2), Progress(0, 2).frac())
+        self.assertEqual((0, 2), Progress(-2, 2).frac())
 
     def test_frac(self):
         p = Progress(1, 2)
