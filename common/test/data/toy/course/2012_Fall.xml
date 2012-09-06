@@ -5,6 +5,8 @@
       <video url_name="Video_Resources" youtube="1.0:1bK-WdDi6Qw"/>
     </videosequence>
     <video url_name="Welcome" youtube="1.0:p2Q6BrNhdh8"/>
+    <video url_name="video_123456789012" youtube="1.0:p2Q6BrNhdh8"/>
+    <video url_name="video_123456789012" youtube="1.0:p2Q6BrNhdh8"/>
   </chapter>
   <chapter url_name="secret:magic"/>
 </course>
