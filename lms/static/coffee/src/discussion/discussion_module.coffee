@@ -2,7 +2,20 @@ if Backbone?
   class @DiscussionModuleView extends Backbone.View
     events:
       "click .discussion-show": "toggleDiscussion"
+      "click .new-post-btn": "toggleNewPost"
+      "click .new-post-cancel": "hideNewPost"
+    initialize: ->
+
+    toggleNewPost: (event) ->
+      if @newPostForm.is(':hidden')
+        @newPostForm.slideDown(300)
+      else
+        @newPostForm.slideUp(300)
+    hideNewPost: (event) ->
+      @newPostForm.slideUp(300)
+
     toggleDiscussion: (event) ->
+      console.log "doing stuff yo"
       if @showed
         @$("section.discussion").hide()
         $(event.target).html("Show Discussion")
@@ -22,18 +35,25 @@ if Backbone?
             url: url
             type: "GET"
             dataType: 'json'
-            success: (response, textStatus) =>
-              window.user = new DiscussionUser(response.user_info)
-              Content.loadContentInfos(response.annotated_content_info)
-              $(event.target).html("Hide Discussion")
-              discussion = new Discussion()
-              discussion.reset(response.discussion_data, {silent: false})
-              $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data})
-              $(".discussion-module").append($discussion)
-              discussion.each (thread) ->
-                element = $("article#thread_#{thread.id}")
-                dtv = new DiscussionThreadInlineView el: element, model: thread
-                dtv.render()
-              DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
-              @retrieved = true
-              @showed = true
+            success: (response, textStatus, jqXHR) => @createDiscussion(event, response, textStatus)
+
+    createDiscussion: (event, response, textStatus) =>
+      console.log "HI"
+      console.log response
+      window.user = new DiscussionUser(response.user_info)
+      Content.loadContentInfos(response.annotated_content_info)
+      console.log "infod"
+      $(event.target).html("Hide Discussion")
+      discussion = new Discussion()
+      discussion.reset(response.discussion_data, {silent: false})
+      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data})
+      $(".discussion-module").append($discussion)
+      @newPostForm = $('.new-post-article')
+      discussion.each (thread) ->
+        element = $("article#thread_#{thread.id}")
+        dtv = new DiscussionThreadInlineView el: element, model: thread
+        dtv.render()
+      DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
+      @newPostView = new NewPostInlineView el: $('.new-post-article'), collection: discussion
+      @retrieved = true
+      @showed = true
