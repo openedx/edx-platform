@@ -127,7 +127,7 @@ class @DiscussionUtil
       if response.errors? and response.errors.length > 0
         errorsField.empty()
         for error in response.errors
-          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error)).show()
 
   @clearFormErrors: (errorsField) ->
     errorsField.empty()
