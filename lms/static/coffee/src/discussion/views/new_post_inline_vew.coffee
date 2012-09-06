@@ -2,7 +2,7 @@ class @NewPostInlineView extends Backbone.View
 
   initialize: () ->
 
-    @topicId    = @$(".topic").first().data("discussion_id")
+    @topicId    = @$(".topic").first().data("discussion-id")
 
     @maxNameWidth = 100
 
