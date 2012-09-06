@@ -80,6 +80,9 @@ urlpatterns = ('',
         {'template': 'press_releases/MIT_and_Harvard_announce_edX.html'}, name="press/mit-and-harvard-announce-edx"),
     url(r'^press/uc-berkeley-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/UC_Berkeley_joins_edX.html'}, name="press/uc-berkeley-joins-edx"),
+    url(r'^press/edX-announces-proctored-exam-testing$', 'static_template_view.views.render',
+        {'template': 'press_releases/edX_announces_proctored_exam_testing.html'}, name="press/edX-announces-proctored-exam-testing"),
+
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
 
@@ -252,4 +255,3 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
-
