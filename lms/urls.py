@@ -111,7 +111,7 @@ if settings.COURSEWARE_ENABLED:
             name='change_setting'),
 
         # TODO: These views need to be updated before they work
-        # url(r'^calculate$', 'util.views.calculate'),
+        url(r'^calculate$', 'util.views.calculate'),
         # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki circuits for the wiki
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
