@@ -29,9 +29,10 @@
         </div>
     </article>
 
-
-    {{#threads}}
-    <article class="discussion-thread" id="thread_{{id}}">
-    </article>
-    {{/threads}}
+    <section class="threads">
+        {{#threads}}
+            <article class="discussion-thread" id="thread_{{id}}">
+            </article>
+        {{/threads}}
+    </section>
 </section>

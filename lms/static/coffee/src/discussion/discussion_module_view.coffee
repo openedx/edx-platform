@@ -15,7 +15,6 @@ if Backbone?
       @newPostForm.slideUp(300)
 
     toggleDiscussion: (event) ->
-      console.log "doing stuff yo"
       if @showed
         @$("section.discussion").hide()
         $(event.target).html("Show Discussion")
@@ -38,22 +37,28 @@ if Backbone?
             success: (response, textStatus, jqXHR) => @createDiscussion(event, response, textStatus)
 
     createDiscussion: (event, response, textStatus) =>
-      console.log "HI"
-      console.log response
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
-      console.log "infod"
       $(event.target).html("Hide Discussion")
-      discussion = new Discussion()
-      discussion.reset(response.discussion_data, {silent: false})
+      @discussion = new Discussion()
+      @discussion.reset(response.discussion_data, {silent: false})
       $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data})
       $(".discussion-module").append($discussion)
       @newPostForm = $('.new-post-article')
-      discussion.each (thread) ->
-        element = $("article#thread_#{thread.id}")
-        dtv = new DiscussionThreadInlineView el: element, model: thread
-        dtv.render()
+      @threadviews = @discussion.map (thread) ->
+        new DiscussionThreadInlineView el: @$("article#thread_#{thread.id}"), model: thread
+      _.each @threadviews, (dtv) -> dtv.render()
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
-      @newPostView = new NewPostInlineView el: $('.new-post-article'), collection: discussion
+      @newPostView = new NewPostInlineView el: @$('.new-post-article'), collection: @discussion
+      @discussion.on "add", @addThread
       @retrieved = true
       @showed = true
+
+    addThread: (thread, collection, options) =>
+      # TODO: When doing pagination, this will need to repaginate
+      article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
+      @$('section.discussion > .threads').prepend(article)
+      threadView = new DiscussionThreadInlineView el: article, model: thread
+      threadView.render()
+      @threadviews.unshift threadView
+
