@@ -58,7 +58,7 @@ $(document).ready(function() {
 	$('.new-post-btn').bind('click', newPost);
 	$('.new-post-cancel').bind('click', closeNewPost);
 
-	$('[data-tooltip]').bind({
+	$body.delegate('[data-tooltip]', {
 		'mouseover': showTooltip,
 		'mousemove': moveTooltip,
 		'mouseout': hideTooltip,
@@ -66,14 +66,6 @@ $(document).ready(function() {
 	});
 
 	$body.delegate('.browse-topic-drop-search-input, .form-topic-drop-search-input', 'keyup', filterDrop);
-
-// 	$(window).bind('resize', updateSidebar);
-// 	$(window).bind('scroll', updateSidebar);
-//   $('.discussion-column').bind("input", function (e) {
-//     console.log("resized");
-// 	  updateSidebar();
-//   })
-// 	updateSidebar();
 });
 
 function filterDrop(e) {
