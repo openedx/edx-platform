@@ -322,10 +322,16 @@ class CapaModule(XModule):
 
         before = self.get_progress()
         d = handlers[dispatch](get)
-        after = self.get_progress()
-        d.update({
-            'progress_changed': after != before,
-            'progress_status': Progress.to_js_status_str(after),
+        try:
+            after = self.get_progress()
+            d.update({
+                'progress_changed': after != before,
+                'progress_status': Progress.to_js_status_str(after),
+                })
+        except ValueError:
+            d.update({
+                'progress_changed': False,
+                'progress_status': Progress.to_js_status(before),
             })
         return json.dumps(d, cls=ComplexEncoder)
 
