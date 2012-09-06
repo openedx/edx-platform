@@ -23,8 +23,8 @@ if Backbone?
             type: "GET"
             dataType: 'json'
             success: (response, textStatus) =>
-              #@$el.append(response.html)
               window.user = new DiscussionUser(response.user_info)
+              Content.loadContentInfos(response.annotated_content_info)
               $(event.target).html("Hide Discussion")
               discussion = new Discussion()
               discussion.reset(response.discussion_data, {silent: false})
