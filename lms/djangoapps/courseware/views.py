@@ -205,6 +205,9 @@ def index(request, course_id, chapter=None, section=None,
                         ' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
+        log.debug("TEMP: course_id {}, chap {}, sec {}, first_time {}, course position = {}"
+                  .format(course_id, chapter, section, first_time, course_module.position))
+
         if chapter is None and section is None:
             return redirect_to_course_position(course_module, first_time)
 
