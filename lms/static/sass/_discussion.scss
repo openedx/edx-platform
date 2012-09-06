@@ -1472,14 +1472,10 @@ body.discussion {
 }
 
 .discussion-module {
-  @extend .discussion-body
-}
+  @extend .discussion-body;
 
-/* For some reason I have to do this to get the SCSS to compile, can't stick it under the above .discussion-module */
-.discussion-module {
   section.discussion {
-    /* Course content p has a default margin-bottom of 1.416, this is just to reset that */
-
+  /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0.5em;
 
@@ -1535,5 +1531,161 @@ body.discussion {
     }
   }
 
+  .new-post-article {
+    display: none;
+    margin-top: 20px;
 
+    .inner-wrapper {
+      max-width: 1180px;
+      min-width: 760px;
+      margin: auto;
+    }
+
+    .new-post-form {
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+      @include clearfix;
+
+      .form-row {
+        margin-bottom: 20px;
+      }
+
+      .new-post-body .wmd-input {
+        @include discussion-wmd-input;
+        position: relative;
+        width: 100%;
+        height: 200px;
+        z-index: 1;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 3px 3px 0 0;
+        background: #fff;
+        font-family: 'Monaco', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-body .wmd-preview {
+        @include discussion-wmd-preview;
+        position: relative;
+        width: 100%;
+        //height: 50px;
+        margin-top: -1px;
+        padding: 25px 20px 10px 20px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 0 0 3px 3px;
+        background: #e6e6e6;
+        color: #333;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-preview-label {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 11px;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+
+      .new-post-title,
+      .new-post-tags {
+        width: 100%;
+        height: 40px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        border-radius: 3px;
+        border: 1px solid #333;
+        font-size: 16px;
+        font-family: 'Open Sans', sans-serif;
+        color: #333;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-title {
+        font-weight: 700;
+      }
+
+      .submit {
+        @include blue-button;
+        float: left;
+        height: 37px;
+        margin-top: 10px;
+        padding-bottom: 2px;
+        border-color: #333;
+
+        &:hover {
+          border-color: #222;
+        }
+      }
+
+      .new-post-cancel {
+        @include white-button;
+        float: left;
+        margin: 10px 0 0 15px;
+      }
+
+      .options {
+        margin-top: 40px;
+
+        label {
+          display: inline;
+          margin-left: 8px;
+          font-size: 15px;
+          color: #fff;
+          text-shadow: none;
+        }
+      }
+      .wmd-button {
+        background: none;
+      }
+
+      .wmd-button span {
+        background: url(../images/new-post-icons-full.png) no-repeat;
+      }
+    }
+
+    .thread-tags {
+      margin-top: 20px;
+    }
+
+    .thread-tag {
+      padding: 3px 10px 6px;
+      border-radius: 3px;
+      color: #333;
+      background: #c5eeff;
+      border: 1px solid #90c4d7;
+      font-size: 13px;
+    }
+
+    .thread-title {
+      display: block;
+      margin-bottom: 20px;
+      font-size: 21px;
+      color: #333;
+      font-weight: 700;
+    }
+  }
+
+  .new-post-btn {
+    @include blue-button;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+
+  .new-post-icon {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 17px;
+    margin: 8px 7px 0 0;
+    background: url(../images/new-post-icon.png) no-repeat;
+  }
 }
