@@ -26,23 +26,23 @@ if Backbone?
           @showed = true
         else
           $elem = $(event.target)
-          discussion_id = $elem.attr("discussion_id")
-          url = DiscussionUtil.urlFor 'retrieve_discussion', discussion_id
+          discussionId = $elem.data("discussion-id")
+          url = DiscussionUtil.urlFor 'retrieve_discussion', discussionId
           DiscussionUtil.safeAjax
             $elem: $elem
             $loading: $elem
             url: url
             type: "GET"
             dataType: 'json'
-            success: (response, textStatus, jqXHR) => @createDiscussion(event, response, textStatus)
+            success: (response, textStatus, jqXHR) => @createDiscussion(event, response, textStatus, discussionId)
 
-    createDiscussion: (event, response, textStatus) =>
+    createDiscussion: (event, response, textStatus, discussionId) =>
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
       $(event.target).html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
-      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data})
+      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
       $(".discussion-module").append($discussion)
       @newPostForm = $('.new-post-article')
       @threadviews = @discussion.map (thread) ->
