@@ -137,12 +137,13 @@ class @DiscussionThreadListView extends Backbone.View
     @$(".browse").toggleClass('is-dropped')
     if @$(".browse").hasClass('is-dropped')
       @$(".browse-topic-drop-menu-wrapper").show()
-      $('body').bind 'click', @toggleTopicDrop
-      $('body').bind 'keydown', @setActiveItem
+      $(".browse-topic-drop-search-input").focus()
+      $("body").bind "click", @toggleTopicDrop
+      $("body").bind "keydown", @setActiveItem
     else
       @$(".browse-topic-drop-menu-wrapper").hide()
-      $('body').unbind 'click', @toggleTopicDrop
-      $('body').unbind 'keydown', @setActiveItem
+      $("body").unbind "click", @toggleTopicDrop
+      $("body").unbind "keydown", @setActiveItem
 
   setTopic: (event) ->
     item = $(event.target).closest('a')
