@@ -131,3 +131,65 @@ img {
     color: rgba(0, 0, 0, .85);
   }
 }
+
+
+
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  max-width: 350px;
+  padding: 15px 20px 17px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
+  background-color: rgba(30, 30, 30, .92);
+  @include box-shadow(0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset);
+  font-size: 13px;
+  color: #fff;
+  opacity: 0;
+  @include transition(all .2s);
+
+  .error-icon {
+    display: block;
+    float: left;
+    width: 27px;
+    height: 24px;
+    margin: 0 auto 10px;
+    background: url(../images/large-error-icon.png) no-repeat;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 27px;
+    height: 27px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #aaa;
+    text-align: center;
+
+    .close-icon {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .action-btn {
+    @include dark-grey-button;
+    margin-top: 10px;
+    text-align: center;
+  }
+}
+
