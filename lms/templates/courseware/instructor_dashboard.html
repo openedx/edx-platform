@@ -64,17 +64,17 @@ table.stat_table td {
 %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List course staff members"> 
+    <input type="submit" name="action" value="List course staff members">
     <p>
-    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff"> 
-    <input type="submit" name="action" value="Add course staff"> 
+    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff">
+    <input type="submit" name="action" value="Add course staff">
     <hr width="40%" style="align:left">
  %endif
- 
+
 %if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
     <p>
-    <input type="submit" name="action" value="Reload course from XML files"> 
-    <input type="submit" name="action" value="GIT pull and Reload course"> 
+    <input type="submit" name="action" value="Reload course from XML files">
+    <input type="submit" name="action" value="GIT pull and Reload course">
 %endif
 
     </form>
@@ -101,7 +101,7 @@ table.stat_table td {
     </p>
 
 %if msg:
-    <p>${msg}</p>    
+    <p>${msg}</p>
 %endif
 
 % if course_errors is not UNDEFINED:
@@ -110,13 +110,17 @@ table.stat_table td {
       <ul>
         % for (summary, err) in course_errors:
         <li>${summary | h}
+        % if err:
           <ul><li><pre>${err | h}</pre></li></ul>
+        % else:
+          <p>&nbsp;</p>
+        % endif
         </li>
         % endfor
         </ul>
       </div>
 % endif
-      
+
   </section>
 </div>
 </section>
