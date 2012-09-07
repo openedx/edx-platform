@@ -143,7 +143,7 @@ class @NewPostView extends Backbone.View
                 DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
                 @$el.hide()
                 @$(".new-post-title").val("").attr("prev-text", "")
-                @$(".new-post-body").val("").attr("prev-text", "")
+                @$(".new-post-body textarea").val("").attr("prev-text", "")
                 @$(".new-post-tags").val("")
                 @$(".new-post-tags").importTags("")
                 @collection.add thread
@@ -169,7 +169,7 @@ class @NewPostView extends Backbone.View
 
         itemTop = $(items[index]).parent().offset().top
         scrollTop = $(".topic_menu").scrollTop()
-        itemFromTop = $(".topic_menu").offset().top - itemTop  
+        itemFromTop = $(".topic_menu").offset().top - itemTop
         scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
         scrollTarget = Math.max(scrollTop - itemFromTop - $(".topic_menu").height() + $(items[index]).height() + 20, scrollTarget)
         $(".topic_menu").scrollTop(scrollTarget)
