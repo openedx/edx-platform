@@ -195,8 +195,8 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     @expanded = true
     @$el.find('.post-body').html(@model.get('body'))
     @convertMath()
-    @$el.find('.expand-post').hide()
-    @$el.find('.collapse-post').show()
+    @$el.find('.expand-post').css('display', 'none')
+    @$el.find('.collapse-post').css('display', 'block')
     @$el.find('.post-extended-content').show()
     @makeWmdEditor "reply-body"
     if @$el.find('.loading').length
@@ -206,6 +206,6 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     @expanded = false
     @$el.find('.post-body').html(@model.get('abbreviatedBody'))
     @convertMath()
-    @$el.find('.collapse-post').hide()
+    @$el.find('.collapse-post').css('display', 'none')
     @$el.find('.post-extended-content').hide()
-    @$el.find('.expand-post').show()
+    @$el.find('.expand-post').css('display', 'block')

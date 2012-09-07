@@ -1219,27 +1219,32 @@ body.discussion {
     padding: 10px 20px;
 
     > header .vote-btn {
+      position: relative;
+      z-index: 100;
       margin-top: 5px;
     }
 
     .post-tools {
+      @include clearfix;
+      margin-top: 15px;
+
       .ui-icon {
         display: inline;
-        float: right;
-      }
-      a {
-        display: inline;
         float: left;
-        height: 26px;
-        padding: 0 12px;
-        border-radius: 3px;
-        border: 1px solid #b2b2b2;
-        @include linear-gradient(top, #fff 35%, #ebebeb);
-        font-size: 13px;
-        line-height: 24px;
-        color: #737373;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-        width: 6em;
+        width: 13px;
+        height: 13px;
+        margin-right: 4px;
+        background: url(../images/small-grey-arrows.png) no-repeat;
+
+        &.expand {
+          margin-top: 5px;
+          background-position: 0 0;
+        }
+
+        &.collapse {
+          margin-top: 6px;
+          background-position: -13px 0;
+        }
       }
     }
   }
@@ -1296,6 +1301,8 @@ body.discussion {
   }
 
   .vote-btn {
+    position: relative;
+    z-index: 100;
     float: right;
     display: block;
     height: 27px;
@@ -1441,7 +1448,6 @@ body.discussion {
     padding: 0;
     @include clearfix;
 
-
     li {
       float: left;
       margin-right: 8px;
@@ -1579,21 +1585,61 @@ body.discussion {
       p {
         margin-bottom: 0em;
       }
+
       .discussion-article {
-        border: 1px solid;
+        border: 1px solid #b2b2b2;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
         min-height: 0;
-        padding: 1em;
-        .discussion-post {
-          header {
-            padding-bottom: 0.1em;
-            margin-bottom: 10px;
+        padding: 10px 10px 40px;
 
+        .discussion-post {
+          @include clearfix;
+
+          header {
+            padding-bottom: 0;
+            margin-bottom: 15px;
+
+            h3 {
+              font-size: 22px;
+              font-weight: 700;
+              margin-bottom: 0px;
+            }
           }
+
           .post-body {
             font-size: 14px;
             clear: both;
+          }
+        }
+
+        .post-tools {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;          
+          border-radius: 0 0 3px 3px;
+          border-top: 1px solid #ddd;
+          @include linear-gradient(top, #f2f2f2, #e2e2e2);
+
+          a {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            line-height: 30px;
+
+            &.expand-post:before {
+              content: '▾ ';
+            }
+
+            &.collapse-post:before {
+              content: '▴ ';
+            }
+
+            &.collapse-post {
+              display: none;
+            }
           }
         }
 
@@ -1603,6 +1649,7 @@ body.discussion {
           header {
             padding-bottom: 0em;
             margin-bottom: 5px;
+
             .posted-by {
               font-size: 0.8em;
             }
@@ -1611,20 +1658,20 @@ body.discussion {
             margin-bottom: 0.2em;
             font-size: 14px;
           }
-
         }
+
         .discussion-reply-new {
           .wmd-input {
             height: 120px;
           }
         }
+
         // Content that is hidden by default in the inline view
         .post-extended-content{
           display: none;
         }
-        .collapse-post{
-          display:none;
-        }
+
+        
       }
     }
   }
@@ -1806,10 +1853,15 @@ body.discussion {
     margin: 8px 7px 0 0;
     background: url(../images/new-post-icon.png) no-repeat;
   }
+
+  .moderator-actions {
+    padding-left: 0 !important;
+  }
+
   section.pagination {
     nav.discussion-paginator {
-      ol{
-        li{
+      ol {
+        li {
           list-style: none;
           display: inline-block;
           padding-right: 0.5em;
