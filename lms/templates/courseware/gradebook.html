@@ -49,7 +49,7 @@
         %for student in students:
         <tr>
           <td>
-            <a href="${reverse('student_progress', kwargs=dict(course_id=course_id, student_id=student['id']))}">${student['username']}</a>
+            <a href="${reverse('student_progress', kwargs=dict(course_id=course_id, student_id=student['id']))}" title="${student['tooltip']}">${student['username']}</a>
           </td>
         </tr>
         %endfor
@@ -90,7 +90,7 @@
 
         <tbody>
           %for student in students:
-          <tr>          
+          <tr>
             %for section in student['grade_summary']['section_breakdown']:
               ${percent_data( section['percent'] )}
             %endfor

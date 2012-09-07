@@ -25,6 +25,8 @@ WIKI_ENABLED = True
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
+INTERNAL_COURSE_IDS = set(['edX/toy/2012_Fall'])
+
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',

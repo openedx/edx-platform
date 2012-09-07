@@ -92,6 +92,12 @@ COURSE_LISTINGS = {
 }
 
 
+INTERNAL_COURSE_IDS = set(['BerkeleyX/CS169/fa12',
+                           'BerkeleyX/CS188/fa12',
+                           'HarvardX/CS50x/2012H',
+                           'MITx/3.091/MIT_2012_Fall',
+                           'MITx/6.002x-EE98/2012_Fall_SJSU'])
+
 SUBDOMAIN_BRANDING = {
     'sjsu': 'MITx',
     'mit': 'MITx',

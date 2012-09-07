@@ -81,7 +81,7 @@ def instructor_dashboard(request, course_id):
         try:
             group = Group.objects.get(name=staffgrp)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)		# create the group
+            group = Group(name=staffgrp)     # create the group
             group.save()
         return group
 
@@ -217,11 +217,18 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
 
+    If the course_id is in INTERNAL_COURSE_IDS, includes student
+    emails and full names.  Otherwise, just returns the usernames and
+    grades.  This may change pending future policy decisions about data access.
     '''
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
 
-    header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
-    if get_grades:
+    internal = course_id in settings.INTERNAL_COURSE_IDS
+    if internal:
+        header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    else:
+        header = ['ID', 'Username']
+    if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
         # log.debug('student %s gradeset %s' % (enrolled_students[0], gradeset))
@@ -234,11 +241,14 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     data = []
 
     for student in enrolled_students:
-        datarow = [ student.id, student.username, student.profile.name, student.email ]
-        try:
-            datarow.append(student.externalauthmap.external_email)
-        except:	# ExternalAuthMap.DoesNotExist
-            datarow.append('')
+        if internal:
+            datarow = [student.id, student.username, student.profile.name, student.email]
+            try:
+                datarow.append(student.externalauthmap.external_email)
+            except:	# ExternalAuthMap.DoesNotExist
+                datarow.append('')
+        else:
+            datarow = [student.id, student.username]
 
         if get_grades:
             gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
@@ -267,11 +277,16 @@ def gradebook(request, course_id):
     # TODO (vshnayder): implement pagination.
     enrolled_students = enrolled_students[:1000]   # HACK!
 
+    internal = course_id in settings.INTERNAL_COURSE_IDS
+    def tooltip(student):
+        if internal:
+            return '{0} <{1}>'.format(student.profile.name, student.email)
+        return ""
+
     student_info = [{'username': student.username,
                      'id': student.id,
-                     'email': student.email,
                      'grade_summary': grades.grade(student, request, course),
-                     'realname': student.profile.name,
+                     'tooltip': tooltip(student),
                      }
                      for student in enrolled_students]
 
