@@ -46,6 +46,7 @@ DATA_DIR = COURSES_ROOT
 LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
+                            dev_env=True,
                             debug=True)
 
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
