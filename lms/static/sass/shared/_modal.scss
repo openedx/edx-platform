@@ -147,9 +147,10 @@
       }
 
       label {
-        color: #999;
+        display: none;
 
         &.field-error {
+          display: block;
           color: #8F0E0E;
 
           + input {
@@ -161,14 +162,6 @@
 
       input[type="checkbox"] {
         margin-right: 5px;
-      }
-
-      ::-webkit-input-placeholder {
-        color: #ddd;
-      }
-
-      :-moz-placeholder {  
-        color: #ddd;  
       }
 
       textarea {

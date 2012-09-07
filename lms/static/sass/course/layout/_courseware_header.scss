@@ -40,6 +40,7 @@ nav.course-material {
         }
 
         &.active {
+          // background: rgba(0, 0, 0, .2);
           @include linear-gradient(top, rgba(0, 0, 0, .4), rgba(0, 0, 0, .25));
           background-color: transparent;
           @include box-shadow(0 1px 0 rgba(255, 255, 255, .5), 0 1px 1px rgba(0, 0, 0, .3) inset);

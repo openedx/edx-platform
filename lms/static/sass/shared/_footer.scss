@@ -110,7 +110,6 @@ footer {
           padding: 0;
 
           a {
-            @include inline-block;
             opacity: 0.3;
             @include transition(all, 0.1s, linear);
 
