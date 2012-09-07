@@ -1580,7 +1580,7 @@ body.discussion {
   section.discussion {
   /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
-      padding: 0.5em;
+      padding: 0.5em 0;
 
       p {
         margin-bottom: 0em;
@@ -1859,7 +1859,11 @@ body.discussion {
   }
 
   section.pagination {
+    margin-top: 30px;
+
     nav.discussion-paginator {
+      float: right;
+
       ol {
         li {
           list-style: none;
@@ -1868,16 +1872,18 @@ body.discussion {
           a {
             @include white-button;
           }
-
         }
+
         li.current-page{
           height: 35px;
+          padding: 0 15px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
           font-size: 13px;
           font-weight: 700;
           line-height: 32px;
           color: #333;
           text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
         }
       }
     }
