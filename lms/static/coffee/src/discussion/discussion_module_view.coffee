@@ -7,9 +7,15 @@ if Backbone?
       "click .discussion-paginator a": "navigateToPage"
 
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
-
+    page_re: /\?discussion_page=(\d+)/
     initialize: ->
-      @page = 1
+      # Set the page if it was set in the URL. This is used to allow deep linking to pages
+      match = @page_re.exec(window.location.href)
+      if match
+        @page = parseInt(match[1])
+      else
+        @page = 1
+
 
     toggleNewPost: (event) ->
       if @newPostForm.is(':hidden')
@@ -67,7 +73,7 @@ if Backbone?
       @renderPagination(2, response.num_pages)
 
     addThread: (thread, collection, options) =>
-      # TODO: When doing pagination, this will need to repaginate
+      # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?
       article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
       @$('section.discussion > .threads').prepend(article)
       threadView = new DiscussionThreadInlineView el: article, model: thread
@@ -77,8 +83,6 @@ if Backbone?
     renderPagination: (delta, numPages) =>
       minPage = Math.max(@page - delta, 1)
       maxPage = Math.min(@page + delta, numPages)
-      console.log minPage
-      console.log maxPage
       pageUrl = (number) ->
         "?discussion_page=#{number}"
       params =
