@@ -15,6 +15,7 @@ class @DiscussionThreadListView extends Backbone.View
     @collection.on "add", @addAndSelectThread
     @sidebar_padding = 10
     @sidebar_header_height = 87
+    @boardName
 
   reloadDisplayedCollection: (thread) =>
     thread_id = thread.get('id')
@@ -41,8 +42,8 @@ class @DiscussionThreadListView extends Backbone.View
     windowHeight = $(window).height();
 
     discussionBody = $(".discussion-article")
-    discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top;
-    discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight();
+    discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top
+    discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight()
 
     sidebar = $(".sidebar")
     if scrollTop > discussionsBodyTop - @sidebar_padding
@@ -62,10 +63,11 @@ class @DiscussionThreadListView extends Backbone.View
     amount = Math.max(topOffset - discussionBottomOffset, 0)
 
     sidebarHeight = sidebarHeight - @sidebar_padding - amount
-    sidebar.css 'height', Math.min(Math.max(sidebarHeight, 400), discussionBody.outerHeight())
+    sidebarHeight = Math.min(Math.max(sidebarHeight, 400), discussionBody.outerHeight())
+    sidebar.css 'height', sidebarHeight
 
     postListWrapper = @$('.post-list-wrapper')
-    postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px');
+    postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
 
 
   # Because we want the behavior that when the body is clicked the menu is
@@ -101,6 +103,8 @@ class @DiscussionThreadListView extends Backbone.View
     content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
     if thread.get('subscribed')
       content.addClass("followed")
+    if thread.get('endorsed')
+      content.addClass("resolved")
     @highlight(content)
 
 
@@ -137,27 +141,65 @@ class @DiscussionThreadListView extends Backbone.View
     @$(".browse").toggleClass('is-dropped')
     if @$(".browse").hasClass('is-dropped')
       @$(".browse-topic-drop-menu-wrapper").show()
-      $('body').bind 'click', @toggleTopicDrop
-      $('body').bind 'keydown', @setActiveItem
+      $(".browse-topic-drop-search-input").focus()
+      $("body").bind "click", @toggleTopicDrop
+      $("body").bind "keydown", @setActiveItem
     else
       @$(".browse-topic-drop-menu-wrapper").hide()
-      $('body').unbind 'click', @toggleTopicDrop
-      $('body').unbind 'keydown', @setActiveItem
+      $("body").unbind "click", @toggleTopicDrop
+      $("body").unbind "keydown", @setActiveItem
 
   setTopic: (event) ->
     item = $(event.target).closest('a')
     boardName = item.find(".board-name").html()
     _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
       boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
-    @$(".current-board").html(boardName)
+    @$(".current-board").html(@fitName(boardName))
     fontSize = 16
     @$(".current-board").css('font-size', '16px')
-
     while @$(".current-board").width() > (@$el.width() * .8) - 40
       fontSize--
       if fontSize < 11
         break
       @$(".current-board").css('font-size', fontSize + 'px')
+
+  setSelectedTopic: (name) ->
+    @$(".current-board").html(@fitName(name))
+
+  getNameWidth: (name) ->
+    test = $("<div>")
+    test.css
+      "font-size": @$(".current-board").css('font-size')
+      opacity: 0
+      position: 'absolute'
+      left: -1000
+      top: -1000
+    $("body").append(test)
+    test.html(name)
+    width = test.width()
+    test.remove()
+    return width
+
+  fitName: (name) ->
+    width = @getNameWidth(name)
+    if width < @maxNameWidth
+      return name
+    path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
+    while path.length > 1
+      path.shift()
+      partialName = "... / " + path.join(" / ")
+      if  @getNameWidth(partialName) < @maxNameWidth
+        return partialName
+
+    rawName = path[0]
+
+    name = "... / " + rawName
+
+    while @getNameWidth(name) > @maxNameWidth
+      rawName = rawName[0...rawName.length-1]
+      name =  "... / " + rawName + " ..."
+
+    return name
 
   filterTopic: (event) ->
     @setTopic(event)

@@ -211,6 +211,28 @@
 
 
 body.discussion {
+  .new-post-form-errors {
+    display: none;
+    background: $error-red;
+    padding: 0;
+    border: 1px solid #333;
+    list-style: none;
+    color: #fff;
+    line-height: 1.6;
+    border-radius: 3px;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2));
+
+    li {
+      padding: 10px 20px 12px 45px;
+      border-bottom: 1px solid #dc4949;
+      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
   .course-tabs .right {
     float: right;
 
@@ -391,6 +413,22 @@ body.discussion {
       font-size: 13px;
       line-height: 1.6;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    }
+
+    .tagsinput {
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      border-radius: 3px;
+      background: #fff;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+
+      span.tag {
+        margin-bottom: 0;
+      }
     }
 
     .new-post-body .wmd-preview {
@@ -713,7 +751,9 @@ body.discussion {
       width: 100%;
       background: #737373;
       border: 1px solid #4b4b4b;
+      border-left: none;
       border-radius: 0 0 3px 3px;
+      @include box-shadow(1px 0 0 #4b4b4b inset);
 
       .browse-topic-drop-menu {
         max-height: 400px;
@@ -906,7 +946,7 @@ body.discussion {
       position: relative;
       display: block;
       height: 36px;
-      padding: 0 10px;
+      padding: 0 10px 0 18px;
       margin-bottom: 1px;
       margin-right: -1px;
       @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
@@ -915,6 +955,35 @@ body.discussion {
       &:hover {
         @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
         background-color: #eee;
+      }
+
+      &.staff-post.staff-response {
+        .staff-post-icon {
+          top: 5px;
+        }
+
+        .staff-response-icon {
+          top: 18px;
+        }
+      }
+
+      .staff-post-icon,
+      .staff-response-icon {
+        position: absolute;
+        top: 11px;
+        left: 3px;
+        width: 13px;
+        height: 13px;
+        background: url(../images/staff-icons.png) no-repeat;
+      }
+
+      .staff-post-icon {
+        left: 2px;
+        background-position: 0 0;
+      }
+
+      .staff-response-icon {
+        background-position: -13px 0;
       }
 
       .title {
@@ -956,6 +1025,14 @@ body.discussion {
 
         .title {
           color: #333;
+        }
+
+        .staff-post-icon {
+          background-position: 0 -13px;
+        }
+
+        .staff-response-icon {
+          background-position: -13px -13px;
         }
 
         .votes-count,
@@ -1363,38 +1440,6 @@ body.discussion {
 
 
 
-
-  .tooltip {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 99999;
-    padding: 0 10px;
-    border-radius: 3px;
-    background: rgba(0, 0, 0, .85);
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 26px;
-    color: #fff;
-    pointer-events: none;
-    opacity: 0;
-    @include transition(opacity .1s);
-
-    &:after {
-      content: '▾';
-      display: block;
-      position: absolute;
-      bottom: -14px;
-      left: 50%;
-      margin-left: -7px;
-      font-size: 20px;
-      color: rgba(0, 0, 0, .85);
-    }
-  }
-
-
-
-
   .main-article.new {
     display: none;
     padding: 50px;
@@ -1472,14 +1517,10 @@ body.discussion {
 }
 
 .discussion-module {
-  @extend .discussion-body
-}
+  @extend .discussion-body;
 
-/* For some reason I have to do this to get the SCSS to compile, can't stick it under the above .discussion-module */
-.discussion-module {
   section.discussion {
-    /* Course content p has a default margin-bottom of 1.416, this is just to reset that */
-
+  /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0.5em;
 
@@ -1535,5 +1576,161 @@ body.discussion {
     }
   }
 
+  .new-post-article {
+    display: none;
+    margin-top: 20px;
 
+    .inner-wrapper {
+      max-width: 1180px;
+      min-width: 760px;
+      margin: auto;
+    }
+
+    .new-post-form {
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+      @include clearfix;
+
+      .form-row {
+        margin-bottom: 20px;
+      }
+
+      .new-post-body .wmd-input {
+        @include discussion-wmd-input;
+        position: relative;
+        width: 100%;
+        height: 200px;
+        z-index: 1;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 3px 3px 0 0;
+        background: #fff;
+        font-family: 'Monaco', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-body .wmd-preview {
+        @include discussion-wmd-preview;
+        position: relative;
+        width: 100%;
+        //height: 50px;
+        margin-top: -1px;
+        padding: 25px 20px 10px 20px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 0 0 3px 3px;
+        background: #e6e6e6;
+        color: #333;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-preview-label {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        font-size: 11px;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+
+      .new-post-title,
+      .new-post-tags {
+        width: 100%;
+        height: 40px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        border-radius: 3px;
+        border: 1px solid #333;
+        font-size: 16px;
+        font-family: 'Open Sans', sans-serif;
+        color: #333;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      .new-post-title {
+        font-weight: 700;
+      }
+
+      .submit {
+        @include blue-button;
+        float: left;
+        height: 37px;
+        margin-top: 10px;
+        padding-bottom: 2px;
+        border-color: #333;
+
+        &:hover {
+          border-color: #222;
+        }
+      }
+
+      .new-post-cancel {
+        @include white-button;
+        float: left;
+        margin: 10px 0 0 15px;
+      }
+
+      .options {
+        margin-top: 40px;
+
+        label {
+          display: inline;
+          margin-left: 8px;
+          font-size: 15px;
+          color: #fff;
+          text-shadow: none;
+        }
+      }
+      .wmd-button {
+        background: none;
+      }
+
+      .wmd-button span {
+        background: url(../images/new-post-icons-full.png) no-repeat;
+      }
+    }
+
+    .thread-tags {
+      margin-top: 20px;
+    }
+
+    .thread-tag {
+      padding: 3px 10px 6px;
+      border-radius: 3px;
+      color: #333;
+      background: #c5eeff;
+      border: 1px solid #90c4d7;
+      font-size: 13px;
+    }
+
+    .thread-title {
+      display: block;
+      margin-bottom: 20px;
+      font-size: 21px;
+      color: #333;
+      font-weight: 700;
+    }
+  }
+
+  .new-post-btn {
+    @include blue-button;
+    font-size: 13px;
+    margin-right: 4px;
+  }
+
+  .new-post-icon {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 17px;
+    margin: 8px 7px 0 0;
+    background: url(../images/new-post-icon.png) no-repeat;
+  }
 }

@@ -136,10 +136,16 @@ def inline_discussion(request, course_id, discussion_id):
 #    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
 #                                                                 query_params=query_params)
     user_info = cc.User.from_django_user(request.user).to_dict()
+
+    def infogetter(thread):
+        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
     return utils.JsonResponse({
 #        'html': html,
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
+        'annotated_content_info': annotated_content_info
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):

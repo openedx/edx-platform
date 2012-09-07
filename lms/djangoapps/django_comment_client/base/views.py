@@ -38,11 +38,10 @@ def permitted(fn):
             else:
                 content = None
             return content
-
         if check_permissions_by_view(request.user, kwargs['course_id'], fetch_content(), request.view_name):
             return fn(request, *args, **kwargs)
         else:
-            return JsonError("unauthorized")
+            return JsonError("unauthorized", status=401)
     return wrapper
 
 def ajax_content_response(request, course_id, content, template_name):
@@ -214,7 +213,7 @@ def undo_vote_for_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
-    
+
 
 @require_POST
 @login_required
@@ -288,7 +287,7 @@ def update_moderator_status(request, course_id, user_id):
         course = get_course_with_access(request.user, course_id, 'load')
         discussion_user = cc.User(id=user_id, course_id=course_id)
         context = {
-            'course': course, 
+            'course': course,
             'course_id': course_id,
             'user': request.user,
             'django_user': user,
@@ -327,7 +326,7 @@ def tags_autocomplete(request, course_id):
 @require_POST
 @login_required
 @csrf.csrf_exempt
-def upload(request, course_id):#ajax upload file to a question or answer 
+def upload(request, course_id):#ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
 
@@ -337,7 +336,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
     new_file_name = ''
     try:
         # TODO authorization
-        #may raise exceptions.PermissionDenied 
+        #may raise exceptions.PermissionDenied
         #if request.user.is_anonymous():
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
@@ -357,7 +356,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
         new_file_name = str(
                             time.time()
                         ).replace(
-                            '.', 
+                            '.',
                             str(random.randint(0,100000))
                         ) + file_extension
 
@@ -386,7 +385,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
         parsed_url = urlparse.urlparse(file_url)
         file_url = urlparse.urlunparse(
             urlparse.ParseResult(
-                parsed_url.scheme, 
+                parsed_url.scheme,
                 parsed_url.netloc,
                 parsed_url.path,
                 '', '', ''

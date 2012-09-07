@@ -49,7 +49,7 @@ class @DiscussionThreadView extends DiscussionContentView
 
   convertMath: ->
     element = @$(".post-body")
-    element.html DiscussionUtil.postMathJaxProcessor(element.html())
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
   renderResponses: ->
@@ -66,11 +66,16 @@ class @DiscussionThreadView extends DiscussionContentView
       response.set('thread', @model)
       view = new ThreadResponseView(model: response)
       view.on "comment:add", @addComment
+      view.on "comment:endorse", @endorseThread
       view.render()
       @$el.find(".responses").append(view.el)
 
   addComment: =>
     @model.comment()
+
+  endorseThread: (endorsed) =>
+    is_endorsed = @$el.find(".is-endorsed").length
+    @model.set 'endorsed', is_endorsed
 
   toggleVote: (event) ->
     event.preventDefault()
