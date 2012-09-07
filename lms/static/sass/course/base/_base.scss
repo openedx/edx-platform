@@ -39,11 +39,6 @@ a {
   }
 }
 
-
-
-
-
-
 form {
   label {
     display: block;
@@ -132,6 +127,9 @@ img {
   }
 }
 
+.test-class {
+  border: 1px solid #f00;
+}
 
 
 .toast-notification {
@@ -143,13 +141,16 @@ img {
   padding: 15px 20px 17px;
   border-radius: 3px;
   border: 1px solid #333;
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
-  background-color: rgba(30, 30, 30, .92);
-  @include box-shadow(0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset);
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, .92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
   font-size: 13px;
   color: #fff;
   opacity: 0;
-  @include transition(all .2s);
+  -webkit-transition: all .2s;
+
+  p, span {
+    color: #fff;
+  }
 
   .error-icon {
     display: block;
@@ -192,4 +193,3 @@ img {
     text-align: center;
   }
 }
-
