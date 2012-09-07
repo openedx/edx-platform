@@ -16,12 +16,13 @@ if Backbone?
       else
         @page = 1
 
-
     toggleNewPost: (event) ->
+      event.preventDefault()
       if @newPostForm.is(':hidden')
         @newPostForm.slideDown(300)
       else
         @newPostForm.slideUp(300)
+
     hideNewPost: (event) ->
       @newPostForm.slideUp(300)
 
