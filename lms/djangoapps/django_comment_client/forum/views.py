@@ -145,9 +145,10 @@ def get_threads(request, course_id, discussion_id=None):
 
     return threads, query_params
 
-# discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
-<<<<<<< HEAD
+    """
+    Renders JSON for DiscussionModules
+    """
     try:
         threads, query_params = get_threads(request, course_id, discussion_id)
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -178,6 +179,9 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id):
+    """
+    Renders the main Discussion page
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         category_map = utils.get_discussion_category_map(course)
