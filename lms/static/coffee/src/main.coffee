@@ -29,3 +29,11 @@ $ ->
 
   window.postJSON = (url, data, callback) ->
     $.postWithPrefix url, data, callback
+
+  $('#login').click ->
+    $('#login_form input[name="email"]').focus()
+    false
+
+  $('#signup').click ->
+    $('#signup-modal input[name="email"]').focus()
+    false
