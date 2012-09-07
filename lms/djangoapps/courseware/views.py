@@ -23,7 +23,7 @@ from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
 from models import StudentModuleCache
-from module_render import toc_for_course, get_module, get_section
+from module_render import toc_for_course, get_module, get_instance_module
 from student.models import UserProfile
 
 from multicourse import multicourse_settings
@@ -39,9 +39,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 
 import comment_client
-
-
-
 
 log = logging.getLogger("mitx.courseware")
 
@@ -83,7 +80,7 @@ def courses(request):
     return render_to_response("courses.html", {'universities': universities})
 
 
-def render_accordion(request, course, chapter, section, course_id=None):
+def render_accordion(request, course, chapter, section):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter.
 
@@ -94,7 +91,7 @@ def render_accordion(request, course, chapter, section, course_id=None):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section, course_id=course_id)
+    toc = toc_for_course(request.user, request, course, chapter, section)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -102,16 +99,78 @@ def render_accordion(request, course, chapter, section, course_id=None):
     return render_to_string('accordion.html', context)
 
 
+def get_current_child(xmodule):
+    """
+    Get the xmodule.position's display item of an xmodule that has a position and
+    children.  Returns None if the xmodule doesn't have a position, or if there
+    are no children.  Otherwise, if position is out of bounds, returns the first child.
+    """
+    if not hasattr(xmodule, 'position'):
+        return None
+
+    children = xmodule.get_display_items()
+    # position is 1-indexed.
+    if 0 <= xmodule.position - 1 < len(children):
+        child = children[xmodule.position - 1]
+    elif len(children) > 0:
+        # Something is wrong.  Default to first child
+        child = children[0]
+    else:
+        child = None
+    return child
+
+
+def redirect_to_course_position(course_module, first_time):
+    """
+    Load the course state for the user, and return a redirect to the
+    appropriate place in the course: either the first element if there
+    is no state, or their previous place if there is.
+
+    If this is the user's first time, send them to the first section instead.
+    """
+    course_id = course_module.descriptor.id
+    chapter = get_current_child(course_module)
+    if chapter is None:
+        # oops.  Something bad has happened.
+        raise Http404
+    if not first_time:
+        return redirect(reverse('courseware_chapter', kwargs={'course_id': course_id,
+                                                              'chapter': chapter.url_name}))
+    # Relying on default of returning first child
+    section = get_current_child(chapter)
+    return redirect(reverse('courseware_section', kwargs={'course_id': course_id,
+                                                          'chapter': chapter.url_name,
+                                                          'section': section.url_name}))
+
+def save_child_position(seq_module, child_name, instance_module):
+    """
+    child_name: url_name of the child
+    instance_module: the StudentModule object for the seq_module
+    """
+    for i, c in enumerate(seq_module.get_display_items()):
+        if c.url_name == child_name:
+            # Position is 1-indexed
+            position = i + 1
+            # Only save if position changed
+            if position != seq_module.position:
+                seq_module.position = position
+                instance_module.state = seq_module.get_instance_state()
+                instance_module.save()
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
-    Displays courseware accordion, and any associated content.
-    If course, chapter, and section aren't all specified, just returns
-    the accordion.  If they are specified, returns an error if they don't
-    point to a valid module.
+    Displays courseware accordion and associated content.  If course, chapter,
+    and section are all specified, renders the page, or returns an error if they
+    are invalid.
+
+    If section is not specified, displays the accordion opened to the right chapter.
+
+    If neither chapter or section are specified, redirects to user's most recent
+    chapter, or the first chapter if this is the user's first visit.
 
     Arguments:
 
@@ -134,9 +193,24 @@ def index(request, course_id, chapter=None, section=None,
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2)
+
+        # Has this student been in this course before?
+        first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
+
+        course_module = get_module(request.user, request, course.location, student_module_cache, course.id)
+        if course_module is None:
+            log.warning('If you see this, something went wrong: if we got this'
+                        ' far, should have gotten a course module for this user')
+            return redirect(reverse('about_course', args=[course.id]))
+
+        if chapter is None:
+            return redirect_to_course_position(course_module, first_time)
+
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section, course_id=course_id),
+            'accordion': render_accordion(request, course, chapter, section),
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
@@ -144,31 +218,62 @@ def index(request, course_id, chapter=None, section=None,
             'staff_access': staff_access,
             }
 
-        look_for_module = chapter is not None and section is not None
-        if look_for_module:
-            section_descriptor = get_section(course, chapter, section)
-            if section_descriptor is not None:
-                student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                    course_id, request.user, section_descriptor)
-                module = get_module(request.user, request,
-                                    section_descriptor.location,
-                                    student_module_cache, course_id, position)
-                if module is None:
-                    # User is probably being clever and trying to access something
-                    # they don't have access to.
-                    raise Http404
-                context['content'] = module.get_html()
-            else:
-                log.warning("Couldn't find a section descriptor for course_id '{0}',"
-                            "chapter '{1}', section '{2}'".format(
-                                course_id, chapter, section))
+        chapter_descriptor = course.get_child_by_url_name(chapter)
+        if chapter_descriptor is not None:
+            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
+            save_child_position(course_module, chapter, instance_module)
         else:
-            if request.user.is_staff:
-                # Add a list of all the errors...
-                context['course_errors'] = modulestore().get_item_errors(course.location)
+            raise Http404
+
+        chapter_module = get_module(request.user, request, chapter_descriptor.location,
+                                    student_module_cache, course_id)
+        if chapter_module is None:
+            # User may be trying to access a chapter that isn't live yet
+            raise Http404
+
+        if section is not None:
+            section_descriptor = chapter_descriptor.get_child_by_url_name(section)
+            if section_descriptor is None:
+                # Specifically asked-for section doesn't exist
+                raise Http404
+
+            section_student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+                course_id, request.user, section_descriptor)
+            section_module = get_module(request.user, request,
+                                section_descriptor.location,
+                                section_student_module_cache, course_id, position)
+            if section_module is None:
+                # User may be trying to be clever and access something
+                # they don't have access to.
+                raise Http404
+
+            # Save where we are in the chapter
+            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+            save_child_position(chapter_module, section, instance_module)
+
+
+            context['content'] = section_module.get_html()
+        else:
+            # section is none, so display a message
+            prev_section = get_current_child(chapter_module)
+            if prev_section is None:
+                # Something went wrong -- perhaps this chapter has no sections visible to the user
+                raise Http404
+            prev_section_url = reverse('courseware_section', kwargs={'course_id': course_id,
+                                                                     'chapter': chapter_descriptor.url_name,
+                                                                     'section': prev_section.url_name})
+            context['content'] = render_to_string('courseware/welcome-back.html',
+                                                  {'course': course,
+                                                   'chapter_module': chapter_module,
+                                                   'prev_section': prev_section,
+                                                   'prev_section_url': prev_section_url})
 
         result = render_to_response('courseware/courseware.html', context)
-    except:
+    except Exception as e:
+        if isinstance(e, Http404):
+            # let it propagate
+            raise
+
         # In production, don't want to let a 500 out for any reason
         if settings.DEBUG:
             raise
