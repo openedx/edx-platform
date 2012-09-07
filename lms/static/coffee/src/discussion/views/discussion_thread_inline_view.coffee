@@ -34,8 +34,6 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     if @expanded
       @makeWmdEditor "reply-body"
       @renderResponses()
-#    @highlight @$(".post-body")
-#    @highlight @$("h1")
     @
 
   renderDogear: ->
@@ -60,6 +58,7 @@ class @DiscussionThreadInlineView extends DiscussionContentView
   renderResponses: ->
     DiscussionUtil.safeAjax
       url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
+      $loading: @$el
       success: (data, textStatus, xhr) =>
         @$el.find(".loading").remove()
         Content.loadContentInfos(data['annotated_content_info'])
@@ -188,11 +187,8 @@ class @DiscussionThreadInlineView extends DiscussionContentView
       success: (response, textStatus) =>
         @model.set('endorsed', not endorsed)
 
-  highlight: (el) ->
-    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-
   abbreviateBody: ->
-    abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140 # Because twitter
+    abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140
     @model.set('abbreviatedBody', abbreviated)
 
   expandPost: (event) ->
