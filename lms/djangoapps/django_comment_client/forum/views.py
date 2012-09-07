@@ -111,7 +111,7 @@ def get_threads(request, course_id, discussion_id=None):
     default_query_params = {
         'page': 1,
         'per_page': THREADS_PER_PAGE,
-        'sort_key': 'activity',
+        'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
         'tags': '',
@@ -129,8 +129,10 @@ def get_threads(request, course_id, discussion_id=None):
 
     return threads, query_params
 
-# discussion per page is fixed for now
 def inline_discussion(request, course_id, discussion_id):
+    """
+    Renders JSON for DiscussionModules
+    """
     threads, query_params = get_threads(request, course_id, discussion_id)
     # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
 #    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
@@ -159,6 +161,9 @@ def render_search_bar(request, course_id, discussion_id=None, text=''):
     return render_to_string('discussion/_search_bar.html', context)
 
 def forum_form_discussion(request, course_id):
+    """
+    Renders the main Discussion page
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     category_map = utils.get_discussion_category_map(course)
     threads, query_params = get_threads(request, course_id)
