@@ -1199,6 +1199,27 @@ body.discussion {
     > header .vote-btn {
       margin-top: 5px;
     }
+
+    .post-tools {
+      .ui-icon {
+        display: inline;
+        float: right;
+      }
+      a {
+        display: inline;
+        float: left;
+        height: 26px;
+        padding: 0 12px;
+        border-radius: 3px;
+        border: 1px solid #b2b2b2;
+        @include linear-gradient(top, #fff 35%, #ebebeb);
+        font-size: 13px;
+        line-height: 24px;
+        color: #737373;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        width: 6em;
+      }
+    }
   }
 
   .discussion-post header,
@@ -1541,6 +1562,7 @@ body.discussion {
           }
           .post-body {
             font-size: 14px;
+            clear: both;
           }
         }
 
