@@ -24,6 +24,7 @@ if Backbone?
         @newPostForm.slideUp(300)
 
     hideNewPost: (event) ->
+      event.preventDefault()
       @newPostForm.slideUp(300)
 
     toggleDiscussion: (event) ->

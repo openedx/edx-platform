@@ -1578,7 +1578,9 @@ body.discussion {
   }
 
   section.discussion {
-  /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
+    margin-top: 20px;
+
+    /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0.5em 0;
 
