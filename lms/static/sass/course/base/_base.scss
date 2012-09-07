@@ -2,6 +2,7 @@ body {
   min-width: 980px;
   min-height: 100%;
   background: url(../images/bg-texture.png) #d6d6d6;
+  font-style: normal;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
@@ -38,11 +39,6 @@ a {
     @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
   }
 }
-
-
-
-
-
 
 form {
   label {
