@@ -23,7 +23,7 @@
   height: 35px;
   padding: 0 15px;
   border-radius: 3px;
-  border: 1px solid #444;
+  border: 1px solid #aaa;
   @include linear-gradient(top, #eee, #ccc);
   font-size: 13px;
   font-weight: 700;
@@ -310,6 +310,7 @@ body.discussion {
         @include white-button;
         height: 40px;
         margin-top: 15px;
+        border-color: #444;
         line-height: 36px;
 
         .drop-arrow {
@@ -507,6 +508,7 @@ body.discussion {
 
     .new-post-cancel {
       @include white-button;
+      bordre-color: #444;
       float: left;
       margin: 10px 0 0 15px;
     }
@@ -1560,6 +1562,15 @@ body.discussion {
 .discussion-module {
   @extend .discussion-body;
 
+  .discussion-show {
+    @include white-button;
+    display: inline-block;
+  } 
+
+  .new-post-btn {
+    display: inline-block;
+  }
+
   section.discussion {
   /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
@@ -1631,11 +1642,13 @@ body.discussion {
     .new-post-form {
       width: 100%;
       margin-bottom: 20px;
+      padding: 30px;
       border-radius: 3px;
       background: rgba(0, 0, 0, .55);
       color: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+      box-shadow: none;
       @include clearfix;
+      @include box-sizing(border-box);
 
       .form-row {
         margin-bottom: 20px;
@@ -1700,6 +1713,22 @@ body.discussion {
         font-weight: 700;
       }
 
+      .tagsinput {
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 3px;
+        background: #fff;
+        font-family: 'Monaco', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+
+        span.tag {
+          margin-bottom: 0;
+        }
+      }
+
       .submit {
         @include blue-button;
         float: left;
@@ -1717,10 +1746,11 @@ body.discussion {
         @include white-button;
         float: left;
         margin: 10px 0 0 15px;
+        border-color: #444;
       }
 
       .options {
-        margin-top: 40px;
+        margin-top: 5px;
 
         label {
           display: inline;
@@ -1763,6 +1793,7 @@ body.discussion {
 
   .new-post-btn {
     @include blue-button;
+    display: inline-block;
     font-size: 13px;
     margin-right: 4px;
   }
@@ -1783,7 +1814,7 @@ body.discussion {
           display: inline-block;
           padding-right: 0.5em;
           a {
-            @include white-button
+            @include white-button;
           }
 
         }
@@ -1800,3 +1831,6 @@ body.discussion {
     }
   }
 }
+
+
+
