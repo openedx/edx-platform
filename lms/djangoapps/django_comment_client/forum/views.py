@@ -20,7 +20,12 @@ import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
 
+<<<<<<< HEAD
 THREADS_PER_PAGE = 200
+=======
+THREADS_PER_PAGE = 50000
+INLINE_THREADS_PER_PAGE = 5
+>>>>>>> Pagination in inline discussion views.
 PAGES_NEARBY_DELTA = 2
 
 
@@ -106,15 +111,19 @@ def render_forum_discussion(*args, **kwargs):
 def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
+<<<<<<< HEAD
 def get_threads(request, course_id, discussion_id=None):
     """
     This may raise cc.utils.CommentClientError or
     cc.utils.CommentClientUnknownError if something goes wrong.
     """
+=======
+def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
+>>>>>>> Pagination in inline discussion views.
 
     default_query_params = {
         'page': 1,
-        'per_page': THREADS_PER_PAGE,
+        'per_page': per_page,
         'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
@@ -150,8 +159,9 @@ def inline_discussion(request, course_id, discussion_id):
     Renders JSON for DiscussionModules
     """
     try:
-        threads, query_params = get_threads(request, course_id, discussion_id)
+        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
         user_info = cc.User.from_django_user(request.user).to_dict()
+
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
@@ -165,7 +175,9 @@ def inline_discussion(request, course_id, discussion_id):
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
-        'annotated_content_info': annotated_content_info
+        'annotated_content_info': annotated_content_info,
+        'page': query_params['page'],
+        'num_pages': query_params['num_pages']
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
