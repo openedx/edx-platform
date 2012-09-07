@@ -215,7 +215,7 @@ def permalink(content):
 
 def extend_content(content):
     user = User.objects.get(pk=content['user_id'])
-    roles = dict([('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id'])])
+    roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
