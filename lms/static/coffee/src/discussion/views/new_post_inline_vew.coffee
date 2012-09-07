@@ -49,7 +49,7 @@ class @NewPostInlineView extends Backbone.View
         DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
         @$el.hide()
         @$(".new-post-title").val("").attr("prev-text", "")
-        @$(".new-post-body").val("").attr("prev-text", "")
+        @$(".new-post-body textarea").val("").attr("prev-text", "")
         @$(".new-post-tags").val("")
         @$(".new-post-tags").importTags("")
         @collection.add thread
