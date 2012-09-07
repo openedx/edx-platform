@@ -194,6 +194,7 @@ class @DiscussionThreadInlineView extends DiscussionContentView
   expandPost: (event) ->
     @expanded = true
     @$el.find('.post-body').html(@model.get('body'))
+    @convertMath()
     @$el.find('.expand-post').hide()
     @$el.find('.collapse-post').show()
     @$el.find('.post-extended-content').show()
@@ -204,6 +205,7 @@ class @DiscussionThreadInlineView extends DiscussionContentView
   collapsePost: (event) ->
     @expanded = false
     @$el.find('.post-body').html(@model.get('abbreviatedBody'))
+    @convertMath()
     @$el.find('.collapse-post').hide()
     @$el.find('.post-extended-content').hide()
     @$el.find('.expand-post').show()
