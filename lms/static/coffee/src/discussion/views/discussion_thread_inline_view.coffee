@@ -21,10 +21,6 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     @model.on "change", @updateModelDetails
 
   render: ->
-    #TODO: Debugging, remove when done
-    if not window.$disc
-      window.$disc = []
-    window.$disc.push(@)
     if not @model.has('abbreviatedBody')
       @abbreviateBody()
     @$el.html(Mustache.render(@template(), $.extend(@model.toJSON(),{expanded: @expanded}) ))
@@ -38,8 +34,6 @@ class @DiscussionThreadInlineView extends DiscussionContentView
     if @expanded
       @makeWmdEditor "reply-body"
       @renderResponses()
-#    @highlight @$(".post-body")
-#    @highlight @$("h1")
     @
 
   renderDogear: ->
@@ -58,12 +52,13 @@ class @DiscussionThreadInlineView extends DiscussionContentView
 
   convertMath: ->
     element = @$(".post-body")
-    element.html DiscussionUtil.postMathJaxProcessor(element.html())
+    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
     MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
   renderResponses: ->
     DiscussionUtil.safeAjax
       url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
+      $loading: @$el
       success: (data, textStatus, xhr) =>
         @$el.find(".loading").remove()
         Content.loadContentInfos(data['annotated_content_info'])
@@ -192,16 +187,14 @@ class @DiscussionThreadInlineView extends DiscussionContentView
       success: (response, textStatus) =>
         @model.set('endorsed', not endorsed)
 
-  highlight: (el) ->
-    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-
   abbreviateBody: ->
-    abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140 # Because twitter
+    abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140
     @model.set('abbreviatedBody', abbreviated)
 
   expandPost: (event) ->
     @expanded = true
     @$el.find('.post-body').html(@model.get('body'))
+    @convertMath()
     @$el.find('.expand-post').hide()
     @$el.find('.collapse-post').show()
     @$el.find('.post-extended-content').show()
@@ -212,6 +205,7 @@ class @DiscussionThreadInlineView extends DiscussionContentView
   collapsePost: (event) ->
     @expanded = false
     @$el.find('.post-body').html(@model.get('abbreviatedBody'))
+    @convertMath()
     @$el.find('.collapse-post').hide()
     @$el.find('.post-extended-content').hide()
     @$el.find('.expand-post').show()

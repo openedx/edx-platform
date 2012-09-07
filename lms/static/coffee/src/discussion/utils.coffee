@@ -3,7 +3,7 @@ $ ->
     window.$$contents = {}
   $.fn.extend
     loading: ->
-      @$_loading = $("<span class='discussion-loading'></span>")
+      @$_loading = $("<div class='loading-animation'></div>")
       $(this).after(@$_loading)
     loaded: ->
       @$_loading.remove()
@@ -107,6 +107,9 @@ class @DiscussionUtil
       [event, selector] = eventSelector.split(' ')
       $local(selector).unbind(event)[event] handler
 
+  @processTag: (text) ->
+    text.toLowerCase()
+
   @tagsInputOptions: ->
     autocomplete_url: @urlFor('tags_autocomplete')
     autocomplete:
@@ -116,6 +119,7 @@ class @DiscussionUtil
     width: '100%'
     defaultText: "Tag your post: press enter after each tag"
     removeWithBackspace: true
+    preprocessTag: @processTag
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
@@ -123,7 +127,7 @@ class @DiscussionUtil
       if response.errors? and response.errors.length > 0
         errorsField.empty()
         for error in response.errors
-          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error)).show()
 
   @clearFormErrors: (errorsField) ->
     errorsField.empty()
