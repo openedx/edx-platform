@@ -194,6 +194,7 @@ def instructor_dashboard(request, course_id):
                'instructor_access': instructor_access,
                'datatable': datatable,
                'msg': msg,
+               'course_errors': modulestore().get_item_errors(course.location),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
