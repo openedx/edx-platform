@@ -21,6 +21,7 @@ import comment_client as cc
 import xml.sax.saxutils as saxutils
 
 THREADS_PER_PAGE = 50000
+INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
 
@@ -106,11 +107,11 @@ def render_forum_discussion(*args, **kwargs):
 def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
-def get_threads(request, course_id, discussion_id=None):
+def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
 
     default_query_params = {
         'page': 1,
-        'per_page': THREADS_PER_PAGE,
+        'per_page': per_page,
         'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
@@ -133,7 +134,7 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    threads, query_params = get_threads(request, course_id, discussion_id)
+    threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
     # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
 #    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
 #                                                                 query_params=query_params)
@@ -147,7 +148,9 @@ def inline_discussion(request, course_id, discussion_id):
 #        'html': html,
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
-        'annotated_content_info': annotated_content_info
+        'annotated_content_info': annotated_content_info,
+        'page': query_params['page'],
+        'num_pages': query_params['num_pages']
     })
 
 def render_search_bar(request, course_id, discussion_id=None, text=''):
