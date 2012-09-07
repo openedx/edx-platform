@@ -7,7 +7,6 @@ if Backbone?
         item.discussion = @
       @comparator = @sortByDateRecentFirst
       @on "thread:remove", (thread) =>
-        console.log "remove triggered"
         @remove(thread)
 
     find: (id) ->
@@ -24,8 +23,8 @@ if Backbone?
 
     sortByDateRecentFirst: (thread) ->
       -(new Date(thread.get("created_at")).getTime())
-      #return String.fromCharCode.apply(String, 
-      #  _.map(thread.get("created_at").split(""), 
+      #return String.fromCharCode.apply(String,
+      #  _.map(thread.get("created_at").split(""),
       #        ((c) -> return 0xffff - c.charChodeAt()))
       #)
 
@@ -134,7 +133,7 @@ if Backbone?
 
         @$(".discussion-submit-post").click $.proxy(@submitNewPost, @)
         @$(".discussion-cancel-post").click $.proxy(@cancelNewPost, @)
-        
+
 
       @$el.children(".blank").hide()
       @$(".new-post-form").show()
@@ -177,7 +176,7 @@ if Backbone?
           threadView = new ThreadView el: $thread[0], model: thread
           thread.updateInfo response.annotated_content_info
           @cancelNewPost()
-          
+
 
     cancelNewPost: (event) ->
       if @$el.hasClass("inline-discussion")
