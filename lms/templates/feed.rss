@@ -8,12 +8,20 @@
   <title>EdX Blog</title>
   <updated>2012-07-16T14:08:12-07:00</updated>
   <entry>
+    <id>tag:www.edx.org,2012:Post/4</id>
+    <published>2012-09-06T14:00:00-07:00</published>
+    <updated>2012-09-06T14:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="${reverse('press/edX-announces-proctored-exam-testing')}"/>
+    <title>EdX to offer learners option of taking proctored final exam</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/diploma_109x65.jpg')}&quot; /&gt;</content>
+  </entry>
+  <entry>
     <id>tag:www.edx.org,2012:Post/3</id>
     <published>2012-07-16T14:08:12-07:00</published>
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/uc-berkeley-joins-edx')}"/>
     <title>UC Berkeley joins edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/edx.png')}&quot; /&gt; 
+    <content type="html">&lt;img src=&quot;${static.url('images/edx.png')}&quot; /&gt;
       &lt;p&gt;edX broadens course offerings&lt;/p&gt;</content>
   </entry>
   <entry>
