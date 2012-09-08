@@ -149,8 +149,13 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
                 # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
                 # Then, we may not need to instatiate any problems if they are already in the database
-                for module in yield_module_descendents(section_module):
-                    (correct, total) = get_score(course.id, student, module, student_module_cache)
+                module_locations = section_module.definition.get('children', [])
+                
+                
+                for module_location in module_locations:
+                    module_descriptor = section_module.descriptor.system.load_item(module_location)
+                    
+                    (correct, total) = get_score(course.id, student, module_descriptor, section_module.system, student_module_cache)
                     if correct is None and total is None:
                         continue
 
@@ -160,12 +165,12 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                         else:
                             correct = total
 
-                    graded = module.metadata.get("graded", False)
+                    graded = module_descriptor.metadata.get("graded", False)
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
+                    scores.append(Score(correct, total, graded, module_descriptor.metadata.get('display_name')))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
@@ -252,7 +257,8 @@ def progress_summary(student, course, grader, student_module_cache):
             for module in yield_module_descendents(s):
                 # course is a module, not a descriptor...
                 course_id = course.descriptor.id
-                (correct, total) = get_score(course_id, student, module, student_module_cache)
+                # TODO: This instantiates the problem TWICE! That is no good.
+                (correct, total) = get_score(course_id, student, module.descriptor, module.system, student_module_cache)
                 if correct is None and total is None:
                     continue
 
@@ -281,7 +287,7 @@ def progress_summary(student, course, grader, student_module_cache):
     return chapters
 
 
-def get_score(course_id, user, problem, student_module_cache):
+def get_score(course_id, user, problem_descriptor, xmodule_system, student_module_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
 
@@ -289,26 +295,20 @@ def get_score(course_id, user, problem, student_module_cache):
     problem: an XModule
     cache: A StudentModuleCache
     """
-    if not (problem.descriptor.stores_state and problem.descriptor.has_score):
+    if not (problem_descriptor.stores_state and problem_descriptor.has_score):
         # These are not problems, and do not have a score
         return (None, None)
 
     correct = 0.0
-
-    # If the ID is not in the cache, add the item
-    instance_module = get_instance_module(course_id, user, problem, student_module_cache)
-    # instance_module = student_module_cache.lookup(problem.category, problem.id)
-    # if instance_module is None:
-    #     instance_module = StudentModule(module_type=problem.category,
-    #                                     course_id=????,
-    #                                     module_state_key=problem.id,
-    #                                     student=user,
-    #                                     state=None,
-    #                                     grade=0,
-    #                                     max_grade=problem.max_score(),
-    #                                     done='i')
-    #     cache.append(instance_module)
-    #     instance_module.save()
+    
+    instance_module = student_module_cache.lookup(
+        course_id, problem_descriptor.category, problem_descriptor.location.url())
+    
+    if not instance_module:
+        # If the problem was not in the cache, we need to instantiate the problem.
+        # Otherwise, the max score (cached in instance_module) won't be available 
+        problem = xmodule_system.get_module(problem_descriptor.location)
+        instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
     # If this problem is ungraded/ungradable, bail
     if instance_module.max_grade is None:
@@ -319,7 +319,7 @@ def get_score(course_id, user, problem, student_module_cache):
 
     if correct is not None and total is not None:
         #Now we re-weight the problem, if specified
-        weight = getattr(problem, 'weight', None)
+        weight = getattr(problem_descriptor, 'weight', None)
         if weight is not None:
             if total == 0:
                 log.exception("Cannot reweight a problem with zero weight. Problem: " + str(instance_module))
