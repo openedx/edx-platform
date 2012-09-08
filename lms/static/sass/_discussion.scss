@@ -23,7 +23,7 @@
   height: 35px;
   padding: 0 15px;
   border-radius: 3px;
-  border: 1px solid #444;
+  border: 1px solid #aaa;
   @include linear-gradient(top, #eee, #ccc);
   font-size: 13px;
   font-weight: 700;
@@ -34,6 +34,25 @@
 
   &:hover {
     @include linear-gradient(top, #fff, #ddd);
+  }
+}
+
+@mixin dark-grey-button {
+  display: block;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #222;
+  background: -webkit-linear-gradient(top, #777, #555);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    background: -webkit-linear-gradient(top, #888, #666);
   }
 }
 
@@ -291,6 +310,7 @@ body.discussion {
         @include white-button;
         height: 40px;
         margin-top: 15px;
+        border-color: #444;
         line-height: 36px;
 
         .drop-arrow {
@@ -488,6 +508,7 @@ body.discussion {
 
     .new-post-cancel {
       @include white-button;
+      bordre-color: #444;
       float: left;
       margin: 10px 0 0 15px;
     }
@@ -1198,27 +1219,32 @@ body.discussion {
     padding: 10px 20px;
 
     > header .vote-btn {
+      position: relative;
+      z-index: 100;
       margin-top: 5px;
     }
 
     .post-tools {
+      @include clearfix;
+      margin-top: 15px;
+
       .ui-icon {
         display: inline;
-        float: right;
-      }
-      a {
-        display: inline;
         float: left;
-        height: 26px;
-        padding: 0 12px;
-        border-radius: 3px;
-        border: 1px solid #b2b2b2;
-        @include linear-gradient(top, #fff 35%, #ebebeb);
-        font-size: 13px;
-        line-height: 24px;
-        color: #737373;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-        width: 6em;
+        width: 13px;
+        height: 13px;
+        margin-right: 4px;
+        background: url(../images/small-grey-arrows.png) no-repeat;
+
+        &.expand {
+          margin-top: 5px;
+          background-position: 0 0;
+        }
+
+        &.collapse {
+          margin-top: 6px;
+          background-position: -13px 0;
+        }
       }
     }
   }
@@ -1275,6 +1301,8 @@ body.discussion {
   }
 
   .vote-btn {
+    position: relative;
+    z-index: 100;
     float: right;
     display: block;
     height: 27px;
@@ -1420,7 +1448,6 @@ body.discussion {
     padding: 0;
     @include clearfix;
 
-
     li {
       float: left;
       margin-right: 8px;
@@ -1541,29 +1568,80 @@ body.discussion {
 .discussion-module {
   @extend .discussion-body;
 
+  .discussion-show {
+    @include white-button;
+    display: inline-block;
+  } 
+
+  .new-post-btn {
+    display: inline-block;
+  }
+
   section.discussion {
-  /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
+    margin-top: 20px;
+
+    /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
-      padding: 0.5em;
+      padding: 0.5em 0;
 
       p {
         margin-bottom: 0em;
       }
+
       .discussion-article {
-        border: 1px solid;
+        border: 1px solid #b2b2b2;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
         min-height: 0;
-        padding: 1em;
-        .discussion-post {
-          header {
-            padding-bottom: 0.1em;
-            margin-bottom: 10px;
+        padding: 10px 10px 40px;
 
+        .discussion-post {
+          @include clearfix;
+
+          header {
+            padding-bottom: 0;
+            margin-bottom: 15px;
+
+            h3 {
+              font-size: 22px;
+              font-weight: 700;
+              margin-bottom: 0px;
+            }
           }
+
           .post-body {
             font-size: 14px;
             clear: both;
+          }
+        }
+
+        .post-tools {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;          
+          border-radius: 0 0 3px 3px;
+          border-top: 1px solid #ddd;
+          @include linear-gradient(top, #f2f2f2, #e2e2e2);
+
+          a {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            line-height: 30px;
+
+            &.expand-post:before {
+              content: '▾ ';
+            }
+
+            &.collapse-post:before {
+              content: '▴ ';
+            }
+
+            &.collapse-post {
+              display: none;
+            }
           }
         }
 
@@ -1573,6 +1651,7 @@ body.discussion {
           header {
             padding-bottom: 0em;
             margin-bottom: 5px;
+
             .posted-by {
               font-size: 0.8em;
             }
@@ -1581,20 +1660,20 @@ body.discussion {
             margin-bottom: 0.2em;
             font-size: 14px;
           }
-
         }
+
         .discussion-reply-new {
           .wmd-input {
             height: 120px;
           }
         }
+
         // Content that is hidden by default in the inline view
         .post-extended-content{
           display: none;
         }
-        .collapse-post{
-          display:none;
-        }
+
+        
       }
     }
   }
@@ -1612,11 +1691,13 @@ body.discussion {
     .new-post-form {
       width: 100%;
       margin-bottom: 20px;
+      padding: 30px;
       border-radius: 3px;
       background: rgba(0, 0, 0, .55);
       color: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+      box-shadow: none;
       @include clearfix;
+      @include box-sizing(border-box);
 
       .form-row {
         margin-bottom: 20px;
@@ -1681,6 +1762,22 @@ body.discussion {
         font-weight: 700;
       }
 
+      .tagsinput {
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #333;
+        border-radius: 3px;
+        background: #fff;
+        font-family: 'Monaco', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+
+        span.tag {
+          margin-bottom: 0;
+        }
+      }
+
       .submit {
         @include blue-button;
         float: left;
@@ -1698,10 +1795,11 @@ body.discussion {
         @include white-button;
         float: left;
         margin: 10px 0 0 15px;
+        border-color: #444;
       }
 
       .options {
-        margin-top: 40px;
+        margin-top: 5px;
 
         label {
           display: inline;
@@ -1744,6 +1842,7 @@ body.discussion {
 
   .new-post-btn {
     @include blue-button;
+    display: inline-block;
     font-size: 13px;
     margin-right: 4px;
   }
@@ -1756,28 +1855,42 @@ body.discussion {
     margin: 8px 7px 0 0;
     background: url(../images/new-post-icon.png) no-repeat;
   }
+
+  .moderator-actions {
+    padding-left: 0 !important;
+  }
+
   section.pagination {
+    margin-top: 30px;
+
     nav.discussion-paginator {
-      ol{
-        li{
+      float: right;
+
+      ol {
+        li {
           list-style: none;
           display: inline-block;
           padding-right: 0.5em;
           a {
-            @include white-button
+            @include white-button;
           }
-
         }
+
         li.current-page{
           height: 35px;
+          padding: 0 15px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
           font-size: 13px;
           font-weight: 700;
           line-height: 32px;
           color: #333;
           text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
         }
       }
     }
   }
 }
+
+
+
