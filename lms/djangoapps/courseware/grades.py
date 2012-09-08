@@ -146,12 +146,10 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                     # student doesn't have access to this module, or something else
                     # went wrong.
                     continue
-
-                # TODO: We may be able to speed this up by only getting a list of children IDs from section_module
-                # Then, we may not need to instatiate any problems if they are already in the database
+                
+                #TODO: This won't get all problems, will it? They could be hidden in a sub-child. What is a better
+                # way of getting all of the children as descriptors?
                 module_locations = section_module.definition.get('children', [])
-                
-                
                 for module_location in module_locations:
                     module_descriptor = section_module.descriptor.system.load_item(module_location)
                     
@@ -219,7 +217,11 @@ def grade_for_percentage(grade_cutoffs, percentage):
 
     return letter_grade
 
-def progress_summary(student, course, grader, student_module_cache):
+
+# TODO: This method is not very good. It was written in the old course style and
+# then converted over and performance is not good. Once the progress page is redesigned
+# to not have the progress summary this method should be deleted (so it won't be copied).
+def progress_summary(student, request, course, grader, student_module_cache):
     """
     This pulls a summary of all problems in the course.
 
@@ -236,34 +238,50 @@ def progress_summary(student, course, grader, student_module_cache):
         student_module_cache: A StudentModuleCache initialized with all
              instance_modules for the student
     """
+    
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
-    for c in course.get_display_items():
+    for c in course.get_children():
         # Skip if the chapter is hidden
         hidden = c.metadata.get('hide_from_toc','false')
         if hidden.lower() == 'true':
             continue
 
         sections = []
-        for s in c.get_display_items():
+        for s in c.get_children():
             # Skip if the section is hidden
             hidden = s.metadata.get('hide_from_toc','false')
             if hidden.lower() == 'true':
                 continue
+            
+            # Now we actually instantiate the section module, to get the children
+            
+            # TODO: We need the request to pass into here. If we could forgo that, our arguments
+            # would be simpler
+            section_module = get_module(student, request,
+                                        s.location, student_module_cache,
+                                        course.id)
+            if section_module is None:
+                # student doesn't have access to this module, or something else
+                # went wrong.
+                continue
+            
 
             # Same for sections
             graded = s.metadata.get('graded', False)
             scores = []
-            for module in yield_module_descendents(s):
-                # course is a module, not a descriptor...
-                course_id = course.descriptor.id
-                # TODO: This instantiates the problem TWICE! That is no good.
-                (correct, total) = get_score(course_id, student, module.descriptor, module.system, student_module_cache)
+            
+            module_locations = section_module.definition.get('children', [])
+            for module_location in module_locations:
+                module_descriptor = s.system.load_item(module_location)
+                
+                course_id = course.id
+                (correct, total) = get_score(course_id, student, module_descriptor, section_module.system, student_module_cache)
                 if correct is None and total is None:
                     continue
 
                 scores.append(Score(correct, total, graded,
-                    module.metadata.get('display_name')))
+                    module_descriptor.metadata.get('display_name')))
 
             section_total, graded_total = graders.aggregate_scores(
                 scores, s.metadata.get('display_name'))
