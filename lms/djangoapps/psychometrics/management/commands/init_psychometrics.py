@@ -11,10 +11,14 @@ from track.models import *
 from psychometrics.models import *
 from xmodule.modulestore import Location
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 #db = "ocwtutor"	# for debugging
-db = "default"
+#db = "default"
+
+db = getattr(settings,'DATABASE_FOR_PSYCHOMETRICS','default')
+
 
 class Command(BaseCommand):
     help = "initialize PsychometricData tables from StudentModule instances (and tracking data, if in SQL)."
@@ -56,7 +60,7 @@ class Command(BaseCommand):
                 tset = tset.filter(event_source='server')
                 tset = tset.filter(event__contains="'%s'" % url)
                 checktimes = [x.dtcreated for x in tset]
-                pmd.checktimes = json.dumps(checktimes)
+                pmd.checktimes = checktimes
                 if not len(checktimes)==pmd.attempts:
                     print "Oops, mismatch in number of attempts and check times for %s" % pmd
         

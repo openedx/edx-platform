@@ -12,6 +12,7 @@ import math
 import numpy as np
 from scipy.optimize import curve_fit
 
+from django.conf import settings
 from django.db.models import Sum, Max
 from psychometrics.models import *
 from xmodule.modulestore import Location
@@ -19,7 +20,9 @@ from xmodule.modulestore import Location
 log = logging.getLogger("mitx.psychometrics")
 
 #db = "ocwtutor"	# for debugging
-db = "default"
+#db = "default"
+
+db = getattr(settings,'DATABASE_FOR_PSYCHOMETRICS','default')
 
 #-----------------------------------------------------------------------------
 # fit functions
