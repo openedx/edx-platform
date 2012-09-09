@@ -341,7 +341,8 @@ class @Problem
     replace_escape_keyword = (match) -> 
       return '"' + match + '"' # Force MathJax plain text
     for escape_keyword in escape_keywords
-      eqn = eqn.replace(escape_keyword, replace_escape_keyword)
+      escape_keyword_patt = RegExp('\\b'+escape_keyword+'\\b')
+      eqn = eqn.replace(escape_keyword_patt, replace_escape_keyword)
 
     return eqn
 
