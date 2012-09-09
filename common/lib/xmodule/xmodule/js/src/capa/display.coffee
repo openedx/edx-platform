@@ -299,24 +299,40 @@ class @Problem
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      eqn = @latexify($(element).val())
+      eqn = @mathjax_preprocessor($(element).val())
+      #eqn = $(element).val()
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
  
-  latexify: (eqn) ->
+  mathjax_preprocessor: (eqn) ->
     ###
     Translate 6.002x conventions for subscripts to standard Latex, e.g.
       'R3'  --> 'R_{3}'
       'vGS' --> 'v_{GS}'
       'K/2*(vIN-VT)^2' --> 'K/2*(v_{IN}-V_{T})^2'
     ###
-    subscript_replace = (match) ->
-      # Default keywords are taken from capa/calc.py
-      default_keywords = ['sin', 'cos', 'tan', 'sqrt', 'log10', 'log2', 'ln', 'arccos', 'arcsin', 'arctan', 'abs', 'pi']
-      if match in default_keywords 
+    
+    # Default keywords are taken from capa/calc.py
+    default_keywords = ['sin', 'cos', 'tan', 'sqrt', 'log10', 'log2', 'ln', 'arccos', 'arcsin', 'arctan', 'abs', 'pi']
+
+    # Escape keywords are strings that have special meaning in 6.002x that should not be processed by Jax
+    escape_keywords = ['in']
+
+    # First, perform subscript insertion
+    replace_subscript = (match) ->
+      if match in default_keywords or match in escape_keywords
         return match
-      return match[0] + '_{' + match.substr(1) + '}'
-    return eqn.replace(/[A-Za-z]\w+/g, subscript_replace)
+      else
+        return match[0] + '_{' + match.substr(1) + '}'
+    eqn = eqn.replace(/[A-Za-z]\w+/g, replace_subscript)
+
+    # Second, escape 6.002x-specific keywords from MathJax
+    replace_escape_keyword = (match) -> 
+      return '"' + match + '"' # Force MathJax plain text
+    for escape_keyword in escape_keywords
+      eqn = eqn.replace(escape_keyword, replace_escape_keyword)
+
+    return eqn
 
   updateMathML: (jax, element) =>
     try
