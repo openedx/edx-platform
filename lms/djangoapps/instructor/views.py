@@ -225,6 +225,7 @@ def instructor_dashboard(request, course_id):
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
+               'djangopid' : os.getpid(),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
