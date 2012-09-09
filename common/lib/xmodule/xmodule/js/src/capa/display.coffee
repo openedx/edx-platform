@@ -310,6 +310,9 @@ class @Problem
       'R3'  --> 'R_{3}'
       'vGS' --> 'v_{GS}'
       'K/2*(vIN-VT)^2' --> 'K/2*(v_{IN}-V_{T})^2'
+
+    ... and also escape specific 6.002x-related keywords from MathJax,
+        such as 'in' (parsed by MathJax as the set symbol)
     ###
     
     # Default keywords are taken from capa/calc.py
@@ -318,7 +321,7 @@ class @Problem
     # Escape keywords are strings that have special meaning in 6.002x that should not be processed by Jax
     escape_keywords = ['in']
 
-    # First, perform subscript insertion
+    # First, perform subscript insertion, but watch out for keywords
     replace_subscript = (match) ->
       if match in default_keywords or match in escape_keywords
         return match
