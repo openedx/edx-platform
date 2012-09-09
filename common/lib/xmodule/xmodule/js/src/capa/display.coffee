@@ -299,8 +299,24 @@ class @Problem
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()],
+      eqn = @latexify($(element).val())
+      MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
+ 
+  latexify: (eqn) ->
+    ###
+    Translate 6.002x conventions for subscripts to standard Latex, e.g.
+      'R3'  --> 'R_{3}'
+      'vGS' --> 'v_{GS}'
+      'K/2*(vIN-VT)^2' --> 'K/2*(v_{IN}-V_{T})^2'
+    ###
+    subscript_replace = (match) ->
+      # Default keywords are taken from capa/calc.py
+      default_keywords = ['sin', 'cos', 'tan', 'sqrt', 'log10', 'log2', 'ln', 'arccos', 'arcsin', 'arctan', 'abs', 'pi']
+      if match in default_keywords 
+        return match
+      return match[0] + '_{' + match.substr(1) + '}'
+    return eqn.replace(/[A-Za-z]\w+/g, subscript_replace)
 
   updateMathML: (jax, element) =>
     try
