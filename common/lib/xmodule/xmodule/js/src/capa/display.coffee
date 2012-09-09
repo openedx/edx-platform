@@ -7,6 +7,11 @@ class @Problem
     @url = @el.data('url')
     @render()
 
+    # TODO: Each course should be able to customize the MathJax preprocessor
+    #       through a generic plug-in
+    if (@id).search('6.002x') >= 0
+      @mathjax_preprocessor = @mathjax_preprocessor_for_6002x 
+
   $: (selector) ->
     $(selector, @el)
 
@@ -299,12 +304,15 @@ class @Problem
     target = "display_#{element.id.replace(/^input_/, '')}"
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      eqn = @mathjax_preprocessor($(element).val())
-      #eqn = $(element).val()
+      eqn = $(element).val()
+      if @mathjax_preprocessor
+        eqn = @mathjax_preprocessor(eqn)
+
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
  
-  mathjax_preprocessor: (eqn) ->
+  # TODO: The 6.002x preprocessor should not be baked into capa/display.coffee, but should be a plug-in 
+  mathjax_preprocessor_for_6002x: (eqn) ->
     ###
     Translate 6.002x conventions for subscripts to standard Latex, e.g.
       'R3'  --> 'R_{3}'
