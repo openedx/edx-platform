@@ -59,6 +59,8 @@ function goto( mode)
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> ]
     </h2>
 
+  <div style="text-align:right" id="djangopid">${djangopid}</div>
+
     <form name="idashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
     <input type="hidden" name="idash_mode" value="">

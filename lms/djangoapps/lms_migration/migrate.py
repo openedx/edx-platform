@@ -35,7 +35,17 @@ def getip(request):
         ip = request.META.get('REMOTE_ADDR','None')
     return ip
 
-def manage_modulestores(request,reload_dir=None):
+
+def get_commit_id(course):
+    return course.metadata.get('GIT_COMMIT_ID','No commit id')
+    # getattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID','No commit id')
+
+
+def set_commit_id(course,commit_id):
+    course.metadata['GIT_COMMIT_ID'] = commit_id
+    # setattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID', new_commit_id)
+
+def manage_modulestores(request, reload_dir=None, commit_id=None):
     '''
     Manage the static in-memory modulestores.
 
@@ -52,8 +62,9 @@ def manage_modulestores(request,reload_dir=None):
     ip = getip(request)
 
     if LOCAL_DEBUG:
-        html += '<h3>IP address: %s ' % ip
-        html += '<h3>User: %s ' % request.user
+        html += '<h3>IP address: %s <h3>' % ip
+        html += '<h3>User: %s </h3>' % request.user
+        html += '<h3>My pid: %s</h3>' % os.getpid()
         log.debug('request from ip=%s, user=%s' % (ip,request.user))
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
@@ -66,14 +77,27 @@ def manage_modulestores(request,reload_dir=None):
             return HttpResponse(html, status=403)
 
     #----------------------------------------
-    # reload course if specified
+    # reload course if specified; handle optional commit_id
 
     if reload_dir is not None:
         if reload_dir not in def_ms.courses:
             html += '<h2 class="inline-error">Error: "%s" is not a valid course directory</h2>' % reload_dir
         else:
-            html += '<h2>Reloaded course directory "%s"</h2>' % reload_dir
-            def_ms.try_load_course(reload_dir)
+            # reloading based on commit_id is needed when running mutiple worker threads,
+            # so that a given thread doesn't reload the same commit multiple times
+            current_commit_id = get_commit_id(def_ms.courses[reload_dir])
+            log.debug('commit_id="%s"' % commit_id)
+            log.debug('current_commit_id="%s"' % current_commit_id)
+
+            if (commit_id is not None) and (commit_id==current_commit_id):
+                html += "<h2>Already at commit id %s for %s</h2>" % (commit_id, reload_dir)
+            else:
+                html += '<h2>Reloaded course directory "%s"</h2>' % reload_dir
+                def_ms.try_load_course(reload_dir)
+                gdir = settings.DATA_DIR / reload_dir 
+                new_commit_id = os.popen('cd %s; git log -n 1 | head -1' % gdir).read().strip().split(' ')[1]
+                set_commit_id(def_ms.courses[reload_dir], new_commit_id)
+                html += '<p>commit_id=%s</p>' % new_commit_id
 
     #----------------------------------------
 
@@ -93,6 +117,8 @@ def manage_modulestores(request,reload_dir=None):
     for cdir, course in def_ms.courses.items():
         html += '<hr width="100%"/>'
         html += '<h2>Course: %s (%s)</h2>' % (course.display_name,cdir)
+
+        html += '<p>commit_id=%s</p>' % get_commit_id(course)
 
         for field in dumpfields:
             data = getattr(course,field)
