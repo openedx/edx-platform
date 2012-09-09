@@ -71,6 +71,8 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
+    'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
+
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -619,6 +621,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'psychometrics',
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
