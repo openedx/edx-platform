@@ -32,3 +32,10 @@ class XModuleDefinition(object):
         """Return a list of child locations for this definition"""
         pass
 
+    @property
+    def resources(self):
+        """
+        Return a list of static resources this definition needs.  What
+        format? type/name/path?  Perhaps just Locations, with category
+        'js', 'css', 'image', etc?  Then would be included in child_locations...
+        """
