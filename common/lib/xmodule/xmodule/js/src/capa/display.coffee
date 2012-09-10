@@ -297,12 +297,17 @@ class @Problem
 
   refreshMath: (event, element) =>
     element = event.target unless element
-    target = "display_#{element.id.replace(/^input_/, '')}"
+    elid = element.id.replace(/^input_/,'')
+
+    target = "display_" + elid
+
+    preprocessor_tag = "inputtype_" + elid
+    mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
     if jax = MathJax.Hub.getAllJax(target)[0]
       eqn = $(element).val()
-      if @mathjax_preprocessor
-        eqn = @mathjax_preprocessor(eqn)
+      if mathjax_preprocessor
+        eqn = mathjax_preprocessor(eqn)
 
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
@@ -324,9 +329,13 @@ class @Problem
   inputtypeSetupMethods:
 
     textinputdynamath: (element) =>
-      preprocessorClass = window['MathjaxPreprocessorFor6002x']
+      data = $(element).find('.textinputdynamath_data')
+
+      preprocessorClassName = data.data('preprocessor')
+      preprocessorClass = window[preprocessorClassName]
+
       preprocessor = new preprocessorClass()
-      alert preprocessor.fn
+      return preprocessor.fn
 
     javascriptinput: (element) =>
 
