@@ -56,12 +56,12 @@ if Backbone?
         url: url
         type: "GET"
         dataType: 'json'
-        success: (response, textStatus, jqXHR) => @renderDiscussion(event, response, textStatus, discussionId)
+        success: (response, textStatus, jqXHR) => @renderDiscussion($elem, response, textStatus, discussionId)
 
-    renderDiscussion: (event, response, textStatus, discussionId) =>
+    renderDiscussion: ($elem, response, textStatus, discussionId) =>
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
-      $(event.target).html("Hide Discussion")
+      $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
       $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
