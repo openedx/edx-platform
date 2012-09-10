@@ -426,7 +426,7 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
 ]
 
-discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee'))
+discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
