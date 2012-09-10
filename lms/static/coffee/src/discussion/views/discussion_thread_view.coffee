@@ -1,184 +1,185 @@
-class @DiscussionThreadView extends DiscussionContentView
+if DiscussionContentView?
+  class @DiscussionThreadView extends DiscussionContentView
 
-  events:
-    "click .discussion-vote": "toggleVote"
-    "click .action-follow": "toggleFollowing"
-    "click .discussion-submit-post": "submitComment"
-    "click .action-edit": "edit"
-    "click .action-delete": "delete"
-    "click .action-openclose": "toggleClosed"
+    events:
+      "click .discussion-vote": "toggleVote"
+      "click .action-follow": "toggleFollowing"
+      "click .discussion-submit-post": "submitComment"
+      "click .action-edit": "edit"
+      "click .action-delete": "delete"
+      "click .action-openclose": "toggleClosed"
 
-  template: _.template($("#thread-template").html())
+    template: _.template($("#thread-template").html())
 
-  initialize: ->
-    super()
-    @model.on "change", @updateModelDetails
+    initialize: ->
+      super()
+      @model.on "change", @updateModelDetails
 
-  render: ->
-    @$el.html(@template(@model.toJSON()))
-    @renderDogear()
-    @renderVoted()
-    @renderAttrs()
-    @$("span.timeago").timeago()
-    @makeWmdEditor "reply-body"
-    @convertMath()
-    @renderResponses()
-    @highlight @$(".post-body")
-    @highlight @$("h1")
-    @
+    render: ->
+      @$el.html(@template(@model.toJSON()))
+      @renderDogear()
+      @renderVoted()
+      @renderAttrs()
+      @$("span.timeago").timeago()
+      @makeWmdEditor "reply-body"
+      @convertMath()
+      @renderResponses()
+      @highlight @$(".post-body")
+      @highlight @$("h1")
+      @
 
-  renderDogear: ->
-    if window.user.following(@model)
-      @$(".dogear").addClass("is-followed")
+    renderDogear: ->
+      if window.user.following(@model)
+        @$(".dogear").addClass("is-followed")
 
-  renderVoted: =>
-    if window.user.voted(@model)
-      @$("[data-role=discussion-vote]").addClass("is-cast")
-    else
-      @$("[data-role=discussion-vote]").removeClass("is-cast")
+    renderVoted: =>
+      if window.user.voted(@model)
+        @$("[data-role=discussion-vote]").addClass("is-cast")
+      else
+        @$("[data-role=discussion-vote]").removeClass("is-cast")
 
-  updateModelDetails: =>
-    @renderVoted()
-    @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
+    updateModelDetails: =>
+      @renderVoted()
+      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
 
-  convertMath: ->
-    element = @$(".post-body")
-    element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
+    convertMath: ->
+      element = @$(".post-body")
+      element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
-  renderResponses: ->
-    DiscussionUtil.safeAjax
-      url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
-      success: (data, textStatus, xhr) =>
-        @$(".loading").remove()
-        Content.loadContentInfos(data['annotated_content_info'])
-        comments = new Comments(data['content']['children'])
-        comments.each @renderResponse
-        @trigger "thread:responses:rendered"
+    renderResponses: ->
+      DiscussionUtil.safeAjax
+        url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
+        success: (data, textStatus, xhr) =>
+          @$(".loading").remove()
+          Content.loadContentInfos(data['annotated_content_info'])
+          comments = new Comments(data['content']['children'])
+          comments.each @renderResponse
+          @trigger "thread:responses:rendered"
 
-  renderResponse: (response) =>
-      response.set('thread', @model)
-      view = new ThreadResponseView(model: response)
-      view.on "comment:add", @addComment
-      view.on "comment:endorse", @endorseThread
-      view.render()
-      @$(".responses").append(view.el)
+    renderResponse: (response) =>
+        response.set('thread', @model)
+        view = new ThreadResponseView(model: response)
+        view.on "comment:add", @addComment
+        view.on "comment:endorse", @endorseThread
+        view.render()
+        @$(".responses").append(view.el)
 
-  addComment: =>
-    
+    addComment: =>
+      
 
-  endorseThread: (endorsed) =>
-    is_endorsed = @$el.find(".is-endorsed").length
-    @model.set 'endorsed', is_endorsed
+    endorseThread: (endorsed) =>
+      is_endorsed = @$el.find(".is-endorsed").length
+      @model.set 'endorsed', is_endorsed
 
-  toggleVote: (event) ->
-    event.preventDefault()
-    if window.user.voted(@model)
-      @unvote()
-    else
-      @vote()
+    toggleVote: (event) ->
+      event.preventDefault()
+      if window.user.voted(@model)
+        @unvote()
+      else
+        @vote()
 
-  toggleFollowing: (event) ->
-    $elem = $(event.target)
-    url = null
-    if not @model.get('subscribed')
-      @model.follow()
-      url = @model.urlFor("follow")
-    else
-      @model.unfollow()
-      url = @model.urlFor("unfollow")
-    DiscussionUtil.safeAjax
-      $elem: $elem
-      url: url
-      type: "POST"
+    toggleFollowing: (event) ->
+      $elem = $(event.target)
+      url = null
+      if not @model.get('subscribed')
+        @model.follow()
+        url = @model.urlFor("follow")
+      else
+        @model.unfollow()
+        url = @model.urlFor("unfollow")
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
 
-  vote: ->
-    window.user.vote(@model)
-    url = @model.urlFor("upvote")
-    DiscussionUtil.safeAjax
-      $elem: @$(".discussion-vote")
-      url: url
-      type: "POST"
-      success: (response, textStatus) =>
-        if textStatus == 'success'
-          @model.set(response, {silent: true})
+    vote: ->
+      window.user.vote(@model)
+      url = @model.urlFor("upvote")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-vote")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response, {silent: true})
 
-  unvote: ->
-    window.user.unvote(@model)
-    url = @model.urlFor("unvote")
-    DiscussionUtil.safeAjax
-      $elem: @$(".discussion-vote")
-      url: url
-      type: "POST"
-      success: (response, textStatus) =>
-        if textStatus == 'success'
-          @model.set(response, {silent: true})
+    unvote: ->
+      window.user.unvote(@model)
+      url = @model.urlFor("unvote")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-vote")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response, {silent: true})
 
-  submitComment: (event) ->
-    event.preventDefault()
-    url = @model.urlFor('reply')
-    body = @getWmdContent("reply-body")
-    return if not body.trim().length
-    @setWmdContent("reply-body", "")
-    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
-    comment.set('thread', @model.get('thread'))
-    @renderResponse(comment)
-    @model.addComment()
+    submitComment: (event) ->
+      event.preventDefault()
+      url = @model.urlFor('reply')
+      body = @getWmdContent("reply-body")
+      return if not body.trim().length
+      @setWmdContent("reply-body", "")
+      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
+      comment.set('thread', @model.get('thread'))
+      @renderResponse(comment)
+      @model.addComment()
 
-    DiscussionUtil.safeAjax
-      $elem: $(event.target)
-      url: url
-      type: "POST"
-      dataType: 'json'
-      data:
-        body: body
-      success: (data, textStatus) =>
-        comment.updateInfo(data.annotated_content_info)
-        comment.set(data.content)
+      DiscussionUtil.safeAjax
+        $elem: $(event.target)
+        url: url
+        type: "POST"
+        dataType: 'json'
+        data:
+          body: body
+        success: (data, textStatus) =>
+          comment.updateInfo(data.annotated_content_info)
+          comment.set(data.content)
 
-  edit: ->
+    edit: ->
 
 
-  delete: (event) ->
-    url = @model.urlFor('delete')
-    if not @model.can('can_delete')
-      return
-    if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
-      return
-    @model.remove()
-    $elem = $(event.target)
-    DiscussionUtil.safeAjax
-      $elem: $elem
-      url: url
-      type: "POST"
-      success: (response, textStatus) =>
+    delete: (event) ->
+      url = @model.urlFor('delete')
+      if not @model.can('can_delete')
+        return
+      if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
+        return
+      @model.remove()
+      $elem = $(event.target)
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
 
-  toggleClosed: (event) ->
-    $elem = $(event.target)
-    url = @model.urlFor('close')
-    closed = @model.get('closed')
-    data = { closed: not closed }
-    DiscussionUtil.safeAjax
-      $elem: $elem
-      url: url
-      data: data
-      type: "POST"
-      success: (response, textStatus) =>
-        @model.set('closed', not closed)
-        @model.set('ability', response.ability)
+    toggleClosed: (event) ->
+      $elem = $(event.target)
+      url = @model.urlFor('close')
+      closed = @model.get('closed')
+      data = { closed: not closed }
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        data: data
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('closed', not closed)
+          @model.set('ability', response.ability)
 
-  toggleEndorse: (event) ->
-    $elem = $(event.target)
-    url = @model.urlFor('endorse')
-    endorsed = @model.get('endorsed')
-    data = { endorsed: not endorsed }
-    DiscussionUtil.safeAjax
-      $elem: $elem
-      url: url
-      data: data
-      type: "POST"
-      success: (response, textStatus) =>
-        @model.set('endorsed', not endorsed)
+    toggleEndorse: (event) ->
+      $elem = $(event.target)
+      url = @model.urlFor('endorse')
+      endorsed = @model.get('endorsed')
+      data = { endorsed: not endorsed }
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        data: data
+        type: "POST"
+        success: (response, textStatus) =>
+          @model.set('endorsed', not endorsed)
 
-  highlight: (el) ->
-    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
+    highlight: (el) ->
+      el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
