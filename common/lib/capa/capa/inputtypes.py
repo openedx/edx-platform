@@ -326,8 +326,16 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     count = int(eid.split('_')[-2]) - 1  # HACK
     size = element.get('size')
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
+
+    # Preprocessor to insert between raw input and Mathjax
+    preprocessor = {'class_name': element.get('preprocessorClassName',''),
+                    'script_src': element.get('preprocessorSrc','')}
+    if '' in preprocessor.values():
+        preprocessor = None
+
     context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size,
                'msg': msg, 'hidden': hidden,
+               'preprocessor': preprocessor,
                }
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
