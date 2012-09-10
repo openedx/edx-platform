@@ -1,6 +1,5 @@
 if Backbone?
   class @DiscussionThreadListView extends Backbone.View
-    template: _.template($("#thread-list-template").html())
     events:
       "click .search": "showSearch"
       "click .browse": "toggleTopicDrop"
@@ -17,6 +16,7 @@ if Backbone?
       @sidebar_padding = 10
       @sidebar_header_height = 87
       @boardName
+      @template = _.template($("#thread-list-template").html())
 
     reloadDisplayedCollection: (thread) =>
       thread_id = thread.get('id')
