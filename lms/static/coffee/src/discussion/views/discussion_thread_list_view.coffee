@@ -156,13 +156,6 @@ if Backbone?
       _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
         boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
       @$(".current-board").html(@fitName(boardName))
-      fontSize = 16
-      @$(".current-board").css('font-size', '16px')
-      while @$(".current-board").width() > (@$el.width() * .8) - 40
-        fontSize--
-        if fontSize < 11
-          break
-        @$(".current-board").css('font-size', fontSize + 'px')
 
     setSelectedTopic: (name) ->
       @$(".current-board").html(@fitName(name))
@@ -182,24 +175,21 @@ if Backbone?
       return width
 
     fitName: (name) ->
+      @maxNameWidth = (@$el.width() * .8) - 50
       width = @getNameWidth(name)
       if width < @maxNameWidth
         return name
       path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
       while path.length > 1
         path.shift()
-        partialName = "... / " + path.join(" / ")
+        partialName = "…/" + path.join("/")
         if  @getNameWidth(partialName) < @maxNameWidth
           return partialName
-
       rawName = path[0]
-
-      name = "... / " + rawName
-
+      name = "…/" + rawName
       while @getNameWidth(name) > @maxNameWidth
         rawName = rawName[0...rawName.length-1]
-        name =  "... / " + rawName + " ..."
-
+        name =  "…/" + rawName + "…"
       return name
 
     filterTopic: (event) ->
@@ -245,6 +235,7 @@ if Backbone?
         return
       if event.which != 40 && event.which != 38
         return
+
       event.preventDefault()
 
       items = $.makeArray($(".browse-topic-drop-menu-wrapper a").not(".hidden"))
