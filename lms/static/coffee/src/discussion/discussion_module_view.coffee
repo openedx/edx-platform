@@ -33,9 +33,9 @@ if Backbone?
         $(event.target).html("Show Discussion")
         @showed = false
       else
+        $(event.target).html("Hide Discussion")
         if @retrieved
-          @$("section.discussion").show()
-          $(event.target).html("Hide Discussion")
+          @$("section.discussion").show()          
           @showed = true
         else
           $elem = $(event.target)
