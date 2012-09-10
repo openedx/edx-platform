@@ -324,7 +324,9 @@ class @Problem
   inputtypeSetupMethods:
 
     textinputdynamath: (element) =>
-      @mathjax_preprocessor = window.mathjax_preprocessor
+      preprocessorClass = window['MathjaxPreprocessorFor6002x']
+      preprocessor = new preprocessorClass()
+      alert preprocessor.fn
 
     javascriptinput: (element) =>
 
