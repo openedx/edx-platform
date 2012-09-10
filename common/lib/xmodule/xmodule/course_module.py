@@ -99,7 +99,14 @@ class CourseDescriptor(SequenceDescriptor):
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks.append(cls.Textbook.from_xml_object(textbook))
+            try:
+                txt = cls.Textbook.from_xml_object(textbook)
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook")
+                continue
+            textbooks.append()
             xml_object.remove(textbook)
 
         #Load the wiki tag if it exists
