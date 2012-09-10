@@ -20,12 +20,8 @@ import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
 
-<<<<<<< HEAD
 THREADS_PER_PAGE = 200
-=======
-THREADS_PER_PAGE = 50000
 INLINE_THREADS_PER_PAGE = 5
->>>>>>> Pagination in inline discussion views.
 PAGES_NEARBY_DELTA = 2
 
 
@@ -111,15 +107,7 @@ def render_forum_discussion(*args, **kwargs):
 def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
-<<<<<<< HEAD
-def get_threads(request, course_id, discussion_id=None):
-    """
-    This may raise cc.utils.CommentClientError or
-    cc.utils.CommentClientUnknownError if something goes wrong.
-    """
-=======
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
->>>>>>> Pagination in inline discussion views.
 
     default_query_params = {
         'page': 1,
@@ -131,18 +119,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'commentable_id': discussion_id,
         'course_id': course_id,
     }
-
-    if not request.GET.get('sort_key'):
-        # If the user did not select a sort key, use their last used sort key
-        user = cc.User.from_django_user(request.user)
-        user.retrieve()
-        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
-        default_query_params['sort_key'] = user.get('default_sort_key') or default_query_params['sort_key']
-    else:
-        # If the user clicked a sort key, update their default sort key
-        user = cc.User.from_django_user(request.user)
-        user.default_sort_key = request.GET.get('sort_key')
-        user.save()
 
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
@@ -167,9 +143,6 @@ def inline_discussion(request, course_id, discussion_id):
 
         annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        # TODO (vshnayder): since none of this code seems to be aware of the fact that
-        # sometimes things go wrong, I suspect that the js client is also not
-        # checking for errors on request.  Check and fix as needed.
         raise Http404
 
     return utils.JsonResponse({
@@ -205,26 +178,30 @@ def forum_form_discussion(request, course_id):
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
-    if request.is_ajax():
-        return utils.JsonResponse({
-            'html': content,
-            'discussion_data': map(utils.safe_content, threads),
-        })
-    else:
-        escapedict = {'"': '&quot;'}
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course,
-            'content': content,
-            'staff_access' : has_access(request.user, course, 'staff'),
-            'threads': saxutils.escape(json.dumps(threads),escapedict),
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
-            'course_id': course.id,
-            'category_map': category_map,
-        }
-        # print "start rendering.."
-        return render_to_response('discussion/index.html', context)
+        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
+        if request.is_ajax():
+            return utils.JsonResponse({
+                'html': content,
+                'discussion_data': map(utils.safe_content, threads),
+            })
+        else:
+            escapedict = {'"': '&quot;'}
+            context = {
+                'csrf': csrf(request)['csrf_token'],
+                'course': course,
+                'content': content,
+                'staff_access' : has_access(request.user, course, 'staff'),
+                'threads': saxutils.escape(json.dumps(threads),escapedict),
+                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                'course_id': course.id,
+                'category_map': category_map,
+            }
+            # print "start rendering.."
+            return render_to_response('discussion/index.html', context)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        raise Http404
 
 def render_single_thread(request, discussion_id, course_id, thread_id):
 
