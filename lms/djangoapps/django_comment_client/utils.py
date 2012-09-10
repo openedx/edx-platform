@@ -9,7 +9,9 @@ from django.utils import simplejson
 from django.db import connection
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.models import Role
 from mitxmako import middleware
 
 import logging
@@ -19,6 +21,7 @@ import urllib
 import pystache_custom as pystache
 
 
+# TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
 _DISCUSSIONINFO = None
 
@@ -55,7 +58,7 @@ def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO:
         initialize_discussion_info(course)
-    title = _DISCUSSIONINFO['by_id'].get(discussion_id, {}).get('title', '(no title)')
+    title = _DISCUSSIONINFO['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 def get_discussion_category_map(course):
@@ -129,7 +132,6 @@ def initialize_discussion_info(course):
     _DISCUSSIONINFO = {}
 
     _DISCUSSIONINFO['id_map'] = discussion_id_map
-
     _DISCUSSIONINFO['category_map'] = category_map
 
 def get_courseware_context(content, course):
@@ -239,13 +241,28 @@ def permalink(content):
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 def extend_content(content):
+    user = User.objects.get(pk=content['user_id'])
+    roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
+        'roles': roles,
+        'updated': content['created_at']!=content['updated_at'],
     }
     return merge_dict(content, content_info)
+
+def get_courseware_context(content, course):
+    id_map = get_discussion_id_map(course)
+    id = content['commentable_id'] 
+    content_info = None
+    if id in id_map:
+        location = id_map[id]["location"].url()
+        title = id_map[id]["title"]
+        content_info = { "courseware_location": location, "courseware_title": title}
+    return content_info
+
 
 def safe_content(content):
     fields = [

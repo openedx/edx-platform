@@ -155,8 +155,8 @@ class CapaModule(XModule):
                 msg = '<p>%s</p>' % msg.replace('<', '&lt;')
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 # create a dummy problem with error message instead of failing
-                problem_text = ('<problem><text><font color="red" size="+2">'
-                                'Problem %s has an error:</font>%s</text></problem>' %
+                problem_text = ('<problem><text><span class="inline-error">'
+                                'Problem %s has an error:</span>%s</text></problem>' %
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
@@ -202,10 +202,8 @@ class CapaModule(XModule):
             try:
                 return Progress(score, total)
             except Exception as err:
-                # TODO (vshnayder): why is this still here? still needed?
-                if self.system.DEBUG:
-                    return None
-                raise
+                log.exception("Got bad progress")
+                return None
         return None
 
     def get_html(self):
@@ -347,6 +345,10 @@ class CapaModule(XModule):
         if self.show_answer == "never":
             return False
 
+        # Admins can see the answer, unless the problem explicitly prevents it
+        if self.system.user_is_staff:
+            return True
+
         if self.show_answer == 'attempted':
             return self.attempts > 0
 
@@ -461,6 +463,15 @@ class CapaModule(XModule):
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
+
+        # Problem queued. Students must wait a specified waittime before they are allowed to submit
+        if self.lcp.is_queued():
+            current_time = datetime.datetime.now()
+            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            waittime_between_requests = self.system.xqueue['waittime']
+            if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
+                msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
+                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
 
         try:
             old_state = self.lcp.get_state()

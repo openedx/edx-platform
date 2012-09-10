@@ -61,7 +61,7 @@ class CourseDescriptor(SequenceDescriptor):
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
         self.textbooks = self.definition['data']['textbooks']
-        
+
         self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
         msg = None
@@ -99,21 +99,28 @@ class CourseDescriptor(SequenceDescriptor):
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks.append(cls.Textbook.from_xml_object(textbook))
+            try:
+                txt = cls.Textbook.from_xml_object(textbook)
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook")
+                continue
+            textbooks.append()
             xml_object.remove(textbook)
-        
+
         #Load the wiki tag if it exists
         wiki_slug = None
         wiki_tag = xml_object.find("wiki")
         if wiki_tag is not None:
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
-        
+
         definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-        
+
         definition.setdefault('data', {})['textbooks'] = textbooks
         definition['data']['wiki_slug'] = wiki_slug
-        
+
         return definition
 
     def has_started(self):
@@ -126,6 +133,10 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+
+    @property
+    def show_calculator(self):
+        return self.metadata.get("show_calculator", None) == "Yes"
 
     @lazyproperty
     def grading_context(self):
@@ -219,7 +230,7 @@ class CourseDescriptor(SequenceDescriptor):
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have
     # different numbers.
-    # 
+    #
     # TODO get rid of this as soon as possible or potentially build in a robust
     # way to add in course-specific styling. There needs to be a discussion
     # about the right way to do this, but arjun will address this ASAP. Also
@@ -231,6 +242,22 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def info_sidebar_name(self):
         return self.metadata.get('info_sidebar_name', 'Course Handouts')
+
+    @property
+    def discussion_link(self):
+        """TODO: This is a quick kludge to allow CS50 (and other courses) to
+        specify their own discussion forums as external links by specifying a
+        "discussion_link" in their policy JSON file. This should later get
+        folded in with Syllabus, Course Info, and additional Custom tabs in a
+        more sensible framework later."""
+        return self.metadata.get('discussion_link', None)
+
+    @property
+    def hide_progress_tab(self):
+        """TODO: same as above, intended to let internal CS50 hide the progress tab
+        until we get grade integration set up."""
+        # Explicit comparison to True because we always want to return a bool.
+        return self.metadata.get('hide_progress_tab') == True
 
     @property
     def title(self):

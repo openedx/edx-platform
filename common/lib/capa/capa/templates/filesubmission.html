@@ -1,17 +1,18 @@
 <section id="filesubmission_${id}" class="filesubmission">
-    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files}" data-allowed_files="${allowed_files}"/><br />
+  <div class="grader-status file">
     % if state == 'unsubmitted':
-    <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+    <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
     % elif state == 'correct':
-    <span class="correct" id="status_${id}"></span>
+    <span class="correct" id="status_${id}">Correct</span>
     % elif state == 'incorrect':
-    <span class="incorrect" id="status_${id}"></span>
+    <span class="incorrect" id="status_${id}">Incorrect</span>
     % elif state == 'queued':
-    <span class="processing" id="status_${id}"></span>
+    <span class="processing" id="status_${id}">Queued</span>
     <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
     % endif
-    <span class="debug">(${state})</span>
-    <br/>
-    <span class="message">${msg|n}</span>
-    <br/>
+    <p class="debug">${state}</p>
+
+    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files}" data-allowed_files="${allowed_files}"/>
+  </div>
+    <div class="message">${msg|n}</div>
 </section>

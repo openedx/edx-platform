@@ -351,7 +351,7 @@ def filesubmission(element, value, status, render_template, msg=''):
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
         status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+        msg = 'Submitted to grader.'
 
     context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
             'queue_len': queue_len, 'allowed_files': allowed_files,
@@ -384,7 +384,7 @@ def textbox(element, value, status, render_template, msg=''):
     if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
         status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader. (Queue length: %s)' % queue_len
+        msg = 'Submitted to grader.'
 
     # For CodeMirror
     mode = element.get('mode','python')
@@ -470,9 +470,9 @@ def math(element, value, status, render_template, msg=''):
         xhtml = etree.XML(html)
     except Exception as err:
         if False:  # TODO needs to be self.system.DEBUG - but can't access system
-            msg = "<html><font color='red'><p>Error %s</p>" % str(err).replace('<', '&lt;')
+            msg = '<html><div class="inline-error"><p>Error %s</p>' % str(err).replace('<', '&lt;')
             msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<', '&lt;')
-            msg += "</font></html>"
+            msg += "</div></html>"
             log.error(msg)
             return etree.XML(msg)
         else:

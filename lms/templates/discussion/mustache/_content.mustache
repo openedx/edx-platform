@@ -1,4 +1,4 @@
-<div class="discussion-content local">
+<div class="discussion-content local{{#content.roles}} role-{{name}}{{/content.roles}}">
   <div class="discussion-content-wrapper">
     <div class="discussion-votes">
       <a class="discussion-vote discussion-vote-up" href="javascript:void(0)" value="up">&#9650;</a>
@@ -27,14 +27,22 @@
             {{/content.tags}}
           </div>
         {{/thread}}
+        <div class="context">
+            {{#content.courseware_location}}
+               (this post is about <a href="../../jump_to/{{content.courseware_location}}">{{content.courseware_title}}</a>)
+            {{/content.courseware_location}}
+        </div>
         <div class="info">
           <div class="comment-time">
-            <span class="timeago" title="{{content.updated_at}}">sometime</span> by
+            {{#content.updated}}
+              updated
+            {{/content.updated}}
+            <span class="timeago" title="{{content.updated_at}}">{{content.created_at}}</span> by
             {{#content.anonymous}}
               anonymous
             {{/content.anonymous}}
             {{^content.anonymous}}
-              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}">{{content.username}}</a>
+              <a href="{{##url_for_user}}{{content.user_id}}{{/url_for_user}}" class="{{#content.roles}}author-{{name}} {{/content.roles}}">{{content.username}}</a>
             {{/content.anonymous}}
           </div>
           <div class="show-comments-wrapper">

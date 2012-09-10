@@ -29,6 +29,8 @@ class SequenceModule(XModule):
                  shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
+        # NOTE: Position is 1-indexed.  This is silly, but there are now student
+        # positions saved on prod, so it's not easy to fix.
         self.position = 1
 
         if instance_state is not None:

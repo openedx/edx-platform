@@ -193,7 +193,7 @@ class ImportTestCase(unittest.TestCase):
         """Make sure that metadata is inherited properly"""
 
         print "Starting import"
-        initial_import = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy'])
+        initial_import = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -216,7 +216,7 @@ class ImportTestCase(unittest.TestCase):
         def get_course(name):
             print "Importing {0}".format(name)
 
-            modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=[name])
+            modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
             courses = modulestore.get_courses()
             self.assertEquals(len(courses), 1)
             return courses[0]
@@ -236,6 +236,10 @@ class ImportTestCase(unittest.TestCase):
         # Also check that the grading policy loaded
         self.assertEqual(two_toys.grade_cutoffs['C'], 0.5999)
 
+        # Also check that keys from policy are run through the
+        # appropriate attribute maps -- 'graded' should be True, not 'true'
+        self.assertEqual(toy.metadata['graded'], True)
+
 
     def test_definition_loading(self):
         """When two courses share the same org and course name and
@@ -245,7 +249,7 @@ class ImportTestCase(unittest.TestCase):
         happen--locations should uniquely name definitions.  But in
         our imperfect XML world, it can (and likely will) happen."""
 
-        modulestore = XMLModuleStore(DATA_DIR, eager=True, course_dirs=['toy', 'two_toys'])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'two_toys'])
 
         toy_id = "edX/toy/2012_Fall"
         two_toy_id = "edX/toy/TT_2012_Fall"
@@ -255,3 +259,61 @@ class ImportTestCase(unittest.TestCase):
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
         self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
+
+
+    def test_colon_in_url_name(self):
+        """Ensure that colons in url_names convert to file paths properly"""
+
+        print "Starting import"
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+
+        courses = modulestore.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+        course_id = course.id
+
+        print "course errors:"
+        for (msg, err) in modulestore.get_item_errors(course.location):
+            print msg
+            print err
+
+        chapters = course.get_children()
+        self.assertEquals(len(chapters), 2)
+
+        ch2 = chapters[1]
+        self.assertEquals(ch2.url_name, "secret:magic")
+
+        print "Ch2 location: ", ch2.location
+
+        also_ch2 = modulestore.get_instance(course_id, ch2.location)
+        self.assertEquals(ch2, also_ch2)
+
+        print "making sure html loaded"
+        cloc = course.location
+        loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
+        html = modulestore.get_instance(course_id, loc)
+        self.assertEquals(html.display_name, "Toy lab")
+
+    def test_url_name_mangling(self):
+        """
+        Make sure that url_names are only mangled once.
+        """
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+
+        toy_id = "edX/toy/2012_Fall"
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 4)
+
+        for i in (2,3):
+            video = sections[i]
+            # Name should be 'video_{hash}'
+            print "video {0} url_name: {1}".format(i, video.url_name)
+
+            self.assertEqual(len(video.url_name), len('video_') + 12)
+

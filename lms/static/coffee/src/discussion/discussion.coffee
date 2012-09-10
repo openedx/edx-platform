@@ -191,7 +191,7 @@ if Backbone?
       url = URI($elem.attr("action")).addSearch({text: @$(".search-input").val()})
       @reload($elem, url)
 
-    sort: ->
+    sort: (event) ->
       $elem = $(event.target)
       url = $elem.attr("sort-url")
       @reload($elem, url)

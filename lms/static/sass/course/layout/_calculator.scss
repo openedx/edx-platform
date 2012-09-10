@@ -1,4 +1,4 @@
-li.calc-main {
+div.calc-main {
   bottom: -126px;
   left: 0;
   position: fixed;
@@ -9,10 +9,6 @@ li.calc-main {
 
   &.open {
     bottom: -36px;
-
-    div#calculator_wrapper form div.input-wrapper div.help-wrapper dl {
-      display: block;
-    }
   }
 
   a.calc {
@@ -27,7 +23,7 @@ li.calc-main {
     margin-right: 10px;
     padding: 8px 12px;
     position: relative;
-    top: -36px;
+    top: -45px;
     width: 16px;
 
     &:hover {
@@ -36,6 +32,7 @@ li.calc-main {
 
     &.closed {
       background-image: url("../images/close-calc-icon.png");
+      top: -36px;
     }
   }
 
@@ -61,6 +58,7 @@ li.calc-main {
         float: left;
         font-size: 30px;
         font-weight: bold;
+        height: 35px;
         margin: 0 (flex-gutter() / 2);
         padding: 0;
         text-shadow: none;
@@ -73,7 +71,7 @@ li.calc-main {
       }
 
       input#calculator_output {
-        background: #222;
+        background: #111;
         border: 0;
         @include box-shadow(none);
         @include box-sizing(border-box);
@@ -111,14 +109,14 @@ li.calc-main {
 
         div.help-wrapper {
           position: absolute;
-          right: 8px;
-          top: 15px;
+          right: 0;
+          top: 0;
 
           a {
             background: url("../images/info-icon.png") center center no-repeat;
-            height: 17px;
+            height: 35px;
             @include hide-text;
-            width: 17px;
+            width: 35px;
           }
 
           dl {
@@ -127,28 +125,30 @@ li.calc-main {
             @include box-shadow(0 0 3px #999);
             color: #333;
             display: none;
+            line-height: lh();
             opacity: 0;
             padding: 10px;
             position: absolute;
             right: -40px;
-            top: -110px;
+            top: -122px;
             @include transition();
-            width: 500px;
+            width: 600px;
 
             &.shown {
+              display: block;
               opacity: 1;
-              top: -115px;
             }
 
             dt {
               clear: both;
               float: left;
               font-weight: bold;
-              padding-right: lh(.5);
+              padding-right: 12px;
             }
 
             dd {
               float: left;
+              margin-left: 0;
             }
           }
         }

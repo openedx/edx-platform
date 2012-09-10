@@ -405,6 +405,9 @@ if Backbone?
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, $contentBody.attr("id")]
 
     initTimeago: ->
+      @$("span.timeago").each (index, element) ->
+        elem = $(element)
+        elem.html("posted on #{$.timeago.parse(elem.html()).toLocaleString()}")
       @$("span.timeago").timeago()
 
     renderPartial: ->

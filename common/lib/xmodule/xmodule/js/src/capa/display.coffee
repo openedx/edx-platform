@@ -84,11 +84,14 @@ class @Problem
   # stuff if a div w a class is found
 
   setupInputTypes: =>
+    @inputtypeDisplays = {}
     @el.find(".capa_inputtype").each (index, inputtype) =>
       classes = $(inputtype).attr('class').split(' ')
+      id = $(inputtype).attr('id')
       for cls in classes
         setupMethod = @inputtypeSetupMethods[cls]
-        setupMethod(inputtype) if setupMethod?
+        if setupMethod?
+          @inputtypeDisplays[id] = setupMethod(inputtype)
 
   executeProblemScripts: (callback=null) ->
 
@@ -192,8 +195,11 @@ class @Problem
     if file_not_selected
       errors.push 'You did not select any files to submit'
 
-    if errors.length > 0
-        alert errors.join("\n")
+    error_html = '<ul>\n'
+    for error in errors
+      error_html += '<li>' + error + '</li>\n'
+    error_html += '</ul>'
+    @gentle_alert error_html
 
     abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
 
@@ -208,7 +214,7 @@ class @Problem
             @render(response.contents)
             @updateProgress response
           else
-            alert(response.success)
+            @gentle_alert response.success
     
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
@@ -220,8 +226,10 @@ class @Problem
         when 'incorrect', 'correct'
           @render(response.contents)
           @updateProgress response
+          if @el.hasClass 'showed'
+            @el.removeClass 'showed'
         else
-          alert(response.success)
+          @gentle_alert response.success
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -243,6 +251,17 @@ class @Problem
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
           else
             @$("#answer_#{key}, #solution_#{key}").html(value)
+
+        # TODO remove the above once everything is extracted into its own
+        # inputtype functions.
+
+        @el.find(".capa_inputtype").each (index, inputtype) =>
+            classes = $(inputtype).attr('class').split(' ')
+            for cls in classes
+              display = @inputtypeDisplays[$(inputtype).attr('id')]
+              showMethod = @inputtypeShowAnswerMethods[cls]
+              showMethod(inputtype, display, answers) if showMethod?
+
         MathJax.Hub.Queue ["Typeset", MathJax.Hub]
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
@@ -253,11 +272,26 @@ class @Problem
       @el.removeClass 'showed'
       @$('.show').val 'Show Answer'
 
+      @el.find(".capa_inputtype").each (index, inputtype) =>
+        display = @inputtypeDisplays[$(inputtype).attr('id')]
+        classes = $(inputtype).attr('class').split(' ')
+        for cls in classes
+          hideMethod = @inputtypeHideAnswerMethods[cls]
+          hideMethod(inputtype, display) if hideMethod?
+
+  gentle_alert: (msg) =>
+    if @el.find('.capa_alert').length
+      @el.find('.capa_alert').remove()
+    alert_elem = "<div class='capa_alert'>" + msg + "</div>"
+    @el.find('.action').after(alert_elem)
+    @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
+
   save: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       if response.success
-        alert 'Saved'
+        saveMessage = "Your answers have been saved but not graded. Hit 'Check' to grade them."
+        @gentle_alert saveMessage
       @updateProgress response
 
   refreshMath: (event, element) =>
@@ -293,8 +327,35 @@ class @Problem
       problemState  = data.data("problem_state")
       displayClass  = window[data.data('display_class')]
 
+      if evaluation == ''
+          evaluation = null
+
       container = $(element).find(".javascriptinput_container")
       submissionField = $(element).find(".javascriptinput_input")
 
       display = new displayClass(problemState, submission, evaluation, container, submissionField, params)
       display.render()
+
+      return display
+
+  inputtypeShowAnswerMethods:
+    choicegroup: (element, display, answers) =>
+      element = $(element)
+      for key, value of answers
+        element.find('input').attr('disabled', 'disabled')
+        for choice in value
+          element.find("label[for='input_#{key}_#{choice}']").addClass 'choicegroup_correct'
+
+    javascriptinput: (element, display, answers) =>
+      answer_id = $(element).attr('id').split("_")[1...].join("_")
+      answer = JSON.parse(answers[answer_id])
+      display.showAnswer(answer)
+
+  inputtypeHideAnswerMethods:
+    choicegroup: (element, display) =>
+      element = $(element)
+      element.find('input').attr('disabled', null)
+      element.find('label').removeClass('choicegroup_correct')
+
+    javascriptinput: (element, display) =>
+      display.hideAnswer()
