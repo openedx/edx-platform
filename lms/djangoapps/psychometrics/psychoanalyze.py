@@ -146,6 +146,13 @@ def generate_plots_for_problem(problem):
     xdat = range(1,max_attempts+1)
     dataset = {'xdat': xdat}
 
+    # compute grade statistics
+    grades = [pmd.studentmodule.grade for pmd in pmdset]    
+    gsv = StatVar()
+    for g in grades:
+        gsv += g
+    msg += "<br><p><font color='blue'>Grade distribution: %s</font></p>" % gsv
+
     # generate grade histogram
     ghist = []
 
@@ -159,8 +166,12 @@ def generate_plots_for_problem(problem):
          }]
          }"""
 
+    if gsv.max > max_grade:
+        msg += "<br/><p><font color='red'>Something is wrong: max_grade=%s, but max(grades)=%s</font></p>" % (max_grade, gsv.max)
+        max_grade = gsv.max
+
     if max_grade > 1:
-        ghist = make_histogram([pmd.studentmodule.grade for pmd in pmdset],np.linspace(0,max_grade,max_grade+1))
+        ghist = make_histogram(grades, np.linspace(0,max_grade,max_grade+1))
         ghist_json = json.dumps(ghist.items())
 
         plot = {'title': "Grade histogram for %s" % problem,
@@ -192,7 +203,7 @@ def generate_plots_for_problem(problem):
                 dtsv += dt
             ct0 = ct
     if dtsv.cnt > 2:
-        msg += "<br/>time differences between checks: %s" % dtsv
+        msg += "<br/><p><font color='brown'>Time differences between checks: %s</font></p>" % dtsv
         bins = np.linspace(0,1.5*dtsv.sdv(),30)
         dbar = bins[1]-bins[0]
         thist = make_histogram(dtset,bins)
@@ -223,7 +234,7 @@ def generate_plots_for_problem(problem):
             ylast = y + ylast
         yset['ydat'] = ydat
 
-        if len(ydat)>5:		# try to fit to logistic function if enough data points
+        if len(ydat)>3:		# try to fit to logistic function if enough data points
             cfp = curve_fit(func_2pl, xdat, ydat, [1.0, max_attempts/2.0])
             yset['fitparam'] = cfp
             yset['fitpts'] = func_2pl(np.array(xdat),*cfp[0])
