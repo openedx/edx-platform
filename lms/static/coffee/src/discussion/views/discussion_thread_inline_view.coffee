@@ -194,6 +194,7 @@ if DiscussionContentView?
 
     expandPost: (event) ->
       @expanded = true
+      @$el.addClass('expanded')
       @$el.find('.post-body').html(@model.get('body'))
       @convertMath()
       @$el.find('.expand-post').css('display', 'none')
@@ -205,6 +206,7 @@ if DiscussionContentView?
 
     collapsePost: (event) ->
       @expanded = false
+      @$el.removeClass('expanded')
       @$el.find('.post-body').html(@model.get('abbreviatedBody'))
       @convertMath()
       @$el.find('.collapse-post').css('display', 'none')
