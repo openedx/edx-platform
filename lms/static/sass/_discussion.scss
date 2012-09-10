@@ -1570,11 +1570,18 @@ body.discussion {
 
 .discussion-module {
   @extend .discussion-body;
+  margin: 20px 0;
+  padding: 20px;
+  background: #f6f6f6 !important;
+  border-radius: 3px;  
 
   .discussion-show {
     @include white-button;
-    display: inline-block;
-  } 
+    display: block;
+    width: 200px;
+    margin: auto;    
+    text-align: center;
+  }
 
   .new-post-btn {
     display: inline-block;
@@ -1585,21 +1592,44 @@ body.discussion {
 
     /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
-      padding: 0.5em 0;
+      padding: 0;
+      @include transition(all .25s);
+
+      .dogear,
+      .vote-btn {
+        display: none;
+      }
+
+      &.expanded {
+        padding: 20px 0;
+
+        .dogear,
+        .vote-btn {
+          display: block;
+        }
+
+        .discussion-article {
+          border: 1px solid #b2b2b2;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+          border-radius: 3px;
+        }
+      }
 
       p {
         margin-bottom: 0em;
       }
 
       .discussion-article {
-        border: 1px solid #b2b2b2;
-        border-radius: 3px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        border: 1px solid #ddd;
+        border-bottom-width: 0;
+        background: #fff;
         min-height: 0;
-        padding: 10px 10px 40px;
+        padding: 10px 10px 15px 10px;
+        box-shadow: 0 1px 0 #ddd;
+        @include transition(all .2s);
 
         .discussion-post {
-          padding: 17px 23px;
+          padding: 12px 20px 0 20px;
           @include clearfix;
 
           header {
@@ -1607,9 +1637,13 @@ body.discussion {
             margin-bottom: 15px;
 
             h3 {
-              font-size: 22px;
+              font-size: 19px;
               font-weight: 700;
               margin-bottom: 0px;
+            }
+
+            h4 {
+              font-size: 16px;
             }
           }
 
@@ -1620,18 +1654,10 @@ body.discussion {
         }
 
         .post-tools {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;          
-          border-radius: 0 0 3px 3px;
-          border-top: 1px solid #ddd;
-          @include linear-gradient(top, #f2f2f2, #e2e2e2);
+          margin-left: 20px;
 
           a {
             display: block;
-            width: 100%;
-            text-align: center;
             font-size: 12px;
             line-height: 30px;
 
