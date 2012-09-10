@@ -28,14 +28,20 @@ if Backbone?
       @newPostForm.slideUp(300)
 
     toggleDiscussion: (event) ->
+      thisButton = $(event.target).closest('a')
       if @showed
-        @$("section.discussion").hide()
-        $(event.target).html("Show Discussion")
+        @$("section.discussion").slideUp()
+        thisButton.removeClass('shown')
+        thisButton.find('.button-text').html("Show Discussion")
         @showed = false
       else
-        $(event.target).html("Hide Discussion")
+        thisButton.addClass('shown')
+        thisButton.find('.button-text').html("Hide Discussion")
+
+        console.log($(event.target))
+
         if @retrieved
-          @$("section.discussion").show()          
+          @$("section.discussion").slideDown()
           @showed = true
         else
           $elem = $(event.target)
