@@ -6,6 +6,7 @@ class @Problem
     @element_id = @el.attr('id')
     @url = @el.data('url')
     @render()
+    @mathjax_preprocessor = false
 
   $: (selector) ->
     $(selector, @el)
@@ -300,12 +301,12 @@ class @Problem
 
     if jax = MathJax.Hub.getAllJax(target)[0]
       eqn = $(element).val()
-      if window.mathjax_preprocessor
-        eqn = window.mathjax_preprocessor(eqn)
+      if @mathjax_preprocessor
+        eqn = @mathjax_preprocessor(eqn)
 
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
- 
+
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
@@ -323,7 +324,7 @@ class @Problem
   inputtypeSetupMethods:
 
     textinputdynamath: (element) =>
-      @mathjax_preprocessor = window.mathjax_preprocessor 
+      @mathjax_preprocessor = window.mathjax_preprocessor
 
     javascriptinput: (element) =>
 
