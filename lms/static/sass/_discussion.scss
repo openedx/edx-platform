@@ -1290,6 +1290,9 @@ body.discussion {
       }
 
       &.loading {
+        height: 0;
+        margin: 0;
+        padding: 0;
         border: none;
         box-shadow: none;
       }
@@ -1596,6 +1599,7 @@ body.discussion {
         padding: 10px 10px 40px;
 
         .discussion-post {
+          padding: 17px 23px;
           @include clearfix;
 
           header {
