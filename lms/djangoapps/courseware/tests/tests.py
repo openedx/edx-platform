@@ -222,16 +222,9 @@ class PageLoader(ActivateLoginTestCase):
         handling.
         """
         resp = self.client.get(url)
-        # HACK: workaround the bug that returns 200 instead of 404.
-        # TODO (vshnayder): once we're returning 404s, get rid of this if.
-        if code != 404:
-            self.assertEqual(resp.status_code, code)
-            # And 'page not found' shouldn't be in the returned page
-            self.assertTrue(resp.content.lower().find('page not found') == -1)
-        else:
-            # look for "page not found" instead of the status code
-            #print resp.content
-            self.assertTrue(resp.content.lower().find('page not found') != -1)
+        self.assertEqual(resp.status_code, code,
+                         "got code {0} for url '{1}'. Expected code {2}"
+                         .format(resp.status_code, url, code))
 
 
     def check_pages_load(self, course_name, data_dir, modstore):
