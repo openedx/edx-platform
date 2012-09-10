@@ -209,6 +209,7 @@ def instructor_dashboard(request, course_id):
         problem = request.POST['Problem']
         nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
         msg += nmsg
+        track.views.server_track(request, 'psychometrics %s' % problem, {}, page='idashboard')
 
     if idash_mode=='Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
