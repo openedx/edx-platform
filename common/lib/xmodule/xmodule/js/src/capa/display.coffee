@@ -7,11 +7,6 @@ class @Problem
     @url = @el.data('url')
     @render()
 
-    # TODO: Each course should be able to customize the MathJax preprocessor
-    #       through a generic plug-in
-    if (@id).search('6.002x') >= 0
-      @mathjax_preprocessor = @mathjax_preprocessor_for_6002x 
-
   $: (selector) ->
     $(selector, @el)
 
@@ -305,47 +300,12 @@ class @Problem
 
     if jax = MathJax.Hub.getAllJax(target)[0]
       eqn = $(element).val()
-      if @mathjax_preprocessor
-        eqn = @mathjax_preprocessor(eqn)
+      if window.mathjax_preprocessor
+        eqn = window.mathjax_preprocessor(eqn)
 
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
  
-  # TODO: The 6.002x preprocessor should not be baked into capa/display.coffee, but should be a plug-in 
-  mathjax_preprocessor_for_6002x: (eqn) ->
-    ###
-    Translate 6.002x conventions for subscripts to standard Latex, e.g.
-      'R3'  --> 'R_{3}'
-      'vGS' --> 'v_{GS}'
-      'K/2*(vIN-VT)^2' --> 'K/2*(v_{IN}-V_{T})^2'
-
-    ... and also escape specific 6.002x-related keywords from MathJax,
-        such as 'in' (parsed by MathJax as the set symbol)
-    ###
-    
-    # Default keywords are taken from capa/calc.py
-    default_keywords = ['sin', 'cos', 'tan', 'sqrt', 'log10', 'log2', 'ln', 'arccos', 'arcsin', 'arctan', 'abs', 'pi']
-
-    # Escape keywords are strings that have special meaning in 6.002x that should not be processed by Jax
-    escape_keywords = ['in']
-
-    # First, perform subscript insertion, but watch out for keywords
-    replace_subscript = (match) ->
-      if match in default_keywords or match in escape_keywords
-        return match
-      else
-        return match[0] + '_{' + match.substr(1) + '}'
-    eqn = eqn.replace(/[A-Za-z]\w+/g, replace_subscript)
-
-    # Second, escape 6.002x-specific keywords from MathJax
-    replace_escape_keyword = (match) -> 
-      return '"' + match + '"' # Force MathJax plain text
-    for escape_keyword in escape_keywords
-      escape_keyword_patt = RegExp('\\b'+escape_keyword+'\\b')
-      eqn = eqn.replace(escape_keyword_patt, replace_escape_keyword)
-
-    return eqn
-
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
@@ -361,6 +321,10 @@ class @Problem
     @answers = @inputs.serialize()
 
   inputtypeSetupMethods:
+
+    textinputdynamath: (element) =>
+      @mathjax_preprocessor = window.mathjax_preprocessor 
+
     javascriptinput: (element) =>
 
       data = $(element).find(".javascriptinput_data")

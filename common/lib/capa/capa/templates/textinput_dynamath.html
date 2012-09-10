@@ -1,7 +1,7 @@
 ###
-### version of textline.html which does dynammic math
+### version of textline.html which does dynamic math
 ###
-<section class="text-input-dynamath">
+<section class="text-input-dynamath textinputdynamath capa_inputtype" id="inputtype_${id}">
     % if state == 'unsubmitted':
     <div class="unanswered" id="status_${id}">
     % elif state == 'correct':
@@ -20,7 +20,7 @@
       	    style="display:none;"
        % endif
       />
-
+      <div class="script_placeholder" data-src="/static/js/mathjax_preprocessor_for_6002x.js"/>
       <p class="status">
         % if state == 'unsubmitted':
         unanswered
