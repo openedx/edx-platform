@@ -3,8 +3,10 @@
 ###
 <section class="text-input-dynamath textinputdynamath capa_inputtype" id="inputtype_${id}">
 
-    <div class="textinputdynamath_data" data-preprocessor="MathjaxPreprocessorFor6002x"/>
-    <div class="script_placeholder" data-src="/static/js/mathjax_preprocessor_for_6002x.js"/>
+    % if preprocessor is not None:
+    <div class="textinputdynamath_data" data-preprocessor="${preprocessor['class_name']}"/>
+    <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
+    % endif
 
     % if state == 'unsubmitted':
     <div class="unanswered" id="status_${id}">

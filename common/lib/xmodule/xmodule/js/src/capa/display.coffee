@@ -6,7 +6,6 @@ class @Problem
     @element_id = @el.attr('id')
     @url = @el.data('url')
     @render()
-    @mathjax_preprocessor = false
 
   $: (selector) ->
     $(selector, @el)
@@ -301,6 +300,7 @@ class @Problem
 
     target = "display_" + elid
 
+    # MathJax preprocessor is loaded by 'setupInputTypes'
     preprocessor_tag = "inputtype_" + elid
     mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
@@ -308,7 +308,6 @@ class @Problem
       eqn = $(element).val()
       if mathjax_preprocessor
         eqn = mathjax_preprocessor(eqn)
-
       MathJax.Hub.Queue ['Text', jax, eqn],
         [@updateMathML, jax, element]
 
@@ -329,13 +328,19 @@ class @Problem
   inputtypeSetupMethods:
 
     textinputdynamath: (element) =>
+      ###
+      Return: function (eqn) -> eqn that preprocesses the user formula input before
+                it is fed into MathJax. Return 'false' if no preprocessor specified
+      ###
       data = $(element).find('.textinputdynamath_data')
 
       preprocessorClassName = data.data('preprocessor')
       preprocessorClass = window[preprocessorClassName]
-
-      preprocessor = new preprocessorClass()
-      return preprocessor.fn
+      if typeof(preprocessorClass) == 'undefined' 
+        return false
+      else
+        preprocessor = new preprocessorClass()
+        return preprocessor.fn
 
     javascriptinput: (element) =>
 
