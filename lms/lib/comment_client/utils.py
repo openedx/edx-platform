@@ -1,6 +1,9 @@
-import requests
 import json
+import logging
+import requests
 import settings
+
+log = logging.getLogger('mitx.' + __name__)
 
 def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
@@ -18,16 +21,22 @@ def extract(dic, keys):
 
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
- 
+
 def perform_request(method, url, data_or_params=None, *args, **kwargs):
     if data_or_params is None:
         data_or_params = {}
     data_or_params['api_key'] = settings.API_KEY
-    if method in ['post', 'put', 'patch']:
-        response = requests.request(method, url, data=data_or_params, timeout=5)
-    else:
-        response = requests.request(method, url, params=data_or_params,
-                timeout=5)
+    try:
+        if method in ['post', 'put', 'patch']:
+            response = requests.request(method, url, data=data_or_params, timeout=5)
+        else:
+            response = requests.request(method, url, params=data_or_params, timeout=5)
+    except Exception as err:
+        log.exception("Trying to call {method} on {url} with params {params}".format(
+            method=method, url=url, params=data_or_params))
+        # Reraise with a single exception type 
+        raise CommentClientError(str(err))
+
     if 200 < response.status_code < 500:
         raise CommentClientError(response.text)
     elif response.status_code == 500:

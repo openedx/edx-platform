@@ -12,6 +12,15 @@ import sys
 
 log = logging.getLogger(__name__)
 
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
+
+def name_to_pathname(name):
+    """
+    Convert a location name for use in a path: replace ':' with '/'.
+    This allows users of the xml format to organize content into directories
+    """
+    return name.replace(':', '/')
 
 def is_pointer_tag(xml_obj):
     """
@@ -90,10 +99,14 @@ class XmlDescriptor(XModuleDescriptor):
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
+    # Allow json to specify either the string "true", or the bool True.  The string is preferred.
+    to_bool = lambda val: val == 'true' or val == True
+    from_bool = lambda val: str(val).lower()
+    bool_map = AttrMap(to_bool, from_bool)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
-        'graded': AttrMap(lambda val: val == 'true',
-                          lambda val: str(val).lower()),
+        'graded': bool_map,
+        'hide_progress_tab': bool_map,
     }
 
 
@@ -140,7 +153,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         Returns an lxml Element
         """
-        return etree.parse(file_object).getroot()
+        return etree.parse(file_object, parser=edx_xml_parser).getroot()
 
     @classmethod
     def load_file(cls, filepath, fs, location):
@@ -226,6 +239,16 @@ class XmlDescriptor(XModuleDescriptor):
 
 
     @classmethod
+    def apply_policy(cls, metadata, policy):
+        """
+        Add the keys in policy to metadata, after processing them
+        through the attrmap.  Updates the metadata dict in place.
+        """
+        for attr in policy:
+            attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+            metadata[attr] = attr_map.from_xml(policy[attr])
+
+    @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
@@ -245,8 +268,8 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] -- detect new-style each-in-a-file mode
         if is_pointer_tag(xml_object):
             # new style:
-            # read the actual definition file--named using url_name
-            filepath = cls._format_filepath(xml_object.tag, url_name)
+            # read the actual definition file--named using url_name.replace(':','/')
+            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
             definition_xml = xml_object	# this is just a pointer, not the real definition content
@@ -273,7 +296,7 @@ class XmlDescriptor(XModuleDescriptor):
         # Set/override any metadata specified by policy
         k = policy_key(location)
         if k in system.policy:
-            metadata.update(system.policy[k])
+            cls.apply_policy(metadata, system.policy[k])
 
         return cls(
             system,
@@ -292,7 +315,8 @@ class XmlDescriptor(XModuleDescriptor):
         """If this returns True, write the definition of this descriptor to a separate
         file.
 
-        NOTE: Do not override this without a good reason.  It is here specifically for customtag...
+        NOTE: Do not override this without a good reason.  It is here
+        specifically for customtag...
         """
         return True
 
@@ -335,7 +359,8 @@ class XmlDescriptor(XModuleDescriptor):
 
         if self.export_to_file():
             # Write the definition to a file
-            filepath = self.__class__._format_filepath(self.category, self.url_name)
+            url_path = name_to_pathname(self.url_name)
+            filepath = self.__class__._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True))

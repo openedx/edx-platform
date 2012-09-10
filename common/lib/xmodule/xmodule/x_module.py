@@ -212,7 +212,7 @@ class XModule(HTMLSnippet):
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
     def __unicode__(self):
-        return '<x_module(name=%s, category=%s, id=%s)>' % (self.name, self.category, self.id)
+        return '<x_module(id={0})>'.format(self.id)
 
     def get_children(self):
         '''
@@ -465,6 +465,16 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
         return self._child_instances
 
+
+    def get_child_by_url_name(self, url_name):
+        """
+        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
+        """
+        for c in self.get_children():
+            if c.url_name == url_name:
+                return c
+        return None
+
     def xmodule_constructor(self, system):
         """
         Returns a constructor for an XModule. This constructor takes two
@@ -544,7 +554,13 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             # Put import here to avoid circular import errors
             from xmodule.error_module import ErrorDescriptor
             msg = "Error loading from xml."
-            log.warning(msg + " " + str(err))
+            log.warning(msg + " " + str(err)[:200])
+
+            # Normally, we don't want lots of exception traces in our logs from common
+            # content problems.  But if you're debugging the xml loading code itself,
+            # uncomment the next line.
+            # log.exception(msg)
+
             system.error_tracker(msg)
             err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
             descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
@@ -717,7 +733,8 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
-                 node_path=""):
+                 node_path="",
+                 anonymous_student_id=''):
         '''
         Create a closure around the system environment.
 
@@ -742,11 +759,16 @@ class ModuleSystem(object):
                          at settings.DATA_DIR.
 
         xqueue - Dict containing XqueueInterface object, as well as parameters
-                    for the specific StudentModule
+                    for the specific StudentModule:
+                    xqueue = {'interface': XQueueInterface object,
+                              'callback_url': Callback into the LMS,
+                              'queue_name': Target queuename in Xqueue}
 
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        anonymous_student_id - Used for tracking modules with student id
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -758,6 +780,8 @@ class ModuleSystem(object):
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
+        self.anonymous_student_id = anonymous_student_id
+        self.user_is_staff = user is not None and user.is_staff
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

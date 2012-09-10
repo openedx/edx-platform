@@ -5,20 +5,17 @@ import hashlib
 import json
 import logging
 import requests
-import time
 
 
 log = logging.getLogger('mitx.' + __name__)
+dateformat = '%Y%m%d%H%M%S'
 
-
-def make_hashkey(seed=None):
+def make_hashkey(seed):
     '''
     Generate a string key by hashing 
     '''
     h = hashlib.md5()
-    if seed is not None:
-        h.update(str(seed))
-    h.update(str(time.time()))
+    h.update(str(seed))
     return h.hexdigest()
 
 

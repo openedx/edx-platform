@@ -504,6 +504,14 @@ body.discussion {
       &:hover {
         border-color: #222;
       }
+
+      .author-moderator:after{
+        content: " (moderator)"
+      }
+
+      .author-administrator:after{
+        content: " (instructor)"
+      }
     }
 
     .new-post-cancel {
@@ -592,14 +600,6 @@ body.discussion {
     }
   }
 }
-
-
-
-
-
-
-
-
 
 .container .discussion-body {
   display: block;
@@ -1942,6 +1942,3 @@ body.discussion {
     }
   }
 }
-
-
-

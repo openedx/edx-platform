@@ -1,8 +1,8 @@
-% if name is not UNDEFINED and name is not None:
-  <h1> ${display_name} </h1>
+% if display_name is not UNDEFINED and display_name is not None:
+  <h2> ${display_name} </h2>
 % endif
 
-<div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}">
+<div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}">
   <div class="tc-wrapper">
     <article class="video-wrapper">
       <section class="video-player">

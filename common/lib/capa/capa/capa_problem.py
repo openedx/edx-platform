@@ -14,6 +14,8 @@ This is used by capa_module.
 
 from __future__ import division
 
+from datetime import datetime
+import json
 import logging
 import math
 import numpy
@@ -32,6 +34,7 @@ from correctmap import CorrectMap
 import eia
 import inputtypes
 from util import contextualize_text, convert_files_to_filenames
+import xqueue_interface
 
 # to be replaced with auto-registering
 import responsetypes
@@ -202,11 +205,24 @@ class LoncapaProblem(object):
         '''
         Returns True if any part of the problem has been submitted to an external queue
         '''
-        queued = False
-        for answer_id in self.correct_map:
-            if self.correct_map.is_queued(answer_id):
-                queued = True
-        return queued
+        return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
+
+
+    def get_recentmost_queuetime(self):
+        '''
+        Returns a DateTime object that represents the timestamp of the most recent queueing request, or None if not queued
+        '''
+        if not self.is_queued():
+            return None
+
+        # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
+        queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
+                          for answer_id in self.correct_map 
+                          if self.correct_map.is_queued(answer_id)]
+        queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat) for qt_str in queuetime_strs]
+
+        return max(queuetimes)
+
 
     def grade_answers(self, answers):
         '''

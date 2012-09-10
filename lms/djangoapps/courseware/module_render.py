@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import sys
@@ -51,7 +52,7 @@ def make_track_function(request):
     return f
 
 
-def toc_for_course(user, request, course, active_chapter, active_section, course_id=None):
+def toc_for_course(user, request, course, active_chapter, active_section):
     '''
     Create a table of contents from the module store
 
@@ -61,7 +62,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
 
     where SECTIONS is a list
     [ {'display_name': name, 'url_name': url_name,
-       'format': format, 'due': due, 'active' : bool}, ...]
+       'format': format, 'due': due, 'active' : bool, 'graded': bool}, ...]
 
     active is set for the section and chapter corresponding to the passed
     parameters, which are expected to be url_names of the chapter+section.
@@ -74,13 +75,13 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
     '''
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course_id, user, course, depth=2)
-    course = get_module(user, request, course.location, student_module_cache, course_id)
-    if course is None:
+        course.id, user, course, depth=2)
+    course_module = get_module(user, request, course.location, student_module_cache, course.id)
+    if course_module is None:
         return None
 
     chapters = list()
-    for chapter in course.get_display_items():
+    for chapter in course_module.get_display_items():
         hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
         if hide_from_toc:
             continue
@@ -97,7 +98,9 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
                                  'url_name': section.url_name,
                                  'format': section.metadata.get('format', ''),
                                  'due': section.metadata.get('due', ''),
-                                 'active': active})
+                                 'active': active,
+                                 'graded': section.metadata.get('graded', False),
+                                 })
 
         chapters.append({'display_name': chapter.display_name,
                          'url_name': chapter.url_name,
@@ -105,36 +108,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, course
                          'active': chapter.url_name == active_chapter})
     return chapters
 
-
-def get_section(course_module, chapter, section):
-    """
-    Returns the xmodule descriptor for the name course > chapter > section,
-    or None if this doesn't specify a valid section
-
-    course: Course url
-    chapter: Chapter url_name
-    section: Section url_name
-    """
-
-    if course_module is None:
-        return
-
-    chapter_module = None
-    for _chapter in course_module.get_children():
-        if _chapter.url_name == chapter:
-            chapter_module = _chapter
-            break
-
-    if chapter_module is None:
-        return
-
-    section_module = None
-    for _section in chapter_module.get_children():
-        if _section.url_name == section:
-            section_module = _section
-            break
-
-    return section_module
 
 def get_module(user, request, location, student_module_cache, course_id, position=None):
     """
@@ -144,8 +117,8 @@ def get_module(user, request, location, student_module_cache, course_id, positio
 
     Arguments:
       - user                  : User for whom we're getting the module
-      - request               : current django HTTPrequest -- used in particular for auth
-                                (This is important e.g. for prof impersonation of students in progress view)
+      - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
+                                and such works based on user.
       - location              : A Location-like object identifying the module to load
       - student_module_cache  : a StudentModuleCache
       - course_id             : the course_id in the context of which to load module
@@ -171,12 +144,16 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
-    # NOTE: Do access check on request.user -- that's who actually needs access (e.g. could be prof
-    # impersonating a user)
-    if not has_access(request.user, descriptor, 'load'):
+    if not has_access(user, descriptor, 'load'):
         return None
 
-    #TODO Only check the cache if this module can possibly have state
+    # Anonymized student identifier
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    anonymous_student_id = h.hexdigest()
+
+    # Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
     if user.is_authenticated():
@@ -190,7 +167,6 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                                         descriptor.category,
                                                         shared_state_key)
 
-
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
 
@@ -200,6 +176,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                    location=descriptor.location.url(),
                                    dispatch=''),
                        )
+    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
+    ajax_url = ajax_url.rstrip('/')
 
     # Fully qualified callback URL for external queueing system
     xqueue_callback_url = '{proto}://{host}'.format(
@@ -220,7 +198,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     xqueue = {'interface': xqueue_interface,
               'callback_url': xqueue_callback_url,
-              'default_queuename': xqueue_default_queuename.replace(' ', '_')}
+              'default_queuename': xqueue_default_queuename.replace(' ', '_'),
+              'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+             }
 
     def inner_get_module(location):
         """
@@ -244,7 +224,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
-                          node_path=settings.NODE_PATH
+                          node_path=settings.NODE_PATH,
+                          anonymous_student_id=anonymous_student_id,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -282,9 +263,10 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     return module
 
+# TODO (vshnayder): Rename this?  It's very confusing.
 def get_instance_module(course_id, user, module, student_module_cache):
     """
-    Returns instance_module is a StudentModule specific to this module for this student,
+    Returns the StudentModule specific to this module for this student,
         or None if this is an anonymous user
     """
     if user.is_authenticated():
@@ -411,6 +393,10 @@ def modx_dispatch(request, dispatch, location, course_id):
       - course_id -- defines the course context for this request.
     '''
     # ''' (fix emacs broken parsing)
+
+    # Check parameters and fail fast if there's a problem
+    if not Location.is_valid(location):
+        raise Http404("Invalid location")
 
     # Check for submitted files and basic file size checks
     p = request.POST.copy()

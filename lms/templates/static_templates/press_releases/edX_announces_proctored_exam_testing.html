@@ -1,0 +1,62 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>edX announces proctored exam testing</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>EdX to offer learners option of taking proctored final exam</h1>
+    <hr class="horizontal-divider">
+    <article>
+      <h2>edX announces option of proctored exam testing through collaboration with Pearson VUE </h2>
+      <p>Online learning venture edX continues to transform higher education by announcing today its agreement with Pearson VUE to offer learners the option of taking a proctored final exam. </p>
+
+      <p>"Our online learners who want the flexibility to provide potential employers with an independently validated certificate may now choose to take the course exam at a proctored test site," said  Anant Agarwal, president of edX. "This option enhances the value of our courses in the real world, helps us maintain our goal of making high-quality education both accessible and practical and thus is a natural evolution of ed's core philosophy of transforming lives through education."</p>
+
+      <p>Pearson VUE, a Pearson business, is the global leader in computer-based testing. Due to this new agreement, edX learners now have the option of taking a course final exam at one of over 450 Pearson VUE test centers in more than 110 countries. Proctors at the centers will verify the identity of the examinee and administer the tests. Examinees using the Pearson VUE centers will take the same rigorous exam as online learners and will be charged a modest fee for the proctoring service. EdX will offer the option to test takers for one of its online courses this Fall. </p>
+
+      <p>Robert Whelan, president and chief executive officer of Pearson VUE said, "We are thrilled to collaborate with edX and help its learners improve their employability and career prospects. Pearson VUE is also pleased to help edX protect the integrity of their courses by providing the option of proctored exams."</p>
+
+      <h2>About edX</h2>
+
+      <p> EdX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions, the founders are creating a new online-learning experience with online courses that reflect their disciplinary breadth. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning-both on-campus and worldwide. Anant Agarwal, former Director of MIT's Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. EdX's goals combine the desire to reach out to students of all ages, means, and nations, and to deliver these teachings from a faculty who reflect the diversity of its audience. EdX is based in Cambridge, Massachusetts and is governed by MIT and Harvard. </p>
+
+      <h2>About Pearson VUE</h2>
+
+      <p> Pearson VUE (<a href="http://www.pearsonvue.com" target="_blank">www.pearsonvue.com</a>) is the global leader in computer-based testing for information technology, academic, government and professional testing programs around the world. Pearson VUE provides a full suite of services from test development to data management, and delivers exams through the world's most comprehensive and secure network of test centers in more than 175 countries. Pearson VUE is a business of Pearson (NYSE: PSO; LSE: PSON), the international education and information company, whose businesses include the Financial Times Group, Pearson Education and the Penguin Group.</p>
+
+      <section class="contact">
+        <p><strong>Contact: </strong>Amanda Keane</p>
+        <p>akeane@webershandwick.com</p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">9 - 07 - 2012</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=edX+announces+exam+testing+in+partnership+with+Pearson+VUE:+http://www.edx.org/press/edX-announces-proctored-exam-testing" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=edX%20announces%20proctored%20exam_testing&body=edX%20announces%20a%20partnership%20with%20Pearson%20VUE%20to%20offer%20learners%20the%20option%20of%20taking%20a%20proctored%20final%20exam…http://edx.org/press/edX-announces-proctored-exam-testing" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/edX-announces-proctored-exam-testing" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+
+      </section>
+    </article>
+  </section>
+</section>

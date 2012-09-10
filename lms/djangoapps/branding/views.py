@@ -20,8 +20,8 @@ def index(request):
         return redirect(reverse('dashboard'))
 
     if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
-        from external_auth.views import edXauth_ssl_login
-        return edXauth_ssl_login(request)
+        from external_auth.views import ssl_login
+        return ssl_login(request)
 
     university = branding.get_university(request.META.get('HTTP_HOST'))
     if university is None:

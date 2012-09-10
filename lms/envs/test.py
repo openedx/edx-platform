@@ -16,6 +16,9 @@ from path import path
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
 
+# Until we have discussion actually working in test mode, just turn it off
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -43,6 +46,7 @@ DATA_DIR = COURSES_ROOT
 LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
+                            dev_env=True,
                             debug=True)
 
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
@@ -58,7 +62,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
@@ -122,6 +126,11 @@ CACHES = {
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+################################## OPENID ######################################
+MITX_FEATURES['AUTH_USE_OPENID'] = True
+MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import simplejson
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -20,7 +20,7 @@ import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
 
-THREADS_PER_PAGE = 50000
+THREADS_PER_PAGE = 200
 INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
@@ -108,6 +108,10 @@ def render_user_discussion(*args, **kwargs):
     return render_discussion(discussion_type='user', *args, **kwargs)
 
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
+    """
+    This may raise cc.utils.CommentClientError or
+    cc.utils.CommentClientUnknownError if something goes wrong.
+    """
 
     default_query_params = {
         'page': 1,
@@ -119,6 +123,18 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'commentable_id': discussion_id,
         'course_id': course_id,
     }
+
+    if not request.GET.get('sort_key'):
+        # If the user did not select a sort key, use their last used sort key
+        user = cc.User.from_django_user(request.user)
+        user.retrieve()
+        # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
+        default_query_params['sort_key'] = user.get('default_sort_key') or default_query_params['sort_key']
+    else:
+        # If the user clicked a sort key, update their default sort key
+        user = cc.User.from_django_user(request.user)
+        user.default_sort_key = request.GET.get('sort_key')
+        user.save()
 
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
@@ -134,16 +150,25 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+
+    try:
+        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+        user_info = cc.User.from_django_user(request.user).to_dict()
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        # TODO (vshnayder): since none of this code seems to be aware of the fact that
+        # sometimes things go wrong, I suspect that the js client is also not
+        # checking for errors on request.  Check and fix as needed.
+        raise Http404
+
     # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
-#    html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
-#                                                                 query_params=query_params)
-    user_info = cc.User.from_django_user(request.user).to_dict()
+    #html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
+    #                                                             query_params=query_params)
 
     def infogetter(thread):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+
     return utils.JsonResponse({
 #        'html': html,
         'discussion_data': map(utils.safe_content, threads),
@@ -169,7 +194,12 @@ def forum_form_discussion(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'load')
     category_map = utils.get_discussion_category_map(course)
-    threads, query_params = get_threads(request, course_id)
+
+    try:
+        threads, query_params = get_threads(request, course_id)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        raise Http404
+
     content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
 
     user_info = cc.User.from_django_user(request.user).to_dict()
@@ -237,7 +267,12 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
 
         user_info = cc.User.from_django_user(request.user).to_dict()
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+
+        try:
+            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+            raise Http404
+
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
@@ -252,7 +287,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
     else:
         course = get_course_with_access(request.user, course_id, 'load')
         category_map = utils.get_discussion_category_map(course)
-        threads, query_params = get_threads(request, course_id)
+        try:
+            threads, query_params = get_threads(request, course_id)
+        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+            raise Http404
 
         course = get_course_with_access(request.user, course_id, 'load')
 
@@ -300,32 +338,28 @@ def single_thread(request, course_id, discussion_id, thread_id):
 def user_profile(request, course_id, user_id):
 
     course = get_course_with_access(request.user, course_id, 'load')
-    profiled_user = cc.User(id=user_id, course_id=course_id)
+    try:
+        profiled_user = cc.User(id=user_id, course_id=course_id)
 
-    query_params = {
-        'page': request.GET.get('page', 1),
-        'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
-    }
+        query_params['page'] = page
+        query_params['num_pages'] = num_pages
 
-    threads, page, num_pages = profiled_user.active_threads(query_params)
+        content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
 
-    query_params['page'] = page
-    query_params['num_pages'] = num_pages
+        if request.is_ajax():
+            return utils.JsonResponse({
+                'html': content,
+                'discussion_data': map(utils.safe_content, threads),
+            })
+        else:
+            context = {
+                'course': course,
+                'user': request.user,
+                'django_user': User.objects.get(id=user_id),
+                'profiled_user': profiled_user.to_dict(),
+                'content': content,
+            }
 
-    content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
-
-    if request.is_ajax():
-        return utils.JsonResponse({
-            'html': content,
-            'discussion_data': map(utils.safe_content, threads),
-        })
-    else:
-        context = {
-            'course': course,
-            'user': request.user,
-            'django_user': User.objects.get(id=user_id),
-            'profiled_user': profiled_user.to_dict(),
-            'content': content,
-        }
-
-        return render_to_response('discussion/user_profile.html', context)
+            return render_to_response('discussion/user_profile.html', context)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        raise Http404

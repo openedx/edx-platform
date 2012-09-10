@@ -56,19 +56,42 @@
 
     <section class="course-content">
       ${content}
-
-      % if course_errors is not UNDEFINED:
-          <h2>Course errors</h2>
-          <div id="course-errors">
-            <ul>
-          % for (msg, err) in course_errors:
-            <li>${msg | h}
-              <ul><li><pre>${err | h}</pre></li></ul>
-            </li>
-          % endfor
-            </ul>
-          </div>
-      % endif
     </section>
   </div>
 </section>
+
+
+% if course.show_calculator:
+    <div class="calc-main">
+        <a aria-label="Open Calculator" href="#" class="calc">Calculator</a>
+
+        <div id="calculator_wrapper">
+            <form id="calculator">
+                <div class="input-wrapper">
+                    <input type="text" id="calculator_input" />
+
+                    <div class="help-wrapper">
+                        <a href="#">Hints</a>
+                        <dl class="help">
+                            <dt>Suffixes:</dt>
+                            <dd> %kMGTcmunp</dd>
+                            <dt>Operations:</dt>
+                            <dd>^ * / + - ()</dd>
+                            <dt>Functions:</dt>
+                            <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
+                            <dt>Constants</dt>
+                            <dd>e, pi</dd>
+
+                            <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
+
+                            <dt>Unsupported:</dt> <dd>||, j </dd>  -->
+                        </dl>
+                    </div>
+                </div>
+                <input id="calculator_button" type="submit" value="="/>
+                <input type="text" id="calculator_output"  readonly />
+            </form>
+
+        </div>
+    </div>
+% endif

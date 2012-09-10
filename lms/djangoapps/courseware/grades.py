@@ -4,11 +4,14 @@ from __future__ import division
 import random
 import logging
 
+from collections import defaultdict
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from models import StudentModuleCache
 from module_render import get_module, get_instance_module
 from xmodule import graders
+from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.graders import Score
 from models import StudentModule
@@ -17,13 +20,80 @@ log = logging.getLogger("mitx.courseware")
 
 def yield_module_descendents(module):
     stack = module.get_display_items()
+    stack.reverse()
 
     while len(stack) > 0:
         next_module = stack.pop()
         stack.extend( next_module.get_display_items() )
         yield next_module
 
-def grade(student, request, course, student_module_cache=None):
+def yield_problems(request, course, student):
+    """
+    Return an iterator over capa_modules that this student has
+    potentially answered.  (all that student has answered will definitely be in
+    the list, but there may be others as well).
+    """
+    grading_context = course.grading_context
+    student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
+
+    for section_format, sections in grading_context['graded_sections'].iteritems():
+        for section in sections:
+
+            section_descriptor = section['section_descriptor']
+
+            # If the student hasn't seen a single problem in the section, skip it.
+            skip = True
+            for moduledescriptor in section['xmoduledescriptors']:
+                if student_module_cache.lookup(
+                        course.id, moduledescriptor.category, moduledescriptor.location.url()):
+                    skip = False
+                    break
+
+            if skip:
+                continue
+
+            section_module = get_module(student, request,
+                                        section_descriptor.location, student_module_cache,
+                                        course.id)
+            if section_module is None:
+                # student doesn't have access to this module, or something else
+                # went wrong.
+                # log.debug("couldn't get module for student {0} for section location {1}"
+                #           .format(student.username, section_descriptor.location))
+                continue
+
+            for problem in yield_module_descendents(section_module):
+                if isinstance(problem, CapaModule):
+                    yield problem
+
+def answer_distributions(request, course):
+    """
+    Given a course_descriptor, compute frequencies of answers for each problem:
+
+    Format is:
+
+    dict: (problem url_name, problem display_name, problem_id) -> (dict : answer ->  count)
+
+    TODO (vshnayder): this is currently doing a full linear pass through all
+    students and all problems.  This will be just a little slow.
+    """
+
+    counts = defaultdict(lambda: defaultdict(int))
+
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course.id)
+
+    for student in enrolled_students:
+        for capa_module in yield_problems(request, course, student):
+            for problem_id in capa_module.lcp.student_answers:
+                # Answer can be a list or some other unhashable element.  Convert to string.
+                answer = str(capa_module.lcp.student_answers[problem_id])
+                key = (capa_module.url_name, capa_module.display_name, problem_id)
+                counts[key][answer] += 1
+
+    return counts
+
+
+def grade(student, request, course, student_module_cache=None, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It retuns the
     output from the course grader, augmented with the final letter
@@ -37,11 +107,13 @@ def grade(student, request, course, student_module_cache=None):
         up the grade. (For display)
     - grade_breakdown : A breakdown of the major components that
         make up the final grade. (For display)
+    - keep_raw_scores : if True, then value for key 'raw_scores' contains scores for every graded module
 
     More information on the format is in the docstring for CourseGrader.
     """
 
     grading_context = course.grading_context
+    raw_scores = []
 
     if student_module_cache == None:
         student_module_cache = StudentModuleCache(course.id, student, grading_context['all_descriptors'])
@@ -82,7 +154,7 @@ def grade(student, request, course, student_module_cache=None):
                     if correct is None and total is None:
                         continue
 
-                    if settings.GENERATE_PROFILE_SCORES:
+                    if settings.GENERATE_PROFILE_SCORES:	# for debugging!
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
@@ -96,6 +168,8 @@ def grade(student, request, course, student_module_cache=None):
                     scores.append(Score(correct, total, graded, module.metadata.get('display_name')))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
+                if keep_raw_scores:
+                    raw_scores += scores
             else:
                 section_total = Score(0.0, 1.0, False, section_name)
                 graded_total = Score(0.0, 1.0, True, section_name)
@@ -116,7 +190,10 @@ def grade(student, request, course, student_module_cache=None):
 
     letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
     grade_summary['grade'] = letter_grade
-
+    grade_summary['totaled_scores'] = totaled_scores	# make this available, eg for instructor download & debugging
+    if keep_raw_scores:
+        grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
+                                                        # so grader can be double-checked
     return grade_summary
 
 def grade_for_percentage(grade_cutoffs, percentage):

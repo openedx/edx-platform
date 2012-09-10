@@ -21,7 +21,7 @@
           if(json.success) {
             location.href="${reverse('dashboard')}";
           }else{
-	    $('#register_message').html("<p><font color='red'>" + json.error + "</font></p>");
+          $('#register_message').html('<p class="inline-error">' + json.error + "</p>");
           }
         });
       })(this)
@@ -61,30 +61,23 @@
         </hgroup>
 
         <div class="main-cta">
-          %if user.is_authenticated():
+        %if user.is_authenticated():
             %if registered:
-   	        <%
-		  ## TODO: move this logic into a view
-                  if has_access(user, course, 'load'):
-                      course_target = reverse('info', args=[course.id])
-                  else:
-                      course_target = reverse('about_course', args=[course.id])
-                  show_link = settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION')
-                %>
-	        %if show_link:
-                <a href="${course_target}">
+	              %if show_courseware_link:
+                    <a href="${course_target}">
                 %endif
-                <span class="register disabled">You are registered for this course (${course.number}).</span>
-	        %if show_link:
-                </a>
+                <span class="register disabled">You are registered for this course (${course.number})</span>
+                %if show_courseware_link:
+                    <strong>View Courseware</strong>
+                    </a>
                 %endif
             %else:
-                <a href="#" class="register">Register for ${course.number}</a>
-	        <div id="register_message"></div>
+               <a href="#" class="register">Register for ${course.number}</a>
+	             <div id="register_message"></div>
             %endif
-          %else:
+        %else:
             <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>
-          %endif
+        %endif
         </div>
 
       </section>
