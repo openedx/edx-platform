@@ -1309,7 +1309,7 @@ body.discussion {
     > li {
       position: relative;
       margin: 0 -10px 30px;
-      padding: 26px 30px 30px;
+      padding: 26px 30px 20px;
       border-radius: 3px;
       border: 1px solid #b2b2b2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
@@ -1573,6 +1573,7 @@ body.discussion {
   .discussion-reply-new {
     padding: 20px;
     @include clearfix;
+    @include transition(opacity .2s);
 
     h4 {
       font-size: 16px;
