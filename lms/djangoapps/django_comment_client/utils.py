@@ -241,8 +241,10 @@ def permalink(content):
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 def extend_content(content):
-    user = User.objects.get(pk=content['user_id'])
-    roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
+    roles = {}
+    if content.get('user_id'):
+        user = User.objects.get(pk=content['user_id'])
+        roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
@@ -255,7 +257,7 @@ def extend_content(content):
 
 def get_courseware_context(content, course):
     id_map = get_discussion_id_map(course)
-    id = content['commentable_id'] 
+    id = content['commentable_id']
     content_info = None
     if id in id_map:
         location = id_map[id]["location"].url()
