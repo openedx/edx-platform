@@ -229,6 +229,10 @@ if Backbone?
           success: (response, textStatus) =>
             if textStatus == 'success'
               @collection.reset(response.discussion_data)
+              Content.loadContentInfos(response.content_info)
+              # TODO: Perhaps reload user info so that votes can be updated.
+              # In the future we might not load all of a user's votes at once
+              # so this would probably be necessary anyway
               @displayedCollection.reset(@collection.models)
 
     setActiveItem: (event) ->
