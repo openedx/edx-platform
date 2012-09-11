@@ -142,6 +142,7 @@ if Backbone?
       setTimeout (-> @$(".post-search-field").focus()), 200
 
     toggleTopicDrop: (event) =>
+      event.preventDefault()
       event.stopPropagation()
       @$(".search").removeClass('is-open')
       @$(".browse").addClass('is-open')
