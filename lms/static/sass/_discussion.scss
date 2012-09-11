@@ -1006,6 +1006,9 @@ body.discussion {
 
   .post-list {
     background-color: #ddd;
+    .loading {
+      padding: 15px 0;
+    }
 
     a {
       position: relative;
