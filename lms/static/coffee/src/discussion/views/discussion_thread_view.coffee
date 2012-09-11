@@ -11,18 +11,13 @@ if Backbone?
 
     initialize: ->
       super()
-      @showView = new DiscussionThreadShowView(model: @model)
-      @showView.bind "thread:delete", @delete
-      @showView.bind "thread:edit", @edit
+      @createShowView()
 
     render: ->
       @$el.html(@template(@model.toJSON()))
       @delegateEvents()
 
-      @showView.setElement(@$('.thread-content-wrapper'))
-      @showView.render()
-      @showView.delegateEvents()
-
+      @renderShowView()
       @renderAttrs()
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
@@ -76,15 +71,94 @@ if Backbone?
           comment.updateInfo(data.annotated_content_info)
           comment.set(data.content)
 
-    edit: ->
+    edit: (event) =>
+      @createEditView()
+      @renderEditView()
 
-    delete: (event) ->
+    update: (event) =>
+
+      newTitle = @editView.$(".edit-post-title").val()
+      newTags  = @editView.$(".edit-post-tags").val()
+      newBody  = @editView.$(".edit-post-body textarea").val()
+
+      url = DiscussionUtil.urlFor('update_thread', @model.id)
+
+      DiscussionUtil.safeAjax
+          $elem: $(event.target)
+          $loading: $(event.target) if event
+          url: url
+          type: "POST"
+          dataType: 'json'
+          async: false # TODO when the rest of the stuff below is made to work properly..
+          data:
+              title: newTitle
+              body: newBody
+              tags: newTags
+          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
+          success: (response, textStatus) =>
+
+              # TODO: Move this out of the callback, this makes it feel sluggish
+
+              @editView.$(".edit-post-title").val("").attr("prev-text", "")
+              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
+              @editView.$(".edit-post-tags").val("")
+              @editView.$(".edit-post-tags").importTags("")
+              @editView.$(".wmd-preview p").html("")
+
+              @model.set
+                title: newTitle
+                body: newBody
+                tags: newTags
+
+              @createShowView()
+              @renderShowView()
+
+    createEditView: () ->
+
+      if @showView?
+        @showView.undelegateEvents()
+        @showView.$el.empty()
+        @showView = null
+
+      @editView = new DiscussionThreadEditView(model: @model)
+      @editView.bind "thread:update", @update
+      @editView.bind "thread:cancel_edit", @cancelEdit
+
+    renderEditView: () ->
+      @editView.setElement(@$('.thread-content-wrapper'))
+      @editView.render()
+      @editView.delegateEvents()
+
+    createShowView: () ->
+
+      if @editView?
+        @editView.undelegateEvents()
+        @editView.$el.empty()
+        @editView = null
+
+      @showView = new DiscussionThreadShowView(model: @model)
+      @showView.bind "thread:delete", @delete
+      @showView.bind "thread:edit", @edit
+
+    renderShowView: () ->
+      @showView.setElement(@$('.thread-content-wrapper'))
+      @showView.render()
+      @showView.delegateEvents()
+
+    cancelEdit: (event) =>
+      @createShowView()
+      @renderShowView()
+
+
+    delete: (event) =>
       url = @model.urlFor('delete')
       if not @model.can('can_delete')
         return
       if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
         return
       @model.remove()
+      @showView.undelegateEvents()
+      @undelegateEvents()
       @$el.empty()
       $elem = $(event.target)
       DiscussionUtil.safeAjax

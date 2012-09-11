@@ -57,7 +57,6 @@ class @DiscussionThreadShowView extends DiscussionContentView
   toggleFollowing: (event) ->
     $elem = $(event.target)
     url = null
-    console.log "follow"
     if not @model.get('subscribed')
       @model.follow()
       url = @model.urlFor("follow")
@@ -113,12 +112,11 @@ class @DiscussionThreadShowView extends DiscussionContentView
         comment.updateInfo(data.annotated_content_info)
         comment.set(data.content)
 
-  edit: ->
-    @trigger "thread:edit"
-    window.showView = @
+  edit: (event) ->
+    @trigger "thread:edit", event
 
   delete: (event) ->
-    @trigger "thread:delete"
+    @trigger "thread:delete", event
 
   toggleClosed: (event) ->
     $elem = $(event.target)

@@ -1,3 +1,6 @@
+import json
+import logging 
+
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse, Http404
@@ -15,7 +18,6 @@ from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank, get_courseware_context
 
-import json
 import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
@@ -24,6 +26,7 @@ THREADS_PER_PAGE = 200
 INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 
+log = logging.getLogger("edx.discussions")
 
 def _general_discussion_id(course_id):
     return course_id.replace('/', '_').replace('.', '_')
