@@ -16,6 +16,7 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from static_replace import replace_urls
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
@@ -230,6 +231,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
+    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS') and instance_module is not None:
+        system.set('psychometrics_handler',		# set callback for updating PsychometricsData
+                   make_psychometrics_data_update_handler(instance_module))
 
     try:
         module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
