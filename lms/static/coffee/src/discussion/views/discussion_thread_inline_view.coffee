@@ -11,8 +11,6 @@ if Backbone?
       "click .expand-post": "expandPost"
       "click .collapse-post": "collapsePost"
 
-    template: -> DiscussionUtil.getTemplate("_inline_thread")
-
     initLocal: ->
       @$local = @$el.children(".discussion-article").children(".local")
       @$delegateElement = @$local
@@ -22,12 +20,14 @@ if Backbone?
       @model.on "change", @updateModelDetails
 
     render: ->
+      @template = DiscussionUtil.getTemplate("_inline_thread")
+
       if not @model.has('abbreviatedBody')
         @abbreviateBody()
       params = $.extend(@model.toJSON(),{expanded: @expanded})
       if not @model.get('anonymous')
         params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
-      @$el.html(Mustache.render(@template(), params))
+      @$el.html(Mustache.render(@template, params))
       @initLocal()
       @delegateEvents()
       @renderDogear()

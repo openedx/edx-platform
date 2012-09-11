@@ -4,8 +4,6 @@ if Backbone?
     events:
       "click .discussion-submit-post": "submitComment"
 
-    template: _.template($("#thread-template").html())
-
     $: (selector) ->
       @$el.find(selector)
 
@@ -14,6 +12,7 @@ if Backbone?
       @createShowView()
 
     render: ->
+      @template = _.template($("#thread-template").html())
       @$el.html(@template(@model.toJSON()))
       @delegateEvents()
 

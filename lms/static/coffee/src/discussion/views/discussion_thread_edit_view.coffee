@@ -4,8 +4,6 @@ class @DiscussionThreadEditView extends Backbone.View
     "click .post-update": "update"
     "click .post-cancel": "cancel_edit"
 
-  template: _.template($("#thread-edit-template").html())
-
   $: (selector) ->
     @$el.find(selector)
 
@@ -13,6 +11,7 @@ class @DiscussionThreadEditView extends Backbone.View
     super()
 
   render: ->
+    @template = _.template($("#thread-edit-template").html())
     @$el.html(@template(@model.toJSON()))
     @delegateEvents()
     DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "edit-post-body"

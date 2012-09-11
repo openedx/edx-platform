@@ -4,7 +4,6 @@ if Backbone?
   console.log('test 2')
   class @ThreadResponseView extends DiscussionContentView
     tagName: "li"
-    template: _.template($("#thread-response-template").html())
 
     events:
         "click .vote-btn": "toggleVote"
@@ -13,6 +12,7 @@ if Backbone?
         "click .action-delete": "delete"
 
     render: ->
+      @template = _.template($("#thread-response-template").html())
       @$el.html(@template(@model.toJSON()))
       @initLocal()
       @delegateEvents()
