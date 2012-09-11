@@ -179,6 +179,7 @@ def inline_discussion(request, course_id, discussion_id):
         'num_pages': query_params['num_pages']
     })
 
+@login_required
 def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
@@ -239,6 +240,7 @@ def forum_form_discussion(request, course_id):
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
 
+@login_required
 def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
@@ -315,6 +317,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return render_to_response('discussion/single_thread.html', context)
 
+@login_required
 def user_profile(request, course_id, user_id):
 
     course = get_course_with_access(request.user, course_id, 'load')
