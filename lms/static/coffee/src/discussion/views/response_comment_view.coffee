@@ -8,7 +8,12 @@ if Backbone?
       @$delegateElement = @$local
 
     render: ->
-      @$el.html(@template(@model.toJSON()))
+      params = @model.toJSON()
+      params['deep'] = @options.deep
+      if @options.deep
+        params['parent_id'] = @options.parent.id
+        params['parent_username'] = @options.parent.get('username')
+      @$el.html(@template(params))
       @initLocal()
       @delegateEvents()
       @renderAttrs()
