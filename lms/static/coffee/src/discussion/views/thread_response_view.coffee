@@ -34,6 +34,9 @@ if Backbone?
       view = new ResponseCommentView(model: comment)
       view.render()
       @$el.find(".comments li:last").before(view.el)
+      children = new Comments(comment.get('children'))
+      children.each @renderComment
+
 
     toggleVote: (event) ->
       event.preventDefault()
