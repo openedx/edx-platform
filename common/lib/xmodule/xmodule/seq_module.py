@@ -87,7 +87,7 @@ class SequenceModule(XModule):
                 'type': child.get_icon_class(),
             }
             if childinfo['title']=='':
-                    childinfo['title'] = child.metadata['display_name']
+                childinfo['title'] = child.metadata.get('display_name','')
             contents.append(childinfo)
 
         params = {'items': contents,
