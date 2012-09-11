@@ -12,6 +12,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/jquery.sequence.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.widowFix-1.3.2.min.js')}"></script>
 
   ## codemirror
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
@@ -20,6 +21,7 @@
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
+
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
@@ -35,6 +37,22 @@
 
   <script type="text/javascript">
     var $$course_id = "${course.id}";
+
+    $(function(){
+        $(".ui-accordion-header a").each(function() {
+          var wordArray = $(this).text().split(" ");
+          var finalTitle = "";
+          for (i=0;i<=wordArray.length-1;i++) {
+            finalTitle += wordArray[i];
+            if (i == (wordArray.length-2)) {
+              finalTitle += "&nbsp;";
+            } else { 
+              finalTitle += " ";
+            }
+          }
+          $(this).html(finalTitle);
+        });
+      });
   </script>
 </%block>
 
