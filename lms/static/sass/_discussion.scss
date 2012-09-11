@@ -1006,8 +1006,14 @@ body.discussion {
 
   .post-list {
     background-color: #ddd;
+
     .loading {
       padding: 15px 0;
+      background: #f6f6f6;
+
+      .loading-animation {
+        background-image: url(../images/spinner-on-grey.gif);
+      }
     }
 
     a {
