@@ -14,6 +14,7 @@ if Backbone?
     render: ->
       @template = _.template($("#thread-template").html())
       @$el.html(@template(@model.toJSON()))
+      @$el.find(".loading").hide()
       @delegateEvents()
 
       @renderShowView()
@@ -27,7 +28,10 @@ if Backbone?
       if @responsesRequest?
         @responsesRequest.abort()
 
-    renderResponses: ->
+    renderResponses: ->      
+      setTimeout(=>
+        @$el.find(".loading").show()
+      , 200)
       @responsesRequest = DiscussionUtil.safeAjax
         url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
         success: (data, textStatus, xhr) =>
