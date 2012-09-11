@@ -10,10 +10,10 @@ if Backbone?
     render: ->
       @template = _.template($("#response-comment-template").html())
       params = @model.toJSON()
-      params['deep'] = @options.deep
-      if @options.deep
-        params['parent_id'] = @options.parent.id
-        params['parent_username'] = @options.parent.get('username')
+      params['deep'] = @model.has('parent')
+      if @model.has('parent')
+        params['parent_id'] = @model.get('parent').id
+        params['parent_username'] = @model.get('parent').get('username')
       @$el.html(@template(params))
       @initLocal()
       @delegateEvents()

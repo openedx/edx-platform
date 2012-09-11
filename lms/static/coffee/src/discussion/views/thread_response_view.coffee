@@ -1,7 +1,4 @@
-console.log('test 1')
-
 if Backbone?
-  console.log('test 2')
   class @ThreadResponseView extends DiscussionContentView
     tagName: "li"
 
@@ -30,16 +27,23 @@ if Backbone?
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
     renderComments: ->
-      @model.get("comments").each (comment) => @renderComment(comment, false, null)
+      comments = new Comments()
+      comments.comparator = (comment) ->
+        comment.get('created_at')
+      collectComments = (comment) ->
+        comments.add(comment)
+        children = new Comments(comment.get('children'))
+        children.each (child) ->
+          child.set('parent', comment)
+          collectComments(child)
+      @model.get('comments').each collectComments
+      comments.each (comment) => @renderComment(comment, false, null)
 
-    renderComment: (comment, deep=false, parent=null) =>
+    renderComment: (comment) =>
       comment.set('thread', @model.get('thread'))
-      view = new ResponseCommentView(model: comment, deep: deep, parent: parent)
+      view = new ResponseCommentView(model: comment)
       view.render()
       @$el.find(".comments li:last").before(view.el)
-      children = new Comments(comment.get('children'))
-      children.each (child) => @renderComment child, true, comment
-
 
     toggleVote: (event) ->
       event.preventDefault()
