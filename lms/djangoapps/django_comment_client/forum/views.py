@@ -265,22 +265,24 @@ def render_single_thread(request, discussion_id, course_id, thread_id):
 def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
-
+        course = get_course_with_access(request.user, course_id, 'load')
         user_info = cc.User.from_django_user(request.user).to_dict()
 
         try:
             thread = cc.Thread.find(thread_id).retrieve(recursive=True)
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
             raise Http404
+        courseware_context = get_courseware_context(thread, course)
 
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
         html = render_to_string('discussion/_ajax_single_thread.html', context)
-
+        content = utils.safe_content(thread.to_dict())
+        content.update(courseware_context)
         return utils.JsonResponse({
             'html': html,
-            'content': utils.safe_content(thread.to_dict()),
+            'content': content,
             'annotated_content_info': annotated_content_info,
         })
 
