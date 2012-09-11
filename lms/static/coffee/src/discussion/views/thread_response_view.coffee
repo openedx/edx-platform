@@ -1,4 +1,7 @@
+console.log('test 1')
+
 if Backbone?
+  console.log('test 2')
   class @ThreadResponseView extends DiscussionContentView
     tagName: "li"
     template: _.template($("#thread-response-template").html())

@@ -1612,12 +1612,23 @@ body.discussion {
   border-bottom: 1px solid #bcbcbc;
 }
 
+
+
 .discussion-module {
   @extend .discussion-body;
   margin: 20px 0;
   padding: 20px 20px 28px 20px;
   background: #f6f6f6 !important;
-  border-radius: 3px;  
+  border-radius: 3px;
+
+  .responses {
+    margin-top: 40px;
+
+    > li {
+      margin: 0 20px 20px !important;
+      padding: 26px 30px 20px !important;
+    }
+  }
 
   .discussion-show {
     display: block;
@@ -2127,15 +2138,28 @@ body.discussion {
 
   .wmd-button-row {
     // this is being hidden now because the inline styles to position the icons are not being written
-    display: none;
     position: relative;
     height: 12px;    
   }
 
   .wmd-button {
     span {
+      width: 20px;
+      height: 20px;
       background-image: url("/static/images/wmd-buttons.png");
       display: inline-block;
     }
+  }
+
+  .wmd-spacer1 {
+    left: 50px;
+  }
+
+  .wmd-spacer2 {
+    left: 175px;
+  }
+
+  .wmd-spacer3 {
+    left: 300px;
   }
 }
