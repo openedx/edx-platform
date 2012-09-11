@@ -50,6 +50,26 @@
   </div>
 </script>
 
+<script type="text/template" id="thread-edit-template">
+  <div class="discussion-post edit-post-form">
+    <h1>Editing post</h1>
+    <ul class="edit-post-form-errors"></ul>
+    <div class="form-row">
+      <input type="text" class="edit-post-title" name="title" value=${"<%-title %>"} placeholder="Title">
+    </div>
+    <div class="form-row">
+      <div class="edit-post-body" name="body">
+        ${"<%- body %>"}
+      </div>
+    </div>
+    <div class="form-row">
+      <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value=${"<%- tags %>"}>
+    </div>
+    <input type="submit" class="post-update" value="Update post">
+    <a href="#" class="post-cancel">Cancel</a>
+  </div>
+</script>
+
 <script type="text/template" id="thread-response-template">
     <header class="response-local">
         <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
