@@ -38,8 +38,6 @@ if Backbone?
         thisButton.addClass('shown')
         thisButton.find('.button-text').html("Hide Discussion")
 
-        console.log($(event.target))
-
         if @retrieved
           @$("section.discussion").slideDown()
           @showed = true

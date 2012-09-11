@@ -6,14 +6,19 @@
             <h3>{{title}}</h3>
             <p class="posted-details">
                 <span class="timeago" title="{{created_at}}">{{created_at}}</span> by
+                {{#user}}
                 <a href="{{user_url}}">{{username}}</a>
+                {{/user}}
+                {{^user}}
+                anonymous
+                {{/user}}
                 <span class="post-status-closed top-post-status" style="display: none">
                     &bull; This thread is closed.
                 </span>
             </p>
         </header>
         <div class="post-body">{{abbreviatedBody}}</div>
-        
+
         <ul class="moderator-actions post-extended-content">
             <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
             <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
