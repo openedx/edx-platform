@@ -7,8 +7,6 @@ class @DiscussionThreadShowView extends DiscussionContentView
     "click .action-delete": "delete"
     "click .action-openclose": "toggleClosed"
 
-  template: _.template($("#thread-show-template").html())
-
   $: (selector) ->
     @$el.find(selector)
 
@@ -17,6 +15,7 @@ class @DiscussionThreadShowView extends DiscussionContentView
     @model.on "change", @updateModelDetails
 
   render: ->
+    @template = _.template($("#thread-show-template").html())
     @$el.html(@template(@model.toJSON()))
     @delegateEvents()
     @renderDogear()
