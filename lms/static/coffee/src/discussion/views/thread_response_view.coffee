@@ -44,6 +44,7 @@ if Backbone?
       view = new ResponseCommentView(model: comment)
       view.render()
       @$el.find(".comments li:last").before(view.el)
+      view
 
     toggleVote: (event) ->
       event.preventDefault()
@@ -81,8 +82,8 @@ if Backbone?
       body = @$(".comment-form-input").val()
       if not body.trim().length
         return
-      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"))
-      @renderComment(comment)
+      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"), id:"unsaved")
+      view = @renderComment(comment)
       @trigger "comment:add", comment
       @$(".comment-form-input").val("")
 
@@ -93,7 +94,9 @@ if Backbone?
         dataType: 'json'
         data:
           body: body
-
+        success: (response, textStatus) ->
+          comment.set(response.content)
+          view.render() # This is just to update the id for the most part, but might be useful in general
     delete: (event) ->
       event.preventDefault()
       if not @model.can('can_delete')
