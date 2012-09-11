@@ -27,15 +27,15 @@ if Backbone?
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
     renderComments: ->
-      @model.get("comments").each @renderComment
+      @model.get("comments").each (comment) => @renderComment(comment, false, null)
 
-    renderComment: (comment) =>
+    renderComment: (comment, deep=false, parent=null) =>
       comment.set('thread', @model.get('thread'))
-      view = new ResponseCommentView(model: comment)
+      view = new ResponseCommentView(model: comment, deep: deep, parent: parent)
       view.render()
       @$el.find(".comments li:last").before(view.el)
       children = new Comments(comment.get('children'))
-      children.each @renderComment
+      children.each (child) => @renderComment child, true, comment
 
 
     toggleVote: (event) ->
