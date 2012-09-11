@@ -75,7 +75,7 @@ class SequenceModule(XModule):
         contents = []
         for child in self.get_display_items():
             progress = child.get_progress()
-	    childinfo = {
+            childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
                     grand_child.display_name.strip()
@@ -86,7 +86,7 @@ class SequenceModule(XModule):
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
             }
-	    if childinfo['title']=='':
+            if childinfo['title']=='':
 		    childinfo['title'] = child.metadata['display_name']
             contents.append(childinfo)
 
