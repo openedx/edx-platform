@@ -147,6 +147,7 @@ if Backbone?
                   @$(".new-post-body textarea").val("").attr("prev-text", "")
                   @$(".new-post-tags").val("")
                   @$(".new-post-tags").importTags("")
+                  @$(".wmd-preview p").html("")
                   @collection.add thread
 
       setActiveItem: (event) ->
