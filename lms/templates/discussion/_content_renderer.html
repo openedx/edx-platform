@@ -5,7 +5,7 @@
 </%def>
 
 <%def name="render_content_with_comments(content, *args, **kwargs)">
-  <div class="${content['type'] | h}${helpers.show_if(' endorsed', content.get('endorsed')) | h}" _id="${content['id'] | h}" _discussion_id="${content.get('commentable_id', '') | h}" _author_id="${helpers.show_if(content['user_id'], not content.get('anonymous')) | h}">
+  <div class="${content['type'] | h}${' endorsed' if content.get('endorsed') else ''| h}" _id="${content['id'] | h}" _discussion_id="${content.get('commentable_id', '') | h}" _author_id="${content['user_id'] if (not content.get('anonymous')) else '' | h}">
     ${render_content(content, *args, **kwargs)}
     ${render_comments(content.get('children', []), *args, **kwargs)}
   </div>
