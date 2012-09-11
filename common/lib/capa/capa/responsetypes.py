@@ -408,7 +408,7 @@ class JavascriptResponse(LoncapaResponse):
         output = self.call_node([generator_file,
                                  self.generator, 
                                  json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.system.seed)), 
+                                 json.dumps(self.context['random'].getrandbits(9)), 
                                  json.dumps(self.params)]).strip()
 
         return json.loads(output)
