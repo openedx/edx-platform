@@ -327,12 +327,12 @@ class @Problem
 
   inputtypeSetupMethods:
 
-    textinputdynamath: (element) =>
+    'text-input-dynamath': (element) =>
       ###
       Return: function (eqn) -> eqn that preprocesses the user formula input before
                 it is fed into MathJax. Return 'false' if no preprocessor specified
       ###
-      data = $(element).find('.textinputdynamath_data')
+      data = $(element).find('.text-input-dynamath_data')
 
       preprocessorClassName = data.data('preprocessor')
       preprocessorClass = window[preprocessorClassName]
