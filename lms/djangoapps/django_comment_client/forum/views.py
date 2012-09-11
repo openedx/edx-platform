@@ -34,7 +34,7 @@ def _should_perform_search(request):
 
 
 def render_accordion(request, course, discussion_id):
-
+    # TODO: Delete if obsolete
     discussion_info = utils.get_categorized_discussion_info(request, course)
 
     context = {
@@ -178,16 +178,6 @@ def inline_discussion(request, course_id, discussion_id):
         'num_pages': query_params['num_pages']
     })
 
-def render_search_bar(request, course_id, discussion_id=None, text=''):
-    if not discussion_id:
-        return ''
-    context = {
-        'discussion_id': discussion_id,
-        'text': text,
-        'course_id': course_id,
-    }
-    return render_to_string('discussion/_search_bar.html', context)
-
 def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page
@@ -240,27 +230,6 @@ def forum_form_discussion(request, course_id):
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
-
-def render_single_thread(request, discussion_id, course_id, thread_id):
-
-    thread = cc.Thread.find(thread_id).retrieve(recursive=True).to_dict()
-    threads, query_params = get_threads(request, course_id)
-
-    user_info = cc.User.from_django_user(request.user).to_dict()
-
-    annotated_content_info = utils.get_annotated_content_infos(course_id, thread=thread, user=request.user, user_info=user_info)
-
-    context = {
-        'discussion_id': discussion_id,
-        'thread': thread,
-        'annotated_content_info': json.dumps(annotated_content_info),
-        'course_id': course_id,
-        'request': request,
-        'discussion_data': json.dumps({ discussion_id: [utils.safe_content(thread)] }),
-        'threads': threads,
-    }
-
-    return render_to_string('discussion/_single_thread.html', context)
 
 def single_thread(request, course_id, discussion_id, thread_id):
 
