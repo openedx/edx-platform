@@ -1620,7 +1620,7 @@ body.discussion {
 .discussion-module {
   @extend .discussion-body;
   margin: 20px 0;
-  padding: 20px 20px 28px 20px;
+  padding: 20px;
   background: #f6f6f6 !important;
   border-radius: 3px;
 
@@ -1634,9 +1634,8 @@ body.discussion {
   }
 
   .discussion-show {
-    display: block;
-    width: 200px;
-    margin: auto;
+    position: relative;
+    top: 3px;
     font-size: 14px;
     text-align: center;
 
@@ -1660,10 +1659,11 @@ body.discussion {
 
   .new-post-btn {
     display: inline-block;
+    float: right;
   }
 
   section.discussion {
-    margin-top: 20px;
+    margin-top: 30px;
 
     .threads {
       margin-top: 20px;
