@@ -1,5 +1,5 @@
 import json
-import logging 
+import logging
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -34,7 +34,6 @@ def _general_discussion_id(course_id):
 def _should_perform_search(request):
     return bool(request.GET.get('text', False) or \
             request.GET.get('tags', False))
-
 
 def render_accordion(request, course, discussion_id):
     # TODO: Delete if obsolete
@@ -85,7 +84,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
                 thread['courseware_title']  = courseware_context['courseware_title']
 
     context = {
-        'threads': threads,
+        #'threads': map(utils.safe_content, threads),   # TODO Delete, this is redundant with discussion_data
         'discussion_id': discussion_id,
         'user_id': user_id,
         'course_id': course_id,
@@ -189,11 +188,12 @@ def forum_form_discussion(request, course_id):
     category_map = utils.get_discussion_category_map(course)
 
     try:
-        threads, query_params = get_threads(request, course_id)
+        unsafethreads, query_params = get_threads(request, course_id)
+        threads = [utils.safe_content(thread) for thread in unsafethreads]
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
 
-    content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
+    #content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
 
     user_info = cc.User.from_django_user(request.user).to_dict()
 
@@ -204,8 +204,8 @@ def forum_form_discussion(request, course_id):
 
     if request.is_ajax():
         return utils.JsonResponse({
-            'html': content,
-            'discussion_data': map(utils.safe_content, threads),
+            #'html': content,
+            'discussion_data': threads,
         })
     else:
         #recent_active_threads = cc.search_recent_active_threads(
@@ -221,7 +221,7 @@ def forum_form_discussion(request, course_id):
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
-            'content': content,
+            #'content': content,
             #'recent_active_threads': recent_active_threads,
             #'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
