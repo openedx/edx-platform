@@ -49,7 +49,6 @@ def render_accordion(request, course, discussion_id):
     return render_to_string('discussion/_accordion.html', context)
 
 def render_discussion(request, course_id, threads, *args, **kwargs):
-
     discussion_id = kwargs.get('discussion_id')
     user_id = kwargs.get('user_id')
     discussion_type = kwargs.get('discussion_type', 'inline')
@@ -182,13 +181,13 @@ def inline_discussion(request, course_id, discussion_id):
 
 def forum_form_discussion(request, course_id):
     """
-    Renders the main Discussion page
+    Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, course_id, 'load')
     category_map = utils.get_discussion_category_map(course)
 
     try:
-        unsafethreads, query_params = get_threads(request, course_id)
+        unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         threads = [utils.safe_content(thread) for thread in unsafethreads]
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
@@ -201,11 +200,16 @@ def forum_form_discussion(request, course_id):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
-
+    for thread in threads:
+        courseware_context = get_courseware_context(thread, course)
+        if courseware_context:
+            thread['courseware_location']  = courseware_context['courseware_location']
+            thread['courseware_title']  = courseware_context['courseware_title']
     if request.is_ajax():
         return utils.JsonResponse({
             #'html': content,
             'discussion_data': threads,
+            'annotated_content_info': annotated_content_info,
         })
     else:
         #recent_active_threads = cc.search_recent_active_threads(
@@ -217,6 +221,7 @@ def forum_form_discussion(request, course_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
+
         escapedict = {'"': '&quot;'}
         context = {
             'csrf': csrf(request)['csrf_token'],

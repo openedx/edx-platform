@@ -15,13 +15,9 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
-  @addContent: (id, content) -> window.$$contents[id] = content
-
-  @getContent: (id) -> window.$$contents[id]
-
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
-      @getContent(id).updateInfo(info)
+      Content.getContent(id).updateInfo(info)
 
   @generateDiscussionLink: (cls, txt, handler) ->
     $("<a>").addClass("discussion-link")
