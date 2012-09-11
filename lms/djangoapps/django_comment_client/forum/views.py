@@ -248,7 +248,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
         # TODO: Remove completely or switch back to server side rendering
         html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
-        content.update(courseware_context)
+        if courseware_context:
+            content.update(courseware_context)
         return utils.JsonResponse({
             'html': html,
             'content': content,
