@@ -35,6 +35,7 @@ from path import path
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
+    'ENABLE_DISCUSSION_SERVICE': False
 }
 
 # needed to use lms student app
