@@ -106,7 +106,7 @@ class CourseDescriptor(SequenceDescriptor):
                 # the rest of the courseware.
                 log.exception("Couldn't load textbook")
                 continue
-            textbooks.append()
+            textbooks.append(txt)
             xml_object.remove(textbook)
 
         #Load the wiki tag if it exists
