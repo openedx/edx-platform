@@ -24,7 +24,10 @@ if Backbone?
     render: ->
       if not @model.has('abbreviatedBody')
         @abbreviateBody()
-      @$el.html(Mustache.render(@template(), $.extend(@model.toJSON(),{expanded: @expanded}) ))
+      params = $.extend(@model.toJSON(),{expanded: @expanded})
+      if not @model.get('anonymous')
+        params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
+      @$el.html(Mustache.render(@template(), params))
       @initLocal()
       @delegateEvents()
       @renderDogear()
