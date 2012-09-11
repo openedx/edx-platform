@@ -34,7 +34,7 @@ if Backbone?
         comments.add(comment)
         children = new Comments(comment.get('children'))
         children.each (child) ->
-          child.set('parent', comment)
+          child.parent = comment
           collectComments(child)
       @model.get('comments').each collectComments
       comments.each (comment) => @renderComment(comment, false, null)
