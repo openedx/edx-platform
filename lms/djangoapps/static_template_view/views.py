@@ -6,6 +6,7 @@
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django.shortcuts import redirect
 from django.conf import settings
+from django.http import HttpResponseNotFound, HttpResponseServerError
 from django_future.csrf import ensure_csrf_cookie
 
 from util.cache import cache_if_anonymous
@@ -40,9 +41,9 @@ def render(request, template):
 
 
 def render_404(request):
-    return render_to_response('static_templates/404.html', {})
+    return HttpResponseNotFound(render_to_string('static_templates/404.html', {}))
 
 
 def render_500(request):
-    return render_to_response('static_templates/server-error.html', {})
+    return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}))
 
