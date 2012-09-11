@@ -507,6 +507,7 @@ class CapaModule(XModule):
         #       'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
+	event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
 	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
