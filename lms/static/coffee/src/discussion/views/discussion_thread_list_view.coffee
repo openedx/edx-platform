@@ -17,6 +17,7 @@ if Backbone?
       @sidebar_header_height = 87
       @boardName
       @template = _.template($("#thread-list-template").html())
+      @current_search = ""
 
     reloadDisplayedCollection: (thread) =>
       thread_id = thread.get('id')
@@ -133,6 +134,9 @@ if Backbone?
       @$("a[data-id='#{thread_id}']").addClass("active")
 
     showSearch: ->
+      @$(".browse").removeClass('is-dropped')
+      @hideTopicDrop()
+
       @$(".search").addClass('is-open')
       @$(".browse").removeClass('is-open')
       setTimeout (-> @$(".post-search-field").focus()), 200
@@ -142,15 +146,20 @@ if Backbone?
       @$(".search").removeClass('is-open')
       @$(".browse").addClass('is-open')
       @$(".browse").toggleClass('is-dropped')
+
       if @$(".browse").hasClass('is-dropped')
         @$(".browse-topic-drop-menu-wrapper").show()
         $(".browse-topic-drop-search-input").focus()
         $("body").bind "click", @toggleTopicDrop
         $("body").bind "keydown", @setActiveItem
       else
-        @$(".browse-topic-drop-menu-wrapper").hide()
-        $("body").unbind "click", @toggleTopicDrop
-        $("body").unbind "keydown", @setActiveItem
+        @hideTopicDrop()
+
+    hideTopicDrop: ->
+      @$(".browse-topic-drop-menu-wrapper").hide()
+      $("body").unbind "click", @toggleTopicDrop
+      $("body").unbind "keydown", @setActiveItem
+
 
     setTopic: (event) ->
       item = $(event.target).closest('a')
@@ -195,14 +204,18 @@ if Backbone?
       return name
 
     filterTopic: (event) ->
-      @setTopic(event)
-      item = $(event.target).closest('li')
-      if item.find("span.board-name").data("discussion_id") == "#all"
-        item = item.parent()
-      discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
-      filtered = @collection.filter (thread) =>
-        _.include(discussionIds, thread.get('commentable_id'))
-      @displayedCollection.reset filtered
+      if @current_search != ""
+        @setTopic(event)
+        @clearSearch @filterTopic, event
+      else
+        @setTopic(event)
+        item = $(event.target).closest('li')
+        if item.find("span.board-name").data("discussion_id") == "#all"
+          item = item.parent()
+        discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
+        filtered = @collection.filter (thread) =>
+          _.include(discussionIds, thread.get('commentable_id'))
+        @displayedCollection.reset filtered
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
@@ -219,21 +232,35 @@ if Backbone?
     performSearch: (event) ->
       if event.which == 13
         event.preventDefault()
-        url = DiscussionUtil.urlFor("search")
         text = @$(".post-search-field").val()
-        DiscussionUtil.safeAjax
-          $elem: @$(".post-search-field")
-          data: { text: text }
-          url: url
-          type: "GET"
-          success: (response, textStatus) =>
-            if textStatus == 'success'
-              @collection.reset(response.discussion_data)
-              Content.loadContentInfos(response.content_info)
-              # TODO: Perhaps reload user info so that votes can be updated.
-              # In the future we might not load all of a user's votes at once
-              # so this would probably be necessary anyway
-              @displayedCollection.reset(@collection.models)
+        @searchFor(text)
+
+    searchFor: (text, callback, value) ->
+      @current_search = text
+      url = DiscussionUtil.urlFor("search")
+      DiscussionUtil.safeAjax
+        $elem: @$(".post-search-field")
+        data: { text: text }
+        url: url
+        type: "GET"
+        $loading: $
+        loadingCallback: =>
+          @$(".post-list").html('<li class="loading"><div class="loading-animation"></div></li>')
+        loadedCallback: =>
+          if callback
+            callback.apply @, [value]
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @collection.reset(response.discussion_data)
+            Content.loadContentInfos(response.content_info)
+            # TODO: Perhaps reload user info so that votes can be updated.
+            # In the future we might not load all of a user's votes at once
+            # so this would probably be necessary anyway
+            @displayedCollection.reset(@collection.models)
+
+    clearSearch: (callback, value) ->
+      @$(".post-search-field").val("")
+      @searchFor("", callback, value)
 
     setActiveItem: (event) ->
       if event.which == 13
