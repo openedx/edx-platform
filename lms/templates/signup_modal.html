@@ -21,18 +21,18 @@
         <div class="input-group">
 	  % if has_extauth_info is UNDEFINED:
           <label data-field="email">E-mail*</label>
-          <input name="email" type="email" placeholder="E-mail*">
+          <input name="email" type="email" placeholder="eg. example@edx.org">
           <label data-field="password">Password*</label>
-          <input name="password" type="password" placeholder="Password*">
+          <input name="password" type="password" placeholder="****">
           <label data-field="username">Public Username*</label>
-          <input name="username" type="text" placeholder="Public Username*">
+          <input name="username" type="text" placeholder="Shown on forms">
           <label data-field="name">Full Name</label>
-          <input name="name" type="text" placeholder="Full Name*">
+          <input name="name" type="text" placeholder="For your certificate">
 	  % else:
 	  <p><i>Welcome</i> ${extauth_email}</p><br/>
 	  <p><i>Enter a public username:</i></p>
           <label data-field="username">Public Username*</label>
-          <input name="username" type="text" value="${extauth_username}" placeholder="Public Username*">
+          <input name="username" type="text" value="${extauth_username}" placeholder="Shown on forums">
 	  % endif
         </div>
 
@@ -75,9 +75,9 @@
           </section>
 
           <label data-field="mailing_address">Mailing address</label>
-          <textarea name="mailing_address" placeholder="Mailing address"></textarea>
+          <textarea name="mailing_address"></textarea>
           <label data-field="goals">Goals in signing up for edX</label>
-          <textarea name="goals" placeholder="Goals in signing up for edX"></textarea>
+          <textarea name="goals"></textarea>
 
         </div>
 
