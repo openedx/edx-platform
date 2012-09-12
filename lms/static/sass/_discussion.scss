@@ -1710,16 +1710,14 @@ body.discussion {
       padding: 0;
       @include transition(all .25s);
 
-      .dogear,
-      .vote-btn {
+      .dogear {
         display: none;
       }
 
       &.expanded {
         padding: 20px 0;
 
-        .dogear,
-        .vote-btn {
+        .dogear{
           display: block;
         }
 
