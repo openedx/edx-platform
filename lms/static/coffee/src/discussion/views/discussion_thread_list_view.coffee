@@ -144,6 +144,8 @@ if Backbone?
     toggleTopicDrop: (event) =>
       event.preventDefault()
       event.stopPropagation()
+      if @current_search != ""
+        @clearSearch()
       @$(".search").removeClass('is-open')
       @$(".browse").addClass('is-open')
       @$(".browse").toggleClass('is-dropped')
