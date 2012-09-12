@@ -25,7 +25,7 @@ import xml.sax.saxutils as saxutils
 THREADS_PER_PAGE = 200
 INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
-
+escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
 def _general_discussion_id(course_id):
@@ -83,7 +83,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
                 thread['courseware_title']  = courseware_context['courseware_title']
 
     context = {
-        #'threads': map(utils.safe_content, threads),   # TODO Delete, this is redundant with discussion_data
+        'threads': map(utils.safe_content, threads),
         'discussion_id': discussion_id,
         'user_id': user_id,
         'course_id': course_id,
@@ -94,7 +94,8 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         'base_url': base_url,
         'query_params': strip_blank(strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text']))),
         'annotated_content_info': json.dumps(annotated_content_info),
-        'discussion_data': json.dumps({ (discussion_id or user_id): map(utils.safe_content, threads) })
+        #'discussion_data': json.dumps({ (discussion_id or user_id): map(utils.safe_content, threads) })
+        # TODO: Delete the above, nothing uses this
     }
     context = dict(context.items() + query_params.items())
     return render_to_string(template, context)
@@ -161,17 +162,12 @@ def inline_discussion(request, course_id, discussion_id):
         # checking for errors on request.  Check and fix as needed.
         raise Http404
 
-    # TODO: Remove all of this stuff or switch back to server side rendering once templates are mustache again
-    #html = render_inline_discussion(request, course_id, threads, discussion_id=discussion_id,  \
-    #                                                             query_params=query_params)
-
     def infogetter(thread):
         return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
     return utils.JsonResponse({
-#        'html': html,
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
@@ -193,8 +189,6 @@ def forum_form_discussion(request, course_id):
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
 
-    #content = render_forum_discussion(request, course_id, threads, discussion_id=_general_discussion_id(course_id), query_params=query_params)
-
     user_info = cc.User.from_django_user(request.user).to_dict()
 
     def infogetter(thread):
@@ -208,8 +202,7 @@ def forum_form_discussion(request, course_id):
             thread['courseware_title']  = courseware_context['courseware_title']
     if request.is_ajax():
         return utils.JsonResponse({
-            #'html': content,
-            'discussion_data': threads,
+            'discussion_data': threads, # TODO: Standardize on 'discussion_data' vs 'threads'
             'annotated_content_info': annotated_content_info,
         })
     else:
@@ -223,11 +216,9 @@ def forum_form_discussion(request, course_id):
         #    course_id,
         #)
 
-        escapedict = {'"': '&quot;'}
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
-            #'content': content,
             #'recent_active_threads': recent_active_threads,
             #'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
@@ -256,12 +247,12 @@ def single_thread(request, course_id, discussion_id, thread_id):
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
-        html = render_to_string('discussion/_ajax_single_thread.html', context)
+        # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
         if courseware_context:
             content.update(courseware_context)
         return utils.JsonResponse({
-            'html': html,
+            #'html': html,
             'content': content,
             'annotated_content_info': annotated_content_info,
         })
@@ -293,7 +284,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #)
 
         user_info = cc.User.from_django_user(request.user).to_dict()
-        escapedict = {'"': '&quot;'}
+
 
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
@@ -303,13 +294,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
-            'init': '',
+            'init': '', #TODO: What is this?
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             #'recent_active_threads': recent_active_threads,
             #'trending_tags': trending_tags,
-            'course_id': course.id,
+            'course_id': course.id, #TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
@@ -323,11 +314,15 @@ def user_profile(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
-
+        query_params = {
+            'page': request.GET.get('page', 1),
+            'per_page': INLINE_THREADS_PER_PAGE,
+        }
+        threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
 
-        content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
+#        content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
 
         if request.is_ajax():
             return utils.JsonResponse({
@@ -335,12 +330,21 @@ def user_profile(request, course_id, user_id):
                 'discussion_data': map(utils.safe_content, threads),
             })
         else:
+            user_info = cc.User.from_django_user(request.user).to_dict()
+
+            def infogetter(thread):
+                return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+
+            annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
             context = {
                 'course': course,
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'content': content,
+                'threads': saxutils.escape(json.dumps(threads), escapedict),
+                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+#                'content': content,
             }
 
             return render_to_response('discussion/user_profile.html', context)
