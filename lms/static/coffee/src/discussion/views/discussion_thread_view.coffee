@@ -3,6 +3,7 @@ if Backbone?
 
     events:
       "click .discussion-submit-post": "submitComment"
+      "click .thread-tag": "tagSelected"
 
     $: (selector) ->
       @$el.find(selector)
@@ -19,6 +20,7 @@ if Backbone?
 
       @renderShowView()
       @renderAttrs()
+      @renderTags()
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderResponses()
@@ -27,6 +29,16 @@ if Backbone?
     cleanup: ->
       if @responsesRequest?
         @responsesRequest.abort()
+
+    renderTags: ->
+      tags = $('<div class="thread-tags">')
+      for tag in @model.get("tags")
+        tags.append("<a class='thread-tag'>#{tag}</a>")
+      @$(".post-body").after(tags)
+
+    tagSelected: (e) ->
+      @trigger "tag:selected", $(e.target).html()
+
 
     renderResponses: ->      
       setTimeout(=>
