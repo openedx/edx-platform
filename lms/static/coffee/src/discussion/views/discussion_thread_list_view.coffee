@@ -236,6 +236,11 @@ if Backbone?
         text = @$(".post-search-field").val()
         @searchFor(text)
 
+    setAndSearchFor: (text) ->
+      @showSearch()
+      @$(".post-search-field").val(text)
+      @searchFor(text)
+
     searchFor: (text, callback, value) ->
       @current_search = text
       url = DiscussionUtil.urlFor("search")
