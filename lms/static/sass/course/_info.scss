@@ -25,11 +25,6 @@ div.info-wrapper {
         margin-bottom: lh();
         padding-bottom: lh(.5);
 
-        &:first-child {
-          margin: 0 (-(lh(.5))) lh();
-          padding: lh(.5);
-        }
-
         ol, ul {
           margin: 0;
           list-style-type: disk;
