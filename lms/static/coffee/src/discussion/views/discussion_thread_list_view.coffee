@@ -142,7 +142,10 @@ if Backbone?
       setTimeout (-> @$(".post-search-field").focus()), 200
 
     toggleTopicDrop: (event) =>
+      event.preventDefault()
       event.stopPropagation()
+      if @current_search != ""
+        @clearSearch()
       @$(".search").removeClass('is-open')
       @$(".browse").addClass('is-open')
       @$(".browse").toggleClass('is-dropped')
@@ -234,6 +237,11 @@ if Backbone?
         event.preventDefault()
         text = @$(".post-search-field").val()
         @searchFor(text)
+
+    setAndSearchFor: (text) ->
+      @showSearch()
+      @$(".post-search-field").val(text)
+      @searchFor(text)
 
     searchFor: (text, callback, value) ->
       @current_search = text

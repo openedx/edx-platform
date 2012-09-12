@@ -9,7 +9,8 @@ if Backbone?
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
     page_re: /\?discussion_page=(\d+)/
     initialize: ->
-      # Set the page if it was set in the URL. This is used to allow deep linking to pages
+      @toggleDiscussionBtn = @$(".discussion-show")
+      # Set the page if it was set in the URL. This is used to allow deep linking to pages      
       match = @page_re.exec(window.location.href)
       if match
         @page = parseInt(match[1])
@@ -18,31 +19,38 @@ if Backbone?
 
     toggleNewPost: (event) ->
       event.preventDefault()
-      if @newPostForm.is(':hidden')
+      if !@newPostForm
+        @toggleDiscussion()
+        @isWaitingOnNewPost = true;        
+        return
+      if @showed
         @newPostForm.slideDown(300)
       else
-        @newPostForm.slideUp(300)
+        @newPostForm.show()
+      @toggleDiscussionBtn.addClass('shown')
+      @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+      @$("section.discussion").slideDown()
+      @showed = true
 
     hideNewPost: (event) ->
       event.preventDefault()
       @newPostForm.slideUp(300)
 
     toggleDiscussion: (event) ->
-      thisButton = $(event.target).closest('a')
       if @showed
         @$("section.discussion").slideUp()
-        thisButton.removeClass('shown')
-        thisButton.find('.button-text').html("Show Discussion")
+        @toggleDiscussionBtn.removeClass('shown')
+        @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
         @showed = false
       else
-        thisButton.addClass('shown')
-        thisButton.find('.button-text').html("Hide Discussion")
+        @toggleDiscussionBtn.addClass('shown')
+        @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
 
         if @retrieved
           @$("section.discussion").slideDown()
           @showed = true
         else
-          $elem = $(event.target)
+          $elem = @toggleDiscussionBtn
           @loadPage $elem
 
     loadPage: ($elem)=>
@@ -59,7 +67,7 @@ if Backbone?
     renderDiscussion: ($elem, response, textStatus, discussionId) =>
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
-      $elem.html("Hide Discussion")
+      # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
       $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
@@ -77,6 +85,8 @@ if Backbone?
       @retrieved = true
       @showed = true
       @renderPagination(2, response.num_pages)
+      if @isWaitingOnNewPost
+        @newPostForm.show()
 
     addThread: (thread, collection, options) =>
       # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?

@@ -274,20 +274,23 @@ body.discussion {
     width: 100%;
     margin-bottom: 20px;
     @include clearfix;
+    @include box-sizing(border-box);
+
+    .form-row {
+      margin-top: 20px;
+    }
+
     .post-cancel {
       @include white-button;
-      border-color: #444;
       float: left;
       margin: 10px 0 0 15px;
     }
 
     .post-update {
-
       @include blue-button;
       float: left;
       height: 37px;
       margin-top: 10px;
-      border-color: #333;
       padding-bottom: 2px;
 
       &:hover {
@@ -301,13 +304,28 @@ body.discussion {
       padding: 0 10px;
       box-sizing: border-box;
       border-radius: 3px;
-      border: 1px solid #333;
+      border: 1px solid #aaa;
       font-size: 16px;
-      font-family: 'Open Sans', sans-serif;
+      font-family: $sans-serif;
       color: #333;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
 
+    .tagsinput {
+      padding: 10px;
+      @include box-sizing(border-box);
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      background: #fff;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+
+      span.tag {
+        margin-bottom: 0;
+      }
+    }
   }
 
   .new-post-form {
@@ -1006,8 +1024,14 @@ body.discussion {
 
   .post-list {
     background-color: #ddd;
+
     .loading {
       padding: 15px 0;
+      background: #f6f6f6;
+
+      .loading-animation {
+        background-image: url(../images/spinner-on-grey.gif);
+      }
     }
 
     a {
@@ -1231,6 +1255,12 @@ body.discussion {
       font-style: italic;
       color: #888;
 
+      .username {
+        display: block;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
       span {
         font-style: italic;
       }
@@ -1309,7 +1339,7 @@ body.discussion {
     > li {
       position: relative;
       margin: 0 -10px 30px;
-      padding: 26px 30px 30px;
+      padding: 26px 30px 20px;
       border-radius: 3px;
       border: 1px solid #b2b2b2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
@@ -1573,6 +1603,7 @@ body.discussion {
   .discussion-reply-new {
     padding: 20px;
     @include clearfix;
+    @include transition(opacity .2s);
 
     h4 {
       font-size: 16px;
@@ -1619,8 +1650,9 @@ body.discussion {
 
 .discussion-module {
   @extend .discussion-body;
+  position: relative;
   margin: 20px 0;
-  padding: 20px 20px 28px 20px;
+  padding: 20px;
   background: #f6f6f6 !important;
   border-radius: 3px;
 
@@ -1633,10 +1665,13 @@ body.discussion {
     }
   }
 
+  .loading-animation {
+    background-image: url(../images/spinner-on-grey.gif);
+  }
+
   .discussion-show {
-    display: block;
-    width: 200px;
-    margin: auto;
+    position: relative;
+    top: 3px;
     font-size: 14px;
     text-align: center;
 
@@ -1660,10 +1695,11 @@ body.discussion {
 
   .new-post-btn {
     display: inline-block;
+    float: right;
   }
 
   section.discussion {
-    margin-top: 20px;
+    margin-top: 30px;
 
     .threads {
       margin-top: 20px;
@@ -1715,6 +1751,16 @@ body.discussion {
             padding-bottom: 0;
             margin-bottom: 15px;
 
+            .posted-details {
+              margin-top: 4px;
+
+              .username {
+                display: inline;
+                font-size: 14px;
+                font-weight: 700;
+              }
+            }
+
             h3 {
               font-size: 19px;
               font-weight: 700;
@@ -1758,13 +1804,16 @@ body.discussion {
           margin-top: 10px;
 
           header {
-            padding-bottom: 0em;
-            margin-bottom: 5px;
+            padding-bottom: 0;
+            margin-bottom: 15px;
 
             .posted-by {
-              font-size: 0.8em;
+              float: left;
+              margin-right: 5px;
+              font-size: 16px;
             }
           }
+
           .response-body {
             margin-bottom: 0.2em;
             font-size: 14px;

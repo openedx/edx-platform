@@ -18,6 +18,7 @@ if Backbone?
       @renderAttrs()
       @$el.find(".posted-details").timeago()
       @convertMath()
+      @markAsStaff()
       @renderComments()
       @
 
@@ -25,6 +26,11 @@ if Backbone?
       element = @$(".response-body")
       element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
+
+    markAsStaff: ->
+      if DiscussionUtil.isStaff(@model.get("user_id"))
+        @$el.addClass("staff")
+        @$el.prepend('<div class="staff-banner">staff</div>')
 
     renderComments: ->
       comments = new Comments()
