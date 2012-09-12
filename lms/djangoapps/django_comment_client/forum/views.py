@@ -236,6 +236,7 @@ def forum_form_discussion(request, course_id):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             'course_id': course.id,
             'category_map': category_map,
+            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -315,6 +316,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
+            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
         }
 
         return render_to_response('discussion/single_thread.html', context)

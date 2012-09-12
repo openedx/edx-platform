@@ -39,6 +39,14 @@ def strip_blank(dic):
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
 
+def get_role_ids(course_id):
+    roles = Role.objects.filter(course_id=course_id)
+    staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
+    roles_with_ids = {'Staff': staff}
+    for role in roles:
+      roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
+    return roles_with_ids
+
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:
