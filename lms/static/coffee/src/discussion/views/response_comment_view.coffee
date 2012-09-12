@@ -18,6 +18,7 @@ if Backbone?
       @initLocal()
       @delegateEvents()
       @renderAttrs()
+      @markAsStaff()
       @$el.find(".timeago").timeago()
       @convertMath()
       @
@@ -29,3 +30,7 @@ if Backbone?
       body.children("p").each (index, elem) ->
         $(elem).replaceWith($(elem).html())
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, body[0]]
+
+    markAsStaff: ->
+      if DiscussionUtil.isStaff(@model.get("user_id"))
+        @$el.find("a").after('<span class="staff-label">staff</span>')

@@ -15,6 +15,11 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
+  @isStaff: (user_id) ->
+    ids = $("#discussion-container").data("roles")
+    staff = _.union(ids['Staff'], ids['Moderator'], ids['Administrator'])
+    _.include(staff, parseInt(user_id))
+
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
       Content.getContent(id).updateInfo(info)
@@ -71,7 +76,7 @@ class @DiscussionUtil
           params["loadingCallback"].apply(params["$loading"])
         else
           params["$loading"].loading()
-    $.ajax(params).always ->
+    request = $.ajax(params).always ->
       if $elem
         $elem.removeAttr("disabled")
       if params["$loading"]
@@ -79,6 +84,7 @@ class @DiscussionUtil
           params["loadedCallback"].apply(params["$loading"])
         else
           params["$loading"].loaded()
+    return request
 
   @get: ($elem, url, data, success) ->
     @safeAjax

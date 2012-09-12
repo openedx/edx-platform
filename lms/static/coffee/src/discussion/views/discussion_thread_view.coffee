@@ -3,6 +3,7 @@ if Backbone?
 
     events:
       "click .discussion-submit-post": "submitComment"
+      "click .thread-tag": "tagSelected"
 
     $: (selector) ->
       @$el.find(selector)
@@ -14,19 +15,39 @@ if Backbone?
     render: ->
       @template = _.template($("#thread-template").html())
       @$el.html(@template(@model.toJSON()))
+      @$el.find(".loading").hide()
       @delegateEvents()
 
       @renderShowView()
       @renderAttrs()
+      @renderTags()
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderResponses()
       @
 
-    renderResponses: ->
-      DiscussionUtil.safeAjax
+    cleanup: ->
+      if @responsesRequest?
+        @responsesRequest.abort()
+
+    renderTags: ->
+      tags = $('<div class="thread-tags">')
+      for tag in @model.get("tags")
+        tags.append("<a class='thread-tag'>#{tag}</a>")
+      @$(".post-body").after(tags)
+
+    tagSelected: (e) ->
+      @trigger "tag:selected", $(e.target).html()
+
+
+    renderResponses: ->      
+      setTimeout(=>
+        @$el.find(".loading").show()
+      , 200)
+      @responsesRequest = DiscussionUtil.safeAjax
         url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
         success: (data, textStatus, xhr) =>
+          @responsesRequest = null
           @$el.find(".loading").remove()
           Content.loadContentInfos(data['annotated_content_info'])
           comments = new Comments(data['content']['children'])

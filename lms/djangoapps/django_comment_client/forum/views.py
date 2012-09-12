@@ -227,6 +227,7 @@ def forum_form_discussion(request, course_id):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             'course_id': course.id,
             'category_map': category_map,
+            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -273,6 +274,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
                 thread['courseware_location']  = courseware_context['courseware_location']
                 thread['courseware_title']  = courseware_context['courseware_title']
 
+        threads = [utils.safe_content(thread) for thread in threads]
+
         #recent_active_threads = cc.search_recent_active_threads(
         #    course_id,
         #    recursive=False,
@@ -304,6 +307,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
+            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
         }
 
         return render_to_response('discussion/single_thread.html', context)
@@ -314,10 +318,12 @@ def user_profile(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
+
         query_params = {
             'page': request.GET.get('page', 1),
-            'per_page': INLINE_THREADS_PER_PAGE,
-        }
+            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            }
+
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
