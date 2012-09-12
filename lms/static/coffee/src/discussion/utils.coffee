@@ -71,7 +71,7 @@ class @DiscussionUtil
           params["loadingCallback"].apply(params["$loading"])
         else
           params["$loading"].loading()
-    $.ajax(params).always ->
+    request = $.ajax(params).always ->
       if $elem
         $elem.removeAttr("disabled")
       if params["$loading"]
@@ -79,6 +79,7 @@ class @DiscussionUtil
           params["loadedCallback"].apply(params["$loading"])
         else
           params["$loading"].loaded()
+    return request
 
   @get: ($elem, url, data, success) ->
     @safeAjax
