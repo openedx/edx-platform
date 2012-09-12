@@ -39,7 +39,7 @@
     var $$course_id = "${course.id}";
 
     $(function(){
-        $(".ui-accordion-header a").each(function() {
+        $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
           var wordArray = $(this).text().split(" ");
           var finalTitle = "";
           for (i=0;i<=wordArray.length-1;i++) {
