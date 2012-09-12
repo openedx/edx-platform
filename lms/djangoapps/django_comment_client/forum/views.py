@@ -83,7 +83,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
                 thread['courseware_title']  = courseware_context['courseware_title']
 
     context = {
-        #'threads': map(utils.safe_content, threads),   # TODO Delete, this is redundant with discussion_data
+        'threads': map(utils.safe_content, threads),   # TODO Delete, this is redundant with discussion_data
         'discussion_id': discussion_id,
         'user_id': user_id,
         'course_id': course_id,
@@ -327,6 +327,13 @@ def user_profile(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
+
+        query_params = {
+            'page': request.GET.get('page', 1),
+            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            }
+
+        threads, page, num_pages = profiled_user.active_threads(query_params)
 
         query_params['page'] = page
         query_params['num_pages'] = num_pages
