@@ -1644,6 +1644,7 @@ body.discussion {
 
 .discussion-module {
   @extend .discussion-body;
+  position: relative;
   margin: 20px 0;
   padding: 20px;
   background: #f6f6f6 !important;
@@ -1656,6 +1657,10 @@ body.discussion {
       margin: 0 20px 20px !important;
       padding: 26px 30px 20px !important;
     }
+  }
+
+  .loading-animation {
+    background-image: url(../images/spinner-on-grey.gif);
   }
 
   .discussion-show {
