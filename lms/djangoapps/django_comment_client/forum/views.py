@@ -282,6 +282,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
                 thread['courseware_location']  = courseware_context['courseware_location']
                 thread['courseware_title']  = courseware_context['courseware_title']
 
+        threads = [utils.safe_content(thread) for thread in threads]
+
         #recent_active_threads = cc.search_recent_active_threads(
         #    course_id,
         #    recursive=False,
