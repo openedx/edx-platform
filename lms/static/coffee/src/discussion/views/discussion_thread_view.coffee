@@ -23,10 +23,15 @@ if Backbone?
       @renderResponses()
       @
 
+    cleanup: ->
+      if @responsesRequest?
+        @responsesRequest.abort()
+
     renderResponses: ->
-      DiscussionUtil.safeAjax
+      @responsesRequest = DiscussionUtil.safeAjax
         url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
         success: (data, textStatus, xhr) =>
+          @responsesRequest = null
           @$el.find(".loading").remove()
           Content.loadContentInfos(data['annotated_content_info'])
           comments = new Comments(data['content']['children'])

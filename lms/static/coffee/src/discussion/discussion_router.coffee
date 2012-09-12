@@ -26,6 +26,7 @@ if Backbone?
       @thread = @discussion.get(thread_id)
       @setActiveThread()
       if(@main)
+        @main.cleanup()
         @main.undelegateEvents()
 
       @main = new DiscussionThreadView(el: $(".discussion-column"), model: @thread)
