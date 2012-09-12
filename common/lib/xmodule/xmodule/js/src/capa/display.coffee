@@ -12,6 +12,7 @@ class @Problem
 
   bind: =>
     MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+
     window.update_schematics()
 
     problem_prefix = @element_id.replace(/problem_/,'')
@@ -23,7 +24,11 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
-    @$('input.math').keyup(@refreshMath).each(@refreshMath)
+
+    # Dynamath
+    @$('input.math').keyup(@refreshMath)
+    @$('input.math').each (index, element) =>
+      MathJax.Hub.Queue [@refreshMath, null, element]
 
   updateProgress: (response) =>
     if response.progress_changed
@@ -297,7 +302,6 @@ class @Problem
   refreshMath: (event, element) =>
     element = event.target unless element
     elid = element.id.replace(/^input_/,'')
-
     target = "display_" + elid
 
     # MathJax preprocessor is loaded by 'setupInputTypes'
@@ -308,9 +312,10 @@ class @Problem
       eqn = $(element).val()
       if mathjax_preprocessor
         eqn = mathjax_preprocessor(eqn)
-      MathJax.Hub.Queue ['Text', jax, eqn],
-        [@updateMathML, jax, element]
+      MathJax.Hub.Queue(['Text', jax, eqn], [@updateMathML, jax, element])
 
+    return # Explicit return for CoffeeScript
+    
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
