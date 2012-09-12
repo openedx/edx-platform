@@ -1255,6 +1255,12 @@ body.discussion {
       font-style: italic;
       color: #888;
 
+      .username {
+        display: block;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
       span {
         font-style: italic;
       }
@@ -1745,6 +1751,16 @@ body.discussion {
             padding-bottom: 0;
             margin-bottom: 15px;
 
+            .posted-details {
+              margin-top: 4px;
+
+              .username {
+                display: inline;
+                font-size: 14px;
+                font-weight: 700;
+              }
+            }
+
             h3 {
               font-size: 19px;
               font-weight: 700;
@@ -1788,13 +1804,16 @@ body.discussion {
           margin-top: 10px;
 
           header {
-            padding-bottom: 0em;
-            margin-bottom: 5px;
+            padding-bottom: 0;
+            margin-bottom: 15px;
 
             .posted-by {
-              font-size: 0.8em;
+              float: left;
+              margin-right: 5px;
+              font-size: 16px;
             }
           }
+
           .response-body {
             margin-bottom: 0.2em;
             font-size: 14px;
