@@ -152,6 +152,9 @@
         </ol>
       </section>
 
+
+      ## For now, ocw links are the only thing that goes in additional resources
+      % if get_course_about_section(course, "ocw_links"):
       <section class="additional-resources">
         <header>
           <h1>Additional Resources</h1>
@@ -159,13 +162,10 @@
 
         <section>
           <h2 class="opencourseware">MITOpenCourseware</h2>
-          <ul>
-            <li>
-              <a href="#">18.03: Differential Equations</a>
-            </li>
-          </ul>
+             ${get_course_about_section(course, "ocw_links")}
         </section>
       </section>
+      %endif
     </section>
 
   </section>
