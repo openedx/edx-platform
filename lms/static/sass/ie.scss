@@ -130,6 +130,13 @@ header.global {
   background: #000;
 }
 
-.modal .inner-wrapper form label {
-  display: block;
+nav.course-material ol.course-tabs li a.active, nav.course-material .xmodule_SequenceModule nav.sequence-nav ol.course-tabs li a.seq_video.active, .xmodule_SequenceModule nav.sequence-nav nav.course-material ol.course-tabs li a.seq_video.active {
+  background-color: #333;
+  background-color: rgba(0, 0, 0, .4);
 }
+
+header.global ol.user > li.primary a.dropdown {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
