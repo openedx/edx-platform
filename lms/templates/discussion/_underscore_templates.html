@@ -29,7 +29,7 @@
               <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
               ${"<% } else {print('anonymous');} %>"}
               <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
-              
+
               <span class="post-status-closed top-post-status" style="display: none">
                 &bull; This thread is closed.
               </span>
@@ -58,7 +58,7 @@
     <h1>Editing post</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
-      <input type="text" class="edit-post-title" name="title" value=${"<%-title %>"} placeholder="Title">
+      <input type="text" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">
@@ -66,7 +66,7 @@
       </div>
     </div>
     <div class="form-row">
-      <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value=${"<%- tags %>"}>
+      <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
     </div>
     <input type="submit" class="post-update" value="Update post">
     <a href="#" class="post-cancel">Cancel</a>
