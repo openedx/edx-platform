@@ -7,10 +7,11 @@ if Backbone?
       window.$$course_id = element.data("course-id")
       user_info = element.data("user-info")
       threads = element.data("threads")
+      thread_pages = element.data("thread-pages")
       content_info = element.data("content-info")
       window.user = new DiscussionUser(user_info)
       Content.loadContentInfos(content_info)
-      discussion = new Discussion(threads)
+      discussion = new Discussion(threads, pages: thread_pages)
       new DiscussionRouter({discussion: discussion})
       Backbone.history.start({pushState: true, root: "/courses/#{$$course_id}/discussion/forum/"})
   DiscussionProfileApp =

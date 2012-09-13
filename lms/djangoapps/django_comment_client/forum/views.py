@@ -22,7 +22,7 @@ import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
 
-THREADS_PER_PAGE = 200
+THREADS_PER_PAGE = 2
 INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
@@ -224,6 +224,7 @@ def forum_form_discussion(request, course_id):
             #'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
             'threads': saxutils.escape(json.dumps(threads),escapedict),
+            'thread_pages': query_params['num_pages'],
             'user_info': saxutils.escape(json.dumps(user_info),escapedict),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             'course_id': course.id,
