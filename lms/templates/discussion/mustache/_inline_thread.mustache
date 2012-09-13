@@ -6,10 +6,10 @@
             <h3>{{title}}</h3>
             <p class="posted-details">
                 {{#user}}
-                <a href="{{user_url}}" class="username">{{username}}</a>
+                    <a href="{{user_url}}" class="username">{{username}}</a>
                 {{/user}}
                 {{^user}}
-                anonymous
+                    anonymous
                 {{/user}}
 
                 <span class="timeago" title="{{created_at}}">{{created_at}}</span>

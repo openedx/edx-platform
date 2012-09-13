@@ -125,7 +125,8 @@ class @DiscussionThreadShowView extends DiscussionContentView
         @model.set('endorsed', not endorsed)
 
   highlight: (el) ->
-    el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
+    if el.html()
+      el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
 
 class @DiscussionThreadInlineShowView extends DiscussionThreadShowView
   renderTemplate: ->
