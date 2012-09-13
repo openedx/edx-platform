@@ -28,7 +28,7 @@ def is_pointer_tag(xml_obj):
     No children, one attribute named url_name.
 
     Special case for course roots: the pointer is
-      <course url_name="something" org="myorg"  course="course">
+      <course url_name="something" org="myorg" course="course">
 
     xml_obj: an etree Element
 
