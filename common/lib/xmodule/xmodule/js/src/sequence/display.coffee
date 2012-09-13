@@ -18,11 +18,10 @@ class @Sequence
   initProgress: ->
     @progressTable = {}  # "#problem_#{id}" -> progress
 
-
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
 
-  mergeProgress: (p1, p2) ->
+  mergeProgressStatus: (p1, p2) ->
     # if either is "NA", return the other one
     if p1 == "NA"
       return p2
@@ -41,25 +40,55 @@ class @Sequence
 
     return "none"
 
+  updateOverallScore: (details) =>
+    # Given a list of "a/b" strings, compute the sum(a)/sum(b), and the corresponding percentage
+    gotten = 0
+    possible = 0
+    for d in details
+      if d? and d.indexOf('/') > 0
+        a = d.split('/')
+        got = parseInt(a[0])
+        pos = parseInt(a[1])
+        gotten += got
+        possible += pos
+
+    if possible > 0
+      s = (gotten / possible * 100).toFixed(1) + "%"
+    else
+      s = "0%"
+
+    s += " (" + gotten + '/' + possible + ")"
+      
+    @el.find('.overall-progress').html(s)
+      
+
   updateProgress: =>
-    new_progress = "NA"
+    new_progress_status = "NA"
+    scores_list = @el.find('.progress-score-list')
+    scores_list.empty()
+    details = []
     _this = this
     $('.problems-wrapper').each (index) ->
-      progress = $(this).attr 'progress'
-      new_progress = _this.mergeProgress progress, new_progress
+      progress_status = $(this).data('progress_status')
+      new_progress_status = _this.mergeProgressStatus progress_status, new_progress_status
 
-    @progressTable[@position] = new_progress
-    @setProgress(new_progress, @link_for(@position))
+      progress_detail = $(this).data('progress_detail')
+      scores_list.append("<li>" + progress_detail + "</li>")
+      details.push(progress_detail)
+
+    @progressTable[@position] = new_progress_status
+    @setProgress(new_progress_status, @link_for(@position))
+    @updateOverallScore(details)
 
   setProgress: (progress, element) ->
       # If progress is "NA", don't add any css class
       element.removeClass('progress-none')
-             .removeClass('progress-some')
+             .removeClass('progress-in_progress')
              .removeClass('progress-done')
       
       switch progress
         when 'none' then element.addClass('progress-none')
-        when 'in_progress' then element.addClass('progress-some')
+        when 'in_progress' then element.addClass('progress-in_progress')
         when 'done' then element.addClass('progress-done')
 
   toggleArrows: =>
@@ -95,6 +124,8 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
+      # update score lists
+      @updateProgress()
 
   goto: (event) =>
     event.preventDefault()

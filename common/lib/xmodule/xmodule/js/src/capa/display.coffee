@@ -19,7 +19,6 @@ class @Problem
     
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
-    #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
@@ -27,7 +26,8 @@ class @Problem
 
   updateProgress: (response) =>
     if response.progress_changed
-        @el.attr progress: response.progress_status
+        @el.data('progress_status', response.progress_status)
+        @el.data('progress_detail', response.progress_detail)
         @el.trigger('progressChanged')
 
   queueing: =>

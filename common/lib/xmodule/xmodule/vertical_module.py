@@ -23,7 +23,9 @@ class VerticalModule(XModule):
         })
 
     def get_progress(self):
-        # TODO: Cache progress or children array?
+        """
+        Combine the progress of all the children.
+        """
         children = self.get_children()
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses, None)

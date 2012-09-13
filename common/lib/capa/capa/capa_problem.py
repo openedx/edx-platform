@@ -157,6 +157,8 @@ class LoncapaProblem(object):
     def get_max_score(self):
         '''
         Return maximum score for this problem.
+
+        TODO (vshnayder): Is this fixed once the problem is instantiated?  Can we compute it only once?
         '''
         maxscore = 0
         for response, responder in self.responders.iteritems():
@@ -217,7 +219,7 @@ class LoncapaProblem(object):
 
         # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
         queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
-                          for answer_id in self.correct_map 
+                          for answer_id in self.correct_map
                           if self.correct_map.is_queued(answer_id)]
         queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat) for qt_str in queuetime_strs]
 

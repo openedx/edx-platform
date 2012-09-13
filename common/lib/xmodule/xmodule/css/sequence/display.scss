@@ -30,6 +30,10 @@ nav.sequence-nav {
     pointer-events: none;
   }
 
+  .student-progress {
+      display: block;
+  }
+
   .sequence-list-wrapper {
     position: relative;
     z-index: 99;
@@ -154,7 +158,7 @@ nav.sequence-nav {
             background-image: url('../images/sequence-nav/list-unstarted.png');
           }
 
-          &.progress-some, &.progress-in_progress {
+          &.progress-in_progress {
             background-image: url('../images/sequence-nav/list-unfinished.png');
           }
 

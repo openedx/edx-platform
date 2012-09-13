@@ -207,15 +207,21 @@ class CapaModule(XModule):
         return None
 
     def get_html(self):
+        progress = self.get_progress()
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'progress_status': Progress.to_js_status_str(progress),
+            'progress_detail': Progress.to_js_detail_str(progress),
+
         })
 
-    def get_problem_html(self, encapsulate=True):
-        '''Return html for the problem.  Adds check, reset, save buttons
-        as necessary based on the problem config and state.'''
+    def get_problem_html(self):
+        """
+        Return html for the problem.  Adds check, reset, save buttons
+        as necessary based on the problem config and state.
+        """
 
         try:
             html = self.lcp.get_html()
@@ -242,11 +248,11 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+        if self.max_attempts is None or self.attempts < self.max_attempts-1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
-            check_button = "Final Check" 
+            check_button = "Final Check"
 
         reset_button = True
         save_button = True
@@ -286,33 +292,29 @@ class CapaModule(XModule):
                    'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'progress': self.get_progress(),
                    }
 
         html = self.system.render_template('problem.html', context)
-        if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
-
         return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
-        '''
+        """
         This is called by courseware.module_render, to handle an AJAX call.
         "get" is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
-          'progress' : 'none'/'in_progress'/'done',
+          'progress_status' : 'none'/'in_progress'/'done',
+          'progress_detail' : 'NA' / '0/3' / '3/8' / '21/20'
           <other request-specific values here > }
-        '''
+        """
         handlers = {
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
-            'score_update': self.update_score,
+            'score_update': self.update_score,   # Callback for xqueue/grader, not the user's browser.
             }
 
         if dispatch not in handlers:
@@ -324,6 +326,7 @@ class CapaModule(XModule):
         d.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
+            'progress_detail': Progress.to_js_detail_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
 
@@ -414,7 +417,7 @@ class CapaModule(XModule):
             Used if we want to reconfirm we have the right thing e.g. after
             several AJAX calls.
         '''
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html()}
 
     @staticmethod
     def make_dict_of_responses(get):
@@ -467,11 +470,11 @@ class CapaModule(XModule):
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
-            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
+                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -514,7 +517,7 @@ class CapaModule(XModule):
 		self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
+        html = self.get_problem_html()
 
         return {'success': success,
                 'contents': html,
@@ -587,7 +590,7 @@ class CapaModule(XModule):
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
 
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html()}
 
 
 class CapaDescriptor(RawDescriptor):
