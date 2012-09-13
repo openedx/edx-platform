@@ -42,11 +42,13 @@
           var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
           var wordArray = elemText.split(" ");
           var finalTitle = "";
-          if (!($.isEmptyObject(wordArray))) {
+          if (wordArray.length > 0) {
             for (i=0;i<=wordArray.length-1;i++) {
               finalTitle += wordArray[i];
               if (i == (wordArray.length-2)) {
                 finalTitle += "&nbsp;";
+              } else if (i == (wordArray.length-1)) {
+                // Do nothing
               } else {
                 finalTitle += " ";
               }
