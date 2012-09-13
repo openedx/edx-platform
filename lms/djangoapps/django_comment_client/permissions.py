@@ -5,7 +5,8 @@ from student.models import CourseEnrollment
 
 import logging
 from util.cache import cache
-
+from django.core import cache
+cache = cache.get_cache('default')
 
 def cached_has_permission(user, permission, course_id=None):
     """
