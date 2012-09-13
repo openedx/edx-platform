@@ -443,9 +443,9 @@ courseware_only_js += [
 main_vendor_js = [
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
-  'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.cookie.js',
   'js/vendor/jquery.qtip.min.js',
+  'js/vendor/swfobject/swfobject.js',
 ]
 
 discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee'))
