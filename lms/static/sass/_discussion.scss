@@ -1034,6 +1034,18 @@ body.discussion {
       }
     }
 
+    .more a {      
+      background: #eee;
+      font-size: 12px;
+      line-height: 33px;
+      text-align: center;
+
+      &:hover {
+        background-image: none;
+        background-color: #e6e6e6;
+      }
+    }
+
     a {
       position: relative;
       display: block;
