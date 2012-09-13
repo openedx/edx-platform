@@ -41,7 +41,7 @@
         $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
           var wordArray = $(this).text().split(" ");
           var finalTitle = "";
-          if (wordArray.isEmptyObject()) {
+          if ($.isEmptyObject(wordArray)) {
             for (i=0;i<=wordArray.length-1;i++) {
               finalTitle += wordArray[i];
               if (i == (wordArray.length-2)) {
