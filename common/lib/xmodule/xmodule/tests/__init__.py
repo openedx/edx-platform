@@ -29,7 +29,7 @@ from nose.plugins.skip import SkipTest
 from mock import Mock
 
 i4xs = ModuleSystem(
-    ajax_url='/',
+    ajax_url='courses/course_id/modx/a_location',
     track_function=Mock(),
     get_module=Mock(),
     render_template=Mock(),

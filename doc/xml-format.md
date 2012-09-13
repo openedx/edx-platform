@@ -299,7 +299,7 @@ This is a sketch ("tue" is not a valid start date), that should help illustrate 
 
 ## Specifying metadata in the xml file
 
-Metadata can also live in the xml files, but anything defined in the policy file overrides anything in the xml.  This is primarily for backwards compatibility, and you should probably  not use both.  If you do leave some metadata tags in the xml, you should be consistent (e.g. if `display_name`s stay in xml, they should all stay in xml).
+Metadata can also live in the xml files, but anything defined in the policy file overrides anything in the xml.  This is primarily for backwards compatibility, and you should probably  not use both.  If you do leave some metadata tags in the xml, you should be consistent (e.g. if `display_name`s stay in xml, they should all stay in xml. Note `display_name` should be specified in the problem xml definition itself, ie, <problem display_name="Title"> Problem Text </problem>, in file ProblemFoo.xml).
    - note, some xml attributes are not metadata.  e.g. in `<video youtube="xyz987293487293847"/>`, the `youtube` attribute specifies what video this is, and is logically part of the content, not the policy, so it should stay in the xml.
 
 Another example policy file:
