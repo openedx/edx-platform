@@ -76,7 +76,11 @@
 	             <div id="register_message"></div>
             %endif
         %else:
-            <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up or <a href="#login-modal" rel="leanModal">Log In</a> to enroll.'>Register for ${course.number}</a>
+            <a href="#signup-modal" class="register" rel="leanModal" data-notice='You must Sign Up
+% if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
+		     or <a href="#login-modal" rel="leanModal">Log In</a>
+% endif
+		     to enroll.'>Register for ${course.number}</a>
         %endif
         </div>
 
