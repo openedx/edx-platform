@@ -6,6 +6,9 @@ if Backbone?
       "click .expand-post": "expandPost"
       "click .collapse-post": "collapsePost"
 
+    initialize: ->
+      super()
+
     initLocal: ->
       @$local = @$el.children(".discussion-article").children(".local")
       if not @$local.length
@@ -25,7 +28,7 @@ if Backbone?
       @delegateEvents()
       @renderShowView()
       @renderAttrs()
-      #@renderTags()  #TODO: Decide if we want tags on inline threads
+      @renderTags()  #TODO: Decide if we want to show tags on inline threads
       @$("span.timeago").timeago()
       @$el.find('.post-extended-content').hide()
       if @expanded
@@ -50,7 +53,6 @@ if Backbone?
           @trigger "thread:responses:rendered"
           @$('.loading').remove()
 
-    edit: ->
 
     toggleClosed: (event) ->
       #TODO: showview
@@ -85,7 +87,7 @@ if Backbone?
       abbreviated = DiscussionUtil.abbreviateString @model.get('body'), 140
       @model.set('abbreviatedBody', abbreviated)
 
-    expandPost: (event) ->
+    expandPost: (event) =>
       @expanded = true
       @$el.addClass('expanded')
       @$el.find('.post-body').html(@model.get('body'))
@@ -105,3 +107,7 @@ if Backbone?
       @$el.find('.collapse-post').css('display', 'none')
       @$el.find('.post-extended-content').hide()
       @$el.find('.expand-post').css('display', 'block')
+
+    createEditView: () ->
+      super()
+      @editView.bind "thread:update", @expandPost

@@ -2214,6 +2214,75 @@ body.discussion {
   .wmd-spacer3 {
     left: 300px;
   }
+  .edit-post-form {
+    width: 100%;
+    margin-bottom: 20px;
+    @include clearfix;
+    @include box-sizing(border-box);
+
+    .form-row {
+      margin-top: 20px;
+    }
+
+    .post-cancel {
+      @include white-button;
+      float: left;
+      margin: 10px 0 0 15px;
+    }
+
+    .post-update {
+      @include blue-button;
+      float: left;
+      height: 37px;
+      margin-top: 10px;
+      padding-bottom: 2px;
+
+      &:hover {
+        border-color: #222;
+      }
+    }
+
+    .edit-post-title, .edit-post-tags {
+      width: 100%;
+      height: 40px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      font-size: 16px;
+      font-family: $sans-serif;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    }
+
+    .tagsinput {
+      padding: 10px;
+      @include box-sizing(border-box);
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      background: #fff;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+
+      span.tag {
+        margin-bottom: 0;
+      }
+    }
+  }
+  .thread-tags {
+    margin-top: 20px;
+  }
+
+  .thread-tag {
+    padding: 3px 10px 6px;
+    border-radius: 3px;
+    color: #333;
+    background: #c5eeff;
+    border: 1px solid #90c4d7;
+    font-size: 13px;
+  }
 }
 
 .discussion-user-threads {
