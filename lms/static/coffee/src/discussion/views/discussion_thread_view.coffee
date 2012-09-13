@@ -12,9 +12,12 @@ if Backbone?
       super()
       @createShowView()
 
-    render: ->
+    renderTemplate: ->
       @template = _.template($("#thread-template").html())
-      @$el.html(@template(@model.toJSON()))
+      @template(@model.toJSON())
+
+    render: ->
+      @$el.html(@renderTemplate())
       @$el.find(".loading").hide()
       @delegateEvents()
 
@@ -39,13 +42,12 @@ if Backbone?
     tagSelected: (e) ->
       @trigger "tag:selected", $(e.target).html()
 
-
-    renderResponses: ->      
+    renderResponses: ->
       setTimeout(=>
         @$el.find(".loading").show()
       , 200)
       @responsesRequest = DiscussionUtil.safeAjax
-        url: "/courses/#{$$course_id}/discussion/forum/#{@model.get('commentable_id')}/threads/#{@model.id}"
+        url: DiscussionUtil.urlFor('retrieve_single_thread', @model.get('commentable_id'), @model.id)
         success: (data, textStatus, xhr) =>
           @responsesRequest = null
           @$el.find(".loading").remove()
@@ -144,10 +146,13 @@ if Backbone?
       @editView.bind "thread:update", @update
       @editView.bind "thread:cancel_edit", @cancelEdit
 
+    renderSubView: (view) ->
+      view.setElement(@$('.thread-content-wrapper'))
+      view.render()
+      view.delegateEvents()
+
     renderEditView: () ->
-      @editView.setElement(@$('.thread-content-wrapper'))
-      @editView.render()
-      @editView.delegateEvents()
+      @renderSubView(@editView)
 
     createShowView: () ->
 
@@ -161,9 +166,7 @@ if Backbone?
       @showView.bind "thread:edit", @edit
 
     renderShowView: () ->
-      @showView.setElement(@$('.thread-content-wrapper'))
-      @showView.render()
-      @showView.delegateEvents()
+      @renderSubView(@showView)
 
     cancelEdit: (event) =>
       @createShowView()
