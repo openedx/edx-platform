@@ -65,7 +65,7 @@ if Backbone?
       amount = Math.max(topOffset - discussionBottomOffset, 0)
 
       sidebarHeight = sidebarHeight - @sidebar_padding - amount
-      sidebarHeight = Math.min(Math.max(sidebarHeight, 400), discussionBody.outerHeight())
+      sidebarHeight = Math.min(sidebarHeight, discussionBody.outerHeight())
       sidebar.css 'height', sidebarHeight
 
       postListWrapper = @$('.post-list-wrapper')
