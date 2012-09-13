@@ -344,7 +344,7 @@ class @Problem
 
       preprocessorClassName = data.data('preprocessor')
       preprocessorClass = window[preprocessorClassName]
-      if typeof(preprocessorClass) == 'undefined' 
+      if not preprocessorClass?
         return false
       else
         preprocessor = new preprocessorClass()
