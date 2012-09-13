@@ -24,26 +24,12 @@ class @VideoPlayer extends Subview
       @toggleFullScreen(event)
 
   render: ->
-    @control = new VideoControl el: @$('.video-controls')
-    @caption = new VideoCaption
-        el: @el
-        youtubeId: @video.youtubeId('1.0')
-        currentSpeed: @currentSpeed()
-        captionDataDir: @video.caption_data_dir
-    unless onTouchBasedDevice()
-      @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
-    @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
-    @progressSlider = new VideoProgressSlider el: @$('.slider')
-
     params = { allowScriptAccess: "always" };
     atts = { id: @videoid };
     youtubeId = @video.youtubeId()
 
-    window.onYouTubePlayerReady = (e) =>
-        @player = document.getElementById("#{@video.id}")
-
-    swfobject.embedSWF("http://www.youtube.com/apiplayer?video_id=#{youtubeId}&enablejsapi=1&version=3&playerapiid=ytplayer&controls=0",
-                       @video.id, "425", "356", "9", null, null, params, atts )
+    swfobject.embedSWF("http://www.youtube.com/v/#{youtubeId}?enablejsapi=1&version=3&playerapiid=ytplayer",
+                         @video.id, "425", "356", "9", null, null, params, atts )
 
 
   addToolTip: ->
