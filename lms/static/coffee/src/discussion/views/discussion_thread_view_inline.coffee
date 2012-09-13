@@ -36,6 +36,11 @@ if Backbone?
         @renderResponses()
       @
     createShowView: () ->
+      
+      if @editView?
+        @editView.undelegateEvents()
+        @editView.$el.empty()
+        @editView = null
       @showView = new DiscussionThreadInlineShowView(model: @model)
       @showView.bind "thread:delete", @delete
       @showView.bind "thread:edit", @edit
@@ -111,4 +116,5 @@ if Backbone?
     createEditView: () ->
       super()
       @editView.bind "thread:update", @expandPost
+      @editView.bind "thread:update", @abbreviateBody
       @editView.bind "thread:cancel_edit", @expandPost
