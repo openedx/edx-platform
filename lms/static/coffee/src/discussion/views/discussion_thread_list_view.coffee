@@ -7,11 +7,20 @@ if Backbone?
       "click .sort-bar a": "sortThreads"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
-      "click .post-list a": "threadSelected"
+      "click .post-list .list-item a": "threadSelected"
+      "click .post-list .more-pages a": "loadMorePages"
 
     initialize: ->
-      @displayedCollection = new Discussion(@collection.models)
+      @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
+      @collection.on "reset", (discussion) =>
+        board = $(".current-board").html()
+        @displayedCollection.current_page = discussion.current_page
+        @displayedCollection.reset discussion.models
+        # TODO: filter correctly
+        # target = _.filter($("a.topic:contains('#{board}')"), (el) -> el.innerText == "General" || el.innerHTML == "General")
+        # if target.length > 0
+        #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
       @sidebar_padding = 10
       @sidebar_header_height = 87
@@ -96,10 +105,20 @@ if Backbone?
       for thread in @displayedCollection.models
         content = @renderThread(thread)
         rendered.append content
-        content.wrap("<li data-id='#{thread.get('id')}' />")
+        content.wrap("<li class='list-item' data-id='#{thread.get('id')}' />")
 
       @$(".post-list").html(rendered.html())
+      @renderMorePages()
       @trigger "threads:rendered"
+
+    renderMorePages: ->
+      if @displayedCollection.hasMorePages()
+        @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
+
+    loadMorePages: ->
+      @$(".more-pages").html('<div class="loading-animation"></div>')
+      @$(".more-pages").addClass("loading")
+      @collection.retrieveAnotherPage()
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))

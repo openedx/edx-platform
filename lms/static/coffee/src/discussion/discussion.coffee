@@ -2,7 +2,9 @@ if Backbone?
   class @Discussion extends Backbone.Collection
     model: Thread
 
-    initialize: ->
+    initialize: (models, options)->
+      @pages = options['pages'] || 1
+      @current_page = 1
       @bind "add", (item) =>
         item.discussion = @
       @comparator = @sortByDateRecentFirst
@@ -12,11 +14,29 @@ if Backbone?
     find: (id) ->
       _.first @where(id: id)
 
+    hasMorePages: ->
+      @current_page < @pages
+
     addThread: (thread, options) ->
       options ||= {}
       model = new Thread thread
       @add model
       model
+
+    retrieveAnotherPage: ->
+      @current_page += 1
+      url = DiscussionUtil.urlFor 'threads'
+      data = { page: @current_page }
+      DiscussionUtil.safeAjax
+        $elem: @$el
+        url: url
+        data: data
+        dataType: 'json'
+        success: (response, textStatus) =>
+          models = @models
+          new_threads = [new Thread(data) for data in response.discussion_data][0]
+          new_collection = _.union(models, new_threads)
+          @reset new_collection
 
     sortByDate: (thread) ->
       thread.get("created_at")
