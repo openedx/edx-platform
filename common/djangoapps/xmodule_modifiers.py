@@ -125,7 +125,7 @@ def add_histogram(get_html, module, user):
         mstart = getattr(module.descriptor,'start')
         if mstart is not None:
             is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
-        
+
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'location': module.location,
@@ -133,6 +133,7 @@ def add_histogram(get_html, module, user):
                          'source_file' : source_file,
                          'source_url': '%s/%s/tree/master/%s' % (giturl,data_dir,source_file),
                          'category': str(module.__class__.__name__),
+                         # Template uses element_id in js function names, so can't allow dashes
                          'element_id': module.location.html_id().replace('-','_'),
                          'edit_link': edit_link,
                          'user': user,
