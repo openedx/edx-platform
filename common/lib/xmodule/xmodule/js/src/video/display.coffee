@@ -33,7 +33,11 @@ class @Video
     @speeds = ($.map @videos, (url, speed) -> speed).sort()
 
   setSpeed: (newSpeed) ->
-    @speed = '1.0'
+    if @videos[newSpeed] != undefined
+      @speed = newSpeed
+      $.cookie('video_speed', "#{newSpeed}", expires: 3650, path: '/')
+    else
+      @speed = '1.0'
 
   embed: ->
     @player = new VideoPlayer video: this
