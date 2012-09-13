@@ -157,6 +157,7 @@ div.video {
               opacity: 1;
               padding: 0;
               margin: 0;
+              list-style: none;
             }
           }
 
@@ -411,6 +412,7 @@ div.video {
     width: flex-grid(3, 9);
     margin: 0;
     font-size: 14px;
+    list-style: none;
 
     li {
       border: 0;
