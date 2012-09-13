@@ -26,35 +26,55 @@ div.info-wrapper {
         padding-bottom: lh(.5);
 
         ol, ul {
-          margin: 0;
-          list-style-type: disk;
-
           ol,ul {
-            list-style-type: circle;
+            list-style-type: disc;
           }
         }
 
         h2 {
-          float: left;
           font-size: $body-font-size;
           font-weight: bold;
-          margin: 0 flex-gutter() 0 0;
-          width: flex-grid(2, 9);
+          background: url('../images/calendar-icon.png') 0 center no-repeat;
+          padding-left: 20px;
         }
 
         section.update-description {
-          float: left;
-          margin-bottom: 0;
-          width: flex-grid(7, 9);
+          section {
+            &.primary {
+              border: 1px solid #DDD;
+              background: #F6F6F6;
+              padding: 20px;
+
+              p {
+                font-weight: bold;
+              }
+              .author {
+                font-weight: normal;
+                font-style: italic;
+              }
+            }
+          }
+
+          h3 {
+            font-size: 1em;
+            font-weight: bold;
+            margin: lh(1.5) 0 lh(.5);
+          }
+
+          > ul {
+            padding-left: 0;
+
+            > li {
+              list-style: none;
+            }
+
+            > ul {
+              list-style-type: disc;
+            }
+          }
 
           li {
             margin-bottom: lh(.5);
-          }
-
-          p {
-            &:last-child {
-              margin-bottom: 0;
-            }
           }
         }
       }
