@@ -38,7 +38,7 @@ if Backbone?
       for tag in @model.get("tags")
         if !tags
           tags = $('<div class="thread-tags">')
-        tags.append("<a class='thread-tag'>#{tag}</a>")
+        tags.append("<a href='#' class='thread-tag'>#{tag}</a>")
       @$(".post-body").after(tags)
 
     tagSelected: (e) ->
