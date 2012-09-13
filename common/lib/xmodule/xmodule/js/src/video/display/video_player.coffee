@@ -34,17 +34,17 @@ class @VideoPlayer extends Subview
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
     @progressSlider = new VideoProgressSlider el: @$('.slider')
-    @player = new YT.Player @video.id,
-      playerVars:
-        controls: 0
-        wmode: 'transparent'
-        rel: 0
-        showinfo: 0
-        enablejsapi: 1
-      videoId: @video.youtubeId()
-      events:
-        onReady: @onReady
-        onStateChange: @onStateChange
+
+    params = { allowScriptAccess: "always" };
+    atts = { id: @videoid };
+    youtubeId = @video.youtubeId()
+
+    window.onYouTubePlayerReady = (e) =>
+        @player = document.getElementById("#{@video.id}")
+
+    swfobject.embedSWF("http://www.youtube.com/apiplayer?video_id=#{youtubeId}&enablejsapi=1&version=3&playerapiid=ytplayer&controls=0",
+                       @video.id, "425", "356", "9", null, null, params, atts )
+
 
   addToolTip: ->
     @$('.add-fullscreen, .hide-subtitles').qtip
