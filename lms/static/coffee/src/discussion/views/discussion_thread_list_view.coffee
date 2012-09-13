@@ -130,8 +130,8 @@ if Backbone?
       @trigger("thread:removed", thread_id)
 
     setActiveThread: (thread_id) ->
-      @$("a[data-id!='#{thread_id}']").removeClass("active")
-      @$("a[data-id='#{thread_id}']").addClass("active")
+      @$(".post-list a[data-id!='#{thread_id}']").removeClass("active")
+      @$(".post-list a[data-id='#{thread_id}']").addClass("active")
 
     showSearch: ->
       @$(".browse").removeClass('is-dropped')
