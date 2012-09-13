@@ -172,7 +172,8 @@ def inline_discussion(request, course_id, discussion_id):
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
-        'num_pages': query_params['num_pages']
+        'num_pages': query_params['num_pages'],
+        'roles': utils.get_role_ids(course_id),
     })
 
 @login_required

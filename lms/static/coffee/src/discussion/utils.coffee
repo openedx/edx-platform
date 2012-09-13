@@ -15,9 +15,14 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
+  @loadRoles: (roles)->
+    @roleIds = roles
+
+  @loadRolesFromContainer: ->
+    @loadRoles($("#discussion-container").data("roles"))
+
   @isStaff: (user_id) ->
-    ids = $("#discussion-container").data("roles")
-    staff = _.union(ids['Staff'], ids['Moderator'], ids['Administrator'])
+    staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
   @bulkUpdateContentInfo: (infos) ->

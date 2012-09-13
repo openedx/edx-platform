@@ -10,7 +10,7 @@ if Backbone?
     page_re: /\?discussion_page=(\d+)/
     initialize: ->
       @toggleDiscussionBtn = @$(".discussion-show")
-      # Set the page if it was set in the URL. This is used to allow deep linking to pages      
+      # Set the page if it was set in the URL. This is used to allow deep linking to pages
       match = @page_re.exec(window.location.href)
       if match
         @page = parseInt(match[1])
@@ -21,7 +21,7 @@ if Backbone?
       event.preventDefault()
       if !@newPostForm
         @toggleDiscussion()
-        @isWaitingOnNewPost = true;        
+        @isWaitingOnNewPost = true;
         return
       if @showed
         @newPostForm.slideDown(300)
@@ -67,6 +67,7 @@ if Backbone?
     renderDiscussion: ($elem, response, textStatus, discussionId) =>
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
+      DiscussionUtil.loadRoles(response.roles)
       # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
