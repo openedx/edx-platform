@@ -29,6 +29,9 @@ INVALID_CHARS = re.compile(r"[^\w.-]")
 # Names are allowed to have colons.
 INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
 
+# html ids can contain word chars and dashes
+INVALID_HTML_CHARS = re.compile(r"[^\w-]")
+
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
 
 
@@ -45,11 +48,34 @@ class Location(_LocationBase):
     __slots__ = ()
 
     @staticmethod
+    def _clean(value, invalid):
+        """
+        invalid should be a compiled regexp of chars to replace with '_'
+        """
+        return re.sub('_+', '_', invalid.sub('_', value))
+
+
+    @staticmethod
     def clean(value):
         """
         Return value, made into a form legal for locations
         """
-        return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
+        return Location._clean(value, INVALID_CHARS)
+
+    @staticmethod
+    def clean_for_url_name(value):
+        """
+        Convert value into a format valid for location names (allows colons).
+        """
+        return Location._clean(value, INVALID_CHARS_NAME)
+
+    @staticmethod
+    def clean_for_html(value):
+        """
+        Convert a string into a form that's safe for use in html ids, classes, urls, etc.
+        Replaces all INVALID_HTML_CHARS with '_', collapses multiple '_' chars
+        """
+        return Location._clean(value, INVALID_HTML_CHARS)
 
     @staticmethod
     def is_valid(value):
@@ -183,9 +209,9 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        # TODO: is ':' ok in html ids?
-        return "-".join(str(v) for v in self.list()
-                        if v is not None).replace('.', '_')
+        s = "-".join(str(v) for v in self.list()
+                        if v is not None)
+        return Location.clean_for_html(s)
 
     def dict(self):
         """
