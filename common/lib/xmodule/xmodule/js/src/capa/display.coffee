@@ -11,7 +11,8 @@ class @Problem
     $(selector, @el)
 
   bind: =>
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+    @el.find('.problem > div').each (index, element) =>
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
     window.update_schematics()
 
@@ -267,7 +268,9 @@ class @Problem
               showMethod = @inputtypeShowAnswerMethods[cls]
               showMethod(inputtype, display, answers) if showMethod?
 
-        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+        @el.find('.problem > div').each (index, element) =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
         @updateProgress response
