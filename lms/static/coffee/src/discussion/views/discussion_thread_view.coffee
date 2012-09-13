@@ -118,9 +118,7 @@ if Backbone?
               tags: newTags
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
           success: (response, textStatus) =>
-
               # TODO: Move this out of the callback, this makes it feel sluggish
-
               @editView.$(".edit-post-title").val("").attr("prev-text", "")
               @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
               @editView.$(".edit-post-tags").val("")
@@ -130,10 +128,11 @@ if Backbone?
               @model.set
                 title: newTitle
                 body: newBody
-                tags: newTags
+                tags: response.content.tags
 
               @createShowView()
               @renderShowView()
+              @renderTags()
 
     createEditView: () ->
 
