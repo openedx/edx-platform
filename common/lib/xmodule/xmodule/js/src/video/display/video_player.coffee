@@ -28,7 +28,7 @@ class @VideoPlayer extends Subview
     atts = { id: @videoid };
     youtubeId = @video.youtubeId()
 
-    swfobject.embedSWF("https://www.youtube.com/v/#{youtubeId}?enablejsapi=1&version=3&playerapiid=ytplayer",
+    swfobject.embedSWF("https://www.youtube.com/v/#{youtubeId}?enablejsapi=1&version=3&playerapiid=ytplayer&rel=0&modestbranding=1&showsearch=0&showinfo=0",
                          @video.id, "425", "356", "9", null, null, params, atts )
 
 
