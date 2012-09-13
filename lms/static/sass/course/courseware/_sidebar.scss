@@ -125,8 +125,12 @@ section.course-index {
               font-weight: normal;
               display: block;
               margin: 0;
+
+              &:empty {
+                display: none;
+              }
             }
-          }          
+          }
 
           &:hover {
             background: rgba(0, 0, 0, .1);
