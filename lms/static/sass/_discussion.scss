@@ -1745,6 +1745,22 @@ body.discussion {
           padding: 12px 20px 0 20px;
           @include clearfix;
 
+          .inline-comment-count {
+            position: relative;
+            z-index: 100;
+            float: right;
+            display: block;
+            height: 27px;
+            margin-top: 6px;
+            margin-right: 8px;
+            padding: 0 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 25px;
+            color: #888;
+          }
+
           header {
             padding-bottom: 0;
             margin-bottom: 15px;
@@ -1778,6 +1794,7 @@ body.discussion {
 
         .post-tools {
           margin-left: 20px;
+          margin-top: 5px;
 
           a {
             display: block;
