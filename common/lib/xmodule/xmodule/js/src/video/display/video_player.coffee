@@ -24,27 +24,13 @@ class @VideoPlayer extends Subview
       @toggleFullScreen(event)
 
   render: ->
-    @control = new VideoControl el: @$('.video-controls')
-    @caption = new VideoCaption
-        el: @el
-        youtubeId: @video.youtubeId('1.0')
-        currentSpeed: @currentSpeed()
-        captionDataDir: @video.caption_data_dir
-    unless onTouchBasedDevice()
-      @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
-    @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
-    @progressSlider = new VideoProgressSlider el: @$('.slider')
-    @player = new YT.Player @video.id,
-      playerVars:
-        controls: 0
-        wmode: 'transparent'
-        rel: 0
-        showinfo: 0
-        enablejsapi: 1
-      videoId: @video.youtubeId()
-      events:
-        onReady: @onReady
-        onStateChange: @onStateChange
+    params = { allowScriptAccess: "always" };
+    atts = { id: @videoid };
+    youtubeId = @video.youtubeId()
+
+    swfobject.embedSWF("https://www.youtube.com/v/#{youtubeId}?enablejsapi=1&version=3&playerapiid=ytplayer&rel=0&modestbranding=1&showsearch=0&showinfo=0",
+                         @video.id, "425", "356", "9", null, null, params, atts )
+
 
   addToolTip: ->
     @$('.add-fullscreen, .hide-subtitles').qtip
