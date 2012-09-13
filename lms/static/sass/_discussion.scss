@@ -390,6 +390,14 @@ $tag-text-color: #5b614f;
           color: #dea03e;
         }
       }
+
+      .author-moderator:after{
+        content: " (moderator)"
+      }
+
+      .author-administrator:after{
+        content: " (instructor)"
+      }
     }
 
     .discussion-content {
@@ -415,6 +423,13 @@ $tag-text-color: #5b614f;
       }
     }
 
+    // Role based styles
+    .role-moderator{
+      background-color: #eafcfc;
+    }
+    .role-administrator{
+      background-color: #eafcea;
+    }
     //COMMENT STYLES
     .comments {
       overflow: hidden;

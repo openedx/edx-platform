@@ -4,6 +4,8 @@
 
 <%block name="headextra">
   <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
@@ -31,53 +33,111 @@ table.stat_table td {
 	border-color: #666666;
 	background-color: #ffffff;
 }
+
+a.selectedmode { background-color: yellow; }
+
 </style>
+
+<script language="JavaScript" type="text/javascript">
+function goto( mode)
+{
+  document.idashform.idash_mode.value = mode;
+  document.idashform.submit() ;
+}
+</script>
 
 <section class="container">
 <div class="instructor-dashboard-wrapper">
+
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <form method="POST">
-    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> | 
+          %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
+          %endif
+          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> ]
+    </h2>
 
+  <div style="text-align:right" id="djangopid">${djangopid}</div>
+
+    <form name="idashform" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <input type="hidden" name="idash_mode" value="">
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Grades'):
     <p>
     <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
+    </p>
 
     <p>
     <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">Grade summary</a>
+    </p>
 
     <p>
     <input type="submit" name="action" value="Dump list of enrolled students">
+    </p>
 
     <p>
     <input type="submit" name="action" value="Dump Grades for all students in this course">
     <input type="submit" name="action" value="Download CSV of all student grades for this course">
+    </p>
 
     <p>
     <input type="submit" name="action" value="Dump all RAW grades for all students in this course">
     <input type="submit" name="action" value="Download CSV of all RAW grades">
+    </p>
 
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions">
-
-%if instructor_access:
-    <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List course staff members"> 
-    <p>
-    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff"> 
-    <input type="submit" name="action" value="Add course staff"> 
-    <hr width="40%" style="align:left">
+    </p>
  %endif
- 
-%if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Psychometrics'):
+
+    <p>Select a problem and an action:
+    </p>
+
     <p>
-    <input type="submit" name="action" value="Reload course from XML files"> 
-    <input type="submit" name="action" value="GIT pull and Reload course"> 
+    <select name="Problem">
+    %for problem, count in sorted(problems.items(), key=lambda x: x[0]):
+        <option value="${problem}">${problem} [${count}]</option>
+    %endfor
+    </select>
+    </p>
+    <p>
+    <input type="submit" name="action" value="Generate Histogram and IRT Plot">
+    </p>
+
+    <p></p>
+
+%endif
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Admin'):
+  %if instructor_access:
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List course staff members">
+    <p>
+    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff">
+    <input type="submit" name="action" value="Add course staff">
+    <hr width="40%" style="align:left">
+  %endif
+
+  %if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
+    <p>
+    <input type="submit" name="action" value="Reload course from XML files">
+    <input type="submit" name="action" value="GIT pull and Reload course">
+  %endif
 %endif
 
     </form>
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Psychometrics') is None:
 
     <br/>
     <br/>
@@ -99,24 +159,61 @@ table.stat_table td {
         %endfor
       </table>
     </p>
-
-%if msg:
-    <p>${msg}</p>    
 %endif
 
-% if course_errors is not UNDEFINED:
+##-----------------------------------------------------------------------------  
+%if modeflag.get('Psychometrics'):
+
+    %for plot in plots:
+      <br/>
+      <h3>${plot['title']}</h3>
+      <br/>
+      <p>${plot['info']}</p>
+      <br/>
+      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
+      <script type="text/javascript">
+          $(function () {
+              ${plot['data']}
+              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
+          });
+      </script>
+      <br/>
+      <br/>
+    %endfor
+
+%endif
+ 
+##-----------------------------------------------------------------------------  
+## always show msg
+
+%if msg:
+    <p>${msg}</p>
+%endif
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Admin'):
+ % if course_errors is not UNDEFINED:
     <h2>Course errors</h2>
     <div id="course-errors">
+    %if not course_errors:
+          None
+    %else:
       <ul>
         % for (summary, err) in course_errors:
         <li>${summary | h}
+        % if err:
           <ul><li><pre>${err | h}</pre></li></ul>
+        % else:
+          <p>&nbsp;</p>
+        % endif
         </li>
         % endfor
         </ul>
+      %endif
       </div>
-% endif
-      
+  % endif
+%endif      
+
   </section>
 </div>
 </section>

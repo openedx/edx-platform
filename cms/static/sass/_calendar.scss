@@ -330,11 +330,6 @@ section.cal {
 
   &:hover {
     opacity: 1;
-    width: flex-grid(5) + flex-gutter();
-
-    + section.main-content {
-      width: flex-grid(7);
-    }
   }
 
   > header {

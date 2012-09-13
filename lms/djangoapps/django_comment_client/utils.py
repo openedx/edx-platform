@@ -9,7 +9,9 @@ from django.utils import simplejson
 from django.db import connection
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.models import Role
 from mitxmako import middleware
 
 import logging
@@ -226,11 +228,15 @@ def permalink(content):
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 def extend_content(content):
+    user = User.objects.get(pk=content['user_id'])
+    roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
+        'roles': roles,
+        'updated': content['created_at']!=content['updated_at'],
     }
     return merge_dict(content, content_info)
 
