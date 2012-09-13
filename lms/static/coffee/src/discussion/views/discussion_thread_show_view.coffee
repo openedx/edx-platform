@@ -14,9 +14,11 @@ class @DiscussionThreadShowView extends DiscussionContentView
     super()
     @model.on "change", @updateModelDetails
 
-  render: ->
+  renderTemplate: ->
     @template = _.template($("#thread-show-template").html())
-    @$el.html(@template(@model.toJSON()))
+    @template(@model.toJSON())
+  render: ->
+    @$el.html(@renderTemplate())
     @delegateEvents()
     @renderDogear()
     @renderVoted()
@@ -24,7 +26,7 @@ class @DiscussionThreadShowView extends DiscussionContentView
     @$("span.timeago").timeago()
     @convertMath()
     @highlight @$(".post-body")
-    @highlight @$("h1")
+    @highlight @$("h1,h3")
     @
 
   renderDogear: ->
@@ -89,28 +91,6 @@ class @DiscussionThreadShowView extends DiscussionContentView
         if textStatus == 'success'
           @model.set(response, {silent: true})
 
-  submitComment: (event) ->
-    event.preventDefault()
-    url = @model.urlFor('reply')
-    body = @getWmdContent("reply-body")
-    return if not body.trim().length
-    @setWmdContent("reply-body", "")
-    comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, endorsed: false, user_id: window.user.get("id"))
-    comment.set('thread', @model.get('thread'))
-    @renderResponse(comment)
-    @model.addComment()
-
-    DiscussionUtil.safeAjax
-      $elem: $(event.target)
-      url: url
-      type: "POST"
-      dataType: 'json'
-      data:
-        body: body
-      success: (data, textStatus) =>
-        comment.updateInfo(data.annotated_content_info)
-        comment.set(data.content)
-
   edit: (event) ->
     @trigger "thread:edit", event
 
@@ -146,3 +126,11 @@ class @DiscussionThreadShowView extends DiscussionContentView
 
   highlight: (el) ->
     el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
+
+class @DiscussionThreadInlineShowView extends DiscussionThreadShowView
+  renderTemplate: ->
+    @template = DiscussionUtil.getTemplate('_inline_thread_show')
+    params = @model.toJSON()
+    if not @model.get('anonymous')
+      params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
+    Mustache.render(@template, params)
