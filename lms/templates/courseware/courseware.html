@@ -39,7 +39,8 @@
 
     $(function(){
         $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
-          var wordArray = $(this).text().split(" ");
+          var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
+          var wordArray = elemText.split(" ");
           var finalTitle = "";
           if (!($.isEmptyObject(wordArray))) {
             for (i=0;i<=wordArray.length-1;i++) {
@@ -50,8 +51,8 @@
                 finalTitle += " ";
               }
             }
-            $(this).html(finalTitle);
           }
+          $(this).html(finalTitle);
         });
       });
   </script>
