@@ -170,6 +170,7 @@ if Backbone?
       @renderSubView(@showView)
 
     cancelEdit: (event) =>
+      event.preventDefault()
       @createShowView()
       @renderShowView()
 
