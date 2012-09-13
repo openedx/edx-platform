@@ -34,7 +34,7 @@ if Backbone?
         @responsesRequest.abort()
 
     renderTags: ->
-      tags
+      # tags
       for tag in @model.get("tags")
         if !tags
           tags = $('<div class="thread-tags">')
