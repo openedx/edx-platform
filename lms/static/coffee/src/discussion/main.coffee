@@ -2,6 +2,7 @@ if Backbone?
   DiscussionApp =
     start: (elem)->
       # TODO: Perhaps eliminate usage of global variables when possible
+      DiscussionUtil.loadRolesFromContainer()
       element = $(elem)
       window.$$course_id = element.data("course-id")
       user_info = element.data("user-info")
