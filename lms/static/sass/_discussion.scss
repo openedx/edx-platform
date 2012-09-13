@@ -2003,6 +2003,7 @@ body.discussion {
 
     .thread-tag {
       padding: 3px 10px 6px;
+      margin-right: 5px;
       border-radius: 3px;
       color: #333;
       background: #c5eeff;
@@ -2299,12 +2300,14 @@ body.discussion {
       }
     }
   }
+
   .thread-tags {
     margin: 20px 0;
   }
 
   .thread-tag {
     padding: 3px 10px 6px;
+    margin-right: 5px;
     border-radius: 3px;
     color: #333;
     background: #c5eeff;
