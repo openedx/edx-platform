@@ -111,3 +111,4 @@ if Backbone?
     createEditView: () ->
       super()
       @editView.bind "thread:update", @expandPost
+      @editView.bind "thread:cancel_edit", @expandPost
