@@ -101,6 +101,7 @@ def get_course_about_section(course, section_key):
     - textbook
     - faq
     - more_info
+    - ocw_links
     """
 
     # Many of these are stored as html files instead of some semantic
@@ -112,7 +113,7 @@ def get_course_about_section(course, section_key):
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
                        'number', 'instructors', 'overview',
-                       'effort', 'end_date', 'prerequisites']:
+                       'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
             fs = course.system.resources_fs
