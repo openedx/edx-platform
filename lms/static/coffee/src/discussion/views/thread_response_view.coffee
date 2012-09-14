@@ -3,34 +3,27 @@ if Backbone?
     tagName: "li"
 
     events:
-        "click .vote-btn": "toggleVote"
         "submit .comment-form": "submitComment"
-        "click .action-endorse": "toggleEndorse"
-        "click .action-delete": "delete"
+
+    $: (selector) ->
+      @$el.find(selector)
+
+    initialize: ->
+      @createShowView()
+
+    renderTemplate: ->
+      @template = _.template($("#thread-response-template").html())
+      @template(@model.toJSON())
 
     render: ->
-      @template = _.template($("#thread-response-template").html())
-      @$el.html(@template(@model.toJSON()))
-      @initLocal()
+      @$el.html(@renderTemplate())
       @delegateEvents()
-      if window.user.voted(@model)
-        @$(".vote-btn").addClass("is-cast")
+
+      @renderShowView()
       @renderAttrs()
-      @$el.find(".posted-details").timeago()
-      @convertMath()
-      @markAsStaff()
+
       @renderComments()
       @
-
-    convertMath: ->
-      element = @$(".response-body")
-      element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
-
-    markAsStaff: ->
-      if DiscussionUtil.isStaff(@model.get("user_id"))
-        @$el.addClass("staff")
-        @$el.prepend('<div class="staff-banner">staff</div>')
 
     renderComments: ->
       comments = new Comments()
@@ -51,36 +44,6 @@ if Backbone?
       view.render()
       @$el.find(".comments li:last").before(view.el)
       view
-
-    toggleVote: (event) ->
-      event.preventDefault()
-      @$(".vote-btn").toggleClass("is-cast")
-      if @$(".vote-btn").hasClass("is-cast")
-        @vote()
-      else
-        @unvote()
-
-    vote: ->
-      url = @model.urlFor("upvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) + 1)
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
-
-    unvote: ->
-      url = @model.urlFor("unvote")
-      @$(".votes-count-number").html(parseInt(@$(".votes-count-number").html()) - 1)
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
 
     submitComment: (event) ->
       event.preventDefault()
@@ -103,14 +66,14 @@ if Backbone?
         success: (response, textStatus) ->
           comment.set(response.content)
           view.render() # This is just to update the id for the most part, but might be useful in general
-    delete: (event) ->
+
+    delete: (event) =>
       event.preventDefault()
       if not @model.can('can_delete')
         return
-      console.log $(event.target)
-      url = @model.urlFor('delete')
       if not confirm "Are you sure to delete this response? "
         return
+      url = @model.urlFor('delete')
       @model.remove()
       @$el.remove()
       $elem = $(event.target)
@@ -120,18 +83,80 @@ if Backbone?
         type: "POST"
         success: (response, textStatus) =>
 
-    toggleEndorse: (event) ->
+    createEditView: () ->
+      if @showView?
+        @showView.undelegateEvents()
+        @showView.$el.empty()
+        @showView = null
+
+      @editView = new ThreadResponseEditView(model: @model)
+      @editView.bind "response:update", @update
+      @editView.bind "response:cancel_edit", @cancelEdit
+
+    renderSubView: (view) ->
+      view.setElement(@$('.discussion-response'))
+      view.render()
+      view.delegateEvents()
+
+    renderEditView: () ->
+      @renderSubView(@editView)
+
+    hideCommentForm: () ->
+      @$('.comment-form').closest('li').hide()
+
+    showCommentForm: () ->
+      @$('.comment-form').closest('li').show()
+
+    createShowView: () ->
+
+      if @editView?
+        @editView.undelegateEvents()
+        @editView.$el.empty()
+        @editView = null
+
+      @showView = new ThreadResponseShowView(model: @model)
+      @showView.bind "response:delete", @delete
+      @showView.bind "response:edit", @edit
+
+    renderShowView: () ->
+      @renderSubView(@showView)
+
+    cancelEdit: (event) =>
       event.preventDefault()
-      if not @model.can('can_endorse')
-        return
-      $elem = $(event.target)
-      url = @model.urlFor('endorse')
-      endorsed = @model.get('endorsed')
-      data = { endorsed: not endorsed }
-      @model.set('endorsed', not endorsed)
-      @trigger "comment:endorse", not endorsed
+      @createShowView()
+      @renderShowView()
+      @showCommentForm()
+
+    edit: (event) =>
+      @createEditView()
+      @renderEditView()
+      @hideCommentForm()
+
+    update: (event) =>
+
+      newBody  = @editView.$(".edit-post-body textarea").val()
+
+      url = DiscussionUtil.urlFor('update_comment', @model.id)
+
       DiscussionUtil.safeAjax
-        $elem: $elem
-        url: url
-        data: data
-        type: "POST"
+          $elem: $(event.target)
+          $loading: $(event.target) if event
+          url: url
+          type: "POST"
+          dataType: 'json'
+          async: false # TODO when the rest of the stuff below is made to work properly..
+          data:
+              body: newBody
+          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
+          success: (response, textStatus) =>
+              # TODO: Move this out of the callback, this makes it feel sluggish
+              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
+              @editView.$(".wmd-preview p").html("")
+
+              @model.set
+                body: newBody
+
+              @createShowView()
+              @renderShowView()
+              @showCommentForm()
+

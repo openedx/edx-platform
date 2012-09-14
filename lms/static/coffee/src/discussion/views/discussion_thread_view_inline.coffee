@@ -28,7 +28,10 @@ if Backbone?
       @delegateEvents()
       @renderShowView()
       @renderAttrs()
-      @renderTags()  #TODO: Decide if we want to show tags on inline threads
+
+      # TODO tags commenting out til we decide what to do with tags
+      #@renderTags()
+
       @$("span.timeago").timeago()
       @$el.find('.post-extended-content').hide()
       if @expanded
@@ -101,6 +104,7 @@ if Backbone?
       @$el.find('.collapse-post').css('display', 'block')
       @$el.find('.post-extended-content').show()
       @makeWmdEditor "reply-body"
+      @renderAttrs()
       if @$el.find('.loading').length
         @renderResponses()
 
