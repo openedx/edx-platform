@@ -335,12 +335,42 @@
 
   .course-sidebar {
     @include box-sizing(border-box);
-    @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
-    border: 1px solid rgb(200,200,200);
-    border-top: none;
     float: left;
-    padding: 16px 20px 30px;
     width: flex-grid(4);
+
+    > section {
+      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+      border: 1px solid rgb(200,200,200);
+
+      &.course-summary {
+        padding: 16px 20px 30px;
+        margin-bottom: 220px;
+        border-top: none;
+      }
+
+      &.additional-resources {
+        padding: 30px;
+
+        .opencourseware {
+          text-indent: -9999px;
+          background: url('../images/opencourseware.png') 0 0 no-repeat;
+          width: 266px;
+          height: 31px;
+          margin-bottom: 20px;
+        }
+
+        ul {
+          padding-left: 0;
+          margin-bottom: 0;
+        }
+
+        li {
+          list-style: none;
+          padding-left: 29px;
+          background: url('../images/link-icon.png') left center no-repeat;
+        }
+      }
+    }
 
     header {
       margin-bottom: 30px;
@@ -440,6 +470,13 @@
             margin-right: 0px;
           }
         }
+      }
+
+      h1 {
+        font: 1em $serif;
+        letter-spacing: 0;
+        color: #999;
+        margin-bottom: 0;
       }
     }
 
