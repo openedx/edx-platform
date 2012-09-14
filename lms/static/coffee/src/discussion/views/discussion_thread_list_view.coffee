@@ -40,15 +40,13 @@ if Backbone?
       if active
         @setActiveThread(thread_id)
 
+    #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
       commentable_id = thread.get("commentable_id")
       commentable = @$(".board-name[data-discussion_id]").filter(-> $(this).data("discussion_id").id == commentable_id)
-      commentable.click()
-      @displayedCollection.add thread
-      content = @renderThread(thread)
-      $(".post-list").prepend content
-      content.wrap("<li data-id='#{thread.get('id')}' />")
-      content.click()
+      @setTopicHack(commentable)
+      @retrieveDiscussion commentable_id, =>
+        @trigger "thread:created", thread.get('id')
 
     updateSidebar: =>
 
@@ -187,6 +185,13 @@ if Backbone?
       $("body").unbind "click", @toggleTopicDrop
       $("body").unbind "keydown", @setActiveItem
 
+    # TODO get rid of this asap
+    setTopicHack: (boardNameContainer) ->
+      item = $(boardNameContainer).closest('a')
+      boardName = item.find(".board-name").html()
+      _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
+        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
+      @$(".current-board").html(@fitName(boardName))
 
     setTopic: (event) ->
       item = $(event.target).closest('a')
@@ -242,6 +247,20 @@ if Backbone?
           @discussionIds = ""
         discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
         @retrieveDiscussions(discussionIds)
+
+    retrieveDiscussion: (discussion_id, callback=null) ->
+      url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
+      DiscussionUtil.safeAjax
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          @collection.current_page = response.page
+          @collection.pages = response.num_pages
+          @collection.reset(response.discussion_data)
+          Content.loadContentInfos(response.content_info)
+          @displayedCollection.reset(@collection.models)
+          if callback?
+            callback()
 
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
