@@ -3,7 +3,8 @@ if Backbone?
     tagName: "li"
 
     events:
-        "submit .comment-form": "submitComment"
+        "click .discussion-submit-comment": "submitComment"
+        "focus .wmd-input": "showEditorChrome"
 
     $: (selector) ->
       @$el.find(selector)
@@ -13,7 +14,10 @@ if Backbone?
 
     renderTemplate: ->
       @template = _.template($("#thread-response-template").html())
-      @template(@model.toJSON())
+
+      templateData = @model.toJSON()
+      templateData.wmdId = @model.id ? (new Date()).getTime()
+      @template(templateData)
 
     render: ->
       @$el.html(@renderTemplate())
@@ -24,6 +28,18 @@ if Backbone?
 
       @renderComments()
       @
+
+    afterInsert: ->
+      @makeWmdEditor "comment-body"
+      @hideEditorChrome()
+
+    hideEditorChrome: ->
+      @$('.wmd-button-row').hide()
+      @$('.wmd-preview').hide()
+
+    showEditorChrome: ->
+      @$('.wmd-button-row').show()
+      @$('.wmd-preview').show()
 
     renderComments: ->
       comments = new Comments()
@@ -42,19 +58,18 @@ if Backbone?
       comment.set('thread', @model.get('thread'))
       view = new ResponseCommentView(model: comment)
       view.render()
-      @$el.find(".comments li:last").before(view.el)
+      @$el.find(".comments .new-comment").before(view.el)
       view
 
     submitComment: (event) ->
       event.preventDefault()
       url = @model.urlFor('reply')
-      body = @$(".comment-form-input").val()
-      if not body.trim().length
-        return
+      body = @getWmdContent("comment-body")
+      return if not body.trim().length
+      @setWmdContent("comment-body", "")
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"), id:"unsaved")
       view = @renderComment(comment)
       @trigger "comment:add", comment
-      @$(".comment-form-input").val("")
 
       DiscussionUtil.safeAjax
         $elem: $(event.target)

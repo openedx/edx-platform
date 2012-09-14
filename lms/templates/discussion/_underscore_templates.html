@@ -76,9 +76,13 @@
 <script type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <ol class="comments">
-        <li class="response-local">
-            <form class="comment-form">
-                <input type="text" placeholder="Comment&hellip;" class="comment-form-input">
+        <li class="new-comment response-local">
+            <form class="comment-form" data-id="${'<%- wmdId %>'}">
+                <ul class="discussion-errors"></ul>
+                <div class="comment-body" data-id="${'<%- wmdId %>'}"></div>
+                <div class="comment-post-control">
+                    <a class="discussion-submit-comment control-button" href="#">Submit</a>
+                </div>
             </form>
         </li>
     </ol>

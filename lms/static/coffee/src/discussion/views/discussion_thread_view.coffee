@@ -76,6 +76,7 @@ if Backbone?
         view.on "comment:endorse", @endorseThread
         view.render()
         @$el.find(".responses").append(view.el)
+        view.afterInsert()
 
     addComment: =>
       @model.comment()
