@@ -105,7 +105,7 @@
                         $('<span>').text(value).append('&nbsp;&nbsp;'),
                         $('<a>', {
                             href  : '#',
-                            title : 'Removing tag',
+                            title : 'Remove tag',
                             text  : 'x'
                         }).click(function () {
                             return $('#' + id).removeTag(escape(value));
