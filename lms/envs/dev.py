@@ -20,6 +20,8 @@ MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains-
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
+MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+
 
 WIKI_ENABLED = True
 

@@ -8,9 +8,6 @@
 
   <%static:css group='application'/>
 
-  <!--[if lte IE 9]>
-  <%static:css group='ie-fixes'/>
-  <![endif]-->
   <%static:js group='main_vendor'/>
   <%block name="headextra"/>
 
@@ -19,6 +16,9 @@
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
+  <!--[if lte IE 9]>
+  <%static:css group='ie-fixes'/>
+  <![endif]-->
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
 </head>
 

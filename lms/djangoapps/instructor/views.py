@@ -27,6 +27,7 @@ from django.views.decorators.cache import cache_control
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
 from courseware.courses import (get_course_with_access, get_courses_by_university)
+from psychometrics import psychoanalyze
 from student.models import UserProfile
 
 from student.models import UserTestGroup, CourseEnrollment
@@ -51,7 +52,18 @@ def instructor_dashboard(request, course_id):
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
 
     msg = ''
-    # msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
+    #msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
+
+    problems = []
+    plots = []
+
+    # the instructor dashboard page is modal: grades, psychometrics, admin
+    # keep that state in request.session (defaults to grades mode)
+    idash_mode = request.POST.get('idash_mode','')
+    if idash_mode:
+        request.session['idash_mode'] = idash_mode
+    else:
+        idash_mode = request.session.get('idash_mode','Grades')
 
     def escape(s):
         """escape HTML special characters in string"""
@@ -149,6 +161,9 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_%s.csv' % course_id, get_answers_distribution(request, course_id))
 
+    #----------------------------------------
+    # Admin
+
     elif 'List course staff' in action:
         group = get_staff_group(course)
         msg += 'Staff group = %s' % group.name
@@ -187,14 +202,31 @@ def instructor_dashboard(request, course_id):
             user.groups.remove(group)
             track.views.server_track(request, 'remove-staff %s' % user, {}, page='idashboard')
 
-    # For now, mostly a static page
+    #----------------------------------------
+    # psychometrics
+
+    elif action == 'Generate Histogram and IRT Plot':
+        problem = request.POST['Problem']
+        nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
+        msg += nmsg
+        track.views.server_track(request, 'psychometrics %s' % problem, {}, page='idashboard')
+
+    if idash_mode=='Psychometrics':
+        problems = psychoanalyze.problems_with_psychometric_data(course_id)
+
+    #----------------------------------------
+    # context for rendering
     context = {'course': course,
                'staff_access': True,
                'admin_access': request.user.is_staff,
                'instructor_access': instructor_access,
                'datatable': datatable,
                'msg': msg,
+               'modeflag': {idash_mode: 'selectedmode'},
+               'problems': problems,		# psychometrics
+               'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
+               'djangopid' : os.getpid(),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
