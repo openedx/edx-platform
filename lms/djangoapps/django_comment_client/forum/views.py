@@ -48,66 +48,6 @@ def render_accordion(request, course, discussion_id):
 
     return render_to_string('discussion/_accordion.html', context)
 
-def render_discussion(request, course_id, threads, *args, **kwargs):
-    discussion_id = kwargs.get('discussion_id')
-    user_id = kwargs.get('user_id')
-    discussion_type = kwargs.get('discussion_type', 'inline')
-    query_params = kwargs.get('query_params', {})
-
-    template = {
-        'inline': 'discussion/_inline.html',
-        'forum': 'discussion/_forum.html',
-        'user': 'discussion/_user_active_threads.html',
-    }[discussion_type]
-
-    base_url = {
-        'inline': (lambda: reverse('django_comment_client.forum.views.inline_discussion', args=[course_id, discussion_id])),
-        'forum': (lambda: reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id])),
-        'user': (lambda: reverse('django_comment_client.forum.views.user_profile', args=[course_id, user_id])),
-    }[discussion_type]()
-
-    user_info = cc.User.from_django_user(request.user).to_dict()
-
-    def infogetter(thread):
-        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
-
-    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
-
-    if discussion_type != 'inline':
-        course = get_course_with_access(request.user, course_id, 'load')
-
-        for thread in threads:
-            courseware_context = get_courseware_context(thread, course)
-            if courseware_context:
-                thread.update(courseware_context)
-
-    context = {
-        'threads': map(utils.safe_content, threads),
-        'discussion_id': discussion_id,
-        'user_id': user_id,
-        'course_id': course_id,
-        'request': request,
-        'performed_search': _should_perform_search(request),
-        'pages_nearby_delta': PAGES_NEARBY_DELTA,
-        'discussion_type': discussion_type,
-        'base_url': base_url,
-        'query_params': strip_blank(strip_none(extract(query_params, ['page', 'sort_key', 'sort_order', 'tags', 'text']))),
-        'annotated_content_info': json.dumps(annotated_content_info),
-        #'discussion_data': json.dumps({ (discussion_id or user_id): map(utils.safe_content, threads) })
-        # TODO: Delete the above, nothing uses this
-    }
-    context = dict(context.items() + query_params.items())
-    return render_to_string(template, context)
-
-def render_inline_discussion(*args, **kwargs):
-    return render_discussion(discussion_type='inline', *args, **kwargs)
-
-def render_forum_discussion(*args, **kwargs):
-    return render_discussion(discussion_type='forum', *args, **kwargs)
-
-def render_user_discussion(*args, **kwargs):
-    return render_discussion(discussion_type='user', *args, **kwargs)
-
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise cc.utils.CommentClientError or
@@ -325,8 +265,6 @@ def user_profile(request, course_id, user_id):
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
-
-#        content = render_user_discussion(request, course_id, threads, user_id=user_id, query_params=query_params)
 
         if request.is_ajax():
             return utils.JsonResponse({
