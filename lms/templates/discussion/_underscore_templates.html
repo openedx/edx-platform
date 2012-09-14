@@ -72,6 +72,17 @@
 </script>
 
 <script type="text/template" id="thread-response-template">
+    <div class="discussion-response"></div>
+    <ol class="comments">
+        <li class="response-local">
+            <form class="comment-form">
+                <input type="text" placeholder="Comment&hellip;" class="comment-form-input">
+            </form>
+        </li>
+    </ol>
+</script>
+
+<script type="text/template" id="thread-response-show-template">
     <header class="response-local">
         <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
         <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
@@ -84,13 +95,18 @@
         <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
         <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
     </ul>
-    <ol class="comments">
-        <li class="response-local">
-            <form class="comment-form">
-                <input type="text" placeholder="Comment&hellip;" class="comment-form-input">
-            </form>
-        </li>
-    </ol>
+</script>
+
+<script type="text/template" id="thread-response-edit-template">
+  <div class="edit-post-form">
+    <h1>Editing response</h1>
+    <ul class="edit-post-form-errors"></ul>
+    <div class="form-row">
+      <div class="edit-post-body" name="body">${"<%- body %>"}</div>
+    </div>
+    <input type="submit" class="post-update" value="Update response">
+    <a href="#" class="post-cancel">Cancel</a>
+  </div>
 </script>
 
 <script type="text/template" id="response-comment-show-template">
