@@ -5,7 +5,7 @@
 
 <div class="user-profile">
   <%
-    role_names = sorted(map(attrgetter('name'), django_user.roles.all()))
+    role_names = sorted(set(map(attrgetter('name'), django_user.roles.all())))
   %>
   <div class="sidebar-username">${django_user.username | h}</div>
   <div class="sidebar-user-roles">
