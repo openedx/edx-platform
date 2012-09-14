@@ -146,8 +146,9 @@ def initialize_discussion_info(course):
             category = module.metadata['discussion_category']
             title = module.metadata['for']
             sort_key = module.metadata.get('sort_key', title)
-            discussion_id_map[id] = {"location": location, "title": title}
             category = " / ".join([x.strip() for x in category.split("/")])
+            last_category = category.split("/")[-1]
+            discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
             unexpanded_category_map[category].append({"title": title, "id": id,
                 "sort_key": sort_key, "start_date": module.start})
 
@@ -333,7 +334,7 @@ def safe_content(content):
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
-        'courseware_title', 'courseware_location', 'tags'
+        'courseware_title', 'courseware_url', 'tags'
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

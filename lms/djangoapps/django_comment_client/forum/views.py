@@ -212,6 +212,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
         category_map = utils.get_discussion_category_map(course)
         try:
             threads, query_params = get_threads(request, course_id)
+            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+            threads.append(thread.to_dict())
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
             raise Http404
 
