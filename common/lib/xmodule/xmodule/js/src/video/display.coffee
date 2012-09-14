@@ -9,6 +9,12 @@ class @Video
     @parseVideos @el.data('streams')
     @fetchMetadata()
     @parseSpeed()
+
+    if $.cookie('hide_captions') == 'true'
+      @el.addClass('closed')
+    else
+      @el.removeClass('closed')
+
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
     if YT.Player
