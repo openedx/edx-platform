@@ -82,6 +82,8 @@ def index(request, extra_context={}, user=None):
                                              domain=domain)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
+    if request.REQUEST.get('next', False):
+        context['show_login_immediately'] = True
     return render_to_response('index.html', context)
 
 def course_from_id(course_id):

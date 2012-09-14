@@ -147,28 +147,10 @@
 
 % if show_signup_immediately is not UNDEFINED:
 <script type="text/javascript">
-function dosignup(){
-    comp = document.getElementById('signup_action');
-try { //in firefox
-    comp.click();
-    return;
-} catch(ex) {}
-try { // in old chrome
-    if(document.createEvent) {
-        var e = document.createEvent('MouseEvents');
-        e.initEvent( 'click', true, true );
-        comp.dispatchEvent(e);
-        return;
-    }
-} catch(ex) {}
-try { // in IE, safari
-    if(document.createEventObject) {
-         var evObj = document.createEventObject();
-         comp.fireEvent("onclick", evObj);
-         return;
-    }
-} catch(ex) {}
-}
-$(window).load(dosignup);
+$(window).load(function() {$('#signup_action').trigger("click");});
+</script>
+% elif show_login_immediately is not UNDEFINED:
+<script type="text/javascript">
+  $(window).load(function() {$('#login').trigger("click");});
 </script>
 % endif
