@@ -24,11 +24,17 @@ class @Problem
     @$('section.action input.save').click @save
     @$('input.math').keyup(@refreshMath).each(@refreshMath)
 
+  renderProgressState: () =>
+    @$(".problem-progress").html(@el.data('progress_detail'))
+    
+
   updateProgress: (response) =>
     if response.progress_changed
         @el.data('progress_status', response.progress_status)
         @el.data('progress_detail', response.progress_detail)
         @el.trigger('progressChanged')
+        @renderProgressState()
+
 
   queueing: =>
     @queued_items = @$(".xqueue")
@@ -79,6 +85,8 @@ class @Problem
           @setupInputTypes()
           @bind()
           @queueing()
+          @renderProgressState()
+
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
