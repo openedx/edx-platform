@@ -408,7 +408,7 @@ class JavascriptResponse(LoncapaResponse):
         output = self.call_node([generator_file,
                                  self.generator, 
                                  json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.system.seed)), 
+                                 json.dumps(str(self.context['the_lcp'].seed)),
                                  json.dumps(self.params)]).strip()
 
         return json.loads(output)
@@ -971,8 +971,9 @@ def sympy_check2():
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
         for k in range(len(idset)):
+            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
-                            npoints=self.maxpoints[idset[k]])
+                            npoints=npoints)
         return correct_map
 
     def get_answers(self):

@@ -2023,7 +2023,16 @@ function add_schematic_handler(other_onload) {
 	update_schematics();
     }
 }
-window.onload = add_schematic_handler(window.onload);
+/*
+ * THK: Attaching update_schematic to window.onload is rather presumptuous...
+ *      The function is called for EVERY page load, whether in courseware or in
+ *      course info, in 6.002x or the public health course. It is also redundant
+ *      because courseware includes an explicit call to update_schematic after
+ *      each ajax exchange. In this case, calling update_schematic twice appears 
+ *      to contribute to a bug in Firefox that does not render the schematic
+ *      properly depending on timing.
+ */
+//window.onload = add_schematic_handler(window.onload);
 
 // ask each schematic input widget to update its value field for submission
 function prepare_schematics() {

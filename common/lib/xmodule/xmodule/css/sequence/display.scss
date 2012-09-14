@@ -32,7 +32,7 @@ nav.sequence-nav {
 
   .sequence-list-wrapper {
     position: relative;
-    z-index: 9999;
+    z-index: 99;
     border: 1px solid #ccc;
     height: 44px;
     margin: 0 30px;
@@ -297,7 +297,6 @@ nav.sequence-bottom {
   ul {
     @extend .clearfix;
     @include inline-block();
-    width: 103px;
 
     li {
       float: left;
