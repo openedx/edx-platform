@@ -2,7 +2,7 @@ if Backbone?
   class @Discussion extends Backbone.Collection
     model: Thread
 
-    initialize: (models, options)->
+    initialize: (models, options={})->
       @pages = options['pages'] || 1
       @current_page = 1
       @bind "add", (item) =>
