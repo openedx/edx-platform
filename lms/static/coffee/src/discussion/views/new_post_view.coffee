@@ -116,8 +116,9 @@ if Backbone?
           body    = @$(".new-post-body").find(".wmd-input").val()
           tags    = @$(".new-post-tags").val()
 
-          anonymous = false || @$("input.discussion-anonymous").is(":checked")
-          follow    = false || @$("input.discussion-follow").is(":checked")
+          anonymous          = false || @$("input.discussion-anonymous").is(":checked")
+          anonymous_to_peers = false || @$("input.discussion-anonymous-to-peers").is(":checked")
+          follow             = false || @$("input.discussion-follow").is(":checked")
 
           $formTopicDropBtn.bind('click', showFormTopicDrop)
           $formTopicDropMenu.bind('click', setFormTopic)
@@ -136,6 +137,7 @@ if Backbone?
                   body: body
                   tags: tags
                   anonymous: anonymous
+                  anonymous_to_peers: anonymous_to_peers
                   auto_subscribe: follow
               error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
               success: (response, textStatus) =>

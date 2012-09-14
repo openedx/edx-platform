@@ -188,7 +188,9 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
-    for topic, entry in course.metadata.get('discussion_topics', {}).items():
+    default_topics = {'General': course.location.html_id()}
+    discussion_topics = course.metadata.get('discussion_topics', default_topics)
+    for topic, entry in discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
                                           "start_date": time.gmtime()}
@@ -327,15 +329,14 @@ def get_courseware_context(content, course):
 
 def safe_content(content):
     fields = [
-        'id', 'title', 'body', 'course_id', 'anonymous', 'endorsed',
-        'parent_id', 'thread_id', 'votes', 'closed',
-        'created_at', 'updated_at', 'depth', 'type',
-        'commentable_id', 'comments_count', 'at_position_list',
-        'children', 'highlighted_title', 'highlighted_body',
+        'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
+        'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
+        'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
+        'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_location', 'tags'
     ]
 
-    if content.get('anonymous') is False:
+    if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
         fields += ['username', 'user_id']
 
     return strip_none(extract(content, fields))

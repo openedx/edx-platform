@@ -68,10 +68,12 @@ if Backbone?
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
       DiscussionUtil.loadRoles(response.roles)
+      allow_anonymous = response.allow_anonymous
+      allow_anonymous_to_peers = response.allow_anonymous_to_peers
       # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
-      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId})
+      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
