@@ -13,7 +13,7 @@ if Backbone?
         @nav.render()
 
         @newPostView = new NewPostView(el: $(".new-post-article"), collection: @discussion)
-        @newPostView.on "thread:created", @navigateToThread
+        @nav.on "thread:created", @navigateToThread
 
     allThreads: ->
       @nav.updateSidebar()
@@ -42,5 +42,4 @@ if Backbone?
       @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
 
     navigateToAllThreads: =>
-      console.log "navigating"
       @navigate("", trigger: true)
