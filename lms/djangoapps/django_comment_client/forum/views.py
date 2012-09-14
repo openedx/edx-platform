@@ -23,7 +23,7 @@ import comment_client as cc
 import xml.sax.saxutils as saxutils
 
 THREADS_PER_PAGE = 20
-INLINE_THREADS_PER_PAGE = 5
+INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")

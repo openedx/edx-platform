@@ -99,7 +99,7 @@ def filter_unstarted_categories(category_map):
 
         for child in unfiltered_map["children"]:
             if child in unfiltered_map["entries"]:
-                if unfiltered_map["entries"][child]["start_date"] < now:
+                if unfiltered_map["entries"][child]["start_date"] <= now:
                     filtered_map["children"].append(child)
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
