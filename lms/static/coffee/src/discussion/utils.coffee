@@ -155,6 +155,7 @@ class @DiscussionUtil
 
   @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
+    placeholder = elem.data('placeholder')
     id = elem.data("id")
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
@@ -162,6 +163,8 @@ class @DiscussionUtil
       (text) -> _this.postMathJaxProcessor(text)
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, _processor(@)
     @wmdEditors["#{cls_identifier}-#{id}"] = editor
+    if placeholder?
+      elem.find("#wmd-input#{appended_id}").attr('placeholder', placeholder)
     editor
 
   @getWmdEditor: ($content, $local, cls_identifier) ->
