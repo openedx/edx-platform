@@ -92,6 +92,8 @@ def inline_discussion(request, course_id, discussion_id):
     Renders JSON for DiscussionModules
     """
 
+    course = get_course_with_access(request.user, course_id, 'load')
+
     try:
         threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -106,6 +108,9 @@ def inline_discussion(request, course_id, discussion_id):
 
     annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
 
+    allow_anonymous = course.metadata.get("allow_anonymous", True)
+    allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
+
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
@@ -113,6 +118,8 @@ def inline_discussion(request, course_id, discussion_id):
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],
         'roles': utils.get_role_ids(course_id),
+        'allow_anonymous_to_peers': allow_anonymous_to_peers,
+        'allow_anonymous': allow_anonymous,
     })
 
 @login_required

@@ -62,19 +62,31 @@ def ajax_content_response(request, course_id, content, template_name):
 @login_required
 @permitted
 def create_thread(request, course_id, commentable_id):
+    course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
+
+    if course.metadata.get("allow_anonymous", True):
+        anonymous = post.get('anonymous', 'false').lower() == 'true'
+    else:
+        anonymous = False
+
+    if course.metadata.get("allow_anonymous_to_peers", False):
+        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+    else:
+        anonymous_to_peers = False
+
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
     thread.update_attributes(**{
-        'anonymous'      : post.get('anonymous', 'false').lower() == 'true',
-        'commentable_id' : commentable_id,
-        'course_id'      : course_id,
-        'user_id'        : request.user.id,
+        'anonymous'          : anonymous,
+        'anonymous_to_peers' : anonymous_to_peers,
+        'commentable_id'     : commentable_id,
+        'course_id'          : course_id,
+        'user_id'            : request.user.id,
     })
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
-    course = get_course_with_access(request.user, course_id, 'load')
     courseware_context = get_courseware_context(thread, course)
     data = thread.to_dict()
     if courseware_context:
@@ -99,8 +111,20 @@ def update_thread(request, course_id, thread_id):
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
+
+    if course.metadata.get("allow_anonymous", True):
+        anonymous = post.get('anonymous', 'false').lower() == 'true'
+    else:
+        anonymous = False
+
+    if course.metadata.get("allow_anonymous_to_peers", False):
+        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+    else:
+        anonymous_to_peers = False
+
     comment.update_attributes(**{
-        'anonymous' : post.get('anonymous', 'false').lower() == 'true',
+        'anonymous'          : anonymous,
+        'anonymous_to_peers' : anonymous_to_peers,
         'user_id'   : request.user.id,
         'course_id' : course_id,
         'thread_id' : thread_id,

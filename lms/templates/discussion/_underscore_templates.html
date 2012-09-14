@@ -25,7 +25,7 @@
           <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
-              ${"<% if (!obj.anonymous) { %>"}
+              ${"<% if (obj.username) { %>"}
               <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
               ${"<% } else {print('anonymous');} %>"}
               <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
