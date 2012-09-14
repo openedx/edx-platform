@@ -1508,14 +1508,18 @@ body.discussion {
 
     }
 
-    p {
+    .response-body {
       font-size: 13px;
       padding: 10px 20px;
 
-      .posted-details {
-        font-size: 11px;
-        white-space: nowrap;
+      p + p {
+        margin-top: 12px;
       }
+    }
+
+    .posted-details {
+      margin: 0 20px 10px;
+      font-size: 11px;
     }
 
     .staff-label {
@@ -1528,10 +1532,6 @@ body.discussion {
       font-style: normal;
       color: white;
       text-transform: uppercase;
-    }
-
-    .posted-details {
-      margin-left: 8px;
     }
   }
 
