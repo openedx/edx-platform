@@ -243,10 +243,11 @@ if Backbone?
         @setTopic(event)  # just sets the title for the dropdown
         item = $(event.target).closest('li')
         if item.find("span.board-name").data("discussion_id") == "#all"
-          item = item.parent()
           @discussionIds = ""
-        discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
-        @retrieveDiscussions(discussionIds)
+          @clearSearch()
+        else
+          discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
+          @retrieveDiscussions(discussionIds)
 
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
