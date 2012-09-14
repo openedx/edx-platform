@@ -6,17 +6,14 @@ import settings
 class Thread(models.Model):
 
     accessible_fields = [
-        'id', 'title', 'body', 'anonymous',
-        'course_id', 'closed', 'tags', 'votes',
-        'commentable_id', 'username', 'user_id',
-        'created_at', 'updated_at', 'comments_count',
-        'at_position_list', 'children', 'type',
-        'highlighted_title', 'highlighted_body',
-        'endorsed'
+        'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
+        'created_at', 'updated_at', 'comments_count', 'at_position_list',
+        'children', 'type', 'highlighted_title', 'highlighted_body', 'endorsed'
     ]
 
     updatable_fields = [
-        'title', 'body', 'anonymous', 'course_id',
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'closed', 'tags', 'user_id', 'commentable_id',
     ]
 

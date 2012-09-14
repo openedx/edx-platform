@@ -134,6 +134,6 @@ if Backbone?
     renderTemplate: ->
       @template = DiscussionUtil.getTemplate('_inline_thread_show')
       params = @model.toJSON()
-      if not @model.get('anonymous')
+      if @model.get('username')?
         params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
       Mustache.render(@template, params)
