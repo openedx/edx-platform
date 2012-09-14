@@ -36,10 +36,14 @@ if Backbone?
     hideEditorChrome: ->
       @$('.wmd-button-row').hide()
       @$('.wmd-preview').hide()
+      @$('.wmd-input').css(height: '50px')
+      @$('.comment-post-control').hide()
 
     showEditorChrome: ->
       @$('.wmd-button-row').show()
       @$('.wmd-preview').show()
+      @$('.comment-post-control').show()
+      @$('.wmd-input').css(height: '125px')
 
     renderComments: ->
       comments = new Comments()
@@ -69,6 +73,7 @@ if Backbone?
       @setWmdContent("comment-body", "")
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"), id:"unsaved")
       view = @renderComment(comment)
+      @hideEditorChrome()
       @trigger "comment:add", comment
 
       DiscussionUtil.safeAjax
