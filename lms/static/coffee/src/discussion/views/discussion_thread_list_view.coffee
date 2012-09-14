@@ -112,13 +112,15 @@ if Backbone?
 
       @$(".post-list").html(rendered.html())
       @renderMorePages()
+      @updateSidebar()
       @trigger "threads:rendered"
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
         @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
 
-    loadMorePages: ->
+    loadMorePages: (event) ->
+      event.preventDefault()
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
       @collection.retrieveAnotherPage(@current_search, @discussionIds, @sortBy)
