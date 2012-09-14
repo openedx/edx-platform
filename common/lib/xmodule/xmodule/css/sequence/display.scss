@@ -297,7 +297,6 @@ nav.sequence-bottom {
   ul {
     @extend .clearfix;
     @include inline-block();
-    width: 103px;
 
     li {
       float: left;
