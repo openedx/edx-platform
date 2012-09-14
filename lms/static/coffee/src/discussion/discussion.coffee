@@ -18,11 +18,12 @@ if Backbone?
       @current_page < @pages
 
     addThread: (thread, options) ->
-      # TODO: Check for existing thread with same ID?
-      options ||= {}
-      model = new Thread thread
-      @add model
-      model
+      # TODO: Check for existing thread with same ID in a faster way
+      if not @find(thread.id)
+        options ||= {}
+        model = new Thread thread
+        @add model
+        model
 
     retrieveAnotherPage: (search_text="", commentable_ids="", sort_key="")->
       # TODO: I really feel that this belongs in DiscussionThreadListView
