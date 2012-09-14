@@ -25,9 +25,6 @@ if Backbone?
     convertMath: ->
       body = @$el.find(".response-body")
       body.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight body.html()
-      # This removes paragraphs so that comments are more compact
-      body.children("p").each (index, elem) ->
-        $(elem).replaceWith($(elem).html())
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, body[0]]
 
     markAsStaff: ->
