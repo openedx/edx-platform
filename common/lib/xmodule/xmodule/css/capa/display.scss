@@ -432,6 +432,19 @@ section.problem {
     input.save {
       @extend .blue-button;
     }
+
+    .submission_feedback {
+      // background: #F3F3F3;
+      // border: 1px solid #ddd;
+      // @include border-radius(3px);
+      // padding: 8px 12px;
+      // margin-top: 10px;
+      @include inline-block;
+      font-style: italic;
+      margin: 8px 0 0 10px;
+      color: #777;
+      -webkit-font-smoothing: antialiased;
+    }
   }
 
   .detailed-solution {
