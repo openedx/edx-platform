@@ -1538,6 +1538,10 @@ body.discussion {
   .comment-form {
     padding: 8px 20px;
 
+    .wmd-input {
+      @include transition(all .2s);
+    }
+
     .wmd-button {
       background: transparent;
 
