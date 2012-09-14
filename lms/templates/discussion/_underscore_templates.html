@@ -118,9 +118,6 @@
 
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
-    ${'<% if (deep) {%>'}
-    <a href="#comment_${'<%- parent_id %>'}">@${'<%- parent_username %>'}</a>:
-    ${'<% }%>'}
     <div class="response-body">
       ${'<%- body %>'}
     </div>
