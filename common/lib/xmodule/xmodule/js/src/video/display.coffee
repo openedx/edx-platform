@@ -10,11 +10,6 @@ class @Video
     @fetchMetadata()
     @parseSpeed()
 
-    if $.cookie('hide_captions') == 'true'
-      @el.addClass('closed')
-    else
-      @el.removeClass('closed')
-
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
     if YT.Player
@@ -23,6 +18,11 @@ class @Video
       window.onYouTubePlayerAPIReady = =>
         $('.course-content .video').each ->
           $(this).data('video').embed()
+
+    if $.cookie('hide_captions') == 'true'
+      @el.addClass('closed')
+    else
+      @el.removeClass('closed')
 
   youtubeId: (speed)->
     @videos[speed || @speed]
