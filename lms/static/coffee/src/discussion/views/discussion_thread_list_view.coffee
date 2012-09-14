@@ -13,6 +13,7 @@ if Backbone?
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
+      @sortBy = "date"
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
         @displayedCollection.current_page = discussion.current_page
@@ -116,9 +117,10 @@ if Backbone?
         @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
 
     loadMorePages: ->
+      # TODO: Obey dropdown filter
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
-      @collection.retrieveAnotherPage()
+      @collection.retrieveAnotherPage(@current_search, "", @sortBy)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -242,12 +244,12 @@ if Backbone?
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
       $(event.target).addClass("active")
-      sortBy = $(event.target).data("sort")
-      if sortBy == "date"
+      @sortBy = $(event.target).data("sort")
+      if @sortBy == "date"
         @displayedCollection.comparator = @displayedCollection.sortByDateRecentFirst
-      else if sortBy == "votes"
+      else if @sortBy == "votes"
         @displayedCollection.comparator = @displayedCollection.sortByVotes
-      else if sortBy == "comments"
+      else if @sortBy == "comments"
         @displayedCollection.comparator = @displayedCollection.sortByComments
       @displayedCollection.sort()
 
@@ -278,6 +280,7 @@ if Backbone?
             callback.apply @, [value]
         success: (response, textStatus) =>
           if textStatus == 'success'
+            # TODO: Augment existing collection?
             @collection.reset(response.discussion_data)
             Content.loadContentInfos(response.content_info)
             # TODO: Perhaps reload user info so that votes can be updated.

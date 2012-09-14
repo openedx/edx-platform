@@ -23,10 +23,13 @@ if Backbone?
       @add model
       model
 
-    retrieveAnotherPage: ->
+    retrieveAnotherPage: (search_text="", commentable_id="", sort_key="")->
+      # TODO: Obey dropdown filter (commentable_id)
       @current_page += 1
       url = DiscussionUtil.urlFor 'threads'
-      data = { page: @current_page }
+      data = { page: @current_page, text: search_text }
+      if sort_key
+        data['sort_key'] = sort_key
       DiscussionUtil.safeAjax
         $elem: @$el
         url: url
