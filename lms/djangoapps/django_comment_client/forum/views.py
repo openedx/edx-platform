@@ -79,8 +79,7 @@ def render_discussion(request, course_id, threads, *args, **kwargs):
         for thread in threads:
             courseware_context = get_courseware_context(thread, course)
             if courseware_context:
-                thread['courseware_location']  = courseware_context['courseware_location']
-                thread['courseware_title']  = courseware_context['courseware_title']
+                thread.update(courseware_context)
 
     context = {
         'threads': map(utils.safe_content, threads),
@@ -199,8 +198,7 @@ def forum_form_discussion(request, course_id):
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
         if courseware_context:
-            thread['courseware_location']  = courseware_context['courseware_location']
-            thread['courseware_title']  = courseware_context['courseware_title']
+            thread.update(courseware_context)
     if request.is_ajax():
         return utils.JsonResponse({
             'discussion_data': threads, # TODO: Standardize on 'discussion_data' vs 'threads'
@@ -273,8 +271,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         for thread in threads:
             courseware_context = get_courseware_context(thread, course)
             if courseware_context:
-                thread['courseware_location']  = courseware_context['courseware_location']
-                thread['courseware_title']  = courseware_context['courseware_title']
+                thread.update(courseware_context)
 
         threads = [utils.safe_content(thread) for thread in threads]
 
@@ -289,7 +286,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #)
 
         user_info = cc.User.from_django_user(request.user).to_dict()
-
 
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
