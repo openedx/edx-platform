@@ -104,6 +104,7 @@ if Backbone?
       @$el.find('.collapse-post').css('display', 'block')
       @$el.find('.post-extended-content').show()
       @makeWmdEditor "reply-body"
+      @renderAttrs()
       if @$el.find('.loading').length
         @renderResponses()
 
