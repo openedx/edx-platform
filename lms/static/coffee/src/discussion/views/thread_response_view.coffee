@@ -38,7 +38,7 @@ if Backbone?
       @$('.wmd-preview').hide()
       @$('.wmd-input').css({
         height: '35px',
-        padding: '0'
+        padding: '5px'
       })
       @$('.comment-post-control').hide()
 
