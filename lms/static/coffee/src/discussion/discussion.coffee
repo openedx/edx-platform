@@ -18,18 +18,23 @@ if Backbone?
       @current_page < @pages
 
     addThread: (thread, options) ->
+      # TODO: Check for existing thread with same ID?
       options ||= {}
       model = new Thread thread
       @add model
       model
 
-    retrieveAnotherPage: (search_text="", commentable_id="", sort_key="")->
-      # TODO: Obey dropdown filter (commentable_id)
+    retrieveAnotherPage: (search_text="", commentable_ids="", sort_key="")->
+      # TODO: I really feel that this belongs in DiscussionThreadListView
       @current_page += 1
       url = DiscussionUtil.urlFor 'threads'
-      data = { page: @current_page, text: search_text }
+      data = { page: @current_page }
+      if search_text
+        data['text'] = search_text
       if sort_key
         data['sort_key'] = sort_key
+      if commentable_ids
+        data['commentable_ids'] = commentable_ids
       DiscussionUtil.safeAjax
         $elem: @$el
         url: url
