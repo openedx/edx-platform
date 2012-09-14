@@ -1,9 +1,12 @@
+import time
 from collections import defaultdict
 from importlib import import_module
+
 from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.db import connection
@@ -74,7 +77,44 @@ def get_discussion_category_map(course):
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO:
         initialize_discussion_info(course)
-    return _DISCUSSIONINFO['category_map']
+    return filter_unstarted_categories(_DISCUSSIONINFO['category_map'])
+
+def filter_unstarted_categories(category_map):
+
+    now = time.gmtime()
+
+    result_map = {}
+
+    unfiltered_queue = [category_map]
+    filtered_queue   = [result_map]
+
+    while len(unfiltered_queue) > 0:
+
+        unfiltered_map = unfiltered_queue.pop()
+        filtered_map   = filtered_queue.pop()
+
+        filtered_map["children"] = []
+        filtered_map["entries"] = {}
+        filtered_map["subcategories"] = {}
+
+        for child in unfiltered_map["children"]:
+            if child in unfiltered_map["entries"]:
+                if unfiltered_map["entries"][child]["start_date"] < now:
+                    filtered_map["children"].append(child)
+                    filtered_map["entries"][child] = {}
+                    for key in unfiltered_map["entries"][child]:
+                        if key != "start_date":
+                            filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
+                else:
+                    print "filtering %s" % child, unfiltered_map["entries"][child]["start_date"]
+            else:
+                if unfiltered_map["subcategories"][child]["start_date"] < now:
+                    filtered_map["children"].append(child)
+                    filtered_map["subcategories"][child] = {}
+                    unfiltered_queue.append(unfiltered_map["subcategories"][child])
+                    filtered_queue.append(filtered_map["subcategories"][child])
+
+    return result_map
 
 def sort_map_entries(category_map):
     things = []
@@ -109,48 +149,55 @@ def initialize_discussion_info(course):
             discussion_id_map[id] = {"location": location, "title": title}
             category = " / ".join([x.strip() for x in category.split("/")])
             unexpanded_category_map[category].append({"title": title, "id": id,
-                "sort_key": sort_key})
+                "sort_key": sort_key, "start_date": module.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
         node = category_map["subcategories"]
         path = [x.strip() for x in category_path.split("/")]
+
+        # Find the earliest start date for the entries in this category
+        category_start_date = None
+        for entry in entries:
+            if category_start_date is None or entry["start_date"] < category_start_date:
+                category_start_date = entry["start_date"]
+
         for level in path[:-1]:
             if level not in node:
                 node[level] = {"subcategories": defaultdict(dict),
                                "entries": defaultdict(dict),
-                               "sort_key": level}
+                               "sort_key": level,
+                               "start_date": category_start_date}
+            else:
+                if node[level]["start_date"] > category_start_date:
+                    node[level]["start_date"] = category_start_date
             node = node[level]["subcategories"]
 
         level = path[-1]
         if level not in node:
             node[level] = {"subcategories": defaultdict(dict),
                             "entries": defaultdict(dict),
-                            "sort_key": level}
+                            "sort_key": level,
+                            "start_date": category_start_date}
+        else:
+            if node[level]["start_date"] > category_start_date:
+                node[level]["start_date"] = category_start_date
+
         for entry in entries:
             node[level]["entries"][entry["title"]] = {"id": entry["id"],
-                                                      "sort_key": entry["sort_key"]}
+                                                      "sort_key": entry["sort_key"],
+                                                      "start_date": entry["start_date"]}
 
     for topic, entry in course.metadata.get('discussion_topics', {}).items():
         category_map['entries'][topic] = {"id": entry["id"],
-                                          "sort_key": entry.get("sort_key", topic)}
-
+                                          "sort_key": entry.get("sort_key", topic),
+                                          "start_date": time.gmtime()}
     sort_map_entries(category_map)
 
     _DISCUSSIONINFO = {}
 
     _DISCUSSIONINFO['id_map'] = discussion_id_map
     _DISCUSSIONINFO['category_map'] = category_map
-
-def get_courseware_context(content, course):
-    id_map = get_discussion_id_map(course)
-    id = content['commentable_id']
-    content_info = None
-    if id in id_map:
-        location = id_map[id]["location"].url()
-        title = id_map[id]["title"]
-        content_info = { "courseware_location": location, "courseware_title": title}
-    return content_info
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
@@ -270,9 +317,13 @@ def get_courseware_context(content, course):
     if id in id_map:
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
-        content_info = { "courseware_location": location, "courseware_title": title}
+        (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+        url = reverse('courseware_position', kwargs={"course_id":course_id, 
+                                                     "chapter":chapter, 
+                                                     "section":section, 
+                                                     "position":position})
+        content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
-
 
 def safe_content(content):
     fields = [
