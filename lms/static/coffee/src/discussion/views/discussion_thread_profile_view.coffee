@@ -17,10 +17,9 @@ if Backbone?
 
     render: ->
       @template = DiscussionUtil.getTemplate("_profile_thread")
-
       if not @model.has('abbreviatedBody')
         @abbreviateBody()
-      params = $.extend(@model.toJSON(),{expanded: @expanded})
+      params = $.extend(@model.toJSON(),{expanded: @expanded, permalink: @model.urlFor('retrieve')})
       if not @model.get('anonymous')
         params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
       @$el.html(Mustache.render(@template, params))
