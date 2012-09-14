@@ -16,7 +16,7 @@ class Thread(models.Model):
     ]
 
     updatable_fields = [
-        'title', 'body', 'anonymous', 'course_id', 
+        'title', 'body', 'anonymous', 'course_id',
         'closed', 'tags', 'user_id', 'commentable_id',
     ]
 
@@ -33,7 +33,7 @@ class Thread(models.Model):
                           'course_id': query_params['course_id'],
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
-        if query_params.get('text') or query_params.get('tags'):
+        if query_params.get('text') or query_params.get('tags') or query_params.get('commentable_ids'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
@@ -41,7 +41,7 @@ class Thread(models.Model):
                 del params['commentable_id']
         response = perform_request('get', url, params, *args, **kwargs)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
-        
+
     @classmethod
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):

@@ -22,7 +22,7 @@ import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
 
-THREADS_PER_PAGE = 2
+THREADS_PER_PAGE = 5
 INLINE_THREADS_PER_PAGE = 5
 PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
@@ -78,8 +78,8 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         user.save()
 
     query_params = merge_dict(default_query_params,
-                              strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags'])))
-
+                              strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags', 'commentable_ids'])))
+    
     threads, page, num_pages = cc.Thread.search(query_params)
 
     query_params['page'] = page
@@ -143,6 +143,8 @@ def forum_form_discussion(request, course_id):
         return utils.JsonResponse({
             'discussion_data': threads, # TODO: Standardize on 'discussion_data' vs 'threads'
             'annotated_content_info': annotated_content_info,
+            'num_pages': query_params['num_pages'],
+            'page': query_params['page'],
         })
     else:
         #recent_active_threads = cc.search_recent_active_threads(

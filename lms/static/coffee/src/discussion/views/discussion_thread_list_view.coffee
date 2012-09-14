@@ -14,6 +14,7 @@ if Backbone?
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
       @sortBy = "date"
+      @discussionIds=""
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
         @displayedCollection.current_page = discussion.current_page
@@ -117,10 +118,12 @@ if Backbone?
         @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
 
     loadMorePages: ->
-      # TODO: Obey dropdown filter
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
-      @collection.retrieveAnotherPage(@current_search, "", @sortBy)
+      @collection.retrieveAnotherPage(@current_search, @discussionIds, @sortBy)
+      if not @collection.hasMorePages()
+        $(".more-pages").hide()
+
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -232,14 +235,27 @@ if Backbone?
         @setTopic(event)
         @clearSearch @filterTopic, event
       else
-        @setTopic(event)
+        @setTopic(event)  # just sets the title for the dropdown
         item = $(event.target).closest('li')
         if item.find("span.board-name").data("discussion_id") == "#all"
           item = item.parent()
+          @discussionIds = ""
         discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
-        filtered = @collection.filter (thread) =>
-          _.include(discussionIds, thread.get('commentable_id'))
-        @displayedCollection.reset filtered
+        @retrieveDiscussions(discussionIds)
+
+    retrieveDiscussions: (discussion_ids) ->
+      @discussionIds = discussion_ids.join(',')
+      url = DiscussionUtil.urlFor("search")
+      DiscussionUtil.safeAjax
+        data: { 'commentable_ids': @discussionIds }
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          @collection.current_page = response.page
+          @collection.pages = response.num_pages
+          @collection.reset(response.discussion_data)
+          Content.loadContentInfos(response.content_info)
+          @displayedCollection.reset(@collection.models)
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
@@ -283,6 +299,8 @@ if Backbone?
             # TODO: Augment existing collection?
             @collection.reset(response.discussion_data)
             Content.loadContentInfos(response.content_info)
+            @collection.current_page = response.page
+            @collection.pages = response.num_pages
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway

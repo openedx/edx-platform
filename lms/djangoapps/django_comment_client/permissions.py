@@ -11,7 +11,7 @@ cache = cache.get_cache('default')
 def cached_has_permission(user, permission, course_id=None):
     """
     Call has_permission if it's not cached. A change in a user's role or
-    a role's permissions will only become effective after CACHE_LIFESPAN seconds. 
+    a role's permissions will only become effective after CACHE_LIFESPAN seconds.
     """
     CACHE_LIFESPAN = 60
     key = "permission_%d_%s_%s" % (user.id, str(course_id), permission)
@@ -54,8 +54,8 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
     """
     Accepts a list of permissions and proceed if any of the permission is valid.
     Note that ["can_view", "can_edit"] will proceed if the user has either
-    "can_view" or "can_edit" permission. To use AND operator in between, wrap them in 
-    a list. 
+    "can_view" or "can_edit" permission. To use AND operator in between, wrap them in
+    a list.
     """
 
     def test(user, per, operator="or"):
@@ -87,7 +87,7 @@ VIEW_PERMISSIONS = {
     'vote_for_thread'   :       [['vote', 'is_open']],
     'undo_vote_for_thread':     [['unvote', 'is_open']],
     'follow_thread'     :       ['follow_thread'],
-    'follow_commentable':       ['follow_commentable'], 
+    'follow_commentable':       ['follow_commentable'],
     'follow_user'       :       ['follow_user'],
     'unfollow_thread'   :       ['unfollow_thread'],
     'unfollow_commentable':     ['unfollow_commentable'],
