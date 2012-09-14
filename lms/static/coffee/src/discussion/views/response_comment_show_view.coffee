@@ -7,12 +7,6 @@ if Backbone?
       @template = _.template($("#response-comment-show-template").html())
       params = @model.toJSON()
 
-      # Only things that are nested under comments get parents
-      params['deep'] = @model.hasOwnProperty('parent')
-      if @model.hasOwnProperty('parent')
-        params['parent_id'] = @model.parent.id
-        params['parent_username'] = @model.parent.get('username')
-
       @$el.html(@template(params))
       @initLocal()
       @delegateEvents()
@@ -20,7 +14,14 @@ if Backbone?
       @markAsStaff()
       @$el.find(".timeago").timeago()
       @convertMath()
+      @addReplyLink()
       @
+
+    addReplyLink: () ->
+      if @model.hasOwnProperty('parent')
+        html = "<a href='#comment_#{@model.parent.id}'>@#{@model.parent.get('username')}</a>:  "
+        p = @$('.response-body p:first')
+        p.prepend(html)
 
     convertMath: ->
       body = @$el.find(".response-body")
