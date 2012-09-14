@@ -112,6 +112,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
 
+    course = get_course_with_access(request.user, course_id, 'load')
     if course.metadata.get("allow_anonymous", True):
         anonymous = post.get('anonymous', 'false').lower() == 'true'
     else:
