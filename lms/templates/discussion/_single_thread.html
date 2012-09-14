@@ -22,7 +22,7 @@
       <div class="response-body">${reply['body']}</div>
       <ol class="comments">
         % for comment in reply.get("children", []):
-        <li><p>${comment['body']}</p></li>
+        <li><div class="comment-body">${comment['body']}</div></li>
         % endfor
       </ol>
     </li>

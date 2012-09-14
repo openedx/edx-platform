@@ -1508,14 +1508,18 @@ body.discussion {
 
     }
 
-    p {
+    .response-body {
       font-size: 13px;
       padding: 10px 20px;
 
-      .posted-details {
-        font-size: 11px;
-        white-space: nowrap;
+      p + p {
+        margin-top: 12px;
       }
+    }
+
+    .posted-details {
+      margin: 0 20px 10px;
+      font-size: 11px;
     }
 
     .staff-label {
@@ -1529,14 +1533,22 @@ body.discussion {
       color: white;
       text-transform: uppercase;
     }
-
-    .posted-details {
-      margin-left: 8px;
-    }
   }
 
   .comment-form {
     padding: 8px 20px;
+
+    .wmd-input {
+      @include transition(all .2s);
+    }
+
+    .wmd-button {
+      background: transparent;
+
+      span {
+        background-image: url(../images/wmd-buttons-transparent.png);
+      }
+    }
   }
 
   .comment-form-input {
