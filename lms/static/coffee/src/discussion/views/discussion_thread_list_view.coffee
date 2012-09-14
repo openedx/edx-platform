@@ -18,6 +18,7 @@ if Backbone?
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
         @displayedCollection.current_page = discussion.current_page
+        @displayedCollection.pages = discussion.pages
         @displayedCollection.reset discussion.models
         # TODO: filter correctly
         # target = _.filter($("a.topic:contains('#{board}')"), (el) -> el.innerText == "General" || el.innerHTML == "General")
@@ -121,9 +122,6 @@ if Backbone?
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
       @collection.retrieveAnotherPage(@current_search, @discussionIds, @sortBy)
-      if not @collection.hasMorePages()
-        $(".more-pages").hide()
-
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
