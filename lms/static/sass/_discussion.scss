@@ -1537,6 +1537,14 @@ body.discussion {
 
   .comment-form {
     padding: 8px 20px;
+
+    .wmd-button {
+      background: transparent;
+
+      span {
+        background-image: url(../images/wmd-buttons-transparent.png);
+      }
+    }
   }
 
   .comment-form-input {
