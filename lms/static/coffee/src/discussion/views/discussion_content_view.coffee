@@ -6,10 +6,10 @@ if Backbone?
         if endorsed
           @$(".action-endorse").show().addClass("is-endorsed")
         else
-          if not @model.get('ability').can_endorse
-            @$(".action-endorse").hide()
-          else
+          if @model.get('ability')?.can_endorse
             @$(".action-endorse").show()
+          else
+            @$(".action-endorse").hide()
           @$(".action-endorse").removeClass("is-endorsed")
 
       closed: (closed) ->
