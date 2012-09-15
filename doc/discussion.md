@@ -9,7 +9,7 @@ If you haven't done so already:
     brew install mongodb
 
 Make sure that you have mongodb running. You can simply open a new terminal tab and type:
- 
+
     mongod
 
 ## Installing elasticsearch
@@ -72,9 +72,9 @@ For convenience, add the following environment variables to the terminal (assumi
     export DJANGO_SETTINGS_MODULE=lms.envs.dev
     export PYTHONPATH=.
 
-Now initialzie roles and permissions:
+Now initialzie roles and permissions, providing a course id eg.:
 
-    django-admin.py seed_permissions_roles
+    django-admin.py seed_permissions_roles "MITx/6.002x/2012_Fall"
 
 To assign yourself as a moderator, use the following command (assuming your username is "test", and the course id is "MITx/6.002x/2012_Fall"):
 
