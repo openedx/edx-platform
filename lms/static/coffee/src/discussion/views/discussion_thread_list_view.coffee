@@ -106,7 +106,7 @@ if Backbone?
       for thread in @displayedCollection.models
         content = @renderThread(thread)
         rendered.append content
-        content.wrap("<li class='list-item' data-id='#{thread.get('id')}' />")
+        content.wrap("<li class='list-item' data-id='\"#{thread.get('id')}\"' />")
 
       @$(".post-list").html(rendered.html())
       @renderMorePages()
