@@ -1,5 +1,6 @@
 class @VideoPlayer extends Subview
   initialize: ->
+    console.log(@['video'].hide_captions)
     # Define a missing constant of Youtube API
     YT.PlayerState.UNSTARTED = -1
 
