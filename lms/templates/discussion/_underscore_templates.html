@@ -36,9 +36,7 @@
           </p>
       </header>
 
-      <div class="post-body">
-          ${'<%- body %>'}
-      </div>
+      <div class="post-body">${'<%- body %>'}</div>
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
@@ -120,9 +118,7 @@
 
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
-    <div class="response-body">
-      ${'<%- body %>'}
-    </div>
+    <div class="response-body"> ${'<%- body %>'} </div>
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by 
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
