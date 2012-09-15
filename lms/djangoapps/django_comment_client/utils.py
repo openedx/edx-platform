@@ -26,7 +26,7 @@ import pystache_custom as pystache
 
 # TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
-_DISCUSSIONINFO = None
+_DISCUSSIONINFO = defaultdict(dict)
 
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
@@ -61,23 +61,23 @@ def get_discussion_id_map(course):
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO:
+    if not _DISCUSSIONINFO[course.id]:
         initialize_discussion_info(course)
-    return _DISCUSSIONINFO['id_map']
+    return _DISCUSSIONINFO[course.id]['id_map']
 
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO:
+    if not _DISCUSSIONINFO[course.id]:
         initialize_discussion_info(course)
-    title = _DISCUSSIONINFO['id_map'].get(discussion_id, {}).get('title', '(no title)')
+    title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO:
+    if not _DISCUSSIONINFO[course.id]:
         initialize_discussion_info(course)
-    return filter_unstarted_categories(_DISCUSSIONINFO['category_map'])
+    return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
 
 def filter_unstarted_categories(category_map):
 
@@ -128,7 +128,7 @@ def sort_map_entries(category_map):
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
-    if _DISCUSSIONINFO:
+    if _DISCUSSIONINFO[course.id]:
         return
 
     course_id = course.id
@@ -197,10 +197,8 @@ def initialize_discussion_info(course):
                                           "start_date": time.gmtime()}
     sort_map_entries(category_map)
 
-    _DISCUSSIONINFO = {}
-
-    _DISCUSSIONINFO['id_map'] = discussion_id_map
-    _DISCUSSIONINFO['category_map'] = category_map
+    _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
+    _DISCUSSIONINFO[course.id]['category_map'] = category_map
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
