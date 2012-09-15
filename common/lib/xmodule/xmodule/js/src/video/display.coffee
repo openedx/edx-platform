@@ -9,7 +9,6 @@ class @Video
     @parseVideos @el.data('streams')
     @fetchMetadata()
     @parseSpeed()
-
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
     @hide_captions = $.cookie('hide_captions') == 'true'
