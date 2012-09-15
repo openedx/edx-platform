@@ -342,4 +342,8 @@ def safe_content(content):
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
         fields += ['username', 'user_id']
 
+    if 'children' in content:
+        safe_children = [safe_content(child) for child in content['children']]
+        content['children'] = safe_children
+
     return strip_none(extract(content, fields))

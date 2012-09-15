@@ -1702,6 +1702,12 @@ body.discussion {
   background: #f6f6f6 !important;
   border-radius: 3px;
 
+  header {
+    .anonymous{
+      font-size: 15px;
+    }
+  }
+
   .responses {
     margin-top: 40px;
 

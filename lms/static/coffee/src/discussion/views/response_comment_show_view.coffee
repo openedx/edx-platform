@@ -19,7 +19,8 @@ if Backbone?
 
     addReplyLink: () ->
       if @model.hasOwnProperty('parent')
-        html = "<a href='#comment_#{@model.parent.id}'>@#{@model.parent.get('username')}</a>:  "
+        name = @model.parent.get('username') ? "anonymous"
+        html = "<a href='#comment_#{@model.parent.id}'>@#{name}</a>:  "
         p = @$('.response-body p:first')
         p.prepend(html)
 
