@@ -4,8 +4,12 @@ if Backbone?
     attrRenderer:
       endorsed: (endorsed) ->
         if endorsed
-          @$(".action-endorse").addClass("is-endorsed")
+          @$(".action-endorse").show().addClass("is-endorsed")
         else
+          if not @model.get('ability').can_endorse
+            @$(".action-endorse").hide()
+          else
+            @$(".action-endorse").show()
           @$(".action-endorse").removeClass("is-endorsed")
 
       closed: (closed) ->
@@ -47,8 +51,14 @@ if Backbone?
         enable: -> @$(".action-delete").closest("li").show()
         disable: -> @$(".action-delete").closest("li").hide()
       can_endorse:
-        enable: -> @$(".action-endorse").css("cursor", "auto")
-        disable: -> @$(".action-endorse").css("cursor", "default")
+        enable: ->
+          @$(".action-endorse").show().css("cursor", "auto")
+        disable: ->
+          @$(".action-endorse").css("cursor", "default")
+          if not @model.get('endorsed')
+            @$(".action-endorse").hide()
+          else
+            @$(".action-endorse").show()
       can_openclose:
         enable: -> @$(".action-openclose").closest("li").show()
         disable: -> @$(".action-openclose").closest("li").hide()
