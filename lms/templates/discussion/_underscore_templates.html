@@ -92,7 +92,7 @@
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
         <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span></a>
-        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         <a href="${'<%- user_url %>'}" class="posted-by">${"<%- username %>"}</a>
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
