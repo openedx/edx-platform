@@ -45,6 +45,7 @@ span {
   font: normal 1em/1.6em $sans-serif;
   color: $base-font-color;
 }
+
 /* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */
 .CodeMirror span {
   font: inherit;
@@ -136,3 +137,23 @@ span.edx {
     margin-top: 20px;
   }
 }
+
+.loading-animation {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  background: url(../images/spinner.gif) no-repeat;
+}
+
+mark {
+  padding: 0 3px;
+  border-radius: 2px;
+  background-color: #f7e9a8;
+  color: #333;
+}
+
+
+
+

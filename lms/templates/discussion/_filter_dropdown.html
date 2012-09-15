@@ -1,0 +1,38 @@
+<%! import json %>
+
+<%def name="render_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${render_entry(map["entries"], child)}
+        %else:
+            ${render_category(map["subcategories"], child)}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li><a href="#"><span class="board-name" data-discussion_id='${json.dumps(entries[entry])}'>${entry}</span></a></li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li>
+        <a href="#"><span class="board-name">${category}</span></a>
+        <ul>
+            ${render_dropdown(categories[category])}
+        </ul>
+    </li>
+</%def>
+
+<div class="browse-topic-drop-menu-wrapper">
+    <div class="browse-topic-drop-search">
+        <input type="text" class="browse-topic-drop-search-input" placeholder="filter topics">
+    </div>
+    <ul class="browse-topic-drop-menu">        
+        <li>
+            <a href="#">
+                <span class="board-name" data-discussion_id='#all'>All</span>
+            </a>
+        </li>
+        ${render_dropdown(category_map)}
+    </ul>
+</div>

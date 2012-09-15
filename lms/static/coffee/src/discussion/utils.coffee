@@ -1,7 +1,9 @@
 $ ->
+  if !window.$$contents
+    window.$$contents = {}
   $.fn.extend
     loading: ->
-      @$_loading = $("<span class='discussion-loading'></span>")
+      @$_loading = $("<div class='loading-animation'></div>")
       $(this).after(@$_loading)
     loaded: ->
       @$_loading.remove()
@@ -13,27 +15,26 @@ class @DiscussionUtil
   @getTemplate: (id) ->
     $("script##{id}").html()
 
-  @getDiscussionData: (id) ->
-    return $$discussion_data[id]
+  @loadRoles: (roles)->
+    @roleIds = roles
 
-  @addContent: (id, content) -> window.$$contents[id] = content
+  @loadRolesFromContainer: ->
+    @loadRoles($("#discussion-container").data("roles"))
 
-  @getContent: (id) -> window.$$contents[id]
+  @isStaff: (user_id) ->
+    staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
+    _.include(staff, parseInt(user_id))
 
-  @addDiscussion: (id, discussion) -> window.$$discussions[id] = discussion
-
-  @getDiscussion: (id) -> window.$$discussions[id]
-  
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
-      @getContent(id).updateInfo(info)
+      Content.getContent(id).updateInfo(info)
 
   @generateDiscussionLink: (cls, txt, handler) ->
     $("<a>").addClass("discussion-link")
             .attr("href", "javascript:void(0)")
             .addClass(cls).html(txt)
             .click -> handler(this)
-    
+
   @urlFor: (name, param, param1, param2) ->
     {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
@@ -64,26 +65,32 @@ class @DiscussionUtil
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
+      user_profile            : "/courses/#{$$course_id}/discussion/forum/users/#{param}"
+      threads                 : "/courses/#{$$course_id}/discussion/forum"
     }[name]
 
   @safeAjax: (params) ->
     $elem = params.$elem
-    if $elem.attr("disabled")
+    if $elem and $elem.attr("disabled")
       return
+    params["url"] = URI(params["url"]).addSearch ajax: 1
     params["beforeSend"] = ->
-      $elem.attr("disabled", "disabled")
+      if $elem
+        $elem.attr("disabled", "disabled")
       if params["$loading"]
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
           params["$loading"].loading()
-    $.ajax(params).always ->
-      $elem.removeAttr("disabled")
+    request = $.ajax(params).always ->
+      if $elem
+        $elem.removeAttr("disabled")
       if params["$loading"]
         if params["loadedCallback"]?
           params["loadedCallback"].apply(params["$loading"])
         else
           params["$loading"].loaded()
+    return request
 
   @get: ($elem, url, data, success) ->
     @safeAjax
@@ -108,6 +115,9 @@ class @DiscussionUtil
       [event, selector] = eventSelector.split(' ')
       $local(selector).unbind(event)[event] handler
 
+  @processTag: (text) ->
+    text.toLowerCase()
+
   @tagsInputOptions: ->
     autocomplete_url: @urlFor('tags_autocomplete')
     autocomplete:
@@ -117,6 +127,7 @@ class @DiscussionUtil
     width: '100%'
     defaultText: "Tag your post: press enter after each tag"
     removeWithBackspace: true
+    preprocessTag: @processTag
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
@@ -124,11 +135,11 @@ class @DiscussionUtil
       if response.errors? and response.errors.length > 0
         errorsField.empty()
         for error in response.errors
-          errorsField.append($("<li>").addClass("new-post-form-error").html(error))
+          errorsField.append($("<li>").addClass("new-post-form-error").html(error)).show()
 
   @clearFormErrors: (errorsField) ->
     errorsField.empty()
-    
+
   @postMathJaxProcessor: (text) ->
     RE_INLINEMATH = /^\$([^\$]*)\$/g
     RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g
@@ -144,21 +155,26 @@ class @DiscussionUtil
 
   @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
-    id = $content.attr("_id")
+    placeholder = elem.data('placeholder')
+    id = elem.data("id")
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
     _processor = (_this) ->
       (text) -> _this.postMathJaxProcessor(text)
     editor = Markdown.makeWmdEditor elem, appended_id, imageUploadUrl, _processor(@)
     @wmdEditors["#{cls_identifier}-#{id}"] = editor
+    if placeholder?
+      elem.find("#wmd-input#{appended_id}").attr('placeholder', placeholder)
     editor
 
   @getWmdEditor: ($content, $local, cls_identifier) ->
-    id = $content.attr("_id")
+    elem = $local(".#{cls_identifier}")
+    id = elem.data("id")
     @wmdEditors["#{cls_identifier}-#{id}"]
 
   @getWmdInput: ($content, $local, cls_identifier) ->
-    id = $content.attr("_id")
+    elem = $local(".#{cls_identifier}")
+    id = elem.data("id")
     $local("#wmd-input-#{cls_identifier}-#{id}")
 
   @getWmdContent: ($content, $local, cls_identifier) ->
@@ -199,9 +215,9 @@ class @DiscussionUtil
         unfollowLink()
     else
       followLink()
-    
+
   @processEachMathAndCode: (text, processor) ->
-  
+
     codeArchive = []
 
     RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]*?)\$\$(.*)$/m
@@ -264,5 +280,17 @@ class @DiscussionUtil
     @processEachMathAndCode text, @stripHighlight
 
   @markdownWithHighlight: (text) ->
+    text = text.replace(/^\&gt\;/gm, ">")
     converter = Markdown.getMathCompatibleConverter()
-    @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
+    text = @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
+    return text.replace(/^>/gm,"&gt;")
+
+  @abbreviateString: (text, minLength) ->
+    # Abbreviates a string to at least minLength characters, stopping at word boundaries
+    if text.length<minLength
+      return text
+    else
+      while minLength < text.length && text[minLength] != ' '
+        minLength++
+      return text.substr(0, minLength) + '...'
+
