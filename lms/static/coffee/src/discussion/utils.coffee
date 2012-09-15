@@ -280,8 +280,10 @@ class @DiscussionUtil
     @processEachMathAndCode text, @stripHighlight
 
   @markdownWithHighlight: (text) ->
+    text = text.replace(/^\&gt\;/gm, ">")
     converter = Markdown.getMathCompatibleConverter()
-    @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
+    text = @unescapeHighlightTag @stripLatexHighlight converter.makeHtml text
+    return text.replace(/^>/gm,"&gt;")
 
   @abbreviateString: (text, minLength) ->
     # Abbreviates a string to at least minLength characters, stopping at word boundaries
