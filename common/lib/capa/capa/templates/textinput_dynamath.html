@@ -1,7 +1,13 @@
 ###
-### version of textline.html which does dynammic math
+### version of textline.html which does dynamic math
 ###
-<section class="text-input-dynamath">
+<section class="text-input-dynamath capa_inputtype" id="inputtype_${id}">
+
+    % if preprocessor is not None:
+    <div class="text-input-dynamath_data" data-preprocessor="${preprocessor['class_name']}"/>
+    <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
+    % endif
+
     % if state == 'unsubmitted':
     <div class="unanswered" id="status_${id}">
     % elif state == 'correct':
@@ -15,27 +21,26 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-      <input type="text" name="input_${id}" id="input_${id}" value="${value}" class="math" size="${size if size else ''}" 
-       % if hidden:
-      	    style="display:none;"
-       % endif
-      />
+    <input type="text" name="input_${id}" id="input_${id}" value="${value}" class="math" size="${size if size else ''}" 
+    % if hidden:
+        style="display:none;"
+    % endif
+    />
+    <p class="status">
+    % if state == 'unsubmitted':
+    unanswered
+    % elif state == 'correct':
+    correct
+    % elif state == 'incorrect':
+    incorrect
+    % elif state == 'incomplete':
+    incomplete
+    % endif
+    </p>
 
-      <p class="status">
-        % if state == 'unsubmitted':
-        unanswered
-        % elif state == 'correct':
-        correct
-        % elif state == 'incorrect':
-        incorrect
-        % elif state == 'incomplete':
-        incomplete
-        % endif
-      </p>
+    <p id="answer_${id}" class="answer"></p>
 
-      <p id="answer_${id}" class="answer"></p>
-
-      <div id="display_${id}" class="equation">`{::}`</div>
+    <div id="display_${id}" class="equation">`{::}`</div>
 
     </div>
     <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">  </textarea>

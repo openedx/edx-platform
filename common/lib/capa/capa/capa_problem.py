@@ -382,10 +382,10 @@ class LoncapaProblem(object):
         original_path = sys.path
 
         for script in scripts:
-
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
+            
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript

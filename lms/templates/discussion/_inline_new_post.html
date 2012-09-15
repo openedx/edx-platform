@@ -1,0 +1,34 @@
+<article class="new-post-article">
+    <div class="inner-wrapper">
+        <div class="new-post-form-errors">
+        </div>
+        <form class="new-post-form">
+            <div class="left-column">
+                <div class="options">
+                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
+                    <br>
+                    % if course.metadata.get("allow_anonymous", True):
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
+                    %elif course.metadata.get("allow_anonymous_to_peers", False):
+                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                    %endif
+                </div>
+            </div>
+            <div class="right-column">
+                <div class="form-row">
+                    <input type="text" class="new-post-title" name="title" placeholder="Title">
+                </div>
+                <div class="form-row">
+                    <div class="new-post-body" name="body" placeholder="Enter your question or comment&hellip;"></div>
+                    <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
+                </div>
+                ## TODO commenting out tags til we figure out what to do with them
+                ##<div class="form-row">
+                ##    <input type="text" class="new-post-tags" name="tags" placeholder="Tags">
+                ##</div>
+                <input type="submit" class="submit" value="Add post">
+                <a href="#" class="new-post-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</article>
