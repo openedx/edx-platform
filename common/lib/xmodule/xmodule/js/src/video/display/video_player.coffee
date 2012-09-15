@@ -1,6 +1,5 @@
 class @VideoPlayer extends Subview
   initialize: ->
-    console.log(@['video'].hide_captions)
     # Define a missing constant of Youtube API
     YT.PlayerState.UNSTARTED = -1
 
@@ -46,6 +45,7 @@ class @VideoPlayer extends Subview
       events:
         onReady: @onReady
         onStateChange: @onStateChange
+    @caption.hideCaptions(@['video'].hide_captions)
 
   addToolTip: ->
     @$('.add-fullscreen, .hide-subtitles').qtip
