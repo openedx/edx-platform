@@ -195,7 +195,11 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            with course.system.resources_fs.open(path("syllabus") / section_key + ".html") as htmlFile:
+            fs = course.system.resources_fs
+            # first look for a run-specific version
+            dirs = [path("syllabus") / course.url_name, path("syllabus")]
+            filepath = find_file(fs, dirs, section_key + ".html")
+            with fs.open(filepath) as htmlFile:
                 return replace_urls(htmlFile.read().decode('utf-8'),
                                     course.metadata['data_dir'])
         except ResourceNotFoundError:
