@@ -1,0 +1,68 @@
+<%def name="render_form_filter_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${render_entry(map["entries"], child)}
+        %else:
+            ${render_category(map["subcategories"], child)}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}">${entry}</a></li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li>
+        <a href="#">${category}</a>
+        <ul>
+            ${render_form_filter_dropdown(categories[category])}
+        </ul>
+    </li>
+</%def>
+
+<article class="new-post-article">
+    <div class="inner-wrapper">        
+        <form class="new-post-form">
+            <div class="left-column">
+                <label>Create new post about:</label>
+                <div class="form-topic-drop">
+                    <a href="#" class="topic_dropdown_button">All<span class="drop-arrow">▾</span></a>
+                    <div class="topic_menu_wrapper">
+                        <div class="topic_menu_search">
+                            <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
+                        </div>
+                        <ul class="topic_menu">
+                            ${render_form_filter_dropdown(category_map)}
+                        </ul>
+                    </div>
+                </div>
+                <div class="options">
+                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
+                    <br>
+                    % if course.metadata.get("allow_anonymous", True):
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
+                    %elif course.metadata.get("allow_anonymous_to_peers", False):
+                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                    %endif
+                </div>
+            </div>
+            <div class="right-column">
+                <ul class="new-post-form-errors"></ul>
+                <div class="form-row">
+                    <input type="text" class="new-post-title" name="title" placeholder="Title">
+                </div>
+                <div class="form-row">
+                    <div class="new-post-body" name="body" placeholder="Enter your question or comment…"></div>
+                    <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
+                </div>
+                ## TODO tags commenting out til we figure out what to do w/ tags
+                ##<div class="form-row">
+                ##    <input type="text" class="new-post-tags" name="tags" placeholder="Tags">
+                ##</div>
+                <input type="submit" class="submit" value="Add post">
+                <a href="#" class="new-post-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</article>

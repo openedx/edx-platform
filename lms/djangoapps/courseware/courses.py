@@ -101,6 +101,7 @@ def get_course_about_section(course, section_key):
     - textbook
     - faq
     - more_info
+    - ocw_links
     """
 
     # Many of these are stored as html files instead of some semantic
@@ -112,7 +113,7 @@ def get_course_about_section(course, section_key):
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
                        'number', 'instructors', 'overview',
-                       'effort', 'end_date', 'prerequisites']:
+                       'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
             fs = course.system.resources_fs
@@ -194,7 +195,11 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            with course.system.resources_fs.open(path("syllabus") / section_key + ".html") as htmlFile:
+            fs = course.system.resources_fs
+            # first look for a run-specific version
+            dirs = [path("syllabus") / course.url_name, path("syllabus")]
+            filepath = find_file(fs, dirs, section_key + ".html")
+            with fs.open(filepath) as htmlFile:
                 return replace_urls(htmlFile.read().decode('utf-8'),
                                     course.metadata['data_dir'])
         except ResourceNotFoundError:

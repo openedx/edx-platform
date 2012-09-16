@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
 
-from django_comment_client.utils import JsonResponse, JsonError, extract
+from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 
 from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.models import Role
@@ -38,11 +38,10 @@ def permitted(fn):
             else:
                 content = None
             return content
-
         if check_permissions_by_view(request.user, kwargs['course_id'], fetch_content(), request.view_name):
             return fn(request, *args, **kwargs)
         else:
-            return JsonError("unauthorized")
+            return JsonError("unauthorized", status=401)
     return wrapper
 
 def ajax_content_response(request, course_id, content, template_name):
@@ -63,22 +62,39 @@ def ajax_content_response(request, course_id, content, template_name):
 @login_required
 @permitted
 def create_thread(request, course_id, commentable_id):
+    course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
+
+    if course.metadata.get("allow_anonymous", True):
+        anonymous = post.get('anonymous', 'false').lower() == 'true'
+    else:
+        anonymous = False
+
+    if course.metadata.get("allow_anonymous_to_peers", False):
+        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+    else:
+        anonymous_to_peers = False
+
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
     thread.update_attributes(**{
-        'anonymous'      : post.get('anonymous', 'false').lower() == 'true',
-        'commentable_id' : commentable_id,
-        'course_id'      : course_id,
-        'user_id'        : request.user.id,
+        'anonymous'          : anonymous,
+        'anonymous_to_peers' : anonymous_to_peers,
+        'commentable_id'     : commentable_id,
+        'course_id'          : course_id,
+        'user_id'            : request.user.id,
     })
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
+    courseware_context = get_courseware_context(thread, course)
+    data = thread.to_dict()
+    if courseware_context:
+        data.update(courseware_context)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_create_thread.html')
+        return ajax_content_response(request, course_id, data, 'discussion/ajax_create_thread.html')
     else:
-        return JsonResponse(utils.safe_content(thread.to_dict()))
+        return JsonResponse(utils.safe_content(data))
 
 @require_POST
 @login_required
@@ -95,8 +111,21 @@ def update_thread(request, course_id, thread_id):
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
     comment = cc.Comment(**extract(post, ['body']))
+
+    course = get_course_with_access(request.user, course_id, 'load')
+    if course.metadata.get("allow_anonymous", True):
+        anonymous = post.get('anonymous', 'false').lower() == 'true'
+    else:
+        anonymous = False
+
+    if course.metadata.get("allow_anonymous_to_peers", False):
+        anonymous_to_peers = post.get('anonymous_to_peers', 'false').lower() == 'true'
+    else:
+        anonymous_to_peers = False
+
     comment.update_attributes(**{
-        'anonymous' : post.get('anonymous', 'false').lower() == 'true',
+        'anonymous'          : anonymous,
+        'anonymous_to_peers' : anonymous_to_peers,
         'user_id'   : request.user.id,
         'course_id' : course_id,
         'thread_id' : thread_id,
@@ -214,7 +243,7 @@ def undo_vote_for_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
-    
+
 
 @require_POST
 @login_required
@@ -288,7 +317,7 @@ def update_moderator_status(request, course_id, user_id):
         course = get_course_with_access(request.user, course_id, 'load')
         discussion_user = cc.User(id=user_id, course_id=course_id)
         context = {
-            'course': course, 
+            'course': course,
             'course_id': course_id,
             'user': request.user,
             'django_user': user,
@@ -327,7 +356,7 @@ def tags_autocomplete(request, course_id):
 @require_POST
 @login_required
 @csrf.csrf_exempt
-def upload(request, course_id):#ajax upload file to a question or answer 
+def upload(request, course_id):#ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
 
@@ -337,7 +366,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
     new_file_name = ''
     try:
         # TODO authorization
-        #may raise exceptions.PermissionDenied 
+        #may raise exceptions.PermissionDenied
         #if request.user.is_anonymous():
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
@@ -357,7 +386,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
         new_file_name = str(
                             time.time()
                         ).replace(
-                            '.', 
+                            '.',
                             str(random.randint(0,100000))
                         ) + file_extension
 
@@ -386,7 +415,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
         parsed_url = urlparse.urlparse(file_url)
         file_url = urlparse.urlunparse(
             urlparse.ParseResult(
-                parsed_url.scheme, 
+                parsed_url.scheme,
                 parsed_url.netloc,
                 parsed_url.path,
                 '', '', ''

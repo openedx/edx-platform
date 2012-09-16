@@ -11,7 +11,9 @@ class @Problem
     $(selector, @el)
 
   bind: =>
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+    @el.find('.problem > div').each (index, element) =>
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
     window.update_schematics()
 
     problem_prefix = @element_id.replace(/problem_/,'')
@@ -23,7 +25,11 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
-    @$('input.math').keyup(@refreshMath).each(@refreshMath)
+
+    # Dynamath
+    @$('input.math').keyup(@refreshMath)
+    @$('input.math').each (index, element) =>
+      MathJax.Hub.Queue [@refreshMath, null, element]
 
   updateProgress: (response) =>
     if response.progress_changed
@@ -262,7 +268,9 @@ class @Problem
               showMethod = @inputtypeShowAnswerMethods[cls]
               showMethod(inputtype, display, answers) if showMethod?
 
-        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+        @el.find('.problem > div').each (index, element) =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
         @updateProgress response
@@ -296,12 +304,21 @@ class @Problem
 
   refreshMath: (event, element) =>
     element = event.target unless element
-    target = "display_#{element.id.replace(/^input_/, '')}"
+    elid = element.id.replace(/^input_/,'')
+    target = "display_" + elid
+
+    # MathJax preprocessor is loaded by 'setupInputTypes'
+    preprocessor_tag = "inputtype_" + elid
+    mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()],
-        [@updateMathML, jax, element]
+      eqn = $(element).val()
+      if mathjax_preprocessor
+        eqn = mathjax_preprocessor(eqn)
+      MathJax.Hub.Queue(['Text', jax, eqn], [@updateMathML, jax, element])
 
+    return # Explicit return for CoffeeScript
+    
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
@@ -317,6 +334,22 @@ class @Problem
     @answers = @inputs.serialize()
 
   inputtypeSetupMethods:
+
+    'text-input-dynamath': (element) =>
+      ###
+      Return: function (eqn) -> eqn that preprocesses the user formula input before
+                it is fed into MathJax. Return 'false' if no preprocessor specified
+      ###
+      data = $(element).find('.text-input-dynamath_data')
+
+      preprocessorClassName = data.data('preprocessor')
+      preprocessorClass = window[preprocessorClassName]
+      if not preprocessorClass?
+        return false
+      else
+        preprocessor = new preprocessorClass()
+        return preprocessor.fn
+
     javascriptinput: (element) =>
 
       data = $(element).find(".javascriptinput_data")

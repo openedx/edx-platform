@@ -71,6 +71,8 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
+    'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
+
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -441,12 +443,12 @@ courseware_only_js += [
 main_vendor_js = [
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
-  'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.cookie.js',
   'js/vendor/jquery.qtip.min.js',
+  'js/vendor/swfobject/swfobject.js',
 ]
 
-discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee'))
+discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -619,6 +621,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'psychometrics',
     
     #For the wiki
     'wiki', # The new django-wiki from benjaoming

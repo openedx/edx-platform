@@ -1,4 +1,196 @@
 [
+
+    {
+      "title": "College may never be the same",
+      "url": "http://www.usatoday.com/news/nation/story/2012/09/12/college-may-never-be-the-same/57752972/1",
+      "author": "Mary Beth Marklein",
+      "image": "usa_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "USA Today",
+      "publish_date": "September 12, 2012"
+    },
+    {
+      "title": "Is MIT Giving Away the Farm?",
+      "url": "http://www.technologyreview.com/mitnews/428698/is-mit-giving-away-the-farm/",
+      "author": "Larry Hardesty",
+      "image": "techreview_logo_178x138.jpg",
+      "deck": "The surprising logic of MIT's free online education program.",
+      "publication": "Technology Review",
+      "publish_date": "September/October 2012"
+    },
+    {
+      "title": "School’s Out, Forever",
+      "url": "http://www.bostonmagazine.com/articles/2012/08/edx-online-classes-schools-ou t-forever/",
+      "author": "Chris Vogel",
+      "image": "bostonmag_logo_178x138.jpg",
+      "deck": "A new online education program from Harvard and MIT is poised to transform what it means to go to college.",
+      "publication": "Boston Magazine",
+      "publish_date": "September 2012"
+    },
+    {
+      "title": "Q&A: Anant Agarwal, edX’s president and first professor",
+      "url": "http://www.bostonmagazine.com/articles/2012/08/edx-online-classes-schools-ou t-forever/",
+      "author": " Molly Petrilla ",
+      "image": "smartplanet_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Smart Planet",
+      "publish_date": "September 3, 2012"
+    },
+
+    {
+      "title": "EdX To Offer Proctored Final Exam For One Course",
+      "url": "http://www.thecrimson.com/article/2012/9/7/edx-offer-proctored-exams/",
+      "author": "Samuel Y. Weinstock",
+      "image": "harvardcrimson_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "Harvard Crimson",
+      "publish_date": "September 7, 2012"
+    },
+    {
+      "title": "MOOCing On Site",
+      "url": "http://www.insidehighered.com/news/2012/09/07/site-based-testing-deals-strengthen-case-granting-credit-mooc-students",
+      "author": "Steve Kolowich ",
+      "image": "insidehighered_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Inside Higher Education",
+      "publish_date": "September 7, 2012"
+    },
+    {
+      "title": "edX Curbs the Downfalls of Online Education By Announcing Supervised Final Exams",
+      "url": "http://bostinno.com/2012/09/07/edx-pearson-proctored-exams/",
+      "author": "Lauren Landry",
+      "image": "bostinno_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Bostinno",
+      "publish_date": "September 7, 2012"
+    },
+    {
+      "title": "Harvard and MIT online courses get 'real world' exams",
+      "url": "http://www.bbc.co.uk/news/education-19505776",
+      "author": "Sean Coughlan",
+      "image": "bbc_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "BBC",
+      "publish_date": "September 6, 2012"
+    },
+    {
+      "title": "Harvard-MIT Online School EdX to Offer Supervised Final Exams",
+      "url": "http://www.businessweek.com/news/2012-09-06/harvard-mit-online-school-edx-to-offer-supervised-final-exams",
+      "author": "Oliver Staley",
+      "image": "bloomberg_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "Bloomberg Business Week",
+      "publish_date": "September 6, 2012"
+    },
+    {
+      "title": "Colorado State to Offer Credits for Online Class",
+      "url": "http://www.nytimes.com/2012/09/07/education/colorado-state-to-offer-credits-for-online-class.html?_r=3",
+      "author": "Tamar Lewin",
+      "image": "nyt_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "New York Times",
+      "publish_date": "September 6, 2012"
+    },
+    {
+      "title": "edX Offers Proctored Exams for Open Online Course",
+      "url": "http://chronicle.com/blogs/wiredcampus/edx-offers-proctored-exams-for-open-online-course/39656",
+      "author": " Marc Parry",
+      "image": "chroniclehighered_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "Chronicle of Higher Education",
+      "publish_date": "September 6, 2012"
+    },
+    {
+      "title": "edX Offers Proctored Exams for Open Online Course",
+      "url": "http://itbriefing.net/modules.php?op=modload&name=News&file=article&sid=323229&newlang=eng&topic=15&catid=37",
+      "author": "",
+      "image": "itbriefing_logo_178x138.jpg",
+      "deck": "",
+      "publication": "ITBriefing.net",
+      "publish_date": "September 6, 2012"
+    },
+
+    {
+      "title": "Student Loans: Debt for Life",
+      "url": "http://www.businessweek.com/articles/2012-09-06/student-loans-debt-for-life#p3",
+      "author": "Peter Coy",
+      "image": "bloomberg_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "Bloomberg Business Week",
+      "publish_date": "September 6, 2012"
+    },
+    {
+      "title": "Straighterline wants to help professors expand reach, while students save",
+      "url": "http://www.baltimoresun.com/business/technology/blog/bs-bz-straighterline-college-professors-20120904,0,6114022.story",
+      "author": "Gus G. Sentementes",
+      "image": "baltsun_logo_178x138.jpg",
+      "deck": "",
+      "publication": "The Baltimore Sun",
+      "publish_date": "September 4, 2012"
+    },
+    {
+      "title": "Want to be a reporter? Learn to code",
+      "url": "http://gigaom.com/cloud/want-to-be-a-reporter-learn-to-code/",
+      "author": "Barb Darrow",
+      "image": "gigaom_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "GigaOM",
+      "publish_date": "September 4, 2012"
+    },
+    {
+      "title": "MOOC Brigade: Will Massive, Open Online Courses Revolutionize Higher Education?",
+      "url": "http://nation.time.com/2012/09/04/mooc-brigade-will-massive-open-online-courses-revolutionize-higher-education/",
+      "author": "Kayla Webley",
+      "image": "time_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Time",
+      "publish_date": "September 4, 2012"
+    },
+    {
+      "title": "Ivy walls lower with free online classes from Coursera and edX ",
+      "url": "http://www.csmonitor.com/Innovation/Pioneers/2012/0903/Ivy-walls-lower-with-free-online-classes-from-Coursera-and-edX",
+      "author": "Chris Gaylord",
+      "image": "csmonitor_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Christian Science Monitor",
+      "publish_date": "September 3, 2012"
+    },
+    {
+      "title": "Summer recap. RLADs, new edX partner, Institute files amicus brief",
+      "url": "http://tech.mit.edu/V132/N34/summer.html",
+      "author": "",
+      "image": "thetech_logo_178x138.jpg",
+      "deck": "",
+      "publication": "The Tech",
+      "publish_date": "September 4, 2012"
+    },
+    {
+      "title": "Into the Future With MOOC's",
+      "url": "http://chronicle.com/article/Into-the-Future-With-MOOCs/134080/",
+      "author": "Kevin Carey",
+      "image": "chroniclehighered_logo_178x138.jpeg",
+      "deck": "",
+      "publication": "The Chronicle of Higher Education",
+      "publish_date": "September 3, 2012"
+    },
+    {
+      "title": "The Future Of Higher Education",
+      "url": "http://radioboston.wbur.org/2012/08/20/higher-education-online",
+      "author": "",
+      "image": "radioboston_logo_178x138.jpg",
+      "deck": "",
+      "publication": "NPR/Radio Boston",
+      "publish_date": "August 20, 2012"
+    },
+    {
+      "title": "Berkeley Joins edX",
+      "url": "http://www.insidehighered.com/quicktakes/2012/07/24/berkeley-joins-edx",
+      "author": "Tamar Lewin",
+      "image": "insidehighered_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Inside Higher Ed",
+      "publish_date": "July 24, 2012"
+    },
     {
         "title": "Berkeley to Join the Free Online Learning Partnership EdX",
         "url": "http://www.nytimes.com/2012/07/24/education/berkeley-to-offer-free-online-classes-on-edx.html?_r=1",

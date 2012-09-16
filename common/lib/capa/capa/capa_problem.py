@@ -265,7 +265,7 @@ class LoncapaProblem(object):
         # include solutions from <solution>...</solution> stanzas
         for entry in self.tree.xpath("//" + "|//".join(solution_types)):
             answer = etree.tostring(entry)
-            if answer: answer_map[entry.get('id')] = answer
+            if answer: answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
         log.debug('answer_map = %s' % answer_map)
         return answer_map
@@ -382,10 +382,10 @@ class LoncapaProblem(object):
         original_path = sys.path
 
         for script in scripts:
-
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
+            
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript

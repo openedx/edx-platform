@@ -114,12 +114,44 @@ def test_equality():
         Location('tag', 'org', 'course', 'category', 'name')
     )
 
+# All the cleaning functions should do the same thing with these
+general_pairs = [ ('',''),
+                  (' ', '_'),
+                  ('abc,', 'abc_'),
+                  ('ab    fg!@//\\aj', 'ab_fg_aj'),
+                  (u"ab\xA9", "ab_"),  # no unicode allowed for now
+                  ]
+
 def test_clean():
-    pairs = [ ('',''),
-              (' ', '_'),
-              ('abc,', 'abc_'),
-              ('ab    fg!@//\\aj', 'ab_fg_aj'),
-              (u"ab\xA9", "ab_"),  # no unicode allowed for now
-              ]
+    pairs = general_pairs + [
+        ('a:b', 'a_b'),  # no colons in non-name components
+        ('a-b', 'a-b'),  # dashes ok 
+        ('a.b', 'a.b'),  # dot ok
+        ]
     for input, output in pairs:
         assert_equals(Location.clean(input), output)
+
+
+def test_clean_for_url_name():
+    pairs = general_pairs + [
+        ('a:b', 'a:b'),  # colons ok in names
+        ('a-b', 'a-b'),  # dashes ok in names
+        ('a.b', 'a.b'),  # dot ok in names
+        ]
+    for input, output in pairs:
+        assert_equals(Location.clean_for_url_name(input), output)
+
+
+def test_clean_for_html():
+    pairs = general_pairs + [
+              ("a:b", "a_b"),   # no colons for html use
+              ("a-b", "a-b"),   # dashes ok (though need to be replaced in various use locations. ugh.)
+              ('a.b', 'a_b'),   # no dots.
+              ]
+    for input, output in pairs:
+        assert_equals(Location.clean_for_html(input), output)
+
+
+def test_html_id():
+    loc = Location("tag://org/course/cat/name:more_name@rev")
+    assert_equals(loc.html_id(), "tag-org-course-cat-name_more_name-rev")

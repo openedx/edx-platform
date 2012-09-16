@@ -17,12 +17,6 @@ def pluralize(singular_term, count):
         return singular_term + 's'
     return singular_term
 
-def show_if(text, condition):
-    if condition:
-        return text
-    else:
-        return ''
-
 # TODO there should be a better way to handle this
 def include_mustache_templates():
     mustache_dir = settings.PROJECT_ROOT / 'templates' / 'discussion' / 'mustache'
@@ -35,7 +29,7 @@ def include_mustache_templates():
     return '\n'.join(map(wrap_in_tag, map(strip_file_name, file_contents)))
 
 def render_content(content, additional_context={}):
-    
+
     context = {
         'content': extend_content(content),
         content['type']: True,
