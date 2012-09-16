@@ -80,7 +80,6 @@ div.course-wrapper {
         }
 
         .histogram {
-          display: none;
           width: 200px;
           height: 150px;
         }
@@ -88,7 +87,7 @@ div.course-wrapper {
         ul {
           list-style: disc outside none;
           padding-left: 1em;
-          
+
           &.discussion-errors {
             list-style: none;
             padding-left: 2em;
@@ -97,6 +96,10 @@ div.course-wrapper {
           &.admin-actions {
             list-style: none;
           }
+        }
+
+        nav.sequence-nav ul li.prev {
+          left: 4px;
         }
 
         nav.sequence-bottom {
@@ -117,6 +120,7 @@ div.course-wrapper {
         margin: 0;
         @include clearfix();
         padding: 0;
+        list-style: none;
 
         li {
           width: flex-grid(3, 9);

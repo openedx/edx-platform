@@ -39,11 +39,6 @@ a {
   }
 }
 
-
-
-
-
-
 form {
   label {
     display: block;
@@ -101,4 +96,91 @@ img {
 ::selection, ::-moz-selection, ::-webkit-selection {
   background: #444;
   color: #fff;
+}
+
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  padding: 0 10px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .85);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 26px;
+  color: #fff;
+  pointer-events: none;
+  opacity: 0;
+  @include transition(opacity .1s);
+
+  &:after {
+    content: '▾';
+    display: block;
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    margin-left: -7px;
+    font-size: 20px;
+    color: rgba(0, 0, 0, .85);
+  }
+}
+
+.test-class {
+  border: 1px solid #f00;
+}
+
+
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  max-width: 350px;
+  padding: 15px 20px 17px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, .92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
+  font-size: 13px;
+  color: #fff;
+  opacity: 0;
+  -webkit-transition: all .2s;
+
+  p, span {
+    color: #fff;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 27px;
+    height: 27px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #aaa;
+    text-align: center;
+
+    .close-icon {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .action-btn {
+    @include dark-grey-button;
+    margin-top: 10px;
+    text-align: center;
+  }
 }

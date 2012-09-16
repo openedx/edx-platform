@@ -1,3 +1,8 @@
+<%! import django_comment_client.helpers as helpers %>
+<%! from django.template.defaultfilters import escapejs %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from courseware.access import has_access %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
@@ -11,26 +16,20 @@
 <%block name="js_extra">
 <%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
+<script type="text/javascript" src="${static.url('js/discussions-temp.js')}"></script>
+
 </%block>
 
-<%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
+<%include file="_discussion_course_navigation.html" args="active_page='discussion'"/>
 
-<section class="container">
-  <div class="course-wrapper">
-    <section aria-label="Course Navigation" class="course-index">
-      <nav>
-        
-        <article class="sidebar-module discussion-sidebar">
-        </article>
-        <%include file="_recent_active_posts.html" />
+<%include file="_new_post.html" />
 
-        <%include file="_trending_tags.html" />
-        
-      </nav>
-    </section>
-
-    <section class="course-content">
-      ${content.decode('utf-8')}
-    </section>
+<section class="discussion container" id="discussion-container" data-roles="${roles}" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}" data-content-info="${annotated_content_info}" data-thread-pages="${thread_pages}">
+  <div class="discussion-body">
+    <div class="sidebar"></div>
+    <div class="discussion-column"></div>
   </div>
 </section>
+
+<%include file="_underscore_templates.html" />
+<%include file="_thread_list_template.html" />

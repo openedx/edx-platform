@@ -45,6 +45,7 @@ $ ->
 
     removeMath: (text) ->
 
+      text = text || ""
       @math = []
       start = end = last = null
       braces = 0
@@ -111,7 +112,7 @@ $ ->
       (text) -> _this.replaceMath(text)
 
   if Markdown?
-    
+
     Markdown.getMathCompatibleConverter = (postProcessor) ->
       postProcessor ||= ((text) -> text)
       converter = Markdown.getSanitizingConverter()
@@ -123,11 +124,9 @@ $ ->
 
     Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl, postProcessor) ->
       $elem = $(elem)
-
       if not $elem.length
         console.log "warning: elem for makeWmdEditor doesn't exist"
         return
-
       if not $elem.find(".wmd-panel").length
         initialText = $elem.html()
         $elem.empty()
@@ -162,7 +161,7 @@ $ ->
             alert(e)
             if startUploadHandler
               $('#file-upload').unbind('change').change(startUploadHandler)
-              
+
       imageUploadHandler = (elem, input) ->
         ajaxFileUpload(imageUploadUrl, input, imageUploadHandler)
 
