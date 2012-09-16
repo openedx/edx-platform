@@ -256,16 +256,16 @@ class CapaModule(XModule):
                                seed=self.seed, system=self.system)
 
                 # Prepend a scary warning to the student
-                warning  = '<div class="capa_reset">'
-                warning += '<h2>Problem reset to initial state!</h2>'
-                warning += '<p>Problem state was corruped by invalid submission. The submission consisted of:</p>'
-                warning += '<ul>'
+                warning  = '<div class="capa_reset">'\
+                           '<h2>Warning: Problem reset to initial state!</h2>'\
+                           'Problem state was corruped by invalid submission. The submission consisted of:'\
+                           '<ul>'
                 for student_answer in student_answers.values():
                     if student_answer != '':
                         warning += '<li>' + cgi.escape(student_answer) + '</li>'
-                warning += '</ul>'
-                warning += '<p>If problem persists, please contact the course staff.</p>'
-                warning += '</div>'
+                warning += '</ul>'\
+                           'If problem persists, please contact the course staff.'\
+                           '</div>'
 
                 html = warning
                 try:
