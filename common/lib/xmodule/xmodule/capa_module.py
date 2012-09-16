@@ -264,7 +264,7 @@ class CapaModule(XModule):
                     if student_answer != '':
                         warning += '<li>' + cgi.escape(student_answer) + '</li>'
                 warning += '</ul>'\
-                           'If problem persists, please contact the course staff.'\
+                           'If the problem persists, please contact the course staff.'\
                            '</div>'
 
                 html = warning
