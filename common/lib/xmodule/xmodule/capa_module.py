@@ -243,6 +243,7 @@ class CapaModule(XModule):
 
                 # Some inputtypes, such as dynamath, have additional "hidden" state that
                 #   is not exposed to the student. Keep those hidden
+                # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
                 hidden_state_keywords = ['dynamath']
                 for answer_id in answer_ids:
                     for hidden_state_keyword in hidden_state_keywords:
