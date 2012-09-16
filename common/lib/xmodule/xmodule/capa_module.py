@@ -257,14 +257,15 @@ class CapaModule(XModule):
 
                 # Prepend a scary warning to the student
                 warning  = '<div class="capa_reset">'\
-                           '<h2>Warning: Problem reset to initial state!</h2>'\
-                           'Problem state was corruped by invalid submission. The submission consisted of:'\
+                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                           'The problem\'s state was corrupted by an invalid submission. ' \
+                           'The submission consisted of:'\
                            '<ul>'
                 for student_answer in student_answers.values():
                     if student_answer != '':
                         warning += '<li>' + cgi.escape(student_answer) + '</li>'
                 warning += '</ul>'\
-                           'If the problem persists, please contact the course staff.'\
+                           'If this error persists, please contact the course staff.'\
                            '</div>'
 
                 html = warning

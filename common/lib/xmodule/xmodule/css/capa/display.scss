@@ -467,15 +467,15 @@ section.problem {
 
   div.capa_reset {
     padding: 25px;
-    border: 1px solid #EBE8BF;
+    border: 1px solid $error-red;
+    background-color: lighten($error-red, 25%);
     border-radius: 3px;
-    background: #FFFCDD;
     font-size: 1em;
     margin-top: 10px;
     margin-bottom: 10px;
   }
   .capa_reset>h2 {
-    color: #FF0000;
+    color: #AA0000;
   }
   .capa_reset li {
     font-size: 0.9em;
