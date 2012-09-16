@@ -131,17 +131,17 @@ class CapaModule(XModule):
             self.weight = None
 
         if self.rerandomize == 'never':
-            seed = 1
+            self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            seed = system.id
+            self.seed = system.id
         else:
-            seed = None
+            self.seed = None
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=seed, system=self.system)
+                                      instance_state, seed=self.seed, system=self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -160,7 +160,7 @@ class CapaModule(XModule):
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    instance_state, seed=seed, system=self.system)
+                    instance_state, seed=self.seed, system=self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
@@ -220,9 +220,10 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
         except Exception, err:
+            log.exception(err)
+
             # TODO (vshnayder): another switch on DEBUG.
             if self.system.DEBUG:
-                log.exception(err)
                 msg = (
                     '[courseware.capa.capa_module] <font size="+1" color="red">'
                     'Failed to generate HTML for problem %s</font>' %
@@ -231,7 +232,28 @@ class CapaModule(XModule):
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
             else:
-                raise
+                # We're in non-debug mode, and possibly even in production. We want
+                #   to avoid bricking of problem as much as possible
+
+                # Presumably, student submission has corrupted LoncapaProblem HTML.
+                #   So, let's try generate a fresh LoncapaProblem
+                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                               state=None, # Tabula rasa
+                               seed=self.seed, system=self.system)
+
+                # Prepend a scary warning to the student
+                warning  = '<div class="capa_reset">'
+                warning += '<p>Problem state was corruped by invalid input. '
+                warning += 'Problem reset to initial state! '
+                warning += 'If problem persists, please contact the course staff.</p>'
+                warning += '</div>'
+
+                html = warning
+                try:
+                    html += self.lcp.get_html()
+                except Exception, err: # Couldn't do it. Give up
+                    log.exception(err)
+                    raise
 
         content = {'name': self.display_name,
                    'html': html,
