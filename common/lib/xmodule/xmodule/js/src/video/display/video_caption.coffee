@@ -1,6 +1,6 @@
 class @VideoCaption extends Subview
   initialize: ->
-    @loaded = false  
+    @loaded = false
 
   bind: ->
     $(window).bind('resize', @resize)
@@ -49,7 +49,7 @@ class @VideoCaption extends Subview
     @$('.subtitles').html(container.html())
     @$('.subtitles li[data-index]').click @seekPlayer
 
-    # prepend and append an empty <li> for cosmatic reason
+    # prepend and append an empty <li> for cosmetic reason
     @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
@@ -130,14 +130,21 @@ class @VideoCaption extends Subview
 
   toggle: (event) =>
     event.preventDefault()
-    if @el.hasClass('closed')
+    if @el.hasClass('closed') # Captions are "closed" e.g. turned off
+      @hideCaptions(false)
+    else # Captions are on
+      @hideCaptions(true)
+
+  hideCaptions: (hide_captions) =>
+    if hide_captions
+      @$('.hide-subtitles').attr('title', 'Turn on captions')
+      @el.addClass('closed')
+    else
       @$('.hide-subtitles').attr('title', 'Turn off captions')
       @el.removeClass('closed')
       @scrollCaption()
-    else
-      @$('.hide-subtitles').attr('title', 'Turn on captions')
-      @el.addClass('closed')
-
+    $.cookie('hide_captions', hide_captions, expires: 3650, path: '/')
+ 
   captionHeight: ->
     if @el.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()
