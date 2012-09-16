@@ -465,6 +465,22 @@ section.problem {
     margin-top: 10px;
   }
 
+  div.capa_reset {
+    padding: 25px;
+    border: 1px solid #EBE8BF;
+    border-radius: 3px;
+    background: #FFFCDD;
+    font-size: 1em;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .capa_reset>h2 {
+    color: #FF0000;
+  }
+  .capa_reset li {
+    font-size: 0.9em;
+  }
+
   .hints {
     border: 1px solid #ccc;
 
