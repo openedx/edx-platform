@@ -239,41 +239,35 @@ def progress_summary(student, request, course, grader, student_module_cache):
              instance_modules for the student
     """
     
+    
+    # TODO: We need the request to pass into here. If we could forgo that, our arguments
+    # would be simpler
+    course_module = get_module(student, request,
+                                course.location, student_module_cache,
+                                course.id)
+    
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
-    for c in course.get_children():
+    for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        hidden = c.metadata.get('hide_from_toc','false')
+        hidden = chapter_module.metadata.get('hide_from_toc','false')
         if hidden.lower() == 'true':
             continue
-
+        
         sections = []
-        for s in c.get_children():
+        for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            hidden = s.metadata.get('hide_from_toc','false')
+            hidden = section_module.metadata.get('hide_from_toc','false')
             if hidden.lower() == 'true':
                 continue
             
-            # Now we actually instantiate the section module, to get the children
-            
-            # TODO: We need the request to pass into here. If we could forgo that, our arguments
-            # would be simpler
-            section_module = get_module(student, request,
-                                        s.location, student_module_cache,
-                                        course.id)
-            if section_module is None:
-                # student doesn't have access to this module, or something else
-                # went wrong.
-                continue
-            
-
             # Same for sections
-            graded = s.metadata.get('graded', False)
+            graded = section_module.metadata.get('graded', False)
             scores = []
             
             module_locations = section_module.definition.get('children', [])
             for module_location in module_locations:
-                module_descriptor = s.system.load_item(module_location)
+                module_descriptor = course.system.load_item(module_location)
                 
                 course_id = course.id
                 (correct, total) = get_score(course_id, student, module_descriptor, section_module.system, student_module_cache)
@@ -284,22 +278,22 @@ def progress_summary(student, request, course, grader, student_module_cache):
                     module_descriptor.metadata.get('display_name')))
 
             section_total, graded_total = graders.aggregate_scores(
-                scores, s.metadata.get('display_name'))
+                scores, section_module.metadata.get('display_name'))
 
-            format = s.metadata.get('format', "")
+            format = section_module.metadata.get('format', "")
             sections.append({
-                'display_name': s.display_name,
-                'url_name': s.url_name,
+                'display_name': section_module.display_name,
+                'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
-                'due': s.metadata.get("due", ""),
+                'due': section_module.metadata.get("due", ""),
                 'graded': graded,
             })
 
         chapters.append({'course': course.display_name,
-                         'display_name': c.display_name,
-                         'url_name': c.url_name,
+                         'display_name': chapter_module.display_name,
+                         'url_name': chapter_module.url_name,
                          'sections': sections})
 
     return chapters
