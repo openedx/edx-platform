@@ -443,7 +443,7 @@ section.problem {
     @include box-shadow(inset 0 0 0 1px #eee);
     @include border-radius(3px);
 
-    p:first-child {
+    > p:first-child {
       font-size: 0.9em;
       font-weight: bold;
       font-style: normal;
