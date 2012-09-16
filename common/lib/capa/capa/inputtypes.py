@@ -333,6 +333,10 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     if '' in preprocessor.values():
         preprocessor = None
 
+    # Escape characters in student input for safe XML parsing
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value, escapedict)
+
     context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size,
                'msg': msg, 'hidden': hidden,
                'preprocessor': preprocessor,
