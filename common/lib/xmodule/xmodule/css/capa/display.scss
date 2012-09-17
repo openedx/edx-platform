@@ -68,7 +68,7 @@ section.problem {
   }
 
   .solution-span {
-    span {
+    > span {
     margin: 20px 0;
     display: block;
     border: 1px solid #ddd;
