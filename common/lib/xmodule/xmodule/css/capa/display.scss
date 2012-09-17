@@ -67,8 +67,7 @@ section.problem {
     }
   }
 
-  .solution-span {
-    > span {
+  span.solution-span {
     margin: 20px 0;
     display: block;
     border: 1px solid #ddd;
@@ -80,7 +79,6 @@ section.problem {
 
     &:empty {
       display: none;
-    }
     }
   }
 
