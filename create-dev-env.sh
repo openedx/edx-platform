@@ -223,7 +223,7 @@ EO
 
         command -v brew &>/dev/null || { 
             output "Installing brew"
-            /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" 
+            /usr/bin/ruby <(curl -fsSkL raw.github.com/mxcl/homebrew/go)
         } 
         command -v git &>/dev/null || {
             output "Installing git"
