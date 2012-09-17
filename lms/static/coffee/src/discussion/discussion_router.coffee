@@ -14,6 +14,9 @@ if Backbone?
 
         @newPostView = new NewPostView(el: $(".new-post-article"), collection: @discussion)
         @nav.on "thread:created", @navigateToThread
+        @newPost = $('.new-post-article')
+        $('.new-post-btn').bind "click", @showNewPost
+        $('.new-post-cancel').bind "click", @hideNewPost
 
     allThreads: ->
       @nav.updateSidebar()
@@ -43,3 +46,10 @@ if Backbone?
 
     navigateToAllThreads: =>
       @navigate("", trigger: true)
+
+    showNewPost: (event) =>
+      @newPost.slideDown(300)
+      $('.new-post-title').focus()
+
+    hideNewPost: (event) =>
+      @newPost.slideUp(300)

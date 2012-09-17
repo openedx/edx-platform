@@ -55,8 +55,6 @@ $(document).ready(function() {
 	// $topicDrop.bind('click', setTopic);
 	$formTopicDropBtn.bind('click', showFormTopicDrop);
 	$formTopicDropMenu.bind('click', setFormTopic);
-	$('.new-post-btn').bind('click', newPost);
-	$('.new-post-cancel').bind('click', closeNewPost);
 
 	$body.delegate('[data-tooltip]', {
 		'mouseover': showTooltip,
@@ -264,15 +262,6 @@ function setTopic(e) {
 	}
 
 	showBrowse();
-}
-
-function newPost(e) {
-	$newPost.slideDown(300);
-	$('.new-post-title').focus();
-}
-
-function closeNewPost(e) {
-	$newPost.slideUp(300);	
 }
 
 function showFormTopicDrop(e) {
