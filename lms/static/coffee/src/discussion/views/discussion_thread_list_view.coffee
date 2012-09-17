@@ -244,7 +244,8 @@ if Backbone?
         item = $(event.target).closest('li')
         if item.find("span.board-name").data("discussion_id") == "#all"
           @discussionIds = ""
-          @clearSearch()
+          @$(".post-search-field").val("")
+          @retrieveAllThreads()
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           @retrieveDiscussions(discussionIds)
@@ -268,6 +269,18 @@ if Backbone?
       url = DiscussionUtil.urlFor("search")
       DiscussionUtil.safeAjax
         data: { 'commentable_ids': @discussionIds }
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          @collection.current_page = response.page
+          @collection.pages = response.num_pages
+          @collection.reset(response.discussion_data)
+          Content.loadContentInfos(response.content_info)
+          @displayedCollection.reset(@collection.models)
+
+    retrieveAllThreads: () ->
+      url = DiscussionUtil.urlFor("threads")
+      DiscussionUtil.safeAjax
         url: url
         type: "GET"
         success: (response, textStatus) =>
