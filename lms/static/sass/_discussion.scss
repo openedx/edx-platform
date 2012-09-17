@@ -1260,6 +1260,10 @@ body.discussion {
     padding: 40px;
     min-height: 468px;
 
+    a {
+      word-wrap: break-word;
+    }
+
     h1 {
       margin-bottom: 10px;
       font-size: 28px;
