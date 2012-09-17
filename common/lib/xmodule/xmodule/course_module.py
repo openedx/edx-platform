@@ -102,7 +102,7 @@ class CourseDescriptor(SequenceDescriptor):
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks = (textbook.get('title'), textbook.get('book_url'))
+            textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
         #Load the wiki tag if it exists
