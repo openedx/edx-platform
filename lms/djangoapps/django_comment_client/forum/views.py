@@ -28,26 +28,6 @@ PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
-def _general_discussion_id(course_id):
-    return course_id.replace('/', '_').replace('.', '_')
-
-def _should_perform_search(request):
-    return bool(request.GET.get('text', False) or \
-            request.GET.get('tags', False))
-
-def render_accordion(request, course, discussion_id):
-    # TODO: Delete if obsolete
-    discussion_info = utils.get_categorized_discussion_info(request, course)
-
-    context = {
-        'course': course,
-        'discussion_info': discussion_info,
-        'active': discussion_id,
-        'csrf': csrf(request)['csrf_token'],
-    }
-
-    return render_to_string('discussion/_accordion.html', context)
-
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise cc.utils.CommentClientError or
