@@ -207,7 +207,7 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
     return ModuleSystem(
-        ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']),
+        ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda type, event: None,
         filestore=descriptor.system.resources_fs,
