@@ -274,6 +274,7 @@ __Inherited:__
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
 *	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+                                                            'onreset' (students see a different version of the problem when they reset, but are not forced to reset after each check)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
                                                             Default: 'always'. Optional.
