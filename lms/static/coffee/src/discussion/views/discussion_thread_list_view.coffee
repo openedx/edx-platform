@@ -130,6 +130,8 @@ if Backbone?
         content.addClass("followed")
       if thread.get('endorsed')
         content.addClass("resolved")
+      if thread.get('viewed')
+        content.addClass("viewed")
       @highlight(content)
 
 

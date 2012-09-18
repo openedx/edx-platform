@@ -1018,6 +1018,7 @@ body.discussion {
         text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
       }
+
     }
   }
 
@@ -1132,6 +1133,10 @@ body.discussion {
         width: 10px;
         height: 12px;
         background: url(../images/following-flag.png) no-repeat;
+      }
+
+      &.viewed {
+        @include linear-gradient(top, white, #ddd);
       }
 
       &.active {
