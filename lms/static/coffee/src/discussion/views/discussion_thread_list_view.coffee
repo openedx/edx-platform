@@ -9,6 +9,7 @@ if Backbone?
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .post-list .list-item a": "threadSelected"
       "click .post-list .more-pages a": "loadMorePages"
+      'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
