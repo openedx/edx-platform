@@ -22,7 +22,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
         @$children.sortable(
           placeholder: "ui-state-highlight"
           update: (event, ui) =>
-            @model.updateChildren(@$children.find('.module-edit').map(
+            @model.set(children: @$children.find('.module-edit').map(
                 (idx, el) -> $(el).data('id')
             ).toArray())
         )
