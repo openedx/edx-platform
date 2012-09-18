@@ -1485,15 +1485,29 @@ body.discussion {
     }
   }
 
+  blockquote {
+    background: #f6f6f6;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+
   .comments {
     list-style: none;
     margin-top: 20px;
     padding: 0;
     border-top: 1px solid #ddd;
 
-    li {
+    > li {
       background: #f6f6f6;
       border-bottom: 1px solid #ddd;
+    }
+
+    blockquote {
+      background: #e6e6e6;
+      border-radius: 3px;
+      padding: 5px 10px;
+      font-size: 14px;
     }
 
     .comment-form {
@@ -1519,7 +1533,6 @@ body.discussion {
       .discussion-errors {
         margin: 0px;
       }
-
     }
 
     .response-body {
