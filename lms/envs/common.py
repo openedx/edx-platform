@@ -550,6 +550,8 @@ PIPELINE_JS = {
     }
 }
 
+PIPELINE_DISABLE_WRAPPER = True
+
 # Compile all coffee files in course data directories if they are out of date.
 # TODO: Remove this once we move data into Mongo. This is only temporary while
 # course data directories are still in use.
