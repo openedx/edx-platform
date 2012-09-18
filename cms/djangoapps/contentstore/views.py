@@ -277,11 +277,11 @@ def save_item(request):
         raise Http404  # TODO (vshnayder): better error
 
     if request.POST['data']:
-        data = json.loads(request.POST['data'])
+        data = request.POST['data']
         modulestore().update_item(item_location, data)
 
     if request.POST['children']:
-        children = json.loads(request.POST['children'])
+        children = request.POST['children']
         modulestore().update_children(item_location, children)
 
     # Export the course back to github

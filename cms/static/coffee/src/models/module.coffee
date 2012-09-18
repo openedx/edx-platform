@@ -11,9 +11,6 @@ class CMS.Models.Module extends Backbone.Model
   editUrl: ->
     "/edit_item?#{$.param(id: @get('id'))}"
 
-  updateChildren: (children) ->
-    @set(children: JSON.stringify(children))
-
   save: (args...) ->
-    @set(data: JSON.stringify(@module.save())) if @module
+    @set(data: @module.save()) if @module
     super(args...)
