@@ -120,16 +120,18 @@ if Backbone?
         @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
 
     loadMorePages: (event) ->
-      event.preventDefault()
+      if event
+        event.preventDefault()
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
       options = {}
       switch @mode
         when 'search'
           options.search_text = @current_search
-          options.commentable_ids = @discussionIds
         when 'followed'
           options.user_id = window.user.id
+        when 'commentables'
+          options.commentable_ids = @discussionIds
       @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
@@ -273,25 +275,30 @@ if Backbone?
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
           Content.loadContentInfos(response.annotated_content_info)
-          @displayedCollection.reset(@collection.models)
+          @displayedCollection.reset(@collection.models)# Don't think this is necessary because it's called on collection.reset
           if callback?
             callback()
 
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
-      url = DiscussionUtil.urlFor("search")
-      DiscussionUtil.safeAjax
-        data: { 'commentable_ids': @discussionIds }
-        url: url
-        type: "GET"
-        success: (response, textStatus) =>
-          @collection.current_page = response.page
-          @collection.pages = response.num_pages
-          @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.annotated_content_info)
-          @displayedCollection.reset(@collection.models)
+      @mode = 'commentables'
+      @collection.current_page = 0
+      @collection.reset()
+      @loadMorePages()
+#      url = DiscussionUtil.urlFor("search")
+#      DiscussionUtil.safeAjax
+#        data: { 'commentable_ids': @discussionIds }
+#        url: url
+#        type: "GET"
+#        success: (response, textStatus) =>
+#          @collection.current_page = response.page
+#          @collection.pages = response.num_pages
+#          @collection.reset(response.discussion_data)
+#          Content.loadContentInfos(response.annotated_content_info)
+#          @displayedCollection.reset(@collection.models)
 
     retrieveAllThreads: () ->
+      @mode='all'
       url = DiscussionUtil.urlFor("threads")
       DiscussionUtil.safeAjax
         url: url
@@ -301,7 +308,7 @@ if Backbone?
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
           Content.loadContentInfos(response.annotated_content_info)
-          @displayedCollection.reset(@collection.models)
+          @displayedCollection.reset(@collection.models)  #Don't think this is necessary
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
@@ -309,12 +316,12 @@ if Backbone?
       @sortBy = $(event.target).data("sort")
       @collection.reset()
       @collection.current_page = 0
-      @loadMorePages(event)
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst
         when 'votes' then @displayedCollection.sortByVotes
         when 'comments' then @displayedCollection.sortByComments
-      @displayedCollection.sort()
+      @loadMorePages(event)
+      #@displayedCollection.sort()  # This should be called automatically and calling this makes the loading indicator go away
 
     performSearch: (event) ->
       if event.which == 13
@@ -355,7 +362,7 @@ if Backbone?
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway
-            @displayedCollection.reset(@collection.models)
+            @displayedCollection.reset(@collection.models) # Don't think this is necessary
 
     clearSearch: (callback, value) ->
       @$(".post-search-field").val("")
