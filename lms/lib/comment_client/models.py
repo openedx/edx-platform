@@ -72,8 +72,8 @@ class Model(object):
         for k, v in kwargs.items():
             if k in self.accessible_fields:
                 self.__setattr__(k, v)
-            else:
-                raise AttributeError("Field {0} does not exist".format(k))
+            #else:
+            #    raise AttributeError("Field {0} does not exist".format(k))
 
     def updatable_attributes(self):
         return extract(self.attributes, self.updatable_fields)
