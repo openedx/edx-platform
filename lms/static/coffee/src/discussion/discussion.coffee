@@ -32,8 +32,9 @@ if Backbone?
         when 'search'
           url = DiscussionUtil.urlFor 'search'
           data['text'] = options.search_text
-          if options.commentable_ids
-            data['commentable_ids'] = options.commentable_ids
+        when 'commentables'
+          url = DiscussionUtil.urlFor 'search'
+          data['commentable_ids'] = options.commentable_ids
         when 'all'
           url = DiscussionUtil.urlFor 'threads'
         when 'followed'
