@@ -31,6 +31,7 @@ if Backbone?
       @boardName
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
+      @mode = 'all'
 
     reloadDisplayedCollection: (thread) =>
       thread_id = thread.get('id')
@@ -122,7 +123,14 @@ if Backbone?
       event.preventDefault()
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
-      @collection.retrieveAnotherPage(@current_search, @discussionIds, @sortBy)
+      options = {}
+      switch @mode
+        when 'search'
+          options.search_text = @current_search
+          options.commentable_ids = @discussionIds
+        when 'following'
+          options.user_id = window.user.id
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -146,7 +154,7 @@ if Backbone?
     threadSelected: (e) =>
       thread_id = $(e.target).closest("a").data("id")
       @setActiveThread(thread_id)
-      @trigger("thread:selected", thread_id)
+      @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
 
     threadRemoved: (thread_id) =>
@@ -243,10 +251,14 @@ if Backbone?
       else
         @setTopic(event)  # just sets the title for the dropdown
         item = $(event.target).closest('li')
-        if item.find("span.board-name").data("discussion_id") == "#all"
+        discussionId = item.find("span.board-name").data("discussion_id")
+        if discussionId == "#all"
           @discussionIds = ""
           @$(".post-search-field").val("")
           @retrieveAllThreads()
+        else if discussionId == "#following"
+          @retrieveFollowing(event)
+          # Retrieve following
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           @retrieveDiscussions(discussionIds)
@@ -260,7 +272,7 @@ if Backbone?
           @collection.current_page = response.page
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
+          Content.loadContentInfos(response.annotated_content_info)
           @displayedCollection.reset(@collection.models)
           if callback?
             callback()
@@ -276,7 +288,7 @@ if Backbone?
           @collection.current_page = response.page
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
+          Content.loadContentInfos(response.annotated_content_info)
           @displayedCollection.reset(@collection.models)
 
     retrieveAllThreads: () ->
@@ -288,7 +300,7 @@ if Backbone?
           @collection.current_page = response.page
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
+          Content.loadContentInfos(response.annotated_content_info)
           @displayedCollection.reset(@collection.models)
 
     sortThreads: (event) ->
@@ -315,6 +327,7 @@ if Backbone?
       @searchFor(text)
 
     searchFor: (text, callback, value) ->
+      @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
       DiscussionUtil.safeAjax
@@ -332,7 +345,7 @@ if Backbone?
           if textStatus == 'success'
             # TODO: Augment existing collection?
             @collection.reset(response.discussion_data)
-            Content.loadContentInfos(response.content_info)
+            Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages
             # TODO: Perhaps reload user info so that votes can be updated.
@@ -370,3 +383,9 @@ if Backbone?
       scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
       scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
       $(".browse-topic-drop-menu").scrollTop(scrollTarget)
+
+    retrieveFollowing: (event)=>
+      @mode = 'following'
+      @collection.reset()
+      @collection.current_page = 0
+      @loadMorePages(event)

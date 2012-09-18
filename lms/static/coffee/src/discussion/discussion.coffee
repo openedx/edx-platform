@@ -25,17 +25,22 @@ if Backbone?
         @add model
         model
 
-    retrieveAnotherPage: (search_text="", commentable_ids="", sort_key="")->
+    retrieveAnotherPage: (mode, options={}, sort_options={})->
       # TODO: I really feel that this belongs in DiscussionThreadListView
       @current_page += 1
-      url = DiscussionUtil.urlFor 'threads'
       data = { page: @current_page }
-      if search_text
-        data['text'] = search_text
-      if sort_key
-        data['sort_key'] = sort_key
-      if commentable_ids
-        data['commentable_ids'] = commentable_ids
+      switch mode
+        when 'search'
+          url = DiscussionUtil.urlFor 'search'
+          data['text'] = options.search_text
+          if options.commentable_ids
+            data['commentable_ids'] = options.commentable_ids
+        when 'all'
+          url = DiscussionUtil.urlFor 'threads'
+        when 'following'
+          url = DiscussionUtil.urlFor 'following_threads', options.user_id
+      data['sort_key'] = sort_options.sort_key || 'date'
+      data['sort_order'] = sort_options.sort_order || 'desc'
       DiscussionUtil.safeAjax
         $elem: @$el
         url: url
@@ -45,6 +50,7 @@ if Backbone?
           models = @models
           new_threads = [new Thread(data) for data in response.discussion_data][0]
           new_collection = _.union(models, new_threads)
+          Content.loadContentInfos(response.annotated_content_info)
           @reset new_collection
 
     sortByDate: (thread) ->

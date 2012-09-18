@@ -259,7 +259,11 @@ def get_ability(course_id, content, user):
             'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
+#TODO: RENAME
 def get_annotated_content_info(course_id, content, user, user_info):
+    """
+    Get metadata for an individual content (thread or comment)
+    """
     voted = ''
     if content['id'] in user_info['upvoted_ids']:
         voted = 'up'
@@ -271,7 +275,11 @@ def get_annotated_content_info(course_id, content, user, user_info):
         'ability': get_ability(course_id, content, user),
     }
 
+#TODO: RENAME
 def get_annotated_content_infos(course_id, thread, user, user_info):
+    """
+    Get metadata for a thread and its children
+    """
     infos = {}
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
@@ -279,6 +287,13 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
             annotate(child)
     annotate(thread)
     return infos
+
+def get_metadata_for_threads(course_id, threads, user, user_info):
+    def infogetter(thread):
+        return get_annotated_content_infos(course_id, thread, user, user_info)
+
+    metadata = reduce(merge_dict, map(infogetter, threads), {})
+    return metadata
 
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 def url_for_tags(course_id, tags):
@@ -304,7 +319,7 @@ def extend_content(content):
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except user.DoesNotExist:
             logging.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
-        
+
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
@@ -323,9 +338,9 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
         (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
-        url = reverse('courseware_position', kwargs={"course_id":course_id, 
-                                                     "chapter":chapter, 
-                                                     "section":section, 
+        url = reverse('courseware_position', kwargs={"course_id":course_id,
+                                                     "chapter":chapter,
+                                                     "section":section,
                                                      "position":position})
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
