@@ -26,7 +26,6 @@ if Backbone?
         model
 
     retrieveAnotherPage: (mode, options={}, sort_options={})->
-      # TODO: I really feel that this belongs in DiscussionThreadListView
       @current_page += 1
       data = { page: @current_page }
       switch mode
@@ -37,8 +36,8 @@ if Backbone?
             data['commentable_ids'] = options.commentable_ids
         when 'all'
           url = DiscussionUtil.urlFor 'threads'
-        when 'following'
-          url = DiscussionUtil.urlFor 'following_threads', options.user_id
+        when 'followed'
+          url = DiscussionUtil.urlFor 'followed_threads', options.user_id
       data['sort_key'] = sort_options.sort_key || 'date'
       data['sort_order'] = sort_options.sort_order || 'desc'
       DiscussionUtil.safeAjax
