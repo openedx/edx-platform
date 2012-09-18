@@ -120,9 +120,6 @@ if Backbone?
           anonymous_to_peers = false || @$("input.discussion-anonymous-to-peers").is(":checked")
           follow             = false || @$("input.discussion-follow").is(":checked")
 
-          $formTopicDropBtn.bind('click', showFormTopicDrop)
-          $formTopicDropMenu.bind('click', setFormTopic)
-
           url = DiscussionUtil.urlFor('create_thread', @topicId)
 
           DiscussionUtil.safeAjax
