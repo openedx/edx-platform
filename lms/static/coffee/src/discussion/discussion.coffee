@@ -66,9 +66,15 @@ if Backbone?
     sortByVotes: (thread1, thread2) ->
       thread1_count = parseInt(thread1.get("votes")['up_count'])
       thread2_count = parseInt(thread2.get("votes")['up_count'])
-      thread2_count - thread1_count
+      if thread2_count != thread1_count
+        thread2_count - thread1_count
+      else
+        thread2.created_at_time() - thread1.created_at_time()
 
     sortByComments: (thread1, thread2) ->
       thread1_count = parseInt(thread1.get("comments_count"))
       thread2_count = parseInt(thread2.get("comments_count"))
-      thread2_count - thread1_count
+      if thread2_count != thread1_count
+        thread2_count - thread1_count
+      else
+        thread2.created_at_time() - thread1.created_at_time()
