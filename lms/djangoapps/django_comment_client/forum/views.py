@@ -21,6 +21,8 @@ from django_comment_client.utils import merge_dict, extract, strip_none, strip_b
 import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
+import datetime
+from django.utils.timezone import utc
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -43,6 +45,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
+        'user_id': request.user.id,
     }
 
     if not request.GET.get('sort_key'):
@@ -166,12 +169,21 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     if request.is_ajax():
         course = get_course_with_access(request.user, course_id, 'load')
-        user_info = cc.User.from_django_user(request.user).to_dict()
+        cc_user = cc.User.from_django_user(request.user)
+        user_info = cc_user.to_dict()
 
         try:
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+            last_read_time = datetime.datetime.utcnow().replace(tzinfo=utc).strftime('%Y-%m-%dT%H:%M:%S%z')
+            cc_user.update_read_states(course_id, thread_id, last_read_time)
+        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+            # TODO log error
+            pass
+
+        try:
+            thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
             raise Http404
+
         courseware_context = get_courseware_context(thread, course)
 
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
@@ -190,9 +202,20 @@ def single_thread(request, course_id, discussion_id, thread_id):
     else:
         course = get_course_with_access(request.user, course_id, 'load')
         category_map = utils.get_discussion_category_map(course)
+
+        cc_user = cc.User.from_django_user(request.user)
+        user_info = cc_user.to_dict()
+
+        try:
+            last_read_time = datetime.datetime.utcnow().replace(tzinfo=utc).strftime('%Y-%m-%dT%H:%M:%S%z')
+            cc_user.update_read_states(course_id, thread_id, last_read_time)
+        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+            # TODO log error
+            pass
+
         try:
             threads, query_params = get_threads(request, course_id)
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
+            thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
             threads.append(thread.to_dict())
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
             raise Http404
@@ -216,8 +239,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        user_info = cc.User.from_django_user(request.user).to_dict()
-
+        
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
