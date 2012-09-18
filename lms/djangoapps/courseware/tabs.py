@@ -43,10 +43,6 @@ TabImpl = namedtuple('TabImpl', 'validator generator')
 
 #####  Generators for various tabs.
 
-def _tab(name, view_name, is_active, extra_args=[]):
-    """Return a CourseTab when link is reverse of css class with course_id"""
-    return CourseTab(name, reverse(class_name, args=[course.id]), class_name)
-
 def _courseware(tab, user, course, active_page):
     link = reverse('courseware', args=[course.id])
     return [CourseTab('Courseware', link, active_page == "courseware")]
