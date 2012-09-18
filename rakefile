@@ -125,8 +125,8 @@ TEST_TASKS = []
     end
 
     # Per environment tasks
-    Dir["#{system}/envs/*.py"].each do |env_file|
-        env = File.basename(env_file).gsub(/\.py/, '')
+    Dir["#{system}/envs/**/*.py"].each do |env_file|
+        env = env_file.gsub("#{system}/envs/", '').gsub(/\.py/, '').gsub('/', '.')
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"
         task "#{system}:check_settings:#{env}" => :predjango do
             sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")

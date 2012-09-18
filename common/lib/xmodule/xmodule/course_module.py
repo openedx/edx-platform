@@ -22,9 +22,6 @@ class CourseDescriptor(SequenceDescriptor):
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
 
-        @classmethod
-        def from_xml_object(cls, xml_object):
-            return cls(xml_object.get('title'), xml_object.get('book_url'))
 
         @property
         def table_of_contents(self):
@@ -57,10 +54,18 @@ class CourseDescriptor(SequenceDescriptor):
 
             return table_of_contents
 
-
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        self.textbooks = self.definition['data']['textbooks']
+
+        self.textbooks = []
+        for title, book_url in self.definition['data']['textbooks']:
+            try:
+                self.textbooks.append(self.Textbook(title, book_url))
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                continue
 
         self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
@@ -82,7 +87,6 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
-
     def set_grading_policy(self, policy_str):
         """Parse the policy specified in policy_str, and save it"""
         try:
@@ -94,19 +98,11 @@ class CourseDescriptor(SequenceDescriptor):
             # the error log.
             self._grading_policy = {}
 
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            try:
-                txt = cls.Textbook.from_xml_object(textbook)
-            except:
-                # If we can't get to S3 (e.g. on a train with no internet), don't break
-                # the rest of the courseware.
-                log.exception("Couldn't load textbook")
-                continue
-            textbooks.append(txt)
+            textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
         #Load the wiki tag if it exists
@@ -116,7 +112,7 @@ class CourseDescriptor(SequenceDescriptor):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
         definition.setdefault('data', {})['textbooks'] = textbooks
         definition['data']['wiki_slug'] = wiki_slug
