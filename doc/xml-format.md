@@ -358,19 +358,14 @@ Links that include `/course` will be rewritten to the root of your course in the
 
 If you want to customize the courseware tabs displayed for your course, specify a "tabs" list in the course-level policy.  e.g.:
 
-"tabs" : [
-{ "type": "courseware"},     # no name--always "Courseware" for consistency between courses
-{"name": "Course Info",
- "type": course_info"},
-{"name": "My Discussion",
- "type": external_"link",
- "link": "http://www.mydiscussion.org/blah"},
-{"name": "Progress",
-"type": "Progress"},
-{"name": "Wonderwiki",
- "type": "wiki"},
-{"type": "textbooks"}   # generates one tab per textbook, taking names from the textbook titles
-]
+    "tabs" : [
+        {"type": "courseware"},       # no name--always "Courseware" for consistency between courses
+        {"type": "course_info", "name": "Course Info"},
+        {"type": "external_link", "name": "My Discussion", "link": "http://www.mydiscussion.org/blah"},
+        {"type": "progress", "name": "Progress"},
+        {"type": "wiki", "name": "Wonderwiki"},
+        {"type": "textbooks"}        # generates one tab per textbook, taking names from the textbook titles
+    ]
 
 
 * If you specify any tabs, you must specify all tabs.  They will appear in the order given.
