@@ -1,7 +1,7 @@
 $ ->
-  new Tooltips
+  new TooltipManager
 
-class @Tooltips
+class @TooltipManager
   constructor: () ->
     @$body = $('body')
     @$tooltip = $('<div class="tooltip"></div>')
