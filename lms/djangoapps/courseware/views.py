@@ -459,6 +459,10 @@ def progress(request, course_id, student_id=None):
     courseware_summary = grades.progress_summary(student, request, course,
                                                  course.grader, student_module_cache)
     grade_summary = grades.grade(student, request, course, student_module_cache)
+    
+    if courseware_summary is None:
+        #This means the student didn't have access to the course (which the instructor requested)
+        raise Http404
 
     context = {'course': course,
                'courseware_summary': courseware_summary,

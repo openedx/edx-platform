@@ -237,6 +237,10 @@ def progress_summary(student, request, course, grader, student_module_cache):
         course: An XModule containing the course to grade
         student_module_cache: A StudentModuleCache initialized with all
              instance_modules for the student
+    
+    If the student does not have access to load the course module, this function
+    will return None.
+    
     """
     
     
@@ -245,6 +249,9 @@ def progress_summary(student, request, course, grader, student_module_cache):
     course_module = get_module(student, request,
                                 course.location, student_module_cache,
                                 course.id)
+    if not course_module:
+        # This student must not have access to the course.
+        return None
     
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
