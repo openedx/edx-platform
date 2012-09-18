@@ -1,9 +1,9 @@
 from fs.errors import ResourceNotFoundError
-import time
 import logging
-import requests
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
+import requests
+import time
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -129,6 +129,13 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+
+    @property
+    def tabs(self):
+        """
+        Return the tabs config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('tabs')
 
     @property
     def show_calculator(self):

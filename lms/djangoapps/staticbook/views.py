@@ -11,11 +11,13 @@ def index(request, course_id, book_index, page=0):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    textbook = course.textbooks[int(book_index)]
+    book_index = int(book_index)
+    textbook = course.textbooks[book_index]
     table_of_contents = textbook.table_of_contents
 
     return render_to_response('staticbook.html',
-                              {'page': int(page), 'course': course, 'book_url': textbook.book_url,
+                              {'book_index': book_index, 'page': int(page),
+                               'course': course, 'book_url': textbook.book_url,
                                'table_of_contents': table_of_contents,
                                'staff_access': staff_access})
 
