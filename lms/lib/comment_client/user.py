@@ -8,7 +8,7 @@ class User(models.Model):
     accessible_fields = ['username', 'email', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
                          'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
                          'subscribed_thread_ids', 'subscribed_commentable_ids',
-                         'subscribed_course_ids', 'threads_count', 'comments_count', 
+                         'subscribed_course_ids', 'threads_count', 'comments_count',
                          'default_sort_key'
                         ]
 
@@ -65,6 +65,15 @@ class User(models.Model):
         response = perform_request('get', url, params)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
+    def subscribed_threads(self, query_params={}):
+        if not self.course_id:
+            raise CommentClientError("Must provide course_id when retrieving subscribed threads for the user")
+        url = _url_for_user_subscribed_threads(self.id)
+        params = {'course_id': self.course_id}
+        params = merge_dict(params, query_params)
+        response = perform_request('get', url, params)
+        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
@@ -84,3 +93,6 @@ def _url_for_subscription(user_id):
 
 def _url_for_user_active_threads(user_id):
     return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+def _url_for_user_subscribed_threads(user_id):
+    return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
