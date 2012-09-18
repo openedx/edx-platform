@@ -307,12 +307,13 @@ if Backbone?
       @$(".sort-bar a").removeClass("active")
       $(event.target).addClass("active")
       @sortBy = $(event.target).data("sort")
-      if @sortBy == "date"
-        @displayedCollection.comparator = @displayedCollection.sortByDateRecentFirst
-      else if @sortBy == "votes"
-        @displayedCollection.comparator = @displayedCollection.sortByVotes
-      else if @sortBy == "comments"
-        @displayedCollection.comparator = @displayedCollection.sortByComments
+      @collection.reset()
+      @collection.current_page = 0
+      @loadMorePages(event)
+      @displayedCollection.comparator = switch @sortBy
+        when 'date' then @displayedCollection.sortByDateRecentFirst
+        when 'votes' then @displayedCollection.sortByVotes
+        when 'comments' then @displayedCollection.sortByComments
       @displayedCollection.sort()
 
     performSearch: (event) ->
@@ -330,6 +331,9 @@ if Backbone?
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
+      #TODO: This might be better done by setting discussion.current_page=0 and calling discussion.loadMorePages
+      # Mainly because this currently does not reset any pagination variables which could cause problems.
+      # This doesn't use pagination either.
       DiscussionUtil.safeAjax
         $elem: @$(".post-search-field")
         data: { text: text }

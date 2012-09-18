@@ -249,15 +249,19 @@ def user_profile(request, course_id, user_id):
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
+        user_info = cc.User.from_django_user(request.user).to_dict()
+
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         if request.is_ajax():
             return utils.JsonResponse({
                 'discussion_data': map(utils.safe_content, threads),
+                'page': query_params['page'],
+                'num_pages': query_params['num_pages'],
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             })
         else:
-            user_info = cc.User.from_django_user(request.user).to_dict()
 
-            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
             context = {
                 'course': course,
@@ -286,7 +290,7 @@ def following_threads(request, course_id, user_id):
             'sort_key': 'date',#TODO: Allow custom sorting?
             'sort_order': 'desc',
         }
-        print user_id
+
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
@@ -297,6 +301,8 @@ def following_threads(request, course_id, user_id):
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
                 'discussion_data': map(utils.safe_content, threads),
+                'page': query_params['page'],
+                'num_pages': query_params['num_pages'],
                 })
         else:
 
