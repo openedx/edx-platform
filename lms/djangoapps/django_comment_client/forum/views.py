@@ -287,8 +287,8 @@ def followed_threads(request, course_id, user_id):
         query_params = {
             'page': request.GET.get('page', 1),
             'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
-            'sort_key': 'date',#TODO: Allow custom sorting?
-            'sort_order': 'desc',
+            'sort_key': request.GET.get('sort_key', 'date'),
+            'sort_order': request.GET.get('sort_order', 'desc'),
         }
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
