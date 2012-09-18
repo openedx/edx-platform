@@ -13,18 +13,22 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
       # Load preview modules
       XModule.loadModules('display')
+      @$children = @$el.find('#sortable')
       @enableDrag()
 
-  enableDrag: ->
+  enableDrag: =>
       # Enable dragging things in the #sortable div (if there is one)
-      if $("#sortable").length > 0
-        $("#sortable").sortable({
+      if @$children.length > 0
+        @$children.sortable(
           placeholder: "ui-state-highlight"
-          })
-        $("#sortable").disableSelection();
+          update: (event, ui) =>
+            @model.set(children: @$children.find('.module-edit').map(
+                (idx, el) -> $(el).data('id')
+            ).toArray())
+        )
+        @$children.disableSelection()
 
-
-  save: (event) ->
+  save: (event) =>
     event.preventDefault()
     @model.save().done((previews) =>
       alert("Your changes have been saved.")
