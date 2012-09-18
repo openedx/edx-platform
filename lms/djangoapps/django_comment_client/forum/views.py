@@ -279,7 +279,7 @@ def user_profile(request, course_id, user_id):
         raise Http404
 
 
-def following_threads(request, course_id, user_id):
+def followed_threads(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)

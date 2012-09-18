@@ -128,7 +128,7 @@ if Backbone?
         when 'search'
           options.search_text = @current_search
           options.commentable_ids = @discussionIds
-        when 'following'
+        when 'followed'
           options.user_id = window.user.id
       @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
@@ -257,7 +257,7 @@ if Backbone?
           @$(".post-search-field").val("")
           @retrieveAllThreads()
         else if discussionId == "#following"
-          @retrieveFollowing(event)
+          @retrieveFollowed(event)
           # Retrieve following
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
@@ -388,8 +388,8 @@ if Backbone?
       scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
       $(".browse-topic-drop-menu").scrollTop(scrollTarget)
 
-    retrieveFollowing: (event)=>
-      @mode = 'following'
+    retrieveFollowed: (event)=>
+      @mode = 'followed'
       @collection.reset()
       @collection.current_page = 0
       @loadMorePages(event)
