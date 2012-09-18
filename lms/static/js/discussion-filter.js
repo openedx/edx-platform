@@ -1,49 +1,6 @@
-var $body;
-var $browse;
-var $search;
-var $searchField;
-var $currentBoard;
+var DiscussionFilter = DiscussionFilter || {};
 
-var $newPost;
-var $sidebar;
-var $sidebarWidthStyles;
-var $postListWrapper;
-var $discussionBody;
-var sidebarWidth;
-var sidebarXOffset;
-var scrollTop;
-
-
-$(document).ready(function() {
-	$body = $('body');
-	//$browse = $('.browse-search .browse');
-	//$search = $('.browse-search .search');
-	$searchField = $('.post-search-field');
-	//$topicDrop = $('.browse-topic-drop-menu-wrapper');
-	$currentBoard = $('.current-board');
-
-	$newPost = $('.new-post-article');
-	$sidebar = $('.sidebar');
-	$discussionBody = $('.discussion-body');
-	$postListWrapper = $('.post-list-wrapper');
-	// $dropFilter = $('.browse-topic-drop-search-input');
-	// $topicFilter = $('.topic-drop-search-input');
-	$sidebarWidthStyles = $('<style></style>');
-	$body.append($sidebarWidthStyles);
-
-	sidebarWidth = $('.sidebar').width();
-	sidebarXOffset = $sidebar.offset().top;
-
-	//$browse.bind('click', showTopicDrop);
-	//$search.bind('click', showSearch);
-	// $topicDrop.bind('click', setTopic);
-//	$formTopicDropBtn.bind('click', showFormTopicDrop);
-//	$formTopicDropMenu.bind('click', setFormTopic);
-
-	$body.delegate('.browse-topic-drop-search-input, .form-topic-drop-search-input', 'keyup', filterDrop);
-});
-
-function filterDrop(e) {
+DiscussionFilter.filterDrop = function (e) {
 	/*
 	 * multiple queries
 	 */
@@ -90,7 +47,7 @@ function filterDrop(e) {
 	 * single query
 	 */
 	var $drop = $(e.target).parents('.topic_menu_wrapper, .browse-topic-drop-menu-wrapper');
-	var query = $(this).val();
+	var query = $(e.target).val();
 	var $items = $drop.find('a');
 
 	if(query.length == 0) {

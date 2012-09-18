@@ -21,6 +21,7 @@ if Backbone?
           "click  .topic_dropdown_button":    "toggleTopicDropdown"
           "click  .topic_menu_wrapper":       "setTopic"
           "click  .topic_menu_search":        "ignoreClick"
+          "keyup .form-topic-drop-search-input": DiscussionFilter.filterDrop
 
       # Because we want the behavior that when the body is clicked the menu is
       # closed, we need to ignore clicks in the search field and stop propagation.
