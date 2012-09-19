@@ -132,6 +132,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_info', name="course_root"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/tab/(?P<tab_name>.*)$',
+            'courseware.views.static_tab', name="static_tab"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
             'courseware.views.syllabus', name="syllabus"), # TODO arjun remove when custom tabs in place, see courseware/courses.py
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',

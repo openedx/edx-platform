@@ -1,0 +1,12 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="title"><title>${course.number} ${tab['name']}</title></%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page=tab['name']" />
+
+<section class="container">
+  <div class="static_tab_wrapper">
+    ${tab_contents}
+  </div>
+</section>
