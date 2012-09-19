@@ -24,13 +24,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
     for course_id in module_store.modules.keys():
         for module in module_store.modules[course_id].itervalues():
 
-            # TODO (cpennington): This forces import to overrite the same items.
-            # This should in the future create new revisions of the items on import
-            try:
-                store.create_item(module.location)
-            except DuplicateItemError:
-                log.exception('Item already exists at %s' % module.location.url())
-                pass
             if 'data' in module.definition:
                 store.update_item(module.location, module.definition['data'])
             if 'children' in module.definition:

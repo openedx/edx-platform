@@ -471,10 +471,6 @@ class XMLModuleStore(ModuleStoreBase):
         """
         return dict( (k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def create_item(self, location):
-        raise NotImplementedError("XMLModuleStores are read-only")
-
-
     def update_item(self, location, data):
         """
         Set the data in the item specified by the location to
