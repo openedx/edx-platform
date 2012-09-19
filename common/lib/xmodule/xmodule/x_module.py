@@ -7,6 +7,7 @@ from functools import partial
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from pprint import pprint
+from collections import namedtuple
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
@@ -71,7 +72,11 @@ class Plugin(object):
 
     @classmethod
     def load_classes(cls):
-        return [class_.load()
+        """
+        Returns a list of containing the identifiers and their corresponding classes for all
+        of the available instances of this plugin
+        """
+        return [(class_.name, class_.load())
                 for class_
                 in pkg_resources.iter_entry_points(cls.entry_point)]
 
@@ -321,6 +326,9 @@ def policy_key(location):
     return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
+Template = namedtuple("Template", "name data children")
+
+
 class XModuleDescriptor(Plugin, HTMLSnippet):
     """
     An XModuleDescriptor is a specification for an element of a course. This
@@ -360,6 +368,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     # be equal
     equality_attributes = ('definition', 'metadata', 'location',
                            'shared_state_key', '_inherited_metadata')
+
+    # A list of Template objects that describe possible templates that can be used
+    # to create a module of this type.
+    # If no templates are provided, there will be no way to create a module of this type
+    templates = []
 
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
