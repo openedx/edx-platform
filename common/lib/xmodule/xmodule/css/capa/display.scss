@@ -56,7 +56,8 @@ section.problem {
       margin: 20px 0;
     }
 
-    input[type="radio"] {
+    input[type="radio"],
+    input[type="checkbox"] {
       float: left;
       margin: 4px 8px 0 0;
     }
