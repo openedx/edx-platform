@@ -8,9 +8,9 @@ class Thread(models.Model):
     accessible_fields = [
         'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
-        'created_at', 'updated_at', 'comments_count', 'at_position_list',
-        'children', 'type', 'highlighted_title', 'highlighted_body', 'endorsed',
-        'unread_comments_count', 'viewed',
+        'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
+        'at_position_list', 'children', 'type', 'highlighted_title',
+        'highlighted_body', 'endorsed', 'unread'
     ]
 
     updatable_fields = [
