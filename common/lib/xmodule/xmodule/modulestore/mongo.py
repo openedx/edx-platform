@@ -153,7 +153,12 @@ class MongoModuleStore(ModuleStoreBase):
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
         data_dir = item.get('metadata', {}).get('data_dir', item['location']['course'])
-        resource_fs = OSFS(self.fs_root / data_dir)
+        root = self.fs_root / data_dir
+        
+        if not root.isdir():
+            root.mkdir()
+
+        resource_fs = OSFS(root)
 
         system = CachingDescriptorSystem(
             self,
