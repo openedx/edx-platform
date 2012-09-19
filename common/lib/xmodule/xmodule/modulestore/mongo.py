@@ -237,20 +237,16 @@ class MongoModuleStore(ModuleStoreBase):
 
         return self._load_items(list(items), depth)
 
-    # TODO (cpennington): This needs to be replaced by clone_item as soon as we allow
-    # creation of items from the cms
-    def create_item(self, location):
+    def clone_item(self, source, location):
         """
-        Create an empty item at the specified location.
-
-        If that location already exists, raises a DuplicateItemError
-
-        location: Something that can be passed to Location
+        Clone a new item that is a copy of the item at the location `source`
+        and writes it to `location`
         """
         try:
-            self.collection.insert({
-                '_id': Location(location).dict(),
-            })
+            source_item = self.collection.find_one(location_to_query(source))
+            source_item['_id'] = Location(location).dict()
+            self.collection.insert(source_item)
+            return self._load_items([source_item])[0]
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
