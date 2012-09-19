@@ -21,7 +21,15 @@ class CourseDescriptor(SequenceDescriptor):
             self.title = title
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
-
+            self.start_page = int(self.table_of_contents[0].attrib['page'])
+            
+            # The last page should be the last element in the table of contents,
+            # but it may be nested. So recurse all the way down the last element
+            last_el = self.table_of_contents[-1]
+            while last_el.getchildren():
+                last_el = last_el[-1]
+            
+            self.end_page = int(last_el.attrib['page'])
 
         @property
         def table_of_contents(self):
