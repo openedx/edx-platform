@@ -254,6 +254,24 @@ class MongoModuleStore(ModuleStoreBase):
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
 
+    def _update_single_item(self, location, update):
+        """
+        Set update on the specified item, and raises ItemNotFoundError
+        if the location doesn't exist
+        """
+
+        # See http://www.mongodb.org/display/DOCS/Updating for
+        # atomic update syntax
+        result = self.collection.update(
+            {'_id': Location(location).dict()},
+            {'$set': update},
+            multi=False,
+            upsert=True,
+        )
+        if result['n'] == 0:
+            raise ItemNotFoundError(location)
+
+
     def update_item(self, location, data):
         """
         Set the data in the item specified by the location to
@@ -263,13 +281,7 @@ class MongoModuleStore(ModuleStoreBase):
         data: A nested dictionary of problem data
         """
 
-        # See http://www.mongodb.org/display/DOCS/Updating for
-        # atomic update syntax
-        self.collection.update(
-            {'_id': Location(location).dict()},
-            {'$set': {'definition.data': data}},
-
-        )
+        self._update_single_item(location, {'definition.data': data})
 
     def update_children(self, location, children):
         """
@@ -280,12 +292,7 @@ class MongoModuleStore(ModuleStoreBase):
         children: A list of child item identifiers
         """
 
-        # See http://www.mongodb.org/display/DOCS/Updating for
-        # atomic update syntax
-        self.collection.update(
-            {'_id': Location(location).dict()},
-            {'$set': {'definition.children': children}}
-        )
+        self._update_single_item(location, {'definition.children': children})
 
     def update_metadata(self, location, metadata):
         """
@@ -296,12 +303,7 @@ class MongoModuleStore(ModuleStoreBase):
         metadata: A nested dictionary of module metadata
         """
 
-        # See http://www.mongodb.org/display/DOCS/Updating for
-        # atomic update syntax
-        self.collection.update(
-            {'_id': Location(location).dict()},
-            {'$set': {'metadata': metadata}}
-        )
+        self._update_single_item(location, {'metadata': metadata})
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
