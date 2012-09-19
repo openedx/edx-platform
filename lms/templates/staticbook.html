@@ -97,6 +97,10 @@ $("#open_close_accordion a").click(function(){
           % for entry in table_of_contents:
             ${print_entry(entry)}
           % endfor
+        
+        ## Don't delete this empty list item. Without it, Jquery.TreeView won't
+        ## render the last list item as expandable.
+        <li></li> 
       </ul>
     </section>
 
