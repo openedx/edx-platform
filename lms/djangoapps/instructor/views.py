@@ -85,7 +85,8 @@ def instructor_dashboard(request, course_id):
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
-            writer.writerow(datarow)
+            encoded_row = [unicode(s).encode('utf-8') for s in datarow]
+            writer.writerow(encoded_row)
         return response
 
     def get_staff_group(course):
@@ -250,7 +251,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
 
     '''
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
     if get_grades:
