@@ -53,6 +53,7 @@ if Backbone?
           Content.loadContentInfos(response.annotated_content_info)
           @reset new_collection
           @pages = response.num_pages
+          @current_page = response.page
 
     sortByDate: (thread) ->
       thread.get("created_at")
