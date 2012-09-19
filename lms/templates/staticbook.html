@@ -38,14 +38,14 @@ function goto_page(n) {
 
 function prev_page() {
   var newpage=page-1;
-  if(newpage<0) newpage=0;
+  if(newpage< ${start_page}) newpage=${start_page};
   goto_page(newpage);
   log_event("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   var newpage=page+1;
-  if(newpage>1008) newpage=1008;
+  if(newpage> ${end_page}) newpage=${end_page};
   goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
