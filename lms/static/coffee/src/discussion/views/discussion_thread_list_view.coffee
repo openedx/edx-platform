@@ -298,17 +298,10 @@ if Backbone?
 #          @displayedCollection.reset(@collection.models)
 
     retrieveAllThreads: () ->
-      @mode='all'
-      url = DiscussionUtil.urlFor("threads")
-      DiscussionUtil.safeAjax
-        url: url
-        type: "GET"
-        success: (response, textStatus) =>
-          @collection.current_page = response.page
-          @collection.pages = response.num_pages
-          @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.annotated_content_info)
-          @displayedCollection.reset(@collection.models)  #Don't think this is necessary
+      @mode = 'all'
+      @collection.current_page = 0
+      @collection.reset()
+      @loadMorePages()
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
@@ -321,7 +314,7 @@ if Backbone?
         when 'votes' then @displayedCollection.sortByVotes
         when 'comments' then @displayedCollection.sortByComments
       @loadMorePages(event)
-      #@displayedCollection.sort()  # This should be called automatically and calling this makes the loading indicator go away
+      #@displayedCollection.sort()  # This should be called automatically and calling manually makes the loading indicator go away
 
     performSearch: (event) ->
       if event.which == 13
