@@ -210,7 +210,7 @@ for dir_ in (js_file_dir, css_file_dir):
 
 js_fragments = set()
 css_fragments = defaultdict(set)
-for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
+for _, descriptor in XModuleDescriptor.load_classes() + [(None, RawDescriptor)]:
     descriptor_js = descriptor.get_javascript()
     module_js = descriptor.module_class.get_javascript()
 

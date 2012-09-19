@@ -297,8 +297,11 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    # TODO (cpennington): Replace with clone_item
-    def create_item(self, location, editor):
+    def clone_item(self, source, location):
+        """
+        Clone a new item that is a copy of the item at the location `source`
+        and writes it to `location`
+        """
         raise NotImplementedError
 
     def update_item(self, location, data):

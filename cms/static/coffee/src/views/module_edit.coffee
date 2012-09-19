@@ -39,7 +39,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       )
 
       XModule.loadModules('display')
-    ).fail(->
+    ).fail( ->
       alert("There was an error saving your changes. Please try again.")
     )
 
