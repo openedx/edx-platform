@@ -294,7 +294,7 @@ def gradebook(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
 
     # TODO (vshnayder): implement pagination.
     enrolled_students = enrolled_students[:1000]   # HACK!
