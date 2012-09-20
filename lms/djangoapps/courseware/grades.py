@@ -27,6 +27,30 @@ def yield_module_descendents(module):
         stack.extend( next_module.get_display_items() )
         yield next_module
 
+def yield_dynamic_descriptor_descendents(descriptor, module_creator):
+    """
+    This returns all of the descendants of a descriptor. If the descriptor
+    has dynamic children, the module will be created using module_creator
+    and the children (as descriptors) of that module will be returned.
+    """
+    def get_dynamic_descriptor_children(descriptor):
+        if descriptor.has_dynamic_children():
+            module = module_creator(descriptor)
+            children_locations = module.get_children_locations()
+            return [descriptor.system.load_item(child_location) for child_location in child_locations ]
+        else:
+            return descriptor.get_children()
+    
+    
+    stack = get_dynamic_descriptor_children(descriptor)
+    stack.reverse()
+
+    while len(stack) > 0:
+        next_descriptor = stack.pop()
+        stack.extend( get_dynamic_descriptor_children(next_descriptor) )
+        yield next_descriptor
+    
+
 def yield_problems(request, course, student):
     """
     Return an iterator over capa_modules that this student has
@@ -128,7 +152,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
             section_name = section_descriptor.metadata.get('display_name')
 
             should_grade_section = False
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
+            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%            
             for moduledescriptor in section['xmoduledescriptors']:
                 if student_module_cache.lookup(
                         course.id, moduledescriptor.category, moduledescriptor.location.url()):
@@ -137,23 +161,16 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
             if should_grade_section:
                 scores = []
-                # TODO: We need the request to pass into here. If we could forgo that, our arguments
-                # would be simpler
-                section_module = get_module(student, request,
-                                            section_descriptor.location, student_module_cache,
-                                            course.id)
-                if section_module is None:
-                    # student doesn't have access to this module, or something else
-                    # went wrong.
-                    continue
                 
-                #TODO: This won't get all problems, will it? They could be hidden in a sub-child. What is a better
-                # way of getting all of the children as descriptors?
-                module_locations = section_module.definition.get('children', [])
-                for module_location in module_locations:
-                    module_descriptor = section_module.descriptor.system.load_item(module_location)
-                    
-                    (correct, total) = get_score(course.id, student, module_descriptor, section_module.system, student_module_cache)
+                def create_module(descriptor):
+                    # TODO: We need the request to pass into here. If we could forgo that, our arguments
+                    # would be simpler
+                    return get_module(student, request, descriptor.location, 
+                                        student_module_cache, course.id)
+                                
+                for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):       
+                                 
+                    (correct, total) = get_score(course.id, student, module_descriptor, create_module, student_module_cache)
                     if correct is None and total is None:
                         continue
 
@@ -277,7 +294,8 @@ def progress_summary(student, request, course, grader, student_module_cache):
                 module_descriptor = course.system.load_item(module_location)
                 
                 course_id = course.id
-                (correct, total) = get_score(course_id, student, module_descriptor, section_module.system, student_module_cache)
+                module_creator = lambda decriptor : section_module.system.get_module(descriptor.location)
+                (correct, total) = get_score(course_id, student, module_descriptor, module_creator, student_module_cache)
                 if correct is None and total is None:
                     continue
 
@@ -306,7 +324,7 @@ def progress_summary(student, request, course, grader, student_module_cache):
     return chapters
 
 
-def get_score(course_id, user, problem_descriptor, xmodule_system, student_module_cache):
+def get_score(course_id, user, problem_descriptor, module_creator, student_module_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
 
@@ -326,7 +344,7 @@ def get_score(course_id, user, problem_descriptor, xmodule_system, student_modul
     if not instance_module:
         # If the problem was not in the cache, we need to instantiate the problem.
         # Otherwise, the max score (cached in instance_module) won't be available 
-        problem = xmodule_system.get_module(problem_descriptor.location)
+        problem = module_creator(problem_descriptor)
         instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
     # If this problem is ungraded/ungradable, bail
