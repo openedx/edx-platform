@@ -347,7 +347,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
     # If this problem is ungraded/ungradable, bail
-    if instance_module.max_grade is None:
+    if not instance_module or instance_module.max_grade is None:
         return (None, None)
 
     correct = instance_module.grade if instance_module.grade is not None else 0
