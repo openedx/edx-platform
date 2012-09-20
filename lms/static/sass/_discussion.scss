@@ -1018,6 +1018,7 @@ body.discussion {
         text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
       }
+
     }
   }
 
@@ -1204,12 +1205,13 @@ body.discussion {
         background-position: 0 -5px;
       }
 
-      &.new {
-       @include linear-gradient(top, #84d7fe, #99e0fe);
+      &.unread {
+        @include linear-gradient(top, #84d7fe, #60a8d6);
         color: #333;
 
         &:after {
           color: #99e0fe;
+          background-position: 0 0px;
         }
       }
     }
