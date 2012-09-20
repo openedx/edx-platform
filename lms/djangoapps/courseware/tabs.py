@@ -235,12 +235,14 @@ def get_default_tabs(user, course, active_page):
 
     return tabs
 
-def get_static_tab_by_slug(tabs, tab_slug):
+def get_static_tab_by_slug(course, tab_slug):
     """
     Look for a tab with type 'static_tab' and the specified 'tab_slug'.  Returns
     the tab (a config dict), or None if not found.
     """
-    for tab in tabs:
+    if course.tabs is None:
+        return None
+    for tab in course.tabs:
         # if the tab is misconfigured, this will blow up.  The validation code should check...
         if tab['type'] == 'static_tab' and tab['url_slug'] == tab_slug:
             return tab
