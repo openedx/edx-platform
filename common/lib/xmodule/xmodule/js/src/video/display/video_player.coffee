@@ -45,6 +45,7 @@ class @VideoPlayer extends Subview
       events:
         onReady: @onReady
         onStateChange: @onStateChange
+    @caption.hideCaptions(@['video'].hide_captions)
 
   addToolTip: ->
     @$('.add-fullscreen, .hide-subtitles').qtip

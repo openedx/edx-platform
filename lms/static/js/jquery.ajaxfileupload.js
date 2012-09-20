@@ -79,7 +79,7 @@ jQuery.extend({
             try {				
 				if(io.contentWindow){
 					 xml.responseText = io.contentWindow.document.body ? 
-                        io.contentWindow.document.body.innerText : null;
+                      io.contentWindow.document.body.textContent || io.contentWindow.document.body.innerText : null;
                 	 xml.responseXML = io.contentWindow.document.XMLDocument ? 
                         io.contentWindow.document.XMLDocument : io.contentWindow.document;
 					 

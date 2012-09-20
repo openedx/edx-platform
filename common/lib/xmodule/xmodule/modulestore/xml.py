@@ -414,7 +414,6 @@ class XMLModuleStore(ModuleStoreBase):
             policy_str = self.read_grading_policy(paths, tracker)
             course_descriptor.set_grading_policy(policy_str)
 
-
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 

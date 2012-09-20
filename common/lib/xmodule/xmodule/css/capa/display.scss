@@ -36,8 +36,35 @@ section.problem {
   }
 
   .choicegroup {
+    @include clearfix;
+
     label.choicegroup_correct:after {
       content: url('../images/correct-icon.png');
+    }
+
+    > span {
+      padding-right: 20px;
+      float: left;
+      background-position: 0 0  !important;
+    }
+
+    fieldset {
+      @include box-sizing(border-box);
+      float: left;
+      border-left: 1px solid #ddd;
+      padding-left: 20px;
+      margin: 20px 0;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      float: left;
+      margin: 4px 8px 0 0;
+    }
+
+    text {
+      display: block;
+      margin-left: 25px;
     }
   }
 
@@ -48,6 +75,23 @@ section.problem {
         display: block;
         height: 0;
         visibility: hidden;
+      }
+    }
+  }
+
+  .solution-span {
+    > span {
+      margin: 20px 0;
+      display: block;
+      border: 1px solid #ddd;
+      padding: 9px 15px 20px;
+      background: #FFF;
+      position: relative;
+      @include box-shadow(inset 0 0 0 1px #eee);
+      @include border-radius(3px);
+
+      &:empty {
+        display: none;
       }
     }
   }
@@ -432,18 +476,23 @@ section.problem {
     input.save {
       @extend .blue-button;
     }
+
+    .submission_feedback {
+      // background: #F3F3F3;
+      // border: 1px solid #ddd;
+      // @include border-radius(3px);
+      // padding: 8px 12px;
+      // margin-top: 10px;
+      @include inline-block;
+      font-style: italic;
+      margin: 8px 0 0 10px;
+      color: #777;
+      -webkit-font-smoothing: antialiased;
+    }
   }
 
   .detailed-solution {
-    border: 1px solid #ddd;
-    padding: 9px 15px 20px;
-    margin-bottom: 10px;
-    background: #FFF;
-    position: relative;
-    @include box-shadow(inset 0 0 0 1px #eee);
-    @include border-radius(3px);
-
-    p:first-child {
+    > p:first-child {
       font-size: 0.9em;
       font-weight: bold;
       font-style: normal;
@@ -463,6 +512,22 @@ section.problem {
     background: #FFFCDD;
     font-size: 0.9em;
     margin-top: 10px;
+  }
+
+  div.capa_reset {
+    padding: 25px;
+    border: 1px solid $error-red;
+    background-color: lighten($error-red, 25%);
+    border-radius: 3px;
+    font-size: 1em;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .capa_reset>h2 {
+    color: #AA0000;
+  }
+  .capa_reset li {
+    font-size: 0.9em;
   }
 
   .hints {

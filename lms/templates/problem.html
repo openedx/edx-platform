@@ -13,7 +13,7 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }">
 
     % if check_button:
-    <input class="check" type="button" value="${ check_button }">
+    <input class="check ${ check_button }" type="button" value="${ check_button }">
     % endif
     % if reset_button:
     <input class="reset" type="button" value="Reset">
@@ -26,7 +26,7 @@
     % endif
     % if attempts_allowed :
     <section class="submission_feedback">
-    You have used ${ attempts_used } of ${ attempts_allowed } submissions
+      You have used ${ attempts_used } of ${ attempts_allowed } submissions
     </section>
     % endif
   </section>

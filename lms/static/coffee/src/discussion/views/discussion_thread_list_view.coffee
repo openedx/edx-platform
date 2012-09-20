@@ -9,6 +9,7 @@ if Backbone?
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .post-list .list-item a": "threadSelected"
       "click .post-list .more-pages a": "loadMorePages"
+      'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
@@ -129,6 +130,8 @@ if Backbone?
         content.addClass("followed")
       if thread.get('endorsed')
         content.addClass("resolved")
+      if thread.get('read')
+        content.addClass("read")
       @highlight(content)
 
 
@@ -244,7 +247,8 @@ if Backbone?
         item = $(event.target).closest('li')
         if item.find("span.board-name").data("discussion_id") == "#all"
           @discussionIds = ""
-          @clearSearch()
+          @$(".post-search-field").val("")
+          @retrieveAllThreads()
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           @retrieveDiscussions(discussionIds)
@@ -268,6 +272,18 @@ if Backbone?
       url = DiscussionUtil.urlFor("search")
       DiscussionUtil.safeAjax
         data: { 'commentable_ids': @discussionIds }
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          @collection.current_page = response.page
+          @collection.pages = response.num_pages
+          @collection.reset(response.discussion_data)
+          Content.loadContentInfos(response.content_info)
+          @displayedCollection.reset(@collection.models)
+
+    retrieveAllThreads: () ->
+      url = DiscussionUtil.urlFor("threads")
+      DiscussionUtil.safeAjax
         url: url
         type: "GET"
         success: (response, textStatus) =>

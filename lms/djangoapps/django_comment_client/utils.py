@@ -189,7 +189,7 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
-    default_topics = {'General': course.location.html_id()}
+    default_topics = {'General': {'id' :course.location.html_id()}}
     discussion_topics = course.metadata.get('discussion_topics', default_topics)
     for topic, entry in discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
@@ -336,7 +336,8 @@ def safe_content(content):
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
-        'courseware_title', 'courseware_url', 'tags'
+        'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
+        'read',
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

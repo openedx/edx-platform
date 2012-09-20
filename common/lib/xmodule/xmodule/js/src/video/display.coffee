@@ -11,6 +11,8 @@ class @Video
     @parseSpeed()
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
+    @hide_captions = $.cookie('hide_captions') == 'true'
+
     if YT.Player
       @embed()
     else

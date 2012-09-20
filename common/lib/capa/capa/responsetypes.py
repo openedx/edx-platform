@@ -1627,6 +1627,10 @@ class ImageResponse(LoncapaResponse):
         for aid in self.answer_ids:	 # loop through IDs of <imageinput> fields in our stanza
             given = student_answers[aid]	 # this should be a string of the form '[x,y]'
 
+            if not given: # No answer to parse. Mark as incorrect and move on
+                correct_map.set(aid, 'incorrect')
+                continue
+
             # parse expected answer
             # TODO: Compile regexp on file load
             m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]', expectedset[aid].strip().replace(' ', ''))
