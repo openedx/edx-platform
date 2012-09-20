@@ -16,6 +16,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from courseware.access import has_access
+from static_replace import replace_urls
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +78,11 @@ def _external_link(tab, user, course, active_page):
     # external links are never active
     return [CourseTab(tab['name'], tab['link'], False)]
 
+def _static_tab(tab, user, course, active_page):
+    link = reverse('static_tab', args=[course.id, tab['url_slug']])
+    active_str = 'static_tab_{0}'.format(tab['url_slug'])
+    return [CourseTab(tab['name'], link, active_page==active_str)]
+
 
 def _textbooks(tab, user, course, active_page):
     """
@@ -123,6 +129,7 @@ VALID_TAB_TYPES = {
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
+    'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     }
 
 
@@ -227,3 +234,33 @@ def get_default_tabs(user, course, active_page):
         tabs.append(CourseTab('Instructor', link, active_page=='instructor'))
 
     return tabs
+
+def get_static_tab_by_slug(tabs, tab_slug):
+    """
+    Look for a tab with type 'static_tab' and the specified 'tab_slug'.  Returns
+    the tab (a config dict), or None if not found.
+    """
+    for tab in tabs:
+        # if the tab is misconfigured, this will blow up.  The validation code should check...
+        if tab['type'] == 'static_tab' and tab['url_slug'] == tab_slug:
+            return tab
+
+    return None
+
+
+def get_static_tab_contents(course, tab):
+    """
+    Given a course and a static tab config dict, load the tab contents,
+    returning None if not found.
+
+    Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.
+    """
+    slug = tab['url_slug']
+    paths = ['tabs/{0}/{1}.html'.format(course.url_name, slug), 'tabs/{0}.html'.format(slug)]
+    fs = course.system.resources_fs
+    for p in paths:
+        if fs.exists(p):
+            with fs.open(p) as tabfile:
+                # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
+                contents = replace_urls(tabfile.read(), course.metadata['data_dir'])
+                return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
