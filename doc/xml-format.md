@@ -365,12 +365,15 @@ If you want to customize the courseware tabs displayed for your course, specify 
         {"type": "external_link", "name": "My Discussion", "link": "http://www.mydiscussion.org/blah"},
         {"type": "progress", "name": "Progress"},
         {"type": "wiki", "name": "Wonderwiki"},
+        {"type": "static_tab", "url_slug": "news", "name": "Exciting news"},
         {"type": "textbooks"}        # generates one tab per textbook, taking names from the textbook titles
     ]
 
 
 * If you specify any tabs, you must specify all tabs.  They will appear in the order given.
-* The first two tabs must have types "courseware" and "course_info", in that order.  Otherwise, we'll refuse to load the course.
+* The first two tabs must have types `"courseware"` and `"course_info"`, in that order.  Otherwise, we'll refuse to load the course.
+* for static tabs, the url_slug will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
+
 * An Instructor tab will be automatically added at the end for course staff users.
 
 ## Supported tab types:

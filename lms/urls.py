@@ -164,6 +164,10 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
+
+        # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>.*)$',
+            'courseware.views.static_tab', name="static_tab"),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
