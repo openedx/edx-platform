@@ -1,6 +1,7 @@
 from util.json_request import expect_json
 import json
 import logging
+import sys
 from collections import defaultdict
 
 from django.http import HttpResponse, Http404
@@ -12,6 +13,8 @@ from django.conf import settings
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import exc_info_to_str
 from github_sync import export_to_github
 from static_replace import replace_urls
 
@@ -288,7 +291,14 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     shared_state: A shared state string
     """
     system = preview_module_system(request, preview_id, descriptor)
-    module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    try:
+        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    except:
+        module = ErrorDescriptor.from_descriptor(
+            descriptor,
+            error_msg=exc_info_to_str(sys.exc_info())
+        ).xmodule_constructor(system)(None, None)
+
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, "xmodule_display.html"),
         module.metadata.get('data_dir', module.location.course)
