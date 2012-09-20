@@ -406,7 +406,6 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
-    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -550,6 +549,8 @@ PIPELINE_JS = {
         'output_filename': 'js/discussion.js'
     }
 }
+
+PIPELINE_DISABLE_WRAPPER = True
 
 # Compile all coffee files in course data directories if they are out of date.
 # TODO: Remove this once we move data into Mongo. This is only temporary while

@@ -1,3 +1,4 @@
+import cgi
 import datetime
 import dateutil
 import dateutil.parser
@@ -125,17 +126,17 @@ class CapaModule(XModule):
         self.name = only_one(dom2.xpath('/problem/@name'))
 
         if self.rerandomize == 'never':
-            seed = 1
+            self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            seed = system.id
+            self.seed = system.id
         else:
-            seed = None
+            self.seed = None
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=seed, system=self.system)
+                                      instance_state, seed=self.seed, system=self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -154,7 +155,7 @@ class CapaModule(XModule):
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    instance_state, seed=seed, system=self.system)
+                    instance_state, seed=self.seed, system=self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
@@ -172,6 +173,8 @@ class CapaModule(XModule):
             return "per_student"
         elif rerandomize == "never":
             return "never"
+        elif rerandomize == "onreset":
+            return "onreset"
         else:
             raise Exception("Invalid rerandomize attribute " + rerandomize)
 
@@ -214,9 +217,10 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
         except Exception, err:
+            log.exception(err)
+
             # TODO (vshnayder): another switch on DEBUG.
             if self.system.DEBUG:
-                log.exception(err)
                 msg = (
                     '[courseware.capa.capa_module] <font size="+1" color="red">'
                     'Failed to generate HTML for problem %s</font>' %
@@ -225,7 +229,47 @@ class CapaModule(XModule):
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
             else:
-                raise
+                # We're in non-debug mode, and possibly even in production. We want
+                #   to avoid bricking of problem as much as possible
+
+                # Presumably, student submission has corrupted LoncapaProblem HTML.
+                #   First, pull down all student answers
+                student_answers = self.lcp.student_answers
+                answer_ids = student_answers.keys()
+
+                # Some inputtypes, such as dynamath, have additional "hidden" state that
+                #   is not exposed to the student. Keep those hidden
+                # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
+                hidden_state_keywords = ['dynamath']
+                for answer_id in answer_ids:
+                    for hidden_state_keyword in hidden_state_keywords:
+                        if answer_id.find(hidden_state_keyword) >= 0:
+                            student_answers.pop(answer_id)
+
+                #   Next, generate a fresh LoncapaProblem
+                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                               state=None, # Tabula rasa
+                               seed=self.seed, system=self.system)
+
+                # Prepend a scary warning to the student
+                warning  = '<div class="capa_reset">'\
+                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                           'The problem\'s state was corrupted by an invalid submission. ' \
+                           'The submission consisted of:'\
+                           '<ul>'
+                for student_answer in student_answers.values():
+                    if student_answer != '':
+                        warning += '<li>' + cgi.escape(student_answer) + '</li>'
+                warning += '</ul>'\
+                           'If this error persists, please contact the course staff.'\
+                           '</div>'
+
+                html = warning
+                try:
+                    html += self.lcp.get_html()
+                except Exception, err: # Couldn't do it. Give up
+                    log.exception(err)
+                    raise
 
         content = {'name': self.display_name,
                    'html': html,
@@ -259,7 +303,7 @@ class CapaModule(XModule):
             save_button = False
 
         # Only show the reset button if pressing it will show different values
-        if self.rerandomize != 'always':
+        if self.rerandomize not in ["always", "onreset"]:
             reset_button = False
 
         # User hasn't submitted an answer yet -- we don't want resets
@@ -569,7 +613,7 @@ class CapaModule(XModule):
             return "Refresh the page and make an attempt before resetting."
 
         self.lcp.do_reset()
-        if self.rerandomize == "always":
+        if self.rerandomize in ["always", "onreset"]:
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None

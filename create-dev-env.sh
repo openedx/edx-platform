@@ -105,7 +105,7 @@ NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
-APT_PKGS="curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript graphviz libgraphviz-dev"
+APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript graphviz graphviz-dev"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -223,7 +223,7 @@ EO
 
         command -v brew &>/dev/null || { 
             output "Installing brew"
-            /usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/master/Library/Contributions/install_homebrew.rb)" 
+            /usr/bin/ruby <(curl -fsSkL raw.github.com/mxcl/homebrew/go)
         } 
         command -v git &>/dev/null || {
             output "Installing git"

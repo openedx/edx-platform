@@ -86,7 +86,12 @@ def export_to_github(course, commit_message, author_str=None):
     If author_str is specified, uses it in the commit.
     '''
     course_dir = course.metadata.get('data_dir', course.location.course)
-    repo_settings = load_repo_settings(course_dir)
+    try:
+        repo_settings = load_repo_settings(course_dir)
+    except InvalidRepo:
+        log.warning("Invalid repo {0}, not exporting data to xml".format(course_dir))
+        return
+
     git_repo = setup_repo(repo_settings)
 
     fs = OSFS(git_repo.working_dir)

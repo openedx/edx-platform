@@ -1,9 +1,9 @@
 from fs.errors import ResourceNotFoundError
-import time
 import logging
-import requests
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
+import requests
+import time
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -21,10 +21,15 @@ class CourseDescriptor(SequenceDescriptor):
             self.title = title
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
-
-        @classmethod
-        def from_xml_object(cls, xml_object):
-            return cls(xml_object.get('title'), xml_object.get('book_url'))
+            self.start_page = int(self.table_of_contents[0].attrib['page'])
+            
+            # The last page should be the last element in the table of contents,
+            # but it may be nested. So recurse all the way down the last element
+            last_el = self.table_of_contents[-1]
+            while last_el.getchildren():
+                last_el = last_el[-1]
+            
+            self.end_page = int(last_el.attrib['page'])
 
         @property
         def table_of_contents(self):
@@ -57,10 +62,18 @@ class CourseDescriptor(SequenceDescriptor):
 
             return table_of_contents
 
-
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        self.textbooks = self.definition['data']['textbooks']
+
+        self.textbooks = []
+        for title, book_url in self.definition['data']['textbooks']:
+            try:
+                self.textbooks.append(self.Textbook(title, book_url))
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                continue
 
         self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
@@ -82,7 +95,6 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
-
     def set_grading_policy(self, policy_str):
         """Parse the policy specified in policy_str, and save it"""
         try:
@@ -94,19 +106,11 @@ class CourseDescriptor(SequenceDescriptor):
             # the error log.
             self._grading_policy = {}
 
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            try:
-                txt = cls.Textbook.from_xml_object(textbook)
-            except:
-                # If we can't get to S3 (e.g. on a train with no internet), don't break
-                # the rest of the courseware.
-                log.exception("Couldn't load textbook")
-                continue
-            textbooks.append(txt)
+            textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
         #Load the wiki tag if it exists
@@ -116,7 +120,7 @@ class CourseDescriptor(SequenceDescriptor):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
         definition.setdefault('data', {})['textbooks'] = textbooks
         definition['data']['wiki_slug'] = wiki_slug
@@ -133,6 +137,13 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+
+    @property
+    def tabs(self):
+        """
+        Return the tabs config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('tabs')
 
     @property
     def show_calculator(self):

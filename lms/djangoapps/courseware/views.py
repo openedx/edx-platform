@@ -22,6 +22,7 @@ from django.views.decorators.cache import cache_control
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
+import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
 from student.models import UserProfile
@@ -343,6 +344,30 @@ def course_info(request, course_id):
     return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
+@ensure_csrf_cookie
+def static_tab(request, course_id, tab_slug):
+    """
+    Display the courses tab with the given name.
+
+    Assumes the course_id is in a valid format.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    tab = tabs.get_static_tab_by_slug(course, tab_slug)
+    if tab is None:
+        raise Http404
+    
+    contents = tabs.get_static_tab_contents(course, tab)
+    if contents is None:
+        raise Http404
+
+    staff_access = has_access(request.user, course, 'staff')
+    return render_to_response('courseware/static_tab.html',
+                              {'course': course,
+                               'tab': tab,
+                               'tab_contents': contents,
+                               'staff_access': staff_access,})
+
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
 @ensure_csrf_cookie
 def syllabus(request, course_id):
@@ -356,6 +381,7 @@ def syllabus(request, course_id):
 
     return render_to_response('courseware/syllabus.html', {'course': course,
                                             'staff_access': staff_access,})
+
 
 def registered_for_course(course, user):
     '''Return CourseEnrollment if user is registered for course, else False'''
@@ -403,6 +429,9 @@ def university_profile(request, org_id):
                                         domain=request.META.get('HTTP_HOST'))[org_id]
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
+
+    if request.REQUEST.get('next', False):
+        context['show_login_immediately'] = True
 
     return render_to_response(template_file, context)
 

@@ -2,6 +2,7 @@ class CMS.Models.Module extends Backbone.Model
   url: '/save_item'
   defaults:
     data: ''
+    children: ''
 
   loadModule: (element) ->
     elt = $(element).find('.xmodule_edit').first()
@@ -11,5 +12,5 @@ class CMS.Models.Module extends Backbone.Model
     "/edit_item?#{$.param(id: @get('id'))}"
 
   save: (args...) ->
-    @set(data: JSON.stringify(@module.save())) if @module
+    @set(data: @module.save()) if @module
     super(args...)
