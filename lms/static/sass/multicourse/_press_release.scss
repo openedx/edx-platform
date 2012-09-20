@@ -18,13 +18,13 @@
       margin-bottom: 30px;
       text-align: center;
     }
-    
+
     li {
       color: $base-font-color;
       font: normal 1em/1.6em $serif;
       margin: 0px;
     }
-    
+
     li + li {
       margin-top: 20px;
     }
@@ -45,6 +45,25 @@
       }
     }
 
+    figure {
+      display: block;
+      float: right;
+      margin: 20px 0px 60px 20px;
+      width: 300px;
+
+      img {
+        width: 100%;
+      }
+
+      figcaption {
+        font: normal 0.8em/1em $serif;
+        padding: 5px;
+        a {
+          font: normal 1em $serif;
+        }
+      }
+    }
+
     p + h2 {
       margin-top: 60px;
     }
@@ -52,18 +71,19 @@
     h2 + p {
       margin-top: 30px;
     }
-    
+
     .contact {
       margin-top: 20px;
-      
+
       p + p {
-       margin-top: 0px; 
+       margin-top: 0px;
       }
     }
 
     h3.date {
       margin-bottom: 0;
     }
+
 
     div.social-sharing {
       @include clearfix;
