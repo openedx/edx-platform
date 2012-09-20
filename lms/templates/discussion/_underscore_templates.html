@@ -119,7 +119,7 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by 
+    <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
         ${"<% } else {print('anonymous');} %>"}
@@ -129,9 +129,9 @@
 
 <script type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
-        <span class="title">${"<%- title %>"}</span> 
+        <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
-            <span class="comments-count unread">${"<%- unread_comments_count %>"}</span>
+            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} unread comments">${"<%- comments_count %>"}</span>
         ${"<% } else { %>"}
             <span class="comments-count">${"<%- comments_count %>"}</span>
         ${"<% } %>"}
