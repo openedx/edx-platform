@@ -178,6 +178,7 @@ class CourseDescriptor(SequenceDescriptor):
             for s in c.get_children():
                 if s.metadata.get('graded', False):
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
+                    xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
