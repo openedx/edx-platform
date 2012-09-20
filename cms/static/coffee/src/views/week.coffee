@@ -8,6 +8,7 @@ class CMS.Views.Week extends Backbone.View
     CMS.on('content.hide', @setHeight)
 
   render: ->
+    @$el.load 'navigation'
     @setHeight()
     @$('.editable').inlineEdit()
     @$('.editable-textarea').inlineEdit(control: 'textarea')

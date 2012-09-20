@@ -18,6 +18,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
+from xmodule.course_module import CourseDescriptor
 from functools import partial
 from itertools import groupby
 from operator import attrgetter
@@ -74,20 +75,35 @@ def has_access(user, location):
 
 @login_required
 @ensure_csrf_cookie
-def course_index(request, org, course, name):
+def course_index(request, course_id):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
-    location = ['i4x', org, course, 'course', name]
+    location = CourseDescriptor.id_to_location(course_id)
+    if not has_access(request.user, location):
+        raise Http404  # TODO (vshnayder): better error
+
+    return render_to_response('course_index.html', {'course_id': course_id})
+
+
+@login_required
+def navigation(request, course_id):
+    """
+    Render the course navigation
+
+    org, course, name: Attributes of the Location for the course to edit
+    """
+    location = CourseDescriptor.id_to_location(course_id)
     if not has_access(request.user, location):
         raise Http404  # TODO (vshnayder): better error
 
     # TODO (cpennington): These need to be read in from the active user
     course = modulestore().get_item(location)
     weeks = course.get_children()
-    return render_to_response('course_index.html', {'weeks': weeks})
+    return render_to_response('widgets/navigation.html', {'weeks': weeks})
+
 
 
 @login_required

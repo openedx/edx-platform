@@ -4,6 +4,7 @@ class CMS.Views.Course extends Backbone.View
     CMS.on('content.hide', @hideContent)
 
   render: ->
+    @$el.find('.navigation').load("/#{@$el.data('course-id')}/navigation")
     @$('#weeks > li').each (index, week) =>
       new CMS.Views.Week(el: week, height: @maxWeekHeight()).render()
     return @
