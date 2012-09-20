@@ -34,10 +34,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
 
-    templates = [
-        Template('Empty', '', [])
-    ]
-
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
     @classmethod

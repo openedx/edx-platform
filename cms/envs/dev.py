@@ -14,7 +14,6 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             tracking_filename="tracking.log",
                             debug=True)
 
-
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
