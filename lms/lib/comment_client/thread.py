@@ -65,5 +65,16 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-        response = perform_request('get', url, {'recursive': kwargs.get('recursive'), 'user_id': kwargs.get('user_id'), 'mark_as_read': kwargs.get('mark_as_read', True)})
+
+        request_params = { 
+                            'recursive': kwargs.get('recursive'),
+                            'user_id': kwargs.get('user_id'),
+                            'mark_as_read': kwargs.get('mark_as_read', True),
+                         }
+
+        # user_id may be none, in which case it shouldn't be part of the
+        # request.
+        request_params = strip_none(request_params)
+
+        response = perform_request('get', url, request_params)
         self.update_attributes(**response)

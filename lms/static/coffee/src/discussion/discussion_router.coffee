@@ -28,7 +28,7 @@ if Backbone?
     showThread: (forum_name, thread_id) ->
       @thread = @discussion.get(thread_id)
       @thread.set("unread_comments_count", 0)
-      @thread.set("viewed", true)
+      @thread.set("read", true)
       @setActiveThread()
       if(@main)
         @main.cleanup()

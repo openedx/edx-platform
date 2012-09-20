@@ -1135,10 +1135,6 @@ body.discussion {
         background: url(../images/following-flag.png) no-repeat;
       }
 
-      &.viewed {
-        @include linear-gradient(top, white, #ddd);
-      }
-
       &.active {
         @include linear-gradient(top, #96e0fd, #61c7fc);
         border-color: #4697c1;
@@ -1209,12 +1205,13 @@ body.discussion {
         background-position: 0 -5px;
       }
 
-      &.new {
-       @include linear-gradient(top, #84d7fe, #99e0fe);
+      &.unread {
+        @include linear-gradient(top, #84d7fe, #60a8d6);
         color: #333;
 
         &:after {
           color: #99e0fe;
+          background-position: 0 0px;
         }
       }
     }
