@@ -131,7 +131,7 @@
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
-            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} unread comments">${"<%- comments_count %>"}</span>
+            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"}</span>
         ${"<% } else { %>"}
             <span class="comments-count">${"<%- comments_count %>"}</span>
         ${"<% } %>"}
