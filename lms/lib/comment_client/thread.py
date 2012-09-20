@@ -10,7 +10,7 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'unread'
+        'highlighted_body', 'endorsed', 'read'
     ]
 
     updatable_fields = [
@@ -60,7 +60,10 @@ class Thread(models.Model):
         else:
             return super(Thread, cls).url(action, params)
 
+    # TODO: This is currently overriding Model._retrieve only to add parameters
+    # for the request. Model._retrieve should be modified to handle this such
+    # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-        response = perform_request('get', url, {'recursive': kwargs.get('recursive'), 'user_id': kwargs.get('user_id')})
+        response = perform_request('get', url, {'recursive': kwargs.get('recursive'), 'user_id': kwargs.get('user_id'), 'mark_as_read': kwargs.get('mark_as_read', True)})
         self.update_attributes(**response)
