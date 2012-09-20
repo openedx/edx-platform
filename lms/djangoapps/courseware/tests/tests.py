@@ -754,13 +754,16 @@ class TestCourseGrader(PageLoader):
         
         # On the second homework, we only answer half of the questions.
         # Then it will be dropped when homework three becomes the higher percent
+        # This problem is also weighted to be 4 points (instead of default of 2)
+        # If the problem was unweighted the percent would have been 0.38 so we 
+        # know it works.
         self.submit_question_answer('H2P1', ['Correct', 'Correct'])
-        self.check_grade_percent(0.38)
+        self.check_grade_percent(0.42)
         
         
         # Third homework
         self.submit_question_answer('H3P1', ['Correct', 'Correct'])
-        self.check_grade_percent(0.38) # Score didn't change
+        self.check_grade_percent(0.42) # Score didn't change
         
         self.submit_question_answer('H3P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.5) # Now homework2 dropped. Score changes

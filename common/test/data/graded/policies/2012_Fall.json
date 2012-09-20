@@ -19,7 +19,11 @@
         "graded": true, 
         "format": "Homework"
     },
-	
+    
+    "problem/H2P1": {
+        "weight": 4
+    },
+    
     "videosequence/Homework3": {
         "display_name": "Homework 3", 
         "graded": true, 
