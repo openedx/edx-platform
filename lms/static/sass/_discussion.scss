@@ -1110,9 +1110,13 @@ body.discussion {
         color: #333;
       }
 
-      &.read .title {
-        font-weight: 400;
-        color: #737373;
+      &.read {
+        background: #f2f2f2;
+
+        .title {
+          font-weight: 400;
+          color: #737373;
+        }
       }
 
       &.resolved:before {
