@@ -128,5 +128,13 @@
 </script>
 
 <script type="text/template" id="thread-list-item-template">
-    <a href="${'<%- id %>'}" data-id="${'<%- id %>'}"><span class="title">${"<%- title %>"}</span> <span class="comments-count">${"<%- comments_count %>"}</span><span class="votes-count">+${"<%- votes['up_count'] %>"}</span></a>
+    <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
+        <span class="title">${"<%- title %>"}</span> 
+        ${"<% if (unread_comments_count > 0) { %>"}
+            <span class="comments-count unread">${"<%- unread_comments_count %>"}</span>
+        ${"<% } else { %>"}
+            <span class="comments-count">${"<%- comments_count %>"}</span>
+        ${"<% } %>"}
+        <span class="votes-count">+${"<%- votes['up_count'] %>"}</span>
+    </a>
 </script>

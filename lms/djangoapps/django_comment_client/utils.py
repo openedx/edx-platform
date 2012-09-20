@@ -336,7 +336,8 @@ def safe_content(content):
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
-        'courseware_title', 'courseware_url', 'tags'
+        'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
+        'read',
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
