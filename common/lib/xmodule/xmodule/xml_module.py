@@ -269,7 +269,11 @@ class XmlDescriptor(XModuleDescriptor):
         if is_pointer_tag(xml_object):
             # new style:
             # read the actual definition file--named using url_name.replace(':','/')
-            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
+            filename = xml_object.get('filename')
+            if filename:
+                filepath = cls._format_filepath(xml_object.tag, filename)
+            else:
+                filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
             definition_xml = xml_object	# this is just a pointer, not the real definition content
