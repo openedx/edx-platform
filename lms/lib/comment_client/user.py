@@ -2,7 +2,6 @@ from utils import *
 
 import models
 import settings
-import json
 
 class User(models.Model):
 
