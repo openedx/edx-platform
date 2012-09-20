@@ -1,6 +1,8 @@
 import logging
 import pkg_resources
 import sys
+import json
+import os
 
 from fs.errors import ResourceNotFoundError
 from functools import partial
@@ -8,6 +10,7 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 from pprint import pprint
 from collections import namedtuple
+from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
@@ -326,10 +329,41 @@ def policy_key(location):
     return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
-Template = namedtuple("Template", "name data children")
+Template = namedtuple("Template", "metadata data children")
 
 
-class XModuleDescriptor(Plugin, HTMLSnippet):
+
+
+class ResourceTemplates(object):
+    @classmethod
+    def templates(cls):
+        """
+        Returns a list of Template objects that describe possible templates that can be used
+        to create a module of this type.
+        If no templates are provided, there will be no way to create a module of
+        this type
+
+        Expects a class attribute template_dir_name that defines the directory
+        inside the 'templates' resource directory to pull templates from
+        """
+        templates = []
+        dirname = os.path.join('templates', cls.template_dir_name)
+        if not resource_isdir(__name__, dirname):
+            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                dir=dirname,
+                cls_name=cls.__name__,
+            ))
+            return []
+
+        for template_file in resource_listdir(__name__, dirname):
+            template_content = resource_string(__name__, os.path.join(dirname, template_file))
+            template = json.loads(template_content)
+            templates.append(Template(**template))
+
+        return templates
+
+
+class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
@@ -369,10 +403,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     equality_attributes = ('definition', 'metadata', 'location',
                            'shared_state_key', '_inherited_metadata')
 
-    # A list of Template objects that describe possible templates that can be used
-    # to create a module of this type.
-    # If no templates are provided, there will be no way to create a module of this type
-    templates = []
+    # Name of resource directory to load templates from
+    template_dir_name = "default"
 
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,

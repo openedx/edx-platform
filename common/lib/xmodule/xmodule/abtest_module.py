@@ -62,6 +62,8 @@ class ABTestModule(XModule):
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
+#    template_dir_name = "abtest"
+
     def __init__(self, system, definition=None, **kwargs):
         """
         definition is a dictionary with the following layout:
