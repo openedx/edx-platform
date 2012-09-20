@@ -35,15 +35,15 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
+            print "descriptor has dynamic children" , descriptor.location
             module = module_creator(descriptor)
-            children_locations = module.get_children_locations()
+            child_locations = module.get_children_locations()
             return [descriptor.system.load_item(child_location) for child_location in child_locations ]
         else:
             return descriptor.get_children()
     
     
-    stack = get_dynamic_descriptor_children(descriptor)
-    stack.reverse()
+    stack = [descriptor]
 
     while len(stack) > 0:
         next_descriptor = stack.pop()
@@ -152,7 +152,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
             section_name = section_descriptor.metadata.get('display_name')
 
             should_grade_section = False
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%            
+            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%  
             for moduledescriptor in section['xmoduledescriptors']:
                 if student_module_cache.lookup(
                         course.id, moduledescriptor.category, moduledescriptor.location.url()):
@@ -168,8 +168,8 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                     return get_module(student, request, descriptor.location, 
                                         student_module_cache, course.id)
                                 
-                for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):       
-                                 
+                for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
+                                                     
                     (correct, total) = get_score(course.id, student, module_descriptor, create_module, student_module_cache)
                     if correct is None and total is None:
                         continue
@@ -289,12 +289,11 @@ def progress_summary(student, request, course, grader, student_module_cache):
             graded = section_module.metadata.get('graded', False)
             scores = []
             
-            module_locations = section_module.definition.get('children', [])
-            for module_location in module_locations:
-                module_descriptor = course.system.load_item(module_location)
+            module_creator = lambda descriptor : section_module.system.get_module(descriptor.location)
+            
+            for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
                 
                 course_id = course.id
-                module_creator = lambda decriptor : section_module.system.get_module(descriptor.location)
                 (correct, total) = get_score(course_id, student, module_descriptor, module_creator, student_module_cache)
                 if correct is None and total is None:
                     continue
