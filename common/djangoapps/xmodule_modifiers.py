@@ -35,7 +35,7 @@ def wrap_xmodule(get_html, module, template):
     return _get_html
 
 
-def replace_course_urls(get_html, course_id, module):
+def replace_course_urls(get_html, course_id):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /course/...
@@ -46,7 +46,7 @@ def replace_course_urls(get_html, course_id, module):
         return replace_urls(get_html(), staticfiles_prefix='/courses/'+course_id, replace_prefix='/course/')
     return _get_html
 
-def replace_static_urls(get_html, prefix, module):
+def replace_static_urls(get_html, prefix):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
