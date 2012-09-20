@@ -243,7 +243,7 @@ def get_static_tab_by_slug(course, tab_slug):
     if course.tabs is None:
         return None
     for tab in course.tabs:
-        # if the tab is misconfigured, this will blow up.  The validation code should check...
+        # The validation code checks that these exist.
         if tab['type'] == 'static_tab' and tab['url_slug'] == tab_slug:
             return tab
 
@@ -258,11 +258,17 @@ def get_static_tab_contents(course, tab):
     Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.
     """
     slug = tab['url_slug']
-    paths = ['tabs/{0}/{1}.html'.format(course.url_name, slug), 'tabs/{0}.html'.format(slug)]
+    paths = ['tabs/{0}/{1}.html'.format(course.url_name, slug),
+             'tabs/{0}.html'.format(slug)]
     fs = course.system.resources_fs
     for p in paths:
         if fs.exists(p):
-            with fs.open(p) as tabfile:
-                # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
-                contents = replace_urls(tabfile.read(), course.metadata['data_dir'])
-                return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
+            try:
+                with fs.open(p) as tabfile:
+                    # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
+                    contents = replace_urls(tabfile.read(), course.metadata['data_dir'])
+                    return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
+            except (ResourceNotFoundError) as err:
+                log.warning("Couldn't load tab contents from '{0}': {1}".format(p, err))
+                return None
+    return None
