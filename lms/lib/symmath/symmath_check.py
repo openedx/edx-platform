@@ -175,6 +175,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     do_matrix = 'matrix' in (options or '')
     do_qubit = 'qubit' in (options or '')
     do_imaginary = 'imaginary' in (options or '')
+    do_numerical = 'numerical' in (options or '')
 
     # parse expected answer
     try:
@@ -194,6 +195,13 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             return {'ok': True, 'msg': msg}
         else:
             msg += '<p>You entered: %s</p>' % to_latex(fans)
+            return {'ok': False, 'msg': msg}
+
+    if do_numerical:		# numerical answer expected - force numerical comparison
+        if abs(abs(fans - fexpect) / fexpect) < threshold:
+            return {'ok': True, 'msg': msg}
+        else:
+            msg += '<p>You entered: %s (note that a numerical answer is expected)</p>' % to_latex(fans)
             return {'ok': False, 'msg': msg}
 
     if fexpect == fans:
