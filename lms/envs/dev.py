@@ -156,6 +156,9 @@ DEBUG_TOOLBAR_PANELS = (
 #  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}
 ############################ FILE UPLOADS (ASKBOT) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
