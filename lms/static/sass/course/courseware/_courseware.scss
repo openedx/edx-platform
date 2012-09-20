@@ -52,6 +52,14 @@ div.course-wrapper {
         margin-bottom: 15px;
         padding: 0 0 15px;
 
+        .collapsible {
+          header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            font-size: 16px;
+          }
+        }
+
         header {
           @extend h1.top-header;
           @include border-radius(0 4px 0 0);
