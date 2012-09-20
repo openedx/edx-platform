@@ -269,6 +269,6 @@ def get_static_tab_contents(course, tab):
                     contents = replace_urls(tabfile.read(), course.metadata['data_dir'])
                     return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
             except (ResourceNotFoundError) as err:
-                log.warning("Couldn't load tab contents from '{0}': {1}".format(p, err))
+                log.exception("Couldn't load tab contents from '{0}': {1}".format(p, err))
                 return None
     return None
