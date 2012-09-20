@@ -35,7 +35,6 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     """
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
-            print "descriptor has dynamic children" , descriptor.location
             module = module_creator(descriptor)
             child_locations = module.get_children_locations()
             return [descriptor.system.load_item(child_location) for child_location in child_locations ]
@@ -238,7 +237,7 @@ def grade_for_percentage(grade_cutoffs, percentage):
 # TODO: This method is not very good. It was written in the old course style and
 # then converted over and performance is not good. Once the progress page is redesigned
 # to not have the progress summary this method should be deleted (so it won't be copied).
-def progress_summary(student, request, course, grader, student_module_cache):
+def progress_summary(student, request, course, student_module_cache):
     """
     This pulls a summary of all problems in the course.
 
