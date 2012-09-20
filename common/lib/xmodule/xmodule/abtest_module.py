@@ -50,6 +50,11 @@ class ABTestModule(XModule):
     
     def get_children_locations(self):
         return self.definition['data']['group_content'][self.group]
+        
+    def displayable_items(self):
+        # Most modules return "self" as the displayable_item. We never display ourself
+        # (which is why we don't implement get_html). We only display our children.
+        return self.get_children()
 
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being
