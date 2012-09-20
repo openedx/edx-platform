@@ -247,7 +247,7 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, "xmodule_display.html"),
-        module.metadata['data_dir'], module
+        module.metadata['data_dir']
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
