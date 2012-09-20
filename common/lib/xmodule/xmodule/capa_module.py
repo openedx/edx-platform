@@ -124,12 +124,6 @@ class CapaModule(XModule):
 
         self.name = only_one(dom2.xpath('/problem/@name'))
 
-        weight_string = only_one(dom2.xpath('/problem/@weight'))
-        if weight_string:
-            self.weight = float(weight_string)
-        else:
-            self.weight = None
-
         if self.rerandomize == 'never':
             seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
@@ -235,7 +229,7 @@ class CapaModule(XModule):
 
         content = {'name': self.display_name,
                    'html': html,
-                   'weight': self.weight,
+                   'weight': self.descriptor.weight,
                    }
 
         # We using strings as truthy values, because the terminology of the
@@ -615,3 +609,12 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+        
+    def __init__(self, *args, **kwargs):
+        super(CapaDescriptor, self).__init__(*args, **kwargs)
+        
+        weight_string = self.metadata.get('weight', None)
+        if weight_string:
+            self.weight = float(weight_string)
+        else:
+            self.weight = None
