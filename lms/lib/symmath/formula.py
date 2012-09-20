@@ -409,8 +409,7 @@ class formula(object):
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:
-                    if usym == 'i': print "options=", self.options
-                    if usym == 'i' and 'imaginary' in self.options:	 # i = sqrt(-1)
+                    if usym == 'i' and self.options is not None and 'imaginary' in self.options:	 # i = sqrt(-1)
                         sym = sympy.I
                     else:
                         sym = sympy.Symbol(str(usym))
