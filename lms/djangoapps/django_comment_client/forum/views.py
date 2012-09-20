@@ -105,7 +105,7 @@ def inline_discussion(request, course_id, discussion_id):
     })
 
 @login_required
-def forum_form_discussion(request, course_id):
+def forum_index(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
@@ -223,7 +223,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        
+
         def infogetter(thread):
             return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 

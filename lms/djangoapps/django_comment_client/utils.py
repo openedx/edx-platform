@@ -282,7 +282,7 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
 
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 def url_for_tags(course_id, tags):
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
+    return reverse('django_comment_client.forum.views.forum_index', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
@@ -304,7 +304,7 @@ def extend_content(content):
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except user.DoesNotExist:
             logging.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
-        
+
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
@@ -323,9 +323,9 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
         (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
-        url = reverse('courseware_position', kwargs={"course_id":course_id, 
-                                                     "chapter":chapter, 
-                                                     "section":section, 
+        url = reverse('courseware_position', kwargs={"course_id":course_id,
+                                                     "chapter":chapter,
+                                                     "section":section,
                                                      "position":position})
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info

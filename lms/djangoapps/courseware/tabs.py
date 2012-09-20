@@ -69,7 +69,7 @@ def _discussion(tab, user, course, active_page):
     This tab format only supports the new Berkeley discussion forums.
     """
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
+        link = reverse('django_comment_client.forum.views.forum_index',
                               args=[course.id])
         return [CourseTab(tab['name'], link, active_page=='discussion')]
     return []
@@ -217,7 +217,7 @@ def get_default_tabs(user, course, active_page):
     if course.discussion_link:
         tabs.append(CourseTab('Discussion', course.discussion_link, active_page == 'discussion'))
     elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
-        link = reverse('django_comment_client.forum.views.forum_form_discussion',
+        link = reverse('django_comment_client.forum.views.forum_index',
                               args=[course.id])
         tabs.append(CourseTab('Discussion', link, active_page == 'discussion'))
     elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
