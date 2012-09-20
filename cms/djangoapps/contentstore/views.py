@@ -106,6 +106,16 @@ def edit_item(request):
     item = modulestore().get_item(item_location)
     item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
 
+    if settings.LMS_BASE is not None:
+        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=settings.LMS_BASE,
+            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+            course_id=[course.id for course in modulestore().get_courses() if course.location.org == item.location.org and course.location.course == item.location.course][0],
+            location=item.location,
+        )
+    else:
+        lms_link = None
+
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name,
@@ -114,12 +124,7 @@ def edit_item(request):
         'previews': get_module_previews(request, item),
         'metadata': item.metadata,
         # TODO: It would be nice to able to use reverse here in some form, but we don't have the lms urls imported
-        'lms_link': "{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id=[course.id for course in modulestore().get_courses() if course.location.org == item.location.org and course.location.course == item.location.course][0],
-            location=item.location,
-        )
+        'lms_link': lms_link,
     })
 
 
