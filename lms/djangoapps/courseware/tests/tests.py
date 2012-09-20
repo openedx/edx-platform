@@ -10,8 +10,9 @@ from pprint import pprint
 from urlparse import urlsplit, urlunsplit
 
 from django.contrib.auth.models import User, Group
+from django.core.handlers.wsgi import WSGIRequest
 from django.test import TestCase
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch, Mock
@@ -20,7 +21,9 @@ from override_settings import override_settings
 import xmodule.modulestore.django
 
 # Need access to internal func to put users in the right group
+from courseware import grades
 from courseware.access import _course_staff_group_name
+from courseware.models import StudentModuleCache
 
 from student.models import Registration
 from xmodule.modulestore.django import modulestore
@@ -640,3 +643,130 @@ class RealCoursesLoadTestCase(PageLoader):
 
 
     # ========= TODO: check ajax interaction here too?
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestCourseGrader(PageLoader):
+    """Check that a course gets graded properly"""
+
+    # NOTE: setUpClass() runs before override_settings takes effect, so
+    # can't do imports there without manually hacking settings.
+
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+        courses = modulestore().get_courses()
+
+        def find_course(course_id):
+            """Assumes the course is present"""
+            return [c for c in courses if c.id==course_id][0]
+
+        self.graded_course = find_course("edX/graded/2012_Fall")
+        
+        # create a test student
+        self.student = 'view@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.activate_user(self.student)
+        self.enroll(self.graded_course)
+        
+        self.student_user = user(self.student)
+        
+        self.factory = RequestFactory()
+    
+    def check_grade_percent(self, percent):
+        
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            self.graded_course.id, self.student_user, self.graded_course)
+        
+        fake_request = self.factory.get(reverse('progress',
+                                       kwargs={'course_id': self.graded_course.id}))
+        
+        grade_summary = grades.grade(self.student_user, fake_request, 
+                                self.graded_course, student_module_cache)
+        self.assertEqual(grade_summary['percent'], percent)
+    
+    def submit_question_answer(self, problem_url_name, responses):
+        """
+        The field names of a problem are hard to determine. This method only works
+        for the problems used in the edX/graded course, which has fields named in the
+        following form:
+        input_i4x-edX-graded-problem-H1P3_2_1
+        input_i4x-edX-graded-problem-H1P3_2_2
+        """
+        
+        
+        problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
+        
+        modx_url = reverse('modx_dispatch', 
+                            kwargs={
+                                'course_id' : self.graded_course.id,
+                                'location' : problem_location,
+                                'dispatch' : 'problem_check', }
+                          )
+        
+        resp = self.client.post(modx_url, {
+            'input_i4x-edX-graded-problem-{0}_2_1'.format(problem_url_name): responses[0],
+            'input_i4x-edX-graded-problem-{0}_2_2'.format(problem_url_name): responses[1],
+            })
+        print "modx_url" , modx_url, "responses" , responses
+        print "resp" , resp
+        
+        return resp
+    
+    def reset_question_answer(self, problem_url_name):
+        problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
+        
+        modx_url = reverse('modx_dispatch', 
+                            kwargs={
+                                'course_id' : self.graded_course.id,
+                                'location' : problem_location,
+                                'dispatch' : 'problem_reset', }
+                          )
+        
+        resp = self.client.post(modx_url)
+        return resp
+        
+     
+    def test_get_graded(self):
+        #### Check that the grader shows we have 0% in the course
+        self.check_grade_percent(0)
+        
+        
+        #### Submit the answers to a few problems as ajax calls
+        
+        # Only get half of the first problem correct
+        self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
+        self.check_grade_percent(0.06)
+        
+        # Get both parts of the first problem correct
+        self.reset_question_answer('H1P1')
+        self.submit_question_answer('H1P1', ['Correct', 'Correct'])
+        self.check_grade_percent(0.13)
+        
+        # This problem is shown in an ABTest
+        self.submit_question_answer('H1P2', ['Correct', 'Correct'])
+        self.check_grade_percent(0.25)
+        
+        # This problem is hidden in an ABTest. Getting it correct doesn't change total grade
+        self.submit_question_answer('H1P3', ['Correct', 'Correct'])
+        self.check_grade_percent(0.25)
+        
+        
+        # On the second homework, we only answer half of the questions.
+        # Then it will be dropped when homework three becomes the higher percent
+        self.submit_question_answer('H2P1', ['Correct', 'Correct'])
+        self.check_grade_percent(0.38)
+        
+        
+        # Third homework
+        self.submit_question_answer('H3P1', ['Correct', 'Correct'])
+        self.check_grade_percent(0.38) # Score didn't change
+        
+        self.submit_question_answer('H3P2', ['Correct', 'Correct'])
+        self.check_grade_percent(0.5) # Now homework2 dropped. Score changes
+        
+        
+        # Now we answer the final question (worth half of the grade)
+        self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
+        self.check_grade_percent(1.0) # Hooray! We got 100%
+
