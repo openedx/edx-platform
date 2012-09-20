@@ -97,6 +97,33 @@ urlpatterns = ('',
 if settings.PERFSTATS:
     urlpatterns += (url(r'^reprofile$','perfstats.views.end_profile'),)
 
+
+    
+# Multicourse wiki (Note: wiki urls must be above the courseware ones because of
+# the custom tab catch-all)
+if settings.WIKI_ENABLED:
+    from wiki.urls import get_pattern as wiki_pattern
+    from django_notify.urls import get_pattern as notify_pattern
+
+    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
+    # them together.
+    urlpatterns += (
+        # First we include views from course_wiki that we use to override the default views.
+        # They come first in the urlpatterns so they get resolved first
+        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
+
+
+        url(r'^wiki/', include(wiki_pattern())),
+        url(r'^notify/', include(notify_pattern())),
+
+        # These urls are for viewing the wiki in the context of a course. They should
+        # never be returned by a reverse() so they come after the other url patterns
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
+            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
+        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
+    )
+
+    
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
@@ -164,6 +191,10 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
+
+        # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>.*)$',
+            'courseware.views.static_tab', name="static_tab"),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
@@ -175,29 +206,6 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
             )
-
-    # Multicourse wiki
-if settings.WIKI_ENABLED:
-    from wiki.urls import get_pattern as wiki_pattern
-    from django_notify.urls import get_pattern as notify_pattern
-
-    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
-    # them together.
-    urlpatterns += (
-        # First we include views from course_wiki that we use to override the default views.
-        # They come first in the urlpatterns so they get resolved first
-        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
-
-
-        url(r'^wiki/', include(wiki_pattern())),
-        url(r'^notify/', include(notify_pattern())),
-
-        # These urls are for viewing the wiki in the context of a course. They should
-        # never be returned by a reverse() so they come after the other url patterns
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
-            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
-    )
 
 if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
