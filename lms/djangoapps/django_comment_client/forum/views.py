@@ -171,13 +171,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
-    if request.is_ajax():
+    try:
+        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        log.error("Error loading single thread.")
+        raise Http404
 
-        try:
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-            log.error("Error loading single thread.")
-            raise Http404
+    if request.is_ajax():
 
         courseware_context = get_courseware_context(thread, course)
 
@@ -199,7 +199,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         try:
             threads, query_params = get_threads(request, course_id)
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
             threads.append(thread.to_dict())
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
             log.error("Error loading single thread.")
