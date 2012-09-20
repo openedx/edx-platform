@@ -21,8 +21,6 @@ from django_comment_client.utils import merge_dict, extract, strip_none, strip_b
 import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
-import datetime
-from django.utils.timezone import utc
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
