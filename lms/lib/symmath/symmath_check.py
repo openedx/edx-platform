@@ -141,12 +141,19 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
     return {'ok': False, 'msg': msg}
 
 #-----------------------------------------------------------------------------
+# helper function to convert all <p> to <span class='inline-error'>
+
+def make_error_message(msg):
+    # msg = msg.replace('<p>','<p><span class="inline-error">').replace('</p>','</span></p>')
+    msg = '<div class="capa_alert">%s</div>' % msg
+    return msg
+
+#-----------------------------------------------------------------------------
 # Check function interface, which takes pmathml input
 #
 # This is one of the main entry points to call.
 
-
-def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
+def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None):
     '''
     Check a symbolic mathematical expression using sympy.
     The input may be presentation MathML.  Uses formula.
@@ -159,6 +166,11 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
     threshold = 1.0e-3
     DEBUG = debug
 
+    if xml is not None:
+        DEBUG = xml.get('debug',False)	# override debug flag using attribute in symbolicmath xml
+        if DEBUG in ['0','False']:
+            DEBUG = False
+
     # options
     do_matrix = 'matrix' in (options or '')
     do_qubit = 'qubit' in (options or '')
@@ -169,7 +181,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
         fexpect = my_sympify(str(expect), matrix=do_matrix, do_qubit=do_qubit)
     except Exception, err:
         msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err, expect)
-        return {'ok': False, 'msg': msg}
+        return {'ok': False, 'msg': make_error_message(msg)}
 
     # if expected answer is a number, try parsing provided answer as a number also
     try:
@@ -205,16 +217,18 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
     except Exception, err:
         log.exception("Error evaluating expression '%s' as a valid equation" % ans)
-        msg += "<p>Error %s in evaluating your expression '%s' as a valid equation</p>" % (str(err).replace('<', '&lt;'),
-                                                                                           ans)
+        msg += "<p>Error in evaluating your expression '%s' as a valid equation</p>" % (ans)
+        if "Illegal math" in str(err):
+            msg += "<p>Illegal math expression</p>"
         if DEBUG:
+            msg += 'Error: %s' % str(err).replace('<', '&lt;')
             msg += '<hr>'
             msg += '<p><font color="blue">DEBUG messages:</p>'
             msg += "<p><pre>%s</pre></p>" % traceback.format_exc()
             msg += '<p>cmathml=<pre>%s</pre></p>' % f.cmathml.replace('<', '&lt;')
             msg += '<p>pmathml=<pre>%s</pre></p>' % mmlans.replace('<', '&lt;')
             msg += '<hr>'
-        return {'ok': False, 'msg': msg}
+        return {'ok': False, 'msg': make_error_message(msg)}
 
     # compare with expected
     if hasattr(fexpect, 'is_number') and fexpect.is_number:
@@ -226,7 +240,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
         msg += "<p>given = %s</p>" % repr(ans)
         msg += "<p>fsym = %s</p>" % repr(fsym)
         # msg += "<p>cmathml = <pre>%s</pre></p>" % str(f.cmathml).replace('<','&lt;')
-        return {'ok': False, 'msg': msg}
+        return {'ok': False, 'msg': make_error_message(msg)}
 
     if fexpect == fsym:
         return {'ok': True, 'msg': msg}
@@ -239,11 +253,11 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None):
                 return {'ok': True, 'msg': msg}
         except sympy.ShapeError:
             msg += "<p>Error - your input vector or matrix has the wrong dimensions"
-            return {'ok': False, 'msg': msg}
+            return {'ok': False, 'msg': make_error_message(msg)}
         except Exception, err:
             msg += "<p>Error %s in comparing expected (a list) and your answer</p>" % str(err).replace('<', '&lt;')
             if DEBUG: msg += "<p/><pre>%s</pre>" % traceback.format_exc()
-            return {'ok': False, 'msg': msg}
+            return {'ok': False, 'msg': make_error_message(msg)}
 
     #diff = (fexpect-fsym).simplify()
     #fsym = fsym.simplify()
