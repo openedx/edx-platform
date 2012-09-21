@@ -1,5 +1,6 @@
 import datetime
 import json
+import pprint
 import sys
 
 from django.conf import settings
@@ -91,3 +92,7 @@ def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
+
+def debug_request(request):
+    """Return a pretty printed version of the request"""
+    return HttpResponse("<html><pre>{0}</pre></html>".format(pprint.pformat(request)))
