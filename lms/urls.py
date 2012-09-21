@@ -204,7 +204,7 @@ if settings.COURSEWARE_ENABLED:
             )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>.*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)$',
         'courseware.views.static_tab', name="static_tab"),
         )
 
