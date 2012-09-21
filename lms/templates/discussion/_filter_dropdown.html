@@ -15,8 +15,8 @@
 </%def>
 
 <%def name="render_category(categories, category)">
-    <li>
-        <a href="#"><span class="board-name">${category}</span></a>
+    <li class="dropdown-category">
+        <a href="#"><span class="toggle-category">+</span><span class="board-name">${category}</span></a>
         <ul>
             ${render_dropdown(categories[category])}
         </ul>

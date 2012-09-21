@@ -883,6 +883,12 @@ body.discussion {
           color: #fff;
         }
 
+        .toggle-category {
+          margin: 7px 0;
+          float: left;
+          font-size: 20px;
+        }
+
         .unread {
           float: right;
           padding: 0 5px;
@@ -1054,7 +1060,7 @@ body.discussion {
 
     a {
       display: block;
-      position: relative;      
+      position: relative;
       float: left;
       clear: both;
       width: 100%;

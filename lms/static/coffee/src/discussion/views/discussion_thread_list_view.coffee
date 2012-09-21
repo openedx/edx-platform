@@ -5,6 +5,7 @@ if Backbone?
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "click .sort-bar a": "sortThreads"
+      "click .toggle-category": "toggleCategory"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
       "click .post-list .list-item a": "threadSelected"
@@ -372,3 +373,12 @@ if Backbone?
       scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
       scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
       $(".browse-topic-drop-menu").scrollTop(scrollTarget)
+
+
+    toggleCategory: (event)=>
+      event.stopImmediatePropagation()
+      event.preventDefault()
+      console.log event.target
+      $elem  = $(event.target)
+      $children = $($elem.closest('li').children('ul')[0])
+      $children.slideToggle(600)
