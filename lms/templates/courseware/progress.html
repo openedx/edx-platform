@@ -50,7 +50,11 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")
               %>
 
               <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
-                ${ section['display_name'] }</a><span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span></h3>
+                ${ section['display_name'] }</a>
+                %if total > 0 or earned > 0:
+                  <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
+                %endif
+              </h3>
               <p>
                 ${section['format']}
 

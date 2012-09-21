@@ -219,13 +219,28 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            child_locations = self.definition.get('children', [])
+            child_locations = self.get_children_locations()
             children = [self.system.get_module(loc) for loc in child_locations]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
+    
+    def get_children_locations(self):
+        '''
+        Returns the locations of each of child modules.
+        
+        Overriding this changes the behavior of get_children and
+        anything that uses get_children, such as get_display_items.
+        
+        This method will not instantiate the modules of the children
+        unless absolutely necessary, so it is cheaper to call than get_children
+        
+        These children will be the same children returned by the
+        descriptor unless descriptor.has_dynamic_children() is true.
+        '''
+        return self.definition.get('children', [])
 
     def get_display_items(self):
         '''
@@ -489,6 +504,18 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             self,
             metadata=self.metadata
         )
+    
+    
+    def has_dynamic_children(self):
+        """
+        Returns True if this descriptor has dynamic children for a given
+        student when the module is created.
+        
+        Returns False if the children of this descriptor are the same
+        children that the module will return for any student. 
+        """
+        return False
+        
 
     # ================================= JSON PARSING ===========================
     @staticmethod

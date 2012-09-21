@@ -47,11 +47,14 @@ class ABTestModule(XModule):
 
     def get_shared_state(self):
         return json.dumps({'group': self.group})
-
+    
+    def get_children_locations(self):
+        return self.definition['data']['group_content'][self.group]
+        
     def displayable_items(self):
-        child_locations = self.definition['data']['group_content'][self.group]
-        children = [self.system.get_module(loc) for loc in child_locations]
-        return [c for c in children if c is not None]
+        # Most modules return "self" as the displayable_item. We never display ourself
+        # (which is why we don't implement get_html). We only display our children.
+        return self.get_children()
 
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being
@@ -158,3 +161,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
 
         return xml_object
+    
+    
+    def has_dynamic_children(self):
+        return True
