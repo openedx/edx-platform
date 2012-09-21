@@ -21,6 +21,7 @@ class EditingDescriptor(MakoModuleDescriptor):
         return {
             'module': self,
             'data': self.definition.get('data', ''),
+            'metadata': self.metadata
     # TODO (vshnayder): allow children and metadata to be edited.
     #'children' : self.definition.get('children, ''),
 

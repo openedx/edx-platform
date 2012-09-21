@@ -1,0 +1,8 @@
+<section class="metadata_edit">
+  <h3>Metadata</h3>
+  <ul>
+    % for keyname in metadata.keys():
+    <li>${keyname}: <input type='text' xmetadata_name='${keyname}' value='${metadata[keyname]}' size='60' /></li>
+    % endfor
+  </ul>
+</section>
