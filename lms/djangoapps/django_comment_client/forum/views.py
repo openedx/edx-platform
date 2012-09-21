@@ -85,10 +85,7 @@ def inline_discussion(request, course_id, discussion_id):
         log.error("Error loading inline discussion threads.")
         raise Http404
 
-    def infogetter(thread):
-        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
-
-    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
     allow_anonymous = course.metadata.get("allow_anonymous", True)
     allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
@@ -121,10 +118,8 @@ def forum_form_discussion(request, course_id):
 
     user_info = cc.User.from_django_user(request.user).to_dict()
 
-    def infogetter(thread):
-        return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
+    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
-    annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
         if courseware_context:
@@ -224,10 +219,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #)
 
         
-        def infogetter(thread):
-            return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
-
-        annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         context = {
             'discussion_id': discussion_id,
@@ -250,7 +242,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 @login_required
 def user_profile(request, course_id, user_id):
-
+    #TODO: Allow sorting?
     course = get_course_with_access(request.user, course_id, 'load')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
@@ -263,19 +255,20 @@ def user_profile(request, course_id, user_id):
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
+        user_info = cc.User.from_django_user(request.user).to_dict()
+
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         if request.is_ajax():
             return utils.JsonResponse({
-                'html': content,
                 'discussion_data': map(utils.safe_content, threads),
+                'page': query_params['page'],
+                'num_pages': query_params['num_pages'],
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
             })
         else:
-            user_info = cc.User.from_django_user(request.user).to_dict()
 
-            def infogetter(thread):
-                return utils.get_annotated_content_infos(course_id, thread, request.user, user_info)
 
-            annotated_content_info = reduce(merge_dict, map(infogetter, threads), {})
             context = {
                 'course': course,
                 'user': request.user,
@@ -285,6 +278,49 @@ def user_profile(request, course_id, user_id):
                 'user_info': saxutils.escape(json.dumps(user_info),escapedict),
                 'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
 #                'content': content,
+            }
+
+            return render_to_response('discussion/user_profile.html', context)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        raise Http404
+
+
+def followed_threads(request, course_id, user_id):
+    course = get_course_with_access(request.user, course_id, 'load')
+    try:
+        profiled_user = cc.User(id=user_id, course_id=course_id)
+
+        query_params = {
+            'page': request.GET.get('page', 1),
+            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            'sort_key': request.GET.get('sort_key', 'date'),
+            'sort_order': request.GET.get('sort_order', 'desc'),
+        }
+
+        threads, page, num_pages = profiled_user.subscribed_threads(query_params)
+        query_params['page'] = page
+        query_params['num_pages'] = num_pages
+        user_info = cc.User.from_django_user(request.user).to_dict()
+
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        if request.is_ajax():
+            return utils.JsonResponse({
+                'annotated_content_info': annotated_content_info,
+                'discussion_data': map(utils.safe_content, threads),
+                'page': query_params['page'],
+                'num_pages': query_params['num_pages'],
+                })
+        else:
+
+            context = {
+                'course': course,
+                'user': request.user,
+                'django_user': User.objects.get(id=user_id),
+                'profiled_user': profiled_user.to_dict(),
+                'threads': saxutils.escape(json.dumps(threads), escapedict),
+                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                #                'content': content,
             }
 
             return render_to_response('discussion/user_profile.html', context)

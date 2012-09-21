@@ -84,7 +84,6 @@ if Backbone?
     toggleFollowing: (event) ->
       $elem = $(event.target)
       url = null
-      console.log "follow"
       if not @model.get('subscribed')
         @model.follow()
         url = @model.urlFor("follow")
