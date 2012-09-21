@@ -6,15 +6,12 @@ if Backbone?
       @renderThreads @$el, @collection
     renderThreads: ($elem, threads) =>
       #Content.loadContentInfos(response.annotated_content_info)
-      console.log threads
       @discussion = new Discussion()
       @discussion.reset(threads, {silent: false})
       $discussion = $(Mustache.render $("script#_user_profile").html(), {'threads':threads})
-      console.log $discussion
       $elem.append($discussion)
       @threadviews = @discussion.map (thread) ->
         new DiscussionThreadProfileView el: @$("article#thread_#{thread.id}"), model: thread
-      console.log @threadviews
       _.each @threadviews, (dtv) -> dtv.render()
 
     addThread: (thread, collection, options) =>

@@ -31,6 +31,7 @@ if Backbone?
       @boardName
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
+      @mode = 'all'
 
     reloadDisplayedCollection: (thread) =>
       thread_id = thread.get('id')
@@ -119,10 +120,19 @@ if Backbone?
         @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
 
     loadMorePages: (event) ->
-      event.preventDefault()
+      if event
+        event.preventDefault()
       @$(".more-pages").html('<div class="loading-animation"></div>')
       @$(".more-pages").addClass("loading")
-      @collection.retrieveAnotherPage(@current_search, @discussionIds, @sortBy)
+      options = {}
+      switch @mode
+        when 'search'
+          options.search_text = @current_search
+        when 'followed'
+          options.user_id = window.user.id
+        when 'commentables'
+          options.commentable_ids = @discussionIds
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -148,7 +158,7 @@ if Backbone?
     threadSelected: (e) =>
       thread_id = $(e.target).closest("a").data("id")
       @setActiveThread(thread_id)
-      @trigger("thread:selected", thread_id)
+      @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
 
     threadRemoved: (thread_id) =>
@@ -245,10 +255,13 @@ if Backbone?
       else
         @setTopic(event)  # just sets the title for the dropdown
         item = $(event.target).closest('li')
-        if item.find("span.board-name").data("discussion_id") == "#all"
+        discussionId = item.find("span.board-name").data("discussion_id")
+        if discussionId == "#all"
           @discussionIds = ""
           @$(".post-search-field").val("")
           @retrieveAllThreads()
+        else if discussionId == "#following"
+          @retrieveFollowed(event)
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           @retrieveDiscussions(discussionIds)
@@ -262,48 +275,35 @@ if Backbone?
           @collection.current_page = response.page
           @collection.pages = response.num_pages
           @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
-          @displayedCollection.reset(@collection.models)
+          Content.loadContentInfos(response.annotated_content_info)
+          @displayedCollection.reset(@collection.models)# Don't think this is necessary because it's called on collection.reset
           if callback?
             callback()
 
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
-      url = DiscussionUtil.urlFor("search")
-      DiscussionUtil.safeAjax
-        data: { 'commentable_ids': @discussionIds }
-        url: url
-        type: "GET"
-        success: (response, textStatus) =>
-          @collection.current_page = response.page
-          @collection.pages = response.num_pages
-          @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
-          @displayedCollection.reset(@collection.models)
+      @mode = 'commentables'
+      @retrieveFirstPage()
 
     retrieveAllThreads: () ->
-      url = DiscussionUtil.urlFor("threads")
-      DiscussionUtil.safeAjax
-        url: url
-        type: "GET"
-        success: (response, textStatus) =>
-          @collection.current_page = response.page
-          @collection.pages = response.num_pages
-          @collection.reset(response.discussion_data)
-          Content.loadContentInfos(response.content_info)
-          @displayedCollection.reset(@collection.models)
+      @mode = 'all'
+      @retrieveFirstPage()
+
+    retrieveFirstPage: (event)->
+      @collection.current_page = 0
+      @collection.reset()
+      @loadMorePages(event)
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
       $(event.target).addClass("active")
       @sortBy = $(event.target).data("sort")
-      if @sortBy == "date"
-        @displayedCollection.comparator = @displayedCollection.sortByDateRecentFirst
-      else if @sortBy == "votes"
-        @displayedCollection.comparator = @displayedCollection.sortByVotes
-      else if @sortBy == "comments"
-        @displayedCollection.comparator = @displayedCollection.sortByComments
-      @displayedCollection.sort()
+
+      @displayedCollection.comparator = switch @sortBy
+        when 'date' then @displayedCollection.sortByDateRecentFirst
+        when 'votes' then @displayedCollection.sortByVotes
+        when 'comments' then @displayedCollection.sortByComments
+      @retrieveFirstPage(event)
 
     performSearch: (event) ->
       if event.which == 13
@@ -317,8 +317,12 @@ if Backbone?
       @searchFor(text)
 
     searchFor: (text, callback, value) ->
+      @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
+      #TODO: This might be better done by setting discussion.current_page=0 and calling discussion.loadMorePages
+      # Mainly because this currently does not reset any pagination variables which could cause problems.
+      # This doesn't use pagination either.
       DiscussionUtil.safeAjax
         $elem: @$(".post-search-field")
         data: { text: text }
@@ -334,13 +338,13 @@ if Backbone?
           if textStatus == 'success'
             # TODO: Augment existing collection?
             @collection.reset(response.discussion_data)
-            Content.loadContentInfos(response.content_info)
+            Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway
-            @displayedCollection.reset(@collection.models)
+            @displayedCollection.reset(@collection.models) # Don't think this is necessary
 
     clearSearch: (callback, value) ->
       @$(".post-search-field").val("")
@@ -372,3 +376,7 @@ if Backbone?
       scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
       scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
       $(".browse-topic-drop-menu").scrollTop(scrollTarget)
+
+    retrieveFollowed: (event)=>
+      @mode = 'followed'
+      @retrieveFirstPage(event)
