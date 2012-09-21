@@ -110,6 +110,7 @@ def edit_item(request):
         'category': item.category,
         'url_name': item.url_name,
         'previews': get_module_previews(request, item),
+        'metadata': item.metadata
     })
 
 
@@ -283,6 +284,11 @@ def save_item(request):
     if request.POST['children']:
         children = request.POST['children']
         modulestore().update_children(item_location, children)
+
+    # cdodge: also commit any metadata which might have been passed along in the
+    # POST from the client
+    if request.POST['metadata']:
+        modulestore().update_metadata(item_location, request.POST['metadata'])
 
     # Export the course back to github
     # This uses wildcarding to find the course, which requires handling
