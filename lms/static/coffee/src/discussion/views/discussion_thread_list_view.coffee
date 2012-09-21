@@ -262,7 +262,6 @@ if Backbone?
           @retrieveAllThreads()
         else if discussionId == "#following"
           @retrieveFollowed(event)
-          # Retrieve following
         else
           discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
           @retrieveDiscussions(discussionIds)
@@ -284,39 +283,27 @@ if Backbone?
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'
-      @collection.current_page = 0
-      @collection.reset()
-      @loadMorePages()
-#      url = DiscussionUtil.urlFor("search")
-#      DiscussionUtil.safeAjax
-#        data: { 'commentable_ids': @discussionIds }
-#        url: url
-#        type: "GET"
-#        success: (response, textStatus) =>
-#          @collection.current_page = response.page
-#          @collection.pages = response.num_pages
-#          @collection.reset(response.discussion_data)
-#          Content.loadContentInfos(response.annotated_content_info)
-#          @displayedCollection.reset(@collection.models)
+      @retrieveFirstPage()
 
     retrieveAllThreads: () ->
       @mode = 'all'
+      @retrieveFirstPage()
+
+    retrieveFirstPage: (event)->
       @collection.current_page = 0
       @collection.reset()
-      @loadMorePages()
+      @loadMorePages(event)
 
     sortThreads: (event) ->
       @$(".sort-bar a").removeClass("active")
       $(event.target).addClass("active")
       @sortBy = $(event.target).data("sort")
-      @collection.reset()
-      @collection.current_page = 0
+
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst
         when 'votes' then @displayedCollection.sortByVotes
         when 'comments' then @displayedCollection.sortByComments
-      @loadMorePages(event)
-      #@displayedCollection.sort()  # This should be called automatically and calling manually makes the loading indicator go away
+      @retrieveFirstPage(event)
 
     performSearch: (event) ->
       if event.which == 13
@@ -392,6 +379,4 @@ if Backbone?
 
     retrieveFollowed: (event)=>
       @mode = 'followed'
-      @collection.reset()
-      @collection.current_page = 0
-      @loadMorePages(event)
+      @retrieveFirstPage(event)
