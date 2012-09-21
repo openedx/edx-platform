@@ -43,6 +43,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
+        'user_id': request.user.id,
     }
 
     if not request.GET.get('sort_key'):
@@ -81,6 +82,7 @@ def inline_discussion(request, course_id, discussion_id):
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
         # checking for errors on request.  Check and fix as needed.
+        log.error("Error loading inline discussion threads.")
         raise Http404
 
     annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
@@ -111,6 +113,7 @@ def forum_form_discussion(request, course_id):
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         threads = [utils.safe_content(thread) for thread in unsafethreads]
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        log.error("Error loading forum discussion threads: %s" % str(err))
         raise Http404
 
     user_info = cc.User.from_django_user(request.user).to_dict()
@@ -159,14 +162,18 @@ def forum_form_discussion(request, course_id):
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
 
-    if request.is_ajax():
-        course = get_course_with_access(request.user, course_id, 'load')
-        user_info = cc.User.from_django_user(request.user).to_dict()
+    course = get_course_with_access(request.user, course_id, 'load')
+    cc_user = cc.User.from_django_user(request.user)
+    user_info = cc_user.to_dict()
 
-        try:
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
-        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-            raise Http404
+    try:
+        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        log.error("Error loading single thread.")
+        raise Http404
+
+    if request.is_ajax():
+
         courseware_context = get_courseware_context(thread, course)
 
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
@@ -183,13 +190,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
         })
 
     else:
-        course = get_course_with_access(request.user, course_id, 'load')
         category_map = utils.get_discussion_category_map(course)
+
         try:
             threads, query_params = get_threads(request, course_id)
-            thread = cc.Thread.find(thread_id).retrieve(recursive=True)
             threads.append(thread.to_dict())
         except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+            log.error("Error loading single thread.")
             raise Http404
 
         course = get_course_with_access(request.user, course_id, 'load')
@@ -211,8 +218,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        user_info = cc.User.from_django_user(request.user).to_dict()
-
+        
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         context = {

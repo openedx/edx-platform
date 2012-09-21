@@ -207,7 +207,7 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
     return ModuleSystem(
-        ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']),
+        ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda type, event: None,
         filestore=descriptor.system.resources_fs,
@@ -247,7 +247,7 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, "xmodule_display.html"),
-        module.metadata['data_dir'], module
+        module.metadata['data_dir']
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
@@ -276,8 +276,13 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
 
-    data = json.loads(request.POST['data'])
-    modulestore().update_item(item_location, data)
+    if request.POST['data']:
+        data = request.POST['data']
+        modulestore().update_item(item_location, data)
+
+    if request.POST['children']:
+        children = request.POST['children']
+        modulestore().update_children(item_location, children)
 
     # Export the course back to github
     # This uses wildcarding to find the course, which requires handling

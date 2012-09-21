@@ -1018,6 +1018,7 @@ body.discussion {
         text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
       }
+
     }
   }
 
@@ -1052,14 +1053,17 @@ body.discussion {
     }
 
     a {
-      position: relative;
       display: block;
-      height: 36px;
+      position: relative;      
+      float: left;
+      clear: both;
+      width: 100%;
       padding: 0 10px 0 18px;
       margin-bottom: 1px;
       margin-right: -1px;
       @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
       background-color: #fff;
+      @include clearfix;
 
       &:hover {
         @include linear-gradient(top, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0));
@@ -1096,15 +1100,23 @@ body.discussion {
       }
 
       .title {
+        display: block;
+        float: left;
+        width: 70%;
+        margin: 8px 0 10px;
         font-size: 13px;
         font-weight: 700;
-        line-height: 34px;
+        line-height: 1.4;
         color: #333;
       }
 
-      &.read .title {
-        font-weight: 400;
-        color: #737373;
+      &.read {
+        background: #f2f2f2;
+
+        .title {
+          font-weight: 400;
+          color: #737373;
+        }
       }
 
       &.resolved:before {
@@ -1121,7 +1133,7 @@ body.discussion {
         content: '';
         position: absolute;
         top: 0;
-        right: 1px;
+        right: 0;
         width: 10px;
         height: 12px;
         background: url(../images/following-flag.png) no-repeat;
@@ -1164,22 +1176,13 @@ body.discussion {
       }
     }
 
-    .title {
-      display: block;
-      float: left;
-      width: 70%;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-
     .votes-count,
     .comments-count {
       display: block;
       float: right;
       width: 32px;
       height: 16px;
-      margin-top: 9px;
+      margin-top: 8px;
       border-radius: 2px;
       @include linear-gradient(top, #d4d4d4, #dfdfdf);
       font-size: 11px;
@@ -1206,12 +1209,13 @@ body.discussion {
         background-position: 0 -5px;
       }
 
-      &.new {
-       @include linear-gradient(top, #84d7fe, #99e0fe);
+      &.unread {
+        @include linear-gradient(top, #84d7fe, #60a8d6);
         color: #333;
 
         &:after {
           color: #99e0fe;
+          background-position: 0 0px;
         }
       }
     }
@@ -1320,6 +1324,7 @@ body.discussion {
       position: relative;
       z-index: 100;
       margin-top: 5px;
+      margin-left: 40px;
     }
 
     .post-tools {
@@ -1475,15 +1480,29 @@ body.discussion {
     }
   }
 
+  blockquote {
+    background: #f6f6f6;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+
   .comments {
     list-style: none;
     margin-top: 20px;
     padding: 0;
     border-top: 1px solid #ddd;
 
-    li {
+    > li {
       background: #f6f6f6;
       border-bottom: 1px solid #ddd;
+    }
+
+    blockquote {
+      background: #e6e6e6;
+      border-radius: 3px;
+      padding: 5px 10px;
+      font-size: 14px;
     }
 
     .comment-form {
@@ -1509,7 +1528,6 @@ body.discussion {
       .discussion-errors {
         margin: 0px;
       }
-
     }
 
     .response-body {

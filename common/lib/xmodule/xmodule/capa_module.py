@@ -179,6 +179,8 @@ class CapaModule(XModule):
             return "per_student"
         elif rerandomize == "never":
             return "never"
+        elif rerandomize == "onreset":
+            return "onreset"
         else:
             raise Exception("Invalid rerandomize attribute " + rerandomize)
 
@@ -307,7 +309,7 @@ class CapaModule(XModule):
             save_button = False
 
         # Only show the reset button if pressing it will show different values
-        if self.rerandomize != 'always':
+        if self.rerandomize not in ["always", "onreset"]:
             reset_button = False
 
         # User hasn't submitted an answer yet -- we don't want resets
@@ -617,7 +619,7 @@ class CapaModule(XModule):
             return "Refresh the page and make an attempt before resetting."
 
         self.lcp.do_reset()
-        if self.rerandomize == "always":
+        if self.rerandomize in ["always", "onreset"]:
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None
