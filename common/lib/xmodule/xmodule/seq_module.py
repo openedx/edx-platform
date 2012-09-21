@@ -120,10 +120,14 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'children': [
-            system.process_xml(etree.tostring(child_module)).location.url()
-            for child_module in xml_object
-        ]}
+        children = []
+        for child in xml_object:
+            try:
+                children.append(system.process_xml(etree.tostring(child)).location.url())
+            except:
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                continue
+        return {'children': children}
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
