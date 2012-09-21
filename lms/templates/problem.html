@@ -34,6 +34,8 @@
 
 <%block name="js_extra">
 <script type="text/javascript" charset="utf-8">
+  var collapsibleSet;
+  
   $(function(){
       // this should be brought back into problems
       $('.longform').hide();
@@ -47,12 +49,16 @@
         return false;
       });
 
-      $('.collapsible section').hide()
-      $('.collapsible header a').click(function() {
-        $(this).parent().siblings().slideToggle();
-        $(this).parent().parent().toggleClass('open');
-        return false
-      });
+      if(!collapsibleSet) {
+        collapsibleSet = true;
+        $('.collapsible section').hide();
+        $('.collapsible header a').bind('click', toggleHint);
+        function toggleHint(e) {
+          $(this).parent().siblings().slideToggle();
+          $(this).parent().parent().toggleClass('open');
+          return false;
+        }
+      }      
     });
 </script>
 </%block>
