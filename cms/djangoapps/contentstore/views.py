@@ -286,7 +286,7 @@ def save_item(request):
         modulestore().update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
-    # POST from the client
+    # POST from the client, if it is there
     if request.POST['metadata']:
         modulestore().update_metadata(item_location, request.POST['metadata'])
 
