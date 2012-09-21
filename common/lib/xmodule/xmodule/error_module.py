@@ -5,7 +5,7 @@ import sys
 
 from lxml import etree
 from xmodule.x_module import XModule
-from xmodule.editing_module import EditingDescriptor
+from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
 
 
@@ -45,7 +45,7 @@ class NonStaffErrorModule(XModule):
             })
 
 
-class ErrorDescriptor(EditingDescriptor):
+class ErrorDescriptor(JSONEditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
