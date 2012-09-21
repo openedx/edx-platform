@@ -7,6 +7,7 @@ from lxml import etree
 from xmodule.x_module import XModule
 from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import Location
 
 
 log = logging.getLogger(__name__)
@@ -52,14 +53,18 @@ class ErrorDescriptor(JSONEditingDescriptor):
     module_class = ErrorModule
 
     @classmethod
-    def _construct(self, system, contents, error_msg, org=None, course=None):
+    def _construct(self, system, contents, error_msg, location):
 
-        # Pick a unique url_name -- the sha1 hash of the contents.
-        # NOTE: We could try to pull out the url_name of the errored descriptor,
-        # but url_names aren't guaranteed to be unique between descriptor types,
-        # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
-        # it will be written out with the original url_name.
-        url_name = hashlib.sha1(contents).hexdigest()
+        if location.name is None:
+            location = location._replace(
+                category='error',
+                # Pick a unique url_name -- the sha1 hash of the contents.
+                # NOTE: We could try to pull out the url_name of the errored descriptor,
+                # but url_names aren't guaranteed to be unique between descriptor types,
+                # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
+                # it will be written out with the original url_name.
+                name=hashlib.sha1(contents).hexdigest()
+            )
 
         definition = {
             'data': {
@@ -68,17 +73,28 @@ class ErrorDescriptor(JSONEditingDescriptor):
             }
         }
 
-        # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
-        # 64-bit num?
-        location = ['i4x', org, course, 'error', url_name]
-
         # real metadata stays in the content, but add a display name
-        metadata = {'display_name': 'Error ' + url_name}
+        metadata = {'display_name': 'Error: ' + location.name}
         super(ErrorDescriptor, self).__init__(
             system,
             definition,
             location=location,
             metadata=metadata
+        )
+
+    def get_context(self):
+        return {
+            'module': self,
+            'data': self.definition['data']['contents'],
+        }
+
+    @classmethod
+    def from_json(cls, json_data, system, error_msg='Error not available'):
+        return cls(
+            system,
+            json.dumps(json_data, indent=4),
+            error_msg,
+            location=Location(json_data['location']),
         )
 
     @classmethod
@@ -89,7 +105,8 @@ class ErrorDescriptor(JSONEditingDescriptor):
                 'definition': descriptor.definition,
                 'metadata': descriptor.metadata,
             }, indent=4),
-            error_msg
+            error_msg,
+            location=descriptor.location,
         )
 
     @classmethod
@@ -119,7 +136,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
             # Save the error to display later--overrides other problems
             error_msg = exc_info_to_str(sys.exc_info())
 
-        return cls._construct(system, xml_data, error_msg, org=org, course=course)
+        return cls._construct(system, xml_data, error_msg, location=Location('i4x', org, course, None, None))
 
     def export_to_xml(self, resource_fs):
         '''
