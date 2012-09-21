@@ -98,7 +98,7 @@ if settings.PERFSTATS:
     urlpatterns += (url(r'^reprofile$','perfstats.views.end_profile'),)
 
 
-    
+
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
 if settings.WIKI_ENABLED:
@@ -123,7 +123,7 @@ if settings.WIKI_ENABLED:
         url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
     )
 
-    
+
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
@@ -191,10 +191,6 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
-
-        # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>.*)$',
-            'courseware.views.static_tab', name="static_tab"),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
@@ -206,6 +202,11 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
             )
+    urlpatterns += (
+        # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>.*)$',
+        'courseware.views.static_tab', name="static_tab"),
+        )
 
 if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
