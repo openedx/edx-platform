@@ -9,6 +9,7 @@ from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 from pkg_resources import resource_string
+from .editing_module import EditingDescriptor
 
 log = logging.getLogger("mitx.common.lib.seq_module")
 
@@ -94,7 +95,8 @@ class SequenceModule(XModule):
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
-                  'tag': self.location.category}
+                  'tag': self.location.category
+                  }
 
         self.content = self.system.render_template('seq_module.html', params)
         self.rendered = True
@@ -109,7 +111,7 @@ class SequenceModule(XModule):
         return new_class
 
 
-class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
+class SequenceDescriptor(EditingDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
