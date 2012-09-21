@@ -219,6 +219,13 @@ Values are dictionaries of the form {"metadata-key" : "metadata-value"}.
 * The order in which things appear does not matter, though it may be helpful to organize the file in the same order as things appear in the content.
 * NOTE: json is picky about commas.  If you have trailing commas before closing braces, it will complain and refuse to parse the file.  This can be irritating at first.
 
+Supported fields at the course level:
+
+* "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
+* "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
+* "tabs" -- have custom tabs in the courseware.  See below for details on config.
+* TODO: there are others
+
 ### Grading policy file contents
 
 TODO: This needs to be improved, but for now here's a sketch of how grading works:
@@ -274,6 +281,7 @@ __Inherited:__
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
 *	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+                                                            'onreset' (randomize question when reset button is pressed by the student)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
                                                             Default: 'always'. Optional.
@@ -340,7 +348,43 @@ If you look at some older xml, you may see some tags or metadata attributes that
 
 # Static links
 
-if your content links (e.g. in an html file)  to `"static/blah/ponies.jpg"`, we will look for this in `YOUR_COURSE_DIR/blah/ponies.jpg`.  Note that this is not looking in a `static/` subfolder in your course dir.  This may (should?) change at some point.   Links that include `/course` will be rewritten to the root of your course in the courseware (e.g. `courses/{org}/{course}/{url_name}/` in the current url structure).  This is useful for linking to the course wiki, for example.
+If your content links (e.g. in an html file)  to `"static/blah/ponies.jpg"`, we will look for this...
+
+* If your course dir has a `static/` subdirectory, we will look in `YOUR_COURSE_DIR/static/blah/ponies.jpg`.   This is the prefered organization, as it does not expose anything except what's in `static/` to the world.
+*  If your course dir does not have a `static/` subdirectory, we will look in `YOUR_COURSE_DIR/blah/ponies.jpg`.  This is the old organization, and requires that the web server allow access to everything in the couse dir.  To switch to the new organization, move all your static content into a new `static/` dir  (e.g. if you currently have things in `images/`, `css/`, and `special/`, create a dir called `static/`, and move `images/, css/, and special/` there).
+
+Links that include `/course` will be rewritten to the root of your course in the courseware (e.g. `courses/{org}/{course}/{url_name}/` in the current url structure).  This is useful for linking to the course wiki, for example.
+
+# Tabs
+
+If you want to customize the courseware tabs displayed for your course, specify a "tabs" list in the course-level policy.  e.g.:
+
+    "tabs" : [
+        {"type": "courseware"},       # no name--always "Courseware" for consistency between courses
+        {"type": "course_info", "name": "Course Info"},
+        {"type": "external_link", "name": "My Discussion", "link": "http://www.mydiscussion.org/blah"},
+        {"type": "progress", "name": "Progress"},
+        {"type": "wiki", "name": "Wonderwiki"},
+        {"type": "static_tab", "url_slug": "news", "name": "Exciting news"},
+        {"type": "textbooks"}        # generates one tab per textbook, taking names from the textbook titles
+    ]
+
+
+* If you specify any tabs, you must specify all tabs.  They will appear in the order given.
+* The first two tabs must have types `"courseware"` and `"course_info"`, in that order.  Otherwise, we'll refuse to load the course.
+* for static tabs, the url_slug will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
+
+* An Instructor tab will be automatically added at the end for course staff users.
+
+## Supported tab types:
+
+* "courseware".  No other parameters.
+* "course_info".  Parameter "name".
+* "wiki". Parameter "name".
+* "discussion".  Parameter "name".
+* "external_link".  Parameters "name", "link".
+* "textbooks".  No parameters--generates tab names from book titles.
+* "progress".  Parameter "name".
 
 # Tips for content developers
 

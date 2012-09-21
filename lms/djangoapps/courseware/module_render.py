@@ -254,12 +254,11 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
-        module.metadata['data_dir'], module
-    )
+        module.metadata['data_dir'])
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
-    module.get_html = replace_course_urls(module.get_html, course_id, module)
+    module.get_html = replace_course_urls(module.get_html, course_id)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, module, 'staff'):
