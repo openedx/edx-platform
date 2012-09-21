@@ -112,7 +112,7 @@ class SequenceModule(XModule):
         return new_class
 
 
-class SequenceDescriptor(EditingDescriptor, XmlDescriptor):
+class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 

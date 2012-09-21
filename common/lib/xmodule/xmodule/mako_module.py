@@ -31,7 +31,9 @@ class MakoModuleDescriptor(XModuleDescriptor):
         """
         Return the context to render the mako template with
         """
-        return {'module': self}
+        return {'module': self,
+                'metadata': self.metadata
+                }
 
     def get_html(self):
         return self.system.render_template(
