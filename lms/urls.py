@@ -15,6 +15,10 @@ urlpatterns = ('',
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
+    # Adding to allow debugging issues when prod is mysteriously different from staging
+    # (specifically missing get parameters in certain cases)
+    url(r'^debug_request$', 'util.views.debug_request'),
+
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
