@@ -1,4 +1,7 @@
 from utils import *
+import logging
+
+log = logging.getLogger(__name__)
 
 class Model(object):
 
@@ -26,7 +29,7 @@ class Model(object):
                 raise AttributeError("Field {0} does not exist".format(name))
             self.retrieve()
             return self.__getattr__(name)
-    
+
     def __setattr__(self, name, value):
         if name == 'attributes' or name not in self.accessible_fields:
             super(Model, self).__setattr__(name, value)
@@ -73,14 +76,14 @@ class Model(object):
             if k in self.accessible_fields:
                 self.__setattr__(k, v)
             else:
-                raise AttributeError("Field {0} does not exist".format(k))
+                log.warning("Field {0} does not exist".format(k))
 
     def updatable_attributes(self):
         return extract(self.attributes, self.updatable_fields)
 
     def initializable_attributes(self):
         return extract(self.attributes, self.initializable_fields)
-        
+
     @classmethod
     def before_save(cls, instance):
         pass
