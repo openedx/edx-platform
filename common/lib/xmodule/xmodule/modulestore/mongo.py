@@ -1,4 +1,5 @@
 import pymongo
+import sys
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -6,13 +7,14 @@ from itertools import repeat
 from path import path
 
 from importlib import import_module
-from xmodule.errortracker import null_error_tracker
+from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.error_module import ErrorDescriptor
 
 from . import ModuleStoreBase, Location
 from .exceptions import (ItemNotFoundError,
-                         NoPathToItem, DuplicateItemError)
+                         DuplicateItemError)
 
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
@@ -57,7 +59,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # TODO (vshnayder): metadata inheritance is somewhat broken because mongo, doesn't
             # always load an entire course.  We're punting on this until after launch, and then
             # will build a proper course policy framework.
-            return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+            try:
+                return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+            except:
+                return ErrorDescriptor.from_json(
+                    json_data,
+                    self,
+                    error_msg=exc_info_to_str(sys.exc_info())
+                )
 
 
 def location_to_query(location):
@@ -154,7 +163,7 @@ class MongoModuleStore(ModuleStoreBase):
         """
         data_dir = item.get('metadata', {}).get('data_dir', item['location']['course'])
         root = self.fs_root / data_dir
-        
+
         if not root.isdir():
             root.mkdir()
 
@@ -267,7 +276,6 @@ class MongoModuleStore(ModuleStoreBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-
     def update_item(self, location, data):
         """
         Set the data in the item specified by the location to
@@ -313,7 +321,7 @@ class MongoModuleStore(ModuleStoreBase):
         '''
         location = Location.ensure_fully_specified(location)
         # Check that it's actually in this modulestore.
-        item = self._find_one(location)
+        self._find_one(location)
         # now get the parents
         items = self.collection.find({'definition.children': location.url()},
                                     {'_id': True})
