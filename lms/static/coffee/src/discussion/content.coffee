@@ -127,7 +127,21 @@ if Backbone?
 
     toJSON: ->
       json_attributes = _.clone(@attributes)
-      _.extend(json_attributes, { title: @display_title(), body: @display_body() })
+      extended_attributes =
+        title: @display_title()
+        body: @display_body()
+        isStaffPost: @isStaffPost()
+        hasStaffResponse: @hasStaffResponse()
+      _.extend(json_attributes, extended_attributes)
+
+    isStaffPost: ->
+      DiscussionUtil.isStaff(@get("user_id"))
+
+    hasStaffResponse: ->
+      _.map(@get('responded_user_ids'), (id)->
+        DiscussionUtil.isStaff(id)).reduce((a,b)->
+        a or b
+      , false)
 
   class @Comment extends @Content
     urlMappers:

@@ -129,6 +129,12 @@
 
 <script type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
+        ${"<% if (isStaffPost) { %>"}
+        <span class="staff-post-icon" data-tooltip="Staff Post"></span>
+        ${"<% }%>"}
+        ${"<% if (hasStaffResponse) { %>"}
+        <span class="staff-response-icon" data-tooltip="Staff Response"></span>
+        ${"<% }%>"}
         <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
             <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"}</span>
