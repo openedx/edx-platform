@@ -3,12 +3,14 @@ import unittest
 from fs.memoryfs import MemoryFS
 
 from lxml import etree
+from mock import Mock, patch
+from collections import defaultdict
 
 from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 from xmodule.xml_module import is_pointer_tag
 from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .test_export import DATA_DIR
@@ -16,35 +18,28 @@ from .test_export import DATA_DIR
 ORG = 'test_org'
 COURSE = 'test_course'
 
-class DummySystem(XMLParsingSystem):
-    def __init__(self):
 
-        self.modules = {}
-        self.resources_fs = MemoryFS()
-        self.errorlog = make_error_tracker()
+class DummySystem(ImportSystem):
 
-        def load_item(loc):
-            loc = Location(loc)
-            if loc in self.modules:
-                return self.modules[loc]
+    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
+    def __init__(self, load_error_modules):
 
-            print "modules: "
-            print self.modules
-            raise ItemNotFoundError("Can't find item at loc: {0}".format(loc))
-
-        def process_xml(xml):
-            print "loading {0}".format(xml)
-            descriptor = XModuleDescriptor.load_from_xml(xml, self, ORG, COURSE, None)
-            # Need to save module so we can find it later
-            self.modules[descriptor.location] = descriptor
-
-            # always eager
-            descriptor.get_children()
-            return descriptor
-
+        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        course_id = "/".join([ORG, COURSE, 'test_run'])
+        course_dir = "test_dir"
         policy = {}
-        XMLParsingSystem.__init__(self, load_item, self.resources_fs,
-                                  self.errorlog.tracker, process_xml, policy)
+        error_tracker = Mock()
+        parent_tracker = Mock()
+
+        super(DummySystem, self).__init__(
+            xmlstore,
+            course_id,
+            course_dir,
+            policy,
+            error_tracker,
+            parent_tracker,
+            load_error_modules=load_error_modules,
+        )
 
     def render_template(self, template, context):
             raise Exception("Shouldn't be called")
@@ -53,9 +48,9 @@ class DummySystem(XMLParsingSystem):
 class ImportTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
-    def get_system():
+    def get_system(load_error_modules=True):
         '''Get a dummy system'''
-        return DummySystem()
+        return DummySystem(load_error_modules)
 
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
@@ -63,8 +58,7 @@ class ImportTestCase(unittest.TestCase):
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system()
 
-        descriptor = XModuleDescriptor.load_from_xml(bad_xml, system, 'org', 'course',
-                                                     None)
+        descriptor = system.process_xml(bad_xml)
 
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
@@ -76,11 +70,8 @@ class ImportTestCase(unittest.TestCase):
         bad_xml2 = '''<sequential url_name="oops"><video url="hi"></sequential>'''
         system = self.get_system()
 
-        descriptor1 = XModuleDescriptor.load_from_xml(bad_xml, system, 'org',
-                                                      'course', None)
-
-        descriptor2 = XModuleDescriptor.load_from_xml(bad_xml2, system, 'org',
-                                                      'course', None)
+        descriptor1 = system.process_xml(bad_xml)
+        descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
 
@@ -91,13 +82,12 @@ class ImportTestCase(unittest.TestCase):
         self.maxDiff = None
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system()
-        descriptor = XModuleDescriptor.load_from_xml(bad_xml, system, 'org', 'course',
-                                                     None)
+        descriptor = system.process_xml(bad_xml)
+
         resource_fs = None
         tag_xml = descriptor.export_to_xml(resource_fs)
-        re_import_descriptor = XModuleDescriptor.load_from_xml(tag_xml, system,
-                                                               'org', 'course',
-                                                               None)
+        re_import_descriptor = system.process_xml(tag_xml)
+
         self.assertEqual(re_import_descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
@@ -116,8 +106,8 @@ class ImportTestCase(unittest.TestCase):
 
         # load it
         system = self.get_system()
-        descriptor = XModuleDescriptor.load_from_xml(xml_str_in, system, 'org', 'course',
-                                                     None)
+        descriptor = system.process_xml(xml_str_in)
+
         # export it
         resource_fs = None
         xml_str_out = descriptor.export_to_xml(resource_fs)
@@ -133,8 +123,6 @@ class ImportTestCase(unittest.TestCase):
         """
         system = self.get_system()
         v = '1 hour'
-        org = 'foo'
-        course = 'bbhh'
         url_name = 'test1'
         start_xml = '''
         <course org="{org}" course="{course}"
@@ -142,9 +130,8 @@ class ImportTestCase(unittest.TestCase):
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
-        </course>'''.format(grace=v, org=org, course=course, url_name=url_name)
-        descriptor = XModuleDescriptor.load_from_xml(start_xml, system,
-                                                     org, course)
+        </course>'''.format(grace=v, org=ORG, course=COURSE, url_name=url_name)
+        descriptor = system.process_xml(start_xml)
 
         print descriptor, descriptor.metadata
         self.assertEqual(descriptor.metadata['graceperiod'], v)
@@ -166,8 +153,8 @@ class ImportTestCase(unittest.TestCase):
         pointer = etree.fromstring(exported_xml)
         self.assertTrue(is_pointer_tag(pointer))
         # but it's a special case course pointer
-        self.assertEqual(pointer.attrib['course'], course)
-        self.assertEqual(pointer.attrib['org'], org)
+        self.assertEqual(pointer.attrib['course'], COURSE)
+        self.assertEqual(pointer.attrib['org'], ORG)
 
         # Does the course still have unicorns?
         with resource_fs.open('course/{url_name}.xml'.format(url_name=url_name)) as f:
@@ -317,3 +304,10 @@ class ImportTestCase(unittest.TestCase):
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
+    def test_error_on_import(self):
+        '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
+
+        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
+        system = self.get_system(False)
+
+        self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)

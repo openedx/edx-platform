@@ -195,6 +195,7 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 # prep it for use in pipeline js
 from xmodule.x_module import XModuleDescriptor
 from xmodule.raw_module import RawDescriptor
+from xmodule.error_module import ErrorDescriptor
 js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
 css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
 module_styles_path = css_file_dir / "_module-styles.scss"
@@ -210,7 +211,7 @@ for dir_ in (js_file_dir, css_file_dir):
 
 js_fragments = set()
 css_fragments = defaultdict(set)
-for _, descriptor in XModuleDescriptor.load_classes() + [(None, RawDescriptor)]:
+for _, descriptor in XModuleDescriptor.load_classes() + [(None, RawDescriptor), (None, ErrorDescriptor)]:
     descriptor_js = descriptor.get_javascript()
     module_js = descriptor.module_class.get_javascript()
 

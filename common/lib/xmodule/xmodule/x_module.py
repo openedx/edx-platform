@@ -1,18 +1,14 @@
 import logging
 import pkg_resources
-import sys
 import json
 import os
 
-from fs.errors import ResourceNotFoundError
 from functools import partial
 from lxml import etree
-from lxml.etree import XMLSyntaxError
 from pprint import pprint
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 
@@ -219,6 +215,7 @@ class XModule(HTMLSnippet):
         '''
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
+
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
 
@@ -332,8 +329,6 @@ def policy_key(location):
 Template = namedtuple("Template", "metadata data children")
 
 
-
-
 class ResourceTemplates(object):
     @classmethod
     def templates(cls):
@@ -378,9 +373,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     module_class = XModule
 
     # Attributes for inpsection of the descriptor
-    stores_state = False # Indicates whether the xmodule state should be
+    stores_state = False  # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
-    has_score = False # This indicates whether the xmodule is a problem-type.
+    has_score = False  # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
 
@@ -485,9 +480,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         """
         Return the metadata that is not inherited, but was defined on this module.
         """
-        return dict((k,v) for k,v in self.metadata.items()
+        return dict((k, v) for k, v in self.metadata.items()
                     if k not in self._inherited_metadata)
-
 
     @staticmethod
     def compute_inherited_metadata(node):
@@ -528,7 +522,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
                 self._child_instances.append(child)
 
         return self._child_instances
-
 
     def get_child_by_url_name(self, url_name):
         """
@@ -613,36 +606,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        try:
-            class_ = XModuleDescriptor.load_class(
-                etree.fromstring(xml_data).tag,
-                default_class
-                )
-            # leave next line, commented out - useful for low-level debugging
-            # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-            #        etree.fromstring(xml_data).tag,class_))
+        class_ = XModuleDescriptor.load_class(
+            etree.fromstring(xml_data).tag,
+            default_class
+            )
+        # leave next line, commented out - useful for low-level debugging
+        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
+        #        etree.fromstring(xml_data).tag,class_))
 
-            descriptor = class_.from_xml(xml_data, system, org, course)
-        except Exception as err:
-            # Didn't load properly.  Fall back on loading as an error
-            # descriptor.  This should never error due to formatting.
-
-            # Put import here to avoid circular import errors
-            from xmodule.error_module import ErrorDescriptor
-            msg = "Error loading from xml."
-            log.warning(msg + " " + str(err)[:200])
-
-            # Normally, we don't want lots of exception traces in our logs from common
-            # content problems.  But if you're debugging the xml loading code itself,
-            # uncomment the next line.
-            # log.exception(msg)
-
-            system.error_tracker(msg)
-            err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
-            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
-                                                  err_msg)
-
-        return descriptor
+        return class_.from_xml(xml_data, system, org, course)
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -725,7 +697,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
                     self.location.url(), self.metadata[key], e)
                 log.warning(msg)
         return None
-
 
 
 class DescriptorSystem(object):
