@@ -95,4 +95,27 @@ def accepts(request, media_type):
 
 def debug_request(request):
     """Return a pretty printed version of the request"""
-    return HttpResponse("<html><pre>{0}</pre></html>".format(pprint.pformat(request)))
+
+    return HttpResponse("""<html>
+<h1>request:</h1>
+<pre>{0}</pre>
+
+<h1>request.GET</h1>:
+
+<pre>{1}</pre>
+
+<h1>request.POST</h1>:
+<pre>{2}</pre>
+
+<h1>request.REQUEST</h1>:
+<pre>{3}</pre>
+
+
+
+</html>
+""".format(
+    pprint.pformat(request),
+    pprint.pformat(dict(request.GET)),
+    pprint.pformat(dict(request.POST)),
+    pprint.pformat(dict(request.REQUEST)),
+    ))
