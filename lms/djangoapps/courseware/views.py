@@ -23,7 +23,7 @@ from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
 import courseware.tabs as tabs
-from models import StudentModuleCache
+from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
 from student.models import UserProfile
 
@@ -484,16 +484,14 @@ def progress(request, course_id, student_id=None):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         course_id, student, course)
-    course_module = get_module(student, request, course.location,
-                               student_module_cache, course_id)
 
-    # The course_module should be accessible, but check anyway just in case something went wrong:
-    if course_module is None:
-        raise Http404("Course does not exist")
-
-    courseware_summary = grades.progress_summary(student, course_module,
-                                                 course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, request, course,
+                                                 student_module_cache)
     grade_summary = grades.grade(student, request, course, student_module_cache)
+    
+    if courseware_summary is None:
+        #This means the student didn't have access to the course (which the instructor requested)
+        raise Http404
 
     context = {'course': course,
                'courseware_summary': courseware_summary,
