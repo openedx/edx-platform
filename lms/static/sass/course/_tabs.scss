@@ -1,0 +1,13 @@
+div.static_tab_wrapper {
+
+  padding: 2em 2.5em;
+
+  h1 {
+    @extend .top-header
+  }
+
+  section {
+    margin: 0px 0px 20px;
+  }
+
+}

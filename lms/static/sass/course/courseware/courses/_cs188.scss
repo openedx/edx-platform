@@ -1,5 +1,36 @@
 body.cs188 {
 
+    .course-staff {
+      .teacher {
+        margin-bottom: 40px;
+
+        h3 {
+          color: $base-font-color;
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-bottom: 15px;
+          text-transform: none;
+        }
+
+        .teacher-image {
+          background: rgb(255,255,255);
+          border: 1px solid rgb(200,200,200);
+          height: 115px;
+          float: left;
+          margin: 0 15px 0px 0;
+          overflow: hidden;
+          padding: 1px;
+          width: 115px;
+
+          img {
+            display: block;
+            min-height: 100%;
+            max-width: 100%;
+          }
+        }
+      }
+    }
+
     .course-content{
 
         .project {
