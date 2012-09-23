@@ -1,38 +1,103 @@
 body.cs188 {
 
-    .course-content{
-
-        .project {
-            ul, ol {
-                margin-top: 3px;
-                list-style: disc;
-                ul, ol {
-                    margin: 0px;
-                }
-            }
+  .due_dates {
+    li {
+      .assignment {
+        float: left;
+      }
+      .due_date {
+        float: right;
+        &.next {
+          font-weight: bold;
         }
-
-        h3, h4 {
-            font-weight: bold;
-            a {
-                color: inherit;
-            }
-        }
-
-        h4 {
-            font-size: 1em;
-        }
-
-        p, .code_snippet {
-            margin-bottom: 1.416em;
-        }
-
-        .choicegroup {
-            input[type=checkbox], input[type=radio] {
-                margin-right: 5px;
-            }
-        }
-
+      }
     }
+    li.past {
+      .assignment, .due_date {
+        text-decoration: line-through;
+        &, a {
+          color: #999999;
+
+        }
+        a:hover{
+        color: #666666;
+        }
+      }
+    }
+    li.next {
+      border-bottom: 2px solid $blue;
+      .assignment, .due_date {
+        &, a {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .course-staff {
+    .teacher {
+      margin-bottom: 40px;
+
+      h3 {
+        color: $base-font-color;
+        font-family: $sans-serif;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-transform: none;
+      }
+
+      .teacher-image {
+        background: rgb(255,255,255);
+        border: 1px solid rgb(200,200,200);
+        height: 115px;
+        float: left;
+        margin: 0 15px 0px 0;
+        overflow: hidden;
+        padding: 1px;
+        width: 115px;
+
+        img {
+          display: block;
+          min-height: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  .course-content{
+
+    .project {
+      ul, ol {
+        margin-top: 3px;
+        list-style: disc;
+        ul, ol {
+          margin: 0px;
+        }
+      }
+    }
+
+    h3, h4 {
+      font-weight: bold;
+      a {
+        color: inherit;
+      }
+    }
+
+    h4 {
+      font-size: 1em;
+    }
+
+    p, .code_snippet {
+      margin-bottom: 1.416em;
+    }
+
+    .choicegroup {
+      input[type=checkbox], input[type=radio] {
+        margin-right: 5px;
+      }
+    }
+
+  }
 
 }
