@@ -18,7 +18,16 @@ $(function () {
       opacity: 0.90
     }).appendTo("body").fadeIn(200);
   }
-      
+
+  function sortGradeCutoffs(obj) {
+    var arr = [];
+    for (var prop in obj)
+      if (obj.hasOwnProperty(prop))
+        arr.push({'key': prop, 'value': obj[prop]});
+    arr.sort(function(a, b) { return b.value - a.value; });
+    return arr.map(function (el) { return el.key; });
+  }
+
   /* -------------------------------- Grade detail bars -------------------------------- */
     
   <%
@@ -97,7 +106,8 @@ $(function () {
   ## ----------------------------- Grade cutoffs ------------------------- ##
   
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
-  for grade in ['A', 'B', 'C']:
+  descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
+  for grade in descending_grades:
       percent = grade_cutoffs[grade]
       grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
   %>
@@ -109,18 +119,31 @@ $(function () {
   var droppedScores = ${ json.dumps(droppedScores) };
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
-  //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
+  //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
+  // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
+  //    by building the grade markers and grid markings from the `grade_cutoffs` object
+  var grade_cutoffs = JSON.parse('${ json.dumps(grade_cutoffs) }');
+  descending_grades = sortGradeCutoffs(grade_cutoffs);
+
+  var colors = ['#ddd', '#e9e9e9', '#f3f3f3'];
+  var markings = [];
+  var marking_from, marking_to = 1;
+  for(var i=0; i<descending_grades.length; i++) {
+    marking_from = grade_cutoffs[descending_grades[i]];
+    var marking = {yaxis: {from: marking_from, to: marking_to}, color: colors[i % colors.length]};
+    marking_to = marking_from;
+    markings.push(marking);
+  }
+
   var options = {
     series: {stack: true,
               lines: {show: false, steps: false },
               bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
     yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 50},
-    grid: { hoverable: true, clickable: true, borderWidth: 1,
-      markings: [ {yaxis: {from: ${grade_cutoffs['A']}, to: 1 }, color: "#ddd"}, {yaxis: {from: ${grade_cutoffs['B']}, to: ${grade_cutoffs['A']} }, color: "#e9e9e9"}, 
-                  {yaxis: {from: ${grade_cutoffs['C']}, to: ${grade_cutoffs['B']} }, color: "#f3f3f3"}, ] },
+    grid: { hoverable: true, clickable: true, borderWidth: 1, markings: markings },
     legend: {show: false},
   };
   
