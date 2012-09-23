@@ -204,7 +204,7 @@ class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
-                                           mimetype='application/json; charset=utf8')
+                                           mimetype='application/json; charset=utf-8')
 
 class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
@@ -214,7 +214,7 @@ class JsonError(HttpResponse):
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf8', status=status)
+                                        mimetype='application/json; charset=utf-8', status=status)
 
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
