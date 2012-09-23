@@ -226,7 +226,10 @@ def grade_for_percentage(grade_cutoffs, percentage):
     """
 
     letter_grade = None
-    for possible_grade in ['A', 'B', 'C']:
+    
+    # Possible grades, sorted in descending order of score
+    descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
+    for possible_grade in descending_grades:
         if percentage >= grade_cutoffs[possible_grade]:
             letter_grade = possible_grade
             break
