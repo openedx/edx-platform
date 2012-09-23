@@ -217,7 +217,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
 def grade_for_percentage(grade_cutoffs, percentage):
     """
-    Returns a letter grade 'A' 'B' 'C' or None.
+    Returns a letter grade as defined in grading_policy (e.g. 'A' 'B' 'C' for 6.002x) or None.
 
     Arguments
     - grade_cutoffs is a dictionary mapping a grade to the lowest
