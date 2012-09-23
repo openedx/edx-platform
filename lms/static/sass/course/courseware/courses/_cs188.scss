@@ -1,5 +1,17 @@
 body.cs188 {
 
+  .course_information {
+    ul, ol {
+      color: $base-font-color;
+      li {
+        margin: 4px 0px;
+      }
+      ul, ol {
+        margin: 6px;
+      }
+    }
+  }
+
   .static_tab_wrapper {
     .syllabus {
       padding: 0px;
