@@ -118,7 +118,7 @@ class ErrorDescriptor(EditingDescriptor):
             # Save the error to display later--overrides other problems
             error_msg = exc_info_to_str(sys.exc_info())
 
-        return cls(system, xml_data, error_msg)
+        return cls(system, xml_data, error_msg, org=org, course=course)
 
     def export_to_xml(self, resource_fs):
         '''
