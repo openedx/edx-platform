@@ -23,6 +23,6 @@ class CMS.Models.Module extends Backbone.Model
       _metadata = {}
       # walk through the set of elments which have the 'xmetadata_name' attribute and
       # build up a object to pass back to the server on the subsequent POST
-      _metadata[el.getAttribute("xmetadata_name")]=el.value for el in $('[xmetadata_name]')
+      _metadata[$(el).data("metadata-name")]=el.value for el in $('[data-metadata-name]', @metadata_elt)
       @set(metadata: _metadata)
     super(args...)
