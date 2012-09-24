@@ -18,7 +18,7 @@ $(function () {
       opacity: 0.90
     }).appendTo("body").fadeIn(200);
   }
-      
+
   /* -------------------------------- Grade detail bars -------------------------------- */
     
   <%
@@ -97,7 +97,8 @@ $(function () {
   ## ----------------------------- Grade cutoffs ------------------------- ##
   
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
-  for grade in ['A', 'B', 'C']:
+  descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
+  for grade in descending_grades:
       percent = grade_cutoffs[grade]
       grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
   %>
@@ -109,18 +110,25 @@ $(function () {
   var droppedScores = ${ json.dumps(droppedScores) };
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
-  //Alwasy be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
+  //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
+  // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
+  var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; }); // Percentage point (in decimal) of each grade cutoff
+  ascending_grades.sort();
+
+  var colors = ['#f3f3f3', '#e9e9e9', '#ddd'];
+  var markings = [];
+  for(var i=1; i<ascending_grades.length-1; i++) // Skip the i=0 marking, which starts from 0%
+    markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
+
   var options = {
     series: {stack: true,
               lines: {show: false, steps: false },
               bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
     xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
     yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 50},
-    grid: { hoverable: true, clickable: true, borderWidth: 1,
-      markings: [ {yaxis: {from: ${grade_cutoffs['A']}, to: 1 }, color: "#ddd"}, {yaxis: {from: ${grade_cutoffs['B']}, to: ${grade_cutoffs['A']} }, color: "#e9e9e9"}, 
-                  {yaxis: {from: ${grade_cutoffs['C']}, to: ${grade_cutoffs['B']} }, color: "#f3f3f3"}, ] },
+    grid: { hoverable: true, clickable: true, borderWidth: 1, markings: markings },
     legend: {show: false},
   };
   
