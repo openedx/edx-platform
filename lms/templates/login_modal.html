@@ -46,11 +46,11 @@
 (function() {
    $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
-       % if request.REQUEST.get('next', False):
-           location.href="${request.REQUEST.get('next')}";
-       % else:
-           location.href="${reverse('dashboard')}";
-       % endif
+        if(getParameterByName('next')) {
+           location.href = getParameterByName('next');
+       } else {
+           location.href = "${reverse('dashboard')}";
+       }
      } else {
        if($('#login_error').length == 0) {
          $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');

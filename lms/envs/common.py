@@ -525,6 +525,7 @@ PIPELINE_JS = {
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
+            'js/query-params.js',
         ],
         'output_filename': 'js/lms-application.js'
     },
