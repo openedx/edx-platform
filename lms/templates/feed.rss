@@ -13,7 +13,7 @@
     <updated>2012-09-25T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/elsevier-collaborates-with-edx')}"/>
     <title>Elsevier collaborates with edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/foundations_of_analog_x109.jpg')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/foundations-of-analog-102x84.jpg')}&quot; /&gt;
       &lt;p&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
@@ -22,7 +22,7 @@
     <updated>2012-09-06T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/edX-announces-proctored-exam-testing')}"/>
     <title>EdX to offer learners option of taking proctored final exam</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/diploma_109x65.jpg')}&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/diploma-102x84.jpg')}&quot; /&gt;</content>
   </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/3</id>
@@ -30,7 +30,7 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/uc-berkeley-joins-edx')}"/>
     <title>UC Berkeley joins edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/edx.png')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/edx-102x84.png')}&quot; /&gt;
       &lt;p&gt;edX broadens course offerings&lt;/p&gt;</content>
   </entry>
   <entry>
