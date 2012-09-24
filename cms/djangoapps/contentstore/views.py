@@ -382,6 +382,10 @@ def clone_item(request):
 
     new_item = modulestore().clone_item(template, dest_location)
     new_item.metadata['display_name'] = display_name
+
+    # TODO: This needs to be deleted when we have proper storage for static content
+    new_item.metadata['data_dir'] = parent.metadata['data_dir']
+
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
     modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
