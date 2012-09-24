@@ -2,7 +2,7 @@
 <section class="metadata_edit">
   <h3>Metadata</h3>
   <ul>
-    % for keyname in metadata.keys():
+    % for keyname in editable_metadata_fields:
     <li>${keyname}: <input type='text' data-metadata-name='${keyname}' value='${metadata[keyname]}' size='60' /></li>
     % endfor
   </ul>
