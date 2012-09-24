@@ -102,27 +102,15 @@ def course_index(request, org, course, name):
     if not has_access(request.user, location):
         raise Http404  # TODO (vshnayder): better error
 
-    # TODO (cpennington): These need to be read in from the active user
-    _course = modulestore().get_item(location)
-    weeks = _course.get_children()
-
-    #upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
-    #    org = org, 
-    #    course = course,
-    #    name = name
-    #    )
-
     upload_asset_callback_url = reverse('upload_asset', kwargs = {
             'org' : org,
             'course' : course,
             'coursename' : name
             })
-    logging.debug(upload_asset_callback_url)
 
-    return render_to_response('course_index.html', {
-            'weeks': weeks, 
-            'upload_asset_callback_url': upload_asset_callback_url
-            })
+    return render_to_response('overview.html', {
+        'upload_asset_callback_url': upload_asset_callback_url
+    })
 
 
 @login_required
