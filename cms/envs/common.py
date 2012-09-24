@@ -275,7 +275,7 @@ PIPELINE_JS = {
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth
             in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')
-        ],
+        ] + ['js/base.js'],
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {

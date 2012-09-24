@@ -2,6 +2,30 @@
 <%block name="title">CMS Courseware Overview</%block>
 <%include file="widgets/header.html"/>
 
+<%def name="branch(section)">
+  <li class="branch collapsed">
+    <div class="section-item">
+      % if len(section.get_children()) > 0:
+      <a href="#" class="expand-collapse-icon expand"></a>
+      % endif
+      <a href="#" class="draft-item">
+        <span class="${section.category}-icon"></span>${section.display_name} <span class="draft-tag">– draft</span>
+      </a>
+      <div class="item-actions">
+        <a href="#" class="edit-button"><span class="edit-icon"></span></a>
+        <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+        <a href="#" class="drag-handle"></a>
+      </div>
+    </div>
+    <ol>
+      % for unit in section.get_children():
+      ${branch(unit)}
+      % endfor
+    </ol>
+  </li>
+</%def>
+
+
 <%block name="content">
     <div class="main-wrapper">
       <div class="inner-wrapper">
@@ -25,30 +49,7 @@
             </header>
             <ol>
               % for section in week.get_children():
-              <li class="branch collapsed">
-                <div class="section-item">
-                  <a href="#" class="expand-collapse-icon expand"></a><a href="#" class="draft-item"><span class="${section.category}-icon"></span>${section.display_name} <span class="draft-tag">– draft</span></a>
-                  <div class="item-actions">
-                    <a href="#" class="edit-button"><span class="edit-icon"></span></a>
-                    <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-                    <a href="#" class="drag-handle"></a>
-                  </div>
-                </div>
-                <ol>
-                  % for unit in section.get_children():
-                  <li>
-                    <div class="section-item">
-                      <a href="#"><span class="${unit.category}-icon"></span>${unit.display_name}</a>
-                      <div class="item-actions">
-                        <a href="#" class="edit-button"><span class="edit-icon"></span></a>
-                        <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-                        <a href="#" class="drag-handle"></a>
-                      </div>
-                    </div>
-                  </li>
-                  % endfor
-                </ol>
-              </li>
+              ${branch(section)}
               % endfor
             </ol>
           </section>
