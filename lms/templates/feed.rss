@@ -14,7 +14,7 @@
     <link type="text/html" rel="alternate" href="${reverse('press/elsevier-collaborates-with-edx')}"/>
     <title>Elsevier collaborates with edX</title>
     <content type="html">&lt;img src=&quot;${static.url('images/press/foundations-of-analog-102x84.jpg')}&quot; /&gt;
-      &lt;p&gt;Course textbook made available to edX students&lt;/p&gt;</content>
+      &lt;p&gt;Free course textbook made available to edX students&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/4</id>
