@@ -101,8 +101,6 @@ class Location(_LocationBase):
                 raise InsufficientSpecificationError(location)
         return loc
 
-
-
     def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
                 name=None, revision=None):
         """
