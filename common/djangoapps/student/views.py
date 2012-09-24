@@ -52,6 +52,10 @@ def csrf_token(context):
             ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
+# NOTE: This view is not linked to directly--it is called from
+# branding/views.py:index(), which is cached for anonymous users.
+# This means that it should always return the same thing for anon
+# users. (in particular, no switching based on query params allowed)
 def index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
@@ -82,8 +86,6 @@ def index(request, extra_context={}, user=None):
                                              domain=domain)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
-    if request.REQUEST.get('next', False):
-        context['show_login_immediately'] = True
     return render_to_response('index.html', context)
 
 def course_from_id(course_id):
