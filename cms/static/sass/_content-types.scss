@@ -4,62 +4,62 @@
   background-repeat: no-repeat;
 }
 
-.videosequence a:first-child {
+.videosequence-icon {
   @extend .content-type;
   background-image: url('../img/content-types/videosequence.png');
 }
 
-.video a:first-child {
+.video-icon {
   @extend .content-type;
   background-image: url('../img/content-types/video.png');
 }
 
-.problemset a:first-child {
+.problemset-icon {
   @extend .content-type;
   background-image: url('../img/content-types/problemset.png');
 }
 
-.problem a:first-child {
+.problem-icon {
   @extend .content-type;
   background-image: url('../img/content-types/problem.png');
 }
 
-.lab a:first-child {
+.lab-icon {
   @extend .content-type;
   background-image: url('../img/content-types/lab.png');
 }
 
-.tab a:first-child {
+.tab-icon {
   @extend .content-type;
   background-image: url('../img/content-types/lab.png');
 }
 
-.html a:first-child {
+.html-icon {
   @extend .content-type;
   background-image: url('../img/content-types/html.png');
 }
 
-.vertical a:first-child {
+.vertical-icon {
   @extend .content-type;
   background-image: url('../img/content-types/vertical.png');
 }
 
-.sequential a:first-child {
+.sequential-icon {
   @extend .content-type;
   background-image: url('../img/content-types/sequential.png');
 }
 
-.chapter a:first-child {
+.chapter-icon {
   @extend .content-type;
   background-image: url('../img/content-types/chapter.png');
 }
 
-.module a:first-child {
+.module-icon {
   @extend .content-type;
   background-image: url('../img/content-types/module.png');
 }
 
-.module a:first-child {
+.module-icon {
   @extend .content-type;
   background-image: url('../img/content-types/module.png');
 }

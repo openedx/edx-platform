@@ -108,7 +108,11 @@ def course_index(request, org, course, name):
             'coursename' : name
             })
 
+    course = modulestore().get_item(location)
+    weeks = course.get_children()
+
     return render_to_response('overview.html', {
+        'weeks': weeks,
         'upload_asset_callback_url': upload_asset_callback_url
     })
 
