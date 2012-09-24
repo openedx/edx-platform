@@ -51,7 +51,8 @@ class ErrorDescriptor(EditingDescriptor):
     """
     module_class = ErrorModule
 
-    def __init__(self, system, contents, error_msg, org=None, course=None):
+    @classmethod
+    def _construct(self, system, contents, error_msg, org=None, course=None):
 
         # Pick a unique url_name -- the sha1 hash of the contents.
         # NOTE: We could try to pull out the url_name of the errored descriptor,
@@ -82,7 +83,7 @@ class ErrorDescriptor(EditingDescriptor):
 
     @classmethod
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
-        return cls(
+        return cls._construct(
             descriptor.system,
             json.dumps({
                 'definition': descriptor.definition,
@@ -118,7 +119,7 @@ class ErrorDescriptor(EditingDescriptor):
             # Save the error to display later--overrides other problems
             error_msg = exc_info_to_str(sys.exc_info())
 
-        return cls(system, xml_data, error_msg, org=org, course=course)
+        return cls._construct(system, xml_data, error_msg, org=org, course=course)
 
     def export_to_xml(self, resource_fs):
         '''
