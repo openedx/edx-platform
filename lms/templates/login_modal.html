@@ -46,8 +46,9 @@
 (function() {
    $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
      if(json.success) {
-        if(getParameterByName('next')) {
-           location.href = getParameterByName('next');
+        next = getParameterByName('next');
+        if(next) {
+           location.href = next;
        } else {
            location.href = "${reverse('dashboard')}";
        }
