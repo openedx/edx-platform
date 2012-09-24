@@ -15,6 +15,15 @@ body.cs188 {
   .static_tab_wrapper {
     .syllabus {
       padding: 0px;
+      ul {
+        margin: 0;
+        li {
+          margin: 7px 0px;
+        }
+        ul {
+          list-style-type: disc;
+        }
+      }
     }
   }
 
