@@ -430,9 +430,6 @@ def university_profile(request, org_id):
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
-    if request.REQUEST.get('next', False):
-        context['show_login_immediately'] = True
-
     return render_to_response(template_file, context)
 
 def render_notifications(request, course, notifications):
