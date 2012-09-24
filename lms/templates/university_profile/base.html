@@ -14,4 +14,17 @@
       <%block name="university_description" />
     </section>
   </section>
+
+<%block name="js_extra">
+   <script type="text/javascript" src="${static.url('js/query-params.js')}"></script>
+   <script type="text/javascript"">
+      $(window).load(function() {
+         if(getParameterByName('next')) {
+              $('#login').trigger("click");
+         }
+      })
+   </script>
+</%block>
+
+
 </section>
