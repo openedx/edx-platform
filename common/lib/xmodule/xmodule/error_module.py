@@ -75,7 +75,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
 
         # real metadata stays in the content, but add a display name
         metadata = {'display_name': 'Error: ' + location.name}
-        super(ErrorDescriptor, self).__init__(
+        return ErrorDescriptor(
             system,
             definition,
             location=location,
@@ -90,7 +90,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
 
     @classmethod
     def from_json(cls, json_data, system, error_msg='Error not available'):
-        return cls(
+        return cls._construct(
             system,
             json.dumps(json_data, indent=4),
             error_msg,
