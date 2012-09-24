@@ -19,15 +19,6 @@ $(function () {
     }).appendTo("body").fadeIn(200);
   }
 
-  function sortGradeCutoffs(obj) {
-    var arr = [];
-    for (var prop in obj)
-      if (obj.hasOwnProperty(prop))
-        arr.push({'key': prop, 'value': obj[prop]});
-    arr.sort(function(a, b) { return b.value - a.value; });
-    return arr.map(function (el) { return el.key; });
-  }
-
   /* -------------------------------- Grade detail bars -------------------------------- */
     
   <%
@@ -123,19 +114,13 @@ $(function () {
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
   // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
-  //    by building the grade markers and grid markings from the `grade_cutoffs` object
-  var grade_cutoffs = JSON.parse('${ json.dumps(grade_cutoffs) }');
-  descending_grades = sortGradeCutoffs(grade_cutoffs);
+  var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; });
+  ascending_grades.sort();
 
-  var colors = ['#ddd', '#e9e9e9', '#f3f3f3'];
+  var colors = ['#f3f3f3', '#e9e9e9', '#ddd'];
   var markings = [];
-  var marking_from, marking_to = 1;
-  for(var i=0; i<descending_grades.length; i++) {
-    marking_from = grade_cutoffs[descending_grades[i]];
-    var marking = {yaxis: {from: marking_from, to: marking_to}, color: colors[i % colors.length]};
-    marking_to = marking_from;
-    markings.push(marking);
-  }
+  for(var i=1; i<ascending_grades.length-1; i++)
+    markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
 
   var options = {
     series: {stack: true,
