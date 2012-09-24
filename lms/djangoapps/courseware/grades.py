@@ -303,6 +303,7 @@ def progress_summary(student, request, course, student_module_cache):
                 scores.append(Score(correct, total, graded,
                     module_descriptor.metadata.get('display_name')))
 
+            scores.reverse()
             section_total, graded_total = graders.aggregate_scores(
                 scores, section_module.metadata.get('display_name'))
 
