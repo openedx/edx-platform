@@ -114,12 +114,12 @@ $(function () {
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
   // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
-  var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; });
+  var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; }); // Percentage point (in decimal) of each grade cutoff
   ascending_grades.sort();
 
   var colors = ['#f3f3f3', '#e9e9e9', '#ddd'];
   var markings = [];
-  for(var i=1; i<ascending_grades.length-1; i++)
+  for(var i=1; i<ascending_grades.length-1; i++) // Skip the i=0 marking, which starts from 0%
     markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
 
   var options = {
