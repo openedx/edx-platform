@@ -10,6 +10,7 @@ if Backbone?
       "click .post-list .list-item a": "threadSelected"
       "click .post-list .more-pages a": "loadMorePages"
       'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
+      "scroll .post-list-wrapper": "scrollHandler"
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
@@ -99,6 +100,7 @@ if Backbone?
 
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
+      @$('.post-list-wrapper').scroll @scrollHandler  # Not sure why but the binding in events doesn't work
       @renderThreads()
       @
 
@@ -380,3 +382,19 @@ if Backbone?
     retrieveFollowed: (event)=>
       @mode = 'followed'
       @retrieveFirstPage(event)
+
+    scrollHandler: (event)=>
+      if not @isLoadingMore() and @isLoadMoreVisible()
+        @loadMorePages()
+
+    isLoadMoreVisible: ->
+      return false if not @$('.more-pages').length
+      listTop = @$('.post-list-wrapper').offset().top
+      listBottom = listTop + @$('.post-list-wrapper').height()
+      elem = @$('.more-pages')
+      elemTop = $(elem).offset().top
+      return ((elemTop <= listBottom) && (elemTop >= listTop))
+
+    isLoadingMore: ->
+      return false if not @$('.more-pages').length
+      @$('.more-pages').hasClass('loading')
