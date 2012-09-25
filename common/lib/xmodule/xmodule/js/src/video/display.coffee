@@ -17,7 +17,7 @@ class @Video
       @embed()
     else
       window.onYouTubePlayerAPIReady = =>
-        $('.course-content .video').each ->
+        @el.each ->
           $(this).data('video').embed()
 
   youtubeId: (speed)->

@@ -23,12 +23,9 @@ import sys
 import tempfile
 import os.path
 import os
-import errno
-import glob2
 import lms.envs.common
-import hashlib
-from collections import defaultdict
 from path import path
+from xmodule.static_content import write_descriptor_styles, write_descriptor_js, write_module_js, write_module_styles
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -194,67 +191,27 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 # Load javascript and css from all of the available descriptors, and
 # prep it for use in pipeline js
-from xmodule.x_module import XModuleDescriptor
 from xmodule.raw_module import RawDescriptor
 from xmodule.error_module import ErrorDescriptor
-js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
-css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
-module_styles_path = css_file_dir / "_module-styles.scss"
+from rooted_paths import rooted_glob, remove_root
 
-for dir_ in (js_file_dir, css_file_dir):
-    try:
-        os.makedirs(dir_)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST:
-            pass
-        else:
-            raise
+write_descriptor_styles(PROJECT_ROOT / "static/sass/descriptor", [RawDescriptor, ErrorDescriptor])
+write_module_styles(PROJECT_ROOT / "static/sass/module", [RawDescriptor, ErrorDescriptor])
 
-js_fragments = set()
-css_fragments = defaultdict(set)
-for _, descriptor in XModuleDescriptor.load_classes() + [(None, RawDescriptor), (None, ErrorDescriptor)]:
-    descriptor_js = descriptor.get_javascript()
-    module_js = descriptor.module_class.get_javascript()
-
-    for filetype in ('coffee', 'js'):
-        for idx, fragment in enumerate(descriptor_js.get(filetype, []) + module_js.get(filetype, [])):
-            js_fragments.add((idx, filetype, fragment))
-
-    for class_ in (descriptor, descriptor.module_class):
-        fragments = class_.get_css()
-        for filetype in ('sass', 'scss', 'css'):
-            for idx, fragment in enumerate(fragments.get(filetype, [])):
-                css_fragments[idx, filetype, fragment].add(class_.__name__)
-
-module_js_sources = []
-for idx, filetype, fragment in sorted(js_fragments):
-    path = js_file_dir / "{idx}-{hash}.{type}".format(
-        idx=idx,
-        hash=hashlib.md5(fragment).hexdigest(),
-        type=filetype)
-    with open(path, 'w') as js_file:
-        js_file.write(fragment)
-    module_js_sources.append(path.replace(PROJECT_ROOT / "static/", ""))
-
-css_imports = defaultdict(set)
-for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
-    fragment_name = "{idx}-{hash}.{type}".format(
-        idx=idx,
-        hash=hashlib.md5(fragment).hexdigest(),
-        type=filetype)
-    # Prepend _ so that sass just includes the files into a single file
-    with open(css_file_dir / '_' + fragment_name, 'w') as js_file:
-        js_file.write(fragment)
-
-    for class_ in classes:
-        css_imports[class_].add(fragment_name)
-
-with open(module_styles_path, 'w') as module_styles:
-    for class_, fragment_names in css_imports.items():
-        imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
-        module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
-            class_=class_, imports=imports
-        ))
+descriptor_js = remove_root(
+    PROJECT_ROOT / 'static',
+    write_descriptor_js(
+        PROJECT_ROOT / "static/coffee/descriptor",
+        [RawDescriptor, ErrorDescriptor]
+    )
+)
+module_js = remove_root(
+    PROJECT_ROOT / 'static',
+    write_module_js(
+        PROJECT_ROOT / "static/coffee/module",
+        [RawDescriptor, ErrorDescriptor]
+    )
+)
 
 PIPELINE_CSS = {
     'base-style': {
@@ -267,23 +224,18 @@ PIPELINE_ALWAYS_RECOMPILE = ['sass/base-style.scss']
 
 PIPELINE_JS = {
     'main': {
-        'source_filenames': [
-            pth.replace(COMMON_ROOT / 'static/', '')
-            for pth
-            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
-        ] + [
-            pth.replace(PROJECT_ROOT / 'static/', '')
-            for pth
-            in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')
-        ] + ['js/base.js'],
+        'source_filenames': sorted(
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.coffee') +
+            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
+        ) + ['js/base.js'],
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {
-        'source_filenames': module_js_sources,
+        'source_filenames': descriptor_js + module_js,
         'output_filename': 'js/cms-modules.js',
     },
     'spec': {
-        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '') for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/spec/**/*.coffee')],
+        'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.coffee')),
         'output_filename': 'js/cms-spec.js'
     }
 }
