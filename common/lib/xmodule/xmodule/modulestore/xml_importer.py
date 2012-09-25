@@ -7,7 +7,8 @@ log = logging.getLogger(__name__)
 
 
 def import_from_xml(store, data_dir, course_dirs=None, 
-                    default_class='xmodule.raw_module.RawDescriptor'):
+                    default_class='xmodule.raw_module.RawDescriptor',
+                    load_error_modules=True):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -19,18 +20,12 @@ def import_from_xml(store, data_dir, course_dirs=None,
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
-        course_dirs=course_dirs
+        course_dirs=course_dirs,
+        load_error_modules=load_error_modules,
     )
     for course_id in module_store.modules.keys():
         for module in module_store.modules[course_id].itervalues():
 
-            # TODO (cpennington): This forces import to overrite the same items.
-            # This should in the future create new revisions of the items on import
-            try:
-                store.create_item(module.location)
-            except DuplicateItemError:
-                log.exception('Item already exists at %s' % module.location.url())
-                pass
             if 'data' in module.definition:
                 store.update_item(module.location, module.definition['data'])
             if 'children' in module.definition:

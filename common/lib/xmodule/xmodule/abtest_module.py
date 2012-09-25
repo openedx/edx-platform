@@ -1,5 +1,6 @@
 import json
 import random
+import logging
 from lxml import etree
 
 from xmodule.x_module import XModule
@@ -8,6 +9,9 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
 
 DEFAULT = "_DEFAULT_GROUP"
+
+
+log = logging.getLogger(__name__)
 
 
 def group_from_value(groups, v):
@@ -61,6 +65,8 @@ class ABTestModule(XModule):
 # managed by ABTests
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
+
+#    template_dir_name = "abtest"
 
     def __init__(self, system, definition=None, **kwargs):
         """
@@ -125,10 +131,13 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 name = group.get('name')
                 definition['data']['group_portions'][name] = float(group.get('portion', 0))
 
-            child_content_urls = [
-                system.process_xml(etree.tostring(child)).location.url()
-                for child in group
-            ]
+            child_content_urls = []
+            for child in group:
+                try:
+                    child_content_urls.append(system.process_xml(etree.tostring(child)).location.url())
+                except:
+                    log.exception("Unable to load child when parsing ABTest. Continuing...")
+                    continue
 
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)

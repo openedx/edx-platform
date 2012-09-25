@@ -644,6 +644,8 @@ class CapaDescriptor(RawDescriptor):
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
 
+    template_dir_name = 'problem'
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
