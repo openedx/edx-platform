@@ -3,16 +3,16 @@ import json
 import logging
 import os
 import re
+import sys
 
 from collections import defaultdict
 from cStringIO import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
-from lxml.html import HtmlComment
 from path import path
 
-from xmodule.errortracker import ErrorLog, make_error_tracker
+from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
@@ -27,6 +27,7 @@ etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 # VS[compat]
 # TODO (cpennington): Remove this once all fall 2012 courses have been imported
 # into the cms from xml
@@ -35,9 +36,11 @@ def clean_out_mako_templating(xml_string):
     xml_string = re.sub("(?m)^\s*%.*$", '', xml_string)
     return xml_string
 
+
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 policy, error_tracker, parent_tracker, **kwargs):
+                 policy, error_tracker, parent_tracker,
+                 load_error_modules=True, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -47,6 +50,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
+        self.load_error_modules = load_error_modules
 
         def process_xml(xml):
             """Takes an xml string, and returns a XModuleDescriptor created from
@@ -93,7 +97,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     because we want it to be lazy."""
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
-                        orig_name = orig_name[len(tag)+1:-12]
+                        orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
                     return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
@@ -144,16 +148,40 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # have been imported into the cms from xml
                 xml = clean_out_mako_templating(xml)
                 xml_data = etree.fromstring(xml)
+
+                make_name_unique(xml_data)
+
+                descriptor = XModuleDescriptor.load_from_xml(
+                    etree.tostring(xml_data), self, self.org,
+                    self.course, xmlstore.default_class)
             except Exception as err:
-                log.warning("Unable to parse xml: {err}, xml: {xml}".format(
-                    err=str(err), xml=xml))
-                raise
+                print err, self.load_error_modules
+                if not self.load_error_modules:
+                    raise
 
-            make_name_unique(xml_data)
+                # Didn't load properly.  Fall back on loading as an error
+                # descriptor.  This should never error due to formatting.
 
-            descriptor = XModuleDescriptor.load_from_xml(
-                etree.tostring(xml_data), self, self.org,
-                self.course, xmlstore.default_class)
+                # Put import here to avoid circular import errors
+                from xmodule.error_module import ErrorDescriptor
+
+                msg = "Error loading from xml. " + str(err)[:200]
+                log.warning(msg)
+                # Normally, we don't want lots of exception traces in our logs from common
+                # content problems.  But if you're debugging the xml loading code itself,
+                # uncomment the next line.
+                # log.exception(msg)
+
+                self.error_tracker(msg)
+                err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
+                descriptor = ErrorDescriptor.from_xml(
+                    xml,
+                    self,
+                    self.org,
+                    self.course,
+                    err_msg
+                )
+
             descriptor.metadata['data_dir'] = course_dir
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
@@ -219,7 +247,7 @@ class XMLModuleStore(ModuleStoreBase):
     """
     An XML backed ModuleStore
     """
-    def __init__(self, data_dir, default_class=None, course_dirs=None):
+    def __init__(self, data_dir, default_class=None, course_dirs=None, load_error_modules=True):
         """
         Initialize an XMLModuleStore from data_dir
 
@@ -237,6 +265,8 @@ class XMLModuleStore(ModuleStoreBase):
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)
         self.courses = {}  # course_dir -> XModuleDescriptor for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
+
+        self.load_error_modules = load_error_modules
 
         if default_class is None:
             self.default_class = None
@@ -396,7 +426,15 @@ class XMLModuleStore(ModuleStoreBase):
 
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
-            system = ImportSystem(self, course_id, course_dir, policy, tracker, self.parent_tracker)
+            system = ImportSystem(
+                self,
+                course_id,
+                course_dir,
+                policy,
+                tracker,
+                self.parent_tracker,
+                self.load_error_modules,
+            )
 
             course_descriptor = system.process_xml(etree.tostring(course_data))
 
@@ -470,10 +508,6 @@ class XMLModuleStore(ModuleStoreBase):
         course_dir where course loading failed.
         """
         return dict( (k, self.errored_courses[k].errors) for k in self.errored_courses)
-
-    def create_item(self, location):
-        raise NotImplementedError("XMLModuleStores are read-only")
-
 
     def update_item(self, location, data):
         """

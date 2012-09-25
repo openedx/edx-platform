@@ -1,16 +1,13 @@
 import hashlib
 import logging
-import random
-import string
+import json
 import sys
 
-from pkg_resources import resource_string
 from lxml import etree
 from xmodule.x_module import XModule
-from xmodule.mako_module import MakoModuleDescriptor
-from xmodule.xml_module import XmlDescriptor
-from xmodule.editing_module import EditingDescriptor
+from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import Location
 
 
 log = logging.getLogger(__name__)
@@ -22,6 +19,7 @@ log = logging.getLogger(__name__)
 # what to show, and the logic for that belongs in the LMS (e.g. in get_module), so the error handler
 # decides whether to create a staff or not-staff module.
 
+
 class ErrorModule(XModule):
     def get_html(self):
         '''Show an error to staff.
@@ -29,9 +27,9 @@ class ErrorModule(XModule):
         '''
         # staff get to see all the details
         return self.system.render_template('module-error.html', {
-            'staff_access' : True,
-            'data' : self.definition['data']['contents'],
-            'error' : self.definition['data']['error_msg'],
+            'staff_access': True,
+            'data': self.definition['data']['contents'],
+            'error': self.definition['data']['error_msg'],
             })
 
 
@@ -42,17 +40,74 @@ class NonStaffErrorModule(XModule):
         '''
         # staff get to see all the details
         return self.system.render_template('module-error.html', {
-            'staff_access' : False,
-            'data' : "",
-            'error' : "",
+            'staff_access': False,
+            'data': "",
+            'error': "",
             })
 
 
-class ErrorDescriptor(EditingDescriptor):
+class ErrorDescriptor(JSONEditingDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
     module_class = ErrorModule
+
+    @classmethod
+    def _construct(self, system, contents, error_msg, location):
+
+        if location.name is None:
+            location = location._replace(
+                category='error',
+                # Pick a unique url_name -- the sha1 hash of the contents.
+                # NOTE: We could try to pull out the url_name of the errored descriptor,
+                # but url_names aren't guaranteed to be unique between descriptor types,
+                # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
+                # it will be written out with the original url_name.
+                name=hashlib.sha1(contents).hexdigest()
+            )
+
+        definition = {
+            'data': {
+                'error_msg': str(error_msg),
+                'contents': contents,
+            }
+        }
+
+        # real metadata stays in the content, but add a display name
+        metadata = {'display_name': 'Error: ' + location.name}
+        return ErrorDescriptor(
+            system,
+            definition,
+            location=location,
+            metadata=metadata
+        )
+
+    def get_context(self):
+        return {
+            'module': self,
+            'data': self.definition['data']['contents'],
+        }
+
+    @classmethod
+    def from_json(cls, json_data, system, error_msg='Error not available'):
+        return cls._construct(
+            system,
+            json.dumps(json_data, indent=4),
+            error_msg,
+            location=Location(json_data['location']),
+        )
+
+    @classmethod
+    def from_descriptor(cls, descriptor, error_msg='Error not available'):
+        return cls._construct(
+            descriptor.system,
+            json.dumps({
+                'definition': descriptor.definition,
+                'metadata': descriptor.metadata,
+            }, indent=4),
+            error_msg,
+            location=descriptor.location,
+        )
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None,
@@ -65,17 +120,6 @@ class ErrorDescriptor(EditingDescriptor):
         Takes an extra, optional, parameter--the error that caused an
         issue.  (should be a string, or convert usefully into one).
         '''
-        # Use a nested inner dictionary because 'data' is hardcoded
-        inner = {}
-        definition = {'data': inner}
-        inner['error_msg'] = str(error_msg)
-
-        # Pick a unique url_name -- the sha1 hash of the xml_data.
-        # NOTE: We could try to pull out the url_name of the errored descriptor,
-        # but url_names aren't guaranteed to be unique between descriptor types,
-        # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
-        # it will be written out with the original url_name.
-        url_name = hashlib.sha1(xml_data).hexdigest()
 
         try:
             # If this is already an error tag, don't want to re-wrap it.
@@ -84,22 +128,15 @@ class ErrorDescriptor(EditingDescriptor):
                 xml_data = xml_obj.text
                 error_node = xml_obj.find('error_msg')
                 if error_node is not None:
-                    inner['error_msg'] = error_node.text
+                    error_msg = error_node.text
                 else:
-                    inner['error_msg'] = 'Error not available'
+                    error_msg = 'Error not available'
 
         except etree.XMLSyntaxError:
             # Save the error to display later--overrides other problems
-            inner['error_msg'] = exc_info_to_str(sys.exc_info())
+            error_msg = exc_info_to_str(sys.exc_info())
 
-        inner['contents'] = xml_data
-        # TODO (vshnayder): Do we need a unique slug here?  Just pick a random
-        # 64-bit num?
-        location = ['i4x', org, course, 'error', url_name]
-        # real metadata stays in the xml_data, but add a display name
-        metadata = {'display_name': 'Error ' + url_name}
-
-        return cls(system, definition, location=location, metadata=metadata)
+        return cls._construct(system, xml_data, error_msg, location=Location('i4x', org, course, None, None))
 
     def export_to_xml(self, resource_fs):
         '''
@@ -111,8 +148,8 @@ class ErrorDescriptor(EditingDescriptor):
         files, etc.  That would just get re-wrapped on import.
         '''
         try:
-           xml = etree.fromstring(self.definition['data']['contents'])
-           return etree.tostring(xml)
+            xml = etree.fromstring(self.definition['data']['contents'])
+            return etree.tostring(xml)
         except etree.XMLSyntaxError:
             # still not valid.
             root = etree.Element('error')
@@ -120,6 +157,7 @@ class ErrorDescriptor(EditingDescriptor):
             err_node = etree.SubElement(root, 'error_msg')
             err_node.text = self.definition['data']['error_msg']
             return etree.tostring(root)
+
 
 class NonStaffErrorDescriptor(ErrorDescriptor):
     """

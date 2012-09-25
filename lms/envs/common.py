@@ -468,7 +468,7 @@ for dir_ in (js_file_dir, css_file_dir):
 
 js_fragments = set()
 css_fragments = defaultdict(set)
-for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+for _, descriptor in XModuleDescriptor.load_classes() + [(None, HiddenDescriptor)]:
     module_js = descriptor.module_class.get_javascript()
     for filetype in ('coffee', 'js'):
         for idx, fragment in enumerate(module_js.get(filetype, [])):

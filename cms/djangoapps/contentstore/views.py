@@ -1,6 +1,7 @@
 from util.json_request import expect_json
 import json
 import logging
+import sys
 from collections import defaultdict
 
 from django.http import HttpResponse, Http404
@@ -12,6 +13,8 @@ from django.conf import settings
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import exc_info_to_str
 from github_sync import export_to_github
 from static_replace import replace_urls
 
@@ -20,6 +23,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
 from functools import partial
+from itertools import groupby
+from operator import attrgetter
 
 log = logging.getLogger(__name__)
 
@@ -125,6 +130,33 @@ def edit_item(request):
         'metadata': item.metadata,
         # TODO: It would be nice to able to use reverse here in some form, but we don't have the lms urls imported
         'lms_link': lms_link,
+    })
+
+
+@login_required
+def new_item(request):
+    """
+    Display a page where the user can create a new item from a template
+
+    Expects a GET request with the parameter 'parent_location', which is the element to add
+    the newly created item to as a child.
+
+    parent_location: A Location URL
+    """
+
+    parent_location = request.GET['parent_location']
+    if not has_access(request.user, parent_location):
+        raise Http404
+
+    parent = modulestore().get_item(parent_location)
+    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
+
+    templates.sort(key=attrgetter('location.category', 'display_name'))
+
+    return render_to_response('new_item.html', {
+        'parent_name': parent.display_name,
+        'parent_location': parent.location.url(),
+        'templates': groupby(templates, attrgetter('location.category')),
     })
 
 
@@ -259,10 +291,17 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     shared_state: A shared state string
     """
     system = preview_module_system(request, preview_id, descriptor)
-    module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    try:
+        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+    except:
+        module = ErrorDescriptor.from_descriptor(
+            descriptor,
+            error_msg=exc_info_to_str(sys.exc_info())
+        ).xmodule_constructor(system)(None, None)
+
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, "xmodule_display.html"),
-        module.metadata['data_dir']
+        module.metadata.get('data_dir', module.location.course)
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
@@ -326,3 +365,28 @@ def save_item(request):
     preview_html = get_module_previews(request, descriptor)
 
     return HttpResponse(json.dumps(preview_html))
+
+
+@login_required
+@expect_json
+def clone_item(request):
+    parent_location = Location(request.POST['parent_location'])
+    template = Location(request.POST['template'])
+    display_name = request.POST['name']
+
+    if not has_access(request.user, parent_location):
+        raise Http404  # TODO (vshnayder): better error
+
+    parent = modulestore().get_item(parent_location)
+    dest_location = parent_location._replace(category=template.category, name=Location.clean_for_url_name(display_name))
+
+    new_item = modulestore().clone_item(template, dest_location)
+    new_item.metadata['display_name'] = display_name
+
+    # TODO: This needs to be deleted when we have proper storage for static content
+    new_item.metadata['data_dir'] = parent.metadata['data_dir']
+
+    modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
+    modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    return HttpResponse()
