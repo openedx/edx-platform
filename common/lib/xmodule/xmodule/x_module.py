@@ -1,6 +1,6 @@
 import logging
 import pkg_resources
-import json
+import yaml
 import os
 
 from functools import partial
@@ -352,7 +352,7 @@ class ResourceTemplates(object):
 
         for template_file in resource_listdir(__name__, dirname):
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = json.loads(template_content)
+            template = yaml.load(template_content)
             templates.append(Template(**template))
 
         return templates
