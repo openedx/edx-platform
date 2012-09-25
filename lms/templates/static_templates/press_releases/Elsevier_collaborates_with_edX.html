@@ -1,0 +1,79 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>Elsevier collaborates with edX</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>Elsevier collaborates with edX</h1>
+    <hr class="horizontal-divider">
+
+    <article>
+      <h2>Content from <a href="http://store.elsevier.com/product.jsp?isbn=9781558607354">Foundations of Analog and Digital Electronic Circuits</a> available free to edX students</h2>
+
+      <p><strong>Waltham, MA, September 19th, 2012</strong>  &ndash; <a href="http://www.elsevier.com/">Elsevier</a>, a world-leading provider of scientific, technical and medical information products and services, today announced its plan to provide free content through <a href="https://www.edx.org/">edX</a>, the online learning initiative founded by Harvard University and the Massachusetts Institute of Technology (MIT) and launched in May.</p>
+
+      <p>Students who enroll in edX&rsquo;s course <a href="https://www.edx.org/courses/MITx/6.002x/2012_Fall/about">6.002X: Circuits and Electronics</a> will have free access to an online version of the course textbook, <a href="http://store.elsevier.com/product.jsp?isbn=9781558607354">Foundations of Analog and Digital Electronic Circuits</a>, written by Anant Agarwal and Jeffrey Lang and published under Elsevier&rsquo;s Morgan Kaufmann imprint.</p>
+
+      <p>&ldquo;We are honored to collaborate with edX,&rdquo; said Suzanne BeDell, Managing Director, Science and Technology Books, Elsevier. &ldquo;With this new course, hundreds of thousands of students around the world will have had free access to the cutting-edge content contained in Foundations of Analog and Digital Electronic Circuits.&rdquo;</p>
+
+      <p>The free version of the textbook was also available in the spring offering of MIT&rsquo;s 6.002x, before the creation of edX.</p>
+
+      <figure>
+        <img src="${static.url('images/press/elsevier_page_sample_680x660.png')}" />
+        <figcaption>A page view from the online version of <a href="http://store.elsevier.com/product.jsp?isbn=9781558607354">Foundations of Analog and Digital Electronic Circuits</a> made available to students taking edX&rsquo;s course <a href="https://www.edx.org/courses/MITx/6.002x/2012_Fall/about">6.002X: Circuits and Electronics</a></figcaption>
+      </figure>
+
+      <p>&ldquo;Innovative alliances, such as this arrangement with Elsevier Science &amp; Technology Books, are at the core of the edX mission to improve access to higher education for students worldwide,&rdquo; said Anant Agarwal, co-author of Foundations of Analog and Digital Electronic Circuits and President of edX. &ldquo;edX is committed to providing our students with content published under the most rigorous standards. We are very grateful for Elsevier&rsquo;s commitment to helping edX learners throughout the world.&rdquo;</p>
+
+      <p>Through edX, the <em>&ldquo;X Universities&rdquo;</em> &ndash; which now includes UC Berkeley in addition to founding institutions Harvard and MIT &ndash; will provide interactive education wherever there is access to the Internet and will enhance teaching and learning through research about how students learn, and how technologies can facilitate effective teaching both on-campus and online. edX plans to add other <em>&ldquo;X Universities&rdquo;</em> from around the world to the edX platform in the coming months.</p>
+
+
+
+      <h2>About edX</h2>
+
+      <p><a href="https://www.edx.org/">edX</a> is a not-for-profit enterprise of its founding partners <a href="http://www.harvard.edu/">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions the founders are creating a new online-learning experience. Anant Agarwal, former Director of MIT&rsquo;s Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning&mdash;both on-campus and worldwide. edX is based in Cambridge, Massachusetts and is governed by MIT and Harvard.</p>
+
+      <h2>About Elsevier</h2>
+
+      <p>Elsevier is a world-leading provider of scientific, technical and medical information products and services. The company works in partnership with the global science and health communities to publish more than 2,000 journals, including <a href="http://www.thelancet.com/">The Lancet</a>&nbsp;and <a href="http://www.cell.com/">Cell</a>, and close to 20,000 book titles, including major reference works from Mosby and Saunders. Elsevier&rsquo;s online solutions include <a href="http://www.sciencedirect.com/">ScienceDirect</a>, <a href="http://www.scopus.com/">Scopus</a>, <a class="c7" href="http://www.reaxys.com/">Reaxys</a>, <a href="http://www.clinicalkey.com/">ClinicalKey</a> and <a href="http://www.confidenceconnected.com/">Mosby&rsquo;s Nursing Suite</a>, which enhance the productivity of science and health professionals, and the <a href="http://www.scival.com/">SciVal suite</a> and <a href="http://www.medai.com/">MEDai&rsquo;s Pinpoint Review</a>, which help research and health care institutions deliver better outcomes more cost-effectively.</p>
+
+      <p>A global business headquartered in Amsterdam, <a href="http://www.elsevier.com/">Elsevier</a> employs 7,000 people worldwide. The company is part of <a href="http://www.reedelsevier.com/">Reed Elsevier Group PLC</a>, a world-leading publisher and information provider, which is jointly owned by Reed Elsevier PLC and Reed Elsevier NV. The ticker symbols are REN (Euronext Amsterdam), REL (London Stock Exchange), RUK and ENL (New York Stock Exchange).</p>
+
+      <section class="contact">
+        <p><strong>Media Contact: </strong>Dan O&rsquo;Connell</p>
+        <p>Elsevier Science &amp; Technology Books</p>
+        <p>+1 781 663 5284</p>
+        <p><a href="mailto:d.oconnell@elsevier.com">d.oconnell@elsevier.com</a></p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">9 - 25 - 2012</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=Elsevier+Collaborates+with+edX:+http://www.edx.org/press/elsevier-collaborates-with-edx" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=Elsevier%20Collaborates%20with%20edX,%20Not-for-Profit%20Venture%20Offering%20Interactive%20Study%20Via%20the%20Web…http://www.edx.org/press/elsevier-collaborates-with-edx" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/elsevier-collaborates-with-edx" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+
+      </section>
+    </article>
+  </section>
+</section>
