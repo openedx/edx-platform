@@ -1,5 +1,4 @@
 from pkg_resources import resource_string
-from lxml import etree
 from xmodule.mako_module import MakoModuleDescriptor
 import logging
 
