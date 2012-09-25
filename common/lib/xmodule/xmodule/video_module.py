@@ -84,3 +84,4 @@ class VideoDescriptor(RawDescriptor):
     module_class = VideoModule
     
     stores_state = True
+    template_dir_name = "video"
