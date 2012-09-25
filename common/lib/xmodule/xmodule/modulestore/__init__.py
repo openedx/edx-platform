@@ -338,7 +338,6 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
@@ -346,6 +345,22 @@ class ModuleStore(object):
         returns an iterable of things that can be passed to Location.
         '''
         raise NotImplementedError
+
+    def get_containing_courses(self, location):
+        '''
+        Returns the list of courses that contains the specified location
+
+        TODO (cpennington): This should really take a module instance id,
+        rather than a location
+        '''
+        courses = [
+            course
+            for course in self.get_courses()
+            if course.location.org == location.org
+               and course.location.course == location.course
+        ]
+
+        return courses
 
 
 class ModuleStoreBase(ModuleStore):

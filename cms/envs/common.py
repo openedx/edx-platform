@@ -88,6 +88,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
 
+LMS_BASE = None
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
@@ -105,13 +106,25 @@ def edit_item(request):
     item = modulestore().get_item(item_location)
     item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
 
+    if settings.LMS_BASE is not None:
+        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=settings.LMS_BASE,
+            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+            course_id=modulestore().get_containing_courses()[0].id,
+            location=item.location,
+        )
+    else:
+        lms_link = None
+
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name,
         'category': item.category,
         'url_name': item.url_name,
         'previews': get_module_previews(request, item),
-        'metadata': item.metadata
+        'metadata': item.metadata,
+        # TODO: It would be nice to able to use reverse here in some form, but we don't have the lms urls imported
+        'lms_link': lms_link,
     })
 
 
