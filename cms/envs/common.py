@@ -215,7 +215,12 @@ module_js = remove_root(
 
 PIPELINE_CSS = {
     'base-style': {
-        'source_filenames': ['sass/base-style.scss'],
+        'source_filenames': [
+            'js/vendor/CodeMirror/codemirror.css',
+            'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+            'css/vendor/jquery.qtip.min.css',
+            'sass/base-style.scss'
+        ],
         'output_filename': 'css/cms-base-style.css',
     },
 }

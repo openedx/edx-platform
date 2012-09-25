@@ -163,25 +163,6 @@ div.course-wrapper {
       font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
     }
 
-    div.ui-slider {
-      border: 1px solid #aaa;
-      background: #ddd;
-      @include box-shadow(inset 0 1px 0 #eee);
-      @include border-radius(0);
-
-      a.ui-slider-handle {
-        @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
-        background: $pink url(../images/slider-bars.png) center center no-repeat;
-        border: 1px solid darken($pink, 20%);
-        cursor: pointer;
-
-        &:hover, &:focus {
-          background-color: lighten($pink, 10%);
-          outline: none;
-        }
-      }
-    }
-
     div.ui-tabs {
       border: 0;
       @include border-radius(0);
@@ -234,12 +215,3 @@ div.course-wrapper {
     }
   }
 }
-
-.xmodule_VideoModule {
-  margin-bottom: 30px;
-
-  
-}
-
-
-
