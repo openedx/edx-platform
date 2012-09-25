@@ -1,0 +1,6 @@
+---
+metadata:
+    display_name: Sequence with Video
+data: ''
+children:
+    - 'i4x://edx/templates/video/Empty'
