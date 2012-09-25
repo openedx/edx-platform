@@ -30,3 +30,4 @@ class DiscussionModule(XModule):
 
 class DiscussionDescriptor(RawDescriptor):
     module_class = DiscussionModule
+    template_dir_name = "discussion"
