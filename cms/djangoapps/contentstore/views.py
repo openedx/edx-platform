@@ -110,7 +110,7 @@ def edit_item(request):
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=settings.LMS_BASE,
             # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id=[course.id for course in modulestore().get_courses() if course.location.org == item.location.org and course.location.course == item.location.course][0],
+            course_id=modulestore().get_containing_courses()[0].id,
             location=item.location,
         )
     else:
