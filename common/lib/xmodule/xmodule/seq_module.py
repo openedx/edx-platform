@@ -9,7 +9,6 @@ from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 from pkg_resources import resource_string
-from .editing_module import EditingDescriptor
 
 log = logging.getLogger("mitx.common.lib.seq_module")
 
