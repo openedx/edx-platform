@@ -33,6 +33,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
     filename_extension = "xml"
+    template_dir_name = "html"
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
