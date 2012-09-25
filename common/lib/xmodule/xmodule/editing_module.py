@@ -17,13 +17,13 @@ class EditingDescriptor(MakoModuleDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit.coffee')]}
     js_module_name = "RawDescriptor"
 
-    def get_context(self):
-        return {
-            'module': self,
-            'data': self.definition.get('data', ''),
-    # TODO (vshnayder): allow children and metadata to be edited.
-    #'children' : self.definition.get('children, ''),
 
-    # TODO: show both own metadata and inherited?
-    #'metadata' : self.own_metadata,
-        }
+    # cdodge: a little refactoring here, since we're basically doing the same thing
+    # here as with our parent class, let's call into it to get the basic fields
+    # set and then add our additional fields. Trying to keep it DRY.
+    def get_context(self):
+        _context = MakoModuleDescriptor.get_context(self)
+        # Add our specific template information (the raw data body)
+        _context.update({ 'data' : self.definition.get('data','') })
+        return _context
+    

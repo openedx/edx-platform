@@ -104,12 +104,14 @@ def edit_item(request):
 
     item = modulestore().get_item(item_location)
     item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
+
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name,
         'category': item.category,
         'url_name': item.url_name,
         'previews': get_module_previews(request, item),
+        'metadata': item.metadata
     })
 
 
@@ -283,6 +285,19 @@ def save_item(request):
     if request.POST['children']:
         children = request.POST['children']
         modulestore().update_children(item_location, children)
+
+    # cdodge: also commit any metadata which might have been passed along in the
+    # POST from the client, if it is there
+    # note, that the postback is not the complete metadata, as there's system metadata which is
+    # not presented to the end-user for editing. So let's fetch the original and
+    # 'apply' the submitted metadata, so we don't end up deleting system metadata
+    if request.POST['metadata']:
+        posted_metadata = request.POST['metadata']
+        # fetch original
+        existing_item = modulestore().get_item(item_location)
+        # update existing metadata with submitted metadata (which can be partial)
+        existing_item.metadata.update(posted_metadata)
+        modulestore().update_metadata(item_location, existing_item.metadata)
 
     # Export the course back to github
     # This uses wildcarding to find the course, which requires handling
