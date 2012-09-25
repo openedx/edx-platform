@@ -1,6 +1,7 @@
 ---
 metadata:
     display_name: Sequence with Video
+    data_dir: a_made_up_name
 data: ''
 children:
     - 'i4x://edx/templates/video/default'
