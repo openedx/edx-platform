@@ -89,16 +89,6 @@ footer {
 	height: 100px;
 }
 
-@mixin clearfix {
-	&:after {
-		content: '';
-		display: block;
-		height: 0;
-		visibility: hidden;
-		clear: both;
-	}
-}
-
 input[type="text"] {
 	padding: 6px 8px 8px;
 	box-sizing: border-box;
