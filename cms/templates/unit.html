@@ -1,61 +1,60 @@
-<section id="unit-wrapper">
-  <header>
-    <section>
-      <h1 class="editable">${url_name}</h1>
-      <p class="${category}"><a href="#">${category}</a></p>
-    </section>
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">CMS Unit</%block>
+<%block name="content">
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <article class="unit-body window">
+        <nav class="breadcrumbs">
+          <ul>
+            <li><a href="#">Week 2</a></li>
+            <li><a href="#">Linearity and Superposition</a></li>
+            <li><span class="current-page">S3V2: Properties of Linearity</span></li>
+          </ul>
+        </nav>
+        ${editable_preview}
+      </article>
 
-    <div class="actions">
-      <a href="#" class="cancel">Cancel</a>
-      <a href="" class="save-update">Save &amp; Update</a>
+      <div class="sidebar">
+        <div class="unit-properties window">
+          <h4>Properties</h4>
+          <div class="window-contents">
+            <div class="row"><label>Display Name:</label><input type="text" value="${module.display_name}" /></div>
+            <div class="row">
+              <label>State:</label>
+              <div class="visibility-options">
+                <span class="option checked"><input type="radio" name="visibility" id="visibility-hidden" checked /><label for="visibility-hidden">Draft</label></span>
+                <span class="option"><input type="radio" name="visibility" id="visibility-visible" /><label for="visibility-visible">Final</label></span>
+              </div>
+            </div>
+            <div class="row">
+              <a href="#" class="save-button">Save</a>
+            </div>
+          </div>
+        </div>
+        <div class="unit-history window collapsed">
+          <h4><a href="#" class="expand-collapse-icon expand"></a>History</h4>
+          <div class="window-contents">
+            <ol>
+            </ol>
+          </div>
+        </div>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <section>
-    <section class="meta wip">
-      <section class="status-settings">
-        <ul>
-          <li><a href="#" class="current">Scrap</a></li>
-          <li><a href="#">Draft</a></li>
-          <li><a href="#">Proofed</a></li>
-          <li><a href="#">Published</a></li>
-        </ul>
-        <a href="#" class="settings">Settings</a>
-      </section>
-      <section class="author">
-        <dl>
-          <dt>Last modified:</dt>
-          <dd>mm/dd/yy</dd>
-          <dt>By</dt>
-          <dd>Anant Agarwal</dd>
-        </dl>
-      </section>
-      <section class="tags">
-        <div>
-          <h2>Tags:</h2>
-          <p class="editable">Click to edit</p>
-        </div>
-        <div>
-          <h2>Goal</h2>
-          <p class="editable">Click to edit</p>
-        </div>
-      </section>
-    </section>
-    ${contents}
-    % if lms_link is not None:
-    <a class="lms-link" href="${lms_link}">View in LMS</a>
-    % endif
-    <section class="previews">
-      % for preview in previews:
-        <section class="preview">
-          ${preview}
-        </section>
-      % endfor
-    </section>
-    <div class="actions">
-      <a href="" class="save-update">Save &amp; Update</a>
-      <a href="#" class="cancel">Cancel</a>
+  <div class="history-modal">
+    <div class="modal-body">
+      <h2>S3V2: Properties of Linearity</h2>
+      <div class="video-unit"><img src="images/video-module.png"></div>
+      <p><span class="textbook-icon"></span>More information given in the text.</p>
+      <p><span class="slides-icon"></span>Lecture Slides Handout [Clean] [Annotated]</p>
     </div>
-    <%include file="widgets/notes.html"/>
-  </section>
-</section>
+    <div class="modal-actions">
+      <a href="#" class="revert-button">Revert to this version</a>
+      <a href="#" class="close-button">Close</a>
+    </div>
+  </div>
+
+  <div class="modal-cover"></div>
+</%block>

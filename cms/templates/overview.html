@@ -1,6 +1,6 @@
 <%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%block name="title">CMS Courseware Overview</%block>
-<%include file="widgets/header.html"/>
 
 <%def name="branch(section)">
   <li class="branch collapsed">
@@ -11,54 +11,62 @@
       <a href="#" class="draft-item">
         <span class="${section.category}-icon"></span>${section.display_name} <span class="draft-tag">– draft</span>
       </a>
-      <div class="item-actions">
-        <a href="#" class="edit-button"><span class="edit-icon"></span></a>
-        <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-        <a href="#" class="drag-handle"></a>
-      </div>
+      ${actions(section)}
     </div>
     <ol>
       % for unit in section.get_children():
       ${branch(unit)}
       % endfor
+      ${new_unit()}
     </ol>
+  </li>
+</%def>
+
+<%def name="actions(unit)">
+  <div class="item-actions">
+    <a href="${reverse('edit_item', args=[unit.location])}" class="edit-button"><span class="edit-icon"></span></a>
+    <a href="${reverse('delete_item', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
+    <a href="#" class="drag-handle"></a>
+  </div>
+</%def>
+
+<%def name="new_unit()">
+  <li>
+    <a href="#" class="section-item new-unit-item">
+      <span class="plus-icon"></span>New Unit
+    </a>
   </li>
 </%def>
 
 
 <%block name="content">
-    <div class="main-wrapper">
-      <div class="inner-wrapper">
-        <h1>Courseware</h1>
-        <input type="text" class="courseware-unit-search-input search" placeholder="search units" />
-        <article class="courseware-overview">
-          <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
-          % for week in weeks:
-          <section class="courseware-section branch">
-            <header>
-              <a href="#" class="expand-collapse-icon collapse"></a>
-              <div class="item-details">
-                <h3>${week.display_name}</h3>
-                <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
-              </div>
-              <div class="item-actions">
-                <a href="#" class="edit-button"><span class="edit-icon"></span></a>
-                <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-                <a href="#" class="drag-handle"></a>
-              </div>
-            </header>
-            <ol>
-              % for section in week.get_children():
-              ${branch(section)}
-              % endfor
-            </ol>
-          </section>
-          % endfor
-        </article>
-      </div>
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <h1>Courseware</h1>
+      <input type="text" class="courseware-unit-search-input search" placeholder="search units" />
+      <article class="courseware-overview">
+        <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
+        % for week in weeks:
+        <section class="courseware-section branch">
+          <header>
+            <a href="#" class="expand-collapse-icon collapse"></a>
+            <div class="item-details">
+              <h3>${week.display_name}</h3>
+              <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
+            </div>
+            ${actions(week)}
+          </header>
+          <ol>
+            % for section in week.get_children():
+            ${branch(section)}
+            % endfor
+            ${new_unit()}
+          </ol>
+        </section>
+        % endfor
+      </article>
     </div>
-
     <%include file="widgets/upload_assets.html"/>
-
-    <footer></footer>
+  </div>
+  <footer></footer>
 </%block>

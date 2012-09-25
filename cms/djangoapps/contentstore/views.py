@@ -118,7 +118,7 @@ def course_index(request, org, course, name):
 
 
 @login_required
-def edit_item(request):
+def edit_item(request, location):
     """
     Display an editing page for the specified module.
 
@@ -127,11 +127,10 @@ def edit_item(request):
     id: A Location URL
     """
     # TODO (vshnayder): change name from id to location in coffee+html as well.
-    item_location = request.GET['id']
-    if not has_access(request.user, item_location):
+    if not has_access(request.user, location):
         raise Http404  # TODO (vshnayder): better error
 
-    item = modulestore().get_item(item_location)
+    item = modulestore().get_item(location)
     item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
 
     if settings.LMS_BASE is not None:
@@ -146,15 +145,14 @@ def edit_item(request):
 
     
     return render_to_response('unit.html', {
-        'contents': item.get_html(),
-        'js_module': item.js_module_name,
-        'category': item.category,
-        'url_name': item.url_name,
-        'previews': get_module_previews(request, item),
-        'metadata': item.metadata,
-        # TODO: It would be nice to able to use reverse here in some form, but we don't have the lms urls imported
-        'lms_link': lms_link,
+        'module': item,
+        'editable_preview': get_module_previews(request, item)[0],
     })
+
+
+@login_required
+def delete_item(request, location):
+    pass
 
 
 @login_required
@@ -277,6 +275,7 @@ def preview_module_system(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
+
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -323,8 +322,10 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
+    module.get_html = wrap_xmodule(module.get_html, module, "xmodule_display.html")
+    module.get_html = wrap_xmodule(module.get_html, module, "editable_preview.html")
     module.get_html = replace_static_urls(
-        wrap_xmodule(module.get_html, module, "xmodule_display.html"),
+        module.get_html,
         module.metadata.get('data_dir', module.location.course)
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
