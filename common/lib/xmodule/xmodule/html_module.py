@@ -6,7 +6,8 @@ import sys
 from lxml import etree
 from path import path
 
-from .x_module import XModule, Template
+from .x_module import XModule
+from pkg_resources import resource_string
 from .xml_module import XmlDescriptor, name_to_pathname
 from .editing_module import EditingDescriptor
 from .stringify import stringify_children
@@ -34,6 +35,9 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
+
+    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    js_module_name = "HTMLEditingDescriptor"
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
