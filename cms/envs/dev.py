@@ -36,6 +36,8 @@ DATABASES = {
     }
 }
 
+LMS_BASE = "http://localhost:8000"
+
 REPOS = {
     'edx4edx': {
         'branch': 'master',

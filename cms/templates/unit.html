@@ -42,6 +42,9 @@
       </section>
     </section>
     ${contents}
+    % if lms_link is not None:
+    <a class="lms-link" href="${lms_link}">View in LMS</a>
+    % endif
     <section class="previews">
       % for preview in previews:
         <section class="preview">
