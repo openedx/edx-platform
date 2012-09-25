@@ -1,0 +1,57 @@
+<%!
+    from django.core.urlresolvers import reverse
+    from courseware.courses import course_image_url, get_course_about_section
+    from courseware.access import has_access
+%>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="title"><title>Notification Settings</title></%block>
+
+<%block name="js_extra">
+
+</%block>
+
+<section class="container dashboard">
+    %if message:
+            <section class="dashboard-banner">
+            ${message}
+            </section>
+    %endif
+    <h4>Notifications</h4>
+    <form action="${reverse('update_notification_settings')}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        % if len(courses) > 0:
+            % for course in courses:
+                <fieldset>
+                        <h3><strong>${course.number}:</strong> ${course.title}</h3>
+                        <h6>Receive Emails for</h6>
+                        <ul>
+                            <li>
+                                <label for="all_posts_${course.id}">All posts</label>
+                                <input type="checkbox" id="all_posts_${course.id}">
+                            </li>
+                            <li>
+                                <label for="followed_posts_${course.id}">Posts I am following</label>
+                                <input type="checkbox" id="followed_posts_${course.id}">
+                            </li>
+                            <li>
+                                <label for="email_frequency_${course.id}">Email Frequency</label>
+                                <select id="email_frequency_${course.id}">
+                                    <option value="never">Never</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="4hours">Every 4 Hours</option>
+                                    <option value="realtime">Real Time</option>
+                                </select>
+                            </li>
+                        </ul>
+                </fieldset>
+                <hr>
+            % endfor
+            <input type="submit" value="Update Notification Preferences">
+        % else:
+        % endif
+
+    </form>
+</section>

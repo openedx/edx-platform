@@ -38,7 +38,9 @@ from datetime import date
 from collections import namedtuple
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
-
+import comment_client as cc
+from django import forms
+from django.forms.formsets import formset_factory
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
@@ -728,3 +730,49 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success': True}))
+
+@ensure_csrf_cookie
+def notification_settings(request):
+    user = request.user
+    enrollments = CourseEnrollment.objects.filter(user=user)
+
+    courses = []
+    for enrollment in enrollments:
+        try:
+            courses.append(course_from_id(enrollment.course_id))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+            .format(user.username, enrollment.course_id))
+
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+
+    cc_user = cc.user.User.from_django_user(user)
+
+    # load existing preferences and render them
+
+    show_courseware_links_for = frozenset(course.id for course in courses
+        if has_access(request.user, course, 'load'))
+
+    context = {'courses': courses,
+               'message': message,
+               'show_courseware_links_for' : show_courseware_links_for,
+               }
+
+    return render_to_response('notification_settings.html', context)
+
+@ensure_csrf_cookie
+def update_notification_settings(request):
+    user = request.user
+    enrollments = CourseEnrollment.objects.filter(user=user)
+    cc_user = cc.user.User.from_django_user(user)
+    # Update preferences on comment service
+    courses = []
+    for enrollment in enrollments:
+        try:
+            courses.append(course_from_id(enrollment.course_id))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+            .format(user.username, enrollment.course_id))
+    return redirect('notification_settings')

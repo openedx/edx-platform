@@ -12,6 +12,8 @@ if settings.DEBUG:
 urlpatterns = ('',
     url(r'^$', 'branding.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^notification_settings$', 'student.views.notification_settings', name="notification_settings"),
+    url(r'^update_notification_settings$', 'student.views.update_notification_settings', name="update_notification_settings"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
