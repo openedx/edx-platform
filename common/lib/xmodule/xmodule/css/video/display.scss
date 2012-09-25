@@ -28,7 +28,7 @@ div.video {
     }
 
     section.video-controls {
-      @extend .clearfix;
+      @include clearfix();
       background: #333;
       border: 1px solid #000;
       border-top: 0;
@@ -42,7 +42,7 @@ div.video {
       }
 
       div.slider {
-        @extend .clearfix;
+        @include clearfix();
         background: #c2c2c2;
         border: 1px solid #000;
         @include border-radius(0);
