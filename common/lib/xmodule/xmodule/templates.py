@@ -1,3 +1,17 @@
+"""
+This module handles loading xmodule templates from disk into the modulestore.
+These templates are used by the CMS to provide baseline content that
+can be cloned when adding new modules to a course.
+
+`Template`s are defined in x_module. They contain 3 attributes:
+    metadata: A dictionary with the template metadata
+    data: A JSON value that defines the template content
+    children: A list of Location urls that define the template children
+
+Templates are defined on XModuleDescriptor types, in the template attribute.
+"""
+
+
 import logging
 from fs.memoryfs import MemoryFS
 
@@ -23,6 +37,10 @@ def all_templates():
 
 
 class TemplateTestSystem(MakoDescriptorSystem):
+    """
+    This system exists to help verify that XModuleDescriptors can be instantiated
+    from their defined templates before we load the templates into the modulestore.
+    """
     def __init__(self):
         super(TemplateTestSystem, self).__init__(
             lambda *a, **k: None,
