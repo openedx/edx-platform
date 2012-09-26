@@ -1,0 +1,27 @@
+---
+metadata:
+    display_name: Multiple Choice
+data: |
+    <problem>
+      <text>
+ <h2>Example: Multiple Choice Response Problem</h2>
+ 
+ <p>
+   A multiple choice response problem presents radio buttons for student 
+   input.  <!-->One or more of the choice may be correct.-->  Correctness of
+   input is evaluated based on expected answers specified within each
+   "choice" stanza.
+ </p>
+ 
+ <p>Select the correct choice.  Grass is:</p>
+ <multiplechoiceresponse direction="vertical" randomize="yes">
+   <choicegroup type="MultipleChoice">
+            <choice location="random" correct="false" name="red">Red</choice>
+            <choice location="random" correct="true" name="green">Green</choice>
+            <choice location="random" correct="false" name="yellow">Yellow</choice>
+            <choice location="bottom" correct="false" name="blue">Blue</choice>
+   </choicegroup>
+ </multiplechoiceresponse>
+      </text>
+    </problem>
+children: []
