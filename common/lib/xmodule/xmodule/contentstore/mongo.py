@@ -23,8 +23,7 @@ class MongoContentStore(object):
     def find(self, filename):
         try:
             with self.fs.get_last_version(filename) as fp:
-                logging.debug('fetched {0}'.format(fp.name))
-                return StaticContent(fp.filename, fp.displayname, fp.content_type, fp.read())
+                return StaticContent(fp.filename, fp.displayname, fp.content_type, fp.read(), fp.uploadDate)
         except NoFile:
             raise NotFoundError()
 
