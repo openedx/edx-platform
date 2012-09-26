@@ -1,60 +1,60 @@
 class CMS.Views.ModuleEdit extends Backbone.View
-  tagName: 'section'
-  className: 'edit-pane'
-
-  events:
-    'click .cancel': 'cancel'
-    'click .module-edit': 'editSubmodule'
-    'click .save-update': 'save'
+  tagName: 'div'
+  className: 'xmodule_edit'
 
   initialize: ->
-    @$el.load @model.editUrl(), =>
-      @model.loadModule(@el)
+    @delegate()
 
-      # Load preview modules
-      XModule.loadModules('display')
-      @$children = @$el.find('#sortable')
-      @enableDrag()
+    @$component_editor = @$el.find('.component-editor')
+    @$metadata = @$component_editor.find('.metadata_edit')
 
-  enableDrag: =>
-      # Enable dragging things in the #sortable div (if there is one)
-      if @$children.length > 0
-        @$children.sortable(
-          placeholder: "ui-state-highlight"
-          update: (event, ui) =>
-            @model.set(children: @$children.find('.module-edit').map(
-                (idx, el) -> $(el).data('id')
-            ).toArray())
-        )
-        @$children.disableSelection()
+  delegate: ->
+    id = @$el.data('id')
+
+    events = {}
+    events["click .component-editor[data-id=#{ id }] .cancel-button"] = 'cancel'
+    events["click .component-editor[data-id=#{ id }] .save-button"] = 'save'
+    events["click .component-actions[data-id=#{ id }] .edit-button"] = 'edit'
+
+    @delegateEvents(events)
+
+  metadata: ->
+    # cdodge: package up metadata which is separated into a number of input fields
+    # there's probably a better way to do this, but at least this lets me continue to move onwards
+    _metadata = {}
+
+    if @$metadata
+      # walk through the set of elments which have the 'xmetadata_name' attribute and
+      # build up a object to pass back to the server on the subsequent POST
+      _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', @$metadata)
+
+    _metadata
 
   save: (event) =>
     event.preventDefault()
-    @model.save().done((previews) =>
+    @model.save(
+      metadata: @metadata()
+    ).done((preview) =>
       alert("Your changes have been saved.")
-      previews_section = @$el.find('.previews').empty()
-      $.each(previews, (idx, preview) =>
-        preview_wrapper = $('<section/>', class: 'preview').append preview
-        previews_section.append preview_wrapper
-      )
+      
+      new_el = $(preview)
+      @$el.replaceWith(new_el)
+      @$el = new_el
 
-      XModule.loadModules('display')
+      @delegate()
+
+      @model.module = XModule.loadModule(@$el)
+      XModule.loadModules(@$el)
     ).fail( ->
       alert("There was an error saving your changes. Please try again.")
     )
 
   cancel: (event) ->
     event.preventDefault()
-    CMS.popView()
-    @enableDrag()
+    @$el.removeClass('editing')
+    @$component_editor.slideUp(150)
 
-  editSubmodule: (event) ->
+  edit: (event) ->
     event.preventDefault()
-    previewType = $(event.target).data('preview-type')
-    moduleType = $(event.target).data('type')
-    CMS.pushView new CMS.Views.ModuleEdit
-        model: new CMS.Models.Module
-            id: $(event.target).data('id')
-            type: if moduleType == 'None' then null else moduleType
-            previewType: if previewType == 'None' then null else previewType
-    @enableDrag()
+    @$el.addClass('editing')
+    @$component_editor.slideDown(150)

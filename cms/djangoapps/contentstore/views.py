@@ -327,7 +327,10 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
         module,
         "xmodule_edit.html",
         {
+            'location': descriptor.location.url(),
             'editor_content': descriptor.get_html(),
+            'editor_type': descriptor.js_module_name,
+            'editor_class': descriptor.__class__.__name__,
             # TODO (cpennington): Make descriptors know if they have data that can be editng
             'editable_data': descriptor.definition.get('data'),
             'editable_class': 'editable' if descriptor.definition.get('data') else '',
@@ -396,7 +399,7 @@ def save_item(request):
         export_to_github(course, "CMS Edit", author_string)
 
     descriptor = modulestore().get_item(item_location)
-    preview_html = get_module_previews(request, descriptor)
+    preview_html = get_module_previews(request, descriptor)[0]
 
     return HttpResponse(json.dumps(preview_html))
 
