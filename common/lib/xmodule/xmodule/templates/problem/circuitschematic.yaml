@@ -70,15 +70,15 @@ data: |
    # of the diagram and analysis results for the i-th schematic tag
    
    def get_tran(json,signal):
-   for element in json:
-   if element[0] == 'transient':
-   return element[1].get(signal,[])
-   return []
+     for element in json:
+       if element[0] == 'transient':
+         return element[1].get(signal,[])
+     return []
    
    def get_value(at,output):
-   for (t,v) in output:
-   if at == t: return v
-   return None
+     for (t,v) in output:
+       if at == t: return v
+     return None
    
    output = get_tran(submission[0],'Z')
    okay = True

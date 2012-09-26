@@ -638,13 +638,12 @@ class CapaDescriptor(RawDescriptor):
 
     stores_state = True
     has_score = True
+    template_dir_name = 'problem'
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-
-    template_dir_name = 'problem'
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
