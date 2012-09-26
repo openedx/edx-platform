@@ -1,0 +1,33 @@
+---
+metadata:
+    display_name: Custom Grader
+data: |
+      <problem>
+ <text>
+   <h2>Example: Custom Response Problem</h2>
+   
+   <p>
+     A custom response problem accepts one or more lines of text input from the
+     student, and evaluates the inputs for correctness based on evaluation using a 
+     python script embedded within the problem.
+   </p>
+   
+   <script type="loncapa/python">
+     
+     def test_add(expect,ans):
+     (a1,a2) = map(float,ans)
+     return (a1+a2)==10
+     
+   </script>
+   
+   <text>
+     Enter two integers which sum to 10: <br/>
+     <customresponse cfn="test_add">
+              <textline size="40" correct_answer="3"/><br/>
+              <textline size="40" correct_answer="7"/>
+     </customresponse>
+   </text>
+   
+ </text>
+      </problem>
+children: []
