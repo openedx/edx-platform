@@ -2,10 +2,13 @@
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">CMS Courseware Overview</%block>
 
-<%def name="branch(section)">
+<%def name="branch(section, depth)">
+  <%
+    has_children = depth > 0 and len(section.get_children()) > 0
+  %>
   <li class="branch collapsed">
     <div class="section-item">
-      % if len(section.get_children()) > 0:
+      % if has_children:
       <a href="#" class="expand-collapse-icon expand"></a>
       % endif
       <a href="#" class="draft-item">
@@ -13,12 +16,15 @@
       </a>
       ${actions(section)}
     </div>
+
+    % if has_children:
     <ol>
       % for unit in section.get_children():
-      ${branch(unit)}
+      ${branch(unit, depth-1)}
       % endfor
       ${new_unit()}
     </ol>
+    % endif
   </li>
 </%def>
 
@@ -58,7 +64,7 @@
           </header>
           <ol>
             % for section in week.get_children():
-            ${branch(section)}
+            ${branch(section, 1)}
             % endfor
             ${new_unit()}
           </ol>
