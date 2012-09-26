@@ -2,7 +2,7 @@
 metadata:
     display_name: Multiple Choice
 data: |
-    <problem>
+ <problem>
       <text>
  <h2>Example: Multiple Choice Response Problem</h2>
  
@@ -23,5 +23,5 @@ data: |
    </choicegroup>
  </multiplechoiceresponse>
       </text>
-    </problem>
+ </problem>
 children: []

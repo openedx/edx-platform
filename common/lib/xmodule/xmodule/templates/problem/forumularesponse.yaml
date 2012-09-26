@@ -2,7 +2,7 @@
 metadata:
     display_name: Formula Repsonse
 data: |
-      <problem>
+ <problem>
  <text>
    <h2>Example: Formula Response Problem</h2>
    
@@ -21,9 +21,7 @@ data: |
      on the problem author to specify the allowed variables in the expression, and the
      numerical ranges over which the variables must be sampled to test for correctness.</p>
    
-   <script type="loncapa/python">
-     I = "m*c^2"
-   </script>
+   <script type="loncapa/python">I = "m*c^2"</script>
    
    <text>
      <br/>
@@ -36,5 +34,5 @@ data: |
           </formularesponse>
    
  </text>
-      </problem>
+ </problem>
 children: []
