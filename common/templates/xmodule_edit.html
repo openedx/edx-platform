@@ -1,3 +1,14 @@
-<section class="xmodule_edit xmodule_${class_}" data-type="${module_name}">
-    ${content}
-</section>
+<div class="xmodule_edit xmodule_${class_} ${editable_class}" data-type="${module_name}">
+  <%include file="xmodule_display.html"/>
+  % if editable_data:
+  <div class="component-actions">
+    <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
+    <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>	
+  </div>
+  <div class="component-editor">
+    ${editor_content}
+    <a href="#" class="save-button">Save</a>
+    <a href="#" class="cancel-button">Cancel</a>
+  </div>
+  % endif
+</div>

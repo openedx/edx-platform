@@ -12,7 +12,7 @@ from xmodule.vertical_module import VerticalModule
 
 log = logging.getLogger("mitx.xmodule_modifiers")
 
-def wrap_xmodule(get_html, module, template):
+def wrap_xmodule(get_html, module, template, context=None):
     """
     Wraps the results of get_html in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
@@ -24,14 +24,18 @@ def wrap_xmodule(get_html, module, template):
         class_: the module class name
         module_name: the js_module_name of the module
     """
+    if context is None:
+        context = {}
 
     @wraps(get_html)
     def _get_html():
-        return render_to_string(template, {
+        context.update({
             'content': get_html(),
             'class_': module.__class__.__name__,
             'module_name': module.js_module_name
         })
+
+        return render_to_string(template, context)
     return _get_html
 
 

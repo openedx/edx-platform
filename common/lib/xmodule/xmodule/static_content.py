@@ -12,7 +12,7 @@ from .x_module import XModuleDescriptor
 
 
 def write_module_styles(output_root, extra_descriptors):
-    return _write_styles(output_root, _list_modules(extra_descriptors))
+    return _write_styles('.xmodule_display', output_root, _list_modules(extra_descriptors))
 
 
 def write_module_js(output_root, extra_descriptors):
@@ -20,7 +20,7 @@ def write_module_js(output_root, extra_descriptors):
 
 
 def write_descriptor_styles(output_root, extra_descriptors):
-    return _write_styles(output_root, _list_descriptors(extra_descriptors))
+    return _write_styles('.xmodule_edit', output_root, _list_descriptors(extra_descriptors))
 
 
 def write_descriptor_js(output_root, extra_descriptors):
@@ -53,7 +53,7 @@ def _ensure_dir(dir_):
             raise
 
 
-def _write_styles(output_root, classes):
+def _write_styles(selector, output_root, classes):
     _ensure_dir(output_root)
 
     css_fragments = defaultdict(set)
@@ -78,8 +78,8 @@ def _write_styles(output_root, classes):
     with open(output_root / '_module-styles.scss', 'w') as module_styles:
         for class_, fragment_names in css_imports.items():
             imports = "\n".join('@import "{0}";'.format(name) for name in fragment_names)
-            module_styles.write(""".xmodule_{class_} {{ {imports} }}""".format(
-                class_=class_, imports=imports
+            module_styles.write("""{selector}.xmodule_{class_} {{ {imports} }}""".format(
+                class_=class_, imports=imports, selector=selector
             ))
 
 

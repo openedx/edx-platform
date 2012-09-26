@@ -131,7 +131,6 @@ def edit_item(request, location):
         raise Http404  # TODO (vshnayder): better error
 
     item = modulestore().get_item(location)
-    item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
 
     if settings.LMS_BASE is not None:
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
@@ -322,8 +321,18 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
-    module.get_html = wrap_xmodule(module.get_html, module, "xmodule_display.html")
-    module.get_html = wrap_xmodule(module.get_html, module, "editable_preview.html")
+
+    module.get_html = wrap_xmodule(
+        module.get_html,
+        module,
+        "xmodule_edit.html",
+        {
+            'editor_content': descriptor.get_html(),
+            # TODO (cpennington): Make descriptors know if they have data that can be editng
+            'editable_data': descriptor.definition.get('data'),
+            'editable_class': 'editable' if descriptor.definition.get('data') else '',
+        }
+    )
     module.get_html = replace_static_urls(
         module.get_html,
         module.metadata.get('data_dir', module.location.course)

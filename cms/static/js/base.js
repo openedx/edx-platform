@@ -17,7 +17,7 @@ $(document).ready(function() {
   $('.expand-collapse-icon').bind('click', toggleSubmodules);
   $('.visibility-options').bind('change', setVisibility);
 
-  $body.delegate('.components .edit-button', 'click', editComponent);
+  $body.delegate('.xmodule_edit .edit-button', 'click', editComponent);
   $body.delegate('.component-editor .save-button, .component-editor .cancel-button', 'click', closeComponentEditor);
 
   $newComponentButton.bind('click', showNewComponentForm);
@@ -45,12 +45,12 @@ function setVisibility(e) {
 
 function editComponent(e) {
   e.preventDefault();
-  $(this).closest('li').addClass('editing').find('.component-editor').slideDown(150);
+  $(this).closest('.xmodule_edit').addClass('editing').find('.component-editor').slideDown(150);
 }
 
 function closeComponentEditor(e) {
   e.preventDefault();
-  $(this).closest('li').removeClass('editing').find('.component-editor').slideUp(150);
+  $(this).closest('.xmodule_edit').removeClass('editing').find('.component-editor').slideUp(150);
 }
 
 function showNewComponentForm(e) {
