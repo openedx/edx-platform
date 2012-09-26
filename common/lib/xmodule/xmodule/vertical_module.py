@@ -1,6 +1,7 @@
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
+from pkg_resources import resource_string
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -40,3 +41,6 @@ class VerticalModule(XModule):
 
 class VerticalDescriptor(SequenceDescriptor):
     module_class = VerticalModule
+
+    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
+    js_module_name = "VerticalDescriptor"

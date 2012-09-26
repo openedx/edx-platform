@@ -119,6 +119,9 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     template_dir_name = 'sequence'
 
+    js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
+    js_module_name = "SequenceDescriptor"
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         children = []
