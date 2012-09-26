@@ -1,9 +1,10 @@
 class StaticContent(object):
-    def __init__(self, filename, name, content_type, data):
+    def __init__(self, filename, name, content_type, data, last_modified_at=None):
         self.filename = filename
         self.name = name
         self.content_type = content_type
         self.data = data
+        self.last_modified_at = last_modified_at
 
     @staticmethod
     def get_location_tag():

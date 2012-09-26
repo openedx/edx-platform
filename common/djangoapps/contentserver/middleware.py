@@ -1,6 +1,7 @@
 import logging
+import time
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseNotModified
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore import StaticContent
@@ -30,7 +31,22 @@ class StaticContentServer(object):
             else:
                 logging.debug('cache hit on {0}'.format(content.filename))
 
+            # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
+
+            logging.debug(request.META)
+
+            # convert over the DB persistent last modified timestamp to a HTTP compatible
+            # timestamp
+            last_modified_at_str = content.last_modified_at.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
+
+            # see if the client has cached this content, if so then compare the
+            # timestamps, if they are the same then just return a 304 (Not Modified)
+            if 'HTTP_IF_MODIFIED_SINCE' in request.META:
+                if_modified_since = request.META['HTTP_IF_MODIFIED_SINCE']
+                if if_modified_since == last_modified_at_str:
+                    return HttpResponseNotModified()
+
             response = HttpResponse(content.data, content_type=content.content_type)
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(content.name)
-            
+            response['Last-Modified'] = last_modified_at_str
+
             return response
