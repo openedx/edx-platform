@@ -2,7 +2,7 @@
 metadata:
     display_name: Custom Grader
 data: |
-      <problem>
+ <problem>
  <text>
    <h2>Example: Custom Response Problem</h2>
    
@@ -12,11 +12,9 @@ data: |
      python script embedded within the problem.
    </p>
    
-   <script type="loncapa/python">
-     
-     def test_add(expect,ans):
-     (a1,a2) = map(float,ans)
-     return (a1+a2)==10
+   <script type="loncapa/python">def test_add(expect,ans):
+        (a1,a2) = map(float,ans)
+        return (a1+a2)==10
      
    </script>
    
@@ -29,5 +27,5 @@ data: |
    </text>
    
  </text>
-      </problem>
+ </problem>
 children: []

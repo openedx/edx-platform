@@ -2,7 +2,7 @@
 metadata:
     display_name: Image Response
 data: |
-    <problem>
+ <problem>
       <text>
  <h2>Example: Image Response Problem</h2>
  
@@ -21,6 +21,6 @@ data: |
    </imageresponse>
  </text>
       </text>
-    </problem>
+ </problem>
     
 children: []
