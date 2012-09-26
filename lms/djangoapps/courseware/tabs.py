@@ -173,7 +173,7 @@ def get_course_tabs(user, course, active_page):
     """
     Return the tabs to show a particular user, as a list of CourseTab items.
     """
-    if not course.tabs:
+    if not hasattr(course,'tabs') or not course.tabs:
         return get_default_tabs(user, course, active_page)
 
     # TODO (vshnayder): There needs to be a place to call this right after course
