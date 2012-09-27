@@ -38,8 +38,10 @@ section.problem {
   .choicegroup {
     @include clearfix;
 
-    label.choicegroup_correct:after {
-      content: url('../images/correct-icon.png');
+    label.choicegroup_correct{
+      text:after{
+        content: url('../images/correct-icon.png');
+      }
     }
 
     min-width:100px; 
@@ -66,7 +68,8 @@ section.problem {
     }
 
     text {
-      margin-left: 5px;
+      display: block;
+      margin-left: 25px;
     }
   }
 
