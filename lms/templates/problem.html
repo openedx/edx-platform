@@ -41,6 +41,8 @@
       $('.longform').hide();
       $('.shortform').append('<a href="#" class="full">See full output</a>');
 
+      $('.collapsible section').hide();
+
       $('.full').click(function() {
         $(this).parent().siblings().slideToggle();
         $(this).parent().parent().toggleClass('open');
@@ -50,6 +52,7 @@
       });
 
       function toggleHint(e) {
+        e.preventDefault();
         $(this).parent().siblings().slideToggle();
         $(this).parent().parent().toggleClass('open');
         return false;
@@ -57,8 +60,7 @@
 
       if(!collapsibleSet) {
         collapsibleSet = true;
-        $('.collapsible section').hide();
-        $('.collapsible header a').bind('click', toggleHint);
+        $('body').delegate('.collapsible header a', 'click', toggleHint);
       }      
     });
 </script>
