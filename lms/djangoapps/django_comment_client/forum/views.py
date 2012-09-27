@@ -81,7 +81,7 @@ def threads_context(user, threads, course_id, page, num_pages):
         'annotated_content_info': annotated_content_info,
         'page': page,
         'num_pages': num_pages,
-        'roles': utils.get_role_ids(course_id), # TODO: This should not be here
+        'roles': utils.get_role_ids(course_id), # TODO: This should not be returned on each JSON response
     }
 
 def add_courseware_context(thread, course):
@@ -95,9 +95,6 @@ def get_anonymous_permissions(context, course):
     context['allow_anonymous_to_peers']= course.metadata.get("allow_anonymous_to_peers", False)
     return context
 
-def escape_quote(string):
-    escapedict = {'"': '&quot;'}
-    return saxutils.escape(string, escapedict)
 def inline_discussion(request,
                       course_id, discussion_id):
     """
@@ -138,15 +135,10 @@ def forum_form_discussion(request, course_id):
         raise Http404
 
     if request.is_ajax():
-        return utils.JsonResponse({
-            'threads': context['threads'],
-            'annotated_content_info': context['annotated_content_info'],
-            'num_pages': query_params['num_pages'],
-            'page': query_params['page'],
-        })
+        del context['roles']
+        return utils.JsonResponse(context)
     else:
         context.update({
-            #TODO: Escape in template, perhaps using mako 'entity' filter?
             'course': course,
             'staff_access' : has_access(request.user, course, 'staff'),
             'category_map': category_map,
@@ -210,7 +202,7 @@ def user_profile(request, course_id, user_id):
 
         query_params = {
             'page': request.GET.get('page', 1),
-            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            'per_page': THREADS_PER_PAGE,
             }
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
@@ -224,8 +216,6 @@ def user_profile(request, course_id, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
-
-
             context.update({
                 'course': course,
                 'user': request.user,
@@ -245,7 +235,7 @@ def followed_threads(request, course_id, user_id):
 
         query_params = {
             'page': request.GET.get('page', 1),
-            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            'per_page': THREADS_PER_PAGE,
             'sort_key': request.GET.get('sort_key', 'date'),
             'sort_order': request.GET.get('sort_order', 'desc'),
         }
