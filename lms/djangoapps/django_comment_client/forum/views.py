@@ -252,31 +252,15 @@ def followed_threads(request, course_id, user_id):
         }
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
-        query_params['page'] = page
-        query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
-        if request.is_ajax():
-            return utils.JsonResponse({
-                'annotated_content_info': annotated_content_info,
-                'discussion_data': map(utils.safe_content, threads),
-                'page': query_params['page'],
-                'num_pages': query_params['num_pages'],
-                })
-        else:
+        return utils.JsonResponse({
+            'annotated_content_info': annotated_content_info,
+            'discussion_data': map(utils.safe_content, threads),
+            'page': page,
+            'num_pages': num_pages,
+            })
 
-            context = {
-                'course': course,
-                'user': request.user,
-                'django_user': User.objects.get(id=user_id),
-                'profiled_user': profiled_user.to_dict(),
-                'threads': saxutils.escape(json.dumps(threads), escapedict),
-                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
-                #                'content': content,
-            }
-
-            return render_to_response('discussion/user_profile.html', context)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
