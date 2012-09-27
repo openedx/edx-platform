@@ -29,11 +29,11 @@ from itertools import groupby
 from operator import attrgetter
 
 from xmodule.contentstore.django import contentstore
-from xmodule.contentstore import StaticContent
+from xmodule.contentstore.content import StaticContent
 
 #from django.core.cache import cache
 
-from cache_toolbox.core import set_cached_content, get_cached_content
+from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 
 log = logging.getLogger(__name__)
 
@@ -450,10 +450,15 @@ def upload_asset(request, org, course, coursename):
     content = StaticContent(file_location, name, mime_type, filedata)
 
     # first commit to the DB
-    contentstore().update(content)
+    contentstore().save(content)
 
-    # then update the cache so we're not serving up stale content
-    set_cached_content(content)
+    # then remove the cache so we're not serving up stale content
+    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
+    # which is used when serving up static content. This integrity is needed for
+    # browser-side caching support. We *could* re-fetch the saved content so that we have the
+    # timestamp populated, but we might as well wait for the first real request to come in
+    # to re-populate the cache.
+    del_cached_content(file_location)
 
     return HttpResponse('Upload completed')
 

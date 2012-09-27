@@ -4,18 +4,15 @@ import time
 from django.http import HttpResponse, Http404, HttpResponseNotModified
 
 from xmodule.contentstore.django import contentstore
-from xmodule.contentstore import StaticContent
+from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
 
 class StaticContentServer(object):
-    def __init__(self):
-        self.match_tag = StaticContent.get_location_tag()
-
     def process_request(self, request):
         # look to see if the request is prefixed with 'c4x' tag
-        if request.path.startswith('/' + self.match_tag):
+        if request.path.startswith('/' + XASSET_LOCATION_TAG):
 
             # first look in our cache so we don't have to round-trip to the DB
             content = get_cached_content(request.path)

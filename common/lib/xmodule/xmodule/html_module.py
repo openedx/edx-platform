@@ -13,6 +13,9 @@ from .xml_module import XmlDescriptor, name_to_pathname
 from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .html_checker import check_html
+from xmodule.modulestore import Location
+
+from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
@@ -20,8 +23,7 @@ log = logging.getLogger("mitx.courseware")
 class HtmlModule(XModule):
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(self.html, self.rewrite_content_links, self)
-        #return self.html
+        return rewrite_links(self.html, self.rewrite_content_links)
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -29,10 +31,6 @@ class HtmlModule(XModule):
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
 
-    def rewrite_content_links(link, self):
-        if link.startswith('xasset:'):
-            logging.debug('found link: {0}'.format(link))
-        return link
 
 
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
