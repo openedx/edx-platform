@@ -1,4 +1,5 @@
 <%! import django_comment_client.helpers as helpers %>
+<%! import json %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django.core.urlresolvers import reverse %>
 
@@ -21,7 +22,7 @@
 
 <%include file="_new_post.html" />
 
-<section class="discussion container" id="discussion-container" data-roles="${roles}" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}" data-thread-pages="${thread_pages}" data-content-info="${annotated_content_info}">
+<section class="discussion container" id="discussion-container" data-roles="${json.dumps(roles) | entity}" data-course-id="${course.id}" data-user-info="${json.dumps(user_info) | entity}" data-threads="${json.dumps(threads) | entity}" data-thread-pages="${num_pages}" data-content-info="${json.dumps(annotated_content_info) | entity}">
     <div class="discussion-body">
         <div class="sidebar"></div>
         <div class="discussion-column">

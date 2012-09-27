@@ -21,9 +21,9 @@ from django_comment_client.utils import merge_dict, extract, strip_none, strip_b
 import django_comment_client.utils as utils
 import comment_client as cc
 import xml.sax.saxutils as saxutils
+from django.views.decorators.cache import never_cache
 
 THREADS_PER_PAGE = 20
-INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
@@ -68,7 +68,38 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     return threads, query_params
 
-def inline_discussion(request, course_id, discussion_id):
+def threads_context(user, threads, course_id, page, num_pages):
+    """
+    Convenience function for DRYing up views that all generate roughly the same data
+    """
+    user_info = cc.User.from_django_user(user).to_dict()
+    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
+
+    return {
+        'threads': [utils.safe_content(thread) for thread in threads],
+        'user_info': user_info,
+        'annotated_content_info': annotated_content_info,
+        'page': page,
+        'num_pages': num_pages,
+        'roles': utils.get_role_ids(course_id),
+    }
+
+def add_courseware_context(thread, course):
+    courseware_context = get_courseware_context(thread, course)
+    if courseware_context:
+        thread.update(courseware_context)
+    return thread
+
+def get_anonymous_permissions(context, course):
+    context['allow_anonymous'] = course.metadata.get("allow_anonymous", True)
+    context['allow_anonymous_to_peers']= course.metadata.get("allow_anonymous_to_peers", False)
+    return context
+
+def escape_quote(string):
+    escapedict = {'"': '&quot;'}
+    return saxutils.escape(string, escapedict)
+def inline_discussion(request,
+                      course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
@@ -76,32 +107,20 @@ def inline_discussion(request, course_id, discussion_id):
     course = get_course_with_access(request.user, course_id, 'load')
 
     try:
-        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-        user_info = cc.User.from_django_user(request.user).to_dict()
+        threads, query_params = get_threads(request, course_id, discussion_id, per_page=THREADS_PER_PAGE)
+        context = threads_context(request.user, threads, course_id, query_params['page'], query_params['num_pages'])
+        get_anonymous_permissions(context, course)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
         # checking for errors on request.  Check and fix as needed.
         log.error("Error loading inline discussion threads.")
-        raise Http404
+        raise Http404   #TODO: Send a status code that makes sense
 
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
-
-    allow_anonymous = course.metadata.get("allow_anonymous", True)
-    allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
-
-    return utils.JsonResponse({
-        'discussion_data': map(utils.safe_content, threads),
-        'user_info': user_info,
-        'annotated_content_info': annotated_content_info,
-        'page': query_params['page'],
-        'num_pages': query_params['num_pages'],
-        'roles': utils.get_role_ids(course_id),
-        'allow_anonymous_to_peers': allow_anonymous_to_peers,
-        'allow_anonymous': allow_anonymous,
-    })
+    return utils.JsonResponse(context)
 
 @login_required
+@never_cache
 def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
@@ -111,51 +130,27 @@ def forum_form_discussion(request, course_id):
 
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
-        threads = [utils.safe_content(thread) for thread in unsafethreads]
+        for thread in unsafethreads:
+            add_courseware_context(thread, course)
+        context = threads_context(request.user, unsafethreads, course_id, query_params['page'], query_params['num_pages'])
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading forum discussion threads: %s" % str(err))
         raise Http404
 
-    user_info = cc.User.from_django_user(request.user).to_dict()
-
-    annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
-
-    for thread in threads:
-        courseware_context = get_courseware_context(thread, course)
-        if courseware_context:
-            thread.update(courseware_context)
     if request.is_ajax():
         return utils.JsonResponse({
-            'discussion_data': threads, # TODO: Standardize on 'discussion_data' vs 'threads'
-            'annotated_content_info': annotated_content_info,
+            'discussion_data': context['threads'], # TODO: Standardize on 'discussion_data' vs 'threads'
+            'annotated_content_info': context['annotated_content_info'],
             'num_pages': query_params['num_pages'],
             'page': query_params['page'],
         })
     else:
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
-
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
-
-        context = {
-            'csrf': csrf(request)['csrf_token'],
+        context.update({
+            #TODO: Escape in template, perhaps using mako 'entity' filter?
             'course': course,
-            #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'staff_access' : has_access(request.user, course, 'staff'),
-            'threads': saxutils.escape(json.dumps(threads),escapedict),
-            'thread_pages': query_params['num_pages'],
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
-            'course_id': course.id,
             'category_map': category_map,
-            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-        }
+        })
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
 
@@ -173,18 +168,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
         raise Http404
 
     if request.is_ajax():
-
-        courseware_context = get_courseware_context(thread, course)
-
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        context = {'thread': thread.to_dict(), 'course_id': course_id}
-        # TODO: Remove completely or switch back to server side rendering
-        # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
-        if courseware_context:
-            content.update(courseware_context)
+        add_courseware_context(thread, course)
         return utils.JsonResponse({
-            #'html': html,
             'content': content,
             'annotated_content_info': annotated_content_info,
         })
@@ -202,34 +189,16 @@ def single_thread(request, course_id, discussion_id, thread_id):
         course = get_course_with_access(request.user, course_id, 'load')
 
         for thread in threads:
-            courseware_context = get_courseware_context(thread, course)
-            if courseware_context:
-                thread.update(courseware_context)
+            add_courseware_context(thread, course)
 
-        threads = [utils.safe_content(thread) for thread in threads]
-
-        #recent_active_threads = cc.search_recent_active_threads(
-        #    course_id,
-        #    recursive=False,
-        #    query_params={'follower_id': request.user.id},
-        #)
-
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
-
-        
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
-
+        context = threads_context(request.user, threads, course_id, query_params['page']. query_params['num_pages'])
+        context['discussion_id'] = discussion_id
+        # TODO: Escape in template
         context = {
             'discussion_id': discussion_id,
-            'csrf': csrf(request)['csrf_token'],
-            'init': '', #TODO: What is this?
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+            'user_info': escape_quote(json.dumps(user_info)),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
-            #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'course_id': course.id, #TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),

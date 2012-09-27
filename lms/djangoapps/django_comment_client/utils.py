@@ -250,6 +250,7 @@ class QueryCountDebugMiddleware(object):
         return response
 
 def get_ability(course_id, content, user):
+    #TODO: Consider changing user to user_id as a slight micro-optimization/cleanup
     return {
             'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
             'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
