@@ -10,7 +10,10 @@
             return
 
         try
-            new window[moduleType](element)
+            xmodule = new window[moduleType](element)
+            if moduleType == 'Problem'
+              console.log('XModule.loadModule: Rendering problem')
+              #xmodule.render()
         catch error
             console.error "Unable to load #{moduleType}: #{error.message}" if console
 

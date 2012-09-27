@@ -5,7 +5,7 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
-    @render()
+    #@render()
 
   $: (selector) ->
     $(selector, @el)
