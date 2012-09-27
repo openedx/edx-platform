@@ -26,7 +26,7 @@ if Backbone?
         @nav.setActiveThread(@thread.get("id"))
 
     showThread: (forum_name, thread_id) ->
-      @thread = @discussion.get(thread_id)
+      @thread = @discussion.get(thread_id) or @discussion.getBySlug(thread_id)
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
@@ -44,7 +44,7 @@ if Backbone?
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+      @navigate("#{thread.get("commentable_id")}/threads/#{(thread.get('slug') or thread_id)}", trigger: true)
 
     navigateToAllThreads: =>
       @navigate("", trigger: true)

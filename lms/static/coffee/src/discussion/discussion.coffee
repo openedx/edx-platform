@@ -5,11 +5,30 @@ if Backbone?
     initialize: (models, options={})->
       @pages = options['pages'] || 1
       @current_page = 1
+      @slugToId = {}
       @bind "add", (item) =>
         item.discussion = @
+        @updateSlugMap(item)
       @comparator = @sortByDateRecentFirst
       @on "thread:remove", (thread) =>
         @remove(thread)
+
+      _.each models, @updateSlugMap
+      @bind "reset", @onReset
+
+    onReset: (new_collection)=>
+      new_collection.each @updateSlugMap
+
+    updateSlugMap: (thread)=>
+      # Don't try to update if thread doesn't have slug
+      # Thread could either be a raw JSON object or a Thread model...
+      if not(thread.slug) and not (thread.get and thread.get('slug'))
+        return
+      slug = thread.slug or thread.get('slug')
+      @slugToId[slug] = thread.id
+
+    getBySlug: (slug) =>
+      @get(@slugToId[slug])
 
     find: (id) ->
       _.first @where(id: id)
@@ -18,8 +37,7 @@ if Backbone?
       @current_page < @pages
 
     addThread: (thread, options) ->
-      # TODO: Check for existing thread with same ID in a faster way
-      if not @find(thread.id)
+      if not @get(thread.id)
         options ||= {}
         model = new Thread thread
         @add model

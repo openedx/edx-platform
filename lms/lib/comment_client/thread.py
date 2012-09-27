@@ -10,7 +10,7 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read'
+        'highlighted_body', 'endorsed', 'read', 'slug',
     ]
 
     updatable_fields = [
@@ -66,7 +66,7 @@ class Thread(models.Model):
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
 
-        request_params = { 
+        request_params = {
                             'recursive': kwargs.get('recursive'),
                             'user_id': kwargs.get('user_id'),
                             'mark_as_read': kwargs.get('mark_as_read', True),
