@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from lxml import etree
+from lxml.html import rewrite_links
 from path import path
 
 from .x_module import XModule
@@ -18,13 +19,20 @@ log = logging.getLogger("mitx.courseware")
 
 class HtmlModule(XModule):
     def get_html(self):
-        return self.html
+        # cdodge: perform link substitutions for any references to course static content (e.g. images)
+        return rewrite_links(self.html, self.rewrite_content_links, self)
+        #return self.html
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
+
+    def rewrite_content_links(link, self):
+        if link.startswith('xasset:'):
+            logging.debug('found link: {0}'.format(link))
+        return link
 
 
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):

@@ -353,7 +353,7 @@ def save_item(request):
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)
-
+        
     if request.POST['children']:
         children = request.POST['children']
         modulestore().update_children(item_location, children)
@@ -457,8 +457,3 @@ def upload_asset(request, org, course, coursename):
 
     return HttpResponse('Upload completed')
 
-
-
-class UploadFileForm(forms.Form):
-    title = forms.CharField(max_length=50)
-    file = forms.FileField()
