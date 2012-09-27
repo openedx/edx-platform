@@ -10,11 +10,12 @@ weighting.
 
 ## Totaling sections
 
-The process of totaling sections is to get a percentage score for every section
-in the course. A section is any module that is a direct child of a chapter. For
-example, psets, labs, and sequences are all common sections. Only the
-*percentage* on the section will be available to compute the final grade, *not*
-the final number of points earned / possible.
+The process of totaling sections is to get a percentage score (between 0.0 and
+1.0) for every section in the course. A section is any module that is a direct
+child of a chapter. For example, psets, labs, and sequences are all common
+sections. Only the *percentage* on the section will be available to compute the
+final grade, *not* the final number of points earned / possible.
+
 
 **For a section to be included in the final grade, the policies file must set
 graded = True for the section.**
@@ -89,6 +90,9 @@ This format supports forecasting the number of homework assignments. For
 example, if the course only has 3 homeworks written, but the section format
 grader has been told to expect 12, the missing 9 will have an assumed 0% and
 will still show up in the grade breakdown.
+
+A section format grader will also show the average of that section in the grade
+breakdown (shown on the Progress page, gradebook, etc.).
 
 
 ### Single Section Graders
