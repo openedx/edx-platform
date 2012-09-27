@@ -11,6 +11,8 @@ from xmodule.modulestore.django import modulestore
 from courseware.grades import grade
 
 
+BATCH_SIZE = 2000
+
 log = logging.getLogger('edx.mailchimp')
 
 
@@ -126,12 +128,20 @@ def update_merge_tags(mailchimp, list_id, data):
 
 def update_grade_data(mailchimp, list_id, data):
     formated_data = list({name_to_tag(k):v for k, v in e.iteritems()} for e in data)
-    result = mailchimp.listBatchSubscribe(id=list_id,
-                                          batch=formated_data,
-                                          double_optin=False,
-                                          update_existing=True)
-    log.debug(result)
+
+    # send the updates in batches of a fixed size
+    for batch in batches(formated_data, BATCH_SIZE):
+        result = mailchimp.listBatchSubscribe(id=list_id,
+                                              batch=batch,
+                                              double_optin=False,
+                                              update_existing=True)
+        log.debug(result)
 
 
 def name_to_tag(name):
     return (name[:10] if len(name) > 10 else name).replace(' ','_').strip()
+
+
+def batches(iterable, size):
+    slices = range(0, len(iterable), size)
+    return [iterable[slice(i, i + size)] for i in slices]
