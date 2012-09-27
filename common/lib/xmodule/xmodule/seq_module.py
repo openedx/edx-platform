@@ -86,6 +86,7 @@ class SequenceModule(XModule):
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
+                'id': child.id,
             }
             if childinfo['title']=='':
                 childinfo['title'] = child.metadata.get('display_name','')

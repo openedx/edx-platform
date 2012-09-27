@@ -14,16 +14,13 @@ $(document).ready(function() {
     $newComponentStep2 = $('.new-component-step-2');
     $newComponentButton = $('.new-component-button');
 
-    $(document).bind('XModule.loaded', function(e, element) {
-        if ($(element).hasClass('.xmodule_display')) {
-            return
-        }
+    $(document).bind('XModule.loaded.edit', function(e, element, module) {
         var previewType = $(element).data('preview-type');
         var moduleType = $(element).data('type');
         new CMS.Views.ModuleEdit({
             el: element,
+            module: module,
             model: new CMS.Models.Module({
-                module: $(element).data('module'),
                 id: $(element).data('id'),
                 type: moduleType == 'None' ? null : moduleType,
                 previewType: previewType == 'None' ? null : previewType,

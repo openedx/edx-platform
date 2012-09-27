@@ -10,7 +10,3 @@ class CMS.Models.Module extends Backbone.Model
     @unset('module')
     delete attributes.module
     super(attributes)
-
-  save: (args...) ->
-    @set(data: @module.save()) if @module
-    super(args...)
