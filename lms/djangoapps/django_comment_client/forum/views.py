@@ -170,7 +170,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         content = utils.safe_content(thread.to_dict())
-        add_courseware_context(thread, course)
+        add_courseware_context(content, course)
         return utils.JsonResponse({
             'content': content,
             'annotated_content_info': annotated_content_info,
