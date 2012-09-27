@@ -1,4 +1,5 @@
 <%! from django.template.defaultfilters import escapejs %>
+<%! import json %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
@@ -29,7 +30,7 @@
       </nav>
     </section>
 
-    <section class="course-content container discussion-user-threads" data-user-id="${django_user.id | escapejs}" data-course-id="${course.id | escapejs}" data-threads="${threads}" data-user-info="${user_info}">
+    <section class="course-content container discussion-user-threads" data-user-id="${django_user.id | escapejs}" data-course-id="${course.id | escapejs}" data-threads="${json.dumps(threads) | entity}" data-user-info="${json.dumps(user_info) | entity}">
         <h2>Active Threads</h2>
     </section>
   </div>

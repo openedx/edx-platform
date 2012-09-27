@@ -192,8 +192,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(thread, course)
 
         context = threads_context(request.user, threads, course_id, query_params['page'], query_params['num_pages'])
-        context['discussion_id'] = discussion_id
-        # TODO: Escape in template (user_info, annconinfo, threads, roles)
         context.update({
             'discussion_id': discussion_id,
             'course': course,
@@ -216,32 +214,25 @@ def user_profile(request, course_id, user_id):
             }
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
-        query_params['page'] = page
-        query_params['num_pages'] = num_pages
-        user_info = cc.User.from_django_user(request.user).to_dict()
 
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        context = threads_context(request.user, threads, course_id, page, num_pages)
 
         if request.is_ajax():
             return utils.JsonResponse({
-                'discussion_data': map(utils.safe_content, threads),
-                'page': query_params['page'],
-                'num_pages': query_params['num_pages'],
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                'discussion_data': context['threads'],
+                'page': page,
+                'num_pages': num_pages,
+                'annotated_content_info': context['annotated_content_info'],
             })
         else:
 
 
-            context = {
+            context.update({
                 'course': course,
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': saxutils.escape(json.dumps(threads), escapedict),
-                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
-#                'content': content,
-            }
+            })
 
             return render_to_response('discussion/user_profile.html', context)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
