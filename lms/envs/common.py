@@ -1246,7 +1246,10 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
-    # For the wiki
+    # For sending emails
+    'mailing',
+
+    #For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',  # Our customizations
