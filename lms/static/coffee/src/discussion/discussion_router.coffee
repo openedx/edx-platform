@@ -2,7 +2,7 @@ if Backbone?
   class @DiscussionRouter extends Backbone.Router
     routes:
       "": "allThreads"
-      ":forum_name/threads/:thread_id" : "showThread"
+      ":forum_name/:thread_id" : "showThread"
 
     initialize: (options) ->
         @discussion = options['discussion']
@@ -44,7 +44,7 @@ if Backbone?
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{thread.get("commentable_id")}/threads/#{(thread.get('slug') or thread_id)}", trigger: true)
+      @navigate("#{thread.get("commentable_id")}/#{(thread.get('slug') or thread_id)}", trigger: true)
 
     navigateToAllThreads: =>
       @navigate("", trigger: true)
