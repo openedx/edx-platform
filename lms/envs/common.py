@@ -580,7 +580,7 @@ INSTALLED_APPS = (
     'instructor',
     'psychometrics',
     'licenses',
-
+    'mailing',  # For sending emails
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
     'django_notify',
