@@ -81,7 +81,7 @@ def threads_context(user, threads, course_id, page, num_pages):
         'annotated_content_info': annotated_content_info,
         'page': page,
         'num_pages': num_pages,
-        'roles': utils.get_role_ids(course_id),
+        'roles': utils.get_role_ids(course_id), # TODO: This should not be here
     }
 
 def add_courseware_context(thread, course):
@@ -214,7 +214,6 @@ def user_profile(request, course_id, user_id):
             }
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
-
         context = threads_context(request.user, threads, course_id, page, num_pages)
 
         if request.is_ajax():
@@ -252,12 +251,11 @@ def followed_threads(request, course_id, user_id):
         }
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
-        user_info = cc.User.from_django_user(request.user).to_dict()
-
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        context = threads_context(request.user, threads, course_id, page, num_pages)
+        #return utils.JsonResponse(extract(context, ['annotated_content_info', 'threads', 'page', 'num_pages']))
         return utils.JsonResponse({
-            'annotated_content_info': annotated_content_info,
-            'discussion_data': map(utils.safe_content, threads),
+            'annotated_content_info': context['annotated_content_info'],
+            'discussion_data': context['threads'],
             'page': page,
             'num_pages': num_pages,
             })
