@@ -42,18 +42,21 @@ section.problem {
       content: url('../images/correct-icon.png');
     }
 
-    > span {
-      padding-right: 20px;
+    min-width:100px; 
+    width: auto !important; 
+    width: 100px;
+
+    .indicator_container {
       float: left;
-      background-position: 0 0  !important;
+      width: 25px;
+      margin-right: 15px;
     }
 
     fieldset {
       @include box-sizing(border-box);
-      float: left;
       border-left: 1px solid #ddd;
       padding-left: 20px;
-      margin: 20px 0;
+      margin: 0px 0px 20px;
     }
 
     input[type="radio"],
@@ -63,8 +66,7 @@ section.problem {
     }
 
     text {
-      display: block;
-      margin-left: 25px;
+      margin-left: 5px;
     }
   }
 
