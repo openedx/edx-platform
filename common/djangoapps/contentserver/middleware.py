@@ -33,10 +33,8 @@ class StaticContentServer(object):
 
             # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
 
-            logging.debug(request.META)
-
             # convert over the DB persistent last modified timestamp to a HTTP compatible
-            # timestamp
+            # timestamp, so we can simply compare the strings
             last_modified_at_str = content.last_modified_at.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
 
             # see if the client has cached this content, if so then compare the
