@@ -41,6 +41,7 @@
       $('.longform').hide();
       $('.shortform').append('<a href="#" class="full">See full output</a>');
 
+      $('.collapsible section').hide();
       $('.full').click(function() {
         $(this).parent().siblings().slideToggle();
         $(this).parent().parent().toggleClass('open');
@@ -57,7 +58,6 @@
 
       if(!collapsibleSet) {
         collapsibleSet = true;
-        $('.collapsible section').hide();
         $('.collapsible header a').bind('click', toggleHint);
       }      
     });
