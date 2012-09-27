@@ -66,7 +66,7 @@ if Backbone?
         dataType: 'json'
         success: (response, textStatus) =>
           models = @models
-          new_threads = [new Thread(data) for data in response.discussion_data][0]
+          new_threads = [new Thread(data) for data in response.threads][0]
           new_collection = _.union(models, new_threads)
           Content.loadContentInfos(response.annotated_content_info)
           @reset new_collection

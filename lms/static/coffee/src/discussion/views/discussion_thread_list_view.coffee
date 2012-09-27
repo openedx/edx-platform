@@ -274,7 +274,7 @@ if Backbone?
         success: (response, textStatus) =>
           @collection.current_page = response.page
           @collection.pages = response.num_pages
-          @collection.reset(response.discussion_data)
+          @collection.reset(response.threads)
           Content.loadContentInfos(response.annotated_content_info)
           @displayedCollection.reset(@collection.models)# Don't think this is necessary because it's called on collection.reset
           if callback?
@@ -337,7 +337,7 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             # TODO: Augment existing collection?
-            @collection.reset(response.discussion_data)
+            @collection.reset(response.threads)
             Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages

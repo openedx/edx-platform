@@ -139,7 +139,7 @@ def forum_form_discussion(request, course_id):
 
     if request.is_ajax():
         return utils.JsonResponse({
-            'discussion_data': context['threads'], # TODO: Standardize on 'discussion_data' vs 'threads'
+            'threads': context['threads'],
             'annotated_content_info': context['annotated_content_info'],
             'num_pages': query_params['num_pages'],
             'page': query_params['page'],
@@ -218,7 +218,7 @@ def user_profile(request, course_id, user_id):
 
         if request.is_ajax():
             return utils.JsonResponse({
-                'discussion_data': context['threads'],
+                'threads': context['threads'],
                 'page': page,
                 'num_pages': num_pages,
                 'annotated_content_info': context['annotated_content_info'],
@@ -252,13 +252,7 @@ def followed_threads(request, course_id, user_id):
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
         context = threads_context(request.user, threads, course_id, page, num_pages)
-        #return utils.JsonResponse(extract(context, ['annotated_content_info', 'threads', 'page', 'num_pages']))
-        return utils.JsonResponse({
-            'annotated_content_info': context['annotated_content_info'],
-            'discussion_data': context['threads'],
-            'page': page,
-            'num_pages': num_pages,
-            })
+        return utils.JsonResponse(extract(context, ['annotated_content_info', 'threads', 'page', 'num_pages']))
 
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
