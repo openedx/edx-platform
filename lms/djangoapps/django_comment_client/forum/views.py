@@ -191,21 +191,15 @@ def single_thread(request, course_id, discussion_id, thread_id):
         for thread in threads:
             add_courseware_context(thread, course)
 
-        context = threads_context(request.user, threads, course_id, query_params['page']. query_params['num_pages'])
+        context = threads_context(request.user, threads, course_id, query_params['page'], query_params['num_pages'])
         context['discussion_id'] = discussion_id
-        # TODO: Escape in template
-        context = {
+        # TODO: Escape in template (user_info, annconinfo, threads, roles)
+        context.update({
             'discussion_id': discussion_id,
-            'user_info': escape_quote(json.dumps(user_info)),
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
-            'course_id': course.id, #TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
-            'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
-            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-            'thread_pages': query_params['num_pages'],
-        }
+        })
 
         return render_to_response('discussion/single_thread.html', context)
 
