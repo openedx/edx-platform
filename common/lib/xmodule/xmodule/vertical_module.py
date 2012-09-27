@@ -17,7 +17,10 @@ class VerticalModule(XModule):
 
     def get_html(self):
         if self.contents is None:
-            self.contents = [child.get_html() for child in self.get_display_items()]
+            self.contents = [{
+                'id': child.id,
+                'content': child.get_html()
+            } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {
             'items': self.contents

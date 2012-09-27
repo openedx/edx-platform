@@ -401,7 +401,9 @@ def save_item(request):
     descriptor = modulestore().get_item(item_location)
     preview_html = get_module_previews(request, descriptor)[0]
 
-    return HttpResponse(json.dumps(preview_html))
+    return HttpResponse(json.dumps({
+        'preview': preview_html
+    }))
 
 
 @login_required

@@ -35,11 +35,12 @@ class CMS.Views.ModuleEdit extends Backbone.View
     _metadata
 
   save: (data) =>
+    @model.unset('preview')
     @model.set(data)
-    @model.save().done((preview) =>
+    @model.save().done( (resp) =>
       alert("Your changes have been saved.")
 
-      $preview = $(preview)
+      $preview = $(resp.preview)
       @$el.replaceWith($preview)
       @setElement($preview)
       @module.constructor(@$el)

@@ -37,14 +37,15 @@
 
 class @XModule.Descriptor
 
-  callbacks: []
-
   ###
   Register a callback method to be called when the state of this
   descriptor is updated. The callback will be passed the results
   of calling the save method on this descriptor.
   ###
   onUpdate: (callback) ->
+    if ! @callbacks?
+      @callbacks = []
+
     @callbacks.push(callback)
 
   ###
