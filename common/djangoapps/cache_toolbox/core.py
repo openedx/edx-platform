@@ -10,7 +10,6 @@ Core methods
 
 from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
-from xmodule.contentstore import StaticContent
 
 from . import app_settings
 
@@ -118,9 +117,5 @@ def set_cached_content(content):
 def get_cached_content(filename):
     return cache.get(content_key(filename))
 
-
-#def set_cached_content(filename, content_type, data):
-#    cache.set(content_key(filename), (filename, content_type, data))
-
-#def get_cached_content(filename):
-#    return cache.get(content_key(filename))
+def del_cached_content(filename):
+    cache.delete(content_key(filename))

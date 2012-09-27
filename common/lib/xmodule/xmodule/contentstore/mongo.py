@@ -5,20 +5,21 @@ from gridfs.errors import NoFile
 import sys
 import logging
 
-from . import StaticContent
+from .content import StaticContent, ContentStore
 from xmodule.exceptions import NotFoundError
 
 
-class MongoContentStore(object):
+class MongoContentStore(ContentStore):
     def __init__(self, host, db, port=27017):
         logging.debug( 'Using MongoDB for static content serving at host={0} db={1}'.format(host,db))
         _db = Connection(host=host, port=port)[db]
         self.fs = gridfs.GridFS(_db)
 
-    def update(self, content):
+    def save(self, content):
         with self.fs.new_file(filename=content.filename, content_type=content.content_type, displayname=content.name) as fp:
             fp.write(content.data)
             return content
+        
     
     def find(self, filename):
         try:

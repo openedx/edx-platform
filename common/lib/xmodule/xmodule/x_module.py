@@ -12,6 +12,8 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 
+from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+
 log = logging.getLogger('mitx.' + __name__)
 
 
@@ -316,6 +318,20 @@ class XModule(HTMLSnippet):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
+
+    # cdodge: added to support dynamic substitutions of 
+    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
+    def rewrite_content_links(self, link):
+        # see if we start with our format, e.g. 'xasset:<filename>'
+        if link.startswith(XASSET_SRCREF_PREFIX):
+            # yes, then parse out the name
+            name = link[len(XASSET_SRCREF_PREFIX):]
+            loc = Location(self.location)
+            # resolve the reference to our internal 'filepath' which
+            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
+
+        return link
+
 
 
 def policy_key(location):
