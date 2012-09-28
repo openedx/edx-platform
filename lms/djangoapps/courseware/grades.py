@@ -253,7 +253,7 @@ def progress_summary(student, request, course, student_module_cache):
 
     Arguments:
         student: A User object for the student to grade
-        course: An XModule containing the course to grade
+        course: A Descriptor containing the course to grade
         student_module_cache: A StudentModuleCache initialized with all
              instance_modules for the student
     
