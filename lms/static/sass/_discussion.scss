@@ -1557,6 +1557,18 @@ body.discussion {
     }
   }
 
+  .moderator-label {
+    margin-left: 2px;
+    padding: 0 4px;
+    border-radius: 2px;
+    background: #55dc9e;
+    font-size: 9px;
+    font-weight: 700;
+    font-style: normal;   
+    color: white;   
+    text-transform: uppercase;
+  }
+
   .comment-form {
     padding: 8px 20px;
 
