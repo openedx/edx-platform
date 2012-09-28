@@ -9,6 +9,11 @@ h2 {
     }
   }
 
+  &.problem-part {
+    font-size: 0.875em;
+    font-weight: bold;
+  }
+
   @media print {
     display: block;
     width: auto;
