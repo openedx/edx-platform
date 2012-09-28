@@ -69,9 +69,9 @@ if Backbone?
           new_threads = [new Thread(data) for data in response.threads][0]
           new_collection = _.union(models, new_threads)
           Content.loadContentInfos(response.annotated_content_info)
-          @reset new_collection
           @pages = response.num_pages
           @current_page = response.page
+          @reset new_collection
 
     sortByDate: (thread) ->
       thread.get("created_at")

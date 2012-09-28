@@ -276,7 +276,6 @@ if Backbone?
           @collection.pages = response.num_pages
           @collection.reset(response.threads)
           Content.loadContentInfos(response.annotated_content_info)
-          @displayedCollection.reset(@collection.models)# Don't think this is necessary because it's called on collection.reset
           if callback?
             callback()
 
@@ -291,6 +290,7 @@ if Backbone?
 
     retrieveFirstPage: (event)->
       @collection.current_page = 0
+      @collection.pages = 0
       @collection.reset()
       @loadMorePages(event)
 
@@ -337,10 +337,10 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             # TODO: Augment existing collection?
-            @collection.reset(response.threads)
-            Content.loadContentInfos(response.annotated_content_info)
             @collection.current_page = response.page
             @collection.pages = response.num_pages
+            @collection.reset(response.threads)
+            Content.loadContentInfos(response.annotated_content_info)
             # TODO: Perhaps reload user info so that votes can be updated.
             # In the future we might not load all of a user's votes at once
             # so this would probably be necessary anyway
