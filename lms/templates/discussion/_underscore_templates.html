@@ -123,6 +123,7 @@
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
         ${"<% } else {print('anonymous');} %>"}
+        <a class="comment-reply-link" href="#comment_${'<%- id %>'}" data-comment-id="${'<%- id %>'}">Reply</a>
     </p>
   </div>
 </script>

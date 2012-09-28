@@ -39,7 +39,7 @@ GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
 DISCUSSION_SETTINGS = {
-    'MAX_COMMENT_DEPTH': 2,
+    'MAX_COMMENT_DEPTH': None,  # Don't force a max comment depth
 }
 
 # Features
@@ -128,7 +128,7 @@ NODE_PATH = ':'.join(node_paths)
 
 
 ############################ OpenID Provider  ##################################
-OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -158,7 +158,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
-    
+
     # Added for django-wiki
     'django.core.context_processors.media',
     'django.core.context_processors.tz',
@@ -355,7 +355,7 @@ WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
-WIKI_LINK_DEFAULT_LEVEL = 2 
+WIKI_LINK_DEFAULT_LEVEL = 2
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -372,10 +372,10 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'mitxmako.makoloader.MakoFilesystemLoader',
     'mitxmako.makoloader.MakoAppDirectoriesLoader',
- 
+
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-    
+
     #'askbot.skins.loaders.filesystem_load_template_source',
     # 'django.template.loaders.eggs.Loader',
 )
@@ -393,7 +393,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
-    
+
     'course_wiki.course_nav.Middleware',
 
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
@@ -624,7 +624,7 @@ INSTALLED_APPS = (
     'certificates',
     'instructor',
     'psychometrics',
-    
+
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
     'django_notify',

@@ -5,6 +5,7 @@ if Backbone?
     events:
         "click .discussion-submit-comment": "submitComment"
         "focus .wmd-input": "showEditorChrome"
+        "click .comment-reply-link": "replyToComment"
 
     $: (selector) ->
       @$el.find(selector)
@@ -52,17 +53,17 @@ if Backbone?
       })
 
     renderComments: ->
-      comments = new Comments()
-      comments.comparator = (comment) ->
+      @comments = new Comments()
+      @comments.comparator = (comment) ->
         comment.get('created_at')
-      collectComments = (comment) ->
-        comments.add(comment)
+      collectComments = (comment) =>
+        @comments.add(comment)
         children = new Comments(comment.get('children'))
         children.each (child) ->
           child.parent = comment
           collectComments(child)
       @model.get('comments').each collectComments
-      comments.each (comment) => @renderComment(comment, false, null)
+      @comments.each (comment) => @renderComment(comment, false, null)
 
     renderComment: (comment) =>
       comment.set('thread', @model.get('thread'))
@@ -73,11 +74,16 @@ if Backbone?
 
     submitComment: (event) ->
       event.preventDefault()
-      url = @model.urlFor('reply')
       body = @getWmdContent("comment-body")
       return if not body.trim().length
       @setWmdContent("comment-body", "")
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"), id:"unsaved")
+      if @parentComment
+        url = @parentComment.urlFor('reply')
+        comment.parent = @parentComment
+        delete @parentComment # Remove reference so future comments aren't incorrectly parented
+      else
+        url = @model.urlFor('reply')
       view = @renderComment(comment)
       @hideEditorChrome()
       @trigger "comment:add", comment
@@ -89,9 +95,10 @@ if Backbone?
         dataType: 'json'
         data:
           body: body
-        success: (response, textStatus) ->
+        success: (response, textStatus) =>
           comment.set(response.content)
-          view.render() # This is just to update the id for the most part, but might be useful in general
+          @comments.add(comment)
+          view.render()
 
     delete: (event) =>
       event.preventDefault()
@@ -186,3 +193,8 @@ if Backbone?
               @renderShowView()
               @showCommentForm()
 
+    replyToComment: (event)=>
+      event.preventDefault()
+      elem = $(event.target)
+      @parentComment = @comments.get(elem.data('comment-id'))
+      @$('.wmd-input').focus()
