@@ -49,7 +49,7 @@ default_options = {
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -e common/lib/xmodule')
+    sh('pip install -e common/lib/xmodule -e common/lib/capa')
     sh('git submodule update --init')
 end
 
