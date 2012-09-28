@@ -1,9 +1,14 @@
 from util.json_request import expect_json
 import json
+import os
 import logging
 import sys
 import mimetypes
+import StringIO
 from collections import defaultdict
+
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+from PIL import Image
 
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
@@ -101,11 +106,18 @@ def course_index(request, org, course, name):
     _course = modulestore().get_item(location)
     weeks = _course.get_children()
 
-    upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
-        org = org, 
-        course = course,
-        name = name
-        )
+    #upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
+    #    org = org, 
+    #    course = course,
+    #    name = name
+    #    )
+
+    upload_asset_callback_url = reverse('upload_asset', kwargs = {
+            'org' : org,
+            'course' : course,
+            'coursename' : name
+            })
+    logging.debug(upload_asset_callback_url)
 
     return render_to_response('course_index.html', {
             'weeks': weeks, 
@@ -459,6 +471,45 @@ def upload_asset(request, org, course, coursename):
     # timestamp populated, but we might as well wait for the first real request to come in
     # to re-populate the cache.
     del_cached_content(file_location)
+
+    # if we're uploading an image, then let's generate a thumbnail so that we can
+    # serve it up when needed without having to rescale on the fly
+    if mime_type.split('/')[0] == 'image':
+        try:
+            # not sure if this is necessary, but let's rewind the stream just in case
+            request.FILES['file'].seek(0)
+
+            # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
+            # My understanding is that PIL will maintain aspect ratios while restricting
+            # the max-height/width to be whatever you pass in as 'size'
+            # @todo: move the thumbnail size to a configuration setting?!?
+            im = Image.open(request.FILES['file'])
+
+            # I've seen some exceptions from the PIL library when trying to save palletted 
+            # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
+            im = im.convert('RGB')
+            size = 128, 128
+            im.thumbnail(size, Image.ANTIALIAS)
+            thumbnail_file = StringIO.StringIO()
+            im.save(thumbnail_file, 'JPEG')
+            thumbnail_file.seek(0)
+        
+            # use a naming convention to associate originals with the thumbnail
+            #   <name_without_extention>.thumbnail.jpg
+            thumbnail_name = os.path.splitext(name)[0] + '.thumbnail.jpg'
+            # then just store this thumbnail as any other piece of content
+            thumbnail_file_location = StaticContent.compute_location_filename(org, course, 
+                                                                              thumbnail_name)
+            thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
+                                              'image/jpeg', thumbnail_file)
+            contentstore().save(thumbnail_content)
+
+            # remove any cached content at this location, as thumbnails are treated just like any
+            # other bit of static content
+            del_cached_content(thumbnail_file_location)
+        except:
+            # catch, log, and continue as thumbnails are not a hard requirement
+            logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
 
     return HttpResponse('Upload completed')
 

@@ -26,7 +26,9 @@ class StaticContentServer(object):
                 # since we fetched it from DB, let's cache it going forward
                 set_cached_content(content)
             else:
-                logging.debug('cache hit on {0}'.format(content.filename))
+                # @todo: we probably want to have 'cache hit' counters so we can
+                # measure the efficacy of our caches
+                pass
 
             # see if the last-modified at hasn't changed, if not return a 302 (Not Modified)
 
