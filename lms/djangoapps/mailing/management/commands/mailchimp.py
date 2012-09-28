@@ -43,24 +43,32 @@ class Command(BaseCommand):
 
         mailchimp = connect_mailchimp(key, list_id, course_id)
 
+        subscribed = get_subscribed(mailchimp, list_id)
         unsubscribed = get_unsubscribed(mailchimp, list_id)
-        data = get_grade_data(course_id, unsubscribed)
 
+        enrolled = get_enrolled_students(course_id)
+        active = [s for s in enrolled if s.user.email not in unsubscribed]
+
+        data = get_student_data(course_id, active)
         update_merge_tags(mailchimp, list_id, data)
         update_grade_data(mailchimp, list_id, data)
 
+        enrolled_emails = set(s.user.email for s in enrolled)
+        non_enrolled_emails = list(subscribed.difference(enrolled_emails))
 
-def connect_mailchimp(key, web_id, course_id):
+        unsubscribe(mailchimp, list_id, non_enrolled_emails)
+
+
+def connect_mailchimp(key, list_id, course_id):
     mailchimp = MailSnake(key)
     result = mailchimp.ping()
     log.debug(result)
 
-    lists = mailchimp.lists(filters={'list_id': web_id})['data']
+    lists = mailchimp.lists(filters={'list_id': list_id})['data']
 
     if len(lists) != 1:
         raise CommandError('incorrect list id')
 
-    list_id = lists[0]['id']
     list_name = lists[0]['name']
 
     log.debug('list name: %s' % list_name)
@@ -76,35 +84,45 @@ def connect_mailchimp(key, web_id, course_id):
     return mailchimp
 
 
-def get_grade_data(course_id, emails_to_skip=None):
-    emails_to_skip = emails_to_skip or []
-
+def get_student_data(course_id, students):
     store = modulestore()
     course_loc = CourseDescriptor.id_to_location(course_id)
     course = store.get_instance(course_id, course_loc)
 
-    students = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
-
     grades = []
     for student in students:
         student_email = student.user.email
-        if student_email not in emails_to_skip:
-            entry = {'EMAIL': student_email,
-                     'FULLNAME': student.name.title()}
+        entry = {'EMAIL': student_email,
+                 'FULLNAME': student.name.title()}
 
-            # student_grade = grade(student.user, None, course)
-            # for g in student_grade['section_breakdown']:
-            #     name = g['label'].upper()
-            #     entry[name] = g['percent']
+        # student_grade = grade(student.user, None, course)
+        # for g in student_grade['section_breakdown']:
+        #     name = g['label'].upper()
+        #     entry[name] = g['percent']
 
-            grades.append(entry)
+        grades.append(entry)
 
     return grades
+
+
+def get_enrolled_students(course_id):
+    students = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
+    return students
 
 
 def get_unsubscribed(mailchimp, list_id):
     unsubscribed = mailchimp.listMembers(id=list_id, status='unsubscribed')
     return set(d['email'] for d in unsubscribed.get('data',[]))
+
+
+def get_subscribed(mailchimp, list_id):
+    unsubscribed = mailchimp.listMembers(id=list_id, status='subscribed')
+    return set(d['email'] for d in unsubscribed.get('data',[]))
+
+
+def unsubscribe(mailchimp, list_id, emails):
+    result = mailchimp.listBatchUnsubscribe(id=list_id, emails=emails, send_goodbye=False, delete_member=False)
+    log.debug(result)
 
 
 def update_merge_tags(mailchimp, list_id, data):
