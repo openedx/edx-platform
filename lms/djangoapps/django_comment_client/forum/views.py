@@ -77,7 +77,7 @@ def threads_context(user, threads, course_id, page, num_pages):
 
     return {
         'threads': [utils.safe_content(thread) for thread in threads],
-        'user_info': user_info,
+        'user_info': user_info, # TODO: This should not be returned on each JSON response
         'annotated_content_info': annotated_content_info,
         'page': page,
         'num_pages': num_pages,
@@ -209,12 +209,8 @@ def user_profile(request, course_id, user_id):
         context = threads_context(request.user, threads, course_id, page, num_pages)
 
         if request.is_ajax():
-            return utils.JsonResponse({
-                'threads': context['threads'],
-                'page': page,
-                'num_pages': num_pages,
-                'annotated_content_info': context['annotated_content_info'],
-            })
+            del context['roles']
+            return utils.JsonResponse(context)
         else:
             context.update({
                 'course': course,
@@ -242,7 +238,8 @@ def followed_threads(request, course_id, user_id):
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
         context = threads_context(request.user, threads, course_id, page, num_pages)
-        return utils.JsonResponse(extract(context, ['annotated_content_info', 'threads', 'page', 'num_pages']))
+        del context['roles']
+        return utils.JsonResponse(context)
 
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
