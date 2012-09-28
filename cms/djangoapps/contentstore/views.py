@@ -109,16 +109,16 @@ def course_index(request, org, course, name):
             })
 
     course = modulestore().get_item(location)
-    weeks = course.get_children()
+    sections = course.get_children()
 
     return render_to_response('overview.html', {
-        'weeks': weeks,
+        'sections': sections,
         'upload_asset_callback_url': upload_asset_callback_url
     })
 
 
 @login_required
-def edit_item(request, location):
+def edit_unit(request, location):
     """
     Display an editing page for the specified module.
 
@@ -150,7 +150,7 @@ def edit_item(request, location):
 
 
 @login_required
-def delete_item(request, location):
+def delete_unit(request, location):
     pass
 
 

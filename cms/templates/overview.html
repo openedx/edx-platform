@@ -2,49 +2,6 @@
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">CMS Courseware Overview</%block>
 
-<%def name="branch(section, depth)">
-  <%
-    has_children = depth > 0 and len(section.get_children()) > 0
-  %>
-  <li class="branch collapsed">
-    <div class="section-item">
-      % if has_children:
-      <a href="#" class="expand-collapse-icon expand"></a>
-      % endif
-      <a href="#" class="draft-item">
-        <span class="${section.category}-icon"></span>${section.display_name} <span class="draft-tag">– draft</span>
-      </a>
-      ${actions(section)}
-    </div>
-
-    % if has_children:
-    <ol>
-      % for unit in section.get_children():
-      ${branch(unit, depth-1)}
-      % endfor
-      ${new_unit()}
-    </ol>
-    % endif
-  </li>
-</%def>
-
-<%def name="actions(unit)">
-  <div class="item-actions">
-    <a href="${reverse('edit_item', args=[unit.location])}" class="edit-button"><span class="edit-icon"></span></a>
-    <a href="${reverse('delete_item', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
-    <a href="#" class="drag-handle"></a>
-  </div>
-</%def>
-
-<%def name="new_unit()">
-  <li>
-    <a href="#" class="section-item new-unit-item">
-      <span class="plus-icon"></span>New Unit
-    </a>
-  </li>
-</%def>
-
-
 <%block name="content">
   <div class="main-wrapper">
     <div class="inner-wrapper">
@@ -52,21 +9,63 @@
       <input type="text" class="courseware-unit-search-input search" placeholder="search units" />
       <article class="courseware-overview">
         <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
-        % for week in weeks:
+        % for section in sections:
         <section class="courseware-section branch">
           <header>
             <a href="#" class="expand-collapse-icon collapse"></a>
             <div class="item-details">
-              <h3>${week.display_name}</h3>
+              <h3>${section.display_name}</h3>
               <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
             </div>
-            ${actions(week)}
+            <div class="item-actions">
+              <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+              <a href="#" class="drag-handle"></a>
+            </div>
           </header>
           <ol>
-            % for section in week.get_children():
-            ${branch(section, 1)}
+            % for subsection in section.get_children():
+            <li class="branch collapsed">
+              <div class="section-item">
+                <a href="#" class="expand-collapse-icon expand"></a>
+                <a href="#" class="draft-item">
+                  <span class="${subsection.category}-icon"></span>${subsection.display_name} <span class="draft-tag">– draft</span>
+                </a>
+                <div class="item-actions">
+                  <a href="#" class="edit-button"><span class="edit-icon"></span></a>
+                  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+                  <a href="#" class="drag-handle"></a>
+                </div>
+              </div>
+
+              <ol>
+                % for unit in subsection.get_children():
+                <li class="branch collapsed">
+                  <div class="section-item">
+                    <a href="#" class="draft-item">
+                      <span class="${unit.category}-icon"></span>${unit.display_name} <span class="draft-tag">– draft</span>
+                    </a>
+                    <div class="item-actions">
+                      <a href="${reverse('edit_unit', args=[unit.location])}" class="edit-button"><span class="edit-icon"></span></a>
+                      <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
+                      <a href="#" class="drag-handle"></a>
+                    </div>
+                  </div>
+                </li>
+                % endfor
+                <li>
+                  <a href="#" class="section-item new-unit-item">
+                    <span class="plus-icon"></span>New Unit
+                  </a>
+                </li>
+              </ol>
+            </li>
             % endfor
-            ${new_unit()}
+
+            <li>
+              <a href="#" class="section-item new-subsection-item">
+                <span class="plus-icon"></span>New Subsection
+              </a>
+            </li>
           </ol>
         </section>
         % endfor
