@@ -292,7 +292,7 @@ if Backbone?
 
     retrieveFirstPage: (event)->
       @collection.current_page = 0
-      @collection.pages = 0
+      @collection.pages = 1
       @collection.reset()
       @loadMorePages(event)
 
@@ -323,8 +323,6 @@ if Backbone?
       @current_search = text
       url = DiscussionUtil.urlFor("search")
       #TODO: This might be better done by setting discussion.current_page=0 and calling discussion.loadMorePages
-      # Mainly because this currently does not reset any pagination variables which could cause problems.
-      # This doesn't use pagination either.
       DiscussionUtil.safeAjax
         $elem: @$(".post-search-field")
         data: { text: text }
