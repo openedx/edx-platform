@@ -34,6 +34,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
     filename_extension = "xml"
+    template_dir_name = "html"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
