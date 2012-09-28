@@ -285,13 +285,14 @@ class AssignmentFormatGrader(CourseGrader):
     "HW".
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None):
+    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
         self.category = category or self.type
         self.section_type = section_type or self.type
         self.short_label = short_label or self.type
+        self.show_only_average = show_only_average
 
     def grade(self, grade_sheet):
         def totalWithDrops(breakdown, drop_count):
@@ -328,7 +329,7 @@ class AssignmentFormatGrader(CourseGrader):
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + 1, section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + 1, short_label=self.short_label)
-
+            
             breakdown.append({'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category})
 
         total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
@@ -338,8 +339,12 @@ class AssignmentFormatGrader(CourseGrader):
 
         total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent, section_type=self.section_type)
         total_label = "{short_label} Avg".format(short_label=self.short_label)
+        
+        if self.show_only_average:
+            breakdown = []
+        
         breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
-
+        
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
                 #No grade_breakdown here
