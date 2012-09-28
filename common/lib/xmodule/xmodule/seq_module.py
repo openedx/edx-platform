@@ -117,7 +117,7 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     stores_state = True # For remembering where in the sequence the student is
 
-    template_dir_name = 'sequential'
+    template_dir_name = 'sequence'
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

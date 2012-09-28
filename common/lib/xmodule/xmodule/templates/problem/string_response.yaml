@@ -1,0 +1,41 @@
+---
+metadata:
+    display_name: String Response
+data: |
+    <problem >
+      <text>
+    <h2>Example: String Response Problem</h2>
+    <p>
+      
+      A string response problem accepts a line of text input from the
+      student, and evaluates the input for correctness based on an expected
+      answer within each input box. 
+      
+      The answer is correct if it is the expected answer.
+    </p>
+      </text>
+      
+      <span style="display:inline">
+    <p style="display:inline">Which US state has Lansing as its capital? &#160; &#160;</p>
+    <stringresponse answer="Michigan" type="ci">
+      <textline size="20" inline="1"/>
+      <hintgroup>
+        <stringhint answer="wisconsin" type="cs" name="wisc">
+        </stringhint>
+        <stringhint answer="minnesota" type="cs" name="minn">
+        </stringhint>
+        <hintpart on="wisc">
+          <text>The state capital of Wisconsin is Madison.</text>
+        </hintpart>
+        <hintpart on="minn">
+          <text>The state capital of Minnesota is St. Paul.</text>
+        </hintpart>
+        <hintpart on="default">
+          <text>The state you are looking for is also known as the 'Great Lakes State'</text>
+        </hintpart>     
+      </hintgroup>
+    </stringresponse>
+      </span>
+      
+    </problem>
+children: []
