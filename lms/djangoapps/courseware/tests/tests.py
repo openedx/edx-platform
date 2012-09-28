@@ -644,7 +644,6 @@ class RealCoursesLoadTestCase(PageLoader):
 
     # ========= TODO: check ajax interaction here too?
 
-
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCourseGrader(PageLoader):
     """Check that a course gets graded properly"""
@@ -673,16 +672,32 @@ class TestCourseGrader(PageLoader):
         
         self.factory = RequestFactory()
     
-    def check_grade_percent(self, percent):
-        
+    def get_grade_summary(self):
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
         
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
         
-        grade_summary = grades.grade(self.student_user, fake_request, 
-                                self.graded_course, student_module_cache)
+        return grades.grade(self.student_user, fake_request, 
+                            self.graded_course, student_module_cache)
+    
+    def get_homework_scores(self):
+        return self.get_grade_summary()['totaled_scores']['Homework']
+    
+    def get_progress_summary(self):
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            self.graded_course.id, self.student_user, self.graded_course)
+        
+        fake_request = self.factory.get(reverse('progress',
+                                       kwargs={'course_id': self.graded_course.id}))
+
+        progress_summary = grades.progress_summary(self.student_user, fake_request, 
+                                                   self.graded_course, student_module_cache)
+        return progress_summary
+        
+    def check_grade_percent(self, percent):
+        grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
     
     def submit_question_answer(self, problem_url_name, responses):
@@ -693,8 +708,6 @@ class TestCourseGrader(PageLoader):
         input_i4x-edX-graded-problem-H1P3_2_1
         input_i4x-edX-graded-problem-H1P3_2_2
         """
-        
-        
         problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
         
         modx_url = reverse('modx_dispatch', 
@@ -713,8 +726,11 @@ class TestCourseGrader(PageLoader):
         
         return resp
     
+    def problem_location(self, problem_url_name):
+        return "i4x://edX/graded/problem/{0}".format(problem_url_name)
+    
     def reset_question_answer(self, problem_url_name):
-        problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
+        problem_location = self.problem_location(problem_url_name)
         
         modx_url = reverse('modx_dispatch', 
                             kwargs={
@@ -724,33 +740,46 @@ class TestCourseGrader(PageLoader):
                           )
         
         resp = self.client.post(modx_url)
-        return resp
-        
+        return resp    
      
     def test_get_graded(self):
         #### Check that the grader shows we have 0% in the course
         self.check_grade_percent(0)
         
-        
         #### Submit the answers to a few problems as ajax calls
+        def earned_hw_scores():
+            """Global scores, each Score is a Problem Set"""
+            return [s.earned for s in self.get_homework_scores()]
+        
+        def score_for_hw(hw_url_name):
+            hw_section = [section for section
+                          in self.get_progress_summary()[0]['sections']
+                          if section.get('url_name') == hw_url_name][0]
+            return [s.earned for s in hw_section['scores']]
         
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
         self.check_grade_percent(0.06)
+        self.assertEqual(earned_hw_scores(), [1.0, 0, 0]) # Order matters
+        self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
         
         # Get both parts of the first problem correct
         self.reset_question_answer('H1P1')
         self.submit_question_answer('H1P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.13)
+        self.assertEqual(earned_hw_scores(), [2.0, 0, 0])
+        self.assertEqual(score_for_hw('Homework1'), [2.0, 0.0])
         
         # This problem is shown in an ABTest
         self.submit_question_answer('H1P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
+        self.assertEqual(earned_hw_scores(), [4.0, 0.0, 0])
+        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])        
         
         # This problem is hidden in an ABTest. Getting it correct doesn't change total grade
         self.submit_question_answer('H1P3', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
-        
+        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
         
         # On the second homework, we only answer half of the questions.
         # Then it will be dropped when homework three becomes the higher percent
@@ -759,15 +788,16 @@ class TestCourseGrader(PageLoader):
         # know it works.
         self.submit_question_answer('H2P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.42)
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])        
         
         # Third homework
         self.submit_question_answer('H3P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.42) # Score didn't change
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])        
         
         self.submit_question_answer('H3P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.5) # Now homework2 dropped. Score changes
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])                
         
         # Now we answer the final question (worth half of the grade)
         self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
