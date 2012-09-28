@@ -127,7 +127,7 @@ if Backbone?
 
     toJSON: ->
       json_attributes = _.clone(@attributes)
-      _.extend(json_attributes, { title: @display_title(), body: @display_body() })
+      _.extend(json_attributes, { display_title: @display_title(), display_body: @display_body() })
 
     created_at_date: ->
       new Date(@get("created_at"))

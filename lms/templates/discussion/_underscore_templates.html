@@ -23,7 +23,7 @@
       <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow"></a></div>
       <header>
           <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
-          <h1>${'<%- title %>'}</h1>
+          <h1>${'<%- display_title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
               <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
@@ -36,7 +36,7 @@
           </p>
       </header>
 
-      <div class="post-body">${'<%- body %>'}</div>
+      <div class="post-body">${'<%- display_body %>'}</div>
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
@@ -129,7 +129,7 @@
 
 <script type="text/template" id="thread-list-item-template">
     <a href="${'<%- slug %>'}" data-id="${'<%- id %>'}">
-        <span class="title">${"<%- title %>"}</span>
+        <span class="title">${"<%- display_title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
             <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"}</span>
         ${"<% } else { %>"}

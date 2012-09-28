@@ -223,7 +223,6 @@ def user_profile(request, course_id, user_id):
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         raise Http404
 
-
 def followed_threads(request, course_id, user_id):
     course = get_course_with_access(request.user, course_id, 'load')
     try:
