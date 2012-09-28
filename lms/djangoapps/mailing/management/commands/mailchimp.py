@@ -92,10 +92,10 @@ def get_grade_data(course_id, emails_to_skip=None):
             entry = {'EMAIL': student_email,
                      'FULLNAME': student.name.title()}
 
-            student_grade = grade(student.user, None, course)
-            for g in student_grade['section_breakdown']:
-                name = g['label'].upper()
-                entry[name] = g['percent']
+            # student_grade = grade(student.user, None, course)
+            # for g in student_grade['section_breakdown']:
+            #     name = g['label'].upper()
+            #     entry[name] = g['percent']
 
             grades.append(entry)
 
