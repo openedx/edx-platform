@@ -148,7 +148,7 @@ def forum_form_discussion(request, course_id):
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
-
+    # TODO: Why is discussion_id passed in here just to pass it straight back out in the JSON?
     course = get_course_with_access(request.user, course_id, 'load')
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()

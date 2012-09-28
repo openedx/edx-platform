@@ -81,7 +81,7 @@ if Backbone?
 
   class @Thread extends @Content
     urlMappers:
-      'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+      'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)# Not sure if this ID means anything anymore, or if it ever did.
       'reply'    : -> DiscussionUtil.urlFor('create_comment', @id)
       'unvote'   : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
       'upvote'   : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
@@ -91,6 +91,7 @@ if Backbone?
       'delete'   : -> DiscussionUtil.urlFor('delete_thread', @id)
       'follow'   : -> DiscussionUtil.urlFor('follow_thread', @id)
       'unfollow' : -> DiscussionUtil.urlFor('unfollow_thread', @id)
+      'permalink': -> DiscussionUtil.urlFor('permanent_link_thread', @get('commentable_id'), @identifier())
 
     initialize: ->
       @set('thread', @)
@@ -134,6 +135,10 @@ if Backbone?
 
     created_at_time: ->
       new Date(@get("created_at")).getTime()
+
+    identifier: ->
+      # Both the slug and the mongoDB ID are valid ways to get to a thread
+      @get('slug') or @get('id')
 
   class @Comment extends @Content
     urlMappers:

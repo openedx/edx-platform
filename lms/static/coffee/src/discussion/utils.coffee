@@ -66,7 +66,7 @@ class @DiscussionUtil
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/#{param}/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/#{param}/#{param1}##{param2}"
       user_profile            : "/courses/#{$$course_id}/discussion/users/#{param}"
-      followed_threads       : "/courses/#{$$course_id}/discussion/users/#{param}/followed"
+      followed_threads        : "/courses/#{$$course_id}/discussion/users/#{param}/followed"
       threads                 : "/courses/#{$$course_id}/discussion"
     }[name]
 

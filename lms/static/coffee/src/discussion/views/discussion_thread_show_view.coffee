@@ -136,4 +136,5 @@ if Backbone?
       params = @model.toJSON()
       if @model.get('username')?
         params = $.extend(params, user:{username: @model.username, user_url: @model.user_url})
+      params = $.extend(params, permalink: @model.urlFor('permalink'))
       Mustache.render(@template, params)
