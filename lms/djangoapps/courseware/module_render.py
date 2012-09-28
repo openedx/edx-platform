@@ -29,7 +29,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 log = logging.getLogger("mitx.courseware")
 
 
-if settings.XQUEUE_INTERFACE['basic_auth'] is not None:
+if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
     requests_auth = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
 else:
     requests_auth = None
