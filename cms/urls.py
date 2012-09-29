@@ -17,7 +17,9 @@ urlpatterns = ('',
         'contentstore.views.course_index', name='course_index'),
     url(r'^github_service_hook$', 'github_sync.views.github_post_receive'),
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-        'contentstore.views.preview_dispatch', name='preview_dispatch')
+        'contentstore.views.preview_dispatch', name='preview_dispatch'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$', 
+        'contentstore.views.upload_asset', name='upload_asset')
 )
 
 # User creation and updating views

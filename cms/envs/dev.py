@@ -28,6 +28,17 @@ MODULESTORE = {
     }
 }
 
+# cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
+# This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db' : 'xcontent',
+    }
+}
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
