@@ -284,6 +284,9 @@ class AssignmentFormatGrader(CourseGrader):
     min_count defines how many assignments are expected throughout the course. Placeholder
     scores (of 0) will be inserted if the number of matching sections in the course is < min_count.
     If there number of matching sections in the course is > min_count, min_count will be ignored.
+    
+    show_only_average is to suppress the display of each assignment in this grader and instead
+    only show the total score of this grader in the breakdown.
 
     category should be presentable to the user, but may not appear. When the grade breakdown is
     displayed, scores from the same category will be similar (for example, by color).
