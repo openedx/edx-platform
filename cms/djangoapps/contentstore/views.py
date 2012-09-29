@@ -1,15 +1,22 @@
 from util.json_request import expect_json
 import json
+import os
 import logging
 import sys
+import mimetypes
+import StringIO
 from collections import defaultdict
 
-from django.http import HttpResponse, Http404
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+from PIL import Image
+
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django import forms
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
@@ -25,6 +32,13 @@ from xmodule.exceptions import NotFoundError
 from functools import partial
 from itertools import groupby
 from operator import attrgetter
+
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
+
+#from django.core.cache import cache
+
+from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 
 log = logging.getLogger(__name__)
 
@@ -89,9 +103,26 @@ def course_index(request, org, course, name):
         raise Http404  # TODO (vshnayder): better error
 
     # TODO (cpennington): These need to be read in from the active user
-    course = modulestore().get_item(location)
-    weeks = course.get_children()
-    return render_to_response('course_index.html', {'weeks': weeks})
+    _course = modulestore().get_item(location)
+    weeks = _course.get_children()
+
+    #upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
+    #    org = org, 
+    #    course = course,
+    #    name = name
+    #    )
+
+    upload_asset_callback_url = reverse('upload_asset', kwargs = {
+            'org' : org,
+            'course' : course,
+            'coursename' : name
+            })
+    logging.debug(upload_asset_callback_url)
+
+    return render_to_response('course_index.html', {
+            'weeks': weeks, 
+            'upload_asset_callback_url': upload_asset_callback_url
+            })
 
 
 @login_required
@@ -115,12 +146,13 @@ def edit_item(request):
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=settings.LMS_BASE,
             # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id=modulestore().get_containing_courses(item.location)[0].id,
+            course_id= modulestore().get_containing_courses(item.location)[0].id,
             location=item.location,
         )
     else:
         lms_link = None
 
+    
     return render_to_response('unit.html', {
         'contents': item.get_html(),
         'js_module': item.js_module_name,
@@ -333,7 +365,7 @@ def save_item(request):
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)
-
+        
     if request.POST['children']:
         children = request.POST['children']
         modulestore().update_children(item_location, children)
@@ -390,3 +422,94 @@ def clone_item(request):
     modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse()
+
+'''
+cdodge: this method allows for POST uploading of files into the course asset library, which will
+be supported by GridFS in MongoDB.
+'''
+#@login_required
+#@ensure_csrf_cookie
+def upload_asset(request, org, course, coursename):
+
+    if request.method != 'POST':
+        # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+
+    # construct a location from the passed in path
+    location = ['i4x', org, course, 'course', coursename]
+    if not has_access(request.user, location):
+        return HttpResponseForbidden()
+    
+    # Does the course actually exist?!?
+    
+    try:
+        item = modulestore().get_item(location)
+    except:
+        # no return it as a Bad Request response
+        logging.error('Could not find course' + location)
+        return HttpResponseBadRequest()
+
+    # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
+    # nomenclature since we're using a FileSystem paradigm here. We're just imposing
+    # the Location string formatting expectations to keep things a bit more consistent
+
+    name = request.FILES['file'].name
+    mime_type = request.FILES['file'].content_type
+    filedata = request.FILES['file'].read()
+
+    file_location = StaticContent.compute_location_filename(org, course, name)
+
+    content = StaticContent(file_location, name, mime_type, filedata)
+
+    # first commit to the DB
+    contentstore().save(content)
+
+    # then remove the cache so we're not serving up stale content
+    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
+    # which is used when serving up static content. This integrity is needed for
+    # browser-side caching support. We *could* re-fetch the saved content so that we have the
+    # timestamp populated, but we might as well wait for the first real request to come in
+    # to re-populate the cache.
+    del_cached_content(file_location)
+
+    # if we're uploading an image, then let's generate a thumbnail so that we can
+    # serve it up when needed without having to rescale on the fly
+    if mime_type.split('/')[0] == 'image':
+        try:
+            # not sure if this is necessary, but let's rewind the stream just in case
+            request.FILES['file'].seek(0)
+
+            # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
+            # My understanding is that PIL will maintain aspect ratios while restricting
+            # the max-height/width to be whatever you pass in as 'size'
+            # @todo: move the thumbnail size to a configuration setting?!?
+            im = Image.open(request.FILES['file'])
+
+            # I've seen some exceptions from the PIL library when trying to save palletted 
+            # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
+            im = im.convert('RGB')
+            size = 128, 128
+            im.thumbnail(size, Image.ANTIALIAS)
+            thumbnail_file = StringIO.StringIO()
+            im.save(thumbnail_file, 'JPEG')
+            thumbnail_file.seek(0)
+        
+            # use a naming convention to associate originals with the thumbnail
+            #   <name_without_extention>.thumbnail.jpg
+            thumbnail_name = os.path.splitext(name)[0] + '.thumbnail.jpg'
+            # then just store this thumbnail as any other piece of content
+            thumbnail_file_location = StaticContent.compute_location_filename(org, course, 
+                                                                              thumbnail_name)
+            thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
+                                              'image/jpeg', thumbnail_file)
+            contentstore().save(thumbnail_content)
+
+            # remove any cached content at this location, as thumbnails are treated just like any
+            # other bit of static content
+            del_cached_content(thumbnail_file_location)
+        except:
+            # catch, log, and continue as thumbnails are not a hard requirement
+            logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
+
+    return HttpResponse('Upload completed')
+

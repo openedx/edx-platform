@@ -10,6 +10,7 @@ import sys
 
 from datetime import timedelta
 from lxml import etree
+from lxml.html import rewrite_links
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
@@ -332,6 +333,15 @@ class CapaModule(XModule):
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
+        # cdodge: OK, we have to do two rounds of url reference subsitutions
+        # one which uses the 'asset library' that is served by the contentstore and the
+        # more global /static/ filesystem based static content.
+        # NOTE: rewrite_content_links is defined in XModule
+        # This is a bit unfortunate and I'm sure we'll try to considate this into
+        # a one step process.
+        html = rewrite_links(html, self.rewrite_content_links)
+
+        # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):

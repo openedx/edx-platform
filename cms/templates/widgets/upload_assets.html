@@ -1,0 +1,44 @@
+<section>
+  <div class="assset-upload">
+    You can upload file assets (such as images) to reference in your courseware
+    <form action="${upload_asset_callback_url}" method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Upload File">
+    </form>
+    <div class="progress" style="position:relative; width:400px; border: 1px solid #ddd; padding: 1px; border-radius: 3px;">
+      <div class="bar" style="background-color: #B4F5B4; width:0%; height:20px; border-radius: 3px;"></div>
+      <div class="percent">0%</div>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+</section>
+
+<script src="http://malsup.github.com/jquery.form.js"></script>
+<script>
+(function() {
+    
+var bar = $('.bar');
+var percent = $('.percent');
+var status = $('#status');
+   
+$('form').ajaxForm({
+    beforeSend: function() {
+        status.empty();
+        var percentVal = '0%';
+        bar.width(percentVal)
+        percent.html(percentVal);
+    },
+    uploadProgress: function(event, position, total, percentComplete) {
+        var percentVal = percentComplete + '%';
+        bar.width(percentVal)
+        percent.html(percentVal);
+    },
+complete: function(xhr) {
+status.html(xhr.responseText);
+}
+}); 
+
+})();       
+</script>
