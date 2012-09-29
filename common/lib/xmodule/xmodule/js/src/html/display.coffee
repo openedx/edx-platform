@@ -1,8 +1,9 @@
 class @HTMLModule
 
   constructor: (@element) ->
-  	@el = $(@element)
-  	@setCollapsibles()
+    @el = $(@element)
+    JavascriptLoader.setCollapsibles()
+    @setCollapsibles()
 
   $: (selector) ->
     $(selector, @el)
