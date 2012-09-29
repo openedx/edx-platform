@@ -10,7 +10,8 @@ $(document).ready(function() {
     $modal = $('.history-modal');
     $modalCover = $('.modal-cover');
     $newComponentItem = $('.new-component-item');
-    $newComponentChooser = $('.new-component');
+    $newComponentTypePicker = $('.new-component');
+    $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
 
     $('li.component').each(function(idx, element) {
@@ -26,7 +27,10 @@ $(document).ready(function() {
     $('.visibility-options').bind('change', setVisibility);
 
     $newComponentButton.bind('click', showNewComponentForm);
-    $newComponentChooser.find('.new-component-type a').bind('click', showComponentTemplates);
+    $newComponentTypePicker.find('.new-component-type a').bind('click', showComponentTemplates);
+    $newComponentTypePicker.find('.cancel-button').bind('click', closeNewComponent);
+    $newComponentTemplatePickers.find('.new-component-template a').bind('click', saveNewComponent);
+    $newComponentTemplatePickers.find('.cancel-button').bind('click', closeNewComponent);
 
     $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideHistoryModal);
@@ -58,21 +62,22 @@ function showNewComponentForm(e) {
     e.preventDefault();
     $newComponentItem.addClass('adding');
     $(this).slideUp(150);
-    $newComponentChooser.slideDown(150);
+    $newComponentTypePicker.slideDown(250);
 }
 
 function showComponentTemplates(e) {
     e.preventDefault();
 
     var type = $(this).data('type');
-    $newComponentChooser.slideUp(250);
+    $newComponentTypePicker.slideUp(250);
     $('.new-component-'+type).slideDown(250);
 }
 
-function cancelNewComponent(e) {
+function closeNewComponent(e) {
     e.preventDefault();
 
-    $newComponentStep2.slideUp(250);
+    $newComponentTypePicker.slideUp(250);
+    $newComponentTemplatePickers.slideUp(250);
     $newComponentButton.slideDown(250);
     $newComponentItem.removeClass('adding');
     $newComponentItem.find('.rendered-component').remove();
@@ -81,22 +86,15 @@ function cancelNewComponent(e) {
 function saveNewComponent(e) {
     e.preventDefault();
 
-    var $newComponent = $newComponentItem.clone();
-    $newComponent.removeClass('adding').removeClass('new-component-item');
-    $newComponent.find('.new-component-step-2').removeClass('new-component-step-2').addClass('component-editor');
-    setTimeout(function() {
-        $newComponent.find('.component-editor').slideUp(250);
-    }, 10);  
-    $newComponent.append('<div class="component-actions"><a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a><a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>  </div><a href="#" class="drag-handle"></a>');
-    $newComponent.find('.new-component-step-1').remove();
-    $newComponent.find('.new-component-button').remove();
+    editor = new CMS.Views.ModuleEdit({
+        model: new CMS.Models.Module()
+    })
 
-    $newComponentStep2.slideUp(250);
-    $newComponentButton.slideDown(250);
-    $newComponentItem.removeClass('adding');
-    $newComponentItem.find('.rendered-component').remove();
+    $('.components').append(editor.$el)
 
-    $newComponentItem.before($newComponent);
+    editor.cloneTemplate($(this).data('location'))
+
+    closeNewComponent(e);
 }
 
 function showHistoryModal(e) {

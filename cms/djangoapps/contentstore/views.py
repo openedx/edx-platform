@@ -145,15 +145,7 @@ def edit_unit(request, location):
     else:
         lms_link = None
 
-<<<<<<< HEAD
-    
-    return render_to_response('unit.html', {
-        'module': item,
-        'editable_preview': get_module_previews(request, item)[0],
-    })
-=======
     component_templates = defaultdict(list)
->>>>>>> Separate unit page from vertical implementation for editing
 
     templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
     for template in templates:
@@ -170,7 +162,7 @@ def edit_unit(request, location):
     ]
 
     return render_to_response('unit.html', {
-        'unit_name': item.display_name,
+        'unit': item,
         'components': components,
         'component_templates': component_templates,
     })
@@ -432,7 +424,7 @@ def clone_item(request):
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
     modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
-    return HttpResponse()
+    return preview_component(request, new_item.location)
 
 '''
 cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -523,4 +515,3 @@ def upload_asset(request, org, course, coursename):
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
 
     return HttpResponse('Upload completed')
-

@@ -9,10 +9,10 @@
           <ul>
             <li><a href="#">Week 2</a></li>
             <li><a href="#">Linearity and Superposition</a></li>
-            <li><span class="current-page">${unit_name}</span></li>
+            <li><span class="current-page">${unit.display_name}</span></li>
           </ul>
         </nav>
-        <ol class="components">
+        <ol class="components" data-id="${unit.location.url()}">
           % for id in components:
           <li class="component" data-id="${id}"/>
           % endfor
@@ -56,7 +56,7 @@
         <div class="unit-properties window">
           <h4>Properties</h4>
           <div class="window-contents">
-            <div class="row"><label>Display Name:</label><input type="text" value="${unit_name}" /></div>
+            <div class="row"><label>Display Name:</label><input type="text" value="${unit.display_name}" /></div>
             <div class="row">
               <label>State:</label>
               <div class="visibility-options">
