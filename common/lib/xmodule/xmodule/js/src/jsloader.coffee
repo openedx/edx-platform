@@ -3,14 +3,15 @@ class @JavascriptLoader
   Set of library functions that provide common interface for javascript loading
   for all module types
   ###
-  @setCollapsibles: () =>
-    console.log($('.collapsible section'))
-    $('.longform').hide();
-    $('.shortform').append('<a href="#" class="full">See full output</a>');
-    $('.collapsible section').hide();
-    $('.full').click @toggleFull
-    $('.collapsible header a').click @toggleHint
-    @toggleHint()
+  @setCollapsibles: (el) =>
+    ###
+    el: jQuery object representing xmodule
+    ###
+    el.find('.longform').hide();
+    el.find('.shortform').append('<a href="#" class="full">See full output</a>');
+    el.find('.collapsible section').hide();
+    el.find('.full').click @toggleFull
+    el.find('.collapsible header a').click @toggleHint
 
   @toggleFull: (event) =>
     $(event.target).parent().siblings().slideToggle()
@@ -19,7 +20,6 @@ class @JavascriptLoader
     $(this).text(text)
 
   @toggleHint: (event) =>
-    console.log('toggleHint')
     event.preventDefault()
     $(event.target).parent().siblings().slideToggle()
     $(event.target).parent().parent().toggleClass('open')
