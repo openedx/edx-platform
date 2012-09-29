@@ -27,6 +27,7 @@ class @Problem
     @$('section.action input.save').click @save
 
     # Collapsibles
+    JavascriptLoader.setCollapsibles()
     @$('.longform').hide();
     @$('.shortform').append('<a href="#" class="full">See full output</a>');
     @$('.collapsible section').hide();
