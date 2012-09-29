@@ -1,9 +1,12 @@
 import abc
 import json
 import logging
+import random
 import sys
 
 from collections import namedtuple
+
+from django.conf import settings
 
 log = logging.getLogger("mitx.courseware")
 
@@ -245,7 +248,16 @@ class SingleSectionGrader(CourseGrader):
                     foundScore = score
                     break
 
-        if foundScore:
+        if settings.GENERATE_PROFILE_SCORES:	# for debugging!
+            earned = random.randint(2,15)
+            possible = random.randint(earned, 15)
+            percent = float(earned) / possible
+            detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
+                                                                        percent=percent,
+                                                                        earned=float(earned),
+                                                                        possible=float(possible))
+                
+        elif foundScore:
             percent = foundScore.earned / float(foundScore.possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                         percent=percent,
@@ -316,7 +328,19 @@ class AssignmentFormatGrader(CourseGrader):
         scores = grade_sheet.get(self.type, [])
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
-            if i < len(scores):
+            print "scores" , scores
+            if settings.GENERATE_PROFILE_SCORES:	# for debugging!
+                earned = random.randint(2,15)
+                possible = random.randint(earned, 15)
+                percentage = float(earned) / possible
+                summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
+                                                                section_type=self.section_type,
+                                                                name="Generated",
+                                                                percent=percentage,
+                                                                earned=float(earned),
+                                                                possible=float(possible))
+            
+            elif i < len(scores):
                 percentage = scores[i].earned / float(scores[i].possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
                                                                 section_type=self.section_type,
