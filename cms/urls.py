@@ -9,9 +9,9 @@ import django.contrib.auth.views
 
 urlpatterns = ('',
     url(r'^$', 'contentstore.views.index', name='index'),
-    url(r'^new_item$', 'contentstore.views.new_item', name='new_item'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^delete/(?P<location>.*?)$', 'contentstore.views.delete_unit', name='delete_unit'),
+    url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^clone_item$', 'contentstore.views.clone_item', name='clone_item'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',

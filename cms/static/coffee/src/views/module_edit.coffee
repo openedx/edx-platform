@@ -1,24 +1,22 @@
 class CMS.Views.ModuleEdit extends Backbone.View
-  tagName: 'div'
-  className: 'xmodule_edit'
+  tagName: 'li'
+  className: 'component'
+
+  events:
+    "click .component-editor .cancel-button": 'clickCancelButton'
+    "click .component-editor .save-button": 'clickSaveButton'
+    "click .component-actions .edit-button": 'clickEditButton'
+
 
   initialize: ->
     @module = @options.module
-    @module.onUpdate(@save)
+    @render()
 
-    @setEvents()
+  $component_editor: => @$el.find('.component-editor')
 
-  $component_editor: -> @$el.find('.component-editor')
-
-  setEvents: ->
-    id = @$el.data('id')
-
-    @events = {}
-    @events["click .component-editor[data-id=#{ id }] .cancel-button"] = 'clickCancelButton'
-    @events["click .component-editor[data-id=#{ id }] .save-button"] = 'clickSaveButton'
-    @events["click .component-actions[data-id=#{ id }] .edit-button"] = 'clickEditButton'
-
-    @delegateEvents()
+  loadModules: ->
+      @module = XModule.loadModule(@$el.find('.xmodule_edit'))
+      XModule.loadModule(@$el.find('.xmodule_display'))
 
   metadata: ->
     # cdodge: package up metadata which is separated into a number of input fields
@@ -32,30 +30,26 @@ class CMS.Views.ModuleEdit extends Backbone.View
       # build up a object to pass back to the server on the subsequent POST
       _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]', $metadata)
 
-    _metadata
+    return _metadata
 
-  save: (data) =>
-    @model.unset('preview')
-    @model.set(data)
-    @model.save().done( (resp) =>
-      alert("Your changes have been saved.")
-
-      $preview = $(resp.preview)
-      @$el.replaceWith($preview)
-      @setElement($preview)
-      @module.constructor(@$el)
-      XModule.loadModules(@$el)
-
-    ).fail( ->
-      alert("There was an error saving your changes. Please try again.")
+  render: ->
+    @$el.load("/preview_component/#{@model.id}", =>
+      @loadModules()
+      @delegateEvents()
     )
 
   clickSaveButton: (event) =>
     event.preventDefault()
     data = @module.save()
     data.metadata = @metadata()
+    @model.save(data).done( =>
+      alert("Your changes have been saved.")
 
-    @save(data)
+      @render()
+      @$el.removeClass('editing')
+    ).fail( ->
+      alert("There was an error saving your changes. Please try again.")
+    )
 
   clickCancelButton: (event) ->
     event.preventDefault()

@@ -43,6 +43,9 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 log = logging.getLogger(__name__)
 
 
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+
+
 # ==== Public views ==================================================
 
 @ensure_csrf_cookie
@@ -142,43 +145,54 @@ def edit_unit(request, location):
     else:
         lms_link = None
 
+<<<<<<< HEAD
     
     return render_to_response('unit.html', {
         'module': item,
         'editable_preview': get_module_previews(request, item)[0],
+    })
+=======
+    component_templates = defaultdict(list)
+>>>>>>> Separate unit page from vertical implementation for editing
+
+    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
+    for template in templates:
+        if template.location.category in COMPONENT_TYPES:
+            component_templates[template.location.category].append((
+                template.display_name,
+                template.location.url(),
+            ))
+
+    components = [
+        component.location.url()
+        for component
+        in item.get_children()
+    ]
+
+    return render_to_response('unit.html', {
+        'unit_name': item.display_name,
+        'components': components,
+        'component_templates': component_templates,
+    })
+
+
+@login_required
+def preview_component(request, location):
+    # TODO (vshnayder): change name from id to location in coffee+html as well.
+    if not has_access(request.user, location):
+        raise Http404  # TODO (vshnayder): better error
+
+    component = modulestore().get_item(location)
+
+    return render_to_response('component.html', {
+        'preview': get_module_previews(request, component)[0],
+        'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
 
 
 @login_required
 def delete_unit(request, location):
     pass
-
-
-@login_required
-def new_item(request):
-    """
-    Display a page where the user can create a new item from a template
-
-    Expects a GET request with the parameter 'parent_location', which is the element to add
-    the newly created item to as a child.
-
-    parent_location: A Location URL
-    """
-
-    parent_location = request.GET['parent_location']
-    if not has_access(request.user, parent_location):
-        raise Http404
-
-    parent = modulestore().get_item(parent_location)
-    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
-
-    templates.sort(key=attrgetter('location.category', 'display_name'))
-
-    return render_to_response('new_item.html', {
-        'parent_name': parent.display_name,
-        'parent_location': parent.location.url(),
-        'templates': groupby(templates, attrgetter('location.category')),
-    })
 
 
 def user_author_string(user):
@@ -321,20 +335,10 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
-
     module.get_html = wrap_xmodule(
         module.get_html,
         module,
-        "xmodule_edit.html",
-        {
-            'location': descriptor.location.url(),
-            'editor_content': descriptor.get_html(),
-            'editor_type': descriptor.js_module_name,
-            'editor_class': descriptor.__class__.__name__,
-            # TODO (cpennington): Make descriptors know if they have data that can be editng
-            'editable_data': descriptor.definition.get('data'),
-            'editable_class': 'editable' if descriptor.definition.get('data') else '',
-        }
+        "xmodule_display.html",
     )
     module.get_html = replace_static_urls(
         module.get_html,

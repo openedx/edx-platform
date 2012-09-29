@@ -9,19 +9,52 @@
           <ul>
             <li><a href="#">Week 2</a></li>
             <li><a href="#">Linearity and Superposition</a></li>
-            <li><span class="current-page">S3V2: Properties of Linearity</span></li>
+            <li><span class="current-page">${unit_name}</span></li>
           </ul>
         </nav>
-        <section class='edit-pane'>
-          ${editable_preview}
-        </section>
+        <ol class="components">
+          % for id in components:
+          <li class="component" data-id="${id}"/>
+          % endfor
+          <li class="new-component-item">
+            <a href="#" class="new-component-button">
+              <span class="plus-icon"></span>New Component
+            </a>
+            <div class="new-component">
+              <h5>Select Component Type</h5>
+              <ul class="new-component-type">
+                % for type in sorted(component_templates.keys()):
+                <li>
+                  <a href="#" data-type="${type}">
+                    <span class="large-template-icon large-${type}-icon"></span>
+                    <span class="name">${type}</span>
+                  </a>
+                </li>
+                % endfor
+              </ul>
+            </div>
+            % for type, templates in sorted(component_templates.items()):
+            <div class="new-component-templates new-component-${type}">
+              <ul class="new-component-template">
+                % for name, location in templates:
+                <li>
+                  <a href="#" data-location="${location}">
+                    <span class="name">${name}</span>
+                  </a>
+                </li>
+                % endfor
+              </ul>
+            </div>
+            % endfor
+          </li>
+        </ol>
       </article>
 
       <div class="sidebar">
         <div class="unit-properties window">
           <h4>Properties</h4>
           <div class="window-contents">
-            <div class="row"><label>Display Name:</label><input type="text" value="${module.display_name}" /></div>
+            <div class="row"><label>Display Name:</label><input type="text" value="${unit_name}" /></div>
             <div class="row">
               <label>State:</label>
               <div class="visibility-options">

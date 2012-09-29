@@ -17,6 +17,8 @@
       if $(element).hasClass('xmodule_display')
         $(document).trigger('XModule.loaded.display', [element, module])
 
+      return module
+
     catch error
       console.error "Unable to load #{moduleType}: #{error.message}" if console
 
@@ -33,7 +35,7 @@
     else
       modules = $(selector)
 
-    modules.each (idx, element) -> XModule.loadModule element
+    modules.each((idx, element) -> XModule.loadModule element)
 
 class @XModule.Descriptor
 

@@ -10,32 +10,23 @@ $(document).ready(function() {
     $modal = $('.history-modal');
     $modalCover = $('.modal-cover');
     $newComponentItem = $('.new-component-item');
-    $newComponentStep1 = $('.new-component-step-1');
-    $newComponentStep2 = $('.new-component-step-2');
+    $newComponentChooser = $('.new-component');
     $newComponentButton = $('.new-component-button');
 
-    $(document).bind('XModule.loaded.edit', function(e, element, module) {
-        var previewType = $(element).data('preview-type');
-        var moduleType = $(element).data('type');
+    $('li.component').each(function(idx, element) {
         new CMS.Views.ModuleEdit({
             el: element,
-            module: module,
             model: new CMS.Models.Module({
                 id: $(element).data('id'),
-                type: moduleType == 'None' ? null : moduleType,
-                previewType: previewType == 'None' ? null : previewType,
             })
         });
     });
-    XModule.loadModules()
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
 
     $newComponentButton.bind('click', showNewComponentForm);
-    $newComponentStep1.find('.new-component-type a').bind('click', showNewComponentProperties);
-    $newComponentStep2.find('.save-button').bind('click', saveNewComponent);
-    $newComponentStep2.find('.cancel-button').bind('click', cancelNewComponent);
+    $newComponentChooser.find('.new-component-type a').bind('click', showComponentTemplates);
 
     $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideHistoryModal);
@@ -64,70 +55,18 @@ function closeComponentEditor(e) {
 }
 
 function showNewComponentForm(e) {
-    e.preventDefault();  
+    e.preventDefault();
     $newComponentItem.addClass('adding');
     $(this).slideUp(150);
-    $newComponentStep1.slideDown(150);
+    $newComponentChooser.slideDown(150);
 }
 
-function showNewComponentProperties(e) {
+function showComponentTemplates(e) {
     e.preventDefault();
 
-    var displayName;
-    var componentSource;
-    var selectionRange;
-    var $renderedComponent;
-
-    switch($(this).attr('data-type')) {
-        case 'video':
-            displayName = 'Video';
-            componentSource = '<video youtube="1.50:___,1.25:___,1.0:___,0.75:___"/>';
-            selectionRange = [21, 24];
-            $renderedComponent = $('<div class="rendered-component"><div class="video-unit"><img src="images/video-module.png"></div></div>');
-            break;
-        case 'textbook':
-            displayName = 'Textbook';
-            componentSource = '<customtag page="___"><impl>book</impl></customtag>';
-            selectionRange = [17, 20];
-            $renderedComponent = $('<div class="rendered-component"><p><span class="textbook-icon"></span>More information given in the text.</p></div>');
-            break;
-        case 'slide':
-            displayName = 'Slide';
-            componentSource = '<customtag page="___"><customtag lecnum="___"><impl>slides</impl></customtag>';
-            selectionRange = [17, 20];
-            $renderedComponent = $('<div class="rendered-component"><p><span class="slides-icon"></span>Lecture Slides Handout [Clean] [Annotated]</p></div>');
-            break;
-        case 'discussion':
-            displayName = 'Discussion';
-            componentSource = '<discussion for="___" id="___" discussion_category="___"/>';
-            selectionRange = [17, 20];
-            $renderedComponent = $('<div class="rendered-component"><div class="discussion-unit"><img src="images/discussion-module.png"></div></div>');
-            break;
-        case 'problem':
-            displayName = 'Problem';
-            componentSource = '<problem>___</problem>';
-            selectionRange = [9, 12];
-            $renderedComponent = $('<div class="rendered-component"></div>');
-            break;
-        case 'freeform':
-            displayName = 'Freeform HTML';
-            componentSource = '';
-            selectionRange = [0, 0];
-            $renderedComponent = $('<div class="rendered-component"></div>');
-            break;
-    }
-
-    $newComponentItem.prepend($renderedComponent);
-    $renderedComponent.slideDown(250);
-
-    $newComponentStep2.find('h5').html('Edit ' + displayName + ' Component');
-    $newComponentStep2.find('textarea').html(componentSource);
-    setTimeout(function() {
-        $newComponentStep2.find('textarea').focus().get(0).setSelectionRange(selectionRange[0], selectionRange[1]);  
-    }, 10);  
-
-    $newComponentStep1.slideUp(250);
-    $newComponentStep2.slideDown(250);
+    var type = $(this).data('type');
+    $newComponentChooser.slideUp(250);
+    $('.new-component-'+type).slideDown(250);
 }
 
 function cancelNewComponent(e) {
