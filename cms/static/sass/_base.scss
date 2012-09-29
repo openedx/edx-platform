@@ -610,7 +610,7 @@ input.courseware-unit-search-input {
                 border-radius: 3px 3px 0 0;
             }
 
-            .new-component-type {
+            .new-component-type, .new-component-template {
                 @include clearfix;
 
                 a {
@@ -619,6 +619,7 @@ input.courseware-unit-search-input {
                     width: 100px;
                     height: 100px;
                     margin-right: 10px;
+                    margin-bottom: 10px;
                     border-radius: 8px;
                     font-size: 13px;
                     line-height: 14px;
@@ -642,16 +643,26 @@ input.courseware-unit-search-input {
                 }
             }
 
+            .new-component-template {
+                a {
+                    height: 60px;
+                }
+            }
+
             .new-component,
             .new-component-templates {
                 display: none;
                 padding: 20px;
+
+                .cancel-button {
+                    @include blue-button;
+                    border-color: #30649c;
+                }
             }
         }
     }
 
-    .component-editor,
-    .new-component-step-2 {
+    .component-editor {
         display: none;
         padding: 20px;
         background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1)) $blue;
@@ -885,51 +896,26 @@ input.courseware-unit-search-input {
     background: url(../img/slides-icon.png) no-repeat;
 }
 
-.large-slide-icon {
+.large-template-icon {
     display: inline-block;
     width: 100px;
     height: 60px;
     margin-right: 5px;
-    background: url(../img/large-slide-icon.png) center no-repeat;
-}
-
-.large-textbook-icon {
-    display: inline-block;
-    width: 100px;
-    height: 60px;
-    margin-right: 5px;
-    background: url(../img/large-textbook-icon.png) center no-repeat;
 }
 
 .large-discussion-icon {
-    display: inline-block;
-    width: 100px;
-    height: 60px;
-    margin-right: 5px;
     background: url(../img/large-discussion-icon.png) center no-repeat;
 }
 
-.large-freeform-icon {
-    display: inline-block;
-    width: 100px;
-    height: 60px;
-    margin-right: 5px;
+.large-html-icon {
     background: url(../img/large-freeform-icon.png) center no-repeat;
 }
 
 .large-problem-icon {
-    display: inline-block;
-    width: 100px;
-    height: 60px;
-    margin-right: 5px;
     background: url(../img/large-problem-icon.png) center no-repeat;
 }
 
 .large-video-icon {
-    display: inline-block;
-    width: 100px;
-    height: 60px;
-    margin-right: 5px;
     background: url(../img/large-video-icon.png) center no-repeat;
 }
 
