@@ -6,8 +6,6 @@ import sys
 
 from collections import namedtuple
 
-from django.conf import settings
-
 log = logging.getLogger("mitx.courseware")
 
 # This is a tuple for holding scores, either from problems or sections.
@@ -187,7 +185,7 @@ class CourseGrader(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         raise NotImplementedError
 
 
@@ -207,13 +205,13 @@ class WeightedSubsectionsGrader(CourseGrader):
     def __init__(self, sections):
         self.sections = sections
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
         section_breakdown = []
         grade_breakdown = []
 
         for subgrader, category, weight in self.sections:
-            subgrade_result = subgrader.grade(grade_sheet)
+            subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weightedPercent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weightedPercent, weight)
@@ -240,7 +238,7 @@ class SingleSectionGrader(CourseGrader):
         self.short_label = short_label or name
         self.category = category or name
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         foundScore = None
         if self.type in grade_sheet:
             for score in grade_sheet[self.type]:
@@ -248,7 +246,7 @@ class SingleSectionGrader(CourseGrader):
                     foundScore = score
                     break
 
-        if settings.GENERATE_PROFILE_SCORES:	# for debugging!
+        if generate_random_scores:	# for debugging!
             earned = random.randint(2,15)
             possible = random.randint(earned, 15)
             percent = float(earned) / possible
@@ -306,7 +304,7 @@ class AssignmentFormatGrader(CourseGrader):
         self.short_label = short_label or self.type
         self.show_only_average = show_only_average
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         def totalWithDrops(breakdown, drop_count):
             #create an array of tuples with (index, mark), sorted by mark['percent'] descending
             sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
@@ -328,8 +326,7 @@ class AssignmentFormatGrader(CourseGrader):
         scores = grade_sheet.get(self.type, [])
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
-            print "scores" , scores
-            if settings.GENERATE_PROFILE_SCORES:	# for debugging!
+            if generate_random_scores:	# for debugging!
                 earned = random.randint(2,15)
                 possible = random.randint(earned, 15)
                 percentage = float(earned) / possible
