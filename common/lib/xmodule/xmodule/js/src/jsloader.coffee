@@ -5,7 +5,7 @@ class @JavascriptLoader
   # place at module scope, i.e. don't run jQuery over entire page
 
   # executeModuleScripts:
-  #   Scan module contents for "script_placeholder"s, then:
+  #   Scan the module ('el') for "script_placeholder"s, then:
   #     1) Fetch each script from server
   #     2) Explicitly attach the script to the <head> of document
   #     3) Explicitly wait for each script to be loaded
