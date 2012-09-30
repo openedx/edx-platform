@@ -246,21 +246,19 @@ class SingleSectionGrader(CourseGrader):
                     foundScore = score
                     break
 
-        if generate_random_scores:	# for debugging!
-            earned = random.randint(2,15)
-            possible = random.randint(earned, 15)
-            percent = float(earned) / possible
+        if foundScore or generate_random_scores:
+            if generate_random_scores:	# for debugging!
+                earned = random.randint(2,15)
+                possible = random.randint(earned, 15)
+            else: # We found the score
+                earned = foundScore.earned
+                possible = foundScore.possible
+                
+            percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                         percent=percent,
                                                                         earned=float(earned),
                                                                         possible=float(possible))
-                
-        elif foundScore:
-            percent = foundScore.earned / float(foundScore.possible)
-            detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
-                                                                        percent=percent,
-                                                                        earned=float(foundScore.earned),
-                                                                        possible=float(foundScore.possible))
 
         else:
             percent = 0.0
@@ -329,25 +327,24 @@ class AssignmentFormatGrader(CourseGrader):
         scores = grade_sheet.get(self.type, [])
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
-            if generate_random_scores:	# for debugging!
-                earned = random.randint(2,15)
-                possible = random.randint(earned, 15)
-                percentage = float(earned) / possible
+            if i < len(scores) or generate_random_scores:
+                if generate_random_scores:	# for debugging!
+                    earned = random.randint(2,15)
+                    possible = random.randint(earned, 15)                    
+                    section_name = "Generated"
+                    
+                else:
+                    earned = scores[i].earned
+                    possible = scores[i].possible
+                    section_name = scores[i].section
+                
+                percentage = earned / float(possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
                                                                 section_type=self.section_type,
-                                                                name="Generated",
+                                                                name=section_name,
                                                                 percent=percentage,
                                                                 earned=float(earned),
                                                                 possible=float(possible))
-            
-            elif i < len(scores):
-                percentage = scores[i].earned / float(scores[i].possible)
-                summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
-                                                                section_type=self.section_type,
-                                                                name=scores[i].section,
-                                                                percent=percentage,
-                                                                earned=float(scores[i].earned),
-                                                                possible=float(scores[i].possible))
             else:
                 percentage = 0
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + 1, section_type=self.section_type)
