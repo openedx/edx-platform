@@ -1,7 +1,8 @@
 class @JavascriptLoader
   ###
   Set of library functions that provide common interface for javascript loading
-  for all module types
+  for all module types. All functionality provided by JavascriptLoader should take
+  place at module scope, i.e. don't run jQuery over entire page
   ###
   @setCollapsibles: (el) =>
     ###
