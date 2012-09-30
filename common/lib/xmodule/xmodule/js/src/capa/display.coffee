@@ -63,7 +63,7 @@ class @Problem
       @new_queued_items = $(response.html).find(".xqueue")
       if @new_queued_items.length isnt @num_queued_items
         @el.html(response.html)
-        @executeProblemScripts () =>
+        JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
       
@@ -81,10 +81,6 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
-      @executeProblemScripts () =>
-        @setupInputTypes()
-        @bind()
-        @queueing()
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
@@ -92,10 +88,7 @@ class @Problem
           @setupInputTypes()
           @bind()
           @queueing()
-        @executeProblemScripts () =>
-          @setupInputTypes()
-          @bind()
-          @queueing()
+
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
@@ -110,50 +103,6 @@ class @Problem
         if setupMethod?
           @inputtypeDisplays[id] = setupMethod(inputtype)
 
-  executeProblemScripts: (callback=null) ->
-
-    placeholders = @el.find(".script_placeholder")
-
-    if placeholders.length == 0
-      callback()
-      return
-
-    completed      = (false for i in [1..placeholders.length])
-    callbackCalled = false
-
-    # This is required for IE8 support.
-    completionHandlerGeneratorIE = (index) =>
-      return () ->
-        if (this.readyState == 'complete' || this.readyState == 'loaded')
-          #completionHandlerGenerator.call(self, index)()
-          completionHandlerGenerator(index)()
-
-    completionHandlerGenerator = (index) =>
-      return () =>
-        allComplete = true
-        completed[index] = true
-        for flag in completed
-          if not flag
-            allComplete = false
-            break
-        if allComplete and not callbackCalled
-          callbackCalled = true
-          callback() if callback?
-
-    placeholders.each (index, placeholder) ->
-      s = document.createElement('script')
-      s.setAttribute('src', $(placeholder).attr("data-src"))
-      s.setAttribute('type', "text/javascript")
-
-      s.onload             = completionHandlerGenerator(index)
-
-      # s.onload does not fire in IE8; this does.
-      s.onreadystatechange = completionHandlerGeneratorIE(index)
-
-      # Need to use the DOM elements directly or the scripts won't execute
-      # properly.
-      $('head')[0].appendChild(s)
-      $(placeholder).remove()
 
   ###
   # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
