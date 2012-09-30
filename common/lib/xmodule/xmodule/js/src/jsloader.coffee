@@ -18,6 +18,7 @@ class @JavascriptLoader
       callback()
       return
 
+    # TODO: Verify the execution order of multiple placeholders
     completed      = (false for i in [1..placeholders.length])
     callbackCalled = false
 
