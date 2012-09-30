@@ -1,6 +1,7 @@
 import abc
 import json
 import logging
+import random
 import sys
 
 from collections import namedtuple
@@ -184,7 +185,7 @@ class CourseGrader(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         raise NotImplementedError
 
 
@@ -204,13 +205,13 @@ class WeightedSubsectionsGrader(CourseGrader):
     def __init__(self, sections):
         self.sections = sections
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
         section_breakdown = []
         grade_breakdown = []
 
         for subgrader, category, weight in self.sections:
-            subgrade_result = subgrader.grade(grade_sheet)
+            subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weightedPercent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weightedPercent, weight)
@@ -237,7 +238,7 @@ class SingleSectionGrader(CourseGrader):
         self.short_label = short_label or name
         self.category = category or name
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         foundScore = None
         if self.type in grade_sheet:
             for score in grade_sheet[self.type]:
@@ -245,12 +246,19 @@ class SingleSectionGrader(CourseGrader):
                     foundScore = score
                     break
 
-        if foundScore:
-            percent = foundScore.earned / float(foundScore.possible)
+        if foundScore or generate_random_scores:
+            if generate_random_scores:	# for debugging!
+                earned = random.randint(2,15)
+                possible = random.randint(earned, 15)
+            else: # We found the score
+                earned = foundScore.earned
+                possible = foundScore.possible
+                
+            percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                         percent=percent,
-                                                                        earned=float(foundScore.earned),
-                                                                        possible=float(foundScore.possible))
+                                                                        earned=float(earned),
+                                                                        possible=float(possible))
 
         else:
             percent = 0.0
@@ -274,6 +282,9 @@ class AssignmentFormatGrader(CourseGrader):
     min_count defines how many assignments are expected throughout the course. Placeholder
     scores (of 0) will be inserted if the number of matching sections in the course is < min_count.
     If there number of matching sections in the course is > min_count, min_count will be ignored.
+    
+    show_only_average is to suppress the display of each assignment in this grader and instead
+    only show the total score of this grader in the breakdown.
 
     category should be presentable to the user, but may not appear. When the grade breakdown is
     displayed, scores from the same category will be similar (for example, by color).
@@ -285,15 +296,16 @@ class AssignmentFormatGrader(CourseGrader):
     "HW".
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None):
+    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
         self.category = category or self.type
         self.section_type = section_type or self.type
         self.short_label = short_label or self.type
+        self.show_only_average = show_only_average
 
-    def grade(self, grade_sheet):
+    def grade(self, grade_sheet, generate_random_scores=False):
         def totalWithDrops(breakdown, drop_count):
             #create an array of tuples with (index, mark), sorted by mark['percent'] descending
             sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
@@ -315,20 +327,30 @@ class AssignmentFormatGrader(CourseGrader):
         scores = grade_sheet.get(self.type, [])
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
-            if i < len(scores):
-                percentage = scores[i].earned / float(scores[i].possible)
+            if i < len(scores) or generate_random_scores:
+                if generate_random_scores:	# for debugging!
+                    earned = random.randint(2,15)
+                    possible = random.randint(earned, 15)                    
+                    section_name = "Generated"
+                    
+                else:
+                    earned = scores[i].earned
+                    possible = scores[i].possible
+                    section_name = scores[i].section
+                
+                percentage = earned / float(possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
                                                                 section_type=self.section_type,
-                                                                name=scores[i].section,
+                                                                name=section_name,
                                                                 percent=percentage,
-                                                                earned=float(scores[i].earned),
-                                                                possible=float(scores[i].possible))
+                                                                earned=float(earned),
+                                                                possible=float(possible))
             else:
                 percentage = 0
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + 1, section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + 1, short_label=self.short_label)
-
+            
             breakdown.append({'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category})
 
         total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
@@ -338,8 +360,12 @@ class AssignmentFormatGrader(CourseGrader):
 
         total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent, section_type=self.section_type)
         total_label = "{short_label} Avg".format(short_label=self.short_label)
+        
+        if self.show_only_average:
+            breakdown = []
+        
         breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
-
+        
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
                 #No grade_breakdown here
