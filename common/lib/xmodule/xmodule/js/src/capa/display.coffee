@@ -77,6 +77,10 @@ class @Problem
   render: (content) ->
     if content
       @el.html(content)
+      JavascriptLoader.executeModuleScripts @el, () =>
+        @setupInputTypes()
+        @bind()
+        @queueing()
       @executeProblemScripts () =>
         @setupInputTypes()
         @bind()
@@ -84,6 +88,10 @@ class @Problem
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
+        JavascriptLoader.executeModuleScripts @el, () =>
+          @setupInputTypes()
+          @bind()
+          @queueing()
         @executeProblemScripts () =>
           @setupInputTypes()
           @bind()
