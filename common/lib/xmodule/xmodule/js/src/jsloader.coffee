@@ -11,7 +11,51 @@ class @JavascriptLoader
   #     3) Explicitly wait for each script to be loaded
   #     4) Return to callback function when all scripts loaded
   @executeModuleScripts: (el, callback=null) ->
-    console.log('executeModuleScripts')
+
+    placeholders = el.find(".script_placeholder")
+
+    if placeholders.length == 0
+      callback()
+      return
+
+    completed      = (false for i in [1..placeholders.length])
+    callbackCalled = false
+
+    # This is required for IE8 support.
+    completionHandlerGeneratorIE = (index) =>
+      return () ->
+        if (this.readyState == 'complete' || this.readyState == 'loaded')
+          #completionHandlerGenerator.call(self, index)()
+          completionHandlerGenerator(index)()
+
+    completionHandlerGenerator = (index) =>
+      return () =>
+        allComplete = true
+        completed[index] = true
+        for flag in completed
+          if not flag
+            allComplete = false
+            break
+        if allComplete and not callbackCalled
+          callbackCalled = true
+          callback() if callback?
+
+    placeholders.each (index, placeholder) ->
+      # TODO: Check if the script already exists in DOM. If so, (1) copy it
+      #       into memory; (2) delete the DOM script element; (3) reappend it
+      s = document.createElement('script')
+      s.setAttribute('src', $(placeholder).attr("data-src"))
+      s.setAttribute('type', "text/javascript")
+
+      s.onload             = completionHandlerGenerator(index)
+
+      # s.onload does not fire in IE8; this does.
+      s.onreadystatechange = completionHandlerGeneratorIE(index)
+
+      # Need to use the DOM elements directly or the scripts won't execute
+      # properly.
+      $('head')[0].appendChild(s)
+      $(placeholder).remove()
 
 
   # setCollapsibles:
