@@ -42,7 +42,8 @@ class @JavascriptLoader
 
     placeholders.each (index, placeholder) ->
       # TODO: Check if the script already exists in DOM. If so, (1) copy it
-      #       into memory; (2) delete the DOM script element; (3) reappend it
+      #         into memory; (2) delete the DOM script element; (3) reappend it.
+      #       This would prevent memory bloat and save a network request.
       s = document.createElement('script')
       s.setAttribute('src', $(placeholder).attr("data-src"))
       s.setAttribute('type', "text/javascript")
