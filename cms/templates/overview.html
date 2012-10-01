@@ -6,9 +6,9 @@
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <h1>Courseware</h1>
-      <input type="text" class="courseware-unit-search-input search" placeholder="search units" />
+      <input type="text" class="courseware-unit-search-input search wip-box" placeholder="search units" />
       <article class="courseware-overview">
-        <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
+        <a href="#" class="new-courseware-section-button wip-box"><span class="plus-icon"></span> New Section</a>
         % for section in sections:
         <section class="courseware-section branch">
           <header>
@@ -18,13 +18,13 @@
               <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
             </div>
             <div class="item-actions">
-              <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-              <a href="#" class="drag-handle"></a>
+              <a href="#" class="edit-button wip"><span class="delete-icon"></span></a>
+              <a href="#" class="drag-handle wip"></a>
             </div>
           </header>
           <div class="unit-list">
             <div class="list-header">
-              <a href="#" class="new-subsection-item">
+              <a href="#" class="new-subsection-item wip-box">
                 <span class="new-folder-icon"></span>New Subsection
               </a>
             </div>
@@ -40,9 +40,9 @@
                     </a>
                   </div>
                   <div class="item-actions">
-                    <a href="#" class="delete-button"><span class="delete-icon"></span></a>
-                    <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-                    <a href="#" class="drag-handle"></a>
+                    <a href="#" class="delete-button wip"><span class="delete-icon"></span></a>
+                    <a href="#" class="visibility-toggle wip"><span class="toggle-icon"></span></a>
+                    <a href="#" class="drag-handle wip"></a>
                   </div>
                 </div>
 
@@ -54,15 +54,15 @@
                         <span class="${unit.category}-icon"></span>${unit.display_name} <span class="hidden-tag">– hidden</span>
                       </a>
                       <div class="item-actions">
-                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
-                        <a href="#" class="visibility-toggle hidden"><span class="toggle-icon"></span></a>
-                        <a href="#" class="drag-handle"></a>
+                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button wip"><span class="delete-icon"></span></a>
+                        <a href="#" class="visibility-toggle hidden wip"><span class="toggle-icon"></span></a>
+                        <a href="#" class="drag-handle wip"></a>
                       </div>
                     </div>
                   </li>
                   % endfor
                   <li>
-                    <a href="#" class="new-unit-item">
+                    <a href="#" class="new-unit-item wip">
                       <span class="new-unit-icon"></span>New Unit
                     </a>
                   </li>
