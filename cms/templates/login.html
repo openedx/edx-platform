@@ -4,39 +4,28 @@
 
 <%block name="content">
 
-<section class="main-container">
-
-  <section class="main-content">
+  <article class="log-in-box">
     <header>
-      <h3>Log in</h3>
-      <hr>
+      <h1>Log in to edX</h1>
     </header>
-
-    <form id="login_form" action="login_post" method="post">
-      <label>E-mail</label>
-      <input name="email" type="email" placeholder="E-mail">
-      <label>Password</label>
-      <input name="password" type="password" placeholder="Password">
-      <label class="remember-me">
-        <input name="remember" type="checkbox">
-        Remember me
-      </label>
-      <div class="submit">
-        <input name="submit" type="submit" value="Submit">
+    <form class="log-in-form" id="login_form" action="login_post" method="post">
+      <div class="row">
+        <label>Email:</label>
+        <input name="email" type="email" class="email-field">
       </div>
+      <div class="row">
+        <label>Password:</label>
+        <input name="password" type="password" class="password-field">
+      </div>
+      <div class="row form-actions">
+        <input name="submit" type="submit" value="Log In" class="log-in-button">
+        <a href="#" class="forgot-button">Forgot password?</a>
+      </div>      
     </form>
-
-    <section class="login-extra">
-      <p>
-        <span>Not enrolled? <a href="${reverse('signup')}">Sign up.</a></span>
-        <a href="#" class="pwd-reset">Forgot password?</a>
-      </p>
-    </section>
-
-
-  </section>
-
-</section>
+    <div class="log-in-extra">
+      <p>Not enrolled? <a href="${reverse('signup')}">Sign up.</a></p>
+    </div>
+  </article>
 
 <script type="text/javascript">
 (function() {

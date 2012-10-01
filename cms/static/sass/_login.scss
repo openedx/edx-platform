@@ -1,0 +1,68 @@
+.log-in-box {
+	width: 500px;
+	margin: 200px auto;
+	border-radius: 3px;
+
+	header {
+		height: 36px;
+		border-radius: 3px 3px 0 0;
+		border: 1px solid #2c2e33;
+		background: -webkit-linear-gradient(top, #686b76, #54565e);
+		color: #fff;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(255, 255, 255, 0.05) inset, 0 1px 0 rgba(255, 255, 255, .25) inset;
+
+		h1 {
+			margin: 5px 0;
+			font-size: 15px;
+			font-weight: 300;
+			text-align: center;
+		}
+	}
+
+	.log-in-form {
+		padding: 40px;
+		border: 1px solid $darkGrey;
+		border-top-width: 0;
+		border-radius: 0 0 3px 3px;
+		background: #fff;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	}
+
+	label {
+		display: block;
+		font-size: 13px;
+		font-weight: 700;
+	}
+
+	.email-field,
+	.password-field {
+		width: 100%;
+		font-size: 20px;
+		font-weight: 300;
+	}
+
+	.row {
+		margin-bottom: 24px;
+	}
+
+	.form-actions {
+		margin-bottom: 0;
+	}
+
+	.log-in-button {
+		@include blue-button;
+		margin-right: 10px;
+		padding: 8px 20px 10px;
+	}
+
+	.forgot-button {
+		font-size: 13px;
+	}
+
+	.log-in-extra {
+		margin-top: 10px;
+		text-align: right;
+		font-size: 13px;
+		border-top: 1px solid $lightGrey;
+	}
+}
