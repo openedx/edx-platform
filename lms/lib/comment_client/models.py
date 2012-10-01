@@ -69,7 +69,7 @@ class Model(object):
         return cls(id=id)
 
     def update_attributes(self, *args, **kwargs):
-        for k, v in kwargs.items():
+      for k, v in kwargs.items():
             if k in self.accessible_fields:
                 self.__setattr__(k, v)
             else:
@@ -89,11 +89,12 @@ class Model(object):
     def after_save(cls, instance):
         pass
 
-    def save(self):
+    def save(self):       
         self.__class__.before_save(self)
         if self.id: # if we have id already, treat this as an update
             url = self.url(action='put', params=self.attributes)
             response = perform_request('put', url, self.updatable_attributes())
+          
         else: # otherwise, treat this as an insert
             url = self.url(action='post', params=self.attributes)
             response = perform_request('post', url, self.initializable_attributes())

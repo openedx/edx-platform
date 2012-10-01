@@ -1,3 +1,26 @@
+<%def name="render_form_filter_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${render_entry(map["entries"], child)}
+        %else:
+            ${render_category(map["subcategories"], child)}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}" id = "${entries[entry]['id']}">${entry}</a></li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li>
+        <a href="#">${category}</a>
+        <ul>
+            ${render_form_filter_dropdown(categories[category])}
+        </ul>
+    </li>
+</%def>
+
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
@@ -39,7 +62,7 @@
       <div class="post-body">${'<%- body %>'}</div>
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
-          (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
+          (this post is about <a href="${'<%- obj.courseware_url%>'}">${'<%- obj.courseware_title %>'}</a>)
       </div>
       ${'<% } %>'}
 
@@ -57,6 +80,20 @@
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
       <input type="text" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
+    </div>
+    <div class="form-row">
+      <div class="form-topic-drop">
+      <input type="hidden" class = "edit-post-commentable_id" name = "commentable_id" id = "commentable-id-edit" />
+                    <a href="#" class="topic_dropdown_button topic_dropdown_button_edit">All<span class="drop-arrow">▾</span></a>
+                    <div class="topic_menu_wrapper">
+                        <div class="topic_menu_search">
+                            <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
+                        </div>
+                        <ul class="topic_menu topic_menu_edit">
+                            ${render_form_filter_dropdown(category_map)}
+                        </ul>
+                    </div>
+                </div>
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>

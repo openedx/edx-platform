@@ -12,8 +12,9 @@ if Backbone?
       @$el.find(selector)
 
     initialize: ->
-      super()
+      super()      
       @model.on "change", @updateModelDetails
+      
 
     renderTemplate: ->
       @template = _.template($("#thread-show-template").html())

@@ -181,7 +181,7 @@ if Backbone?
 
               @model.set
                 body: newBody
-
+                
               @createShowView()
               @renderShowView()
               @showCommentForm()

@@ -100,11 +100,17 @@ def create_thread(request, course_id, commentable_id):
 @login_required
 @permitted
 def update_thread(request, course_id, thread_id):
+    course = get_course_with_access(request.user, course_id, 'load')
     thread = cc.Thread.find(thread_id)
-    thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
+    thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags','commentable_id']))   
     thread.save()
+    courseware_context = get_courseware_context(thread, course)
+    data = thread.to_dict()
+    
+    data.update(courseware_context)        
+      
     if request.is_ajax():
-        return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
+        return ajax_content_response(request, course_id, data, 'discussion/ajax_update_thread.html')
     else:
         return JsonResponse(utils.safe_content(thread.to_dict()))
 

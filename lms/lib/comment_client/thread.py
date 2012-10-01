@@ -15,7 +15,7 @@ class Thread(models.Model):
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id',
+        'closed', 'tags', 'user_id', 'commentable_id'
     ]
 
     initializable_fields = updatable_fields
@@ -41,6 +41,7 @@ class Thread(models.Model):
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
     @classmethod
+    
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):
             return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
@@ -58,6 +59,9 @@ class Thread(models.Model):
         elif action == 'search':
             return cls.url_for_search_threads(params)
         else:
+            #we have to update the commentable id in case it has changed
+            if params.get('commentable_id'):
+                cls.commentable_id = params['commentable_id']
             return super(Thread, cls).url(action, params)
 
     # TODO: This is currently overriding Model._retrieve only to add parameters

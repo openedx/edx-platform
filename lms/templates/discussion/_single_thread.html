@@ -1,3 +1,12 @@
+<%def name="render_form_filter_dropdown(map)">
+    % for child in map["children"]:
+        % if child in map["entries"]:
+            ${render_entry(map["entries"], child)}
+        %else:
+            ${render_category(map["subcategories"], child)}
+        %endif
+    %endfor
+</%def>
 <%namespace name="renderer" file="_content_renderer.html"/>
 <%! from django_comment_client.mustache_helpers import url_for_user %>
 

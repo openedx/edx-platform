@@ -26,6 +26,7 @@ if Backbone?
       # Because we want the behavior that when the body is clicked the menu is
       # closed, we need to ignore clicks in the search field and stop propagation.
       # Without this, clicking the search field would also close the menu.
+      
       ignoreClick: (event) ->
           event.stopPropagation()
 
