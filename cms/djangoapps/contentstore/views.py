@@ -385,16 +385,6 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
         modulestore().update_metadata(item_location, existing_item.metadata)
 
-    # Export the course back to github
-    # This uses wildcarding to find the course, which requires handling
-    # multiple courses returned, but there should only ever be one
-    course_location = Location(item_location)._replace(
-        category='course', name=None)
-    courses = modulestore().get_items(course_location, depth=None)
-    for course in courses:
-        author_string = user_author_string(request.user)
-        export_to_github(course, "CMS Edit", author_string)
-
     descriptor = modulestore().get_item(item_location)
     preview_html = get_module_previews(request, descriptor)[0]
 
