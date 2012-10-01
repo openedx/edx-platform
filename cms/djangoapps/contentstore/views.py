@@ -421,7 +421,7 @@ def clone_item(request):
     display_name = request.POST['name']
 
     if not has_access(request.user, parent_location):
-        raise PermissionDenies()
+        raise PermissionDenied()
 
     parent = modulestore().get_item(parent_location)
     dest_location = parent_location._replace(category=template.category, name=Location.clean_for_url_name(display_name))
