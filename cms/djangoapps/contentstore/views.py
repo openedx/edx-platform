@@ -6,6 +6,7 @@ import sys
 import mimetypes
 import StringIO
 from collections import defaultdict
+from uuid import uuid4
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -407,16 +408,14 @@ def save_item(request):
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
-    display_name = request.POST['name']
 
     if not has_access(request.user, parent_location):
         raise Http404  # TODO (vshnayder): better error
 
     parent = modulestore().get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=Location.clean_for_url_name(display_name))
+    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
     new_item = modulestore().clone_item(template, dest_location)
-    new_item.metadata['display_name'] = display_name
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
