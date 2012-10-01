@@ -1,0 +1,38 @@
+<%inherit file="base.html" />
+<%block name="title">Course Editor Manager</%block>
+<%include file="widgets/header.html"/>
+
+<%block name="content">
+<section class="main-container">
+
+  <h2>Course Editors</h2>
+  <ul>
+    % for user in editors:
+    <li>${user.email} (${user.username})</li>
+    % endfor
+  </ul>
+
+  <form action="add_user" id="addEditorsForm">
+    <label>email:&nbsp;</label><input type="text" name="email" placeholder="email@example.com..." />
+    <input type="submit" value="add editor" />
+  </form>
+  <div id="result"></div>
+
+<script>
+  $("#addEditorsForm").submit(function(event) {
+  event.preventDefault();
+  var $form = $(this),
+  email = $form.find('input[name="email"]').val(),
+  url = $form.attr('action');
+  $.post(url, {email:email},
+  function(data) {
+  if(data['Status'] != 'OK')
+  $("#result").empty().append(data['ErrMsg']);
+  else
+  location.reload();
+  });
+  });
+</script>
+
+</section>
+</%block>
