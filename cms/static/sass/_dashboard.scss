@@ -1,0 +1,44 @@
+.class-list {
+	margin-top: 20px;
+	border-radius: 3px;
+	border: 1px solid $darkGrey;	
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+
+	li {
+		border-bottom: 1px solid $mediumGrey;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	a {
+		padding: 20px 25px;
+		line-height: 1.3;
+		
+		&:hover {
+			background: $paleYellow;
+		}
+	}
+
+	.class-name {
+		display: block;
+		font-size: 22px;
+		font-weight: 300;
+	}
+
+	.detail {
+		font-size: 14px;
+		font-weight: 400;
+		margin-right: 20px;
+		color: #3c3c3c;
+	}
+}
+
+.new-course-button {
+	@include grey-button;
+	display: block;
+	padding: 20px;
+	text-align: center;
+}
