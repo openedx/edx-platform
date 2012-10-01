@@ -413,7 +413,7 @@ def clone_item(request):
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
     modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
-    return preview_component(request, new_item.location)
+    return HttpResponse(json.dumps({'id': dest_location.url()}))
 
 '''
 cdodge: this method allows for POST uploading of files into the course asset library, which will
