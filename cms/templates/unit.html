@@ -4,75 +4,98 @@
 <%block name="content">
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <article class="unit-body window">
-        <nav class="breadcrumbs">
-          <ul>
-            <li><a href="#">Week 2</a></li>
-            <li><a href="#">Linearity and Superposition</a></li>
-            <li><span class="current-page">${unit.display_name}</span></li>
-          </ul>
-        </nav>
-        <ol class="components" data-id="${unit.location.url()}">
-          % for id in components:
-          <li class="component" data-id="${id}"/>
-          % endfor
-          <li class="new-component-item">
-            <a href="#" class="new-component-button">
-              <span class="plus-icon"></span>New Component
-            </a>
-            <div class="new-component">
-              <h5>Select Component Type</h5>
-              <ul class="new-component-type">
-                % for type in sorted(component_templates.keys()):
-                <li>
-                  <a href="#" data-type="${type}">
-                    <span class="large-template-icon large-${type}-icon"></span>
-                    <span class="name">${type}</span>
-                  </a>
-                </li>
-                % endfor
-              </ul>
-              <a href="#" class="cancel-button">Cancel</a>
-            </div>
-            % for type, templates in sorted(component_templates.items()):
-            <div class="new-component-templates new-component-${type}">
-              <ul class="new-component-template">
-                % for name, location in templates:
-                <li>
-                  <a href="#" data-location="${location}">
-                    <span class="name">${name}</span>
-                  </a>
-                </li>
-                % endfor
-              </ul>
-              <a href="#" class="cancel-button">Cancel</a>
-            </div>
+      <div class="main-column">
+        <article class="unit-body window">
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
+          <ol class="components" data-id="${unit.location.url()}">
+            % for id in components:
+            <li class="component" data-id="${id}"/>
             % endfor
-          </li>
-        </ol>
-      </article>
+            <li class="new-component-item">
+              <a href="#" class="new-component-button">
+                <span class="plus-icon"></span>New Component
+              </a>
+              <div class="new-component">
+                <h5>Select Component Type</h5>
+                <ul class="new-component-type">
+                  % for type in sorted(component_templates.keys()):
+                  <li>
+                    <a href="#" data-type="${type}">
+                      <span class="large-template-icon large-${type}-icon"></span>
+                      <span class="name">${type}</span>
+                    </a>
+                  </li>
+                  % endfor
+                </ul>
+                <a href="#" class="cancel-button">Cancel</a>
+              </div>
+              % for type, templates in sorted(component_templates.items()):
+              <div class="new-component-templates new-component-${type}">
+                <ul class="new-component-template">
+                  % for name, location in templates:
+                  <li>
+                    <a href="#" data-location="${location}">
+                      <span class="name">${name}</span>
+                    </a>
+                  </li>
+                  % endfor
+                </ul>
+                <a href="#" class="cancel-button">Cancel</a>
+              </div>
+              % endfor
+            </li>
+          </ol>
+        </article>
+      </div>
 
       <div class="sidebar">
         <div class="unit-properties window">
-          <h4>Properties</h4>
+          <h4>Unit Properties</h4>
           <div class="window-contents">
-            <div class="row"><label>Display Name:</label><input type="text" value="${unit.display_name}" /></div>
-            <div class="row">
-              <label>State:</label>
-              <div class="visibility-options">
-                <span class="option checked"><input type="radio" name="visibility" id="visibility-hidden" checked /><label for="visibility-hidden">Draft</label></span>
-                <span class="option"><input type="radio" name="visibility" id="visibility-visible" /><label for="visibility-visible">Final</label></span>
+            <div class="due-date-input row">
+              <label>Due date:</label>
+              <a href="#" class="set-date">Set a due date</a>
+              <div class="date-setter">
+                <p class="date-description"><input type="text" value="10/20/2012" class="date-input" /> <input type="text" value="6:00 am" class="time-input" />
+                <a href="#" class="remove-date">Remove due date</a>
               </div>
             </div>
-            <div class="row">
+            <div class="visibility row">
+              <label>Visibility:<!-- <span class="description">Shows or hides this subsection and the units within it.</span>--></label>
+              <a href="#" class="toggle-off">hide</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">show</a>
+            </div>
+            <div class="row unit-actions">
               <a href="#" class="save-button">Save</a>
+              <a href="preview.html" target="_blank" class="preview-button">Preview</a>
             </div>
           </div>
         </div>
-        <div class="unit-history window collapsed">
-          <h4><a href="#" class="expand-collapse-icon expand"></a>History</h4>
+        <div class="window unit-location">
+          <h4>Unit Location</h4>
           <div class="window-contents">
+            <div><input type="text" class="url" value="/courseware/Week_1/My_Unit" disabled /></div>
             <ol>
+              <li>
+                <a href="#" class="section-item">Week 1</a>
+                <ol>
+                  <li>
+                    <a href="#" class="section-item"><span class="folder-icon"></span>Administrivia and Circuit Elements</a>
+                    <ol>
+                      <li><a href="#" class="section-item"><span class="file-icon"></span>Motiviation for 6.002</a></li>
+                      <li><a href="#" class="section-item"><span class="file-icon"></span>Administrivia</a></li>
+                      <li><a href="#" class="section-item"><span class="file-icon"></span>Course Overview</a></li>
+                      <li><a href="#" class="section-item"><span class="file-icon"></span>Lumped Element Abstraction</a></li>
+                      <li><a href="#" class="section-item"><span class="file-icon"></span>Simple Power</a></li>
+                      <li><a href="#" class="current section-item"><span class="file-icon"></span>New Unit</a></li>
+                      <li>
+                        <a href="unit.html" class="new-unit-item">
+                          <span class="new-unit-icon"></span>New Unit
+                        </a>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
             </ol>
           </div>
         </div>
