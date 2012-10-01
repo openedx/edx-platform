@@ -1,5 +1,6 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">unit</%block>
 <%block name="title">CMS Unit</%block>
 <%block name="content">
   <div class="main-wrapper">
@@ -62,11 +63,19 @@
             </div>
             <div class="visibility row">
               <label>Visibility:<!-- <span class="description">Shows or hides this subsection and the units within it.</span>--></label>
-              <a href="#" class="toggle-off">hide</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">show</a>
+              <a href="#" class="toggle-off">hidden</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">shown</a>
+            </div>
+            <div class="status row">
+              <label class="inline-label">Status:</label>
+              <select>
+                <option>Draft</option>
+                <option>Released</option>
+              </select>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="save-button">Save</a>
+              <a href="#" class="save-button">Save Draft</a>
               <a href="preview.html" target="_blank" class="preview-button">Preview</a>
+              <a href="#" class="release-button">Release</a>
             </div>
           </div>
         </div>

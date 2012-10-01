@@ -263,6 +263,10 @@
         }
     }
 
+    .status {
+        display: none;
+    }
+
     .visibility-options .option {
         margin-right: 10px;
         padding: 3px 13px 6px;
@@ -279,7 +283,7 @@
     }
 
     .save-button {
-        @include blue-button;
+        @include white-button;
         margin-top: 10px;
     }
 
@@ -291,6 +295,10 @@
     .publish-button {
         @include orange-button;
         margin-top: 10px;
+    }
+
+    .release-button {
+        @include blue-button;
     }
 }
 

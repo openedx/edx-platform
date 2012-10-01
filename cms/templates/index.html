@@ -3,18 +3,28 @@
 <%block name="title">Courses</%block>
 
 <%block name="content">
-<h1>edX Course Management</h1>
 
-<section class="main-container">
-  <header>
-    <h1>Courses</h1>
-    <a href="#" class="wip">+</a>
-  </header>
+	<div class="main-wrapper">
+		<div class="inner-wrapper">
+			<h1>My Courses</h1>				
+			<article class="my-classes">
+				<a href="#" class="new-course-button wip-box"><span class="plus-icon"></span> New Course</a>
+				<ul class="class-list">
+					%for course, url in courses:
+			    <li>
+						<a href="${url}" class="class-name">
+							<span class="class-name">${course}</span>
+							<!--
+							<span class="detail">Started: 9/21/2012</span>
+							<span class="detail">Ends: 10/21/2012</span>
+							-->
+						</a>
+					</li>
+			    %endfor
+				</ul>
+			</article>
+		</div>
+	</div>
 
-  <ol>
-    %for course, url in courses:
-    <li><a href="${url}">${course}</a></li>
-    %endfor
-  </ol>
 </section>
 </%block>

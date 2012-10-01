@@ -64,7 +64,9 @@ footer {
     height: 100px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="email"],
+input[type="password"] {
     padding: 6px 8px 8px;
     box-sizing: border-box;
     border: 1px solid #b0b6c2;
