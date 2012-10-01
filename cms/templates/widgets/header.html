@@ -14,9 +14,9 @@
     <div class="right">
       <span class="username">${ user.username }</span>
       % if user.is_authenticated():
-         <li><a href="${reverse('logout')}">Log out</a></li>
+         <a href="${reverse('logout')}">Log out</a>
       % else:
-         <li><a href="${reverse('login')}">Log in</a></li>
+         <a href="${reverse('login')}">Log in</a>
       % endif
 
     </ul>

@@ -26,6 +26,11 @@
 		color: #e4e6ee;
 	}
 
+	.class-nav,
+	.class-nav li {
+		float: left;
+	}
+
 	a {
 		box-shadow: 1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44;
 
@@ -36,14 +41,6 @@
 		&.active {
 			background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
 			box-shadow: 0 2px 8px rgba(0, 0, 0, .7) inset;
-		}
-
-		&:last-child {
-			box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset, 1px 0 0 rgba(255, 255, 255, 0.2);
-		}
-
-		&:first-child {
-			box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset, -1px 0 0 rgba(0, 0, 0, 0.3);
 		}
 	}
 }
