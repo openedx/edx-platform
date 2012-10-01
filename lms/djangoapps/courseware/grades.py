@@ -201,7 +201,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
 
         totaled_scores[section_format] = format_scores
 
-    grade_summary = course.grader.grade(totaled_scores)
+    grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
     # doesn't get displayed differently than it gets grades

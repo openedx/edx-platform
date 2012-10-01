@@ -26,6 +26,13 @@ class @Problem
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
 
+    # Collapsibles
+    @$('.longform').hide();
+    @$('.shortform').append('<a href="#" class="full">See full output</a>');
+    @$('.collapsible section').hide();
+    @$('.full').click @toggleFull
+    @$('.collapsible header a').click @toggleHint
+
     # Dynamath
     @$('input.math').keyup(@refreshMath)
     @$('input.math').each (index, element) =>
@@ -332,6 +339,17 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
+
+  toggleFull: (event) =>
+    $(event.target).parent().siblings().slideToggle()
+    $(event.target).parent().parent().toggleClass('open')
+    text = $(event.target).text() == 'See full output' ? 'Hide output' : 'See full output'
+    $(this).text(text)
+
+  toggleHint: (event) =>
+    event.preventDefault()
+    $(event.target).parent().siblings().slideToggle()
+    $(event.target).parent().parent().toggleClass('open')
 
   inputtypeSetupMethods:
 
