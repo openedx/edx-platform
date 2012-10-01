@@ -40,7 +40,7 @@ from xmodule.contentstore.content import StaticContent
 
 from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
-from auth.authz import get_user_by_email, add_user_to_course_group
+from auth.authz import get_user_by_email, add_user_to_course_group, ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
 from .utils import get_course_location_for_item
 
 log = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ def index(request):
 
 # ==== Views with per-item permissions================================
 
-def has_access(user, location, role='editor'):
+def has_access(user, location, role=EDITOR_ROLE_NAME):
     '''Return True if user allowed to access this piece of data'''
     '''Note that the CMS permissions model is with respect to courses'''
     return is_user_in_course_group_role(user, get_course_location_for_item(location), role)
@@ -535,11 +535,11 @@ def manage_users(request, org, course, name):
     location = ['i4x', org, course, 'course', name]
     
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
+    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
         raise PermissionDenied()
 
     return render_to_response('manage_users.html', {
-        'editors': get_users_in_course_group_by_role(location, 'editor')
+        'editors': get_users_in_course_group_by_role(location, EDITOR_ROLE_NAME)
     })
     
 
@@ -565,8 +565,8 @@ def add_user(request, org, course, name):
 
     location = ['i4x', org, course, 'course', name]
     
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
+    # check that logged in user has admin permissions to this course
+    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
         raise PermissionDenied()
     
     user = get_user_by_email(email)
@@ -580,7 +580,7 @@ def add_user(request, org, course, name):
         return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
 
     # ok, we're cool to add to the course group
-    add_user_to_course_group(request.user, user, location, 'editor')
+    add_user_to_course_group(request.user, user, location, EDITOR_ROLE_NAME)
 
     return create_json_response()
 
@@ -595,13 +595,13 @@ def remove_user(request, org, course, name):
 
     location = ['i4x', org, course, 'course', name]
     
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
+    # check that logged in user has admin permissions on this course
+    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
         raise PermissionDenied()
     
     user = get_user_by_email(email)
     if user is not None:
-        remove_user_from_course_group(request.user, user, location, 'editor')
+        remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
 
     return create_json_response()
 
