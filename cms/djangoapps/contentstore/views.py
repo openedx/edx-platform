@@ -601,8 +601,10 @@ def remove_user(request, org, course, name):
         raise PermissionDenied()
 
     user = get_user_by_email(email)
-    if user is not None:
-        remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
+    if user is None:
+        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+
+    remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
 
     return create_json_response()
 
