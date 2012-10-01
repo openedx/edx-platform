@@ -27,7 +27,7 @@ class @Problem
     @$('section.action input.save').click @save
 
     # Collapsibles
-    JavascriptLoader.setCollapsibles(@el)
+    Collapsible.setCollapsibles(@el)
 
     # Dynamath
     @$('input.math').keyup(@refreshMath)

@@ -3,7 +3,7 @@ class @HTMLModule
   constructor: (@element) ->
     @el = $(@element)
     JavascriptLoader.executeModuleScripts(@el)
-    JavascriptLoader.setCollapsibles(@el)
+    Collapsible.setCollapsibles(@el)
 
   $: (selector) ->
     $(selector, @el)
