@@ -17,13 +17,17 @@
 		line-height: 18px;
 	}
 
-	a {
+	a,
+	.username {
 		float: left;
 		display: inline-block;
 		height: 29px;
 		padding: 7px 15px 0;
 		color: #e4e6ee;
-		box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset;
+	}
+
+	a {
+		box-shadow: 1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44;
 
 		&:hover {
 			background: rgba(255, 255, 255, .1);

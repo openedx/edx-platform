@@ -1,12 +1,18 @@
 <%! from django.core.urlresolvers import reverse %>
-<header>
-  <nav>
-    <a href="/">Home</a>
-    <h2><a href="#">edX CMS: TODO:-course-name-here</a></h2>
 
-    <ul class="user-nav">
-      <li><a href="#" class="wip">Tasks</a></li>
-      <li><a href="#" class="wip">Settings</a></li>
+<header class="primary-header">
+  <nav class="inner-wrapper">
+    <div class="left">
+      <a href="/"><span class="home-icon"></span></a>
+      <a href="#" class="class-name wip-box">6.002x Circuits and Electronics <span class="drop-icon">▾</span></a>
+      <ul class="class-nav">
+        <li><a href="overview-full.html" class="active">Courseware</a></li>
+        <li><a href="updates.html" class="wip-box">Course Info</a></li>
+        <li><a href="textbook.html" class="wip-box">Textbook</a></li>
+      </ul>
+    </div>
+    <div class="right">
+      <span class="username">${ user.username }</span>
       % if user.is_authenticated():
          <li><a href="${reverse('logout')}">Log out</a></li>
       % else:
