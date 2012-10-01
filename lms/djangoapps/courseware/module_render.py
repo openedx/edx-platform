@@ -435,6 +435,10 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         oldgrade = instance_module.grade
+        # The max grade shouldn't change under normal circumstances, but
+        # sometimes the problem changes with the same name but a new max grade.
+        # This updates the module if that happens.
+        old_instance_max_grade = instance_module.max_grade
         old_instance_state = instance_module.state
         old_shared_state = shared_module.state if shared_module is not None else None
 
@@ -452,9 +456,12 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         instance_module.state = instance.get_instance_state()
+        instance_module.max_grade=instance.max_score()
         if instance.get_score():
             instance_module.grade = instance.get_score()['score']
-        if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+        if (instance_module.grade != oldgrade or
+            instance_module.state != old_instance_state or
+            instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
 
     if shared_module is not None:
