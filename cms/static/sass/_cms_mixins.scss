@@ -1,0 +1,196 @@
+@mixin clearfix {
+	&:after {
+		content: '';
+		display: block;
+		height: 0;
+		visibility: hidden;
+		clear: both;
+	}
+}
+
+@mixin button {
+	display: inline-block;
+	padding: 4px 20px 6px;
+	font-size: 14px;
+	font-weight: 700;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0);
+	-webkit-transition: background-color .15s, box-shadow .15s;
+
+	&:hover {
+		box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15);
+	}
+}
+
+@mixin blue-button {
+	@include button;
+	border: 1px solid #437fbf;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) $blue;
+	color: #fff;
+
+	&:hover {
+		background-color: #62aaf5;
+		color: #fff;
+	}
+}
+
+@mixin white-button {
+	@include button;
+	border: 1px solid $darkGrey;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 60%) #dfe5eb;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	color: #5d6779;
+
+	&:hover {
+		background-color: #f2f6f9;
+		color: #5d6779;
+	}
+}
+
+@mixin orange-button {
+	@include button;
+	border: 1px solid #bda046;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%) #edbd3c;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	color: #3c3c3c;
+
+	&:hover {
+		background-color: #ffcd46;
+		color: #3c3c3c;
+	}
+}
+
+@mixin grey-button {
+	@include button;
+	border: 1px solid $darkGrey;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) #d1dae3;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	color: #6d788b;
+
+	&:hover {
+		background-color: #d9e3ee;
+		color: #6d788b;		
+	}
+}
+
+@mixin edit-box {
+	padding: 15px 20px;
+	border-radius: 3px;
+	border: 1px solid #5597dd;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0)) #5597dd;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+
+	label {
+		color: #fff;
+	}
+
+	input,
+	textarea {
+		border: 1px solid #3c3c3c;
+	}
+
+	textarea {
+		min-height: 80px;		
+	}
+
+	h5 {
+		margin-bottom: 8px;
+		color: #fff;
+		font-weight: 700;
+	}
+
+	.row {
+		margin-bottom: 10px;
+		padding: 0;
+		border: none;
+	}
+
+	.save-button {
+		@include orange-button;
+		border-color: #3c3c3c;
+		margin-top: 0;
+	}
+
+	.cancel-button {
+		@include white-button;
+		border-color: #30649C;
+		margin-top: 0;
+	}
+}
+
+@mixin tree-view {
+	border: 1px solid #ced2db;
+	background: #edf1f5;
+
+	.branch {
+		margin-bottom: 10px;
+
+		&.collapsed {
+			margin-bottom: 0;
+		}
+	}
+
+	.branch > .section-item {
+		border-top: 1px solid #c5cad4;
+	}
+
+	.section-item {
+		position: relative;
+		display: block;
+		padding: 6px 8px 8px 16px;			
+		background: #edf1f5;
+		font-size: 13px;
+
+		&:hover {
+			background: #fffcf1;
+
+			.item-actions {
+				display: block;
+			}
+		}
+
+		&.editing {
+			background: #d1dae3;
+		}
+
+		.draft-item,
+		.hidden-item {
+			color: #a4aab7;
+		}
+
+		.has-new-draft-item {
+			color: #9f7d10;
+		}
+
+		.item-actions {
+			// display: none;
+		}
+	}
+
+	a {
+		color: #2c2e33;
+	}
+
+	ol {
+		.section-item {
+			padding-left: 56px;
+		}
+
+		.new-unit-item {
+			margin-left: 56px;
+		}
+	}
+
+	ol ol {
+		.section-item {
+			padding-left: 96px;
+		}
+
+		.new-unit-item {
+			margin-left: 96px;
+		}
+	}
+}

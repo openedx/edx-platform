@@ -1,0 +1,28 @@
+.alert {
+	padding: 15px 20px;
+	margin-bottom: 30px;
+	border-radius: 3px;
+	border: 1px solid #edbd3c;
+	border-radius: 3px;
+	background: #fbf6e1;
+	// background: #edbd3c;
+	font-size: 14px;
+	@include clearfix;
+
+	.alert-message {
+		float: left;
+		margin-top: 4px;
+	}
+
+	strong {
+		font-weight: 700;
+	}
+
+	.alert-action {
+		float: right;
+
+		&.secondary {
+			@include orange-button;
+		}
+	}
+}

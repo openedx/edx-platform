@@ -1,0 +1,45 @@
+.primary-header {
+	width: 100%;
+	height: 36px;
+	border-bottom: 1px solid #2c2e33;
+	background: -webkit-linear-gradient(top, #686b76, #54565e);
+	font-size: 13px;
+	color: #fff;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(255, 255, 255, 0.05) inset;
+
+	.drop-icon {
+		margin-left: 5px;
+		font-size: 11px;
+	}
+
+	.settings-icon {
+		font-size: 18px;
+		line-height: 18px;
+	}
+
+	a {
+		float: left;
+		display: inline-block;
+		height: 29px;
+		padding: 7px 15px 0;
+		color: #e4e6ee;
+		box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset;
+
+		&:hover {
+			background: rgba(255, 255, 255, .1);
+		}
+
+		&.active {
+			background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+			box-shadow: 0 2px 8px rgba(0, 0, 0, .7) inset;
+		}
+
+		&:last-child {
+			box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset, 1px 0 0 rgba(255, 255, 255, 0.2);
+		}
+
+		&:first-child {
+			box-shadow: 1px 0 0 rgba(255, 255, 255, 0.2) inset, -1px 0 0 rgba(0, 0, 0, 0.3) inset, -1px 0 0 rgba(0, 0, 0, 0.3);
+		}
+	}
+}

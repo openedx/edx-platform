@@ -1,0 +1,105 @@
+.subsection-body {
+	padding: 32px 40px;
+	@include clearfix;
+
+	> div {
+		margin-bottom: 40px;
+	}
+
+	input {
+		font-size: 14px;
+	}
+
+	.unit-subtitle {
+		display: block;
+		width: 100%;
+	}
+
+	.unit-list {
+		ol {
+			@include tree-view;
+		}
+	}
+}
+
+.subsection-name-input {
+	label {
+		display: block;
+	}
+
+	input {
+		width: 100%;
+		font-size: 20px;
+	}
+}
+
+.scheduled-date-input,
+.due-date-input {
+	@include clearfix;
+
+	.date-input,
+	.time-input {
+		display: inline-block;
+		width: 100px;
+	}
+
+	.inherits-check {
+		label {
+			font-size: 13px;
+		}
+	}
+
+	.notice {
+		margin-top: 6px;
+		font-size: 11px;
+		color: #999;
+	}
+}
+
+.due-date-input {
+	label {
+		display: inline-block !important;
+		margin-right: 10px;
+	}
+
+	a {
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 31px;
+		text-transform: uppercase;
+	}
+
+	.date-setter {
+		@include clearfix;
+		display: none;
+	}
+
+	.remove-date {
+		display: block;
+	}
+}
+
+.row.visibility {
+	label {
+		display: inline-block !important;
+		margin-right: 10px;
+		line-height: 31px;
+	}
+
+	a {
+		display: inline-block;
+		height: 31px;
+		margin-right: 8px;
+		vertical-align: middle;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 31px;
+		text-transform: uppercase;
+	}
+
+	.large-toggle {
+		width: 41px;
+		background: url(../img/large-toggles.png) no-repeat;
+		background-position: 0 -5px;
+	}
+}

@@ -1,0 +1,150 @@
+input.courseware-unit-search-input {
+	position: absolute;
+	right: 0;
+	top: 5px;
+	width: 260px;
+	background-color: #fff;
+}
+
+.courseware-overview {
+	.new-courseware-section-button {
+		@include grey-button;
+		display: block;
+		text-align: center;
+		padding: 12px 0;
+	}
+}
+
+.courseware-section {
+	position: relative;
+	background: #fff;
+	border: 1px solid $darkGrey;
+	border-radius: 3px;
+	margin: 10px 0;
+	padding-bottom: 12px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+
+	&:first-child {
+		margin-top: 0;
+	}
+
+	&.collapsed {
+		padding-bottom: 0;
+
+		header {
+			height: 47px;
+		}
+		
+		h4 {
+			display: none !important;
+		}
+	}
+
+	&.collapsed .unit-list,
+	.collapsed .unit-list,
+	.collapsed > ol {
+		display: none !important;
+	}
+
+	header {
+		height: 67px;
+
+		.item-details {
+			float: left;
+			padding: 10px 0 0;
+		}
+
+		.item-actions {			
+			margin-top: 11px;
+			margin-right: 12px;
+
+			.edit-button,
+			.delete-button {
+				margin-top: -3px;
+			}
+		}
+
+		.expand-collapse-icon {
+			float: left;
+			margin: 16px 6px 16px 16px;
+		}
+
+		.drag-handle {
+			margin-left: 11px;
+		}
+	}
+
+	h3 {
+		font-size: 16px;
+		font-weight: 700;
+		color: $blue;
+	}
+
+	h4 {
+		font-size: 12px;
+		color: #878e9d;
+
+		strong {
+			font-weight: 700;
+		}
+	}
+
+	.list-header {
+		background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, .1)) #ced2db;
+		border-radius: 3px 3px 0 0;
+	}
+
+	.unit-list {
+		margin: 0 12px;
+
+		> ol {
+			@include tree-view;
+			border-top-width: 0;
+		}
+	}
+}
+
+.new-section-name,
+.new-subsection-name-input {
+	width: 515px;
+}
+
+.new-section-name-save,
+.new-subsection-name-save {
+	@include blue-button;
+	padding: 2px 20px 5px;
+	margin: 0 5px;
+}
+
+.new-section-name-cancel,
+.new-subsection-name-cancel {
+	@include white-button;
+	padding: 2px 20px 5px;
+}
+
+.dummy-calendar {
+	display: none;
+	position: absolute;
+	top: 55px;
+	left: 110px;
+	z-index: 9999;
+	border: 1px solid #3C3C3C;
+	box-shadow: 0 1px 15px rgba(0, 0, 0, .2);	
+}
+
+.unit-name-input {
+	padding: 20px 40px;
+
+	label {
+		display: block;
+	}
+
+	input {
+		width: 100%;
+		font-size: 20px;
+	}
+}
+
+.preview {
+	background: url(../img/preview.jpg) center top no-repeat;
+}

@@ -1,0 +1,17 @@
+$gw-column: 80px;
+$gw-gutter: 20px;
+
+$fg-column: $gw-column;
+$fg-gutter: $gw-gutter;
+$fg-max-columns: 12;
+$fg-max-width: 1400px;
+$fg-min-width: 810px;
+
+$sans-serif: 'Open Sans', $verdana;
+$body-line-height: golden-ratio(.875em, 1);
+
+$pink: rgb(182,37,104);
+$error-red: rgb(253, 87, 87);
+
+$blue: #5597dd;
+$darkGrey: #8891a1;

@@ -1,0 +1,56 @@
+.modal-cover {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, .8);
+}
+
+.history-modal {
+	display: none;
+	position: fixed;
+	top: 60px;
+	left: 50%;
+	z-index: 1001;
+	width: 930px;
+	height: 540px;
+	margin-left: -465px;
+	background: #fff;
+
+	.modal-body {
+		height: 400px;
+		padding: 40px;
+		overflow-y: scroll;
+	}
+
+	.modal-actions {
+		height: 60px;
+		background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0)) #d1dae3;
+	}
+
+	h2 {
+		margin: 0 10px 30px;
+		color: #646464;
+		font-size: 19px;
+		font-weight: 300;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	p {
+		margin: 20px;
+	}
+
+	.revert-button {
+		@include blue-button;
+		margin: 13px 6px 0 13px;
+	}
+
+	.close-button {
+		@include white-button;
+		margin-top: 13px;
+	}
+}

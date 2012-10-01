@@ -1,0 +1,223 @@
+.expand-collapse-icon {
+	position: relative;
+	display: inline-block;
+	width: 9px;
+	height: 11px;
+	margin-right: 10px;
+	background: url(../img/expand-collapse-icons.png) no-repeat;
+
+	&.expand {
+		top: 1px;
+		background-position: 0 0;
+	}
+
+	&.collapse {
+		top: -1px;
+		background-position: 0 -11px;
+	}
+}
+
+.sequence-icon {
+	display: inline-block;
+	width: 15px;
+	height: 9px;
+	margin-right: 5px;
+	background: url(../img/sequence-icon.png) no-repeat;
+}
+
+.video-icon {
+	display: inline-block;
+	width: 14px;
+	height: 12px;
+	margin-right: 5px;
+	background: url(../img/video-icon.png) no-repeat;
+}
+
+.list-icon {
+	display: inline-block;
+	width: 14px;
+	height: 10px;
+	margin-right: 5px;
+	background: url(../img/list-icon.png) no-repeat;
+}
+
+.calendar-icon {
+	display: inline-block;
+	width: 12px;
+	height: 11px;
+	margin-right: 5px;
+	background: url(../img/calendar-icon.png) no-repeat;
+}
+
+.edit-icon {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-right: 2px;
+	background: url(../img/edit-icon.png) no-repeat;
+
+	&.white {
+		background: url(../img/edit-icon-white.png) no-repeat;		
+	}
+}
+
+.visibility-toggle {
+	.toggle-icon {
+		display: inline-block;
+		width: 27px;
+		height: 20px;
+		background: url(../img/small-toggle-icons.png) no-repeat;
+		background-position: 0 -34px;
+	}
+
+	&.hidden .toggle-icon {
+		background-position: 0 -4px;
+	}
+
+	&.both .toggle-icon {
+		background-position: 0 -64px;
+	}
+}
+
+
+.delete-icon {
+	display: inline-block;
+	width: 10px;
+	height: 11px;
+	margin-right: 2px;
+	background: url(../img/delete-icon.png) no-repeat;
+
+	&.white {
+		background: url(../img/delete-icon-white.png) no-repeat;		
+	}
+}
+
+.drag-handle {
+	display: inline-block;
+	float: right;
+	width: 7px;
+	height: 22px;
+	margin-left: 10px;
+	background: url(../img/drag-handles.png) no-repeat;
+	cursor: move;
+}
+
+.draft-tag,
+.hidden-tag,
+.has-new-draft-tag {
+	margin-left: 3px;
+	font-size: 9px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: #a4aab7;
+}
+
+.has-new-draft-tag {
+	color: #9f7d10;
+}
+
+.plus-icon {
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	margin-right: 8px;
+	background: url(../img/plus-icon.png) no-repeat;
+}
+
+.folder-icon {
+	display: inline-block;
+	width: 15px;
+	height: 11px;
+	margin-right: 4px;
+	background: url(../img/folder-icon.png) no-repeat;
+}
+
+.new-folder-icon {
+	display: inline-block;
+	width: 23px;
+	height: 11px;
+	margin-right: 8px;
+	background: url(../img/new-folder-icon.png) no-repeat;
+}
+
+.file-icon {
+	display: inline-block;
+	width: 10px;
+	height: 11px;
+	margin-right: 8px;
+	background: url(../img/file-icon.png) no-repeat;
+}
+
+.new-unit-icon {
+	display: inline-block;
+	width: 23px;
+	height: 12px;
+	margin-right: 8px;
+	background: url(../img/new-unit-icon.png) right no-repeat;
+}
+
+.textbook-icon {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	margin-right: 8px;
+	vertical-align: middle;
+	background: url(../img/textbook-icon.png) no-repeat;
+}
+
+.slides-icon {
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	margin-right: 8px;
+	vertical-align: middle;
+	background: url(../img/slides-icon.png) no-repeat;
+}
+
+.large-slide-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-slide-icon.png) center no-repeat;
+}
+
+.large-textbook-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-textbook-icon.png) center no-repeat;
+}
+
+.large-discussion-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-discussion-icon.png) center no-repeat;
+}
+
+.large-freeform-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-freeform-icon.png) center no-repeat;
+}
+
+.large-problem-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-problem-icon.png) center no-repeat;
+}
+
+.large-video-icon {
+	display: inline-block;
+	width: 100px;
+	height: 60px;
+	margin-right: 5px;
+	background: url(../img/large-video-icon.png) center no-repeat;
+}

@@ -4,9 +4,20 @@
 
 @import 'reset';
 @import 'mixins';
-@import 'base', 'layout', 'content-types';
-@import 'calendar';
-@import 'section', 'unit', 'index';
+
+@import "variables";
+@import "cms_mixins";
+@import "base";
+@import "header";
+@import "courseware";
+@import "subsection";
+@import "unit";
+@import "course-info";
+@import "graphics";
+@import "modal";
+@import "alerts";
+
+@import 'content-types';
 
 @import 'module/module-styles.scss';
 @import 'descriptor/module-styles.scss';

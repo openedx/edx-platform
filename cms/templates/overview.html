@@ -22,51 +22,55 @@
               <a href="#" class="drag-handle"></a>
             </div>
           </header>
-          <ol>
-            % for subsection in section.get_children():
-            <li class="branch collapsed">
-              <div class="section-item">
-                <a href="#" class="expand-collapse-icon expand"></a>
-                <a href="#" class="draft-item">
-                  <span class="${subsection.category}-icon"></span>${subsection.display_name} <span class="draft-tag">– draft</span>
-                </a>
-                <div class="item-actions">
-                  <a href="#" class="edit-button"><span class="edit-icon"></span></a>
-                  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-                  <a href="#" class="drag-handle"></a>
-                </div>
-              </div>
-
-              <ol>
-                % for unit in subsection.get_children():
-                <li class="branch collapsed">
-                  <div class="section-item">
-                    <a href="#" class="draft-item">
-                      <span class="${unit.category}-icon"></span>${unit.display_name} <span class="draft-tag">– draft</span>
-                    </a>
-                    <div class="item-actions">
-                      <a href="${reverse('edit_unit', args=[unit.location])}" class="edit-button"><span class="edit-icon"></span></a>
-                      <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
-                      <a href="#" class="drag-handle"></a>
-                    </div>
-                  </div>
-                </li>
-                % endfor
-                <li>
-                  <a href="#" class="section-item new-unit-item">
-                    <span class="plus-icon"></span>New Unit
-                  </a>
-                </li>
-              </ol>
-            </li>
-            % endfor
-
-            <li>
-              <a href="#" class="section-item new-subsection-item">
-                <span class="plus-icon"></span>New Subsection
+          <div class="unit-list">
+            <div class="list-header">
+              <a href="#" class="new-subsection-item">
+                <span class="new-folder-icon"></span>New Subsection
               </a>
-            </li>
-          </ol>
+            </div>
+            <ol>
+              % for subsection in section.get_children():
+              <li class="branch collapsed">
+                <div class="section-item">
+                  <div>
+                    <a href="#" class="expand-collapse-icon expand"></a>
+                    <a href="#">
+                      <span class="folder-icon"></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                    </a>
+                  </div>
+                  <div class="item-actions">
+                    <a href="#" class="delete-button"><span class="delete-icon"></span></a>
+                    <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+                    <a href="#" class="drag-handle"></a>
+                  </div>
+                </div>
+
+                <ol>
+                  % for unit in subsection.get_children():
+                  <li class="leaf">
+                    <div class="section-item">
+                      <a href="${reverse('edit_unit', args=[unit.location])}" class="hidden-item">
+                        <span class="${unit.category}-icon"></span>${unit.display_name} <span class="hidden-tag">– hidden</span>
+                      </a>
+                      <div class="item-actions">
+                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button"><span class="delete-icon"></span></a>
+                        <a href="#" class="visibility-toggle hidden"><span class="toggle-icon"></span></a>
+                        <a href="#" class="drag-handle"></a>
+                      </div>
+                    </div>
+                  </li>
+                  % endfor
+                  <li>
+                    <a href="#" class="new-unit-item">
+                      <span class="new-unit-icon"></span>New Unit
+                    </a>
+                  </li>
+                </ol>
+              </li>
+              % endfor
+            </ol>
+          </div>
         </section>
         % endfor
       </article>
