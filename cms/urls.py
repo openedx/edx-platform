@@ -19,7 +19,7 @@ urlpatterns = ('',
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$', 
-        'contentstore.views.upload_asset', name='upload_asset')
+        'contentstore.views.upload_asset', name='upload_asset'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/manage_users$',
         'contentstore.views.manage_users', name='manage_users'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/add_user$',
