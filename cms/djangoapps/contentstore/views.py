@@ -106,12 +106,6 @@ def course_index(request, org, course, name):
     _course = modulestore().get_item(location)
     weeks = _course.get_children()
 
-    #upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
-    #    org = org, 
-    #    course = course,
-    #    name = name
-    #    )
-
     upload_asset_callback_url = reverse('upload_asset', kwargs = {
             'org' : org,
             'course' : course,
