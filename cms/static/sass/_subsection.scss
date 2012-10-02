@@ -83,7 +83,7 @@
 	label {
 		display: inline-block !important;
 		margin-right: 10px;
-		line-height: 31px;
+		line-height: 21px;
 	}
 
 	a {
@@ -100,6 +100,10 @@
 	.large-toggle {
 		width: 41px;
 		background: url(../img/large-toggles.png) no-repeat;
-		background-position: 0 -5px;
+		background-position: 0 -50px;
+
+		.hidden {
+			background-position: 0 -5px;			
+		}
 	}
 }
