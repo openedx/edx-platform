@@ -15,10 +15,9 @@ class CMS.Views.ModuleEdit extends Backbone.View
   $component_editor: => @$el.find('.component-editor')
 
   loadDisplay: ->
-      XModule.loadModule(@$el.find('.xmodule_display'))
+       XModule.loadModule(@$el.find('.xmodule_display'))
 
   loadEdit: ->
-    if !@module
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
 
   metadata: ->
