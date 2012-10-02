@@ -2,7 +2,7 @@
 This config file runs the simplest dev environment"""
 
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 
 import logging
 import sys

@@ -3,7 +3,7 @@ This is the default template for our main set of AWS servers.
 """
 import json
 
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 from .common import *
 
 ############################### ALWAYS THE SAME ################################
