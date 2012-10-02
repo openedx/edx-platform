@@ -4,4 +4,6 @@ class @HTMLEditingDescriptor
       mode: "text/html"
     })
 
-  save: -> @edit_box.getValue()
+  save: ->
+    data: @edit_box.getValue()
+

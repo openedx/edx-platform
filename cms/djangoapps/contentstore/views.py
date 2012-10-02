@@ -364,6 +364,7 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise Http404  # TODO (vshnayder): better error
 
+    logging.debug(request.POST['data'])
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)
