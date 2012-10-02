@@ -7,8 +7,6 @@ import logging
 import os
 import sys
 
-from util.cache import cache
-
 log = logging.getLogger(__name__)
 
 def get_site_status_msg():
