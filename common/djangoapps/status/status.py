@@ -25,5 +25,5 @@ def get_site_status_msg():
 
         return content
     except:
-        log.debug("Error while getting a status message: {0}".format(sys.exc_info()))
+        log.exception("Error while getting a status message.")
         return None
