@@ -25,6 +25,7 @@ import glob2
 import errno
 import hashlib
 from collections import defaultdict
+import socket
 
 import djcelery
 from path import path
@@ -95,6 +96,7 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -103,7 +105,6 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
 sys.path.append(REPO_ROOT)
@@ -127,8 +128,11 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
 NODE_PATH = ':'.join(node_paths)
 
 
+# Where to look for a status message
+STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.html"
+
 ############################ OpenID Provider  ##################################
-OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -158,7 +162,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
-    
+
     # Added for django-wiki
     'django.core.context_processors.media',
     'django.core.context_processors.tz',
@@ -355,7 +359,7 @@ WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
-WIKI_LINK_DEFAULT_LEVEL = 2 
+WIKI_LINK_DEFAULT_LEVEL = 2
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -372,10 +376,10 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'mitxmako.makoloader.MakoFilesystemLoader',
     'mitxmako.makoloader.MakoAppDirectoriesLoader',
- 
+
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-    
+
     #'askbot.skins.loaders.filesystem_load_template_source',
     # 'django.template.loaders.eggs.Loader',
 )
@@ -393,7 +397,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
-    
+
     'course_wiki.course_nav.Middleware',
 
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
@@ -622,7 +626,7 @@ INSTALLED_APPS = (
     'certificates',
     'instructor',
     'psychometrics',
-    
+
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
     'django_notify',
