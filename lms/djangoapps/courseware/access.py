@@ -106,7 +106,7 @@ def _has_access_course_desc(user, course, action):
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
         # delegate to generic descriptor check to check start dates
-        return _has_access_descriptor(user, course, action)
+        return _has_access_descriptor(user, course, 'load')
 
     def can_enroll():
         """
