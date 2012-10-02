@@ -90,7 +90,7 @@ function saveNewComponent(e) {
         model: new CMS.Models.Module()
     })
 
-    $('.components').append(editor.$el)
+    $newComponentItem.before(editor.$el)
 
     editor.cloneTemplate($(this).data('location'))
 
