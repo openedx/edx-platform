@@ -585,8 +585,6 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
-    "*.py",
-    "*.pyc"
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
