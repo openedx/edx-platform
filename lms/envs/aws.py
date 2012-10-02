@@ -8,8 +8,8 @@ Common traits:
 """
 import json
 
-from logsettings import get_logger_config
 from .common import *
+from logsettings import get_logger_config
 
 ############################### ALWAYS THE SAME ################################
 DEBUG = False
