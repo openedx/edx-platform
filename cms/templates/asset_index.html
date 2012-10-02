@@ -1,0 +1,18 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">assets</%block>
+<%block name="title">CMS Courseware Overview</%block>
+
+<%block name="content">
+  
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <h1>Asset Library</h1>
+      <input type="text" class="asset-search-input search wip-box" placeholder="search assets" />
+      <article class="asset-library">
+
+      </article>
+    </div>
+  </div>
+
+</%block>

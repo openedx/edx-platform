@@ -26,7 +26,9 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/add_user$',
         'contentstore.views.add_user', name='add_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
-        'contentstore.views.remove_user', name='remove_user')
+        'contentstore.views.remove_user', name='remove_user'),
+    url(r'^assets/(?P<location>.*?)$', 'contentstore.views.asset_index', name='asset_index')
+
 
 )
 
