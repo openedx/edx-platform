@@ -14,9 +14,15 @@ site_status_msg = get_site_status_msg()
 %>
 
 % if site_status_msg:
-<div class="site-status">${site_status_msg}</div>
+<div class="site-status">
+  <div class="inner-wrapper">
+    <span class="white-error-icon"></span>
+    <p>${site_status_msg}</p>
+  </div>
+</div>
 % endif
-  
+
+
 
 % if course:
   <header class="global slim" aria-label="Global Navigation">
