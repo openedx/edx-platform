@@ -97,12 +97,6 @@ GENERATE_PROFILE_SCORES = False
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
 
-# Used for per-maching caching
-try:
-    HOSTNAME = socket.gethostname()
-except:
-    HOSTNAME = 'localhost'
-
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
