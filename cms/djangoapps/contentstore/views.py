@@ -99,6 +99,7 @@ def index(request):
 def has_access(user, location, role=EDITOR_ROLE_NAME):
     '''Return True if user allowed to access this piece of data'''
     '''Note that the CMS permissions model is with respect to courses'''
+    '''There is a super-admin permissions if user.is_staff is set'''
     return is_user_in_course_group_role(user, get_course_location_for_item(location), role)
 
 
