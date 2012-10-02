@@ -14,9 +14,12 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
   $component_editor: => @$el.find('.component-editor')
 
-  loadModules: ->
-      @module = XModule.loadModule(@$el.find('.xmodule_edit'))
+  loadDisplay: ->
       XModule.loadModule(@$el.find('.xmodule_display'))
+
+  loadEdit: ->
+    if !@module
+      @module = XModule.loadModule(@$el.find('.xmodule_edit'))
 
   metadata: ->
     # cdodge: package up metadata which is separated into a number of input fields
@@ -44,7 +47,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   render: ->
     if @model.id
       @$el.load("/preview_component/#{@model.id}", =>
-        @loadModules()
+        @loadDisplay()
         @delegateEvents()
       )
 
@@ -70,3 +73,4 @@ class CMS.Views.ModuleEdit extends Backbone.View
     event.preventDefault()
     @$el.addClass('editing')
     @$component_editor().slideDown(150)
+    @loadEdit()

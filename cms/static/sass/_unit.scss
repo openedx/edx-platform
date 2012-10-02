@@ -228,6 +228,10 @@
         border-radius: 0 0 3px 3px;
         background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1)) $blue;
 
+        .module-editor {
+            background: white;
+        }
+
         h5 {
             margin-bottom: 8px;
             color: #fff;
