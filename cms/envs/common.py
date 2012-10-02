@@ -282,6 +282,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'auth',
     'github_sync',
     'student',  # misleading name due to sharing with lms
 
