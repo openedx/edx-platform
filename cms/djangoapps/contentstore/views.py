@@ -133,6 +133,10 @@ def course_index(request, org, course, name):
 
 
 @login_required
+def edit_subsection(request, location):
+    pass
+
+@login_required
 def edit_unit(request, location):
     """
     Display an editing page for the specified module.
@@ -377,7 +381,6 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    logging.debug(request.POST['data'])
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)
