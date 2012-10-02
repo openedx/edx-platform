@@ -376,6 +376,7 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
+    logging.debug(request.POST['data'])
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)
