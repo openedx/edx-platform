@@ -15,10 +15,10 @@ class CMS.Views.ModuleEdit extends Backbone.View
   $component_editor: => @$el.find('.component-editor')
 
   loadDisplay: ->
-      XModule.loadModule(@$el.find('.xmodule_display'))
+       XModule.loadModule(@$el.find('.xmodule_display'))
 
   loadEdit: ->
-    if !@module
+    if not @module
       @module = XModule.loadModule(@$el.find('.xmodule_edit'))
 
   metadata: ->
@@ -57,7 +57,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     data.metadata = @metadata()
     @model.save(data).done( =>
       alert("Your changes have been saved.")
-
+      @module = null
       @render()
       @$el.removeClass('editing')
     ).fail( ->
