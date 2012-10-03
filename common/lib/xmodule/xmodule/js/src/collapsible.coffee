@@ -18,8 +18,11 @@ class @Collapsible
   @toggleFull: (event) =>
     $(event.target).parent().siblings().slideToggle()
     $(event.target).parent().parent().toggleClass('open')
-    text = $(event.target).text() == 'See full output' ? 'Hide output' : 'See full output'
-    $(this).text(text)
+    if $(event.target).text() == 'See full output'
+      new_text = 'Hide output'
+    else
+      new_text = 'See full ouput'
+    $(event.target).text(new_text)
 
   @toggleHint: (event) =>
     event.preventDefault()
