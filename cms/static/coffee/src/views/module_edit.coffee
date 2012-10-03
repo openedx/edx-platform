@@ -41,6 +41,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
       template: template
     }, (data) => 
       @model.set(id: data.id)
+      @$el.data('id', data.id)
       @render()
     )
 
