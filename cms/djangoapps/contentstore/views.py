@@ -144,7 +144,8 @@ def edit_subsection(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
-    return render_to_response('edit_subsection.html', {})
+    return render_to_response('edit_subsection.html', 
+                              {'subsection':item})
 
 @login_required
 def edit_unit(request, location):

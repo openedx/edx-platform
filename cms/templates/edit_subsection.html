@@ -2,8 +2,10 @@
 <%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">subsection</%block>
 <%block name="title">CMS Subsection</%block>
-<%block name="content">
 
+<%namespace name="units" file="widgets/units.html" />
+
+<%block name="content">
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
@@ -18,63 +20,7 @@
 	</div>
 	<div class="unit-list">
 	  <label>Units:</label>
-	  <ol>
-	    <li class="leaf">
-	      <div class="section-item">
-		<a href="unit.html"><span class="video-icon"></span>Motivation for 6.002x</a>
-		<div class="item-actions">
-		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-		  <a href="#" class="drag-handle"></a>
-		</div>
-	      </div>
-	    </li>
-	    <li class="leaf">
-	      <div class="section-item">
-		<a href="unit.html"><span class="video-icon"></span>Administrivia</a>
-		<div class="item-actions">
-		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-		  <a href="#" class="drag-handle"></a>
-		</div>
-	      </div>
-	    </li>
-	    <li class="leaf">
-	      <div class="section-item">
-		<a href="unit.html"><span class="video-icon"></span>Course Overview</a>
-		<div class="item-actions">
-		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-		  <a href="#" class="drag-handle"></a>
-		</div>
-	      </div>
-	    </li>
-	    <li class="leaf">
-	      <div class="section-item">
-		<a href="unit.html"><span class="video-icon"></span>Lumped Element Abstraction</a>
-		<div class="item-actions">
-		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-		  <a href="#" class="drag-handle"></a>
-		</div>
-	      </div>
-	    </li>
-	    <li class="leaf">
-	      <div class="section-item">
-		<a href="unit.html"><span class="video-icon"></span>Simple Power</a>
-		<div class="item-actions">
-		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
-		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
-		  <a href="#" class="drag-handle"></a>
-		</div>
-	      </div>
-	    </li>										
-	    <li>
-	      <a href="unit.html" class="new-unit-item">
-		<span class="new-unit-icon"></span>New Unit
-	      </a>
-	    </li>
-	  </ol>
+	  ${units.enum_units(subsection)}
 	</div>
 	<div>
 	  <label>Policy:</label>
