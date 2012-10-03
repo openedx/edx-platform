@@ -135,6 +135,17 @@ def update_merge_tags(mailchimp, list_id, data):
 
     for name in names:
         tag = name_to_tag(name)
+
+        # verify FULLNAME is present
+        if 'FULLNAME' not in mc_vars:
+            result = mailchimp.listMergeVarAdd(id=list_id,
+                                               tag='FULLNAME',
+                                               name=name,
+                                               options={'field_type':'text',
+                                                        'public': False})
+            log.debug(result)
+
+        # add extra tags if not present
         if name not in mc_names and tag not in ['EMAIL', 'FULLNAME']:
             result = mailchimp.listMergeVarAdd(id=list_id,
                                                tag=tag,
