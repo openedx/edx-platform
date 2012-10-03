@@ -621,4 +621,6 @@ def remove_user(request, org, course, name):
 @ensure_csrf_cookie
 def asset_index(request, location):
     return render_to_response('asset_index.html',{})
-    
+
+def landing(request, org, course, coursename):
+    return render_to_response('landing.html', {})
