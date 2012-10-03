@@ -500,8 +500,8 @@ def upload_asset(request, org, course, coursename):
             thumbnail_file.seek(0)
         
             # use a naming convention to associate originals with the thumbnail
-            #   <name_without_extention>.thumbnail.jpg
-            thumbnail_name = os.path.splitext(name)[0] + '.thumbnail.jpg'
+            thumbnail_name = content.generate_thumbnail_name()
+
             # then just store this thumbnail as any other piece of content
             thumbnail_file_location = StaticContent.compute_location(org, course, 
                                                                               thumbnail_name)
@@ -515,6 +515,7 @@ def upload_asset(request, org, course, coursename):
         except:
             # catch, log, and continue as thumbnails are not a hard requirement
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
+            raise
 
     return HttpResponse('Upload completed')
 

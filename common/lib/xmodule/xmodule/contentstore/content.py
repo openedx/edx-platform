@@ -1,6 +1,9 @@
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 
+XASSET_THUMBNAIL_TAIL_NAME = '.thumbnail.jpg'
+
+import os
 import logging
 from xmodule.modulestore import Location
 
@@ -12,6 +15,12 @@ class StaticContent(object):
         self.data = data
         self.last_modified_at = last_modified_at
 
+    @property
+    def is_thumbnail(self):
+        return self.name.endswith(XASSET_THUMBNAIL_TAIL_NAME)
+
+    def generate_thumbnail_name(self):
+        return ('{0}'+XASSET_THUMBNAIL_TAIL_NAME).format(os.path.splitext(self.name)[0])
 
     @staticmethod
     def compute_location(org, course, name, revision=None):
