@@ -44,8 +44,8 @@ section.problem {
       }
     }
 
-    min-width:100px; 
-    width: auto !important; 
+    min-width:100px;
+    width: auto !important;
     width: 100px;
 
     .indicator_container {
@@ -299,7 +299,7 @@ section.problem {
   form.option-input {
     margin: -10px 0 20px;
     padding-bottom: 20px;
-    
+
     select {
       margin-right: flex-gutter();
     }
@@ -421,7 +421,7 @@ section.problem {
         background-position: right;
         background-repeat: no-repeat;
     }
-    
+
     pre {
       @include border-radius(0);
       border-radius: 0;
@@ -619,6 +619,72 @@ section.problem {
         display: block;
         background: #F3F3F3;
         @include box-sizing(border-box);
+      }
+    }
+  }
+
+  .external-grader-message {
+    section {
+      padding-left: 20px;
+      background-color: #FAFAFA;
+      color: #2C2C2C;
+      font-family: monospace;
+      font-size: 1em;
+
+      .shortform {
+        font-weight: bold;
+      }
+
+      .longform {
+        padding: 0px;
+        margin: 0px;
+
+        .result-errors {
+          margin: 5px;
+          padding: 10px 10px 10px 40px;
+          background: url('../images/incorrect-icon.png') center left no-repeat;
+          li {
+            color: #B00;
+            }
+        }
+
+        .result-output {
+          margin: 5px;
+          padding: 20px 0px 15px 50px;
+          border-top: 1px solid #DDD;
+          border-left: 20px solid #FAFAFA;
+
+          h4 {
+            font-family: monospace;
+            font-size: 1em;
+          }
+
+          dl {
+            margin: 0px;
+          }
+
+          dt {
+            margin-top: 20px;
+          }
+
+          dd {
+            margin-left: 24pt;
+          }
+        }
+
+        .result-correct {
+          background: url('../images/correct-icon.png') center left no-repeat;
+          .result-actual-output {
+            color: #090;
+          }
+        }
+
+        .result-incorrect {
+          background: url('../images/incorrect-icon.png') center left no-repeat;
+          .result-actual-output {
+            color: #B00;
+          }
+        }
       }
     }
   }
