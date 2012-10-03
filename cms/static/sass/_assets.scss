@@ -1,11 +1,160 @@
 .assets {
   input.asset-search-input {
-    position: absolute;
-    right: 0;
-    top: 5px;
+    float: left;
     width: 260px;
     background-color: #fff;
   }
 
-  
+  .upload-button {
+    @include blue-button;
+    float: left;
+    margin-right: 20px;
+    font-size: 12px;
+  }
+
+  .asset-library {
+    @include clearfix;
+
+    table {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      border: 1px solid #c5cad4;
+
+      td,
+      th {
+        padding: 10px 20px;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      thead th {
+        background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, .1)) #ced2db;
+        font-size: 12px;
+        font-weight: 700;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+      }
+
+      tbody {
+        background: #fff;
+
+        tr {
+          border-top: 1px solid #c5cad4;
+
+          &:first-child {
+            border-top: none;
+          }
+        }
+      }
+
+      .thumb-col {
+        width: 100px;
+      }
+
+      .date-col {
+        width: 200px;
+      }
+
+      .embed-col {
+        width: 70px;
+      }
+
+      .thumb {
+        width: 100px;
+        max-height: 80px;
+
+        img {
+          width: 100%;
+        }
+      }
+    }
+
+    .pagination {
+      float: right;
+      margin: 15px 10px;
+
+      ol, li {
+        display: inline;
+      }
+
+      a {
+        display: inline-block;
+        height: 25px;
+        padding: 0 4px;
+        text-align: center;
+        line-height: 25px;
+      }
+    }
+  }
+}
+
+.upload-modal {
+	display: none;	
+	width: 640px !important;
+	margin-left: -320px !important;
+
+	.modal-body {
+		height: auto !important;
+		overflow-y: auto !important;
+		text-align: center;
+	}
+
+	.file-input {
+		display: none;
+	}
+
+	.choose-file-button {
+		@include blue-button;
+		padding: 10px 82px 12px;
+		font-size: 17px;
+	}
+
+	.progress-bar {
+		display: none;
+		width: 350px;
+		height: 50px;
+		margin: 30px auto 10px;
+		border: 1px solid $blue;
+
+		&.loaded {
+			border-color: #66b93d;
+
+			.progress-fill {
+				background: #66b93d;
+			}
+		}
+	}
+
+	.progress-fill {
+		width: 0%;
+		height: 50px;
+		background: $blue;
+		color: #fff;
+		line-height: 48px;
+	}
+
+	h1 {
+		float: none;
+		margin: 40px 0 30px;
+		font-size: 34px;
+		font-weight: 300;
+	}
+
+	.close-button {
+		@include white-button;
+		position: absolute;
+		top: 0;
+		right: 15px;
+		width: 29px;
+		height: 29px;
+		padding: 0 !important;
+		border-radius: 17px !important;
+		line-height: 29px;
+		text-align: center;
+	}
+
+	.copy-button {
+		@include white-button;
+		display: none;
+		margin-bottom: 100px;
+	}
 }
