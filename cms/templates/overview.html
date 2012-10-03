@@ -49,12 +49,11 @@
                   % for unit in subsection.get_children():
                   <li class="leaf">
                     <div class="section-item">
-                      <a href="${reverse('edit_unit', args=[unit.location])}" class="hidden-item">
-                        <span class="${unit.category}-icon"></span>${unit.display_name} <span class="hidden-tag">– hidden</span>
+                      <a href="${reverse('edit_unit', args=[unit.location])}" class="private-item">
+                        <span class="${unit.category}-icon"></span>${unit.display_name} <span class="private-tag">– private</span>
                       </a>
                       <div class="item-actions">
-                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button wip"><span class="delete-icon"></span></a>
-                        <a href="#" class="visibility-toggle hidden wip"><span class="toggle-icon"></span></a>
+                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button wip"><span class="delete-icon"></span></a>                        
                         <a href="#" class="drag-handle wip"></a>
                       </div>
                     </div>
