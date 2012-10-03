@@ -2,6 +2,16 @@
 <%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">unit</%block>
 <%block name="title">CMS Unit</%block>
+<%block name="jsextra">
+  <script type='text/javascript'>
+    new CMS.Views.UnitEdit({
+      el: $('.main-wrapper'),
+      model: new CMS.Models.Module({
+        id: '${unit.location.url()}'
+      })
+    });
+  </script>
+</%block>
 <%block name="content">
   <div class="main-wrapper">
     <div class="inner-wrapper">
@@ -49,8 +59,8 @@
         </article>
       </div>
 
-      <div class="sidebar">
-        <div class="unit-properties window wip-box">
+      <div class="sidebar wip-box">
+        <div class="unit-properties window">
           <h4>Unit Properties</h4>
           <div class="window-contents">
             <div class="due-date-input row">
