@@ -1,0 +1,119 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">subsection</%block>
+<%block name="title">CMS Subsection</%block>
+<%block name="content">
+
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <div class="main-column">
+      <article class="subsection-body window">
+	<div class="subsection-name-input">
+	  <label>Display Name:</label>
+	  <input type="text" value="Welcome to 6.002x" class="subsection-display-name-input" />
+	</div>
+	<div>
+	  <label>Subtitle:</label>
+	  <input type="text" value="Lecture Sequence" class="unit-subtitle" />
+	</div>
+	<div class="unit-list">
+	  <label>Units:</label>
+	  <ol>
+	    <li class="leaf">
+	      <div class="section-item">
+		<a href="unit.html"><span class="video-icon"></span>Motivation for 6.002x</a>
+		<div class="item-actions">
+		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+		  <a href="#" class="drag-handle"></a>
+		</div>
+	      </div>
+	    </li>
+	    <li class="leaf">
+	      <div class="section-item">
+		<a href="unit.html"><span class="video-icon"></span>Administrivia</a>
+		<div class="item-actions">
+		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+		  <a href="#" class="drag-handle"></a>
+		</div>
+	      </div>
+	    </li>
+	    <li class="leaf">
+	      <div class="section-item">
+		<a href="unit.html"><span class="video-icon"></span>Course Overview</a>
+		<div class="item-actions">
+		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+		  <a href="#" class="drag-handle"></a>
+		</div>
+	      </div>
+	    </li>
+	    <li class="leaf">
+	      <div class="section-item">
+		<a href="unit.html"><span class="video-icon"></span>Lumped Element Abstraction</a>
+		<div class="item-actions">
+		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+		  <a href="#" class="drag-handle"></a>
+		</div>
+	      </div>
+	    </li>
+	    <li class="leaf">
+	      <div class="section-item">
+		<a href="unit.html"><span class="video-icon"></span>Simple Power</a>
+		<div class="item-actions">
+		  <a href="#" class="edit-button"><span class="delete-icon"></span></a>
+		  <a href="#" class="visibility-toggle"><span class="toggle-icon"></span></a>
+		  <a href="#" class="drag-handle"></a>
+		</div>
+	      </div>
+	    </li>										
+	    <li>
+	      <a href="unit.html" class="new-unit-item">
+		<span class="new-unit-icon"></span>New Unit
+	      </a>
+	    </li>
+	  </ol>
+	</div>
+	<div>
+	  <label>Policy:</label>
+	  <textarea class="text-editor">Policy blah, blah, blah…</textarea>
+	</div>					
+      </article>
+    </div>
+
+    <div class="sidebar">
+      <div class="unit-properties window">
+	<h4>Subsection Settings</h4>
+	<div class="window-contents">
+	  <div class="scheduled-date-input row">
+	    <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
+	    <div class="date-setter">
+	      <input type="text" value="10/22/2012" class="date-input" />
+	      <input type="text" value="6:00 am" class="time-input" />
+	    </div>
+	    <p class="notice">The date above differs from the release date of Week 1 – 10/10/2012 at 12:00 am. <a href="#" class="sync-date">Sync to Week 1.</a></p>
+	  </div>
+	<div class="due-date-input row">
+	  <label>Due date:</label>
+	  <a href="#" class="set-date">Set a due date</a>
+	  <div class="date-setter">
+	    <p class="date-description"><input type="text" value="10/20/2012" class="date-input" /> <input type="text" value="6:00 am" class="time-input" />
+	      <a href="#" class="remove-date">Remove due date</a>
+	    </p>
+	  </div>
+	</div>
+	<div class="visibility row">
+	  <label>Visibility:<!-- <span class="description">Shows or hides this subsection and the units within it.</span>--></label>
+	  <a href="#" class="toggle-off">hide</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">show</a>
+	</div>
+	<div class="row unit-actions">
+	  <a href="#" class="save-button">Save</a>
+	  <a href="preview.html" target="_blank" class="preview-button">Preview</a>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+</%block>
