@@ -1,52 +1,59 @@
 <%inherit file="base.html" />
 <%block name="title">Sign up</%block>
+<%block name="bodyclass">no-header</%block>
 
 <%block name="content">
-<section class="main-container">
-
-  <section class="main-content">
-    <header>
-      <h3>Sign Up for edX</h3>
-      <hr>
-    </header>
-
-    <div id="register">
-
-      <form id="register_form" method="post">
-        <div id="register_error" name="register_error"></div>
-        <label>E-mail</label>
-        <input name="email" type="email" placeholder="E-mail">
-        <label>Password</label>
-        <input name="password" type="password" placeholder="Password">
-        <label>Public Username</label>
-        <input name="username" type="text" placeholder="Public Username">
-        <label>Full Name</label>
-        <input name="name" type="text" placeholder="Full Name">
-        <label>Your Location</label>
-        <input name="location" type="text" placeholder="Your Location">
-        <label>Preferred Language</label>
-        <input name="language" type="text" placeholder="Preferred Language">
-        <label class="terms-of-service">
-          <input name="terms_of_service" type="checkbox" value="true">
-          I agree to the
-          <a href="#">Terms of Service</a>
-        </label>
-        
-        <!-- no honor code for CMS, but need it because we're using the lms student object -->
-          <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
-
-        <div class="submit">
-          <input name="submit" type="submit" value="Create My Account">
-        </div>
-        </form>
-        
-        <section class="login-extra">
-        <p>
-        <span>Already have an account? <a href="#">Login.</a></span>
-        </p>
-        </section>
-
+<article class="sign-up-box">
+  <header>
+    <h1>Register for edX Labs</h1>
+  </header>
+  <form id="register_form" method="post">
+    <div id="register_error" name="register_error"></div>
+    <div class="row">
+      <label>E-mail</label>
+      <input name="email" type="email">
     </div>
+    <div class="row">
+      <label>Password</label>
+      <input name="password" type="password">
+    </div>
+    <div class="row">
+      <label>Public Username</label>
+      <input name="username" type="text">
+    </div>
+    <div class="row">
+      <label>Full Name</label>
+      <input name="name" type="text">
+    </div>
+    <div class="row">
+      <div class="split">
+        <label>Your Location</label>
+        <input name="location" type="text">
+      </div>
+      <div class="split">
+        <label>Preferred Language</label>
+        <input name="language" type="text">
+      </div>
+    </div>
+    <div class="row">
+      <label class="terms-of-service">
+        <input name="terms_of_service" type="checkbox" value="true">
+        I agree to the
+        <a href="#">Terms of Service</a>
+      </label>
+    </div>
+    
+    <!-- no honor code for CMS, but need it because we're using the lms student object -->
+      <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+
+    <div class="row form-actions submit">
+      <input name="submit" type="submit" value="Create My Account">
+    </div>
+  </form>
+  <div class="log-in-extra">
+    <p>Not enrolled? <a href="/">Sign up.</a></p>
+  </div>
+</article>
 
 <script type="text/javascript">
   (function() {
@@ -81,8 +88,4 @@
     });
   })(this)
 </script>
-
-  </section>
-
-</section>
 </%block>
