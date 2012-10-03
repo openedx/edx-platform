@@ -24,8 +24,14 @@ a {
 }
 
 h1 {
+    float: left;
     font-size: 28px;
     margin: 36px 6px;
+}
+
+.page-actions {
+    float: right;
+    margin-top: 42px;
 }
 
 .main-wrapper {
@@ -37,6 +43,10 @@ h1 {
     position: relative;
     max-width: 1280px;
     margin: auto;
+
+    > article {
+        clear: both;
+    }
 }
 
 .window {
@@ -189,20 +199,21 @@ label {
     }
 }
 
-.wip {
-    outline: 1px solid #f00 !important;
-    position: relative;
-}
+body.show-wip {
+    .wip {
+        outline: 1px solid #f00 !important;
+        position: relative;
+    }
 
-.wip-box {
-    @extend .wip;
-    &:after {
-        content: "WIP";
-        font-size: 8px;
-        padding: 2px;
-        background: #f00;
-        color: #fff;
-        @include position(absolute, 0px 0px 0 0);
+    .wip-box {
+        @extend .wip;
+        &:after {
+            content: "WIP";
+            font-size: 8px;
+            padding: 2px;
+            background: #f00;
+            color: #fff;
+            @include position(absolute, 0px 0px 0 0);
+        }
     }
 }
-

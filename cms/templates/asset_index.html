@@ -1,0 +1,200 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">assets</%block>
+<%block name="title">CMS Courseware Overview</%block>
+
+<%block name="content">
+  
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <h1>Asset Library</h1>
+      <div class="page-actions">
+        <a href="#" class="upload-button">Upload New File</a><input type="text" class="asset-search-input search wip-box" placeholder="search assets" />
+      </div>
+      <article class="asset-library">
+        <table>
+          <thead>
+            <tr>
+              <th class="thumb-col"></th>
+              <th class="name-col">Name</th>
+              <th class="date-col">Date Added</th>
+              <th class="embed-col">Embed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-1.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-1.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-1.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-2.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+            <tr>
+              <td class="thumb-col">
+                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+              </td>
+              <td class="name-col">
+                <a href="#" class="filename">raygun-1.jpg</a>
+              </td>
+              <td class="date-col">
+                10/2/2012
+              </td>
+              <td class="embed-col">
+                <a href="#">copy</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <nav class="pagination">
+          Page: 
+          <ol class="pages">
+            <li>1</li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+          </ol>
+          <a href="#" class="next">»</a>
+        </nav>
+      </article>
+    </div>
+  </div>
+
+  <div class="upload-modal modal">
+  	<a href="#" class="close-button"><span class="close-icon"></span></a>
+		<div class="modal-body">
+			<h1>Upload New File</h1>
+			<p class="file-name"></a>
+			<div class="progress-bar">
+				<div class="progress-fill"></div>
+			</div>
+			<a href="#" class="copy-button">Copy Embed Link</a>
+			<div class="file-chooser">
+				<a href="#" class="choose-file-button">Choose File</a>
+				<input type="file" class="file-input">
+			</div>
+		</div>
+	</div>
+
+	<div class="modal-cover"></div>
+
+</%block>

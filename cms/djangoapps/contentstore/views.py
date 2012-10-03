@@ -633,3 +633,9 @@ def remove_user(request, org, course, name):
     remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
 
     return create_json_response()
+
+@login_required
+@ensure_csrf_cookie
+def asset_index(request, location):
+    return render_to_response('asset_index.html',{})
+    
