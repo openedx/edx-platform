@@ -332,6 +332,14 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def delete_item(self, location):
+        """
+        Delete an item from this modulestore
+
+        location: Something that can be passed to Location
+        """
+        raise NotImplementedError
+
     def get_courses(self):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses

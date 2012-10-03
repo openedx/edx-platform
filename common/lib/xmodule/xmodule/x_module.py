@@ -13,6 +13,7 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -531,7 +532,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         if self._child_instances is None:
             self._child_instances = []
             for child_loc in self.definition.get('children', []):
-                child = self.system.load_item(child_loc)
+                try:
+                    child = self.system.load_item(child_loc)
+                except ItemNotFoundError:
+                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    continue
                 # TODO (vshnayder): this should go away once we have
                 # proper inheritance support in mongo.  The xml
                 # datastore does all inheritance on course load.
