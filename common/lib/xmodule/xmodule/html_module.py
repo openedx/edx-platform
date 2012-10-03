@@ -26,7 +26,13 @@ class HtmlModule(XModule):
     
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(self.html, self.rewrite_content_links)
+        _html = self.html
+        try:
+            _html = rewrite_links(_html, self.rewrite_content_links)
+        except:
+            logging.error('error rewriting links on the following HTML content: {0}'.format(_html))
+
+        return _html
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):

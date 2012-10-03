@@ -1,26 +1,59 @@
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 
+import logging
+from xmodule.modulestore import Location
+
 class StaticContent(object):
-    def __init__(self, filename, name, content_type, data, last_modified_at=None):
-        self.filename = filename
-        self.name = name
+    def __init__(self, loc, name, content_type, data, last_modified_at=None):
+        self.location = loc
+        self.name = name #a display string which can be edited, and thus not part of the location which needs to be fixed
         self.content_type = content_type
         self.data = data
         self.last_modified_at = last_modified_at
 
-    @staticmethod
-    def compute_location_filename(org, course, name):
-        return '/{0}/{1}/{2}/asset/{3}'.format(XASSET_LOCATION_TAG, org, course, name)
 
-'''
-Abstraction for all ContentStore providers (e.g. MongoDB)
-'''
+    @staticmethod
+    def compute_location(org, course, name, revision=None):
+        return Location([XASSET_LOCATION_TAG, org, course, 'asset', name, revision])
+
+    def get_id(self):
+        return StaticContent.get_id_from_location(self.location)
+
+    def get_url_path(self):
+        return StaticContent.get_url_path_from_location(self.location)
+    
+    @staticmethod
+    def get_url_path_from_location(location):
+        return "/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+
+    @staticmethod
+    def get_id_from_location(location):
+        return { 'tag':location.tag, 'org' : location.org, 'course' : location.course,
+                   'category' : location.category, 'name' : location.name, 
+                   'revision' : location.revision}
+    @staticmethod
+    def get_location_from_path(path):
+        # remove leading / character if it is there one
+        if path.startswith('/'):
+            path = path[1:]
+        
+        return Location(path.split('/'))
+
+    @staticmethod
+    def get_id_from_path(path):
+        return get_id_from_location(get_location_from_path(path))
+    
+
 class ContentStore(object):
+    '''
+    Abstraction for all ContentStore providers (e.g. MongoDB)
+    '''
     def save(self, content):
         raise NotImplementedError
 
     def find(self, filename):
         raise NotImplementedError
 
-            
+    def get_all_content_for_course(self, location):
+        raise NotImplementedError
