@@ -19,3 +19,11 @@ MODULESTORE = {
         'OPTIONS': modulestore_options
     },
 }
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db' : 'xcontent',
+    }
+}
