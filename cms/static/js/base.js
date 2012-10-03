@@ -20,7 +20,23 @@ $(document).ready(function() {
     $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideHistoryModal);
     $modalCover.bind('click', hideHistoryModal);
+
+    $('.unit .item-actions .delete-button').bind('click', deleteUnit);
 });
+
+function deleteUnit(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var _this = $(this);
+    
+    $.post('/delete_item', 
+	   {'id': id, 'delete_children' : 'true'}, 
+	   function(data) {
+	       // remove 'leaf' class containing <li> element
+	       var parent = _this.parents('li.leaf');
+	       parent.remove();
+	   });
+}
 
 function toggleSubmodules(e) {
     e.preventDefault();

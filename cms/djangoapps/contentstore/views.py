@@ -209,10 +209,6 @@ def preview_component(request, location):
     })
 
 
-@login_required
-def delete_unit(request, location):
-    pass
-
 
 def user_author_string(user):
     '''Get an author string for commits by this user.  Format:
@@ -382,12 +378,33 @@ def get_module_previews(request, descriptor):
         preview_html.append(module.get_html())
     return preview_html
 
+def _delete_item(item, recurse=False):
+    if recurse:
+        children = item.get_children()
+        for child in children:
+            _delete_item(child)
+        
+    modulestore().delete_item(item.location);
+    
 
 @login_required
 @expect_json
 def delete_item(request):
     item_location = request.POST['id']
-    modulestore().delete_item(item_location)
+
+    # check permissions for this user within this course
+    if not has_access(request.user, item_location):
+        raise PermissionDenied()
+
+    # optional parameter to delete all children (default False)
+    delete_children = False
+    if 'delete_children' in request.POST:
+        delete_children = request.POST['delete_children'] in ['true', 'True']
+
+    item = modulestore().get_item(item_location)
+
+    _delete_item(item)
+    
     return HttpResponse()
 
 
