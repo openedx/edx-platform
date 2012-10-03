@@ -13,6 +13,7 @@ $(document).ready(function() {
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
+    $body.bind('keyup', onKeyUp);
 
     $('li.component').each(function(idx, element) {
         new CMS.Views.ModuleEdit({
@@ -33,9 +34,55 @@ $(document).ready(function() {
     $newComponentTemplatePickers.find('.cancel-button').bind('click', closeNewComponent);
 
     $('.unit-history ol a').bind('click', showHistoryModal);
-    $modal.bind('click', hideHistoryModal);
+    $modal.bind('click', hideModal);
     $modalCover.bind('click', hideHistoryModal);
+
+    $('.assets .upload-button').bind('click', showUploadModal);
+    $('.upload-modal .close-button').bind('click', hideModal);
 });
+
+function showUploadModal(e) {
+    e.preventDefault();
+    $('.upload-modal').show();
+    $('.file-input').bind('change', startUpload);
+    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+    $modalCover.show();
+}
+
+function showFileSelectionMenu(e) {
+    e.preventDefault();
+    $('.file-input').click();
+}
+
+function startUpload(e) {
+    $('.upload-modal h1').html('Uploading…');
+    $('.upload-modal .file-name').html($('.file-input').val());
+    $('.upload-modal .choose-file-button').hide();
+    $('.upload-modal .progress-bar').removeClass('loaded').show();
+    $('.upload-modal .progress-fill').html('').css('width', '0').animate({
+        'width': '100%'
+    }, 1500);
+    setTimeout(markAsLoaded, 1500);
+}
+
+function markAsLoaded() {
+    $('.upload-modal .copy-button').css('display', 'inline-block');
+    $('.upload-modal .progress-bar').addClass('loaded');
+    $('.upload-modal .progress-fill').html('loaded successfully');
+    $('.upload-modal .choose-file-button').html('Load Another File').show();
+}
+
+function hideModal(e) {
+    e.preventDefault();
+    $('.modal').hide();
+    $modalCover.hide();
+}
+
+function onKeyUp(e) {
+    if(e.which == 87) {
+        $body.toggleClass('show-wip');
+    }
+}
 
 function toggleSubmodules(e) {
     e.preventDefault();
