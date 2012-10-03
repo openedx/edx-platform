@@ -42,7 +42,12 @@
         lineWrapping: true,
         indentUnit: "${tabsize}",
         tabSize: "${tabsize}",
-        indentWithTabs: true,
+        indentWithTabs: false,
+        extraKeys: {
+            "Tab": function(cm) {
+                cm.replaceSelection("${' '*tabsize}", "end");
+            }
+        },
         smartIndent: false
       });
     });
