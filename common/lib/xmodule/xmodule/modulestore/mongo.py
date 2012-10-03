@@ -309,6 +309,14 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
 
+    def delete_item(self, location):
+        """
+        Delete an item from this modulestore
+
+        location: Something that can be passed to Location
+        """
+        self.collection.remove({'_id': Location(location).dict()})
+
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().

@@ -6,10 +6,10 @@ class CMS.Views.ModuleEdit extends Backbone.View
     "click .component-editor .cancel-button": 'clickCancelButton'
     "click .component-editor .save-button": 'clickSaveButton'
     "click .component-actions .edit-button": 'clickEditButton'
-
+    "click .component-actions .delete-button": 'onDelete'
 
   initialize: ->
-    @module = @options.module
+    @onDelete = @options.onDelete
     @render()
 
   $component_editor: => @$el.find('.component-editor')

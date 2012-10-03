@@ -385,6 +385,14 @@ def get_module_previews(request, descriptor):
 
 @login_required
 @expect_json
+def delete_item(request):
+    item_location = request.POST['id']
+    modulestore().delete_item(item_location)
+    return HttpResponse()
+
+
+@login_required
+@expect_json
 def save_item(request):
     item_location = request.POST['id']
 
@@ -413,12 +421,7 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
         modulestore().update_metadata(item_location, existing_item.metadata)
 
-    descriptor = modulestore().get_item(item_location)
-    preview_html = get_module_previews(request, descriptor)[0]
-
-    return HttpResponse(json.dumps({
-        'preview': preview_html
-    }))
+    return HttpResponse()
 
 
 @login_required

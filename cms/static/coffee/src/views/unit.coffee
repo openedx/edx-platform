@@ -18,9 +18,10 @@ class CMS.Views.UnitEdit extends Backbone.View
       update: (event, ui) => @saveOrder()
     )
 
-    @$('.component').each((idx, element) ->
+    @$('.component').each((idx, element) =>
         new CMS.Views.ModuleEdit(
             el: element,
+            onDelete: @deleteComponent,
             model: new CMS.Models.Module(
                 id: $(element).data('id'),
             )
@@ -70,3 +71,13 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save(
       children: @components()
     )
+
+  deleteComponent: (event) =>
+    $component = $(event.currentTarget).parents('.component')
+    $.post('/delete_item', {
+      id: $component.data('id')
+    }, =>
+      $component.remove()
+      @saveOrder()
+    )
+
