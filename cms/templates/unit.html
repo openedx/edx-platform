@@ -1,5 +1,6 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%namespace name="units" file="widgets/units.html" />
 <%block name="bodyclass">unit</%block>
 <%block name="title">CMS Unit</%block>
 <%block name="content">
@@ -73,37 +74,36 @@
             </div>
             <div class="row unit-actions">
               <a href="#" class="save-button">Save</a>
-              <a href="preview.html" target="_blank" class="preview-button">Preview</a>
+              <a href="${lms_link}" target="_blank" class="preview-button">Preview</a>
             </div>
           </div>
         </div>
         <div class="window unit-location">
           <h4>Unit Location</h4>
           <div class="window-contents">
-            <div><input type="text" class="url" value="/courseware/Week_1/My_Unit" disabled /></div>
-            <ol>
-              <li>
-                <a href="#" class="section-item">Week 1</a>
+            <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
+            <section class="courseware-section branch">
+              <header>
+                <div class="item-details">
+                  <h3>${section.display_name}</h3>
+                </div>
+              </header>
+              <div class="unit-list">
                 <ol>
-                  <li>
-                    <a href="#" class="section-item"><span class="folder-icon"></span>Administrivia and Circuit Elements</a>
-                    <ol>
-                      <li><a href="#" class="section-item"><span class="file-icon"></span>Motiviation for 6.002</a></li>
-                      <li><a href="#" class="section-item"><span class="file-icon"></span>Administrivia</a></li>
-                      <li><a href="#" class="section-item"><span class="file-icon"></span>Course Overview</a></li>
-                      <li><a href="#" class="section-item"><span class="file-icon"></span>Lumped Element Abstraction</a></li>
-                      <li><a href="#" class="section-item"><span class="file-icon"></span>Simple Power</a></li>
-                      <li><a href="#" class="current section-item"><span class="file-icon"></span>New Unit</a></li>
-                      <li>
-                        <a href="unit.html" class="new-unit-item">
-                          <span class="new-unit-icon"></span>New Unit
+                  <li class="branch">
+                    <div class="section-item">
+                      <div>
+                        <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                          <span class="folder-icon"></span>
+                          <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                         </a>
-                      </li>
-                    </ol>
+                      </div>
+                    </div>
+                    ${units.enum_units(subsection, actions=False, selected=unit.location)}
                   </li>
                 </ol>
-              </li>
-            </ol>
+              </div>
+            </section>
           </div>
         </div>
       </div>

@@ -3,18 +3,28 @@
 <!--
 This def will enumerate through a passed in subsection and list all of the units
 -->
-<%def name="enum_units(subsection)">
+<%def name="enum_units(subsection, actions=True, selected=None)">
 <ol>
   % for unit in subsection.get_children():
   <li class="leaf">
-    <div class="section-item">
+    <%
+      if unit.location == selected:
+        selected_class = 'editing'
+      else:
+        selected_class = ''
+    %>
+    <div class="section-item ${selected_class}">
       <a href="${reverse('edit_unit', args=[unit.location])}" class="private-item">
-	<span class="${unit.category}-icon"></span>${unit.display_name} <span class="private-tag">- private</span>
+        <span class="${unit.category}-icon"></span>
+        ${unit.display_name}
+        <span class="private-tag">- private</span>
       </a>
+      % if actions:
       <div class="item-actions">
 	<a href="${reverse('delete_unit', args=[unit.location])}" classs="edit-button wip"><span class="delete-icon"></span></a>
 	<a href="#" class="drag-handle wip"></a>
       </div>
+      % endif
     </div>
   </li>
   % endfor
