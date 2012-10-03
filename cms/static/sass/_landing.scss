@@ -1,0 +1,113 @@
+.class-landing {
+	
+	.main-wrapper {
+		width: 700px !important;
+		margin: 100px auto;
+	}
+
+	.class-info {		
+		padding: 30px 40px 40px;
+		@extend .window;
+
+		hgroup {
+			padding-bottom: 26px;
+			border-bottom: 1px solid $mediumGrey;
+		}
+
+		h1 {
+			font-size: 30px;
+			font-weight: 300;
+			margin: 0;
+		}
+
+		h2 {
+			color: #5d6779;
+		}
+
+		.class-actions {
+			@include clearfix;
+			padding: 15px 0;
+			margin-bottom: 18px;
+			border-bottom: 1px solid $mediumGrey;
+		}
+
+		.log-in-form {
+			@include clearfix;
+			padding: 15px 0 20px;
+			margin-bottom: 18px;
+			border-bottom: 1px solid $mediumGrey;
+
+			.log-in-submit-button {
+				@include blue-button;
+				padding: 6px 20px	8px;
+				margin: 24px 0 0;
+			}
+
+			.column {
+				float: left;
+				width: 41%;
+				margin-right: 1%;
+
+				&.submit {
+					width: 16%;
+					margin-right: 0;
+				}
+
+				label {
+					float: left;
+				}
+			}
+
+			input {
+				width: 100%;
+				font-family: $sans-serif;
+				font-size: 13px;
+			}
+
+			.forgot-button {
+				float: right;
+				margin-bottom: 6px;
+				font-size: 12px;
+			}
+		}
+
+		.sign-up-button {
+			@include blue-button;
+			display: block;
+			width: 250px;
+			margin: auto;
+		}
+
+		.log-in-button {
+			@include white-button;
+			float: right;
+		}
+
+		.sign-up-button,
+		.log-in-button {
+			padding: 8px 0 12px;
+			font-size: 18px;
+			font-weight: 300;
+			text-align: center;
+		}
+
+		.class-description {
+			margin-top: 30px;
+			font-size: 14px;
+		}
+
+		p + p {
+			margin-top: 22px;
+		}
+	}
+
+	.edx-labs-logo-small {
+		display: block;
+		width: 124px;
+		height: 30px;
+		margin: auto;
+		background: url(../img/edx-labs-logo-small.png) no-repeat;
+		text-indent: -9999px;
+		overflow: hidden;
+	}
+}
