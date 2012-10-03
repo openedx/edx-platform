@@ -133,6 +133,21 @@ def course_index(request, org, course, name):
 
 
 @login_required
+def edit_subsection(request, location):
+    # check that we have permissions to edit this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest
+
+    return render_to_response('edit_subsection.html', 
+                              {'subsection':item})
+
+@login_required
 def edit_unit(request, location):
     """
     Display an editing page for the specified module.
@@ -377,7 +392,6 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    logging.debug(request.POST['data'])
     if request.POST['data']:
         data = request.POST['data']
         modulestore().update_item(item_location, data)

@@ -2,6 +2,9 @@
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">CMS Courseware Overview</%block>
 
+<%namespace name="units" file="widgets/units.html" />
+
+
 <%block name="content">
   <div class="main-wrapper">
     <div class="inner-wrapper">
@@ -34,7 +37,7 @@
                 <div class="section-item">
                   <div>
                     <a href="#" class="expand-collapse-icon expand"></a>
-                    <a href="#">
+                    <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                     </a>
@@ -44,27 +47,7 @@
                     <a href="#" class="drag-handle wip"></a>
                   </div>
                 </div>
-
-                <ol>
-                  % for unit in subsection.get_children():
-                  <li class="leaf">
-                    <div class="section-item">
-                      <a href="${reverse('edit_unit', args=[unit.location])}" class="private-item">
-                        <span class="${unit.category}-icon"></span>${unit.display_name} <span class="private-tag">– private</span>
-                      </a>
-                      <div class="item-actions">
-                        <a href="${reverse('delete_unit', args=[unit.location])}" class="edit-button wip"><span class="delete-icon"></span></a>                        
-                        <a href="#" class="drag-handle wip"></a>
-                      </div>
-                    </div>
-                  </li>
-                  % endfor
-                  <li>
-                    <a href="#" class="new-unit-item wip">
-                      <span class="new-unit-icon"></span>New Unit
-                    </a>
-                  </li>
-                </ol>
+		${units.enum_units(subsection)}
               </li>
               % endfor
             </ol>
