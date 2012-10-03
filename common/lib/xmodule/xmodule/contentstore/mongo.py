@@ -28,9 +28,10 @@ class MongoContentStore(ContentStore):
         if self.fs.exists({"_id" : id}):
             self.fs.delete(id)
 
-        with self.fs.new_file(_id = id, content_type=content.content_type, displayname=content.name) as fp:
+        with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, displayname=content.name) as fp:
             fp.write(content.data)
-            return content
+        
+        return content
         
     
     def find(self, location):
