@@ -413,12 +413,7 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
         modulestore().update_metadata(item_location, existing_item.metadata)
 
-    descriptor = modulestore().get_item(item_location)
-    preview_html = get_module_previews(request, descriptor)[0]
-
-    return HttpResponse(json.dumps({
-        'preview': preview_html
-    }))
+    return HttpResponse()
 
 
 @login_required
