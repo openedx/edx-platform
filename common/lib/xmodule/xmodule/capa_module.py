@@ -339,7 +339,10 @@ class CapaModule(XModule):
         # NOTE: rewrite_content_links is defined in XModule
         # This is a bit unfortunate and I'm sure we'll try to considate this into
         # a one step process.
-        html = rewrite_links(html, self.rewrite_content_links)
+        try:
+            html = rewrite_links(html, self.rewrite_content_links)
+        except:
+            logging.error('error rewriting links in {0}'.format(html))
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html, self.metadata['data_dir'])

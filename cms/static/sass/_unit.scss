@@ -226,9 +226,20 @@
     padding: 20px;
     border-radius: 0 0 3px 3px;
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1)) $blue;
+    color: #fff;
 
-    .module-editor {
-      background: white;
+    .metadata_edit {
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .CodeMirror {
+      border: 1px solid #3c3c3c;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
     }
 
     h5 {
@@ -238,7 +249,8 @@
     }
 
     .save-button {
-      margin-right: 8px;
+      margin-top: 10px;
+      margin: 15px 8px 0 0;
     }
   }
 }
@@ -266,19 +278,8 @@
     }
   }
 
-  .visibility-options .option {
-    margin-right: 10px;
-    padding: 3px 13px 6px;
-    border-radius: 3px;
-    background: #edf1f5;
-
-    &.checked {
-      background: #d1dae3;
-    }
-
-    input[type="radio"] {
+  input[type="radio"] {
       margin-right: 7px;
-    }
   }
 
   .status {

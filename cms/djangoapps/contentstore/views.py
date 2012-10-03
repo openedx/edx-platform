@@ -442,14 +442,13 @@ def clone_item(request):
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
-'''
-cdodge: this method allows for POST uploading of files into the course asset library, which will
-be supported by GridFS in MongoDB.
-'''
 #@login_required
 #@ensure_csrf_cookie
 def upload_asset(request, org, course, coursename):
-
+    '''
+    cdodge: this method allows for POST uploading of files into the course asset library, which will
+    be supported by GridFS in MongoDB.
+    '''
     if request.method != 'POST':
         # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
         return HttpResponseBadRequest()
@@ -476,7 +475,7 @@ def upload_asset(request, org, course, coursename):
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 
-    file_location = StaticContent.compute_location_filename(org, course, name)
+    file_location = StaticContent.compute_location(org, course, name)
 
     content = StaticContent(file_location, name, mime_type, filedata)
 
@@ -489,7 +488,7 @@ def upload_asset(request, org, course, coursename):
     # browser-side caching support. We *could* re-fetch the saved content so that we have the
     # timestamp populated, but we might as well wait for the first real request to come in
     # to re-populate the cache.
-    del_cached_content(file_location)
+    del_cached_content(content.location)
 
     # if we're uploading an image, then let's generate a thumbnail so that we can
     # serve it up when needed without having to rescale on the fly
@@ -514,10 +513,10 @@ def upload_asset(request, org, course, coursename):
             thumbnail_file.seek(0)
         
             # use a naming convention to associate originals with the thumbnail
-            #   <name_without_extention>.thumbnail.jpg
-            thumbnail_name = os.path.splitext(name)[0] + '.thumbnail.jpg'
+            thumbnail_name = content.generate_thumbnail_name()
+
             # then just store this thumbnail as any other piece of content
-            thumbnail_file_location = StaticContent.compute_location_filename(org, course, 
+            thumbnail_file_location = StaticContent.compute_location(org, course, 
                                                                               thumbnail_name)
             thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                               'image/jpeg', thumbnail_file)
@@ -525,10 +524,11 @@ def upload_asset(request, org, course, coursename):
 
             # remove any cached content at this location, as thumbnails are treated just like any
             # other bit of static content
-            del_cached_content(thumbnail_file_location)
+            del_cached_content(thumbnail_content.location)
         except:
             # catch, log, and continue as thumbnails are not a hard requirement
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
+
 
     return HttpResponse('Upload completed')
 

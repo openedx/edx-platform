@@ -328,7 +328,8 @@ class XModule(HTMLSnippet):
             name = link[len(XASSET_SRCREF_PREFIX):]
             loc = Location(self.location)
             # resolve the reference to our internal 'filepath' which
-            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
+            content_loc = StaticContent.compute_location(loc.org, loc.course, name)
+            link = StaticContent.get_url_path_from_location(content_loc)
 
         return link
 
