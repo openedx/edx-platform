@@ -26,7 +26,34 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
     $('.save-subsection').bind('click', saveSubsection);
+
+    // making the unit list sortable
+    $('.sortable-unit-list').sortable();
+    $('.sortable-unit-list').disableSelection();
+    $('.sortable-unit-list').bind('sortstop', onUnitReordered);
 });
+
+// This method only changes the ordering of the child objects in a subsection
+function onUnitReordered() {
+    var subsection_id = $(this).data('subsection-id');
+
+    var _els = $(this).children('li:.leaf');
+
+    var children = new Array();
+    for(var i=0;i<_els.length;i++) {
+	el = _els[i];
+	children[i] = $(el).data('id');
+    }
+
+    // call into server to commit the new order
+    $.ajax({
+	    url: "/save_item",
+		type: "POST",
+		dataType: "json",
+		contentType: "application/json",
+		data:JSON.stringify({ 'id' : subsection_id, 'metadata' : null, 'data': null, 'children' : children})
+	});
+}
 
 function saveSubsection(e) {
     e.preventDefault();
