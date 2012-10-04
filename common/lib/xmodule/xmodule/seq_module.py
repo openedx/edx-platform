@@ -118,8 +118,6 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     stores_state = True # For remembering where in the sequence the student is
 
-    template_dir_name = 'sequence'
-
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"
 
