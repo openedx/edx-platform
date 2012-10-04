@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
@@ -141,7 +142,10 @@ class DraftModuleStore(ModuleStoreBase):
         Save a current draft to the underlying modulestore
         """
         draft = self.get_item(location)
+        metadata = {}
+        metadata.update(draft.metadata)
+        metadata['published_date'] = tuple(datetime.utcnow().timetuple())
         super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
         super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
-        super(DraftModuleStore, self).update_metadata(location, draft.metadata)
+        super(DraftModuleStore, self).update_metadata(location, metadata)
         self.delete_item(location)

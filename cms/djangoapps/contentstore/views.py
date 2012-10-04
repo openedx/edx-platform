@@ -1,11 +1,12 @@
 from util.json_request import expect_json
-import json
-import os
-import logging
-import sys
-import mimetypes
-import StringIO
 import exceptions
+import json
+import logging
+import mimetypes
+import os
+import StringIO
+import sys
+import time
 from collections import defaultdict
 from uuid import uuid4
 
@@ -154,7 +155,7 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    lms_link = get_lms_link_for_item(location)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -183,7 +184,8 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    # The non-draft location
+    lms_link = get_lms_link_for_item(item.location._replace(revision=None))
 
     component_templates = defaultdict(list)
 
@@ -212,16 +214,24 @@ def edit_unit(request, location):
 
     unit_state = compute_unit_state(item)
 
+    try:
+        published_date = time.strftime('%B %d, %Y', item.metadata.get('published_date'))
+    except TypeError:
+        published_date = None
+
     return render_to_response('unit.html', {
         'unit': item,
+        'unit_location': published_location,
         'components': components,
         'component_templates': component_templates,
-        'lms_link': lms_link,
+        'draft_preview_link': lms_link,
+        'published_preview_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
         'release_date': None,
+        'published_date': published_date,
     })
 
 

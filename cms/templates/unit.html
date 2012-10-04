@@ -8,14 +8,22 @@
     new CMS.Views.UnitEdit({
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
-        id: '${unit.location.url()}'
+        id: '${unit_location}'
       })
     });
   </script>
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit.location.url()}">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
+      <div class="alert" id="published-alert">
+        <p class="alert-message"><strong>You are editing a draft.</strong>
+        % if published_date:
+        This unit was originally published on ${published_date}.
+        % endif
+        </p>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
+      </div>
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
@@ -60,7 +68,7 @@
         </article>
       </div>
 
-      <div class="sidebar wip-box">
+      <div class="sidebar">
         <div class="unit-properties window">
           <h4>Unit Properties</h4>
           <div class="window-contents">
@@ -79,7 +87,7 @@
             <div class="row unit-actions">
               <a id="save-draft" href="#" class="save-button">Save Draft</a>
               <a id="delete-draft" href="#" class="save-button">Delete Draft</a>
-              <a href="${lms_link}" target="_blank" class="preview-button">Preview</a>
+              <a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
             </div>
           </div>
         </div>

@@ -87,7 +87,7 @@
         }
       }
 
-      .rendered-component {
+      .xmodule_display {
         padding: 40px 20px 20px;
       }
 
@@ -410,7 +410,8 @@
   #delete-draft,
   #publish-draft,
   .component-actions,
-  .new-component-item {
+  .new-component-item,
+  #published-alert {
     display: none;
   }
 
@@ -423,6 +424,7 @@
   #save-draft,
   #delete-draft,
   #publish-draft,
+  #published-alert,
   #create-draft, {
     display: none;
   }
