@@ -210,6 +210,10 @@ def edit_unit(request, location):
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
+    # This knowledge of what the 'new template' should be seems like it needs to be kept deeper down in the
+    # code. We should probably refactor
+    template = modulestore().get_item(Location('i4x', 'edx', 'templates', 'vertical', 'Empty'))
+
     return render_to_response('unit.html', {
         'unit': item,
         'components': components,
@@ -217,6 +221,7 @@ def edit_unit(request, location):
         'lms_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
+        'create_new_unit_template' : template.location
     })
 
 
