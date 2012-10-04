@@ -14,17 +14,23 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             tracking_filename="tracking.log",
                             debug=True)
 
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+    'fs_root': GITHUB_REPO_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
+}
+
 MODULESTORE = {
     'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'xmodule',
-            'collection': 'modulestore',
-            'fs_root': GITHUB_REPO_ROOT,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
-        }
+        'OPTIONS': modulestore_options
     }
 }
 

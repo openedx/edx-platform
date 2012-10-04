@@ -345,7 +345,9 @@ class ModuleStore(object):
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
         '''
-        raise NotImplementedError
+        # TODO (vshnayder): Why do I have to specify i4x here?
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed

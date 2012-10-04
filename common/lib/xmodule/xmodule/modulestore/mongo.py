@@ -13,6 +13,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
 from . import ModuleStoreBase, Location
+from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
 
@@ -341,3 +342,8 @@ class MongoModuleStore(ModuleStoreBase):
         are loaded on demand, rather than up front
         """
         return {}
+
+
+# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
+class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
+    pass
