@@ -13,13 +13,13 @@ ouch() {
     printf '\E[31m'
 
     cat<<EOL
-    
+
     !! ERROR !!
 
-    The last command did not complete successfully, 
+    The last command did not complete successfully,
     For more details or trying running the
-    script again with the -v flag.  
-    
+    script again with the -v flag.
+
     Output of the script is recorded in $LOG
 
 EOL
@@ -27,18 +27,18 @@ EOL
 
 }
 error() {
-      printf '\E[31m'; echo "$@"; printf '\E[0m' 
+      printf '\E[31m'; echo "$@"; printf '\E[0m'
 }
 output() {
-      printf '\E[36m'; echo "$@"; printf '\E[0m' 
+      printf '\E[36m'; echo "$@"; printf '\E[0m'
 }
 usage() {
     cat<<EO
 
     Usage: $PROG [-c] [-v] [-h]
-    
+
             -c        compile scipy and numpy
-            -s        give access to global site-packages for virtualenv 
+            -s        give access to global site-packages for virtualenv
             -v        set -x + spew
             -h        this
 
@@ -49,7 +49,7 @@ EO
 info() {
 
     cat<<EO
-    MITx base dir : $BASE 
+    MITx base dir : $BASE
     Python dir : $PYTHON_DIR
     Ruby dir : $RUBY_DIR
     Ruby ver : $RUBY_VER
@@ -59,11 +59,11 @@ EO
 
 clone_repos() {
     cd "$BASE"
-    
+
     if [[ -d "$BASE/mitx/.git" ]]; then
         output "Pulling mitx"
         cd "$BASE/mitx"
-        git pull 
+        git pull
     else
         output "Cloning mitx"
         if [[ -d "$BASE/mitx" ]]; then
@@ -71,13 +71,13 @@ clone_repos() {
         fi
         git clone git@github.com:MITx/mitx.git
     fi
-     
+
     if [[ ! -d "$BASE/mitx/askbot/.git" ]]; then
         output "Cloning askbot as a submodule of mitx"
         cd "$BASE/mitx"
         git submodule update --init
     fi
-    
+
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
     mkdir -p "$BASE/data"
@@ -85,14 +85,14 @@ clone_repos() {
     if [[ -d "$BASE/data/$REPO/.git" ]]; then
         output "Pulling $REPO"
         cd "$BASE/data/$REPO"
-        git pull 
+        git pull
     else
         output "Cloning $REPO"
         if [[ -d "$BASE/data/$REPO" ]]; then
             mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
         fi
 	cd "$BASE/data"
-        git clone git@github.com:MITx/$REPO 
+        git clone git@github.com:MITx/$REPO
     fi
 }
 
@@ -118,8 +118,8 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 eval set -- "$ARGS"
-while true; do 
-    case $1 in 
+while true; do
+    case $1 in
         -c)
             compile=true
             shift
@@ -159,16 +159,16 @@ cat<<EO
   To compile scipy and numpy from source use the -c option
 
   !!! Do not run this script from an existing virtualenv !!!
-  
+
   If you are in a ruby/python virtualenv please start a new
-  shell. 
+  shell.
 
 EO
 info
 output "Press return to begin or control-C to abort"
 read dummy
 
-# log all stdout and stderr 
+# log all stdout and stderr
 exec > >(tee $LOG)
 exec 2>&1
 
@@ -193,7 +193,7 @@ case `uname -s` in
             maya|lisa|natty|oneiric|precise)
                 output "Installing ubuntu requirements"
                 sudo apt-get -y update
-                sudo apt-get -y install $APT_PKGS 
+                sudo apt-get -y install $APT_PKGS
                 clone_repos
                 ;;
             *)
@@ -203,11 +203,11 @@ case `uname -s` in
         esac
         ;;
     Darwin)
-    
+
         if [[ ! -w /usr/local ]]; then
             cat<<EO
-   
-        You need to be able to write to /usr/local for 
+
+        You need to be able to write to /usr/local for
         the installation of brew and brew packages.
 
         Either make sure the group you are in (most likely 'staff')
@@ -221,13 +221,13 @@ EO
 
         fi
 
-        command -v brew &>/dev/null || { 
+        command -v brew &>/dev/null || {
             output "Installing brew"
             /usr/bin/ruby <(curl -fsSkL raw.github.com/mxcl/homebrew/go)
-        } 
+        }
         command -v git &>/dev/null || {
             output "Installing git"
-            brew install git 
+            brew install git
         }
 
         clone_repos
@@ -241,17 +241,21 @@ EO
         for pkg in $(cat $BREW_FILE); do
             grep $pkg <(brew list) &>/dev/null || {
                 output "Installing $pkg"
-                brew install $pkg  
+                brew install $pkg
             }
         done
+
+        # paths where brew likes to install python scripts
+        PATH=/usr/local/share/python:/usr/local/bin:$PATH
+
         command -v pip &>/dev/null || {
             output "Installing pip"
-            sudo easy_install pip  
+            easy_install pip
         }
 
         if ! grep -Eq ^1.7 <(virtualenv --version 2>/dev/null); then
             output "Installing virtualenv >1.7"
-            sudo pip install 'virtualenv>1.7' virtualenvwrapper
+            pip install 'virtualenv>1.7' virtualenvwrapper
         fi
 
         command -v coffee &>/dev/null || {
@@ -267,18 +271,10 @@ EO
 esac
 
 output "Installing rvm and ruby"
-curl -sL get.rvm.io | bash -s stable
+curl -sL get.rvm.io | bash -s -- --version 1.15.7
 source $RUBY_DIR/scripts/rvm
-# skip the intro 
+# skip the intro
 LESS="-E" rvm install $RUBY_VER
-if [[ $systempkgs ]]; then
-    virtualenv --system-site-packages "$PYTHON_DIR"
-else
-    # default behavior for virtualenv>1.7 is 
-    # --no-site-packages
-    virtualenv  "$PYTHON_DIR"
-fi
-source $PYTHON_DIR/bin/activate
 output "Installing gem bundler"
 gem install bundler
 output "Installing ruby packages"
@@ -287,6 +283,16 @@ cd $BASE/mitx  || true
 bundle install
 
 cd $BASE
+if [[ $systempkgs ]]; then
+    virtualenv --system-site-packages "$PYTHON_DIR"
+else
+    # default behavior for virtualenv>1.7 is
+    # --no-site-packages
+    virtualenv  "$PYTHON_DIR"
+fi
+
+# change to mitx python virtualenv
+source $PYTHON_DIR/bin/activate
 
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
@@ -297,23 +303,36 @@ if [[ -n $compile ]]; then
     rm -f numpy.tar.gz scipy.tar.gz
     output "Compiling numpy"
     cd "$BASE/numpy-${NUMPY_VER}"
-    python setup.py install 
+    python setup.py install
     output "Compiling scipy"
     cd "$BASE/scipy-${SCIPY_VER}"
-    python setup.py install 
+    python setup.py install
     cd "$BASE"
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
+case `uname -s` in
+    Darwin)
+        # on mac os x get the latest distribute and pip
+        curl http://python-distribute.org/distribute_setup.py | python
+        pip install -U pip
+        # need latest pytz before compiling numpy and scipy
+        pip install -U pytz
+        pip install numpy
+        # fixes problem with scipy on 10.8
+        pip install -e git+https://github.com/scipy/scipy#egg=scipy-dev
+        ;;
+esac
+
 output "Installing MITx pre-requirements"
-pip install -r mitx/pre-requirements.txt 
+pip install -r mitx/pre-requirements.txt
 # Need to be in the mitx dir to get the paths to local modules right
 output "Installing MITx requirements"
 cd mitx
-pip install -r requirements.txt 
+pip install -r requirements.txt
 output "Installing askbot requirements"
-pip install -r askbot/askbot_requirements.txt 
-pip install -r askbot/askbot_requirements_dev.txt 
+pip install -r askbot/askbot_requirements.txt
+pip install -r askbot/askbot_requirements_dev.txt
 
 
 mkdir "$BASE/log" || true
@@ -322,14 +341,14 @@ mkdir "$BASE/db" || true
 cat<<END
    Success!!
 
-   To start using Django you will need to activate the local Python 
+   To start using Django you will need to activate the local Python
    and Ruby environment (at this time rvm only supports bash) :
 
         $ source $RUBY_DIR/scripts/rvm
         $ source $PYTHON_DIR/bin/activate
-  
+
    To initialize Django
-        
+
         $ cd $BASE/mitx
         $ rake django-admin[syncdb]
         $ rake django-admin[migrate]
@@ -337,21 +356,20 @@ cat<<END
    To start the Django on port 8000
 
         $ rake lms
-   
+
    Or to start Django on a different <port#>
 
-        $ rake django-admin[runserver,lms,dev,<port#>]   
+        $ rake django-admin[runserver,lms,dev,<port#>]
 
-  If the Django development server starts properly you 
+  If the  Django development server starts properly you
   should see:
 
       Development server is running at http://127.0.0.1:<port#>/
       Quit the server with CONTROL-C.
 
-  Connect your browser to http://127.0.0.1:<port#> to 
+  Connect your browser to http://127.0.0.1:<port#> to
   view the Django site.
 
 
 END
 exit 0
-
