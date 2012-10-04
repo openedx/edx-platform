@@ -49,6 +49,20 @@ section.course-index {
           padding-left: 19px;
         }
 
+        &.started a:before {
+          content: 'started';
+          float: right;
+          display: inline-block;
+          margin-top: -1px;
+          padding: 0 4px;
+          @include border-radius(3px);
+          @include box-shadow(0 1px 0 rgba(255, 255, 255, .6), 0 1px 0 rgba(0, 0, 0, .05) inset);
+          background: rgba(0, 0, 0, .05);          
+          font-size: 9px;
+          color: $pink;
+          font-weight: 700;          
+        }
+
         &.ui-state-active {
           @extend .active;
           border-bottom: none;
