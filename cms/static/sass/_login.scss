@@ -1,6 +1,7 @@
+.sign-up-box,
 .log-in-box {
 	width: 500px;
-	margin: 200px auto;
+	margin: 100px auto;
 	border-radius: 3px;
 
 	header {
@@ -19,7 +20,7 @@
 		}
 	}
 
-	.log-in-form {
+	form {
 		padding: 40px;
 		border: 1px solid $darkGrey;
 		border-top-width: 0;
@@ -34,22 +35,33 @@
 		font-weight: 700;
 	}
 
-	.email-field,
-	.password-field {
+	input[type="text"],
+	input[type="email"],
+	input[type="password"] {
 		width: 100%;
 		font-size: 20px;
 		font-weight: 300;
 	}
 
 	.row {
+		@include clearfix;
 		margin-bottom: 24px;
+
+		.split {
+			float: left;
+			width: 48%;
+
+			&:first-child {
+				margin-right: 4%;
+			}
+		}
 	}
 
 	.form-actions {
 		margin-bottom: 0;
 	}
 
-	.log-in-button {
+	input[type="submit"] {
 		@include blue-button;
 		margin-right: 10px;
 		padding: 8px 20px 10px;
@@ -63,6 +75,5 @@
 		margin-top: 10px;
 		text-align: right;
 		font-size: 13px;
-		border-top: 1px solid $lightGrey;
 	}
 }
