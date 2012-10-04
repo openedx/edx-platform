@@ -136,10 +136,12 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return super(DraftModuleStore, self).delete_item(Location(location)._replace(revision=DRAFT))
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
-
-        returns an iterable of things that can be passed to Location.
-        '''
-        return super(DraftModuleStore, self).get_parent_locations(Location(location)._replace(revision=DRAFT))
+    def publish(self, location):
+        """
+        Save a current draft to the underlying modulestore
+        """
+        draft = self.get_item(location)
+        super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
+        super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
+        super(DraftModuleStore, self).update_metadata(location, draft.metadata)
+        self.delete_item(location)

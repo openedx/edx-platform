@@ -394,3 +394,36 @@
     }
   }
 }
+
+.edit-state-draft {
+  .visibility {
+    display: none;
+  }
+
+  #create-draft {
+    display: none;
+  }
+}
+
+.edit-state-public {
+  #save-draft,
+  #delete-draft,
+  #publish-draft,
+  .component-actions,
+  .new-component-item {
+    display: none;
+  }
+
+  .drag-handle {
+    display: none !important;
+  }
+}
+
+.edit-state-private {
+  #save-draft,
+  #delete-draft,
+  #publish-draft,
+  #create-draft, {
+    display: none;
+  }
+}

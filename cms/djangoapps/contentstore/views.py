@@ -43,7 +43,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
-from .utils import get_course_location_for_item, get_lms_link_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state
 
 from xmodule.templates import all_templates
 
@@ -210,6 +210,8 @@ def edit_unit(request, location):
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
+    unit_state = compute_unit_state(item)
+
     return render_to_response('unit.html', {
         'unit': item,
         'components': components,
@@ -217,7 +219,9 @@ def edit_unit(request, location):
         'lms_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'unit_state': unit_state,
+        'release_date': None,
     })
 
 
@@ -233,7 +237,6 @@ def preview_component(request, location):
         'preview': get_module_previews(request, component)[0],
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
-
 
 
 def user_author_string(user):
@@ -428,7 +431,7 @@ def delete_item(request):
     item = modulestore().get_item(item_location)
 
     _delete_item(item, delete_children)
-    
+
     return HttpResponse()
 
 
@@ -478,6 +481,34 @@ def save_item(request):
 
     return HttpResponse()
 
+
+@login_required
+@expect_json
+def create_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # This clones the existing item location to a draft location (the draft is implicit,
+    # because modulestore is a Draft modulestore)
+    modulestore().clone_item(location, location)
+
+    return HttpResponse()
+
+@login_required
+@expect_json
+def publish_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    modulestore().publish(location)
+
+    return HttpResponse()
 
 @login_required
 @expect_json

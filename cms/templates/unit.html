@@ -14,12 +14,12 @@
   </script>
 </%block>
 <%block name="content">
-  <div class="main-wrapper">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit.location.url()}">
     <div class="inner-wrapper">
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
-          <ol class="components" data-id="${unit.location.url()}">
+          <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
@@ -64,14 +64,6 @@
         <div class="unit-properties window">
           <h4>Unit Properties</h4>
           <div class="window-contents">
-            <div class="due-date-input row">
-              <label>Due date:</label>
-              <a href="#" class="set-date">Set a due date</a>
-              <div class="date-setter">
-                <p class="date-description"><input type="text" value="10/20/2012" class="date-input" /> <input type="text" value="6:00 am" class="time-input" />
-                <a href="#" class="remove-date">Remove due date</a>
-              </div>
-            </div>
             <div class="row visibility">
               <label class="inline-label">Visibility:</label>
               <select>
@@ -79,11 +71,14 @@
                 <option>Private</option>
               </select>
             </div>
+            <a id="create-draft" href="#">This unit has been published. Click here to edit it.</a>
+            <a id="publish-draft" href="#">This unit has already been published. Click here to release your changes to it</a>
             <div class="row status">
-              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>10/12/2012</strong> with the subsection <a href="#">"Administrivia and Circuit Elements."</a></p>
+              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${release_date}</strong> with the subsection <a href="#">""</a></p>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="save-button">Save</a>
+              <a id="save-draft" href="#" class="save-button">Save Draft</a>
+              <a id="delete-draft" href="#" class="save-button">Delete Draft</a>
               <a href="${lms_link}" target="_blank" class="preview-button">Preview</a>
             </div>
           </div>

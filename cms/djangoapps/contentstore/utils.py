@@ -1,6 +1,9 @@
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft import DRAFT
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 def get_course_location_for_item(location):
     '''
@@ -45,3 +48,22 @@ def get_lms_link_for_item(item):
 
     return lms_link
 
+
+def compute_unit_state(unit):
+    """
+    Returns whether this unit is 'draft', 'public', or 'private'.
+
+    'draft' content is in the process of being edited, but still has a previous
+        version visible in the LMS
+    'public' content is locked and visible in the LMS
+    'private' content is editabled and not visible in the LMS
+    """
+
+    if unit.location.revision == DRAFT:
+        try:
+            modulestore('direct').get_item(unit.location._replace(revision=None))
+            return 'draft'
+        except ItemNotFoundError:
+            return 'private'
+    else:
+        return 'public'
