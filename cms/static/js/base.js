@@ -234,25 +234,27 @@ function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
     $('.upload-modal .file-name').html($('.file-input').val());
 
-    var bar = $('.progress-fill');
-    var percent = $('.percent');
+    var bar = $('.upload-modal .progress-fill');
 
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: function() {
             var percentVal = '0%';
             bar.width(percentVal)
-            percent.html(percentVal);
+            bar.html(percentVal);
         },
         uploadProgress: function(event, position, total, percentComplete) {
             var percentVal = percentComplete + '%';
             bar.width(percentVal)
-            percent.html(percentVal);
+            bar.html(percentVal);
         },
         complete: function(xhr) {
-          markAsLoaded();
+            if(xhr.status = 200){
+                markAsLoaded();
+            }
+            bar.html(xhr.responseText);
+            $('.upload-modal .choose-file-button').html('Load Another File').show();
         }
     });
-
     $('.upload-modal .choose-file-button').hide();
     $('.upload-modal .progress-bar').removeClass('loaded').show();
 }
@@ -260,9 +262,7 @@ function startUpload(e) {
 function markAsLoaded() {
     $('.upload-modal .copy-button').css('display', 'inline-block');
     $('.upload-modal .progress-bar').addClass('loaded');
-    $('.upload-modal .progress-fill').html('loaded successfully');
-    $('.upload-modal .choose-file-button').html('Load Another File').show();
-}
+}    
 
 function hideModal(e) {
     e.preventDefault();
