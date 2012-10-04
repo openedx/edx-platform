@@ -220,6 +220,10 @@
     }
   }
 
+  .xmodule_display {
+    padding: 10px 20px;
+  }
+
   .component-editor {
     @include edit-box;
     display: none;
