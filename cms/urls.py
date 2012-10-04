@@ -29,9 +29,7 @@ urlpatterns = ('',
         'contentstore.views.add_user', name='add_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
-    url(r'^assets/(?P<location>.*?)$', 'contentstore.views.asset_index', name='asset_index')
-
-
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index')
 )
 
 # User creation and updating views
