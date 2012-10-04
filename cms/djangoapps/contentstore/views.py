@@ -45,6 +45,8 @@ from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_
 from auth.authz import ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
 from .utils import get_course_location_for_item
 
+from xmodule.templates import all_templates
+
 log = logging.getLogger(__name__)
 
 
@@ -128,7 +130,8 @@ def course_index(request, org, course, name):
 
     return render_to_response('overview.html', {
         'sections': sections,
-        'upload_asset_callback_url': upload_asset_callback_url
+        'upload_asset_callback_url': upload_asset_callback_url,
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
 
@@ -145,8 +148,9 @@ def edit_subsection(request, location):
         return HttpResponseBadRequest
 
     return render_to_response('edit_subsection.html',
-                              {'subsection': item})
-
+                              {'subsection': item,
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+                               })
 
 @login_required
 def edit_unit(request, location):
@@ -205,6 +209,7 @@ def edit_unit(request, location):
         'lms_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
 
@@ -221,10 +226,6 @@ def preview_component(request, location):
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
 
-
-@login_required
-def delete_unit(request, location):
-    pass
 
 
 def user_author_string(user):
@@ -395,12 +396,31 @@ def get_module_previews(request, descriptor):
         preview_html.append(module.get_html())
     return preview_html
 
+def _delete_item(item, recurse=False):
+    if recurse:
+        children = item.get_children()
+        for child in children:
+            _delete_item(child, recurse)
+        
+    modulestore().delete_item(item.location);
+    
 
 @login_required
 @expect_json
 def delete_item(request):
     item_location = request.POST['id']
-    modulestore().delete_item(item_location)
+
+    # check permissions for this user within this course
+    if not has_access(request.user, item_location):
+        raise PermissionDenied()
+
+    # optional parameter to delete all children (default False)
+    delete_children = request.POST.get('delete_children', False)
+
+    item = modulestore().get_item(item_location)
+
+    _delete_item(item, delete_children)
+    
     return HttpResponse()
 
 
@@ -442,6 +462,8 @@ def save_item(request):
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
+    
+    display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
@@ -453,6 +475,10 @@ def clone_item(request):
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
+    
+    # replace the display name with an optional parameter passed in from the caller
+    if display_name is not None:
+        new_item.metadata['display_name'] = display_name
 
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
     modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])

@@ -3,10 +3,10 @@
 <!--
 This def will enumerate through a passed in subsection and list all of the units
 -->
-<%def name="enum_units(subsection, actions=True, selected=None)">
-<ol>
+<%def name="enum_units(subsection, actions=True, selected=None, sortable=True)">
+<ol ${'class="sortable-unit-list"' if sortable else ''} data-subsection-id="${subsection.location}">
   % for unit in subsection.get_children():
-  <li class="leaf">
+  <li class="leaf unit" data-id="${unit.location}">
     <%
       if unit.location == selected:
         selected_class = 'editing'
@@ -21,17 +21,20 @@ This def will enumerate through a passed in subsection and list all of the units
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="${reverse('delete_unit', args=[unit.location])}" classs="edit-button wip"><span class="delete-icon"></span></a>
-	<a href="#" class="drag-handle wip"></a>
+	<a href="#" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
+	<a href="#" class="drag-handle"></a>
       </div>
       % endif
     </div>
   </li>
   % endfor
   <li>
-    <a href="#" class="new-unit-item wip">
+    <a href="#" class="new-unit-item" data-template="${create_new_unit_template}" data-parent="${subsection.location}">
       <span class="new-unit-icon"></span>New Unit
     </a>
   </li>
 </ol>
 </%def> 
+
+
+

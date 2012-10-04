@@ -45,5 +45,9 @@ class VerticalModule(XModule):
 class VerticalDescriptor(SequenceDescriptor):
     module_class = VerticalModule
 
+    # cdodge: override the SequenceDescript's template_dir_name to point to default template directory
+    template_dir_name = "default"
+
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
+        
