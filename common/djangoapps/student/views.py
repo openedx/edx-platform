@@ -52,6 +52,10 @@ def csrf_token(context):
             ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
+# NOTE: This view is not linked to directly--it is called from
+# branding/views.py:index(), which is cached for anonymous users.
+# This means that it should always return the same thing for anon
+# users. (in particular, no switching based on query params allowed)
 def index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
@@ -75,8 +79,11 @@ def index(request, extra_context={}, user=None):
         entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
+    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
+    if domain==False:				# do explicit check, because domain=None is valid
+        domain = request.META.get('HTTP_HOST')
     universities = get_courses_by_university(None,
-                                             domain=request.META.get('HTTP_HOST'))
+                                             domain=domain)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
     return render_to_response('index.html', context)
@@ -131,10 +138,14 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
+    show_courseware_links_for = frozenset(course.id for course in courses
+                                          if has_access(request.user, course, 'load'))
+
     context = {'courses': courses,
                'message': message,
                'staff_access': staff_access,
-               'errored_courses': errored_courses,}
+               'errored_courses': errored_courses,
+               'show_courseware_links_for' : show_courseware_links_for}
 
     return render_to_response('dashboard.html', context)
 

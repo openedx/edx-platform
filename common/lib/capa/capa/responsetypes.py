@@ -8,6 +8,7 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import cgi
 import inspect
 import json
 import logging
@@ -318,30 +319,37 @@ class JavascriptResponse(LoncapaResponse):
     
     def compile_display_javascript(self):
 
-        latestTimestamp = 0
-        basepath = self.system.filestore.root_path + '/js/'
-        for filename in (self.display_dependencies + [self.display]):
-            filepath = basepath + filename
-            timestamp = os.stat(filepath).st_mtime
-            if timestamp > latestTimestamp:
-                latestTimestamp = timestamp
-        
-        h = hashlib.md5()
-        h.update(self.answer_id + str(self.display_dependencies))
-        compiled_filename = 'compiled/' + h.hexdigest() + '.js'
-        compiled_filepath = basepath + compiled_filename
+        # TODO FIXME
+        # arjun: removing this behavior for now (and likely forever). Keeping
+        # until we decide on exactly how to solve this issue. For now, files are
+        # manually being compiled to DATA_DIR/js/compiled.
 
-        if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
-            outfile = open(compiled_filepath, 'w')
-            for filename in (self.display_dependencies + [self.display]):
-                filepath = basepath + filename
-                infile = open(filepath, 'r')
-                outfile.write(infile.read())
-                outfile.write(';\n')
-                infile.close()
-            outfile.close()
+        #latestTimestamp = 0
+        #basepath = self.system.filestore.root_path + '/js/'
+        #for filename in (self.display_dependencies + [self.display]):
+        #    filepath = basepath + filename
+        #    timestamp = os.stat(filepath).st_mtime
+        #    if timestamp > latestTimestamp:
+        #        latestTimestamp = timestamp
+        #
+        #h = hashlib.md5()
+        #h.update(self.answer_id + str(self.display_dependencies))
+        #compiled_filename = 'compiled/' + h.hexdigest() + '.js'
+        #compiled_filepath = basepath + compiled_filename
 
-        self.display_filename = compiled_filename
+        #if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
+        #    outfile = open(compiled_filepath, 'w')
+        #    for filename in (self.display_dependencies + [self.display]):
+        #        filepath = basepath + filename
+        #        infile = open(filepath, 'r')
+        #        outfile.write(infile.read())
+        #        outfile.write(';\n')
+        #        infile.close()
+        #    outfile.close()
+
+        # TODO this should also be fixed when the above is fixed.
+        filename = self.system.ajax_url.split('/')[-1] + '.js'
+        self.display_filename = 'compiled/' + filename
 
     def parse_xml(self):
         self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
@@ -400,7 +408,7 @@ class JavascriptResponse(LoncapaResponse):
         output = self.call_node([generator_file,
                                  self.generator, 
                                  json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.system.seed)), 
+                                 json.dumps(str(self.context['the_lcp'].seed)),
                                  json.dumps(self.params)]).strip()
 
         return json.loads(output)
@@ -718,7 +726,8 @@ class NumericalResponse(LoncapaResponse):
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError('Invalid input -- please use a number only')
+            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %\
+                                    cgi.escape(student_answer))
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -877,7 +886,7 @@ def sympy_check2():
         if len(idset) == 1 and not submission[0]:
             # default to no error message on empty answer (to be consistent with other responsetypes)
             # but allow author to still have the old behavior by setting empty_answer_err attribute
-            msg = '<font color="red">No answer entered!</font>' if self.xml.get('empty_answer_err') else ''
+            msg = '<span class="inline-error">No answer entered!</span>' if self.xml.get('empty_answer_err') else ''
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
         # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are not expecting 'unknown's
@@ -907,10 +916,12 @@ def sympy_check2():
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
+                messages = self.context['messages']
             except Exception as err:
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
                 print traceback.format_exc()
+                raise StudentInputError("Error: Problem could not be evaluated with your input") # Notify student
         else:					# self.code is not a string; assume its a function
 
             # this is an interface to the Tutor2 check functions
@@ -960,7 +971,9 @@ def sympy_check2():
         # build map giving "correct"ness of the answer(s)
         correct_map = CorrectMap()
         for k in range(len(idset)):
-            correct_map.set(idset[k], correct[k], msg=messages[k])
+            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
+            correct_map.set(idset[k], correct[k], msg=messages[k],
+                            npoints=npoints)
         return correct_map
 
     def get_answers(self):
@@ -1211,7 +1224,7 @@ class CodeResponse(LoncapaResponse):
         return oldcmap
 
     def get_answers(self):
-        anshtml = '<font color="blue"><span class="code-answer"><br/><pre>%s</pre><br/></span></font>' % self.answer
+        anshtml = '<span class="code-answer"><pre><code>%s</code></pre></span>' % self.answer
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
@@ -1388,7 +1401,7 @@ main()
             log.error('Error %s' % err)
             if self.system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(self.answer_ids), ['incorrect'] * len(idset))))
-                cmap.set_property(self.answer_ids[0], 'msg', '<font color="red" size="+2">%s</font>' % str(err).replace('<', '&lt;'))
+                cmap.set_property(self.answer_ids[0], 'msg', '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
                 return cmap
 
         ad = rxml.find('awarddetail').text
@@ -1417,7 +1430,7 @@ main()
         except Exception as err:
             log.error('Error %s' % err)
             if self.system.DEBUG:
-                msg = '<font color=red size=+2>%s</font>' % str(err).replace('<', '&lt;')
+                msg = '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;')
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
 
@@ -1510,11 +1523,12 @@ class FormulaResponse(LoncapaResponse):
                                            cs=self.case_sensitive)
             except UndefinedVariable as uv:
                 log.debug('formularesponse: undefined variable in given=%s' % given)
-                raise StudentInputError(uv.message + " not permitted in answer")
+                raise StudentInputError("Invalid input: " + uv.message + " not permitted in answer")
             except Exception as err:
                 #traceback.print_exc()
                 log.debug('formularesponse: error %s in formula' % err)
-                raise StudentInputError("Error in formula")
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %\
+                                        cgi.escape(given))
             if numpy.isnan(student_result) or numpy.isinf(student_result):
                 return "incorrect"
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
@@ -1612,6 +1626,10 @@ class ImageResponse(LoncapaResponse):
 
         for aid in self.answer_ids:	 # loop through IDs of <imageinput> fields in our stanza
             given = student_answers[aid]	 # this should be a string of the form '[x,y]'
+
+            if not given: # No answer to parse. Mark as incorrect and move on
+                correct_map.set(aid, 'incorrect')
+                continue
 
             # parse expected answer
             # TODO: Compile regexp on file load

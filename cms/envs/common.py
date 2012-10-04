@@ -35,6 +35,7 @@ from path import path
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
+    'ENABLE_DISCUSSION_SERVICE': False
 }
 
 # needed to use lms student app
@@ -87,6 +88,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf',  # necessary for csrf protection
 )
 
+LMS_BASE = None
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -115,6 +118,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'contentserver.middleware.StaticContentServer',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,7 +131,7 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
+    'django.middleware.transaction.TransactionMiddleware'
 )
 
 ############################ SIGNAL HANDLERS ################################
@@ -192,6 +196,7 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 # prep it for use in pipeline js
 from xmodule.x_module import XModuleDescriptor
 from xmodule.raw_module import RawDescriptor
+from xmodule.error_module import ErrorDescriptor
 js_file_dir = PROJECT_ROOT / "static" / "coffee" / "module"
 css_file_dir = PROJECT_ROOT / "static" / "sass" / "module"
 module_styles_path = css_file_dir / "_module-styles.scss"
@@ -207,7 +212,7 @@ for dir_ in (js_file_dir, css_file_dir):
 
 js_fragments = set()
 css_fragments = defaultdict(set)
-for descriptor in XModuleDescriptor.load_classes() + [RawDescriptor]:
+for _, descriptor in XModuleDescriptor.load_classes() + [(None, RawDescriptor), (None, ErrorDescriptor)]:
     descriptor_js = descriptor.get_javascript()
     module_js = descriptor.module_class.get_javascript()
 
@@ -320,6 +325,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'auth',
     'github_sync',
     'student',  # misleading name due to sharing with lms
 

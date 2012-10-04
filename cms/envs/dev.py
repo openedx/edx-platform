@@ -14,7 +14,6 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             tracking_filename="tracking.log",
                             debug=True)
 
-
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
@@ -29,12 +28,25 @@ MODULESTORE = {
     }
 }
 
+# cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
+# This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db' : 'xcontent',
+    }
+}
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "cms.db",
     }
 }
+
+LMS_BASE = "http://localhost:8000"
 
 REPOS = {
     'edx4edx': {

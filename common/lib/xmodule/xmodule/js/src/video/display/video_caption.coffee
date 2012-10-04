@@ -1,4 +1,7 @@
 class @VideoCaption extends Subview
+  initialize: ->
+    @loaded = false
+
   bind: ->
     $(window).bind('resize', @resize)
     @$('.hide-subtitles').click @toggle
@@ -10,8 +13,12 @@ class @VideoCaption extends Subview
     "/static/#{@captionDataDir}/subs/#{@youtubeId}.srt.sjson"
 
   render: ->
+    # TODO: make it so you can have a video with no captions.
+    #@$('.video-wrapper').after """
+    #  <ol class="subtitles"><li>Attempting to load captions...</li></ol>
+    #  """
     @$('.video-wrapper').after """
-      <ol class="subtitles"><li>Attempting to load captions...</li></ol>
+      <ol class="subtitles"></ol>
       """
     @$('.video-controls .secondary-controls').append """
       <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
@@ -23,6 +30,8 @@ class @VideoCaption extends Subview
     $.getWithPrefix @captionURL(), (captions) =>
       @captions = captions.text
       @start = captions.start
+
+      @loaded = true
 
       if onTouchBasedDevice()
         $('.subtitles li').html "Caption will be displayed when you start playing the video."
@@ -40,44 +49,47 @@ class @VideoCaption extends Subview
     @$('.subtitles').html(container.html())
     @$('.subtitles li[data-index]').click @seekPlayer
 
-    # prepend and append an empty <li> for cosmatic reason
+    # prepend and append an empty <li> for cosmetic reason
     @$('.subtitles').prepend($('<li class="spacing">').height(@topSpacingHeight()))
       .append($('<li class="spacing">').height(@bottomSpacingHeight()))
 
     @rendered = true
 
   search: (time) ->
-    min = 0
-    max = @start.length - 1
+    if @loaded
+      min = 0
+      max = @start.length - 1
 
-    while min < max
-      index = Math.ceil((max + min) / 2)
-      if time < @start[index]
-        max = index - 1
-      if time >= @start[index]
-        min = index
-
-    return min
+      while min < max
+        index = Math.ceil((max + min) / 2)
+        if time < @start[index]
+          max = index - 1
+        if time >= @start[index]
+          min = index
+      return min
 
   play: ->
-    @renderCaption() unless @rendered
-    @playing = true
+    if @loaded
+      @renderCaption() unless @rendered
+      @playing = true
 
   pause: ->
-    @playing = false
+    if @loaded
+      @playing = false
 
   updatePlayTime: (time) ->
-    # This 250ms offset is required to match the video speed
-    time = Math.round(Time.convert(time, @currentSpeed, '1.0') * 1000 + 250)
-    newIndex = @search time
+    if @loaded
+      # This 250ms offset is required to match the video speed
+      time = Math.round(Time.convert(time, @currentSpeed, '1.0') * 1000 + 250)
+      newIndex = @search time
 
-    if newIndex != undefined && @currentIndex != newIndex
-      if @currentIndex
-        @$(".subtitles li.current").removeClass('current')
-      @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
+      if newIndex != undefined && @currentIndex != newIndex
+        if @currentIndex
+          @$(".subtitles li.current").removeClass('current')
+        @$(".subtitles li[data-index='#{newIndex}']").addClass('current')
 
-      @currentIndex = newIndex
-      @scrollCaption()
+        @currentIndex = newIndex
+        @scrollCaption()
 
   resize: =>
     @$('.subtitles').css maxHeight: @captionHeight()
@@ -118,14 +130,21 @@ class @VideoCaption extends Subview
 
   toggle: (event) =>
     event.preventDefault()
-    if @el.hasClass('closed')
+    if @el.hasClass('closed') # Captions are "closed" e.g. turned off
+      @hideCaptions(false)
+    else # Captions are on
+      @hideCaptions(true)
+
+  hideCaptions: (hide_captions) =>
+    if hide_captions
+      @$('.hide-subtitles').attr('title', 'Turn on captions')
+      @el.addClass('closed')
+    else
       @$('.hide-subtitles').attr('title', 'Turn off captions')
       @el.removeClass('closed')
       @scrollCaption()
-    else
-      @$('.hide-subtitles').attr('title', 'Turn on captions')
-      @el.addClass('closed')
-
+    $.cookie('hide_captions', hide_captions, expires: 3650, path: '/')
+ 
   captionHeight: ->
     if @el.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()

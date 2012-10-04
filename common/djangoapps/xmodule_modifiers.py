@@ -1,6 +1,7 @@
 import re
 import json
 import logging
+import time
 
 from django.conf import settings
 from functools import wraps
@@ -34,7 +35,7 @@ def wrap_xmodule(get_html, module, template):
     return _get_html
 
 
-def replace_course_urls(get_html, course_id, module):
+def replace_course_urls(get_html, course_id):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /course/...
@@ -45,7 +46,7 @@ def replace_course_urls(get_html, course_id, module):
         return replace_urls(get_html(), staticfiles_prefix='/courses/'+course_id, replace_prefix='/course/')
     return _get_html
 
-def replace_static_urls(get_html, prefix, module):
+def replace_static_urls(get_html, prefix):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -75,7 +76,7 @@ def grade_histogram(module_id):
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])          # Add ORDER BY to sql query?
-    if len(grades) == 1 and grades[0][0] is None:
+    if len(grades) >= 1 and grades[0][0] is None:
         return []
     return grades
 
@@ -117,6 +118,14 @@ def add_histogram(get_html, module, user):
             data_dir = ""
         source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
 
+        # useful to indicate to staff if problem has been released or not
+        # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
+        now = time.gmtime()
+        is_released = "unknown"
+        mstart = getattr(module.descriptor,'start')
+        if mstart is not None:
+            is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
+
         staff_context = {'definition': module.definition.get('data'),
                          'metadata': json.dumps(module.metadata, indent=4),
                          'location': module.location,
@@ -124,13 +133,16 @@ def add_histogram(get_html, module, user):
                          'source_file' : source_file,
                          'source_url': '%s/%s/tree/master/%s' % (giturl,data_dir,source_file),
                          'category': str(module.__class__.__name__),
+                         # Template uses element_id in js function names, so can't allow dashes
                          'element_id': module.location.html_id().replace('-','_'),
                          'edit_link': edit_link,
                          'user': user,
                          'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
-                         'module_content': get_html()}
+                         'module_content': get_html(),
+                         'is_released': is_released,
+                         }
         return render_to_string("staff_problem_info.html", staff_context)
 
     return _get_html

@@ -1,9 +1,9 @@
 from fs.errors import ResourceNotFoundError
-import time
 import logging
-import requests
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
+import requests
+import time
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -21,10 +21,15 @@ class CourseDescriptor(SequenceDescriptor):
             self.title = title
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
-
-        @classmethod
-        def from_xml_object(cls, xml_object):
-            return cls(xml_object.get('title'), xml_object.get('book_url'))
+            self.start_page = int(self.table_of_contents[0].attrib['page'])
+            
+            # The last page should be the last element in the table of contents,
+            # but it may be nested. So recurse all the way down the last element
+            last_el = self.table_of_contents[-1]
+            while last_el.getchildren():
+                last_el = last_el[-1]
+            
+            self.end_page = int(last_el.attrib['page'])
 
         @property
         def table_of_contents(self):
@@ -57,11 +62,19 @@ class CourseDescriptor(SequenceDescriptor):
 
             return table_of_contents
 
-
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-        self.textbooks = self.definition['data']['textbooks']
-        
+
+        self.textbooks = []
+        for title, book_url in self.definition['data']['textbooks']:
+            try:
+                self.textbooks.append(self.Textbook(title, book_url))
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                continue
+
         self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
 
         msg = None
@@ -82,7 +95,6 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
-
     def set_grading_policy(self, policy_str):
         """Parse the policy specified in policy_str, and save it"""
         try:
@@ -94,26 +106,25 @@ class CourseDescriptor(SequenceDescriptor):
             # the error log.
             self._grading_policy = {}
 
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks.append(cls.Textbook.from_xml_object(textbook))
+            textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
-        
+
         #Load the wiki tag if it exists
         wiki_slug = None
         wiki_tag = xml_object.find("wiki")
         if wiki_tag is not None:
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
-        
-        definition =  super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
-        
+
+        definition = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+
         definition.setdefault('data', {})['textbooks'] = textbooks
         definition['data']['wiki_slug'] = wiki_slug
-        
+
         return definition
 
     def has_started(self):
@@ -126,6 +137,17 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+
+    @property
+    def tabs(self):
+        """
+        Return the tabs config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('tabs')
+
+    @property
+    def show_calculator(self):
+        return self.metadata.get("show_calculator", None) == "Yes"
 
     @lazyproperty
     def grading_context(self):
@@ -167,6 +189,7 @@ class CourseDescriptor(SequenceDescriptor):
             for s in c.get_children():
                 if s.metadata.get('graded', False):
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
+                    xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
@@ -219,7 +242,7 @@ class CourseDescriptor(SequenceDescriptor):
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have
     # different numbers.
-    # 
+    #
     # TODO get rid of this as soon as possible or potentially build in a robust
     # way to add in course-specific styling. There needs to be a discussion
     # about the right way to do this, but arjun will address this ASAP. Also
@@ -231,6 +254,22 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def info_sidebar_name(self):
         return self.metadata.get('info_sidebar_name', 'Course Handouts')
+
+    @property
+    def discussion_link(self):
+        """TODO: This is a quick kludge to allow CS50 (and other courses) to
+        specify their own discussion forums as external links by specifying a
+        "discussion_link" in their policy JSON file. This should later get
+        folded in with Syllabus, Course Info, and additional Custom tabs in a
+        more sensible framework later."""
+        return self.metadata.get('discussion_link', None)
+
+    @property
+    def hide_progress_tab(self):
+        """TODO: same as above, intended to let internal CS50 hide the progress tab
+        until we get grade integration set up."""
+        # Explicit comparison to True because we always want to return a bool.
+        return self.metadata.get('hide_progress_tab') == True
 
     @property
     def title(self):

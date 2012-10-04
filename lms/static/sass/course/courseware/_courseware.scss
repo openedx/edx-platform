@@ -6,10 +6,6 @@ html {
 div.course-wrapper {
   @extend .table-wrapper;
 
-  ul, ol {
-    list-style: none;
-  }
-
   section.course-content {
     @extend .content;
     padding: 40px;
@@ -47,6 +43,7 @@ div.course-wrapper {
       padding: 0;
       margin: 0;
       line-height: 1.4;
+      list-style: none;
 
       > li {
         @extend .clearfix;
@@ -54,6 +51,14 @@ div.course-wrapper {
         border-bottom: 1px solid #ddd;
         margin-bottom: 15px;
         padding: 0 0 15px;
+
+        .collapsible {
+          header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            font-size: 16px;
+          }
+        }
 
         header {
           @extend h1.top-header;
@@ -83,7 +88,6 @@ div.course-wrapper {
         }
 
         .histogram {
-          display: none;
           width: 200px;
           height: 150px;
         }
@@ -91,7 +95,7 @@ div.course-wrapper {
         ul {
           list-style: disc outside none;
           padding-left: 1em;
-          
+
           &.discussion-errors {
             list-style: none;
             padding-left: 2em;
@@ -100,6 +104,10 @@ div.course-wrapper {
           &.admin-actions {
             list-style: none;
           }
+        }
+
+        nav.sequence-nav ul li.prev {
+          left: 4px;
         }
 
         nav.sequence-bottom {
@@ -120,6 +128,7 @@ div.course-wrapper {
         margin: 0;
         @include clearfix();
         padding: 0;
+        list-style: none;
 
         li {
           width: flex-grid(3, 9);

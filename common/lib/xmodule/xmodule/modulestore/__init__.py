@@ -29,6 +29,9 @@ INVALID_CHARS = re.compile(r"[^\w.-]")
 # Names are allowed to have colons.
 INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
 
+# html ids can contain word chars and dashes
+INVALID_HTML_CHARS = re.compile(r"[^\w-]")
+
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
 
 
@@ -45,11 +48,34 @@ class Location(_LocationBase):
     __slots__ = ()
 
     @staticmethod
+    def _clean(value, invalid):
+        """
+        invalid should be a compiled regexp of chars to replace with '_'
+        """
+        return re.sub('_+', '_', invalid.sub('_', value))
+
+
+    @staticmethod
     def clean(value):
         """
         Return value, made into a form legal for locations
         """
-        return re.sub('_+', '_', INVALID_CHARS.sub('_', value))
+        return Location._clean(value, INVALID_CHARS)
+
+    @staticmethod
+    def clean_for_url_name(value):
+        """
+        Convert value into a format valid for location names (allows colons).
+        """
+        return Location._clean(value, INVALID_CHARS_NAME)
+
+    @staticmethod
+    def clean_for_html(value):
+        """
+        Convert a string into a form that's safe for use in html ids, classes, urls, etc.
+        Replaces all INVALID_HTML_CHARS with '_', collapses multiple '_' chars
+        """
+        return Location._clean(value, INVALID_HTML_CHARS)
 
     @staticmethod
     def is_valid(value):
@@ -74,8 +100,6 @@ class Location(_LocationBase):
             if key != 'revision' and val is None:
                 raise InsufficientSpecificationError(location)
         return loc
-
-
 
     def __new__(_cls, loc_or_tag=None, org=None, course=None, category=None,
                 name=None, revision=None):
@@ -183,9 +207,9 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        # TODO: is ':' ok in html ids?
-        return "-".join(str(v) for v in self.list()
-                        if v is not None).replace('.', '_')
+        s = "-".join(str(v) for v in self.list()
+                        if v is not None)
+        return Location.clean_for_html(s)
 
     def dict(self):
         """
@@ -271,8 +295,11 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    # TODO (cpennington): Replace with clone_item
-    def create_item(self, location, editor):
+    def clone_item(self, source, location):
+        """
+        Clone a new item that is a copy of the item at the location `source`
+        and writes it to `location`
+        """
         raise NotImplementedError
 
     def update_item(self, location, data):
@@ -312,7 +339,6 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
@@ -320,6 +346,22 @@ class ModuleStore(object):
         returns an iterable of things that can be passed to Location.
         '''
         raise NotImplementedError
+
+    def get_containing_courses(self, location):
+        '''
+        Returns the list of courses that contains the specified location
+
+        TODO (cpennington): This should really take a module instance id,
+        rather than a location
+        '''
+        courses = [
+            course
+            for course in self.get_courses()
+            if course.location.org == location.org
+               and course.location.course == location.course
+        ]
+
+        return courses
 
 
 class ModuleStoreBase(ModuleStore):

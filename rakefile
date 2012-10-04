@@ -49,7 +49,7 @@ default_options = {
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -e common/lib/xmodule')
+    sh('pip install -e common/lib/xmodule -e common/lib/capa')
     sh('git submodule update --init')
 end
 
@@ -125,8 +125,8 @@ TEST_TASKS = []
     end
 
     # Per environment tasks
-    Dir["#{system}/envs/*.py"].each do |env_file|
-        env = File.basename(env_file).gsub(/\.py/, '')
+    Dir["#{system}/envs/**/*.py"].each do |env_file|
+        env = env_file.gsub("#{system}/envs/", '').gsub(/\.py/, '').gsub('/', '.')
         desc "Attempt to import the settings file #{system}.envs.#{env} and report any errors"
         task "#{system}:check_settings:#{env}" => :predjango do
             sh("echo 'import #{system}.envs.#{env}' | #{django_admin(system, env, 'shell')}")
@@ -226,4 +226,14 @@ namespace :cms do
         "Example: \`rake cms:import DATA_DIR=../data\`"
     end
   end
+end
+
+desc "Build a properties file used to trigger autodeploy builds"
+task :autodeploy_properties do
+    File.open("autodeploy.properties", "w") do |file|
+        file.puts("UPSTREAM_NOOP=false")
+        file.puts("UPSTREAM_BRANCH=#{BRANCH}")
+        file.puts("UPSTREAM_JOB=#{PACKAGE_NAME}")
+        file.puts("UPSTREAM_REVISION=#{COMMIT}")
+    end
 end

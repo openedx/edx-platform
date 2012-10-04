@@ -30,11 +30,23 @@ class VideoModule(XModule):
         xmltree = etree.fromstring(self.definition['data'])
         self.youtube = xmltree.get('youtube')
         self.position = 0
+        self.show_captions = xmltree.get('show_captions', 'true')
+        self.source = self._get_source(xmltree)
 
         if instance_state is not None:
             state = json.loads(instance_state)
             if 'position' in state:
                 self.position = int(float(state['position']))
+
+    def _get_source(self, xmltree):
+        # find the first valid source
+        source = None
+        for element in xmltree.findall('source'):
+            src = element.get('src')
+            if src:
+                source = src
+                break
+        return source
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -72,13 +84,15 @@ class VideoModule(XModule):
             'streams': self.video_list(),
             'id': self.location.html_id(),
             'position': self.position,
+            'source': self.source,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],
+            'show_captions': self.show_captions
         })
 
 
 class VideoDescriptor(RawDescriptor):
     module_class = VideoModule
-    
     stores_state = True
+    template_dir_name = "video"

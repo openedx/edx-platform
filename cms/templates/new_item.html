@@ -1,0 +1,19 @@
+<section>
+  <div>${parent_name}</div>
+  <div>${parent_location}</div>
+  <input type="text" class="name"/>
+  <div>
+    % for module_type, module_templates in templates:
+    <div>
+      <div>${module_type}</div>
+      <div>
+        % for template in module_templates:
+        <a class="save" data-template-id="${template.location.url()}">${template.display_name}</a>
+        % endfor
+      </div>
+    </div>
+    % endfor
+  </div>
+  <a class='cancel'>Cancel</a>
+</section>
+

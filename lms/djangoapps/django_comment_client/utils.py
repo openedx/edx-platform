@@ -1,14 +1,20 @@
+import time
+from collections import defaultdict
 from importlib import import_module
+
 from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.db import connection
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.models import Role
 from mitxmako import middleware
 
 import logging
@@ -18,10 +24,9 @@ import urllib
 import pystache_custom as pystache
 
 
+# TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
-_DISCUSSIONINFO = None
-
-
+_DISCUSSIONINFO = defaultdict(dict)
 
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
@@ -37,106 +42,186 @@ def strip_blank(dic):
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
 
+def get_role_ids(course_id):
+    roles = Role.objects.filter(course_id=course_id)
+    staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
+    roles_with_ids = {'Staff': staff}
+    for role in roles:
+      roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
+    return roles_with_ids
+
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:
-        class_path = settings.MODULESTORE['default']['ENGINE']
-        module_path, _, class_name = class_path.rpartition('.')
-        class_ = getattr(import_module(module_path), class_name)
-        modulestore = class_(**dict(settings.MODULESTORE['default']['OPTIONS'].items() + [('eager', True)]))
-        _FULLMODULES = modulestore.modules
+        _FULLMODULES = modulestore().modules
     return _FULLMODULES
 
-def get_categorized_discussion_info(request, course):
+def get_discussion_id_map(course):
     """
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO:
-        initialize_discussion_info(request, course)
-    return _DISCUSSIONINFO['categorized']
+    if not _DISCUSSIONINFO[course.id]:
+        initialize_discussion_info(course)
+    return _DISCUSSIONINFO[course.id]['id_map']
 
-def get_discussion_title(request, course, discussion_id):
+def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO:
-        initialize_discussion_info(request, course)
-    title = _DISCUSSIONINFO['by_id'].get(discussion_id, {}).get('title', '(no title)')
+    if not _DISCUSSIONINFO[course.id]:
+        initialize_discussion_info(course)
+    title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
-def initialize_discussion_info(request, course):
+def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
-    if _DISCUSSIONINFO:
+    if not _DISCUSSIONINFO[course.id]:
+        initialize_discussion_info(course)
+    return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
+
+def filter_unstarted_categories(category_map):
+
+    now = time.gmtime()
+
+    result_map = {}
+
+    unfiltered_queue = [category_map]
+    filtered_queue   = [result_map]
+
+    while len(unfiltered_queue) > 0:
+
+        unfiltered_map = unfiltered_queue.pop()
+        filtered_map   = filtered_queue.pop()
+
+        filtered_map["children"] = []
+        filtered_map["entries"] = {}
+        filtered_map["subcategories"] = {}
+
+        for child in unfiltered_map["children"]:
+            if child in unfiltered_map["entries"]:
+                if unfiltered_map["entries"][child]["start_date"] <= now:
+                    filtered_map["children"].append(child)
+                    filtered_map["entries"][child] = {}
+                    for key in unfiltered_map["entries"][child]:
+                        if key != "start_date":
+                            filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
+                else:
+                    print "filtering %s" % child, unfiltered_map["entries"][child]["start_date"]
+            else:
+                if unfiltered_map["subcategories"][child]["start_date"] < now:
+                    filtered_map["children"].append(child)
+                    filtered_map["subcategories"][child] = {}
+                    unfiltered_queue.append(unfiltered_map["subcategories"][child])
+                    filtered_queue.append(filtered_map["subcategories"][child])
+
+    return result_map
+
+def sort_map_entries(category_map):
+    things = []
+    for title, entry in category_map["entries"].items():
+        things.append((title, entry))
+    for title, category in category_map["subcategories"].items():
+        things.append((title, category))
+        sort_map_entries(category_map["subcategories"][title])
+    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+
+def initialize_discussion_info(course):
+
+    global _DISCUSSIONINFO
+    if _DISCUSSIONINFO[course.id]:
         return
 
     course_id = course.id
-    _, course_name, _ = course_id.split('/')
-    user = request.user
     url_course_id = course_id.replace('/', '_').replace('.', '_')
 
-    _is_course_discussion = lambda x: x[0].dict()['category'] == 'discussion' \
-                         and x[0].dict()['course'] == course_name
-    
-    _get_module_descriptor = operator.itemgetter(1)
+    all_modules = get_full_modules()[course_id]
 
-    def _get_module(module_descriptor):
-        print module_descriptor
-        module = get_module(user, request, module_descriptor.location, student_module_cache)
-        return module
+    discussion_id_map = {}
 
-    def _extract_info(module):
-        return {
-            'title': module.title,
-            'discussion_id': module.discussion_id,
-            'category': module.discussion_category,
-        }
+    unexpanded_category_map = defaultdict(list)
 
-    def _pack_with_id(info):
-        return (info['discussion_id'], info)
+    for location, module in all_modules.items():
+        if location.category == 'discussion':
+            id = module.metadata['id']
+            category = module.metadata['discussion_category']
+            title = module.metadata['for']
+            sort_key = module.metadata.get('sort_key', title)
+            category = " / ".join([x.strip() for x in category.split("/")])
+            last_category = category.split("/")[-1]
+            discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
+            unexpanded_category_map[category].append({"title": title, "id": id,
+                "sort_key": sort_key, "start_date": module.start})
 
-    discussion_module_descriptors = map(_get_module_descriptor,
-                                        filter(_is_course_discussion,
-                                               get_full_modules().items()))
+    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
+    for category_path, entries in unexpanded_category_map.items():
+        node = category_map["subcategories"]
+        path = [x.strip() for x in category_path.split("/")]
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(user, course)
+        # Find the earliest start date for the entries in this category
+        category_start_date = None
+        for entry in entries:
+            if category_start_date is None or entry["start_date"] < category_start_date:
+                category_start_date = entry["start_date"]
 
-    discussion_info = map(_extract_info, map(_get_module, discussion_module_descriptors))
+        for level in path[:-1]:
+            if level not in node:
+                node[level] = {"subcategories": defaultdict(dict),
+                               "entries": defaultdict(dict),
+                               "sort_key": level,
+                               "start_date": category_start_date}
+            else:
+                if node[level]["start_date"] > category_start_date:
+                    node[level]["start_date"] = category_start_date
+            node = node[level]["subcategories"]
 
-    _DISCUSSIONINFO = {}
+        level = path[-1]
+        if level not in node:
+            node[level] = {"subcategories": defaultdict(dict),
+                            "entries": defaultdict(dict),
+                            "sort_key": level,
+                            "start_date": category_start_date}
+        else:
+            if node[level]["start_date"] > category_start_date:
+                node[level]["start_date"] = category_start_date
 
-    _DISCUSSIONINFO['by_id'] = dict(map(_pack_with_id, discussion_info))
+        for entry in entries:
+            node[level]["entries"][entry["title"]] = {"id": entry["id"],
+                                                      "sort_key": entry["sort_key"],
+                                                      "start_date": entry["start_date"]}
 
-    _DISCUSSIONINFO['categorized'] = dict((category, list(l)) \
-                for category, l in itertools.groupby(discussion_info, operator.itemgetter('category')))
+    default_topics = {'General': {'id' :course.location.html_id()}}
+    discussion_topics = course.metadata.get('discussion_topics', default_topics)
+    for topic, entry in discussion_topics.items():
+        category_map['entries'][topic] = {"id": entry["id"],
+                                          "sort_key": entry.get("sort_key", topic),
+                                          "start_date": time.gmtime()}
+    sort_map_entries(category_map)
 
-    _DISCUSSIONINFO['categorized']['General'] = [{
-        'title': 'General discussion',
-        'discussion_id': url_course_id,
-        'category': 'General',
-    }]
+    _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
+    _DISCUSSIONINFO[course.id]['category_map'] = category_map
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
-                                           mimetype='application/json; charset=utf8')
+                                           mimetype='application/json; charset=utf-8')
 
 class JsonError(HttpResponse):
-    def __init__(self, error_messages=[]):
+    def __init__(self, error_messages=[], status=400):
         if isinstance(error_messages, str):
             error_messages = [error_messages]
         content = simplejson.dumps({'errors': error_messages},
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf8', status=400)
+                                        mimetype='application/json; charset=utf-8', status=status)
 
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
-class ViewNameMiddleware(object):  
-    def process_view(self, request, view_func, view_args, view_kwargs):  
+class ViewNameMiddleware(object):
+    def process_view(self, request, view_func, view_args, view_kwargs):
         request.view_name = view_func.__name__
 
 class QueryCountDebugMiddleware(object):
@@ -174,7 +259,11 @@ def get_ability(course_id, content, user):
             'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
+#TODO: RENAME
 def get_annotated_content_info(course_id, content, user, user_info):
+    """
+    Get metadata for an individual content (thread or comment)
+    """
     voted = ''
     if content['id'] in user_info['upvoted_ids']:
         voted = 'up'
@@ -186,7 +275,11 @@ def get_annotated_content_info(course_id, content, user, user_info):
         'ability': get_ability(course_id, content, user),
     }
 
+#TODO: RENAME
 def get_annotated_content_infos(course_id, thread, user, user_info):
+    """
+    Get metadata for a thread and its children
+    """
     infos = {}
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
@@ -194,6 +287,13 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
             annotate(child)
     annotate(thread)
     return infos
+
+def get_metadata_for_threads(course_id, threads, user, user_info):
+    def infogetter(thread):
+        return get_annotated_content_infos(course_id, thread, user, user_info)
+
+    metadata = reduce(merge_dict, map(infogetter, threads), {})
+    return metadata
 
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 def url_for_tags(course_id, tags):
@@ -212,24 +312,54 @@ def permalink(content):
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 def extend_content(content):
+    roles = {}
+    if content.get('user_id'):
+        try:
+            user = User.objects.get(pk=content['user_id'])
+            roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
+        except user.DoesNotExist:
+            logging.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
+        'roles': roles,
+        'updated': content['created_at']!=content['updated_at'],
     }
     return merge_dict(content, content_info)
 
+def get_courseware_context(content, course):
+    id_map = get_discussion_id_map(course)
+    id = content['commentable_id']
+    content_info = None
+    if id in id_map:
+        location = id_map[id]["location"].url()
+        title = id_map[id]["title"]
+        (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+        url = reverse('courseware_position', kwargs={"course_id":course_id,
+                                                     "chapter":chapter,
+                                                     "section":section,
+                                                     "position":position})
+        content_info = {"courseware_url": url, "courseware_title": title}
+    return content_info
+
 def safe_content(content):
     fields = [
-        'id', 'title', 'body', 'course_id', 'anonymous', 'endorsed',
-        'parent_id', 'thread_id', 'votes', 'closed',
-        'created_at', 'updated_at', 'depth', 'type',
-        'commentable_id', 'comments_count', 'at_position_list',
-        'children', 'highlighted_title', 'highlighted_body',
+        'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
+        'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
+        'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
+        'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
+        'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
+        'read',
     ]
 
-    if content.get('anonymous') is False:
+    if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
         fields += ['username', 'user_id']
+
+    if 'children' in content:
+        safe_children = [safe_content(child) for child in content['children']]
+        content['children'] = safe_children
 
     return strip_none(extract(content, fields))

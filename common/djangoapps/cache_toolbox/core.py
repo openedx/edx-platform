@@ -107,3 +107,15 @@ def instance_key(model, instance_or_pk):
         model._meta.module_name,
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
+
+def content_key(filename):
+    return 'content:%s' % (filename)
+
+def set_cached_content(content):
+    cache.set(content_key(content.filename), content)
+
+def get_cached_content(filename):
+    return cache.get(content_key(filename))
+
+def del_cached_content(filename):
+    cache.delete(content_key(filename))

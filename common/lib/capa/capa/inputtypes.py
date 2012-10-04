@@ -326,8 +326,20 @@ def textline_dynamath(element, value, status, render_template, msg=''):
     count = int(eid.split('_')[-2]) - 1  # HACK
     size = element.get('size')
     hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
+
+    # Preprocessor to insert between raw input and Mathjax
+    preprocessor = {'class_name': element.get('preprocessorClassName',''),
+                    'script_src': element.get('preprocessorSrc','')}
+    if '' in preprocessor.values():
+        preprocessor = None
+
+    # Escape characters in student input for safe XML parsing
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value, escapedict)
+
     context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size,
                'msg': msg, 'hidden': hidden,
+               'preprocessor': preprocessor,
                }
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
@@ -470,9 +482,9 @@ def math(element, value, status, render_template, msg=''):
         xhtml = etree.XML(html)
     except Exception as err:
         if False:  # TODO needs to be self.system.DEBUG - but can't access system
-            msg = "<html><font color='red'><p>Error %s</p>" % str(err).replace('<', '&lt;')
+            msg = '<html><div class="inline-error"><p>Error %s</p>' % str(err).replace('<', '&lt;')
             msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<', '&lt;')
-            msg += "</font></html>"
+            msg += "</div></html>"
             log.error(msg)
             return etree.XML(msg)
         else:

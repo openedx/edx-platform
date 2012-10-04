@@ -8,13 +8,17 @@
 
     <ul>
       % for section in chapter['sections']:
-          <li class="${"active" if section.get('active') else ""} ${"started" if section.get('started') else ""}">
+
+      <%
+        css_class = ' '.join(['active' if section.get('active') else '',
+                              'started' if section.get('started') else '',
+                              'graded' if 'graded' in section and section['graded'] else ''])
+      %>
+      
+          <li class="${css_class}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-              <p>${section['display_name']}
-              <span class="subtitle">
-                ${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}
-              </span>
-              </p>
+              <p>${section['display_name']}</p>
+              <p class="subtitle">${section['format']} ${"due " + section['due'] if 'due' in section and section['due'] != '' else ''}</p>
             </a>
           </li>
       % endfor

@@ -48,10 +48,12 @@ for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
+local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
+                            local_loglevel=local_loglevel,
                             debug=False)
 
 COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
@@ -68,6 +70,7 @@ SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+AWS_STORAGE_BUCKET_NAME = 'edxuploads'
 
 DATABASES = AUTH_TOKENS['DATABASES']
 

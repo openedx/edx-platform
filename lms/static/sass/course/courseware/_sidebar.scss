@@ -133,13 +133,18 @@ section.course-index {
             margin-bottom: 0;
             line-height: 1.3;
 
-            span.subtitle {
+            &.subtitle {
               color: #666;
               font-size: 13px;
               font-weight: normal;
               display: block;
+              margin: 0;
+
+              &:empty {
+                display: none;
+              }
             }
-          }          
+          }
 
           &:hover {
             background: rgba(0, 0, 0, .1);
@@ -192,6 +197,18 @@ section.course-index {
 
           span.subtitle {
             font-weight: normal;
+          }
+        }
+
+        &.graded {
+         > a {
+           background-image: url('../images/graded.png');
+           background-repeat: no-repeat;
+           background-position: 97% center;
+          }
+
+          &.active > a {
+            @include background-image(url('../images/graded.png'), linear-gradient(top, #e6e6e6, #d6d6d6));
           }
         }
       }

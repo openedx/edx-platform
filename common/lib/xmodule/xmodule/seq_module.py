@@ -21,7 +21,8 @@ class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__,
-                                     'js/src/sequence/display.coffee')]}
+                                     'js/src/sequence/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')]}
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
@@ -29,6 +30,8 @@ class SequenceModule(XModule):
                  shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
+        # NOTE: Position is 1-indexed.  This is silly, but there are now student
+        # positions saved on prod, so it's not easy to fix.
         self.position = 1
 
         if instance_state is not None:
@@ -73,7 +76,7 @@ class SequenceModule(XModule):
         contents = []
         for child in self.get_display_items():
             progress = child.get_progress()
-            contents.append({
+            childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
                     grand_child.display_name.strip()
@@ -83,13 +86,17 @@ class SequenceModule(XModule):
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
-            })
+            }
+            if childinfo['title']=='':
+                childinfo['title'] = child.metadata.get('display_name','')
+            contents.append(childinfo)
 
         params = {'items': contents,
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
-                  'tag': self.location.category}
+                  'tag': self.location.category
+                  }
 
         self.content = self.system.render_template('seq_module.html', params)
         self.rendered = True
@@ -110,12 +117,18 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     stores_state = True # For remembering where in the sequence the student is
 
+    template_dir_name = 'sequence'
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'children': [
-            system.process_xml(etree.tostring(child_module)).location.url()
-            for child_module in xml_object
-        ]}
+        children = []
+        for child in xml_object:
+            try:
+                children.append(system.process_xml(etree.tostring(child)).location.url())
+            except:
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                continue
+        return {'children': children}
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')

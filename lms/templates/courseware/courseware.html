@@ -11,7 +11,6 @@
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('js/vendor/jquery.scrollTo-1.4.2-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/jquery.sequence.js')}"></script>
 
   ## codemirror
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
@@ -20,6 +19,7 @@
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/lib/codemirror.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/xml/xml.js')}"></script>
   ##  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror-2.25/mode/python/python.js')}"></script>
+
 
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
@@ -35,6 +35,27 @@
 
   <script type="text/javascript">
     var $$course_id = "${course.id}";
+
+    $(function(){
+        $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {
+          var elemText = $(this).text().replace(/^\s+|\s+$/g,''); // Strip leading and trailing whitespace
+          var wordArray = elemText.split(" ");
+          var finalTitle = "";
+          if (wordArray.length > 0) {
+            for (i=0;i<=wordArray.length-1;i++) {
+              finalTitle += wordArray[i];
+              if (i == (wordArray.length-2)) {
+                finalTitle += "&nbsp;";
+              } else if (i == (wordArray.length-1)) {
+                // Do nothing
+              } else {
+                finalTitle += " ";
+              }
+            }
+          }
+          $(this).html(finalTitle);
+        });
+      });
   </script>
 </%block>
 
@@ -56,19 +77,42 @@
 
     <section class="course-content">
       ${content}
-
-      % if course_errors is not UNDEFINED:
-          <h2>Course errors</h2>
-          <div id="course-errors">
-            <ul>
-          % for (msg, err) in course_errors:
-            <li>${msg | h}
-              <ul><li><pre>${err | h}</pre></li></ul>
-            </li>
-          % endfor
-            </ul>
-          </div>
-      % endif
     </section>
   </div>
 </section>
+
+
+% if course.show_calculator:
+    <div class="calc-main">
+        <a aria-label="Open Calculator" href="#" class="calc">Calculator</a>
+
+        <div id="calculator_wrapper">
+            <form id="calculator">
+                <div class="input-wrapper">
+                    <input type="text" id="calculator_input" />
+
+                    <div class="help-wrapper">
+                        <a href="#">Hints</a>
+                        <dl class="help">
+                            <dt>Suffixes:</dt>
+                            <dd> %kMGTcmunp</dd>
+                            <dt>Operations:</dt>
+                            <dd>^ * / + - ()</dd>
+                            <dt>Functions:</dt>
+                            <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
+                            <dt>Constants</dt>
+                            <dd>e, pi</dd>
+
+                            <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
+
+                            <dt>Unsupported:</dt> <dd>||, j </dd>  -->
+                        </dl>
+                    </div>
+                </div>
+                <input id="calculator_button" type="submit" value="="/>
+                <input type="text" id="calculator_output"  readonly />
+            </form>
+
+        </div>
+    </div>
+% endif

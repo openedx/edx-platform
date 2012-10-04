@@ -1,6 +1,6 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>Textbook – MITx 6.002x</title></%block>
+<%block name="title"><title>${course.number} Textbook</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -38,14 +38,14 @@ function goto_page(n) {
 
 function prev_page() {
   var newpage=page-1;
-  if(newpage<0) newpage=0;
+  if(newpage< ${start_page}) newpage=${start_page};
   goto_page(newpage);
   log_event("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   var newpage=page+1;
-  if(newpage>1008) newpage=1008;
+  if(newpage> ${end_page}) newpage=${end_page};
   goto_page(newpage);
   log_event("book", {"type":"nextpage","new":page});
 }
@@ -61,7 +61,7 @@ $("#open_close_accordion a").click(function(){
 </script>
 </%block>
 
-<%include file="/courseware/course_navigation.html" args="active_page='book'" />
+<%include file="/courseware/course_navigation.html" args="active_page='textbook/{0}'.format(book_index)" />
 
 <section class="container">
   <div class="book-wrapper">
@@ -97,6 +97,10 @@ $("#open_close_accordion a").click(function(){
           % for entry in table_of_contents:
             ${print_entry(entry)}
           % endfor
+        
+        ## Don't delete this empty list item. Without it, Jquery.TreeView won't
+        ## render the last list item as expandable.
+        <li></li> 
       </ul>
     </section>
 

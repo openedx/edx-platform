@@ -1,21 +1,25 @@
-<form class="choicegroup">
-  
-  % for choice_id, choice_description in choices:
-  <label for="input_${id}_${choice_id}">  <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" value="${choice_id}"
-  % if choice_id in value:
-	checked="true"
-  % endif
-  /> ${choice_description} </label>
-  % endfor
-  <span id="answer_${id}"></span>
+<form class="choicegroup capa_inputtype" id="inputtype_${id}">
+  <div class="indicator_container">
+    % if state == 'unsubmitted':
+    <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+    % elif state == 'correct': 
+    <span class="correct" id="status_${id}"></span>
+    % elif state == 'incorrect':
+    <span class="incorrect" id="status_${id}"></span>
+    % elif state == 'incomplete':
+    <span class="incorrect" id="status_${id}"></span>
+    % endif
+  </div>
 
-  % if state == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif state == 'correct': 
-  <span class="correct" id="status_${id}"></span>
-  % elif state == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
-  % elif state == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
-  % endif
+  <fieldset>
+    % for choice_id, choice_description in choices:
+    <label for="input_${id}_${choice_id}">  <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" value="${choice_id}"
+    % if choice_id in value:
+    checked="true"
+    % endif
+    /> ${choice_description} </label>
+    % endfor
+    <span id="answer_${id}"></span>
+  </fieldset>
+
 </form>

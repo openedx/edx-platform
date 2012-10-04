@@ -1,23 +1,14 @@
 import pymongo
 
 from nose.tools import assert_equals, assert_raises, assert_not_equals, with_setup
-from path import path
 from pprint import pprint
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.search import path_to_location
 
-# from ~/mitx_all/mitx/common/lib/xmodule/xmodule/modulestore/tests/
-# to   ~/mitx_all/mitx/common/test
-TEST_DIR = path(__file__).abspath().dirname()
-for i in range(5):
-    TEST_DIR = TEST_DIR.dirname()
-TEST_DIR = TEST_DIR / 'test'
-
-DATA_DIR = TEST_DIR / 'data'
+from .test_modulestore import check_path_to_location
+from . import DATA_DIR
 
 
 HOST = 'localhost'
@@ -110,27 +101,5 @@ class TestMongoModuleStore(object):
 
     def test_path_to_location(self):
         '''Make sure that path_to_location works'''
-        should_work = (
-            ("i4x://edX/toy/video/Welcome",
-             ("edX/toy/2012_Fall", "Overview", "Welcome", None)),
-            ("i4x://edX/toy/chapter/Overview",
-             ("edX/toy/2012_Fall", "Overview", None, None)),
-            )
-        for location, expected in should_work:
-            assert_equals(path_to_location(self.store, location), expected)
-
-        not_found = (
-            "i4x://edX/toy/video/WelcomeX", "i4x://edX/toy/course/NotHome"
-            )
-        for location in not_found:
-            assert_raises(ItemNotFoundError, path_to_location, self.store, location)
-
-        # Since our test files are valid, there shouldn't be any
-        # elements with no path to them.  But we can look for them in
-        # another course.
-        no_path = (
-            "i4x://edX/simple/video/Lost_Video",
-            )
-        for location in no_path:
-            assert_raises(NoPathToItem, path_to_location, self.store, location, "toy")
+        check_path_to_location(self.store)
 

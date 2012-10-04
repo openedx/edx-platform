@@ -15,6 +15,10 @@ urlpatterns = ('',
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
+    # Adding to allow debugging issues when prod is mysteriously different from staging
+    # (specifically missing get parameters in certain cases)
+    url(r'^debug_request$', 'util.views.debug_request'),
+
     url(r'^change_email$', 'student.views.change_email_request'),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
@@ -80,6 +84,12 @@ urlpatterns = ('',
         {'template': 'press_releases/MIT_and_Harvard_announce_edX.html'}, name="press/mit-and-harvard-announce-edx"),
     url(r'^press/uc-berkeley-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/UC_Berkeley_joins_edX.html'}, name="press/uc-berkeley-joins-edx"),
+    url(r'^press/edX-announces-proctored-exam-testing$', 'static_template_view.views.render',
+        {'template': 'press_releases/edX_announces_proctored_exam_testing.html'}, name="press/edX-announces-proctored-exam-testing"),
+    url(r'^press/elsevier-collaborates-with-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/Elsevier_collaborates_with_edX.html'}, name="press/elsevier-collaborates-with-edx"),
+
+
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
 
@@ -94,12 +104,40 @@ urlpatterns = ('',
 if settings.PERFSTATS:
     urlpatterns += (url(r'^reprofile$','perfstats.views.end_profile'),)
 
+
+
+# Multicourse wiki (Note: wiki urls must be above the courseware ones because of
+# the custom tab catch-all)
+if settings.WIKI_ENABLED:
+    from wiki.urls import get_pattern as wiki_pattern
+    from django_notify.urls import get_pattern as notify_pattern
+
+    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
+    # them together.
+    urlpatterns += (
+        # First we include views from course_wiki that we use to override the default views.
+        # They come first in the urlpatterns so they get resolved first
+        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
+
+
+        url(r'^wiki/', include(wiki_pattern())),
+        url(r'^notify/', include(notify_pattern())),
+
+        # These urls are for viewing the wiki in the context of a course. They should
+        # never be returned by a reverse() so they come after the other url patterns
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
+            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
+        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
+    )
+
+
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         # Hook django-masquerade, allowing staff to view site as other users
         url(r'^masquerade/', include('masquerade.urls')),
-        url(r'^jump_to/(?P<location>.*)$', 'courseware.views.jump_to', name="jump_to"),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
+            'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
@@ -110,7 +148,7 @@ if settings.COURSEWARE_ENABLED:
             name='change_setting'),
 
         # TODO: These views need to be updated before they work
-        # url(r'^calculate$', 'util.views.calculate'),
+        url(r'^calculate$', 'util.views.calculate'),
         # TODO: We should probably remove the circuit package. I believe it was only used in the old way of saving wiki circuits for the wiki
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
@@ -142,6 +180,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.index', name="courseware_chapter"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.index', name="courseware_section"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/(?P<section>[^/]*)/(?P<position>[^/]*)/?$',
+            'courseware.views.index', name="courseware_position"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
             'courseware.views.progress', name="progress"),
         # Takes optional student_id for instructor use--shows profile as that student sees it.
@@ -150,52 +190,34 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'courseware.views.instructor_dashboard', name="instructor_dashboard"),
+            'instructor.views.instructor_dashboard', name="instructor_dashboard"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'courseware.views.gradebook', name='gradebook'),
+            'instructor.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'courseware.views.grade_summary', name='grade_summary'),
+            'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
-            'courseware.views.enroll_students', name='enroll_students'),
+            'instructor.views.enroll_students', name='enroll_students'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
 
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$', 
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls'))
             )
-
-    # Multicourse wiki
-if settings.WIKI_ENABLED:
-    from wiki.urls import get_pattern as wiki_pattern
-    from django_notify.urls import get_pattern as notify_pattern
-
-    # Note that some of these urls are repeated in course_wiki.course_nav. Make sure to update
-    # them together.
     urlpatterns += (
-        # First we include views from course_wiki that we use to override the default views.
-        # They come first in the urlpatterns so they get resolved first
-        url('^wiki/create-root/$', 'course_wiki.views.root_create', name='root_create'),
-
-
-        url(r'^wiki/', include(wiki_pattern())),
-        url(r'^notify/', include(notify_pattern())),
-
-        # These urls are for viewing the wiki in the context of a course. They should
-        # never be returned by a reverse() so they come after the other url patterns
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/course_wiki/?$',
-            'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
-    )
+        # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/(?P<tab_slug>[^/]+)/$',
+        'courseware.views.static_tab', name="static_tab"),
+        )
 
 if settings.QUICKEDIT:
-	urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
-	urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
+    urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
+    urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
 if settings.ASKBOT_ENABLED:
     urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
@@ -215,14 +237,23 @@ if settings.DEBUG:
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
-        url(r'^openid/complete/$', 'external_auth.views.edXauth_openid_login_complete', name='openid-complete'),
+        url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
-        )
+    )
+
+if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
+    urlpatterns += (
+        url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
+        url(r'^openid/provider/login/(?:[\w%\. ]+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
+        url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
+        url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
+    )
 
 if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
+        url(r'^migrate/reload/(?P<reload_dir>[^/]+)/(?P<commit_id>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^gitreload$', 'lms_migration.migrate.gitreload'),
         url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
         )
@@ -241,4 +272,3 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
-

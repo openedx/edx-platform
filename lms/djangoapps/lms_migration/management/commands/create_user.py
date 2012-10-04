@@ -67,7 +67,10 @@ class Command(BaseCommand):
             password = GenPasswd(12)
             
             # get name from kerberos
-            kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
+            try:
+                kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
+            except:
+                kname = ''
             name = raw_input('Full name: [%s] ' % kname).strip()
             if name=='':
                 name = kname

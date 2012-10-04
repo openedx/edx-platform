@@ -98,6 +98,7 @@ section.tool-wrapper {
           display: block;
           float: right;
           font: bold 14px $body-font-family;
+          margin-top: 19px;
 
           &:active {
             @include box-shadow(none);
@@ -130,6 +131,7 @@ section.tool-wrapper {
         margin: 0;
         text-shadow: 0 -1px 0 darken(#073642, 10%);
         -webkit-font-smoothing: antialiased;
+        color: #839496;
       }
 
       ul {
@@ -205,6 +207,7 @@ section.tool-wrapper {
           font-weight: bold;
           @include inline-block();
           margin: 0 lh(.5) lh() 0;
+          color: #839496;
           text-shadow: 0 -1px 0 darken(#073642, 10%);
           -webkit-font-smoothing: antialiased;
         }

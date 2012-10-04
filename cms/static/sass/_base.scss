@@ -14,9 +14,11 @@ $yellow: #fff8af;
 $cream: #F6EFD4;
 $border-color: #ddd;
 
+
 // edX colors
 $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
+$error-red: rgb(253, 87, 87);
 
 @mixin hide-text {
   background-color: transparent;
@@ -139,11 +141,15 @@ textarea {
   }
 }
 
-// .wip {
-//   outline: 1px solid #f00 !important;
-//   position: relative;
-// }
-
-.hidden {
-  display: none;
+.wip {
+  outline: 1px solid #f00 !important;
+  position: relative;
+  &:after {
+   content: "WIP";
+   font-size: 8px;
+   padding: 2px;
+   background: #f00;
+   color: #fff;
+   @include position(absolute, 0px 0px 0 0);
+  }
 }

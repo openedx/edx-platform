@@ -25,6 +25,7 @@ import glob2
 import errno
 import hashlib
 from collections import defaultdict
+import socket
 
 import djcelery
 from path import path
@@ -64,12 +65,18 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
+    'FORCE_UNIVERSITY_DOMAIN': False,	# set this to the university domain to use, as an override to HTTP_HOST
+                                        # set to None to do no university selection
+
     'ENABLE_TEXTBOOK' : True,
     'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
+    'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
+
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
+    'ENABLE_MANUAL_GIT_RELOAD': False,
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -77,7 +84,7 @@ MITX_FEATURES = {
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
-
+    'AUTH_USE_OPENID_PROVIDER': False,
 }
 
 # Used for A/B testing
@@ -89,6 +96,7 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -97,7 +105,6 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
 sys.path.append(REPO_ROOT)
@@ -119,6 +126,13 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
               system_node_path
               ]
 NODE_PATH = ':'.join(node_paths)
+
+
+# Where to look for a status message
+STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.html"
+
+############################ OpenID Provider  ##################################
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -148,7 +162,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
-    
+
     # Added for django-wiki
     'django.core.context_processors.media',
     'django.core.context_processors.tz',
@@ -219,7 +233,6 @@ MODULESTORE = {
         'OPTIONS': {
             'data_dir': DATA_DIR,
             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            'eager': True,
         }
     }
 }
@@ -260,12 +273,22 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "askbot" / "skins",
 ]
 if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
     STATICFILES_DIRS += [
         # TODO (cpennington): When courses are stored in a database, this
         # should no longer be added to STATICFILES
         (course_dir, DATA_DIR / course_dir)
         for course_dir in os.listdir(DATA_DIR)
-        if os.path.isdir(DATA_DIR / course_dir)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
     ]
 
 # Locale/Internationalization
@@ -336,7 +359,7 @@ WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
-WIKI_LINK_DEFAULT_LEVEL = 2 
+WIKI_LINK_DEFAULT_LEVEL = 2
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -353,10 +376,10 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'mitxmako.makoloader.MakoFilesystemLoader',
     'mitxmako.makoloader.MakoAppDirectoriesLoader',
- 
+
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-    
+
     #'askbot.skins.loaders.filesystem_load_template_source',
     # 'django.template.loaders.eggs.Loader',
 )
@@ -374,7 +397,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
-    
+
     'course_wiki.course_nav.Middleware',
 
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
@@ -387,7 +410,6 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
-    'django_comment_client.utils.QueryCountDebugMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -424,12 +446,12 @@ courseware_only_js += [
 main_vendor_js = [
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
-  'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.cookie.js',
   'js/vendor/jquery.qtip.min.js',
+  'js/vendor/swfobject/swfobject.js',
 ]
 
-discussion_js = glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/*.coffee')
+discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -450,7 +472,7 @@ for dir_ in (js_file_dir, css_file_dir):
 
 js_fragments = set()
 css_fragments = defaultdict(set)
-for descriptor in XModuleDescriptor.load_classes() + [HiddenDescriptor]:
+for _, descriptor in XModuleDescriptor.load_classes() + [(None, HiddenDescriptor)]:
     module_js = descriptor.module_class.get_javascript()
     for filetype in ('coffee', 'js'):
         for idx, fragment in enumerate(module_js.get(filetype, [])):
@@ -497,16 +519,17 @@ PIPELINE_JS = {
         'source_filenames': [
             pth.replace(COMMON_ROOT / 'static/', '')
             for pth
-            in glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee')
+            in sorted(glob2.glob(COMMON_ROOT / 'static/coffee/src/**/*.coffee'))
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
-            for pth in glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee')\
+            for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
             if pth not in courseware_only_js and pth not in discussion_js
         ] + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
+            'js/query-params.js',
         ],
         'output_filename': 'js/lms-application.js'
     },
@@ -531,6 +554,8 @@ PIPELINE_JS = {
         'output_filename': 'js/discussion.js'
     }
 }
+
+PIPELINE_DISABLE_WRAPPER = True
 
 # Compile all coffee files in course data directories if they are out of date.
 # TODO: Remove this once we move data into Mongo. This is only temporary while
@@ -564,8 +589,6 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
-    "*.py",
-    "*.pyc"
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
@@ -601,7 +624,9 @@ INSTALLED_APPS = (
     'track',
     'util',
     'certificates',
-    
+    'instructor',
+    'psychometrics',
+
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
     'django_notify',
