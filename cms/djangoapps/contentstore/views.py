@@ -144,8 +144,9 @@ def edit_subsection(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
-    return render_to_response('edit_subsection.html', 
-                              {'subsection':item})
+    return render_to_response('edit_subsection.html',
+                              {'subsection': item})
+
 
 @login_required
 def edit_unit(request, location):
@@ -166,7 +167,7 @@ def edit_unit(request, location):
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=settings.LMS_BASE,
             # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id= modulestore().get_containing_courses(item.location)[0].id,
+            course_id = modulestore().get_containing_courses(item.location)[0].id,
             location=item.location,
         )
     else:
@@ -188,10 +189,22 @@ def edit_unit(request, location):
         in item.get_children()
     ]
 
+    # TODO (cpennington): If we share units between courses,
+    # this will need to change to check permissions correctly so as
+    # to pick the correct parent subsection
+    containing_subsection_locs = modulestore().get_parent_locations(location)
+    containing_subsection = modulestore().get_item(containing_subsection_locs[0])
+
+    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
+    containing_section = modulestore().get_item(containing_section_locs[0])
+
     return render_to_response('unit.html', {
         'unit': item,
         'components': components,
         'component_templates': component_templates,
+        'lms_link': lms_link,
+        'subsection': containing_subsection,
+        'section': containing_section,
     })
 
 
