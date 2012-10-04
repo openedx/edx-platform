@@ -22,14 +22,14 @@ This def will enumerate through a passed in subsection and list all of the units
       % if actions:
       <div class="item-actions">
 	<a href="#" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
-	<a href="#" class="drag-handle wip"></a>
+	<a href="#" class="drag-handle"></a>
       </div>
       % endif
     </div>
   </li>
   % endfor
   <li>
-    <a href="#" class="new-unit-item wip" data-template="${create_new_unit_template}" data-parent="${subsection.location}">
+    <a href="#" class="new-unit-item" data-template="${create_new_unit_template}" data-parent="${subsection.location}">
       <span class="new-unit-icon"></span>New Unit
     </a>
   </li>

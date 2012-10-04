@@ -113,7 +113,7 @@ function deleteUnit(e) {
     var id = _li_el.data('id');
     
     $.post('/delete_item', 
-	   {'id': id, 'delete_children' : 'true'}, 
+	   {'id': id, 'delete_children' : true}, 
 	   function(data) {
 	       _li_el.remove();
 	   });

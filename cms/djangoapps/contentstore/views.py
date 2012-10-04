@@ -128,14 +128,10 @@ def course_index(request, org, course, name):
     course = modulestore().get_item(location)
     sections = course.get_children()
 
-    # This knowledge of what the 'new template' should be seems like it needs to be kept deeper down in the
-    # code. We should probably refactor
-    template = modulestore().get_item(Location('i4x', 'edx', 'templates', 'vertical', 'Empty'))
-
     return render_to_response('overview.html', {
         'sections': sections,
         'upload_asset_callback_url': upload_asset_callback_url,
-        'create_new_unit_template': template.location
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
 
@@ -151,13 +147,9 @@ def edit_subsection(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
-    # This knowledge of what the 'new template' should be seems like it needs to be kept deeper down in the
-    # code. We should probably refactor
-    template = modulestore().get_item(Location('i4x', 'edx', 'templates', 'vertical', 'Empty'))
-
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
-                               'create_new_unit_template' : template.location
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
                                })
 
 @login_required
@@ -210,10 +202,6 @@ def edit_unit(request, location):
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
-    # This knowledge of what the 'new template' should be seems like it needs to be kept deeper down in the
-    # code. We should probably refactor
-    template = modulestore().get_item(Location('i4x', 'edx', 'templates', 'vertical', 'Empty'))
-
     return render_to_response('unit.html', {
         'unit': item,
         'components': components,
@@ -221,7 +209,7 @@ def edit_unit(request, location):
         'lms_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
-        'create_new_unit_template' : template.location
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
 
@@ -412,7 +400,7 @@ def _delete_item(item, recurse=False):
     if recurse:
         children = item.get_children()
         for child in children:
-            _delete_item(child)
+            _delete_item(child, recurse)
         
     modulestore().delete_item(item.location);
     
@@ -427,29 +415,13 @@ def delete_item(request):
         raise PermissionDenied()
 
     # optional parameter to delete all children (default False)
-    delete_children = False
-    if 'delete_children' in request.POST:
-        delete_children = request.POST['delete_children'] in ['true', 'True']
+    delete_children = request.POST.get('delete_children', False)
 
     item = modulestore().get_item(item_location)
 
-    _delete_item(item)
+    _delete_item(item, delete_children)
     
     return HttpResponse()
-
-@login_required
-@expect_json
-def create_item(request):
-    # parent_location should be the location of the parent container
-    parent_location = request.POST['parent_id']
-
-    # which type of item to create
-    category = request.POST['category']
-
-    # check permissions for this user within this course
-    if not has_access(request.user, parent_location):
-        raise PermissionDenied()
-
 
 
 @login_required
@@ -491,9 +463,7 @@ def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
     
-    display_name = None
-    if 'display_name' in request.POST:
-        display_name = request.POST['display_name']
+    display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
