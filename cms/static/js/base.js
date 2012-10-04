@@ -233,12 +233,28 @@ function showFileSelectionMenu(e) {
 function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
     $('.upload-modal .file-name').html($('.file-input').val());
+
+    var bar = $('.progress-fill');
+    var percent = $('.percent');
+
+    $('.upload-modal .file-chooser').ajaxSubmit({
+        beforeSend: function() {
+            var percentVal = '0%';
+            bar.width(percentVal)
+            percent.html(percentVal);
+        },
+        uploadProgress: function(event, position, total, percentComplete) {
+            var percentVal = percentComplete + '%';
+            bar.width(percentVal)
+            percent.html(percentVal);
+        },
+        complete: function(xhr) {
+          markAsLoaded();
+        }
+    });
+
     $('.upload-modal .choose-file-button').hide();
     $('.upload-modal .progress-bar').removeClass('loaded').show();
-    $('.upload-modal .progress-fill').html('').css('width', '0').animate({
-        'width': '100%'
-    }, 1500);
-    setTimeout(markAsLoaded, 1500);
 }
 
 function markAsLoaded() {
