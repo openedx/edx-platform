@@ -24,7 +24,7 @@ class StaticContent(object):
 
     @staticmethod
     def compute_location(org, course, name, revision=None):
-        return Location([XASSET_LOCATION_TAG, org, course, 'asset', name, revision])
+        return Location([XASSET_LOCATION_TAG, org, course, 'asset', Location.clean(name), revision])
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
