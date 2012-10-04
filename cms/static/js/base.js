@@ -25,7 +25,39 @@ $(document).ready(function() {
     $('.upload-modal .close-button').bind('click', hideModal);
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
+    $('.save-subsection').bind('click', saveSubsection);
 });
+
+function saveSubsection(e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+
+    // pull all metadata editable fields on page
+    var metadata_fields = $('input[data-metadata-name]');
+    
+    metadata = {};
+    for(var i=0; i< metadata_fields.length;i++) {
+	el = metadata_fields[i];
+	metadata[$(el).data("metadata-name")] = el.value;
+    } 
+
+    children =[];
+
+    $.ajax({
+	    url: "/save_item",
+		type: "POST",
+		dataType: "json",
+		contentType: "application/json",
+		data:JSON.stringify({ 'id' : id, 'metadata' : metadata, 'data': null, 'children' : children}),
+		success: function() {
+		alert('Your changes have been saved.');
+	    },
+		error: function() {
+		alert('There has been an error while saving your changes.');
+	    }
+	});
+}
 
 function createNewUnit(e) {
     e.preventDefault();
