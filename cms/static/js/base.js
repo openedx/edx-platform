@@ -24,19 +24,39 @@ $(document).ready(function() {
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
+    $('.new-unit-item').bind('click', createNewUnit);
 });
+
+function createNewUnit(e) {
+    e.preventDefault();
+
+    parent = $(this).data('parent');
+    template = $(this).data('template');
+
+    $.post('/clone_item',
+	   {'parent_location' : parent,
+		   'template' : template,
+		   'display_name': 'New Unit',
+		   },
+	   function(data) {
+	       // redirect to the edit page
+	       window.location = "/edit/" + data['id'];
+	   });
+}
 
 function deleteUnit(e) {
     e.preventDefault();
-    var id = $(this).data('id');
-    var _this = $(this);
+
+    if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
+	return;
+
+    var _li_el = $(this).parents('li.leaf');
+    var id = _li_el.data('id');
     
     $.post('/delete_item', 
 	   {'id': id, 'delete_children' : 'true'}, 
 	   function(data) {
-	       // remove 'leaf' class containing <li> element
-	       var parent = _this.parents('li.leaf');
-	       parent.remove();
+	       _li_el.remove();
 	   });
 }
 

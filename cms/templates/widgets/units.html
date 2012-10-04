@@ -6,7 +6,7 @@ This def will enumerate through a passed in subsection and list all of the units
 <%def name="enum_units(subsection)">
 <ol>
   % for unit in subsection.get_children():
-  <li class="leaf unit">
+  <li class="leaf unit" data-id="${unit.location}">
     <div class="section-item">
       <a href="${reverse('edit_unit', args=[unit.location])}" class="private-item">
 	<span class="${unit.category}-icon"></span>${unit.display_name} <span class="private-tag">- private</span>
@@ -19,7 +19,7 @@ This def will enumerate through a passed in subsection and list all of the units
   </li>
   % endfor
   <li>
-    <a href="#" class="new-unit-item wip">
+    <a href="#" class="new-unit-item wip" data-template="${create_new_unit_template}" data-parent="${subsection.location}">
       <span class="new-unit-icon"></span>New Unit
     </a>
   </li>
