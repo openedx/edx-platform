@@ -2,15 +2,17 @@
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
 
+DRAFT = 'draft'
+
 
 class DraftModuleStore(ModuleStoreBase):
     """
     This mixin modifies a modulestore to give it draft semantics.
-    That is, edits made to units are stored to locations that have the revision 'draft',
-    and when reads are made, they first read with revision 'draft', and then fall back
-    to the baseline revision only if 'draft' doesn't exist.
+    That is, edits made to units are stored to locations that have the revision DRAFT,
+    and when reads are made, they first read with revision DRAFT, and then fall back
+    to the baseline revision only if DRAFT doesn't exist.
 
-    This module also includes functionality to promote 'draft' modules (and optionally
+    This module also includes functionality to promote DRAFT modules (and optionally
     their children) to published modules.
     """
 
@@ -34,7 +36,7 @@ class DraftModuleStore(ModuleStoreBase):
             get_children() to cache. None indicates to cache all descendents
         """
         try:
-            return super(DraftModuleStore, self).get_item(Location(location)._replace(revision='draft'), depth)
+            return super(DraftModuleStore, self).get_item(Location(location)._replace(revision=DRAFT), depth)
         except ItemNotFoundError:
             return super(DraftModuleStore, self).get_item(location, depth)
 
@@ -44,7 +46,7 @@ class DraftModuleStore(ModuleStoreBase):
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
         try:
-            return super(DraftModuleStore, self).get_instance(course_id, Location(location)._replace(revision='draft'))
+            return super(DraftModuleStore, self).get_instance(course_id, Location(location)._replace(revision=DRAFT))
         except ItemNotFoundError:
             return super(DraftModuleStore, self).get_instance(course_id, location)
 
@@ -61,7 +63,7 @@ class DraftModuleStore(ModuleStoreBase):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-        draft_loc = Location(location)._replace(revision='draft')
+        draft_loc = Location(location)._replace(revision=DRAFT)
         draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth)
         items = super(DraftModuleStore, self).get_items(location, depth)
 
@@ -69,7 +71,7 @@ class DraftModuleStore(ModuleStoreBase):
         non_draft_items = [
             item
             for item in items
-            if (item.location.revision != 'draft'
+            if (item.location.revision != DRAFT
                 and item.location._replace(revision=None) not in draft_locs_found)
         ]
         return draft_items + non_draft_items
@@ -79,7 +81,7 @@ class DraftModuleStore(ModuleStoreBase):
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
-        return super(DraftModuleStore, self).clone_item(source, Location(location)._replace(revision='draft'))
+        return super(DraftModuleStore, self).clone_item(source, Location(location)._replace(revision=DRAFT))
 
     def update_item(self, location, data):
         """
@@ -89,7 +91,12 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-        return super(DraftModuleStore, self).update_item(Location(location)._replace(revision='draft'), data)
+        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_item = self.get_item(location)
+        if draft_item.location.revision != DRAFT:
+            self.clone_item(location, draft_loc)
+
+        return super(DraftModuleStore, self).update_item(draft_loc, data)
 
     def update_children(self, location, children):
         """
@@ -99,7 +106,12 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
-        return super(DraftModuleStore, self).update_children(Location(location)._replace(revision='draft'), children)
+        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_item = self.get_item(location)
+        if draft_item.location.revision != DRAFT:
+            self.clone_item(location, draft_loc)
+
+        return super(DraftModuleStore, self).update_children(draft_loc, children)
 
     def update_metadata(self, location, metadata):
         """
@@ -109,7 +121,12 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         metadata: A nested dictionary of module metadata
         """
-        return super(DraftModuleStore, self).update_metadata(Location(location)._replace(revision='draft'), metadata)
+        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_item = self.get_item(location)
+        if draft_item.location.revision != DRAFT:
+            self.clone_item(location, draft_loc)
+
+        return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
     def delete_item(self, location):
         """
@@ -117,7 +134,7 @@ class DraftModuleStore(ModuleStoreBase):
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(Location(location)._replace(revision='draft'))
+        return super(DraftModuleStore, self).delete_item(Location(location)._replace(revision=DRAFT))
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
@@ -125,4 +142,4 @@ class DraftModuleStore(ModuleStoreBase):
 
         returns an iterable of things that can be passed to Location.
         '''
-        return super(DraftModuleStore, self).get_parent_locations(Location(location)._replace(revision='draft'))
+        return super(DraftModuleStore, self).get_parent_locations(Location(location)._replace(revision=DRAFT))
