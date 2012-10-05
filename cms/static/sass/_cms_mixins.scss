@@ -173,13 +173,33 @@
 			background: #fffcf1;
 		}
 
-		.draft-item,
-		.hidden-item,
+		.draft-item:after,
+		.public-item:after,
+		.private-item:after {
+			margin-left: 3px;
+			font-size: 9px;
+			font-weight: 600;
+			text-transform: uppercase;
+		}
+
+		.draft-item:after {
+			content: "- draft";
+		}
+
+		.public-item:after {
+			content: "- public";
+		}
+
+		.private-item:after {
+			content: "- private";
+		}
+
+		.public-item,
 		.private-item {
 			color: #a4aab7;
 		}
 
-		.has-new-draft-item {
+		.draft-item {
 			color: #9f7d10;
 		}
 	}

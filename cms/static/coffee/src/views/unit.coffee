@@ -22,6 +22,11 @@ class CMS.Views.UnitEdit extends Backbone.View
       model: @model
     )
 
+    @locationView = new CMS.Views.UnitEdit.LocationState(
+      el: @$('.section-item.editing a')
+      model: @model
+    )
+
     @model.on('change:state', @render)
 
     @$newComponentItem = @$('.new-component-item')
@@ -149,6 +154,13 @@ class CMS.Views.UnitEdit extends Backbone.View
     }, =>
       @model.set('state', @$('#visibility').val())
     )
+
+class CMS.Views.UnitEdit.LocationState extends Backbone.View
+  initialize: =>
+    @model.on('change:state', @render)
+  
+  render: =>
+    @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 
 class CMS.Views.UnitEdit.Visibility extends Backbone.View
   initialize: =>

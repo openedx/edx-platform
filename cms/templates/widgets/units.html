@@ -1,4 +1,5 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from contentstore.utils import compute_unit_state %>
 
 <!--
 This def will enumerate through a passed in subsection and list all of the units
@@ -8,16 +9,16 @@ This def will enumerate through a passed in subsection and list all of the units
   % for unit in subsection.get_children():
   <li class="leaf unit" data-id="${unit.location}">
     <%
+      unit_state = compute_unit_state(unit)
       if unit.location == selected:
         selected_class = 'editing'
       else:
         selected_class = ''
     %>
     <div class="section-item ${selected_class}">
-      <a href="${reverse('edit_unit', args=[unit.location])}" class="private-item">
+      <a href="${reverse('edit_unit', args=[unit.location])}" class="${unit_state}-item">
         <span class="${unit.category}-icon"></span>
         ${unit.display_name}
-        <span class="private-tag wip">- private</span>
       </a>
       % if actions:
       <div class="item-actions">
