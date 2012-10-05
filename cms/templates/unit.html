@@ -92,46 +92,25 @@
           <h4>Unit Location</h4>
           <div class="window-contents">
             <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
-            <section class="courseware-section branch">
-              <header>
-                <div class="item-details">
-                  <h3>${section.display_name}</h3>
-                </div>
-              </header>
-              <div class="unit-list">
+            <ol>
+              <li>
+                <a href="#" class="section-item">${section.display_name}</a>
                 <ol>
-                  <li class="branch">
-                    <div class="section-item">
-                      <div>
-                        <a href="${reverse('edit_subsection', args=[subsection.location])}">
-                          <span class="folder-icon"></span>
-                          <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
-                        </a>
-                      </div>
-                    </div>
-                    ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                  <li>
+                    <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
+                      <span class="folder-icon"></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                    </a>
+                    <ol>
+                      ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                    </ol>
                   </li>
                 </ol>
-              </div>
-            </section>
+              </li>
+            </ol>            
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="history-modal">
-    <div class="modal-body">
-      <h2>S3V2: Properties of Linearity</h2>
-      <div class="video-unit"><img src="images/video-module.png"></div>
-      <p><span class="textbook-icon"></span>More information given in the text.</p>
-      <p><span class="slides-icon"></span>Lecture Slides Handout [Clean] [Annotated]</p>
-    </div>
-    <div class="modal-actions">
-      <a href="#" class="revert-button">Revert to this version</a>
-      <a href="#" class="close-button">Close</a>
-    </div>
-  </div>
-
-  <div class="modal-cover"></div>
 </%block>
