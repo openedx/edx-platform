@@ -334,9 +334,11 @@ output "Installing askbot requirements"
 pip install -r askbot/askbot_requirements.txt
 pip install -r askbot/askbot_requirements_dev.txt
 
-
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
+
+output "Fixing your git default settings"
+git config --global push.default current
 
 cat<<END
    Success!!
