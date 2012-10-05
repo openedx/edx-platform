@@ -288,12 +288,13 @@
             white-space: nowrap;
 
             a {
+              font-family: $serif;
               color: $base-font-color;
-              font-weight: 700;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
 
               &:hover {
-                text-decoration: underline;
+                color: $pink;
+                text-decoration: none;
               }
             }
           }
@@ -316,6 +317,26 @@
             letter-spacing: 1px;
             text-align: center;
           }
+
+          &.ended {
+            width: flex-grid(4);
+            background: #ddd;
+          }
+        }
+
+        .download-certificate {
+          @include button(shiny, lighten($pink, 15%));
+          @include box-sizing(border-box);
+          @include border-radius(3px);
+          display: block;
+          float: left;
+          font: normal .9rem/1.6rem $sans-serif;
+          padding: 6px 0px;
+          text-transform: uppercase;
+          text-align: center;
+          margin-top: 16px;
+          margin-right: flex-gutter();
+          width: flex-grid(4);
         }
 
         .enter-course {
@@ -324,8 +345,7 @@
           @include border-radius(3px);
           display: block;
           float: left;
-          font: normal 1rem/1.6rem $sans-serif;
-          letter-spacing: 1px;
+          font: normal .9rem/1.6rem $sans-serif;
           padding: 6px 0px;
           text-transform: uppercase;
           text-align: center;
