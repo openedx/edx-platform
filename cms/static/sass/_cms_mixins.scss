@@ -17,10 +17,10 @@
 	@include transition(background-color .15s, box-shadow .15s);
 
 	&.disabled {
-		border: 1px solid $darkGrey !important;
+		border: 1px solid $lightGrey !important;
 		border-radius: 3px !important;
 		background: $lightGrey !important;
-		color: #fff !important;
+		color: $darkGrey !important;
 		pointer-events: none;
 		cursor: none;
 		&:hover {
