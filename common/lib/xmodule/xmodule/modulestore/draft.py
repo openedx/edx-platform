@@ -112,7 +112,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
-        if draft_item.location.revision != DRAFT:
+        if not draft_item.metadata['is_draft']:
             self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_item(draft_loc, data)
@@ -143,11 +143,11 @@ class DraftModuleStore(ModuleStoreBase):
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
 
+        if not draft_item.metadata['is_draft']:
+            self.clone_item(location, draft_loc)
+
         if 'is_draft' in metadata:
             del metadata['is_draft']
-
-        if draft_item.location.revision != DRAFT:
-            self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
 
