@@ -22,8 +22,9 @@
   .breadcrumbs {
     border-radius: 3px 3px 0 0;
     border-bottom: 1px solid #cbd1db;
-    background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%) #edf1f5;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+    @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%);
+    background-color: #edf1f5;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
     @include clearfix;
 
     li {
@@ -56,7 +57,7 @@
       border: 1px solid #d1ddec;
       border-radius: 3px;
       background: #fff;
-      -webkit-transition: border-color .15s;
+      @include transition(border-color .15s);
 
       &:hover {
         border-color: #6696d7;
@@ -94,7 +95,7 @@
         position: absolute;
         top: 4px;
         right: 4px;
-        -webkit-transition: opacity .15s;
+        @include transition(opacity .15s);
       }
 
       .edit-button,
@@ -107,7 +108,7 @@
         background: #d1ddec;
         font-size: 12px;
         color: #fff;
-        -webkit-transition: all .15s;
+        @include transition(all .15s);
 
         &:hover {
           background-color: $blue;
@@ -132,16 +133,17 @@
         border: 1px solid #d1ddec;
         background: url(../img/drag-handles.png) center no-repeat #d1ddec;
         cursor: move;
-        -webkit-transition: all .15s;
+        @include transition(all .15s);
       }
 
       &.new-component-item {
         padding: 0;
         border: 1px solid #8891a1;
         border-radius: 3px;
-        background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) #d1dae3;
-        box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
-        -webkit-transition: background-color .15s, border-color .15s;
+        @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+        background-color: #d1dae3;
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
+        @include transition(background-color .15s, border-color .15s);
 
         &.adding {
           background-color: $blue;
@@ -182,8 +184,8 @@
             line-height: 14px;
             color: #fff;
             text-align: center;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .4) inset;
-            -webkit-transition: background-color .15s;
+            @include box-shadow(0 1px 1px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .4) inset);
+            @include transition(background-color .15s);
 
             &:hover {
               background-color: rgba(255, 255, 255, .2);
@@ -195,7 +197,7 @@
               left: 0;
               width: 100%;
               padding: 10px;
-              box-sizing: border-box;
+              @include box-sizing(border-box);
             }
           }
         }
@@ -225,7 +227,8 @@
     display: none;
     padding: 20px;
     border-radius: 0 0 3px 3px;
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1)) $blue;
+    @include linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1));
+    background-color: $blue;
     color: #fff;
 
     .metadata_edit {
@@ -360,7 +363,7 @@
   .url {
     width: 100%;
     margin-bottom: 10px;
-    box-shadow: none;
+    @include box-shadow(none);
   }
 
   .window-contents > ol {

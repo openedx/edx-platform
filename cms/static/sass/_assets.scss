@@ -28,7 +28,8 @@
       }
 
       thead th {
-        background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, .1)) #ced2db;
+        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+        background-color: #ced2db;
         font-size: 12px;
         font-weight: 700;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .5);

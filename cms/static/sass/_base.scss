@@ -16,7 +16,7 @@ body {
 a {
     text-decoration: none;
     color: $blue;
-    -webkit-transition: color .15s;
+    @include transition(color .15s);
 
     &:hover {
         color: #cb9c40;
@@ -53,7 +53,7 @@ h1 {
     background: #fff;
     border: 1px solid $darkGrey;
     border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
 }
 
 .sidebar {
@@ -78,24 +78,27 @@ input[type="text"],
 input[type="email"],
 input[type="password"] {
     padding: 6px 8px 8px;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border: 1px solid #b0b6c2;
     border-radius: 2px;
-    background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3)) #edf1f5;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
+    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
+    background-color: #edf1f5;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
     font-family: 'Open Sans', sans-serif;
     font-size: 11px;
     color: #3c3c3c;
     outline: 0;
 
-    &::-webkit-input-placeholder {
+    &::-webkit-input-placeholder,
+    &:-moz-placeholder,
+    &:-ms-input-placeholder {
         color: #979faf;
     }
 }
 
 input.search {
     padding: 6px 15px 8px 30px;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border: 1px solid $darkGrey;
     border-radius: 20px;
     background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
@@ -116,10 +119,11 @@ label {
     width: 100%;
     min-height: 80px;
     padding: 10px;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border: 1px solid #b0b6c2;
-    background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3)) #edf1f5;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
+    background-color:  #edf1f5;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.1) inset);
     font-family: Monaco, monospace;
 }
 
@@ -167,8 +171,9 @@ label {
         padding: 6px 14px;
         border-bottom: 1px solid #cbd1db;
         border-radius: 3px 3px 0 0;
-        background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%) #edf1f5;
-        box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+        @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%);
+        background-color: #edf1f5;
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
         font-size: 14px;
         font-weight: 600;
     }
