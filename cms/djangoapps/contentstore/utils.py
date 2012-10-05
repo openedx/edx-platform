@@ -1,13 +1,14 @@
+from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 
-'''
-cdodge: for a given Xmodule, return the course that it belongs to
-NOTE: This makes a lot of assumptions about the format of the course location
-Also we have to assert that this module maps to only one course item - it'll throw an
-assert if not
-'''
 def get_course_location_for_item(location):
+    '''
+    cdodge: for a given Xmodule, return the course that it belongs to
+    NOTE: This makes a lot of assumptions about the format of the course location
+    Also we have to assert that this module maps to only one course item - it'll throw an
+    assert if not
+    '''
     item_loc = Location(location)
 
     # check to see if item is already a course, if so we can skip this
@@ -29,3 +30,18 @@ def get_course_location_for_item(location):
         location = courses[0].location
 
     return location
+
+
+def get_lms_link_for_item(item):
+    if settings.LMS_BASE is not None:
+        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=settings.LMS_BASE,
+            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+            course_id = modulestore().get_containing_courses(item.location)[0].id,
+            location=item.location,
+        )
+    else:
+        lms_link = None
+
+    return lms_link
+

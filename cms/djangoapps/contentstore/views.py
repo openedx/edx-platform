@@ -43,7 +43,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
-from .utils import get_course_location_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item
 
 from xmodule.templates import all_templates
 
@@ -143,13 +143,18 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
+    lms_link = get_lms_link_for_item(item)
+
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
+    logging.debug('Start = {0}'.format(item.start))
+
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'lms_link': lms_link
                                })
 
 @login_required
@@ -167,15 +172,7 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
-    if settings.LMS_BASE is not None:
-        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id = modulestore().get_containing_courses(item.location)[0].id,
-            location=item.location,
-        )
-    else:
-        lms_link = None
+    lms_link = get_lms_link_for_item(item)
 
     component_templates = defaultdict(list)
 

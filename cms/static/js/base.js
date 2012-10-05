@@ -31,6 +31,11 @@ $(document).ready(function() {
     $('.sortable-unit-list').sortable();
     $('.sortable-unit-list').disableSelection();
     $('.sortable-unit-list').bind('sortstop', onUnitReordered);
+
+    // expand/collapse methods for optional date setters
+    $('.set-date').bind('click', showDateSetter);
+    $('.remove-date').bind('click', removeDateSetter);
+
 });
 
 // This method only changes the ordering of the child objects in a subsection
@@ -198,8 +203,22 @@ function hideHistoryModal(e) {
     $modalCover.hide();
 }
 
+function showDateSetter(e) {
+    e.preventDefault();
+    var $block = $(this).closest('.due-date-input');
+    $(this).hide();
+    $block.find('.date-setter').show();
+}
 
-
+function removeDateSetter(e) {
+    e.preventDefault();
+    var $block = $(this).closest('.due-date-input');
+    $block.find('.date-setter').hide();
+    $block.find('.set-date').show();
+    // clear out the values
+    $block.find('.date').val('');
+    $block.find('.time').val('');
+}
 
 
 
