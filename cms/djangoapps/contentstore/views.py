@@ -231,7 +231,6 @@ def edit_unit(request, location):
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
-        'release_date': None,
         'published_date': published_date,
     })
 

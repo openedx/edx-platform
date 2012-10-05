@@ -83,7 +83,7 @@
             <a id="create-draft" href="#">This unit has been published. Click here to edit it.</a>
             <a id="publish-draft" href="#">This unit has already been published. Click here to release your changes to it</a>
             <div class="row status">
-              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${release_date}</strong> with the subsection <a href="#">""</a></p>
+              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${subsection.start}</strong> with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
             </div>
             <div class="row unit-actions">
               <a id="save-draft" href="#" class="save-button">Save Draft</a>
