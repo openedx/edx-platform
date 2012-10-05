@@ -59,9 +59,9 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.location.revision == DRAFT:
+    if unit.metadata.get('is_draft', False):
         try:
-            modulestore('direct').get_item(unit.location._replace(revision=None))
+            modulestore('direct').get_item(unit.location)
             return 'draft'
         except ItemNotFoundError:
             return 'private'

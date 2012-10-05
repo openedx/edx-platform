@@ -521,6 +521,21 @@ def publish_draft(request):
 
     return HttpResponse()
 
+
+@login_required
+@expect_json
+def unpublish_unit(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    modulestore().unpublish(location)
+
+    return HttpResponse()
+
+
 @login_required
 @expect_json
 def clone_item(request):

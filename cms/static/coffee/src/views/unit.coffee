@@ -9,8 +9,15 @@ class CMS.Views.UnitEdit extends Backbone.View
     'click #delete-draft': 'deleteDraft'
     'click #create-draft': 'createDraft'
     'click #publish-draft': 'publishDraft'
+    'change #visibility': 'setVisibility'
 
   initialize: =>
+    @visibility_view = new CMS.Views.UnitEdit.Visibility(
+      el: @$('#visibility')
+      model: @model
+    )
+    @visibility_view.render()
+
     @$newComponentItem = @$('.new-component-item')
     @$newComponentTypePicker = @$('.new-component')
     @$newComponentTemplatePickers = @$('.new-component-templates')
@@ -18,6 +25,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$('.components').sortable(
       handle: '.drag-handle'
+      update: (event, ui) => @model.set('children', @components())
     )
 
     @$('.component').each((idx, element) =>
@@ -28,9 +36,8 @@ class CMS.Views.UnitEdit extends Backbone.View
                 id: $(element).data('id'),
             )
         )
+        update: (event, ui) => @model.set('children', @components())
     )
-
-    @model.components = @components()
 
   # New component creation
   showNewComponentForm: (event) =>
@@ -75,9 +82,7 @@ class CMS.Views.UnitEdit extends Backbone.View
   components: => @$('.component').map((idx, el) -> $(el).data('id')).get()
 
   saveDraft: =>
-    @model.save(
-      children: @components()
-    )
+    @model.save()
 
   deleteComponent: (event) =>
     $component = $(event.currentTarget).parents('.component')
@@ -101,6 +106,7 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: @$el.data('id')
     }, =>
       @$el.toggleClass('edit-state-public edit-state-draft')
+      @model.set('state', 'draft')
     )
 
   publishDraft: (event) ->
@@ -108,4 +114,26 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: @$el.data('id')
     }, =>
       @$el.toggleClass('edit-state-public edit-state-draft')
+      @model.set('state', 'public')
     )
+
+  setVisibility: (event) ->
+    if @$('#visibility').val() == 'private'
+      target_url = '/unpublish_unit'
+    else
+      target_url = '/publish_draft'
+
+    $.post(target_url, {
+      id: @$el.data('id')
+    }, =>
+      @$el.toggleClass('edit-state-public edit-state-private')
+      @model.set('state', @$('#visibility').val())
+    )
+
+class CMS.Views.UnitEdit.Visibility extends Backbone.View
+  initialize: =>
+    @model.on('change:state', @render)
+
+  render: =>
+    @$el.val(@model.get('state'))
+

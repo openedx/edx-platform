@@ -8,7 +8,8 @@
     new CMS.Views.UnitEdit({
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
-        id: '${unit_location}'
+        id: '${unit_location}',
+        state: '${unit_state}'
       })
     });
   </script>
@@ -74,9 +75,9 @@
           <div class="window-contents">
             <div class="row visibility">
               <label class="inline-label">Visibility:</label>
-              <select>
-                <option>Public</option>
-                <option>Private</option>
+              <select id='visibility'>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
               </select>
             </div>
             <a id="create-draft" href="#">This unit has been published. Click here to edit it.</a>

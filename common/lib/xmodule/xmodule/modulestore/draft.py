@@ -6,6 +6,24 @@ from .exceptions import ItemNotFoundError
 DRAFT = 'draft'
 
 
+def as_draft(location):
+    """
+    Returns the Location that is the draft for `location`
+    """
+    return Location(location)._replace(revision=DRAFT)
+
+
+def wrap_draft(item):
+    """
+    Sets `item.metadata['is_draft']` to `True` if the item is a
+    draft, and false otherwise. Sets the item's location to the
+    non-draft location in either case
+    """
+    item.metadata['is_draft'] = item.location.revision == DRAFT
+    item.location = item.location._replace(revision=None)
+    return item
+
+
 class DraftModuleStore(ModuleStoreBase):
     """
     This mixin modifies a modulestore to give it draft semantics.
@@ -37,9 +55,9 @@ class DraftModuleStore(ModuleStoreBase):
             get_children() to cache. None indicates to cache all descendents
         """
         try:
-            return super(DraftModuleStore, self).get_item(Location(location)._replace(revision=DRAFT), depth)
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth))
         except ItemNotFoundError:
-            return super(DraftModuleStore, self).get_item(location, depth)
+            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth))
 
     def get_instance(self, course_id, location):
         """
@@ -47,9 +65,9 @@ class DraftModuleStore(ModuleStoreBase):
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
         try:
-            return super(DraftModuleStore, self).get_instance(course_id, Location(location)._replace(revision=DRAFT))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location)))
         except ItemNotFoundError:
-            return super(DraftModuleStore, self).get_instance(course_id, location)
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location))
 
     def get_items(self, location, depth=0):
         """
@@ -64,7 +82,7 @@ class DraftModuleStore(ModuleStoreBase):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_loc = as_draft(location)
         draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth)
         items = super(DraftModuleStore, self).get_items(location, depth)
 
@@ -75,14 +93,14 @@ class DraftModuleStore(ModuleStoreBase):
             if (item.location.revision != DRAFT
                 and item.location._replace(revision=None) not in draft_locs_found)
         ]
-        return draft_items + non_draft_items
+        return [wrap_draft(item) for item in draft_items + non_draft_items]
 
     def clone_item(self, source, location):
         """
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
-        return super(DraftModuleStore, self).clone_item(source, Location(location)._replace(revision=DRAFT))
+        return super(DraftModuleStore, self).clone_item(source, as_draft(location))
 
     def update_item(self, location, data):
         """
@@ -92,7 +110,7 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_loc = as_draft(location)
         draft_item = self.get_item(location)
         if draft_item.location.revision != DRAFT:
             self.clone_item(location, draft_loc)
@@ -107,9 +125,9 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
-        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_loc = as_draft(location)
         draft_item = self.get_item(location)
-        if draft_item.location.revision != DRAFT:
+        if not draft_item.metadata['is_draft']:
             self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_children(draft_loc, children)
@@ -122,8 +140,12 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         metadata: A nested dictionary of module metadata
         """
-        draft_loc = Location(location)._replace(revision=DRAFT)
+        draft_loc = as_draft(location)
         draft_item = self.get_item(location)
+
+        if 'is_draft' in metadata:
+            del metadata['is_draft']
+
         if draft_item.location.revision != DRAFT:
             self.clone_item(location, draft_loc)
 
@@ -135,7 +157,7 @@ class DraftModuleStore(ModuleStoreBase):
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(Location(location)._replace(revision=DRAFT))
+        return super(DraftModuleStore, self).delete_item(as_draft(location))
 
     def publish(self, location):
         """
@@ -149,3 +171,10 @@ class DraftModuleStore(ModuleStoreBase):
         super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
         super(DraftModuleStore, self).update_metadata(location, metadata)
         self.delete_item(location)
+
+    def unpublish(self, location):
+        """
+        Turn the published version into a draft, removing the published version
+        """
+        super(DraftModuleStore, self).clone_item(location, as_draft(location))
+        super(DraftModuleStore, self).delete_item(location)
