@@ -12,11 +12,11 @@
       <article class="subsection-body window">
 	<div class="subsection-name-input">
 	  <label>Display Name:</label>
-	  <input type="text" value="Welcome to 6.002x" class="subsection-display-name-input" />
+	  <input type="text" value="${subsection.metadata['display_name']}" class="subsection-display-name-input" data-metadata-name="display_name"/>
 	</div>
 	<div>
 	  <label>Subtitle:</label>
-	  <input type="text" value="Lecture Sequence" class="unit-subtitle" />
+	  <input type="text" value="${subsection.metadata['subtitle'] if 'subtitle' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="subtitle"/>
 	</div>
 	<div class="unit-list">
 	  <label>Units:</label>
@@ -55,7 +55,7 @@
 	  <a href="#" class="toggle-off">hide</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">show</a>
 	</div>
 	<div class="row unit-actions">
-	  <a href="#" class="save-button">Save</a>
+	  <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
 	  <a href="preview.html" target="_blank" class="preview-button">Preview</a>
 	</div>
       </div>

@@ -11,7 +11,6 @@ urlpatterns = ('',
     url(r'^$', 'contentstore.views.index', name='index'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
-    url(r'^delete/(?P<location>.*?)$', 'contentstore.views.delete_unit', name='delete_unit'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
@@ -30,6 +29,10 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index')
+
+    # temporary landing page for a course
+    url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing')
+
 )
 
 # User creation and updating views

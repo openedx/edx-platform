@@ -21,10 +21,103 @@ $(document).ready(function() {
     $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideModal);
     $modalCover.bind('click', hideHistoryModal);
-
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
+    $('.unit .item-actions .delete-button').bind('click', deleteUnit);
+    $('.new-unit-item').bind('click', createNewUnit);
+    $('.save-subsection').bind('click', saveSubsection);
+
+    // making the unit list sortable
+    $('.sortable-unit-list').sortable();
+    $('.sortable-unit-list').disableSelection();
+    $('.sortable-unit-list').bind('sortstop', onUnitReordered);
 });
+
+// This method only changes the ordering of the child objects in a subsection
+function onUnitReordered() {
+    var subsection_id = $(this).data('subsection-id');
+
+    var _els = $(this).children('li:.leaf');
+
+    var children = new Array();
+    for(var i=0;i<_els.length;i++) {
+	el = _els[i];
+	children[i] = $(el).data('id');
+    }
+
+    // call into server to commit the new order
+    $.ajax({
+	    url: "/save_item",
+		type: "POST",
+		dataType: "json",
+		contentType: "application/json",
+		data:JSON.stringify({ 'id' : subsection_id, 'metadata' : null, 'data': null, 'children' : children})
+	});
+}
+
+function saveSubsection(e) {
+    e.preventDefault();
+    
+    var id = $(this).data('id');
+
+    // pull all metadata editable fields on page
+    var metadata_fields = $('input[data-metadata-name]');
+    
+    metadata = {};
+    for(var i=0; i< metadata_fields.length;i++) {
+	el = metadata_fields[i];
+	metadata[$(el).data("metadata-name")] = el.value;
+    } 
+
+    children =[];
+
+    $.ajax({
+	    url: "/save_item",
+		type: "POST",
+		dataType: "json",
+		contentType: "application/json",
+		data:JSON.stringify({ 'id' : id, 'metadata' : metadata, 'data': null, 'children' : children}),
+		success: function() {
+		alert('Your changes have been saved.');
+	    },
+		error: function() {
+		alert('There has been an error while saving your changes.');
+	    }
+	});
+}
+
+function createNewUnit(e) {
+    e.preventDefault();
+
+    parent = $(this).data('parent');
+    template = $(this).data('template');
+
+    $.post('/clone_item',
+	   {'parent_location' : parent,
+		   'template' : template,
+		   'display_name': 'New Unit',
+		   },
+	   function(data) {
+	       // redirect to the edit page
+	       window.location = "/edit/" + data['id'];
+	   });
+}
+
+function deleteUnit(e) {
+    e.preventDefault();
+
+    if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
+	return;
+
+    var _li_el = $(this).parents('li.leaf');
+    var id = _li_el.data('id');
+    
+    $.post('/delete_item', 
+	   {'id': id, 'delete_children' : true}, 
+	   function(data) {
+	       _li_el.remove();
+	   });
+}
 
 function showUploadModal(e) {
     e.preventDefault();
