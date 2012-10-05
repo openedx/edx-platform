@@ -124,7 +124,8 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   publishDraft: (event) ->
     @wait(true)
-    
+    @saveDraft()
+
     $.post('/publish_draft', {
       id: @$el.data('id')
     }, =>
