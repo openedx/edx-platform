@@ -8,7 +8,7 @@ from django.core.cache import cache
 import logging
 import time
 
-DEFAULT_ASSOCIATION_TIMEOUT = 60
+DEFAULT_ASSOCIATIONS_TIMEOUT = 60
 DEFAULT_NONCE_TIMEOUT = 600
 
 ASSOCIATIONS_KEY_PREFIX = 'openid.provider.associations.'
@@ -34,51 +34,51 @@ class DjangoOpenIDStore(OpenIDStore):
     def __init__(self):
         log.info('DjangoStore cache:' + str(cache.__class__))
 
-    def storeAssociation(self, server_url, association):
+    def storeAssociation(self, server_url, assoc):
         key = get_url_key(server_url)
 
         log.info('storeAssociation {0}'.format(key))
 
         associations = cache.get(key, {})
-        associations[association.handle] = association
+        associations[assoc.handle] = assoc
 
-        cache.set(key, associations, DEFAULT_ASSOCIATION_TIMEOUT)
+        cache.set(key, associations, DEFAULT_ASSOCIATIONS_TIMEOUT)
 
     def getAssociation(self, server_url, handle=None):
         key = get_url_key(server_url)
 
         log.info('getAssociation {0}'.format(key))
 
-        associations = cache.get(key)
+        associations = cache.get(key, {})
 
-        association = None
+        assoc = None
 
-        if associations:
-            if handle is None:
-                # get best association
-                valid = [a for a in associations if a.getExpiresIn() > 0]
-                if valid:
-                    association = valid[0]
-            else:
-                association = associations.get(handle)
+        if handle is None:
+            # get best association
+            valid_assocs = [a for a in associations if a.getExpiresIn() > 0]
+            if valid_assocs:
+                valid_assocs.sort(lambda a: a.getExpiresIn(), reverse=True)
+                assoc = valid_assocs.sort[0]
+        else:
+            assoc = associations.get(handle)
 
         # check expiration and remove if it has expired
-        if association and association.getExpiresIn() <= 0:
+        if assoc and assoc.getExpiresIn() <= 0:
             if handle is None:
                 cache.delete(key)
             else:
                 associations.pop(handle)
-                cache.set(key, association, DEFAULT_ASSOCIATION_TIMEOUT)
-            association = None
+                cache.set(key, associations, DEFAULT_ASSOCIATIONS_TIMEOUT)
+            assoc = None
 
-        return association
+        return assoc
 
     def removeAssociation(self, server_url, handle):
         key = get_url_key(server_url)
 
         log.info('removeAssociation {0}'.format(key))
 
-        associations = cache.get(key)
+        associations = cache.get(key, {})
 
         removed = False
 
@@ -87,9 +87,9 @@ class DjangoOpenIDStore(OpenIDStore):
                 cache.delete(key)
                 removed = True
             else:
-                association = associations.pop(handle)
-                if association:
-                    cache.set(key, association, DEFAULT_ASSOCIATION_TIMEOUT)
+                assoc = associations.pop(handle)
+                if assoc:
+                    cache.set(key, associations, DEFAULT_ASSOCIATIONS_TIMEOUT)
                     removed = True
 
         return removed
