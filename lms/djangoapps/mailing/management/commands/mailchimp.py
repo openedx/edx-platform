@@ -41,6 +41,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         key, list_id, course_id = self.parse_options(options)
 
+        log.info('Syncronizing email list for {0}'.format(course_id))
+
         mailchimp = connect_mailchimp(key, list_id, course_id)
 
         subscribed = get_subscribed(mailchimp, list_id)
