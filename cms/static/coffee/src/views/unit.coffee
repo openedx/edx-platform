@@ -59,6 +59,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     event.preventDefault()
 
     editor = new CMS.Views.ModuleEdit(
+      onDelete: @deleteComponent
       model: new CMS.Models.Module()
     )
 
