@@ -65,4 +65,23 @@ class ContentStore(object):
         raise NotImplementedError
 
     def get_all_content_for_course(self, location):
+        '''
+        Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
+
+            [
+
+            {u'displayname': u'profile.jpg', u'chunkSize': 262144, u'length': 85374, 
+            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 183000), u'contentType': u'image/jpeg', 
+            u'_id': {u'category': u'asset', u'name': u'profile.jpg', u'course': u'6.002x', u'tag': u'c4x', 
+            u'org': u'MITx', u'revision': None}, u'md5': u'36dc53519d4b735eb6beba51cd686a0e'}, 
+
+            {u'displayname': u'profile.thumbnail.jpg', u'chunkSize': 262144, u'length': 4073, 
+            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 196000), u'contentType': u'image/jpeg', 
+            u'_id': {u'category': u'asset', u'name': u'profile.thumbnail.jpg', u'course': u'6.002x', u'tag': u'c4x', 
+            u'org': u'MITx', u'revision': None}, u'md5': u'ff1532598830e3feac91c2449eaa60d6'},
+
+            ....
+
+            ]
+        '''
         raise NotImplementedError
