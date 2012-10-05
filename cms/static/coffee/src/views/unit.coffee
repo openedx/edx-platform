@@ -12,11 +12,15 @@ class CMS.Views.UnitEdit extends Backbone.View
     'change #visibility': 'setVisibility'
 
   initialize: =>
-    @visibility_view = new CMS.Views.UnitEdit.Visibility(
+    @visibilityView = new CMS.Views.UnitEdit.Visibility(
       el: @$('#visibility')
       model: @model
     )
-    @visibility_view.render()
+
+    @saveView = new CMS.Views.UnitEdit.SaveDraftButton(
+      el: @$('#save-draft')
+      model: @model
+    )
 
     @model.on('change:state', @render)
 
@@ -149,7 +153,21 @@ class CMS.Views.UnitEdit extends Backbone.View
 class CMS.Views.UnitEdit.Visibility extends Backbone.View
   initialize: =>
     @model.on('change:state', @render)
+    @render()
 
   render: =>
     @$el.val(@model.get('state'))
 
+class CMS.Views.UnitEdit.SaveDraftButton extends Backbone.View
+  initialize: =>
+    @model.on('change:children', @enable)
+    @model.on('change:metadata', @enable)
+    @model.on('sync', @disable)
+
+    @disable()
+  
+  disable: =>
+    @$el.addClass('disabled')
+
+  enable: =>
+    @$el.removeClass('disabled')

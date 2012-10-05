@@ -16,6 +16,18 @@
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
 	@include transition(background-color .15s, box-shadow .15s);
 
+	&.disabled {
+		border: 1px solid $darkGrey !important;
+		border-radius: 3px !important;
+		background: $lightGrey !important;
+		color: #fff !important;
+		pointer-events: none;
+		cursor: none;
+		&:hover {
+			box-shadow: 0 0 0 0 !important;
+		}
+	}
+
 	&:hover {
 		@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
 	}
