@@ -418,6 +418,13 @@ def get_module_previews(request, descriptor):
         preview_html.append(module.get_html())
     return preview_html
 
+
+def _xmodule_recurse(item, action):
+    for child in item.get_children():
+        _xmodule_recurse(child, action)
+
+    action(item)
+
 def _delete_item(item, recurse=False):
     if recurse:
         children = item.get_children()
@@ -441,7 +448,10 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    _delete_item(item, delete_children)
+    if delete_children:
+        _xmodule_recurse(item, lambda i: modulestore().delete_item(i.location))
+    else:
+        modulestore().delete_item(item.location)
 
     return HttpResponse()
 
@@ -517,7 +527,8 @@ def publish_draft(request):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    modulestore().publish(location)
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().publish(i.location))
 
     return HttpResponse()
 
@@ -531,7 +542,8 @@ def unpublish_unit(request):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    modulestore().unpublish(location)
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
 
