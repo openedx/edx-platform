@@ -673,14 +673,14 @@ section.problem {
         }
 
         .result-correct {
-          background: url('../images/correct-icon.png') center left no-repeat;
+          background: url('../images/correct-icon.png') left 20px no-repeat;
           .result-actual-output {
             color: #090;
           }
         }
 
         .result-incorrect {
-          background: url('../images/incorrect-icon.png') center left no-repeat;
+          background: url('../images/incorrect-icon.png') left 20px no-repeat;
           .result-actual-output {
             color: #B00;
           }
