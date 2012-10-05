@@ -185,5 +185,22 @@ mark {
   }
 }
 
+.ie-banner {
+  display: none;
+  max-width: 1140px;
+  min-width: 720px;
+  margin: auto;
+  @include border-radius(0 0 3px 3px);
+  background: #f4f4e0;
+  color: #3c3c3c;
+  padding: 5px 20px 8px;
+  font-size: 13px;
+  text-align: center;
+
+  strong {
+    font-weight: 700;
+  }
+}
+
 
 
