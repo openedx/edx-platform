@@ -220,6 +220,10 @@
     }
   }
 
+  .xmodule_display {
+    padding: 10px 20px;
+  }
+
   .component-editor {
     @include edit-box;
     display: none;
@@ -382,7 +386,7 @@
       }
 
       .new-unit-item {
-        margin-left: 50px;
+        margin: 0 0 15px 50px;
       }
     }
   }
