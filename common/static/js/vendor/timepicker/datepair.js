@@ -1,3 +1,15 @@
+/************************
+datepair.js
+
+This is a component of the jquery-timepicker plugin
+
+http://jonthornton.github.com/jquery-timepicker/
+
+requires jQuery 1.6+
+
+version: 1.2.2
+************************/
+
 $(function() {
 
 	$('.datepair input.date').each(function(){

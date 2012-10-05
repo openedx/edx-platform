@@ -95,11 +95,10 @@ function saveSubsection(e) {
 	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
-    // OK, we have some metadata (namely 'Release Date' (aka 'start') and 'Due Date') which has been normalized in the UI
-    // we have to piece it back together. Unfortunate 'start' and 'due' use different string formatters. Rather than try to 
-    // replicate the string formatting which is used in the backend here in JS, let's just pass back a unified format
-    // and let the server re-format into the expected persisted format
 
+    // Piece back together the date/time UI elements into one date/time string
+    // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
+    // so make sure we're passing back the correct format
     metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
     metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
 

@@ -448,14 +448,15 @@ def save_item(request):
         # fetch original
         existing_item = modulestore().get_item(item_location)
 
-        logging.debug(posted_metadata)
-
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
         for metadata_key in posted_metadata.keys():
-            if posted_metadata[metadata_key] is None:
+            # NOTE: We don't want clients to be able to delete 'system metadata' which are not intended to be user
+            # editable
+            if posted_metadata[metadata_key] is None and metadata_key not in existing_item.system_metadata_fields:
                 # remove both from passed in collection as well as the collection read in from the modulestore
-                del existing_item.metadata[metadata_key]
+                if metadata_key in existing_item.metadata:
+                    del existing_item.metadata[metadata_key]
                 del posted_metadata[metadata_key]
 
         # overlay the new metadata over the modulestore sourced collection to support partial updates
