@@ -30,9 +30,9 @@ urlpatterns = ('',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
-    url(r'^assets/(?P<location>.*?)$', 'contentstore.views.asset_index', name='asset_index'),
     url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', name='static_pages'),
     url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index'),
 
     # temporary landing page for a course
     url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing'),

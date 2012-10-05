@@ -822,12 +822,17 @@ def asset_index(request, org, course, name):
         display_info = {}
         display_info['displayname'] = asset['displayname']
         display_info['uploadDate'] = asset['uploadDate']
-        contentstore_reference = StaticContent.compute_location(id['org'], id['course'], id['name'])
-        display_info['url'] = StaticContent.get_url_path_from_location(contentstore_reference)
         
+        asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
+        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        
+        thumbnail_name = contentstore().find(asset_location).generate_thumbnail_name()
+        thumbnail_location = StaticContent.compute_location(id['org'], id['course'], thumbnail_name)
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location)
+        
+
         asset_display.append(display_info)
 
-    print assets[0]
     return render_to_response('asset_index.html', {
         'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url
