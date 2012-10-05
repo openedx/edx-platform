@@ -18,6 +18,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     )
     @visibility_view.render()
 
+    @model.on('change:state', @render)
+
     @$newComponentItem = @$('.new-component-item')
     @$newComponentTypePicker = @$('.new-component')
     @$newComponentTemplatePickers = @$('.new-component-templates')
@@ -81,6 +83,14 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   components: => @$('.component').map((idx, el) -> $(el).data('id')).get()
 
+  wait: (value) =>
+    @$('.unit-body').toggleClass("waiting", value)
+
+  render: =>
+    if @model.hasChanged('state')
+      @$el.toggleClass("edit-state-#{@model.previous('state')} edit-state-#{@model.get('state')}")
+      @wait(false)
+
   saveDraft: =>
     @model.save()
 
@@ -94,6 +104,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     )
 
   deleteDraft: (event) ->
+    @wait(true)
+
     $.post('/delete_item', {
       id: @$el.data('id')
       delete_children: true
@@ -102,18 +114,20 @@ class CMS.Views.UnitEdit extends Backbone.View
     )
 
   createDraft: (event) ->
+    @wait(true)
+
     $.post('/create_draft', {
       id: @$el.data('id')
     }, =>
-      @$el.toggleClass('edit-state-public edit-state-draft')
       @model.set('state', 'draft')
     )
 
   publishDraft: (event) ->
+    @wait(true)
+    
     $.post('/publish_draft', {
       id: @$el.data('id')
     }, =>
-      @$el.toggleClass('edit-state-public edit-state-draft')
       @model.set('state', 'public')
     )
 
@@ -123,10 +137,11 @@ class CMS.Views.UnitEdit extends Backbone.View
     else
       target_url = '/publish_draft'
 
+    @wait(true)
+
     $.post(target_url, {
       id: @$el.data('id')
     }, =>
-      @$el.toggleClass('edit-state-public edit-state-private')
       @model.set('state', @$('#visibility').val())
     )
 
