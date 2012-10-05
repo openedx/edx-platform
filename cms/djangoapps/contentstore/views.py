@@ -822,7 +822,7 @@ def asset_index(request, org, course, name):
         display_info = {}
         display_info['displayname'] = asset['displayname']
         display_info['uploadDate'] = asset['uploadDate']
-        contentstore_reference = StaticContent.compute_location(id['course'], id['org'], id['name'])
+        contentstore_reference = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(contentstore_reference)
         
         asset_display.append(display_info)
