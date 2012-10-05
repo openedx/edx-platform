@@ -79,9 +79,12 @@ site_status_msg = get_site_status_msg()
       </li>
 % endif
     </ol>
-  </nav>
   %endif
+  </nav>
 </header>
+% if course:
+<div class="ie-banner"><strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> or <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
+% endif
 
 %if not user.is_authenticated():
   <%include file="login_modal.html" />
