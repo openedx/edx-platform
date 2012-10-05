@@ -23,138 +23,28 @@
             </tr>
           </thead>
           <tbody>
+          % for asset in assets:
             <tr>
               <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+                <div class="thumb"><img src="${asset['url']}"></div>
               </td>
               <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
+                <a href="${asset['url']}" class="filename">${asset['displayname']}</a>
               </td>
               <td class="date-col">
-                10/2/2012
+                ${asset['uploadDate']}
               </td>
               <td class="embed-col">
-                <a href="#">copy</a>
+                <a href="${asset['url']}">copy</a>
               </td>
             </tr>
+          % endfor
             <tr>
               <td class="thumb-col">
                 <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
               </td>
               <td class="name-col">
                 <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
               </td>
               <td class="date-col">
                 10/2/2012

@@ -618,7 +618,7 @@ def upload_asset(request, org, course, coursename):
     if not has_access(request.user, location):
         return HttpResponseForbidden()
     
-    # Does the course actually exist?!?
+    # Does the course actually exist?!? Get anything from it to prove its existance
     
     try:
         item = modulestore().get_item(location)
@@ -813,11 +813,22 @@ def asset_index(request, org, course, name):
             'course' : course,
             'coursename' : name
             })
+    
+    course_reference = StaticContent.compute_location(org, course, name)
+    assets = contentstore().get_all_content_for_course(course_reference)
+    asset_display = []
+    for asset in assets:
+        id = asset['_id']
+        display_info = {}
+        display_info['displayname'] = asset['displayname']
+        display_info['uploadDate'] = asset['uploadDate']
+        contentstore_reference = StaticContent.compute_location(id['course'], id['org'], id['name'])
+        display_info['url'] = StaticContent.get_url_path_from_location(contentstore_reference)
+        
+        asset_display.append(display_info)
 
-    course = modulestore().get_item(location)
-    sections = course.get_children()
-
+    print assets[0]
     return render_to_response('asset_index.html', {
-        'sections': sections,
+        'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url
     })

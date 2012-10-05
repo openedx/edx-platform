@@ -42,7 +42,7 @@ class MongoContentStore(ContentStore):
         except NoFile:
             raise NotFoundError()
 
-    def get_all_content_info_for_course(self, location):
+    def get_all_content_for_course(self, location):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 
