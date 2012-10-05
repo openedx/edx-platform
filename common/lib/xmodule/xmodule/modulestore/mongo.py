@@ -70,17 +70,21 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
 
 
-def location_to_query(location):
+def location_to_query(location, wildcard=True):
     """
     Takes a Location and returns a SON object that will query for that location.
     Fields in location that are None are ignored in the query
+
+    If `wildcard` is True, then a None in a location is treated as a wildcard
+    query. Otherwise, it is searched for literally
     """
     query = SON()
     # Location dict is ordered by specificity, and SON
     # will preserve that order for queries
     for key, val in Location(location).dict().iteritems():
-        if val is not None:
-            query['_id.{key}'.format(key=key)] = val
+        if wildcard and val is None:
+            continue
+        query['_id.{key}'.format(key=key)] = val
 
     return query
 
@@ -203,18 +207,27 @@ class MongoModuleStore(ModuleStoreBase):
         ItemNotFoundError.
         '''
         item = self.collection.find_one(
-            location_to_query(location),
+            location_to_query(location, wildcard=False),
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
             raise ItemNotFoundError(location)
         return item
 
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        location = Location.ensure_fully_specified(location)
+        try:
+            self._find_one(location)
+            return True
+        except ItemNotFoundError:
+            return False
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
-        recent revision.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -322,16 +335,10 @@ class MongoModuleStore(ModuleStoreBase):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
-        If there is no data at location in this modulestore, raise
-            ItemNotFoundError.
-
         returns an iterable of things that can be passed to Location.  This may
         be empty if there are no parents.
         '''
         location = Location.ensure_fully_specified(location)
-        # Check that it's actually in this modulestore.
-        self._find_one(location)
-        # now get the parents
         items = self.collection.find({'definition.children': location.url()},
                                     {'_id': True})
         return [i['_id'] for i in items]

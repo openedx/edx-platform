@@ -169,6 +169,7 @@ def edit_subsection(request, location):
                                'lms_link': lms_link
                                })
 
+
 @login_required
 def edit_unit(request, location):
     """

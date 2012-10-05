@@ -477,11 +477,16 @@ class XMLModuleStore(ModuleStoreBase):
         except KeyError:
             raise ItemNotFoundError(location)
 
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        location = Location(location)
+        return any(location in course_modules for course_modules in self.modules.values())
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
-        recent revision
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -545,14 +550,8 @@ class XMLModuleStore(ModuleStoreBase):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
-        If there is no data at location in this modulestore, raise
-            ItemNotFoundError.
-
         returns an iterable of things that can be passed to Location.  This may
         be empty if there are no parents.
         '''
         location = Location.ensure_fully_specified(location)
-        if not self.parent_tracker.is_known(location):
-            raise ItemNotFoundError(location)
-
         return self.parent_tracker.parents(location)
