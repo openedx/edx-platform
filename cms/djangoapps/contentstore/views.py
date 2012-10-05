@@ -440,15 +440,28 @@ def save_item(request):
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
-    # note, that the postback is not the complete metadata, as there's system metadata which is
+    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
     # not presented to the end-user for editing. So let's fetch the original and
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
     if request.POST['metadata']:
         posted_metadata = request.POST['metadata']
         # fetch original
         existing_item = modulestore().get_item(item_location)
+
+        logging.debug(posted_metadata)
+
         # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        for metadata_key in posted_metadata.keys():
+            if posted_metadata[metadata_key] is None:
+                # remove both from passed in collection as well as the collection read in from the modulestore
+                del existing_item.metadata[metadata_key]
+                del posted_metadata[metadata_key]
+
+        # overlay the new metadata over the modulestore sourced collection to support partial updates
         existing_item.metadata.update(posted_metadata)
+
+        # commit to datastore
         modulestore().update_metadata(item_location, existing_item.metadata)
 
     return HttpResponse()

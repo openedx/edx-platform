@@ -60,6 +60,27 @@ function onUnitReordered() {
 	});
 }
 
+function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+    var input_date = $('#'+date_id).val();
+    var input_time = $('#'+time_id).val();
+
+    var edxTimeStr = null;
+
+    if (input_date != '') {
+        if (input_time == '') 
+            input_time = '00:00';
+
+        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
+        date = Date.parse(input_date+" "+input_time);
+        if (format == null)
+            format = 'yyyy-MM-ddTHH:mm';
+
+        edxTimeStr = date.toString(format);
+    }
+
+    return edxTimeStr;
+}
+
 function saveSubsection(e) {
     e.preventDefault();
     
@@ -70,10 +91,19 @@ function saveSubsection(e) {
     
     metadata = {};
     for(var i=0; i< metadata_fields.length;i++) {
-	el = metadata_fields[i];
-	metadata[$(el).data("metadata-name")] = el.value;
+	   el = metadata_fields[i];
+	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
+    // OK, we have some metadata (namely 'Release Date' (aka 'start') and 'Due Date') which has been normalized in the UI
+    // we have to piece it back together. Unfortunate 'start' and 'due' use different string formatters. Rather than try to 
+    // replicate the string formatting which is used in the backend here in JS, let's just pass back a unified format
+    // and let the server re-format into the expected persisted format
+
+    metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
+    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
+
+    // reordering is done through immediate callbacks when the resorting has completed in the UI
     children =[];
 
     $.ajax({
