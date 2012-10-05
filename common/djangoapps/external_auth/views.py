@@ -7,6 +7,7 @@ import string
 import fnmatch
 
 from external_auth.models import ExternalAuthMap
+from external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
@@ -30,7 +31,6 @@ from openid.consumer.consumer import SUCCESS
 
 from openid.server.server import Server
 from openid.server.trustroot import TrustRoot
-from openid.store.filestore import FileOpenIDStore
 from openid.extensions import ax, sreg
 
 import student.views as student_views
@@ -271,10 +271,7 @@ def get_xrds_url(resource, request):
     """
     Return the XRDS url for a resource
     """
-    host = request.META['HTTP_HOST']
-
-    if not host.endswith('edx.org'):
-        return None
+    host = request.get_host()
 
     location = host + '/openid/provider/' + resource + '/'
 
@@ -400,7 +397,7 @@ def provider_login(request):
         return default_render_failure(request, "Invalid OpenID request")
 
     # initialize store and server
-    store = FileOpenIDStore('/tmp/openid_provider')
+    store = DjangoOpenIDStore()
     server = Server(store, endpoint)
 
     # handle OpenID request
