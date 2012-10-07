@@ -1,4 +1,5 @@
 import abc
+import inspect
 import json
 import logging
 import random
@@ -103,6 +104,15 @@ def aggregate_scores(scores, section_name="summary"):
     return all_total, graded_total
 
 
+def invalid_args(func, argdict):
+    """
+    Given a function and a dictionary of arguments, returns a set of arguments
+    from argdict that aren't accepted by func
+    """
+    args, varargs, keywords, defaults = inspect.getargspec(func)
+    if keywords: return set()  # All accepted
+    return set(argdict) - set(args)
+
 def grader_from_conf(conf):
     """
     This creates a CourseGrader from a configuration (such as in course_settings.py).
@@ -122,14 +132,21 @@ def grader_from_conf(conf):
         try:
             if 'min_count' in subgraderconf:
                 #This is an AssignmentFormatGrader
-                subgrader = AssignmentFormatGrader(**subgraderconf)
-                subgraders.append((subgrader, subgrader.category, weight))
+                subgrader_class = AssignmentFormatGrader
             elif 'name' in subgraderconf:
                 #This is an SingleSectionGrader
-                subgrader = SingleSectionGrader(**subgraderconf)
-                subgraders.append((subgrader, subgrader.category, weight))
+                subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
+            
+            bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
+            if len(bad_args) > 0:
+                log.warning("Invalid arguments for a subgrader: %s", bad_args)
+                for key in bad_args:
+                    del subgraderconf[key]
+            
+            subgrader = subgrader_class(**subgraderconf)
+            subgraders.append((subgrader, subgrader.category, weight))
 
         except (TypeError, ValueError) as error:
             # Add info and re-raise
@@ -294,9 +311,12 @@ class AssignmentFormatGrader(CourseGrader):
 
     short_label is similar to section_type, but shorter. For example, for Homework it would be
     "HW".
+    
+    starting_index is the first number that will appear. For example, starting_index=3 and
+    min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False):
+    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False, starting_index=1):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
@@ -304,6 +324,7 @@ class AssignmentFormatGrader(CourseGrader):
         self.section_type = section_type or self.type
         self.short_label = short_label or self.type
         self.show_only_average = show_only_average
+        self.starting_index = starting_index
 
     def grade(self, grade_sheet, generate_random_scores=False):
         def totalWithDrops(breakdown, drop_count):
@@ -339,7 +360,7 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].section
                 
                 percentage = earned / float(possible)
-                summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + 1,
+                summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + self.starting_index,
                                                                 section_type=self.section_type,
                                                                 name=section_name,
                                                                 percent=percentage,
@@ -347,9 +368,9 @@ class AssignmentFormatGrader(CourseGrader):
                                                                 possible=float(possible))
             else:
                 percentage = 0
-                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + 1, section_type=self.section_type)
+                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index, section_type=self.section_type)
 
-            short_label = "{short_label} {index:02d}".format(index=i + 1, short_label=self.short_label)
+            short_label = "{short_label} {index:02d}".format(index=i + self.starting_index, short_label=self.short_label)
             
             breakdown.append({'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category})
 
