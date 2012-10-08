@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.test import TestCase
-from mock import Mock
 import os
 from override_settings import override_settings
 from tempfile import NamedTemporaryFile
@@ -53,13 +52,11 @@ class TestStatus(TestCase):
 
     def setUp(self):
         """
-        Mock courses, since we don't have to have full django
+        Fake course ids, since we don't have to have full django
         settings (common tests run without the lms settings imported)
         """
-        self.full = Mock()
-        self.full.id = 'edX/full/2012_Fall'
-        self.toy = Mock()
-        self.toy.id = 'edX/toy/2012_Fall'
+        self.full_id = 'edX/full/2012_Fall'
+        self.toy_id = 'edX/toy/2012_Fall'
 
     def create_status_file(self, contents):
         """
@@ -88,6 +85,6 @@ class TestStatus(TestCase):
             print "course=None:"
             self.assertEqual(get_site_status_msg(None), exp_none)
             print "course=toy:"
-            self.assertEqual(get_site_status_msg(self.toy), exp_toy)
+            self.assertEqual(get_site_status_msg(self.toy_id), exp_toy)
             print "course=full:"
-            self.assertEqual(get_site_status_msg(self.full), exp_full)
+            self.assertEqual(get_site_status_msg(self.full_id), exp_full)
