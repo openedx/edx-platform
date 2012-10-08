@@ -635,23 +635,8 @@ def upload_asset(request, org, course, coursename):
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 
-    file_location = StaticContent.compute_location(org, course, name)
+    thumbnail_file_location = None
 
-    content = StaticContent(file_location, name, mime_type, filedata)
-
-    # first commit to the DB
-    contentstore().save(content)
-
-    # then remove the cache so we're not serving up stale content
-    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
-    # which is used when serving up static content. This integrity is needed for
-    # browser-side caching support. We *could* re-fetch the saved content so that we have the
-    # timestamp populated, but we might as well wait for the first real request to come in
-    # to re-populate the cache.
-    del_cached_content(content.location)
-
-    # if we're uploading an image, then let's generate a thumbnail so that we can
-    # serve it up when needed without having to rescale on the fly
     if mime_type.split('/')[0] == 'image':
         try:
             # not sure if this is necessary, but let's rewind the stream just in case
@@ -673,11 +658,11 @@ def upload_asset(request, org, course, coursename):
             thumbnail_file.seek(0)
         
             # use a naming convention to associate originals with the thumbnail
-            thumbnail_name = content.generate_thumbnail_name()
+            thumbnail_name = StaticContent.generate_thumbnail_name(name)
 
             # then just store this thumbnail as any other piece of content
             thumbnail_file_location = StaticContent.compute_location(org, course, 
-                                                                              thumbnail_name)
+                                                                              thumbnail_name, is_thumbnail=True)
             thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                               'image/jpeg', thumbnail_file)
             contentstore().save(thumbnail_content)
@@ -685,9 +670,37 @@ def upload_asset(request, org, course, coursename):
             # remove any cached content at this location, as thumbnails are treated just like any
             # other bit of static content
             del_cached_content(thumbnail_content.location)
+
+            # not sure if this is necessary, but let's rewind the stream just in case
+            request.FILES['file'].seek(0)
         except:
             # catch, log, and continue as thumbnails are not a hard requirement
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
+            thumbnail_file_location = None
+            raise
+
+
+    file_location = StaticContent.compute_location(org, course, name)
+
+    # if we're uploading an asset for which we can generate a thumbnail, let's generate it first so that we have
+    # the location to point to
+
+    content = StaticContent(file_location, name, mime_type, filedata, thumbnail_location = thumbnail_file_location)
+
+    # first commit to the DB
+    contentstore().save(content)
+
+    # then remove the cache so we're not serving up stale content
+    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
+    # which is used when serving up static content. This integrity is needed for
+    # browser-side caching support. We *could* re-fetch the saved content so that we have the
+    # timestamp populated, but we might as well wait for the first real request to come in
+    # to re-populate the cache.
+    del_cached_content(content.location)
+
+    # if we're uploading an image, then let's generate a thumbnail so that we can
+    # serve it up when needed without having to rescale on the fly
+ 
 
 
     return HttpResponse('Upload completed')
@@ -816,6 +829,7 @@ def asset_index(request, org, course, name):
     
     course_reference = StaticContent.compute_location(org, course, name)
     assets = contentstore().get_all_content_for_course(course_reference)
+    thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
     asset_display = []
     for asset in assets:
         id = asset['_id']
@@ -826,11 +840,11 @@ def asset_index(request, org, course, name):
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
         
-        thumbnail_name = contentstore().find(asset_location).generate_thumbnail_name()
-        thumbnail_location = StaticContent.compute_location(id['org'], id['course'], thumbnail_name)
+        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        thumbnail_location = Location(asset.get('thumbnail_location', None))
+
         display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location)
         
-
         asset_display.append(display_info)
 
     return render_to_response('asset_index.html', {
