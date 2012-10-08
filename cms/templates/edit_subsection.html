@@ -25,7 +25,7 @@
 	</div>
 	<div>
 	  <label>Format:</label>
-	  <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="subtitle"/>
+	  <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
 	</div>
 	<div class="unit-list">
 	  <label>Units:</label>
@@ -33,9 +33,23 @@
 	</div>
 	<div class='wip-box'>
 	  <label>Policy:</label>
-	  <textarea class="text-editor">Policy blah, blah, blah…</textarea>
+	  <ol class='policy-list'>
+	  	% for policy_name in policy_metadata.keys():
+	  	<li class="policy-list-element">
+	  		<input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled />:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="30"/><a href="#" class="delete-icon remove-policy-data"></a>
+	  	</li>
+	  	% endfor 
+	  	<a href="#" class="add-button add-policy-data">Add</a>
+	  </ol>
 	</div>					
       </article>
+    </div>
+
+    <div id="policy-to-delete" style="display:none">
+    </div>
+
+    <div id="add-new-policy-element-template" style="display:none">
+ 	  	<li class="policy-list-element"><input type="text" class="policy-list-name" autocomplete="off"/>:&nbsp;<input type="text" class="policy-list-value" size=30 autocomplete="off"/><a href="#" class="delete-icon remove-policy-data"></a></li>   	
     </div>
 
     <div class="sidebar">
@@ -49,8 +63,8 @@
 	    		start_date = datetime.fromtimestamp(mktime(subsection.start)) if subsection.start is not None else None
 	    		parent_start_date = datetime.fromtimestamp(mktime(parent_item.start)) if parent_item.start is not None else None
 	    	%>
-	      <input type="text" id="start_date" value="${start_date.strftime('%m/%d/%Y') if start_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15'/>
-	      <input type="text" id="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10'/> 
+	      <input type="text" id="start_date" name="start_date" value="${start_date.strftime('%m/%d/%Y') if start_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+	      <input type="text" id="start_time" name="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
 	    </div>
 	    % if start_date != parent_start_date and parent_start_date is not None:
 	    <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}. <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
@@ -65,8 +79,8 @@
 	      	# due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
 		 	due_date = dateutil.parser.parse(subsection.metadata.get('due')) if 'due' in subsection.metadata else None
 		  %>
-	      <input type="text" id="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' /> 
-	      <input type="text" id="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' />
+	      <input type="text" id="due_date" name="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/> 
+	      <input type="text" id="due_time" name="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
 	      <a href="#" class="remove-date">Remove due date</a>
 	    </p>
 	  </div>
@@ -88,6 +102,7 @@
 <script src="${static.url('js/vendor/date.js')}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
+		// expand the due-date area if the values are set
 		if ($('#due_date').val() != '') {
 		    var $block = $('.set-date').closest('.due-date-input');
 		    $('.set-date').hide();

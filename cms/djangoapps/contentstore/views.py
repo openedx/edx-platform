@@ -158,11 +158,19 @@ def edit_subsection(request, location):
     # this should blow up if we don't find any parents, which would be erroneous
     parent = modulestore().get_item(parent_locs[0])
 
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+
+    policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
+        if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
+
+    logging.debug(policy_metadata)
+
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
-                               'parent_item' : parent
+                               'parent_item' : parent,
+                               'policy_metadata' : policy_metadata
                                })
 
 @login_required
