@@ -15,11 +15,11 @@ from status.status import get_site_status_msg
 <%block cached="False">
 <%
 try:
-    c = course
+    course_id = course.id
 except:
     # can't figure out a better way to get at a possibly-defined course var
-    c = None
-site_status_msg = get_site_status_msg(c)
+    course_id = None
+site_status_msg = get_site_status_msg(course_id)
 %>
 % if site_status_msg:
 <div class="site-status">
