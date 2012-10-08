@@ -40,6 +40,8 @@ TEST_ROOT = path("test_root")
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 
+STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
+
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
@@ -76,6 +78,19 @@ STATICFILES_DIRS += [
     for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
+
+# point tests at the test courses by default
+
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': COMMON_TEST_DATA_ROOT,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
+    }
+}
+
 
 DATABASES = {
     'default': {
