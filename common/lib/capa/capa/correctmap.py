@@ -5,23 +5,26 @@
 
 
 class CorrectMap(object):
-    '''
+    """
     Stores map between answer_id and response evaluation result for each question
     in a capa problem.  The response evaluation result for each answer_id includes
     (correctness, npoints, msg, hint, hintmode).
 
     - correctness : either 'correct' or 'incorrect'
     - npoints     : None, or integer specifying number of points awarded for this answer_id
-    - msg         : string (may have HTML) giving extra message response (displayed below textline or textbox)
-    - hint        : string (may have HTML) giving optional hint (displayed below textline or textbox, above msg)
+    - msg         : string (may have HTML) giving extra message response
+                    (displayed below textline or textbox)
+    - hint        : string (may have HTML) giving optional hint
+                    (displayed below textline or textbox, above msg)
     - hintmode    : one of (None,'on_request','always') criteria for displaying hint
     - queuestate  : Dict {key:'', time:''} where key is a secret string, and time is a string dump
                     of a DateTime object in the format '%Y%m%d%H%M%S'. Is None when not queued
 
     Behaves as a dict.
-    '''
+    """
     def __init__(self, *args, **kwargs):
-        self.cmap = dict()		# start with empty dict
+        # start with empty dict
+        self.cmap = dict()
         self.items = self.cmap.items
         self.keys = self.cmap.keys
         self.set(*args, **kwargs)
@@ -33,7 +36,15 @@ class CorrectMap(object):
         return self.cmap.__iter__()
 
     # See the documentation for 'set_dict' for the use of kwargs
-    def set(self, answer_id=None, correctness=None, npoints=None, msg='', hint='', hintmode=None, queuestate=None, **kwargs):
+    def set(self,
+            answer_id=None,
+            correctness=None,
+            npoints=None,
+            msg='',
+            hint='',
+            hintmode=None,
+            queuestate=None, **kwargs):
+
         if answer_id is not None:
             self.cmap[answer_id] = {'correctness': correctness,
                                     'npoints': npoints,
@@ -56,12 +67,13 @@ class CorrectMap(object):
         '''
         Set internal dict of CorrectMap to provided correct_map dict
 
-        correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This means that
-        when the definition of CorrectMap (e.g. its properties) are altered, existing correct_map dict
-        not coincide with the newest CorrectMap format as defined by self.set.
+        correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This
+        means that when the definition of CorrectMap (e.g. its properties) are altered,
+        an existing correct_map dict not coincide with the newest CorrectMap format as
+        defined by self.set.
 
         For graceful migration, feed the contents of each correct map to self.set, rather than
-        making a direct copy of the given correct_map dict. This way, the common keys between 
+        making a direct copy of the given correct_map dict. This way, the common keys between
         the incoming correct_map dict and the new CorrectMap instance will be written, while
         mismatched keys will be gracefully ignored.
 
@@ -69,14 +81,20 @@ class CorrectMap(object):
             If correct_map is a one-level dict, then convert it to the new dict of dicts format.
         '''
         if correct_map and not (type(correct_map[correct_map.keys()[0]]) == dict):
-            self.__init__()	                                  # empty current dict
-            for k in correct_map: self.set(k, correct_map[k]) # create new dict entries
+            # empty current dict
+            self.__init__()
+
+            # create new dict entries
+            for k in correct_map:
+                self.set(k, correct_map[k])
         else:
             self.__init__()
-            for k in correct_map: self.set(k, **correct_map[k])
+            for k in correct_map:
+                self.set(k, **correct_map[k])
 
     def is_correct(self, answer_id):
-        if answer_id in self.cmap: return self.cmap[answer_id]['correctness'] == 'correct'
+        if answer_id in self.cmap:
+            return self.cmap[answer_id]['correctness'] == 'correct'
         return None
 
     def is_queued(self, answer_id):
@@ -94,14 +112,18 @@ class CorrectMap(object):
             return npoints
         elif self.is_correct(answer_id):
             return 1
-        return 0 # if not correct and no points have been assigned, return 0
+         # if not correct and no points have been assigned, return 0
+        return 0
 
     def set_property(self, answer_id, property, value):
-        if answer_id in self.cmap: self.cmap[answer_id][property] = value
-        else: self.cmap[answer_id] = {property: value}
+        if answer_id in self.cmap:
+            self.cmap[answer_id][property] = value
+        else:
+            self.cmap[answer_id] = {property: value}
 
     def get_property(self, answer_id, property, default=None):
-        if answer_id in self.cmap: return self.cmap[answer_id].get(property, default)
+        if answer_id in self.cmap:
+            return self.cmap[answer_id].get(property, default)
         return default
 
     def get_correctness(self, answer_id):
