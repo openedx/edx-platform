@@ -28,7 +28,9 @@ class MongoContentStore(ContentStore):
         if self.fs.exists({"_id" : id}):
             self.fs.delete(id)
 
-        with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, displayname=content.name) as fp:
+        with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, 
+            displayname=content.name, thumbnail_location=content.thumbnail_location) as fp:
+
             fp.write(content.data)
         
         return content
@@ -38,11 +40,18 @@ class MongoContentStore(ContentStore):
         id = StaticContent.get_id_from_location(location)
         try:
             with self.fs.get(id) as fp:
-                return StaticContent(location, fp.displayname, fp.content_type, fp.read(), fp.uploadDate)
+                return StaticContent(location, fp.displayname, fp.content_type, fp.read(), 
+                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None)
         except NoFile:
             raise NotFoundError()
 
+    def get_all_content_thumbnails_for_course(self, location):
+        return self._get_all_content_for_course(location, get_thumbnails = True)
+
     def get_all_content_for_course(self, location):
+        return self._get_all_content_for_course(location, get_thumbnails = False)
+
+    def _get_all_content_for_course(self, location, get_thumbnails = False):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 
@@ -62,7 +71,8 @@ class MongoContentStore(ContentStore):
 
             ]
         '''
-        course_filter = Location(XASSET_LOCATION_TAG, category="asset",course=location.course,org=location.org)
+        course_filter = Location(XASSET_LOCATION_TAG, category="asset" if not get_thumbnails else "thumbnail",
+            course=location.course,org=location.org)
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
         items = self.fs_files.find(location_to_query(course_filter))
         return list(items)
