@@ -124,8 +124,8 @@ def register_render_function(fn, names=None, cls=SimpleInput):
     else:
         raise NotImplementedError
 
-    def wrapped():
-        return fn
+    def wrapped(*args, **kwargs):
+        return fn(*args, **kwargs)
     return wrapped
 
 #-----------------------------------------------------------------------------
@@ -146,12 +146,14 @@ def optioninput(element, value, status, render_template, msg=''):
         raise Exception(
             "[courseware.capa.inputtypes.optioninput] Missing options specification in "
             + etree.tostring(element))
+
+    # parse the set of possible options
     oset = shlex.shlex(options[1:-1])
     oset.quotes = "'"
     oset.whitespace = ","
     oset = [x[1:-1] for x  in list(oset)]
 
-    # make ordered list with (key,value) same
+    # make ordered list with (key, value) same
     osetdict = [(oset[x], oset[x]) for x in range(len(oset))]
     # TODO: allow ordering to be randomized
 
