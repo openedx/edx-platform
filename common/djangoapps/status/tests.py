@@ -1,17 +1,20 @@
 from django.conf import settings
 from django.test import TestCase
-from tempfile import NamedTemporaryFile
+from mock import Mock
 import os
 from override_settings import override_settings
+from tempfile import NamedTemporaryFile
 
 from status import get_site_status_msg
 
-import xmodule.modulestore.django
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
-from xmodule.modulestore.xml_importer import import_from_xml
+# Get a name where we can put test files
+TMP_FILE = NamedTemporaryFile(delete=False)
+TMP_NAME = TMP_FILE.name
+# Close it--we just want the path.
+TMP_FILE.close()
 
 
+@override_settings(STATUS_MESSAGE_PATH=TMP_NAME)
 class TestStatus(TestCase):
     """Test that the get_site_status_msg function does the right thing"""
 
@@ -49,15 +52,14 @@ class TestStatus(TestCase):
         ]
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
-
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
-
-        self.full = find_course("edX/full/6.002_Spring_2012")
-        self.toy = find_course("edX/toy/2012_Fall")
+        """
+        Mock courses, since we don't have to have full django
+        settings (common tests run without the lms settings imported)
+        """
+        self.full = Mock()
+        self.full.id = 'edX/full/2012_Fall'
+        self.toy = Mock()
+        self.toy.id = 'edX/toy/2012_Fall'
 
     def create_status_file(self, contents):
         """
