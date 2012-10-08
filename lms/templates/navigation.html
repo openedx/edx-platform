@@ -14,7 +14,12 @@ from status.status import get_site_status_msg
 
 <%block cached="False">
 <%
-site_status_msg = get_site_status_msg()
+try:
+    c = course
+except:
+    # can't figure out a better way to get at a possibly-defined course var
+    c = None
+site_status_msg = get_site_status_msg(c)
 %>
 % if site_status_msg:
 <div class="site-status">

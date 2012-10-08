@@ -129,7 +129,7 @@ NODE_PATH = ':'.join(node_paths)
 
 
 # Where to look for a status message
-STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.html"
+STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
