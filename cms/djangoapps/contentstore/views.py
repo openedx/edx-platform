@@ -637,6 +637,9 @@ def upload_asset(request, org, course, coursename):
 
     thumbnail_file_location = None
 
+    # if the upload asset is an image, we can generate a thumbnail from it
+    # let's do so now, so that we have the thumbnail location which we need 
+    # so that the asset can point to it
     if mime_type.split('/')[0] == 'image':
         try:
             # not sure if this is necessary, but let's rewind the stream just in case
@@ -677,14 +680,11 @@ def upload_asset(request, org, course, coursename):
             # catch, log, and continue as thumbnails are not a hard requirement
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
             thumbnail_file_location = None
-            raise
 
 
     file_location = StaticContent.compute_location(org, course, name)
 
-    # if we're uploading an asset for which we can generate a thumbnail, let's generate it first so that we have
-    # the location to point to
-
+    # create a StaticContent entity and point to the thumbnail
     content = StaticContent(file_location, name, mime_type, filedata, thumbnail_location = thumbnail_file_location)
 
     # first commit to the DB
@@ -697,11 +697,6 @@ def upload_asset(request, org, course, coursename):
     # timestamp populated, but we might as well wait for the first real request to come in
     # to re-populate the cache.
     del_cached_content(content.location)
-
-    # if we're uploading an image, then let's generate a thumbnail so that we can
-    # serve it up when needed without having to rescale on the fly
- 
-
 
     return HttpResponse('Upload completed')
 
