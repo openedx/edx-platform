@@ -436,13 +436,12 @@ class LoncapaProblem(object):
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
-            
-            if stype:
-                if 'javascript' in stype:
-                    continue    # skip javascript
-                if 'perl' in stype:
-                    continue        # skip perl
-            # TODO: evaluate only python
+
+            # Require that there be a type, and that the type be one we understand
+            known_types = ['loncapa/python', 'edx/python']
+            if not stype in known_types:
+                continue
+
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
