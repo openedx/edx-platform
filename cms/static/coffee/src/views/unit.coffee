@@ -47,6 +47,7 @@ class CMS.Views.UnitEdit extends Backbone.View
       placeholder: 'component-placeholder'
       forcePlaceholderSize: true
       axis: 'y'
+      items: '> .component'
     )
 
     @$('.component').each((idx, element) =>
