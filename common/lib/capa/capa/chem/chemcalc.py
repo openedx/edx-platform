@@ -1,27 +1,19 @@
 from __future__ import division
 import copy
+from fractions import Fraction
 import logging
 import math
 import operator
 import re
-import unittest
 import numpy
 import numbers
 import scipy.constants
 
-from pyparsing import Literal, Keyword, Word, nums, StringEnd, Optional, Forward, OneOrMore
-from pyparsing import ParseException
+from pyparsing import (Literal, Keyword, Word, nums, StringEnd, Optional,
+                       Forward, OneOrMore, ParseException)
 import nltk
 from nltk.tree import Tree
 
-local_debug = None
-
-
-def log(s, output_type=None):
-    if local_debug:
-        print s
-        if output_type == 'html':
-            f.write(s + '\n<br>\n')
 
 ## Defines a simple pyparsing tokenizer for chemical equations
 elements = ['Ac','Ag','Al','Am','Ar','As','At','Au','B','Ba','Be',
@@ -42,19 +34,19 @@ tokens = reduce(lambda a, b: a ^ b, map(Literal, elements + digits + symbols + p
 tokenizer = OneOrMore(tokens) + StringEnd()
 
 
-def orjoin(l):
+def _orjoin(l):
     return "'" + "' | '".join(l) + "'"
 
-## Defines an NLTK parser for tokenized equations
+## Defines an NLTK parser for tokenized expressions
 grammar = """
   S -> multimolecule | multimolecule '+' S
   multimolecule -> count molecule | molecule
   count -> number | number '/' number
   molecule -> unphased | unphased phase
   unphased -> group | paren_group_round | paren_group_square
-  element -> """ + orjoin(elements) + """
-  digit -> """ + orjoin(digits) + """
-  phase -> """ + orjoin(phases) + """
+  element -> """ + _orjoin(elements) + """
+  digit -> """ + _orjoin(digits) + """
+  phase -> """ + _orjoin(phases) + """
   number -> digit | digit number
   group -> suffixed | suffixed group
   paren_group_round -> '(' group ')'
@@ -70,7 +62,7 @@ grammar = """
 parser = nltk.ChartParser(nltk.parse_cfg(grammar))
 
 
-def clean_parse_tree(tree):
+def _clean_parse_tree(tree):
     ''' The parse tree contains a lot of redundant
     nodes. E.g. paren_groups have groups as children, etc. This will
     clean up the tree.
@@ -119,7 +111,7 @@ def clean_parse_tree(tree):
 
     children = []
     for child in tree:
-        child = clean_parse_tree(child)
+        child = _clean_parse_tree(child)
         children.append(child)
 
     tree = nltk.tree.Tree(tree.node, children)
@@ -127,7 +119,7 @@ def clean_parse_tree(tree):
     return tree
 
 
-def merge_children(tree, tags):
+def _merge_children(tree, tags):
     ''' nltk, by documentation, cannot do arbitrary length
     groups. Instead of:
     (group 1 2 3 4)
@@ -157,13 +149,13 @@ def merge_children(tree, tags):
     # And recurse
     children = []
     for child in tree:
-        children.append(merge_children(child, tags))
+        children.append(_merge_children(child, tags))
 
     #return tree
     return nltk.tree.Tree(tree.node, children)
 
 
-def render_to_html(tree):
+def _render_to_html(tree):
     ''' Renders a cleaned tree to HTML '''
 
     def molecule_count(tree, children):
@@ -196,29 +188,29 @@ def render_to_html(tree):
     if type(tree) == str:
         return tree
     else:
-        children = "".join(map(render_to_html, tree))
+        children = "".join(map(_render_to_html, tree))
         if tree.node in dispatch:
             return dispatch[tree.node](tree, children)
         else:
             return children.replace(' ', '')
 
 
-def clean_and_render_to_html(s):
+def render_to_html(s):
     ''' render a string to html '''
-    status = render_to_html(get_finale_tree(s))
+    status = _render_to_html(_get_final_tree(s))
     return status
 
 
-def get_finale_tree(s):
+def _get_final_tree(s):
     '''  return final tree after merge and clean  '''
     tokenized = tokenizer.parseString(s)
     parsed = parser.parse(tokenized)
-    merged = merge_children(parsed, {'S','group'})
-    final = clean_parse_tree(merged)
+    merged = _merge_children(parsed, {'S','group'})
+    final = _clean_parse_tree(merged)
     return final
 
 
-def check_equality(tuple1, tuple2):
+def _check_equality(tuple1, tuple2):
     ''' return True if tuples of multimolecules are equal '''
     list1 = list(tuple1)
     list2 = list(tuple2)
@@ -242,18 +234,31 @@ def compare_chemical_expression(s1, s2, ignore_state=False):
 
 
 def divide_chemical_expression(s1, s2, ignore_state=False):
-    ''' Compare chemical equations for difference
-    in factors. Ideas:
+    '''Compare two chemical equations for equivalence up to a multiplicative factor:
+
+    - If they are not the same chemicals, returns False.
+    - If they are the same, "divide" s1 by s2 to returns a factor x such that s1 / s2 == x as a Fraction object.
+    - if ignore_state is True, ignores phases when doing the comparison.
+
+    Examples:
+    divide_chemical_expression("H2O", "3H2O") -> Fraction(1,3)
+    divide_chemical_expression("3H2O", "H2O") -> 3  # actually Fraction(3, 1), but compares == to 3.
+    divide_chemical_expression("2H2O(s) + 2CO2", "H2O(s)+CO2") -> 2
+    divide_chemical_expression("H2O(s) + CO2", "3H2O(s)+2CO2") -> False
+
+    Implementation sketch:
         - extract factors and phases to standalone lists,
         - compare equations without factors and phases,
         - divide lists of factors for each other and check
              for equality of every element in list,
-        - return result of factor division '''
+        - return result of factor division
+
+    '''
 
     # parsed final trees
     treedic = {}
-    treedic['1'] = get_finale_tree(s1)
-    treedic['2'] = get_finale_tree(s2)
+    treedic['1'] = _get_final_tree(s1)
+    treedic['2'] = _get_final_tree(s2)
 
     # strip phases and factors
     # collect factors in list
@@ -290,7 +295,7 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         *sorted(zip(treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'])))
 
     # check if equations are correct without factors
-    if not check_equality(treedic['1 cleaned_mm_list'], treedic['2 cleaned_mm_list']):
+    if not _check_equality(treedic['1 cleaned_mm_list'], treedic['2 cleaned_mm_list']):
         return False
 
     # phases are ruled by ingore_state flag
@@ -300,241 +305,58 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
 
     if any(map(lambda x, y: x / y - treedic['1 factors'][0] / treedic['2 factors'][0],
                                          treedic['1 factors'], treedic['2 factors'])):
-        log('factors are not proportional')
+        # factors are not proportional
         return False
-    else:  # return ratio
-        return int(max(treedic['1 factors'][0] / treedic['2 factors'][0],
-                    treedic['2 factors'][0] / treedic['1 factors'][0]))
+    else:
+        # return ratio
+        return Fraction(treedic['1 factors'][0] / treedic['2 factors'][0])
 
 
-class Test_Compare_Equations(unittest.TestCase):
+def chemical_equations_equal(eq1, eq2, ignoreFactor=True):
+    """
+    Check whether two chemical equations are the same.  If ignoreFactor is True,
+    then they are considered equal if they differ by a constant factor.
 
-        def test_compare_incorrect_order_of_atoms_in_molecule(self):
-            self.assertFalse(compare_chemical_expression("H2O + CO2", "O2C + OH2"))
+    arrows matter: ->, and <-> are different.
 
-        def test_compare_same_order_no_phases_no_factors_no_ions(self):
-            self.assertTrue(compare_chemical_expression("H2O + CO2", "CO2+H2O"))
+    e.g.
+    chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + H2 -> H2O2') -> True
+    chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + 2H2 -> H2O2') -> False
 
-        def test_compare_different_order_no_phases_no_factors_no_ions(self):
-            self.assertTrue(compare_chemical_expression("H2O + CO2", "CO2 + H2O"))
+    chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + H2 <-> H2O2') -> False
 
-        def test_compare_different_order_three_multimolecule(self):
-            self.assertTrue(compare_chemical_expression("H2O + Fe(OH)3 +  CO2", "CO2 + H2O + Fe(OH)3"))
+    If there's a syntax error, we raise pyparsing.ParseException.
+    """
+    # for now, we do a manual parse for the arrow.
+    arrows = ('<->', '->')   # order matters -- need to try <-> first
+    def split_on_arrow(s):
+        """Split a string on an arrow.  Returns left, arrow, right, or raises ParseException if there isn't an arrow"""
+        for arrow in arrows:
+            left, a, right = s.partition(arrow)
+            if a != '':
+                return left, a, right
+        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(arrows))
 
-        def test_compare_same_factors(self):
-            self.assertTrue(compare_chemical_expression("3H2O +  2CO2", "2CO2 + 3H2O "))
+    left1, arrow1, right1 = split_on_arrow(eq1)
+    left2, arrow2, right2 = split_on_arrow(eq2)
 
-        def test_compare_different_factors(self):
-            self.assertFalse(compare_chemical_expression("2H2O +  3CO2", "2CO2 + 3H2O "))
+    # TODO: may want to be able to give student helpful feedback about why things didn't work.
+    if arrow1 != arrow2:
+        # arrows don't match
+        return False
 
-        def test_compare_correct_ions(self):
-            self.assertTrue(compare_chemical_expression("H^+ + OH^-", " OH^- + H^+ "))
+    factor_left = divide_chemical_expression(left1, left2)
+    if not factor_left:
+        # left sides don't match
+        return False
 
-        def test_compare_wrong_ions(self):
-            self.assertFalse(compare_chemical_expression("H^+ + OH^-", " OH^- + H^- "))
+    factor_right = divide_chemical_expression(right1, right2)
+    if not factor_right:
+        # right sides don't match
+        return False
 
-        def test_compare_parent_groups_ions(self):
-            self.assertTrue(compare_chemical_expression("Fe(OH)^2- + (OH)^-", " (OH)^- + Fe(OH)^2- "))
+    if factor_left != factor_right:
+        # factors don't match (molecule counts to add up)
+        return False
 
-        def test_compare_correct_factors_ions_and_one(self):
-            self.assertTrue(compare_chemical_expression("3H^+ + 2OH^-", " 2OH^- + 3H^+ "))
-
-        def test_compare_wrong_factors_ions(self):
-            self.assertFalse(compare_chemical_expression("2H^+ + 3OH^-", " 2OH^- + 3H^+ "))
-
-        def test_compare_float_factors(self):
-            self.assertTrue(compare_chemical_expression("7/2H^+ + 3/5OH^-", " 3/5OH^- + 7/2H^+ "))
-
-        # Phases tests
-        def test_compare_phases_ignored(self):
-            self.assertTrue(compare_chemical_expression(
-                "H2O(s) + CO2", "H2O+CO2", ignore_state=True))
-
-        def test_compare_phases_not_ignored_explicitly(self):
-            self.assertFalse(compare_chemical_expression(
-                "H2O(s) + CO2", "H2O+CO2", ignore_state=False))
-
-        def test_compare_phases_not_ignored(self):  # same as previous
-            self.assertFalse(compare_chemical_expression(
-                "H2O(s) + CO2", "H2O+CO2"))
-
-        def test_compare_phases_not_ignored_explicitly(self):
-            self.assertTrue(compare_chemical_expression(
-                "H2O(s) + CO2", "H2O(s)+CO2", ignore_state=False))
-
-        # all in one cases
-        def test_complex_additivity(self):
-            self.assertTrue(compare_chemical_expression(
-                "5(H1H212)^70010- + 2H20 + 7/2HCl + H2O",
-                "7/2HCl + 2H20 + H2O + 5(H1H212)^70010-"))
-
-        def test_complex_additivity_wrong(self):
-            self.assertFalse(compare_chemical_expression(
-                "5(H1H212)^70010- + 2H20 + 7/2HCl + H2O",
-                "2H20 + 7/2HCl + H2O + 5(H1H212)^70011-"))
-
-        def test_complex_all_grammar(self):
-            self.assertTrue(compare_chemical_expression(
-                "5[Ni(NH3)4]^2+ + 5/2SO4^2-",
-                "5/2SO4^2- + 5[Ni(NH3)4]^2+"))
-
-        # special cases
-
-        def test_compare_one_superscript_explicitly_set(self):
-            self.assertTrue(compare_chemical_expression("H^+ + OH^1-", " OH^- + H^+ "))
-
-        def test_compare_equal_factors_differently_set(self):
-            self.assertTrue(compare_chemical_expression("6/2H^+ + OH^-", " OH^- + 3H^+ "))
-
-        def test_compare_one_subscript_explicitly_set(self):
-            self.assertFalse(compare_chemical_expression("H2 + CO2", "H2 + C102"))
-
-
-class Test_Divide_Equations(unittest.TestCase):
-    ''' as compare_ use divide_,
-    tests here must consider different
-    division (not equality) cases '''
-
-    def test_divide_wrong_factors(self):
-        self.assertFalse(divide_chemical_expression(
-            "5(H1H212)^70010- + 10H2O", "5H2O + 10(H1H212)^70010-"))
-
-    def test_divide_right(self):
-        self.assertEqual(divide_chemical_expression(
-            "5(H1H212)^70010- + 10H2O", "10H2O + 5(H1H212)^70010-"), 1)
-
-    def test_divide_wrong_reagents(self):
-        self.assertFalse(divide_chemical_expression(
-            "H2O + CO2", "CO2"))
-
-    def test_divide_right_simple(self):
-        self.assertEqual(divide_chemical_expression(
-            "H2O + CO2", "H2O+CO2"), 1)
-
-    def test_divide_right_phases(self):
-        self.assertEqual(divide_chemical_expression(
-            "H2O(s) + CO2", "2H2O(s)+2CO2"), 2)
-
-    def test_divide_wrong_phases(self):
-        self.assertFalse(divide_chemical_expression(
-            "H2O(s) + CO2", "2H2O+2CO2(s)"))
-
-    def test_divide_wrong_phases_but_phases_ignored(self):
-        self.assertEqual(divide_chemical_expression(
-            "H2O(s) + CO2", "2H2O+2CO2(s)", ignore_state=True), 2)
-
-    def test_divide_order(self):
-        self.assertEqual(divide_chemical_expression(
-            "2CO2 + H2O", "2H2O+4CO2"), 2)
-
-    def test_divide_fract_to_int(self):
-        self.assertEqual(divide_chemical_expression(
-            "3/2CO2 + H2O", "2H2O+3CO2"), 2)
-
-    def test_divide_fract_to_frac(self):
-        self.assertEqual(divide_chemical_expression(
-            "3/4CO2 + H2O", "2H2O+9/6CO2"), 2)
-
-    def test_divide_fract_to_frac_wrog(self):
-        self.assertFalse(divide_chemical_expression(
-            "6/2CO2 + H2O", "2H2O+9/6CO2"), 2)
-
-
-class Test_Render_Equations(unittest.TestCase):
-
-        def test_render1(self):
-            s = "H2O + CO2"
-            out = clean_and_render_to_html(s)
-            correct = "H<sub>2</sub>O+CO<sub>2</sub>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render_uncorrect_reaction(self):
-            s = "O2C + OH2"
-            out = clean_and_render_to_html(s)
-            correct = "O<sub>2</sub>C+OH<sub>2</sub>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render2(self):
-            s = "CO2 + H2O + Fe(OH)3"
-            out = clean_and_render_to_html(s)
-            correct = "CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render3(self):
-            s = "3H2O + 2CO2"
-            out = clean_and_render_to_html(s)
-            correct = "3H<sub>2</sub>O+2CO<sub>2</sub>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render4(self):
-            s = "H^+ + OH^-"
-            out = clean_and_render_to_html(s)
-            correct = "H<sup>+</sup>+OH<sup>-</sup>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render5(self):
-            s = "Fe(OH)^2- + (OH)^-"
-            out = clean_and_render_to_html(s)
-            correct = "Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render6(self):
-            s = "7/2H^+ + 3/5OH^-"
-            out = clean_and_render_to_html(s)
-            correct = "<sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render7(self):
-            s = "5(H1H212)^70010- + 2H2O + 7/2HCl + H2O"
-            out = clean_and_render_to_html(s)
-            correct = "5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render8(self):
-            s = "H2O(s) + CO2"
-            out = clean_and_render_to_html(s)
-            correct = "H<sub>2</sub>O(s)+CO<sub>2</sub>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render9(self):
-            s = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
-            #import ipdb; ipdb.set_trace()
-            out = clean_and_render_to_html(s)
-            correct = "5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup>"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-        def test_render_error(self):
-            s = "5.2H20"
-            self.assertRaises(ParseException, clean_and_render_to_html, s)
-
-        def test_render_simple_brackets(self):
-            s = "(Ar)"
-            out = clean_and_render_to_html(s)
-            correct = "(Ar)"
-            log(out + ' ------- ' + correct, 'html')
-            self.assertEqual(out, correct)
-
-
-def suite():
-
-    testcases = [Test_Compare_Equations, Test_Divide_Equations, Test_Render_Equations]
-    suites = []
-    for testcase in testcases:
-        suites.append(unittest.TestLoader().loadTestsFromTestCase(testcase))
-    return unittest.TestSuite(suites)
-
-if __name__ == "__main__":
-    local_debug = True
-    with open('render.html', 'w') as f:
-        unittest.TextTestRunner(verbosity=2).run(suite())
-    # open render.html to look at rendered equations
+    return True
