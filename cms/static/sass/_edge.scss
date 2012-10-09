@@ -8,14 +8,13 @@
   }
 
   .main-wrapper {
-    width: 940px;
+    width: 942px;
     margin: auto;
 
     .content {
+      @extend .window;
       padding: 24px 60px 36px;
       border-radius: 3px;
-      background: #fff;
-      box-shadow: 0 0 50px rgba(0, 0, 0, .1);
       @include clearfix;
     }
 
@@ -28,6 +27,7 @@
 
       .row {
         margin-bottom: 20px;
+        border-bottom: none;
       }
 
       label {
