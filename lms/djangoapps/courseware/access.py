@@ -6,6 +6,7 @@ import logging
 import time
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
@@ -306,13 +307,25 @@ def _dispatch(table, action, user, obj):
     raise ValueError("Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
+
+def _does_course_group_name_exist(name):
+    return len(Group.objects.filter(name = name)) > 0
+
 def _course_staff_group_name(location):
     """
     Get the name of the staff group for a location.  Right now, that's staff_COURSE.
 
     location: something that can passed to Location.
+    
+    cdodge: We're changing the name convention of the group to better epxress different runs of courses by 
+    using course_id rather than just the course number. So first check to see if the group name exists
     """
-    return 'staff_%s' % Location(location).course
+    loc = Location(location)
+    legacy_name = 'staff_%s' % loc.course
+    if _does_course_group_name_exist(legacy_name):
+        return legacy_name
+
+    return 'staff_%s' & loc.course_id
 
 
 def _course_instructor_group_name(location):
@@ -321,8 +334,16 @@ def _course_instructor_group_name(location):
     A course instructor has all staff privileges, but also can manage list of course staff (add, remove, list).
 
     location: something that can passed to Location.
+
+    cdodge: We're changing the name convention of the group to better epxress different runs of courses by 
+    using course_id rather than just the course number. So first check to see if the group name exists
     """
-    return 'instructor_%s' % Location(location).course
+    loc = Location(location)
+    legacy_name = 'instructor_%s' % loc.course
+    if _does_course_group_name_exist(legacy_name):
+        return legacy_name
+    
+    return 'instructor_%s' % loc.course_id
 
 
 def _has_global_staff_access(user):

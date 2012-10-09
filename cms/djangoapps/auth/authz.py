@@ -20,7 +20,14 @@ STAFF_ROLE_NAME = 'staff'
 # of those two variables
 def get_course_groupname_for_role(location, role):
     loc = Location(location)
-    groupname = role  + '_' + loc.course
+    # hack: check for existence of a group name in the legacy LMS format <role>_<course>
+    # if it exists, then use that one, otherwise use a <role>_<course_id> which contains
+    # more information
+    groupname = '{0}_{1}'.format(role, loc.course)
+
+    if len(Group.objects.filter(name = groupname)) == 0:
+        groupname = '{0}_{1}'.format(role,loc.course_id)
+
     return groupname
 
 def get_users_in_course_group_by_role(location, role):
