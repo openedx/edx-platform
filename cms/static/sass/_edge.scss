@@ -1,97 +1,78 @@
 .edge-landing {
+  border-top: 5px solid $blue;
+
   header {
     @include clearfix;
     background: $extraDarkGrey;
     border-bottom: 3px solid $blue;
   }
 
-  .log-in-form {
-    @include clearfix;
-    float: right;
-    padding: 10px;
+  .main-wrapper {
+    width: 940px;
+    margin: auto;
 
-    .column {
+    .content {
+      padding: 24px 60px 36px;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 0 50px rgba(0, 0, 0, .1);
+      @include clearfix;
+    }
+
+    .log-in-form {
       float: left;
-      width: 200px;
-      margin-right: 10px;
+      width: 470px;
+      margin-right: 50px;
+      padding-right: 49px;
+      border-right: 1px solid $lightGrey;
 
-      &.submit {
-        width: auto;
+      .row {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: 700;
       }
 
       input {
         width: 100%;
-        padding: 5px 8px 7px;
-        @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1));
-        background-color: #4e5153;
-        border-color: #1c1e20;
-        color: #fff;
+        font-size: 21px;
+        font-weight: 300;
       }
 
-      input[type="submit"] {
-        @include dark-grey-button;
-        position: relative;
-        top: -1px;
-        width: 100px;
-        padding: 6px 20px 8px;
-        font-size: 11px;
-        font-weight: 400;
-      }
-    }
-
-    .forgot-button {
-      font-size: 11px;
-      margin-left: 5px;
-    }
-  }
-
-  .main-wrapper {
-    width: 980px;
-    margin: auto;
-
-    .column {
-      float: left;
-      width: 400px;
-      padding: 26px 40px 40px;
-      border-radius: 3px;
-      background: #fff;
-      -webkit-transition: all .15s;
-      @include box-shadow(0 0 50px rgba(0, 0, 0, .1));
-
-      &:hover {
-        background: $blue;
-
-        h2 {
-          color: #fff;
-        }
-
-        p {
-          color: #bee1f0;
-        }
+      .log-in-submit-button {
+        @include blue-button;
+        width: 130px;
+        padding: 8px 20px 10px;
+        font-size: 16px;
       }
 
-      &.left {
-        margin-right: 10px;
-      }
-
-      &.right {
+      .forgot-button {
+        font-size: 12px;
         margin-left: 10px;
       }
     }
 
-    h2 {
-      margin-bottom: 12px;
-      font-size: 30px;
-      font-weight: 300;
-      color: $blue;
-      @include transition(all .15s);
+    .sign-up {
+      float: left;
+      width: 250px;
+
+      .register-button {
+        @include grey-button;
+        margin-top: 20px;
+      }
     }
 
-    p {
-      font-size: 14px;
-      line-height: 1.4;
-      color: #7d7d7d;
-      @include transition(all .15s);
+    h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 300;
+    }
+
+    h3 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 300;      
     }
   }
 

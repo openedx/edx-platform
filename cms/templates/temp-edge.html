@@ -5,33 +5,32 @@
 
 <%block name="content">
 
-<header>
-  <div class="log-in-form">
-    <form>
-      <div class="column">
-        <input name="email" type="email" class="email-field" tabindex="1" placeholder="email">
-      </div>
-      <div class="column">
-        <input name="password" type="password" class="password-field" tabindex="2" placeholder="password">
-      </div>
-      <div class="column submit">
-        <input name="submit" type="submit" value="Log In" class="log-in-submit-button" tabindex="3">
-        <a href="#" class="forgot-button">Forgot password?</a>
-      </div>
-    </form>
-  </div>
-</header>
-
 <div class="main-wrapper">
   <div class="edx-edge-logo-large"></div>
-  <a href="#" class="column left">
-    <h2>Create a course</h2>
-    <p>Hendrerit in vulputate velit, esse molestie consequat vel illum dolore eu feugiat. Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Modo typi qui nunc nobis, videntur parum clari.</p>
-  </a>
-  <a href="#" class="column right">
-    <h2>Register for courses</h2>
-    <p>Hendrerit in vulputate velit, esse molestie consequat vel illum dolore eu feugiat. Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Modo typi qui nunc nobis, videntur parum clari.</p>
-  </a>
+  <div class="content">
+    <div class="log-in-form">
+      <h2>Log in to your courses</h2>
+      <form>
+        <div class="row">
+          <label>Email</label>
+          <input name="email" type="email" class="email-field" tabindex="1">
+        </div>
+        <div class="row">
+          <label>Password</label>
+          <input name="password" type="password" class="password-field" tabindex="2">
+        </div>
+        <div class="row submit">
+          <input name="submit" type="submit" value="Log In" class="log-in-submit-button" tabindex="3">
+          <a href="#" class="forgot-button">Forgot password?</a>
+        </div>
+      </form>
+    </div>
+    <div class="sign-up">
+      <h3>Register for classes</h3>
+      <p>Take free online courses from today's leading universities.</p>
+      <p><a href="#" class="register-button">Register</a></p>
+    </div>
+  </div>
 </div>
 
 </%block>
