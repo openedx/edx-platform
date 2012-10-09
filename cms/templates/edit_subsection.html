@@ -1,9 +1,18 @@
 <%inherit file="base.html" />
+<%!
+   from time import mktime
+   import dateutil.parser
+   import logging
+   from datetime import datetime
+%>
+
 <%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">subsection</%block>
 <%block name="title">CMS Subsection</%block>
 
 <%namespace name="units" file="widgets/units.html" />
+<%namespace name='static' file='static_content.html'/>
+<%namespace name='datetime' module='datetime'/>
 
 <%block name="content">
 <div class="main-wrapper">
@@ -15,14 +24,14 @@
 	  <input type="text" value="${subsection.metadata['display_name']}" class="subsection-display-name-input" data-metadata-name="display_name"/>
 	</div>
 	<div>
-	  <label>Subtitle:</label>
-	  <input type="text" value="${subsection.metadata['subtitle'] if 'subtitle' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="subtitle"/>
+	  <label>Format:</label>
+	  <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="subtitle"/>
 	</div>
 	<div class="unit-list">
 	  <label>Units:</label>
 	  ${units.enum_units(subsection)}
 	</div>
-	<div>
+	<div class='wip-box'>
 	  <label>Policy:</label>
 	  <textarea class="text-editor">Policy blah, blah, blah…</textarea>
 	</div>					
@@ -35,31 +44,52 @@
 	<div class="window-contents">
 	  <div class="scheduled-date-input row">
 	    <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
-	    <div class="date-setter">
-	      <input type="text" value="10/22/2012" class="date-input" />
-	      <input type="text" value="6:00 am" class="time-input" />
+	    <div class="datepair" data-language="javascript">
+	    	<%
+	    		start_time = datetime.fromtimestamp(mktime(subsection.start)) if subsection.start is not None else None
+	    	%>
+	      <input type="text" id="start_date" value="${start_time.strftime('%m/%d/%Y') if start_time is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15'/>
+	      <input type="text" id="start_time" value="${start_time.strftime('%H:%M') if start_time is not None else ''}" placeholder="HH:MM" class="time" size='10'/> 
 	    </div>
-	    <p class="notice">The date above differs from the release date of Week 1 – 10/10/2012 at 12:00 am. <a href="#" class="sync-date">Sync to Week 1.</a></p>
+	    <p class="notice wip-box">The date above differs from the release date of Week 1 – 10/10/2012 at 12:00 am. <a href="#" class="sync-date">Sync to Week 1.</a></p>
 	  </div>
 	<div class="due-date-input row">
 	  <label>Due date:</label>
 	  <a href="#" class="set-date">Set a due date</a>
-	  <div class="date-setter">
-	    <p class="date-description"><input type="text" value="10/20/2012" class="date-input" /> <input type="text" value="6:00 am" class="time-input" />
+	  <div class="datepair date-setter">
+	    <p class="date-description">
+	      <%
+	      	# due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
+		 	due_date = dateutil.parser.parse(subsection.metadata.get('due')) if 'due' in subsection.metadata else None
+		  %>
+	      <input type="text" id="due_date" value="${due_date.strftime('%Y-%m-%d') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' /> 
+	      <input type="text" id="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' />
 	      <a href="#" class="remove-date">Remove due date</a>
 	    </p>
 	  </div>
 	</div>
-	<div class="visibility row">
-	  <label>Visibility:<!-- <span class="description">Shows or hides this subsection and the units within it.</span>--></label>
-	  <a href="#" class="toggle-off">hide</a><a href="#" class="large-toggle"></a><a href="#" class="toggle-on">show</a>
-	</div>
 	<div class="row unit-actions">
 	  <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
-	  <a href="preview.html" target="_blank" class="preview-button">Preview</a>
+	  <a href="${lms_link}" target="_blank" class="preview-button">Preview</a>
 	</div>
       </div>
     </div>
   </div>
 </div>
+</%block>
+
+<%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+<script src="${static.url('js/vendor/date.js')}"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		if ($('#due_date').val() != '') {
+		    var $block = $('.set-date').closest('.due-date-input');
+		    $('.set-date').hide();
+		    $block.find('.date-setter').show();
+		}
+	})
+</script>
 </%block>

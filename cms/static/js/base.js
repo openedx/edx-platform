@@ -31,6 +31,11 @@ $(document).ready(function() {
     $('.sortable-unit-list').sortable();
     $('.sortable-unit-list').disableSelection();
     $('.sortable-unit-list').bind('sortstop', onUnitReordered);
+
+    // expand/collapse methods for optional date setters
+    $('.set-date').bind('click', showDateSetter);
+    $('.remove-date').bind('click', removeDateSetter);
+
 });
 
 // This method only changes the ordering of the child objects in a subsection
@@ -55,6 +60,27 @@ function onUnitReordered() {
 	});
 }
 
+function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+    var input_date = $('#'+date_id).val();
+    var input_time = $('#'+time_id).val();
+
+    var edxTimeStr = null;
+
+    if (input_date != '') {
+        if (input_time == '') 
+            input_time = '00:00';
+
+        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
+        date = Date.parse(input_date+" "+input_time);
+        if (format == null)
+            format = 'yyyy-MM-ddTHH:mm';
+
+        edxTimeStr = date.toString(format);
+    }
+
+    return edxTimeStr;
+}
+
 function saveSubsection(e) {
     e.preventDefault();
     
@@ -65,10 +91,18 @@ function saveSubsection(e) {
     
     metadata = {};
     for(var i=0; i< metadata_fields.length;i++) {
-	el = metadata_fields[i];
-	metadata[$(el).data("metadata-name")] = el.value;
+	   el = metadata_fields[i];
+	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
+
+    // Piece back together the date/time UI elements into one date/time string
+    // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string
+    // so make sure we're passing back the correct format
+    metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
+    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
+
+    // reordering is done through immediate callbacks when the resorting has completed in the UI
     children =[];
 
     $.ajax({
@@ -198,8 +232,22 @@ function hideHistoryModal(e) {
     $modalCover.hide();
 }
 
+function showDateSetter(e) {
+    e.preventDefault();
+    var $block = $(this).closest('.due-date-input');
+    $(this).hide();
+    $block.find('.date-setter').show();
+}
 
-
+function removeDateSetter(e) {
+    e.preventDefault();
+    var $block = $(this).closest('.due-date-input');
+    $block.find('.date-setter').hide();
+    $block.find('.set-date').show();
+    // clear out the values
+    $block.find('.date').val('');
+    $block.find('.time').val('');
+}
 
 
 

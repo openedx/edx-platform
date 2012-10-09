@@ -43,7 +43,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
-from .utils import get_course_location_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item
 
 from xmodule.templates import all_templates
 
@@ -143,13 +143,18 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
+    lms_link = get_lms_link_for_item(item)
+
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
+    logging.debug('Start = {0}'.format(item.start))
+
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'lms_link': lms_link
                                })
 
 @login_required
@@ -167,15 +172,7 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
-    if settings.LMS_BASE is not None:
-        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id = modulestore().get_containing_courses(item.location)[0].id,
-            location=item.location,
-        )
-    else:
-        lms_link = None
+    lms_link = get_lms_link_for_item(item)
 
     component_templates = defaultdict(list)
 
@@ -443,15 +440,29 @@ def save_item(request):
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
-    # note, that the postback is not the complete metadata, as there's system metadata which is
+    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
     # not presented to the end-user for editing. So let's fetch the original and
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
     if request.POST['metadata']:
         posted_metadata = request.POST['metadata']
         # fetch original
         existing_item = modulestore().get_item(item_location)
+
         # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        for metadata_key in posted_metadata.keys():
+            # NOTE: We don't want clients to be able to delete 'system metadata' which are not intended to be user
+            # editable
+            if posted_metadata[metadata_key] is None and metadata_key not in existing_item.system_metadata_fields:
+                # remove both from passed in collection as well as the collection read in from the modulestore
+                if metadata_key in existing_item.metadata:
+                    del existing_item.metadata[metadata_key]
+                del posted_metadata[metadata_key]
+
+        # overlay the new metadata over the modulestore sourced collection to support partial updates
         existing_item.metadata.update(posted_metadata)
+
+        # commit to datastore
         modulestore().update_metadata(item_location, existing_item.metadata)
 
     return HttpResponse()
