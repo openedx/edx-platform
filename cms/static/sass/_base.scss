@@ -124,13 +124,15 @@ label {
 }
 
 .new-unit-item,
-.new-subsection-item {
+.new-subsection-item,
+.new-policy-item {
     @include grey-button;
     margin: 5px 8px;
     padding: 3px 10px 4px 10px;
     font-size: 10px;
 
     .new-folder-icon,
+    .new-policy-icon,
     .new-unit-icon {
         position: relative;
         top: 2px;

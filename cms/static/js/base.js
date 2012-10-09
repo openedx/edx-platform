@@ -40,7 +40,15 @@ $(document).ready(function() {
     $('.add-policy-data').bind('click', addPolicyMetadata);
     $('.remove-policy-data').bind('click', removePolicyMetadata);
 
+    $('.sync-date').bind('click', syncReleaseDate);
+
 });
+
+function syncReleaseDate(e) {
+    e.preventDefault();
+    $("#start_date").val("");
+    $("#start_time").val("");
+}
 
 function addPolicyMetadata(e) {
     e.preventDefault();
@@ -55,9 +63,10 @@ function removePolicyMetadata(e) {
     e.preventDefault();
     policy_name = $(this).data('policy-name');
     var _parent_el = $(this).parent('li:.policy-list-element');
-    //$(_parent_el).remove();
-
-    _parent_el.appendTo("#policy-to-delete");
+    if ($(_parent_el).hasClass("new-policy-list-element"))
+        _parent_el.remove();
+    else
+        _parent_el.appendTo("#policy-to-delete");
 }
 
 
@@ -129,7 +138,8 @@ function saveSubsection(e) {
     // 'null' presented to the server means 'remove'
     $("#policy-to-delete > li.policy-list-element").each(function(i, element) {
         name = $(element).children('.policy-list-name').val();
-        metadata[name] = null;
+        if (name != "")
+           metadata[name] = null;
     });
 
     // Piece back together the date/time UI elements into one date/time string
