@@ -698,8 +698,9 @@ def upload_asset(request, org, course, coursename):
     # timestamp populated, but we might as well wait for the first real request to come in
     # to re-populate the cache.
     del_cached_content(content.location)
-
-    return HttpResponse('Upload completed')
+    response = HttpResponse('Upload completed')
+    response['asset_url'] = StaticContent.get_url_path_from_location(file_location)
+    return response
 
 '''
 This view will return all CMS users who are editors for the specified course

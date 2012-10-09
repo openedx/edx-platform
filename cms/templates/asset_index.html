@@ -30,12 +30,13 @@
               </td>
               <td class="name-col">
                 <a href="${asset['url']}" class="filename">${asset['displayname']}</a>
+                <div class="embeddable-xml"></div>
               </td>
               <td class="date-col">
                 ${asset['uploadDate']}
               </td>
               <td class="embed-col">
-                <a href="${asset['url']}">copy</a>
+                <a class="show-xml" href="${asset['url']}">XML</a>
               </td>
             </tr>
           % endfor
@@ -64,8 +65,10 @@
 			<div class="progress-bar">
 				<div class="progress-fill"></div>
 			</div>
-  		<a href="#" class="copy-button">Copy Embed Link</a>
-			<form class="file-chooser" action="${upload_asset_callback_url}" method="post" enctype="multipart/form-data">
+      <div class="embeddable-xml"></div>
+      <a href="#" class="copy-button">Show Embeddable XML</a>
+			<form class="file-chooser" action="${upload_asset_callback_url}"
+                                method="post" enctype="multipart/form-data">
 				<a href="#" class="choose-file-button">Choose File</a>
 				<input type="file" class="file-input" name="file">
 			</form>
