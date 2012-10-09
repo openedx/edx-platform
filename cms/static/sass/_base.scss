@@ -280,3 +280,39 @@ body.show-wip {
     text-align: center;
   }
 }
+
+.waiting {
+    position: relative;
+
+    &:before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 999998;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background: rgba(255, 255, 255, .9);
+    }
+
+    &:after {
+        content: '';
+        @extend .spinner-icon;
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        z-index: 999999;
+    }
+}
+
+.waiting-inline {
+    &:after {
+        content: '';
+        @extend .spinner-icon;
+    }
+}
