@@ -624,3 +624,20 @@ def imageinput(element, value, status, render_template, msg=''):
         }
     html = render_template("imageinput.html", context)
     return etree.XML(html)
+
+
+#-----------------------------------------------------------------------------
+@register_render_function
+def crystallography(element, value, status, render_template, msg=''):
+    eid = element.get('id')
+    height = element.get('height')
+    width = element.get('width')
+    display_file = element.get('display_file')
+    context = {
+        'id': eid,
+        'width': width,
+        'height': height,
+        'display_file': display_file,
+        }
+    html = render_template("crystallography.html", context)
+    return etree.XML(html)
