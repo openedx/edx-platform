@@ -100,7 +100,7 @@ class DraftModuleStore(ModuleStoreBase):
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
-        return super(DraftModuleStore, self).clone_item(source, as_draft(location))
+        return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
     def update_item(self, location, data):
         """
@@ -158,6 +158,14 @@ class DraftModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         """
         return super(DraftModuleStore, self).delete_item(as_draft(location))
+
+    def get_parent_locations(self, location):
+        '''Find all locations that are the parents of this location.  Needed
+        for path_to_location().
+
+        returns an iterable of things that can be passed to Location.
+        '''
+        return super(DraftModuleStore, self).get_parent_locations(location)
 
     def publish(self, location, published_by_id):
         """

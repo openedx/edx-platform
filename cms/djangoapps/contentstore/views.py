@@ -571,7 +571,12 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
-    modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if parent_location.category not in ('vertical',):
+        parent_update_modulestore = modulestore('direct')
+    else:
+        parent_update_modulestore = modulestore()
+    parent_update_modulestore.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
