@@ -1,7 +1,15 @@
+.edx-studio-logo-large {
+	display: block;
+	width: 224px;
+	height: 45px;
+	margin: 100px auto 30px;
+	background: url(../img/edx-studio-large.png) no-repeat;
+}
+
 .sign-up-box,
 .log-in-box {
 	width: 500px;
-	margin: 100px auto;
+	margin: auto;
 	border-radius: 3px;
 
 	header {
