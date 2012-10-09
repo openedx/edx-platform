@@ -42,7 +42,7 @@ from xmodule.contentstore.content import StaticContent
 from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
-from auth.authz import ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
+from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
 from .utils import get_course_location_for_item, get_lms_link_for_item
 
 from xmodule.templates import all_templates
@@ -98,11 +98,22 @@ def index(request):
 
 # ==== Views with per-item permissions================================
 
-def has_access(user, location, role=EDITOR_ROLE_NAME):
-    '''Return True if user allowed to access this piece of data'''
-    '''Note that the CMS permissions model is with respect to courses'''
-    '''There is a super-admin permissions if user.is_staff is set'''
-    return is_user_in_course_group_role(user, get_course_location_for_item(location), role)
+def has_access(user, location, role=STAFF_ROLE_NAME):
+    '''
+    Return True if user allowed to access this piece of data
+    Note that the CMS permissions model is with respect to courses
+    There is a super-admin permissions if user.is_staff is set
+    Also, since we're unifying the user database between LMS and CAS, 
+    I'm presuming that the course instructor (formally known as admin)
+    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our queries here as INSTRUCTOR
+    has all the rights that STAFF do
+    '''
+    course_location = get_course_location_for_item(location)
+    _has_access = is_user_in_course_group_role(user, course_location, role)
+    # if we're not in STAFF, perhaps we're in INSTRUCTOR groups
+    if not _has_access and role == STAFF_ROLE_NAME:
+        _has_access = is_user_in_course_group_role(user, course_location, INSTRUCTOR_ROLE_NAME)
+    return _has_access
 
 
 @login_required
@@ -591,15 +602,16 @@ This view will return all CMS users who are editors for the specified course
 '''
 @login_required
 @ensure_csrf_cookie
-def manage_users(request, org, course, name):
-    location = ['i4x', org, course, 'course', name]
+def manage_users(request, location):
     
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
 
     return render_to_response('manage_users.html', {
-        'editors': get_users_in_course_group_by_role(location, EDITOR_ROLE_NAME)
+        'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
+        'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
+        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/')
     })
     
 
@@ -615,18 +627,17 @@ def create_json_response(errmsg = None):
 This POST-back view will add a user - specified by email - to the list of editors for
 the specified course
 '''
+@expect_json
 @login_required
 @ensure_csrf_cookie
-def add_user(request, org, course, name):
+def add_user(request, location):
     email = request.POST["email"]
 
     if email=='':
         return create_json_response('Please specify an email address.')
-
-    location = ['i4x', org, course, 'course', name]
     
     # check that logged in user has admin permissions to this course
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
     
     user = get_user_by_email(email)
@@ -640,7 +651,7 @@ def add_user(request, org, course, name):
         return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
 
     # ok, we're cool to add to the course group
-    add_user_to_course_group(request.user, user, location, EDITOR_ROLE_NAME)
+    add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
 
@@ -648,22 +659,21 @@ def add_user(request, org, course, name):
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
 '''
+@expect_json
 @login_required
 @ensure_csrf_cookie
-def remove_user(request, org, course, name):
+def remove_user(request, location):
     email = request.POST["email"]
-
-    location = ['i4x', org, course, 'course', name]
     
     # check that logged in user has admin permissions on this course
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
 
     user = get_user_by_email(email)
     if user is None:
         return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
 
-    remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
+    remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
 

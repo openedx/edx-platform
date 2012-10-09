@@ -1,38 +1,81 @@
 <%inherit file="base.html" />
-<%block name="title">Course Editor Manager</%block>
+<%block name="title">Course Staff Manager</%block>
 <%include file="widgets/header.html"/>
 
 <%block name="content">
 <section class="main-container">
 
-  <h2>Course Editors</h2>
-  <ul>
-    % for user in editors:
-    <li>${user.email} (${user.username})</li>
-    % endfor
-  </ul>
+  <h2>Course Staff</h2>
+  <div>
+    <p>
+      The following list of users have been designated as course staff. This means that these users will 
+      have permissions to modify course content. You may add additional source staff below. Please note that they
+      must have already registered and verified their account.
+    </p>
+  </div>
+  <div>
+    <ol>
+      % for user in staff:
+      <li>${user.email} (${user.username}) <a href='#' class='remove-user' data-id='${user.email}'>remove</a></li>
+      % endfor
+    </ol>
+  </div>
 
-  <form action="add_user" id="addEditorsForm">
-    <label>email:&nbsp;</label><input type="text" name="email" placeholder="email@example.com..." />
-    <input type="submit" value="add editor" />
-  </form>
+  
+  <label>email:&nbsp;</label><input type="text" id="email" autocomplete="Off" placeholder="email@example.com..." size="40"/>
+  <a href="#" id="add_user" class="button" />add as course staff</a>
+  
   <div id="result"></div>
 
 <script>
   $("#addEditorsForm").submit(function(event) {
-  event.preventDefault();
-  var $form = $(this),
-  email = $form.find('input[name="email"]').val(),
-  url = $form.attr('action');
-  $.post(url, {email:email},
-  function(data) {
-  if(data['Status'] != 'OK')
-  $("#result").empty().append(data['ErrMsg']);
-  else
-  location.reload();
-  });
+    event.preventDefault();
+    var $form = $(this),
+    email = $form.find('input[name="email"]').val(),
+    url = $form.attr('action');
+    $.post(url, {email:email},
+    function(data) {
+      if(data['Status'] != 'OK')
+        $("#result").empty().append(data['ErrMsg']);
+      else
+        location.reload();
+      });
   });
 </script>
 
 </section>
+</%block>
+
+<%block name="jsextra">
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $("#add_user").click(function() {
+        $.ajax({
+          url: "${add_user_postback_url}",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data:JSON.stringify({ 'email': $('#email').val()}),
+        }).done(function(data) {
+          if (data.ErrMsg != undefined)
+            $("#result").empty().append(data.ErrMsg);
+          else
+            location.reload();
+        })
+      })
+
+      $(".remove-user").click(function() {
+        $.ajax({
+          url: "${remove_user_postback_url}",
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json",
+          data:JSON.stringify({ 'email': $(this).data('id')}),          
+          }).done(function() {
+            location.reload();
+          })
+      });
+  });
+</script>
 </%block>
