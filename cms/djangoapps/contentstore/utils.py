@@ -74,3 +74,8 @@ def compute_unit_state(unit):
             return UnitState.private
     else:
         return UnitState.public
+
+
+def get_date_display(date):
+    print date, type(date)
+    return date.strftime("%d %B, %Y at %I:%M %p")

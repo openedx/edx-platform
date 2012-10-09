@@ -1,3 +1,4 @@
+import traceback 
 from util.json_request import expect_json
 import exceptions
 import json
@@ -44,7 +45,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display
 
 from xmodule.templates import all_templates
 
@@ -669,7 +670,7 @@ def upload_asset(request, org, course, coursename):
             thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                               'image/jpeg', thumbnail_file)
             contentstore().save(thumbnail_content)
-
+            
             # remove any cached content at this location, as thumbnails are treated just like any
             # other bit of static content
             del_cached_content(thumbnail_content.location)
@@ -830,7 +831,7 @@ def asset_index(request, org, course, name):
         id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = asset['uploadDate']
+        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
         
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
