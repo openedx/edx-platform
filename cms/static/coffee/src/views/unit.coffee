@@ -120,7 +120,7 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: $component.data('id')
     }, =>
       $component.remove()
-      @saveOrder()
+      @model.set('children', @components())
     )
 
   deleteDraft: (event) ->
