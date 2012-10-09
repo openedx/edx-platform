@@ -159,7 +159,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return super(DraftModuleStore, self).delete_item(as_draft(location))
 
-    def publish(self, location):
+    def publish(self, location, published_by_id):
         """
         Save a current draft to the underlying modulestore
         """
@@ -167,6 +167,7 @@ class DraftModuleStore(ModuleStoreBase):
         metadata = {}
         metadata.update(draft.metadata)
         metadata['published_date'] = tuple(datetime.utcnow().timetuple())
+        metadata['published_by'] = published_by_id
         super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
         super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
         super(DraftModuleStore, self).update_metadata(location, metadata)

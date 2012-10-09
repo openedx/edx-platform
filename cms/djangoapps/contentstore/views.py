@@ -527,7 +527,7 @@ def publish_draft(request):
         raise PermissionDenied()
 
     item = modulestore().get_item(location)
-    _xmodule_recurse(item, lambda i: modulestore().publish(i.location))
+    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
 
     return HttpResponse()
 

@@ -409,7 +409,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
-    system_metadata_fields = ['data_dir', 'published_date']
+    system_metadata_fields = ['data_dir', 'published_date', 'published_by']
     
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
