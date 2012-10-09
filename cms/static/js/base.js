@@ -295,5 +295,36 @@ function removeDateSetter(e) {
     $block.find('.time').val('');
 }
 
+function showToastMessage(message, $button, lifespan) {
+    var $toast = $('<div class="toast-notification"></div>');
+    var $closeBtn = $('<a href="#" class="close-button">×</a>');
+    $toast.append($closeBtn);
+    var $content = $('<div class="notification-content"></div>');
+    $content.html(message);
+    $toast.append($content);
+    if($button) {
+        $button.addClass('action-button');
+        $button.bind('click', hideToastMessage);
+        $content.append($button);
+    }
+    $closeBtn.bind('click', hideToastMessage);
 
+    if($('.toast-notification')[0]) {
+        var targetY = $('.toast-notification').offset().top + $('.toast-notification').outerHeight();
+        $toast.css('top', (targetY + 10) + 'px');
+    }
 
+    $body.prepend($toast);
+    $toast.fadeIn(200);
+
+    if(lifespan) {
+        $toast.timer = setTimeout(function() {
+            $toast.fadeOut(300);
+        }, lifespan * 1000);
+    }
+}
+
+function hideToastMessage(e) {
+    e.preventDefault();
+    $(this).closest('.toast-notification').remove();
+}

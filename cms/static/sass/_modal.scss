@@ -28,7 +28,8 @@
 
 	.modal-actions {
 		height: 60px;
-		background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0)) #d1dae3;
+		@include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+		background-color: #d1dae3;
 	}
 
 	h2 {

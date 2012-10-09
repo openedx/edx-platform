@@ -20,7 +20,7 @@ input.courseware-unit-search-input {
 	border-radius: 3px;
 	margin: 10px 0;
 	padding-bottom: 12px;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	@include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
 
 	&:first-child {
 		margin-top: 0;
@@ -88,7 +88,8 @@ input.courseware-unit-search-input {
 	}
 
 	.list-header {
-		background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, .1)) #ced2db;
+		@include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+		background-color: #ced2db;
 		border-radius: 3px 3px 0 0;
 	}
 
@@ -127,7 +128,7 @@ input.courseware-unit-search-input {
 	left: 110px;
 	z-index: 9999;
 	border: 1px solid #3C3C3C;
-	box-shadow: 0 1px 15px rgba(0, 0, 0, .2);	
+	@include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
 }
 
 .unit-name-input {
