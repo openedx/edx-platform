@@ -13,11 +13,11 @@
 	padding: 4px 20px 6px;
 	font-size: 14px;
 	font-weight: 700;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0);
-	-webkit-transition: background-color .15s, box-shadow .15s;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
+	@include transition(background-color .15s, box-shadow .15s);
 
 	&:hover {
-		box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15);
+		@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
 	}
 }
 
@@ -25,7 +25,8 @@
 	@include button;
 	border: 1px solid #437fbf;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) $blue;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $blue;
 	color: #fff;
 
 	&:hover {
@@ -38,8 +39,9 @@
 	@include button;
 	border: 1px solid $darkGrey;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 60%) #dfe5eb;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 60%);
+	background-color: #dfe5eb;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
 	color: #5d6779;
 
 	&:hover {
@@ -52,8 +54,9 @@
 	@include button;
 	border: 1px solid #bda046;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%) #edbd3c;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
+	background-color: #edbd3c;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
 	color: #3c3c3c;
 
 	&:hover {
@@ -66,8 +69,9 @@
 	@include button;
 	border: 1px solid $darkGrey;
 	border-radius: 3px;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)) #d1dae3;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: #d1dae3;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
 	color: #6d788b;
 
 	&:hover {
@@ -80,8 +84,9 @@
 	padding: 15px 20px;
 	border-radius: 3px;
 	border: 1px solid #5597dd;
-	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0)) #5597dd;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+	background-color: #5597dd;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
 
 	label {
 		color: #fff;
@@ -164,10 +169,6 @@
 
 		.has-new-draft-item {
 			color: #9f7d10;
-		}
-
-		.item-actions {
-			// display: none;
 		}
 	}
 
