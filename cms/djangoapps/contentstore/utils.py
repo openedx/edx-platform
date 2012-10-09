@@ -49,6 +49,12 @@ def get_lms_link_for_item(location):
     return lms_link
 
 
+class UnitState(object):
+    draft = 'draft'
+    private = 'private'
+    public = 'public'
+
+
 def compute_unit_state(unit):
     """
     Returns whether this unit is 'draft', 'public', or 'private'.
@@ -62,8 +68,8 @@ def compute_unit_state(unit):
     if unit.metadata.get('is_draft', False):
         try:
             modulestore('direct').get_item(unit.location)
-            return 'draft'
+            return UnitState.draft
         except ItemNotFoundError:
-            return 'private'
+            return UnitState.private
     else:
-        return 'public'
+        return UnitState.public
