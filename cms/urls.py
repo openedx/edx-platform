@@ -41,6 +41,9 @@ urlpatterns = ('',
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index'),
+
+    # temporary landing page for edge
+    url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edge', name='edge'),
 )
 
 # User creation and updating views

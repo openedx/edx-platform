@@ -1,0 +1,105 @@
+.edge-landing {
+  header {
+    @include clearfix;
+    background: $extraDarkGrey;
+    border-bottom: 3px solid $blue;
+  }
+
+  .log-in-form {
+    @include clearfix;
+    float: right;
+    padding: 10px;
+
+    .column {
+      float: left;
+      width: 200px;
+      margin-right: 10px;
+
+      &.submit {
+        width: auto;
+      }
+
+      input {
+        width: 100%;
+        padding: 5px 8px 7px;
+        @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1));
+        background-color: #4e5153;
+        border-color: #1c1e20;
+        color: #fff;
+      }
+
+      input[type="submit"] {
+        @include dark-grey-button;
+        position: relative;
+        top: -1px;
+        width: 100px;
+        padding: 6px 20px 8px;
+        font-size: 11px;
+        font-weight: 400;
+      }
+    }
+
+    .forgot-button {
+      font-size: 11px;
+      margin-left: 5px;
+    }
+  }
+
+  .main-wrapper {
+    width: 980px;
+    margin: auto;
+
+    .column {
+      float: left;
+      width: 400px;
+      padding: 26px 40px 40px;
+      border-radius: 3px;
+      background: #fff;
+      -webkit-transition: all .15s;
+      @include box-shadow(0 0 50px rgba(0, 0, 0, .1));
+
+      &:hover {
+        background: $blue;
+
+        h2 {
+          color: #fff;
+        }
+
+        p {
+          color: #bee1f0;
+        }
+      }
+
+      &.left {
+        margin-right: 10px;
+      }
+
+      &.right {
+        margin-left: 10px;
+      }
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 30px;
+      font-weight: 300;
+      color: $blue;
+      @include transition(all .15s);
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #7d7d7d;
+      @include transition(all .15s);
+    }
+  }
+
+  .edx-edge-logo-large {
+    display: block;
+    width: 263px;
+    height: 72px;
+    margin: 150px auto 50px;
+    background: url(../img/edge-logo-large.png) no-repeat;
+  }
+}

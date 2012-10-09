@@ -848,3 +848,8 @@ def asset_index(request, org, course, name):
         'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url
     })
+
+
+# points to the temporary edge page
+def edge(request, org, course, coursename):
+    return render_to_response('temp-edge.html', {})
