@@ -222,7 +222,7 @@ def edit_unit(request, location):
 
     return render_to_response('unit.html', {
         'unit': item,
-        'unit_location': published_location,
+        'unit_location': location,
         'components': components,
         'component_templates': component_templates,
         'draft_preview_link': lms_link,
