@@ -42,7 +42,7 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "cms.db",
+        'NAME': ENV_ROOT / "db" / "mitx.db",
     }
 }
 
@@ -97,3 +97,6 @@ CACHES = {
 
 # Make the keyedcache startup warnings go away
 CACHE_TIMEOUT = 0
+
+# Dummy secret key for dev
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
