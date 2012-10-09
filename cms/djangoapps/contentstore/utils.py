@@ -36,6 +36,7 @@ def get_course_location_for_item(location):
 
 
 def get_lms_link_for_item(location):
+    location = Location(location)
     if settings.LMS_BASE is not None:
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=settings.LMS_BASE,
