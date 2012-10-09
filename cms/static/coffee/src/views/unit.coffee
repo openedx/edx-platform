@@ -27,6 +27,11 @@ class CMS.Views.UnitEdit extends Backbone.View
       model: @model
     )
 
+    @nameView = new CMS.Views.UnitEdit.NameEdit(
+      el: @$('.unit-name-input')
+      model: @model
+    )
+
     @model.on('change:state', @render)
 
     @$newComponentItem = @$('.new-component-item')
@@ -154,6 +159,23 @@ class CMS.Views.UnitEdit extends Backbone.View
     }, =>
       @model.set('state', @$('#visibility').val())
     )
+
+class CMS.Views.UnitEdit.NameEdit extends Backbone.View
+  events:
+    "keyup .unit-display-name-input": "saveName"
+
+  initialize: =>
+    @model.on('change:metadata', @render)
+    @saveName
+
+  render: =>
+    @$('.unit-display-name-input').val(@model.get('metadata').display_name)
+
+  saveName: =>
+    # Treat the metadata dictionary as immutable
+    metadata = $.extend({}, @model.get('metadata'))
+    metadata.display_name = @$('.unit-display-name-input').val()
+    @model.set('metadata', metadata)
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
