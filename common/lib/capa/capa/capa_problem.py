@@ -30,6 +30,8 @@ import sys
 from lxml import etree
 from xml.sax.saxutils import unescape
 
+import chem
+import chem.chemcalc
 import calc
 from correctmap import CorrectMap
 import eia
@@ -72,7 +74,8 @@ global_context = {'random': random,
                   'math': math,
                   'scipy': scipy,
                   'calc': calc,
-                  'eia': eia}
+                  'eia': eia,
+                  'chemcalc': chem.chemcalc}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
@@ -436,7 +439,7 @@ class LoncapaProblem(object):
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
-            
+
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript
