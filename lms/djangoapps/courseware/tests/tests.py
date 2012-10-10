@@ -57,7 +57,7 @@ def mongo_store_config(data_dir):
         'OPTIONS': {
             'default_class': 'xmodule.raw_module.RawDescriptor',
             'host': 'localhost',
-            'db': 'xmodule',
+            'db': 'test_xmodule',
             'collection': 'modulestore',
             'fs_root': data_dir,
             'render_template': 'mitxmako.shortcuts.render_to_string',

@@ -75,19 +75,17 @@
       &.editing {
         border-color: #6696d7;
 
-        &:hover {
-          .drag-handle,
-          .component-actions a {
-            background-color: $blue;
-          }
-
-          .drag-handle {
-            border-color: $blue;
-          }
+        .drag-handle,
+        .component-actions {
+          display: none;
         }
       }
 
-      .rendered-component {
+      &.component-placeholder {
+        border-color: #6696d7;
+      }
+
+      .xmodule_display {
         padding: 40px 20px 20px;
       }
 
@@ -230,14 +228,24 @@
     @include edit-box;
     display: none;
     padding: 20px;
-    border-radius: 0 0 3px 3px;
+    border-radius: 2px 2px 0 0;
     @include linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1));
     background-color: $blue;
     color: #fff;
+    @include box-shadow(none);
 
     .metadata_edit {
       margin-bottom: 20px;
       font-size: 13px;
+
+      li {
+        margin-bottom: 10px;
+      }
+
+      label {
+        display: inline-block;
+        margin-right: 10px;  
+      }
     }
 
     .CodeMirror {
@@ -245,6 +253,7 @@
     }
 
     h3 {
+      margin-bottom: 10px;
       font-size: 18px;
       font-weight: 700;
     }
@@ -392,5 +401,39 @@
         margin: 0 0 15px 50px;
       }
     }
+  }
+}
+
+.edit-state-draft {
+  .visibility {
+    display: none;
+  }
+
+  #create-draft {
+    display: none;
+  }
+}
+
+.edit-state-public {
+  #save-draft,
+  #delete-draft,
+  #publish-draft,
+  .component-actions,
+  .new-component-item,
+  #published-alert {
+    display: none;
+  }
+
+  .drag-handle {
+    display: none !important;
+  }
+}
+
+.edit-state-private {
+  #delete-draft,
+  #publish-draft,
+  #published-alert,
+  #create-draft, {
+    display: none;
   }
 }

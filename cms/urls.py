@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
-import django.contrib.auth.views
-
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -15,12 +13,15 @@ urlpatterns = ('',
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
     url(r'^clone_item$', 'contentstore.views.clone_item', name='clone_item'),
+    url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
+    url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
+    url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),
     url(r'^github_service_hook$', 'github_sync.views.github_post_receive'),
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$', 
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
     url(r'^manage_users/(?P<location>.*?)$', 'contentstore.views.manage_users', name='manage_users'),
     url(r'^add_user/(?P<location>.*?)$',
@@ -30,6 +31,8 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^assets/(?P<location>.*?)$', 'contentstore.views.asset_index', name='asset_index'),
+    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', name='static_pages'),
+    url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
 
     # temporary landing page for a course
     url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing')
@@ -54,6 +57,6 @@ urlpatterns += (
 
 if settings.DEBUG:
     ## Jasmine
-    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
+    urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 urlpatterns = patterns(*urlpatterns)

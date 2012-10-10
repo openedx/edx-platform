@@ -240,11 +240,15 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        raise NotImplementedError
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
-        recent revision
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -345,7 +349,8 @@ class ModuleStore(object):
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
         '''
-        raise NotImplementedError
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed

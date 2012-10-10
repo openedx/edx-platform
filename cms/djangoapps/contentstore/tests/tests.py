@@ -141,8 +141,6 @@ class AuthTestCase(ContentStoreTestCase):
         """Make sure pages that do require login work."""
         auth_pages = (
             reverse('index'),
-            reverse('edit_item'),
-            reverse('save_item'),
             )
 
         # These are pages that should just load when the user is logged in
@@ -181,6 +179,7 @@ class AuthTestCase(ContentStoreTestCase):
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
+TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class EditTestCase(ContentStoreTestCase):
@@ -195,17 +194,17 @@ class EditTestCase(ContentStoreTestCase):
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
 
-    def check_edit_item(self, test_course_name):
+    def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
 
-        for descriptor in modulestore().get_items(Location(None, None, None, None, None)):
+        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
             print "Checking ", descriptor.location.url()
             print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('edit_item'), {'id': descriptor.location.url()})
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
-    def test_edit_item_toy(self):
-        self.check_edit_item('toy')
+    def test_edit_unit_toy(self):
+        self.check_edit_unit('toy')
 
-    def test_edit_item_full(self):
-        self.check_edit_item('full')
+    def test_edit_unit_full(self):
+        self.check_edit_unit('full')

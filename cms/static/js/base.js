@@ -36,6 +36,7 @@ $(document).ready(function() {
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
 
+<<<<<<< HEAD
     // add new/delete section
     $('.new-courseware-section-button').bind('click', addNewSection);
     $('.delete-section-button').bind('click', deleteSection);
@@ -43,8 +44,41 @@ $(document).ready(function() {
     // add new/delete subsection
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
+=======
+    // add/remove policy metadata button click handlers
+    $('.add-policy-data').bind('click', addPolicyMetadata);
+    $('.remove-policy-data').bind('click', removePolicyMetadata);
+
+    $('.sync-date').bind('click', syncReleaseDate);
+>>>>>>> 2cf14ae339aed0150be353cbcac25c377956b7ab
 
 });
+
+function syncReleaseDate(e) {
+    e.preventDefault();
+    $("#start_date").val("");
+    $("#start_time").val("");
+}
+
+function addPolicyMetadata(e) {
+    e.preventDefault();
+    var template =$('#add-new-policy-element-template > li'); 
+    var newNode = template.clone();
+    var _parent_el = $(this).parent('ol:.policy-list');
+    newNode.insertBefore('.add-policy-data');
+    $('.remove-policy-data').bind('click', removePolicyMetadata);
+}
+
+function removePolicyMetadata(e) {
+    e.preventDefault();
+    policy_name = $(this).data('policy-name');
+    var _parent_el = $(this).parent('li:.policy-list-element');
+    if ($(_parent_el).hasClass("new-policy-list-element"))
+        _parent_el.remove();
+    else
+        _parent_el.appendTo("#policy-to-delete");
+}
+
 
 // This method only changes the ordering of the child objects in a subsection
 function onUnitReordered() {
@@ -94,7 +128,7 @@ function saveSubsection(e) {
     
     var id = $(this).data('id');
 
-    // pull all metadata editable fields on page
+    // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
     
     metadata = {};
@@ -103,6 +137,20 @@ function saveSubsection(e) {
 	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
+    // now add 'free-formed' metadata which are presented to the user as dual input fields (name/value)
+    $('ol.policy-list > li.policy-list-element').each( function(i, element) {
+        name = $(element).children('.policy-list-name').val();
+        val = $(element).children('.policy-list-value').val();
+        metadata[name] = val;
+    });
+
+    // now add any 'removed' policy metadata which is stored in a separate hidden div
+    // 'null' presented to the server means 'remove'
+    $("#policy-to-delete > li.policy-list-element").each(function(i, element) {
+        name = $(element).children('.policy-list-name').val();
+        if (name != "")
+           metadata[name] = null;
+    });
 
     // Piece back together the date/time UI elements into one date/time string
     // NOTE: our various "date/time" metadata elements don't always utilize the same formatting string

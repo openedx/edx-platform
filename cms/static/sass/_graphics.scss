@@ -117,9 +117,8 @@
 }
 
 .draft-tag,
-.hidden-tag,
-.private-tag,
-.has-new-draft-tag {
+.public-tag,
+.private-tag {
 	margin-left: 3px;
 	font-size: 9px;
 	font-weight: 600;
@@ -127,7 +126,7 @@
 	color: #a4aab7;
 }
 
-.has-new-draft-tag {
+.draft-tag {
 	color: #9f7d10;
 }
 
@@ -164,6 +163,14 @@
 }
 
 .new-unit-icon {
+	display: inline-block;
+	width: 23px;
+	height: 12px;
+	margin-right: 8px;
+	background: url(../img/new-unit-icon.png) right no-repeat;
+}
+
+.new-policy-icon {
 	display: inline-block;
 	width: 23px;
 	height: 12px;

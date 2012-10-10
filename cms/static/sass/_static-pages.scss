@@ -1,0 +1,64 @@
+.static-pages {
+  .new-static-page-button {
+    @include grey-button;
+    display: block;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  .static-page-item {
+    position: relative;    
+    margin: 10px 0;
+    padding: 22px 20px;
+    border: 1px solid $darkGrey;
+    border-radius: 3px;
+    background: #fff;    
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+
+    .page-name {
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .item-actions {
+      margin-top: 19px;
+      margin-right: 12px;
+    }
+  }
+}
+
+.edit-static-page {
+  .main-wrapper {
+    margin-top: 40px;
+  }
+
+  .static-page-details {
+    @extend .window;
+    padding: 32px 40px;
+
+    .row {
+      border: none;
+    }
+  }
+
+  .page-display-name-input {
+    width: 100%;
+    font-size: 20px;
+  }
+
+  .page-contents {
+    @include box-sizing(border-box);
+    width: 100%;
+    height: 360px;
+    padding: 15px;
+    border: 1px solid #b0b6c2;
+    border-radius: 2px;
+    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
+    background-color: #edf1f5;
+    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+    font-family: Monaco, monospace;
+    font-size: 13px;
+    color: #3c3c3c;
+    outline: 0;
+  }
+}

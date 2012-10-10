@@ -35,9 +35,9 @@ class CMS.Views.ModuleEdit extends Backbone.View
 
     return _metadata
 
-  cloneTemplate: (template) ->
+  cloneTemplate: (parent, template) ->
     $.post("/clone_item", {
-      parent_location: @$el.parent().data('id')
+      parent_location: parent
       template: template
     }, (data) => 
       @model.set(id: data.id)

@@ -1,11 +1,12 @@
 from util.json_request import expect_json
-import json
-import os
-import logging
-import sys
-import mimetypes
-import StringIO
 import exceptions
+import json
+import logging
+import mimetypes
+import os
+import StringIO
+import sys
+import time
 from collections import defaultdict
 from uuid import uuid4
 
@@ -43,7 +44,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
-from .utils import get_course_location_for_item, get_lms_link_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state
 
 from xmodule.templates import all_templates
 
@@ -157,19 +158,36 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    lms_link = get_lms_link_for_item(location)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
-    logging.debug('Start = {0}'.format(item.start))
+    parent_locs = modulestore().get_parent_locations(location)
+
+    # we're for now assuming a single parent
+    if len(parent_locs) != 1:
+        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+
+    # this should blow up if we don't find any parents, which would be erroneous
+    parent = modulestore().get_item(parent_locs[0])
+
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+
+    policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
+        if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
+
+    logging.debug(policy_metadata)
 
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-                               'lms_link': lms_link
+                               'lms_link': lms_link,
+                               'parent_item' : parent,
+                               'policy_metadata' : policy_metadata
                                })
+
 
 @login_required
 def edit_unit(request, location):
@@ -186,7 +204,8 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    # The non-draft location
+    lms_link = get_lms_link_for_item(item.location._replace(revision=None))
 
     component_templates = defaultdict(list)
 
@@ -213,14 +232,25 @@ def edit_unit(request, location):
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
+    unit_state = compute_unit_state(item)
+
+    try:
+        published_date = time.strftime('%B %d, %Y', item.metadata.get('published_date'))
+    except TypeError:
+        published_date = None
+
     return render_to_response('unit.html', {
         'unit': item,
+        'unit_location': location,
         'components': components,
         'component_templates': component_templates,
-        'lms_link': lms_link,
+        'draft_preview_link': lms_link,
+        'published_preview_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'unit_state': unit_state,
+        'published_date': published_date,
     })
 
 
@@ -236,7 +266,6 @@ def preview_component(request, location):
         'preview': get_module_previews(request, component)[0],
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
-
 
 
 def user_author_string(user):
@@ -407,6 +436,13 @@ def get_module_previews(request, descriptor):
         preview_html.append(module.get_html())
     return preview_html
 
+
+def _xmodule_recurse(item, action):
+    for child in item.get_children():
+        _xmodule_recurse(child, action)
+
+    action(item)
+
 def _delete_item(item, recurse=False):
     if recurse:
         children = item.get_children()
@@ -430,8 +466,11 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    _delete_item(item, delete_children)
-    
+    if delete_children:
+        _xmodule_recurse(item, lambda i: modulestore().delete_item(i.location))
+    else:
+        modulestore().delete_item(item.location)
+
     return HttpResponse()
 
 
@@ -465,9 +504,12 @@ def save_item(request):
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
         for metadata_key in posted_metadata.keys():
-            # NOTE: We don't want clients to be able to delete 'system metadata' which are not intended to be user
-            # editable
-            if posted_metadata[metadata_key] is None and metadata_key not in existing_item.system_metadata_fields:
+
+            # let's strip out any metadata fields from the postback which have been identified as system metadata
+            # and therefore should not be user-editable, so we should accept them back from the client
+            if metadata_key in existing_item.system_metadata_fields:
+                del posted_metadata[metadata_key]
+            elif posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
                 if metadata_key in existing_item.metadata:
                     del existing_item.metadata[metadata_key]
@@ -478,6 +520,51 @@ def save_item(request):
 
         # commit to datastore
         modulestore().update_metadata(item_location, existing_item.metadata)
+
+    return HttpResponse()
+
+
+@login_required
+@expect_json
+def create_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # This clones the existing item location to a draft location (the draft is implicit,
+    # because modulestore is a Draft modulestore)
+    modulestore().clone_item(location, location)
+
+    return HttpResponse()
+
+@login_required
+@expect_json
+def publish_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
+
+    return HttpResponse()
+
+
+@login_required
+@expect_json
+def unpublish_unit(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
 
@@ -506,7 +593,12 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
-    modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if parent_location.category not in ('vertical',):
+        parent_update_modulestore = modulestore('direct')
+    else:
+        parent_update_modulestore = modulestore()
+    parent_update_modulestore.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -688,3 +780,9 @@ def asset_index(request, location):
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
+
+def static_pages(request, org, course, coursename):
+    return render_to_response('static-pages.html', {})
+
+def edit_static(request, org, course, coursename):
+    return render_to_response('edit-static-page.html', {})
