@@ -35,8 +35,6 @@ $(document).ready(function() {
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
-
-<<<<<<< HEAD
     // add new/delete section
     $('.new-courseware-section-button').bind('click', addNewSection);
     $('.delete-section-button').bind('click', deleteSection);
@@ -44,14 +42,11 @@ $(document).ready(function() {
     // add new/delete subsection
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
-=======
     // add/remove policy metadata button click handlers
     $('.add-policy-data').bind('click', addPolicyMetadata);
     $('.remove-policy-data').bind('click', removePolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
->>>>>>> 2cf14ae339aed0150be353cbcac25c377956b7ab
-
 });
 
 function syncReleaseDate(e) {
