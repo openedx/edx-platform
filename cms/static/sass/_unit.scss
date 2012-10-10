@@ -382,6 +382,11 @@
   .window-contents > ol {
     @include tree-view;
 
+    .section-item {
+      font-size: 11px;
+      padding: 2px 8px 4px 16px;
+    }
+
     ol {
       .section-item {
         padding-left: 30px;
