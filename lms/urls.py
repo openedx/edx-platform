@@ -219,14 +219,6 @@ if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
-if settings.ASKBOT_ENABLED:
-    urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
-                    url(r'^settings/', include('askbot.deps.livesettings.urls')), \
-                    url(r'^followit/', include('followit.urls')), \
-#                       url(r'^robots.txt$', include('robots.urls')),
-                              )
-
-
 
 if settings.DEBUG:
     ## Jasmine and admin
