@@ -11,7 +11,7 @@ class @Collapsible
     ###
     el.find('.longform').hide()
     el.find('.shortform').append('<a href="#" class="full">See full output</a>')
-    el.find('.collapsible section').hide()
+    el.find('.collapsible header + section').hide()
     el.find('.full').click @toggleFull
     el.find('.collapsible header a').click @toggleHint
 
