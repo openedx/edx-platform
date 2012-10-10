@@ -97,14 +97,20 @@ class MongoModuleStore(ModuleStoreBase):
     # TODO (cpennington): Enable non-filesystem filestores
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
-                 error_tracker=null_error_tracker):
+                 error_tracker=null_error_tracker,
+                 user=None, password=None, **kwargs):
 
         ModuleStoreBase.__init__(self)
 
         self.collection = pymongo.connection.Connection(
             host=host,
-            port=port
+            port=port,
+            **kwargs
         )[db][collection]
+
+        if user is not None and password is not None:
+            self.collection.database.authenticate(user, password)
+
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
