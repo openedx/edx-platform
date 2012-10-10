@@ -1,0 +1,41 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Edit Static Page</%block>
+<%block name="bodyclass">edit-static-page</%block>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <div class="main-column">
+      <article class="static-page-details">
+        <div class="row">
+          <label>Display Name:</label>
+          <input type="text" value="Syllabus" class="page-display-name-input" data-metadata-name="display_name"/>
+        </div>
+        <div class="row">
+          <label>Page Content:</label>
+          <textarea class="page-contents"></textarea>
+        </div>
+      </article>
+    </div>
+    <div class="sidebar">
+      <div class="unit-properties window">
+        <h4>Page Settings</h4>
+        <div class="window-contents">
+          <div class="row visibility">
+            <label class="inline-label">Visibility:</label>
+            <select>
+              <option>Public</option>
+              <option>Private</option>
+            </select>
+          </div>
+          <div class="row unit-actions">
+            <a href="#" class="save-button">Save</a>
+            <a href="#" target="_blank" class="preview-button">Preview</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</%block>
