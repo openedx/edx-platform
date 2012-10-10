@@ -5,6 +5,7 @@
 	height: 11px;
 	margin-right: 10px;
 	background: url(../img/expand-collapse-icons.png) no-repeat;
+	@include transition(none);
 
 	&.expand {
 		top: 1px;

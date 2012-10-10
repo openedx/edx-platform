@@ -65,6 +65,7 @@ input.courseware-unit-search-input {
 		.expand-collapse-icon {
 			float: left;
 			margin: 16px 6px 16px 16px;
+			@include transition(none);
 		}
 
 		.drag-handle {
