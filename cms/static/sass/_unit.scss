@@ -209,7 +209,10 @@
         .new-component,
         .new-component-templates {
           display: none;
+          position: absolute;
+          width: 100%;
           padding: 20px;
+          @include clearfix;
 
           .cancel-button {
             @include blue-button;
