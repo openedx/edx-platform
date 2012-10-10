@@ -379,12 +379,25 @@
     @include box-shadow(none);
   }
 
+  .draft-tag,
+  .hidden-tag,
+  .private-tag,
+  .has-new-draft-tag {
+    font-size: 8px;
+  }
+
   .window-contents > ol {
     @include tree-view;
 
     .section-item {
+      display: inline-block;
+      width: 100%;
       font-size: 11px;
       padding: 2px 8px 4px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      @include box-sizing(border-box);
     }
 
     ol {
