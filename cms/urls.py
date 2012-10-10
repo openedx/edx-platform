@@ -35,8 +35,9 @@ urlpatterns = ('',
     url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
 
     # temporary landing page for a course
-    url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing')
+    url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing'),
 
+    url(r'^heartbeat$', include('heartbeat.urls')),
 )
 
 # User creation and updating views
