@@ -856,7 +856,7 @@ def sympy_check2():
   </customresponse>"""}]
 
     response_tag = 'customresponse'
-    allowed_inputfields = ['textline', 'textbox', 'javascriptinput']
+    allowed_inputfields = ['textline', 'textbox', 'crystallography']
 
     def setup_response(self):
         xml = self.xml
@@ -1762,6 +1762,57 @@ class ImageResponse(LoncapaResponse):
     def get_answers(self):
         return dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements])
 
+
+#-----------------------------------------------------------------------------
+
+
+class CrystResponse(LoncapaResponse):
+
+    response_tag = 'crystresponse'
+    hint_tag = 'crystresponse'
+    allowed_inputfields = ['crystallography']
+    required_attributes = ['answer']
+    max_inputfields = 1
+
+    def setup_response(self):
+        xml = self.xml
+        context = self.context
+        self.correct_answer = contextualize_text(xml.get('answer'), context)
+        # try:
+        #     self.tolerance_xml = xml.xpath('//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+        #                                    id=xml.get('id'))[0]
+        #     self.tolerance = contextualize_text(self.tolerance_xml, context)
+        # except Exception:
+        #     self.tolerance = 0
+        try:
+            self.answer_id = xml.xpath('//*[@id=$id]//crystallography/@id',
+                                       id=xml.get('id'))[0]
+        except Exception:
+            self.answer_id = None
+
+    def get_score(self, student_answers):
+        '''Grade a numeric response '''
+        student_answer = student_answers[self.answer_id]
+        try:
+            correct = compare_with_tolerance(evaluator(dict(), dict(), student_answer),
+                                             complex(self.correct_answer), self.tolerance)
+        # We should catch this explicitly.
+        # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
+        # But we'd need to confirm
+        except:
+            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %
+                                    cgi.escape(student_answer))
+
+        if correct:
+            return CorrectMap(self.answer_id, 'correct')
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
+    # TODO: add check_hint_condition(self, hxml_set, student_answers)
+
+    def get_answers(self):
+        return {self.answer_id: self.correct_answer}
+
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
@@ -1779,4 +1830,5 @@ __all__ = [CodeResponse,
            ChoiceResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
-           JavascriptResponse]
+           JavascriptResponse,
+           CrystResponse]
