@@ -16,6 +16,18 @@
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
 	@include transition(background-color .15s, box-shadow .15s);
 
+	&.disabled {
+		border: 1px solid $lightGrey !important;
+		border-radius: 3px !important;
+		background: $lightGrey !important;
+		color: $darkGrey !important;
+		pointer-events: none;
+		cursor: none;
+		&:hover {
+			box-shadow: 0 0 0 0 !important;
+		}
+	}
+
 	&:hover {
 		@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
 	}
@@ -161,13 +173,33 @@
 			background: #fffcf1;
 		}
 
-		.draft-item,
-		.hidden-item,
+		.draft-item:after,
+		.public-item:after,
+		.private-item:after {
+			margin-left: 3px;
+			font-size: 9px;
+			font-weight: 600;
+			text-transform: uppercase;
+		}
+
+		.draft-item:after {
+			content: "- draft";
+		}
+
+		.public-item:after {
+			content: "- public";
+		}
+
+		.private-item:after {
+			content: "- private";
+		}
+
+		.public-item,
 		.private-item {
 			color: #a4aab7;
 		}
 
-		.has-new-draft-item {
+		.draft-item {
 			color: #9f7d10;
 		}
 	}

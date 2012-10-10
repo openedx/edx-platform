@@ -75,6 +75,6 @@ def update_templates():
                 ), exc_info=True)
                 continue
 
-            modulestore().update_item(template_location, template.data)
-            modulestore().update_children(template_location, template.children)
-            modulestore().update_metadata(template_location, template.metadata)
+            modulestore('direct').update_item(template_location, template.data)
+            modulestore('direct').update_children(template_location, template.children)
+            modulestore('direct').update_metadata(template_location, template.metadata)

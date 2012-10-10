@@ -87,7 +87,11 @@
         }
       }
 
-      .rendered-component {
+      &.component-placeholder {
+        border-color: #6696d7;
+      }
+
+      .xmodule_display {
         padding: 40px 20px 20px;
       }
 
@@ -392,5 +396,39 @@
         margin: 0 0 15px 50px;
       }
     }
+  }
+}
+
+.edit-state-draft {
+  .visibility {
+    display: none;
+  }
+
+  #create-draft {
+    display: none;
+  }
+}
+
+.edit-state-public {
+  #save-draft,
+  #delete-draft,
+  #publish-draft,
+  .component-actions,
+  .new-component-item,
+  #published-alert {
+    display: none;
+  }
+
+  .drag-handle {
+    display: none !important;
+  }
+}
+
+.edit-state-private {
+  #delete-draft,
+  #publish-draft,
+  #published-alert,
+  #create-draft, {
+    display: none;
   }
 }

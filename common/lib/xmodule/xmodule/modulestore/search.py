@@ -60,10 +60,8 @@ def path_to_location(modulestore, course_id, location):
             (loc, path) = queue.pop()  # Takes from the end
             loc = Location(loc)
 
-            # get_parent_locations should raise ItemNotFoundError if location
-            # isn't found so we don't have to do it explicitly.  Call this
-            # first to make sure the location is there (even if it's a course, and
-            # we would otherwise immediately exit).
+            # Call get_parent_locations first to make sure the location is there
+            # (even if it's a course, and we would otherwise immediately exit).
             parents = modulestore.get_parent_locations(loc)
 
             # print 'Processing loc={0}, path={1}'.format(loc, path)
@@ -80,6 +78,9 @@ def path_to_location(modulestore, course_id, location):
 
         # If we're here, there is no path
         return None
+
+    if not modulestore.has_item(location):
+        raise ItemNotFoundError
 
     path = find_path_to_course()
     if path is None:

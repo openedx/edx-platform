@@ -1,6 +1,9 @@
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft import DRAFT
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 def get_course_location_for_item(location):
     '''
@@ -32,16 +35,42 @@ def get_course_location_for_item(location):
     return location
 
 
-def get_lms_link_for_item(item):
+def get_lms_link_for_item(location):
+    location = Location(location)
     if settings.LMS_BASE is not None:
         lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=settings.LMS_BASE,
             # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id = modulestore().get_containing_courses(item.location)[0].id,
-            location=item.location,
+            course_id = modulestore().get_containing_courses(location)[0].id,
+            location=location,
         )
     else:
         lms_link = None
 
     return lms_link
 
+
+class UnitState(object):
+    draft = 'draft'
+    private = 'private'
+    public = 'public'
+
+
+def compute_unit_state(unit):
+    """
+    Returns whether this unit is 'draft', 'public', or 'private'.
+
+    'draft' content is in the process of being edited, but still has a previous
+        version visible in the LMS
+    'public' content is locked and visible in the LMS
+    'private' content is editabled and not visible in the LMS
+    """
+
+    if unit.metadata.get('is_draft', False):
+        try:
+            modulestore('direct').get_item(unit.location)
+            return UnitState.draft
+        except ItemNotFoundError:
+            return UnitState.private
+    else:
+        return UnitState.public

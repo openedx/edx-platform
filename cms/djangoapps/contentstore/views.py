@@ -1,11 +1,12 @@
 from util.json_request import expect_json
-import json
-import os
-import logging
-import sys
-import mimetypes
-import StringIO
 import exceptions
+import json
+import logging
+import mimetypes
+import os
+import StringIO
+import sys
+import time
 from collections import defaultdict
 from uuid import uuid4
 
@@ -43,7 +44,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
-from .utils import get_course_location_for_item, get_lms_link_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state
 
 from xmodule.templates import all_templates
 
@@ -154,7 +155,7 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    lms_link = get_lms_link_for_item(location)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -167,6 +168,7 @@ def edit_subsection(request, location):
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link
                                })
+
 
 @login_required
 def edit_unit(request, location):
@@ -183,7 +185,8 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
-    lms_link = get_lms_link_for_item(item)
+    # The non-draft location
+    lms_link = get_lms_link_for_item(item.location._replace(revision=None))
 
     component_templates = defaultdict(list)
 
@@ -210,14 +213,25 @@ def edit_unit(request, location):
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
+    unit_state = compute_unit_state(item)
+
+    try:
+        published_date = time.strftime('%B %d, %Y', item.metadata.get('published_date'))
+    except TypeError:
+        published_date = None
+
     return render_to_response('unit.html', {
         'unit': item,
+        'unit_location': location,
         'components': components,
         'component_templates': component_templates,
-        'lms_link': lms_link,
+        'draft_preview_link': lms_link,
+        'published_preview_link': lms_link,
         'subsection': containing_subsection,
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'unit_state': unit_state,
+        'published_date': published_date,
     })
 
 
@@ -233,7 +247,6 @@ def preview_component(request, location):
         'preview': get_module_previews(request, component)[0],
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
-
 
 
 def user_author_string(user):
@@ -404,6 +417,13 @@ def get_module_previews(request, descriptor):
         preview_html.append(module.get_html())
     return preview_html
 
+
+def _xmodule_recurse(item, action):
+    for child in item.get_children():
+        _xmodule_recurse(child, action)
+
+    action(item)
+
 def _delete_item(item, recurse=False):
     if recurse:
         children = item.get_children()
@@ -427,8 +447,11 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    _delete_item(item, delete_children)
-    
+    if delete_children:
+        _xmodule_recurse(item, lambda i: modulestore().delete_item(i.location))
+    else:
+        modulestore().delete_item(item.location)
+
     return HttpResponse()
 
 
@@ -481,6 +504,51 @@ def save_item(request):
 
 @login_required
 @expect_json
+def create_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # This clones the existing item location to a draft location (the draft is implicit,
+    # because modulestore is a Draft modulestore)
+    modulestore().clone_item(location, location)
+
+    return HttpResponse()
+
+@login_required
+@expect_json
+def publish_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
+
+    return HttpResponse()
+
+
+@login_required
+@expect_json
+def unpublish_unit(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
+
+    return HttpResponse()
+
+
+@login_required
+@expect_json
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
@@ -503,7 +571,12 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
-    modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if parent_location.category not in ('vertical',):
+        parent_update_modulestore = modulestore('direct')
+    else:
+        parent_update_modulestore = modulestore()
+    parent_update_modulestore.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
