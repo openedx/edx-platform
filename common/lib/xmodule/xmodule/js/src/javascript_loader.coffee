@@ -15,7 +15,7 @@ class @JavascriptLoader
     placeholders = el.find(".script_placeholder")
 
     if placeholders.length == 0
-      callback()
+      callback() if callback?
       return
 
     # TODO: Verify the execution order of multiple placeholders
