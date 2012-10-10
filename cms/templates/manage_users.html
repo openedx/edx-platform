@@ -1,65 +1,93 @@
 <%inherit file="base.html" />
 <%block name="title">Course Staff Manager</%block>
+<%block name="bodyclass">users</%block>
 <%include file="widgets/header.html"/>
 
 <%block name="content">
-<section class="main-container">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <h1>Users</h1>
 
-  <h2>Course Staff</h2>
-  <div>
-    <p>
-      The following list of users have been designated as course staff. This means that these users will 
-      have permissions to modify course content. You may add additional source staff below. Please note that they
-      must have already registered and verified their account.
-    </p>
+    <article class="user-overview">
+      <div class="details">
+        <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional source staff below. Please note that they must have already registered and verified their account.</p>
+      </div>
+      <div class="list-header">
+        <a href="#" class="new-user-button wip-box">
+          <span class="plus-icon"></span>New User
+        </a>
+      </div>
+      <div class="new-user-form">
+        <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
+        <a href="#" id="add_user" class="add-button">save</a>
+        <a href="#" class="cancel-button">cancel</a>
+      </div>
+      <div>
+        <ol class="user-list">
+          % for user in staff:
+          <li>
+            <span class="user-name">${user.username}</span>
+            <span class="user-email">${user.email}</span>
+            <div class="item-actions">
+              <a href="#" class="delete-button"><span class="delete-icon"></span></a>
+            </div>
+          </li>
+          % endfor
+        </ol>
+      </div>
+      
+      <div id="result"></div>
+    </article>
   </div>
-  <div>
-    <ol>
-      % for user in staff:
-      <li>${user.email} (${user.username}) <a href='#' class='remove-user' data-id='${user.email}'>remove</a></li>
-      % endfor
-    </ol>
-  </div>
-
-  
-  <label>email:&nbsp;</label><input type="text" id="email" autocomplete="Off" placeholder="email@example.com..." size="40"/>
-  <a href="#" id="add_user" class="button" />add as course staff</a>
-  
-  <div id="result"></div>
-
-</section>
+</div>
 </%block>
 
 <%block name="jsextra">
-
 <script type="text/javascript">
-  $(document).ready(function() {
-      $("#add_user").click(function() {
-        $.ajax({
-          url: "${add_user_postback_url}",
-          type: "POST",
-          dataType: "json",
-          contentType: "application/json",
-          data:JSON.stringify({ 'email': $('#email').val()}),
-        }).done(function(data) {
-          if (data.ErrMsg != undefined)
-            $("#result").empty().append(data.ErrMsg);
-          else
-            location.reload();
-        })
-      })
+  var $newUserForm;
 
-      $(".remove-user").click(function() {
-        $.ajax({
-          url: "${remove_user_postback_url}",
-          type: "POST",
-          dataType: "json",
-          contentType: "application/json",
-          data:JSON.stringify({ 'email': $(this).data('id')}),          
-          }).done(function() {
-            location.reload();
-          })
-      });
+  function showNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideDown(150);
+  }
+
+  function hideNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideUp(150);
+  }
+
+  $(document).ready(function() {
+    $newUserForm = $('.new-user-form');
+    $newUserForm.find('.cancel-button').bind('click', hideNewUserForm);
+
+    $('.new-user-button').bind('click', showNewUserForm);
+
+    $('#add_user').click(function() {
+      $.ajax({
+        url: '${add_user_postback_url}',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify({ 'email': $('#email').val()}),
+      }).done(function(data) {
+        if (data.ErrMsg != undefined)
+          $('#result').empty().append(data.ErrMsg);
+        else
+          location.reload();
+      })
+    });
+
+    $('.remove-user').click(function() {
+      $.ajax({
+        url: '${remove_user_postback_url}',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify({ 'email': $(this).data('id')}),          
+        }).done(function() {
+          location.reload();
+        })
+    });
   });
 </script>
 </%block>
