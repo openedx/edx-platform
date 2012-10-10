@@ -51,14 +51,11 @@
       submit_data,
       function(json) {
         if(json.success) {
-          console.log('success');
           location.href = "${reverse('index')}";
         } else if($('#login_error').length == 0) {
-          console.log('error 1');
           $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
           $('#login_error').slideDown(150);
         } else {
-          console.log('error 2');
           $('#login_error').stop().slideDown(150);
         }
       }
