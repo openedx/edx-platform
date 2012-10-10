@@ -384,26 +384,26 @@
 
     .section-item {
       font-size: 11px;
-      padding: 2px 8px 4px 16px;
+      padding: 2px 8px 4px;
     }
 
     ol {
       .section-item {
-        padding-left: 30px;
+        padding-left: 20px;
       }
 
       .new-unit-item {
-        margin-left: 30px;
+        margin-left: 20px;
       }
     }
 
     ol ol {
       .section-item {
-        padding-left: 50px;
+        padding-left: 34px;
       }
 
       .new-unit-item {
-        margin: 0 0 15px 50px;
+        margin: 0 0 10px 41px;
       }
     }
   }
