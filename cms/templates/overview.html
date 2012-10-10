@@ -4,6 +4,42 @@
 
 <%namespace name="units" file="widgets/units.html" />
 
+<%block name="header_extras">
+  <script type="text/template" id="new-section-template">
+    <section class="courseware-section branch new-section">
+      <header>
+        <a href="#" class="expand-collapse-icon collapse"></a>
+        <div class="item-details">
+          <h3 class="section-name"><input type="text" value="New Section Name" class="new-section-name" /><a href="#" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}">Save</a><a href="#" class="new-section-name-cancel">Cancel</a></h3>
+        </div>
+      </header>
+    </section>
+  </script>
+
+  <script type="text/template" id="new-subsection-template">
+    <li class="branch collapsed">
+      <div class="section-item editing">
+        <div>
+          <span class="folder-icon"></span>
+          <span class="subsection-name">
+            <input type="text" value="New Subsection" class="new-subsection-name-input" />
+          </span>
+          <a href="#" class="new-subsection-name-save">Save</a>
+          <a href="#" class="new-subsection-name-cancel">Cancel</a>
+        </div>
+      </div>
+      <ol>
+        <li>
+          <a href="unit.html" class="new-unit-item">
+            <span class="new-unit-icon"></span>New Unit
+          </a>
+        </li>
+      </ol>
+    </li>
+  </script>
+
+
+</%block>
 
 <%block name="content">
   <div class="main-wrapper">
@@ -13,9 +49,9 @@
         <input type="text" class="courseware-unit-search-input search wip-box" placeholder="search units" />
       </div>
       <article class="courseware-overview">
-        <a href="#" class="new-courseware-section-button wip-box"><span class="plus-icon"></span> New Section</a>
+        <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
         % for section in sections:
-        <section class="courseware-section branch">
+        <section class="courseware-section branch" data-id="${section.location}">
           <header>
             <a href="#" class="expand-collapse-icon collapse"></a>
             <div class="item-details">
@@ -23,19 +59,19 @@
               <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
             </div>
             <div class="item-actions">
-              <a href="#" class="edit-button wip"><span class="delete-icon"></span></a>
+              <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
               <a href="#" class="drag-handle wip"></a>
             </div>
           </header>
           <div class="unit-list">
             <div class="list-header">
-              <a href="#" class="new-subsection-item wip-box">
+              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
                 <span class="new-folder-icon"></span>New Subsection
               </a>
             </div>
             <ol>
               % for subsection in section.get_children():
-              <li class="branch collapsed">
+              <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
                   <div>
                     <a href="#" class="expand-collapse-icon expand"></a>
@@ -45,7 +81,7 @@
                     </a>
                   </div>
                   <div class="item-actions">
-                    <a href="#" class="delete-button wip"><span class="delete-icon"></span></a>                    
+                    <a href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
                     <a href="#" class="drag-handle wip"></a>
                   </div>
                 </div>

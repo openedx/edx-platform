@@ -36,6 +36,14 @@ $(document).ready(function() {
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
 
+    // add new/delete section
+    $('.new-courseware-section-button').bind('click', addNewSection);
+    $('.delete-section-button').bind('click', deleteSection);
+    
+    // add new/delete subsection
+    $('.new-subsection-item').bind('click', addNewSubsection);
+    $('.delete-subsection-button').bind('click', deleteSubsection);
+
 });
 
 // This method only changes the ordering of the child objects in a subsection
@@ -120,6 +128,7 @@ function saveSubsection(e) {
 	});
 }
 
+
 function createNewUnit(e) {
     e.preventDefault();
 
@@ -139,18 +148,30 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
+    _deleteItem($(this).parents('li.leaf'));
+}
 
-    if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
-	return;
+function deleteSubsection(e) {
+    e.preventDefault();
+    _deleteItem($(this).parents('li.branch'));
+}
 
-    var _li_el = $(this).parents('li.leaf');
-    var id = _li_el.data('id');
+function deleteSection(e) {
+    e.preventDefault();
+    _deleteItem($(this).parents('section.branch'));
+}
+
+function _deleteItem($el) {
+     if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
+       return;
+          
+    var id = $el.data('id');
     
     $.post('/delete_item', 
-	   {'id': id, 'delete_children' : true}, 
-	   function(data) {
-	       _li_el.remove();
-	   });
+       {'id': id, 'delete_children' : true}, 
+       function(data) {
+           $el.remove();
+       });
 }
 
 function showUploadModal(e) {
@@ -281,4 +302,83 @@ function showToastMessage(message, $button, lifespan) {
 function hideToastMessage(e) {
     e.preventDefault();
     $(this).closest('.toast-notification').remove();
+}
+
+function addNewSection(e) {
+    e.preventDefault();
+    var $newSection = $($('#new-section-template').html());
+    $('.new-courseware-section-button').after($newSection);
+    $newSection.find('.new-section-name').focus().select();
+    $newSection.find('.new-section-name-save').bind('click', saveNewSection);
+    $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
+}
+
+function saveNewSection(e) {
+    e.preventDefault();
+
+    parent = $(this).data('parent');
+    template = $(this).data('template');
+
+    display_name = $(this).prev('.new-section-name').val();
+
+    $.post('/clone_item',
+       {'parent_location' : parent,
+           'template' : template,
+           'display_name': display_name,
+           },
+       function(data) {
+            if (data.id != undefined)
+               location.reload();
+       });    
+}
+
+function cancelNewSection(e) {
+    e.preventDefault();
+    $(this).parents('section.new-section').remove();
+}
+
+function addNewSubsection(e) {
+    e.preventDefault();
+    var $section = $(this).closest('.courseware-section');
+    var $newSubsection = $($('#new-subsection-template').html());
+    $section.find('.unit-list > ol').append($newSubsection);
+    $section.find('.new-subsection-name-input').focus().select();
+
+    var $saveButton = $newSubsection.find('.new-subsection-name-save');
+    $saveButton.bind('click', saveNewSubsection);
+
+    parent = $(this).parents("section.branch").data("id");
+
+    $saveButton.data('parent', parent)
+    $saveButton.data('template', $(this).data('template'));
+
+    $newSubsection.find('.new-subsection-name-cancel').bind('click', cancelNewSubsection);    
+}
+
+function saveNewSubsection(e) {
+    e.preventDefault();
+
+    parent = $(this).data('parent');
+    template = $(this).data('template');
+
+
+    display_name = $(this).prev('.subsection-name').find('.new-subsection-name-input').val()
+
+    $.post('/clone_item',
+       {'parent_location' : parent,
+           'template' : template,
+           'display_name': display_name,
+           },
+       function(data) {
+            if (data.id != undefined) {
+                location.reload();             
+            }
+       });  
+
+            
+}
+
+function cancelNewSubsection(e) {
+    e.preventDefault();
+    $(this).parents('li.branch').remove();
 }
