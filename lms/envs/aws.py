@@ -78,6 +78,7 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
 MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
+CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
