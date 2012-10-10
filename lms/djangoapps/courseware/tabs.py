@@ -220,9 +220,6 @@ def get_default_tabs(user, course, active_page):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
                               args=[course.id])
         tabs.append(CourseTab('Discussion', link, active_page == 'discussion'))
-    elif settings.MITX_FEATURES.get('ENABLE_DISCUSSION'):
-        ## This is Askbot, which we should be retiring soon...
-        tabs.append(CourseTab('Discussion', reverse('questions'), active_page == 'discussion'))
 
     tabs.extend(_wiki({'name': 'Wiki', 'type': 'wiki'}, user, course, active_page))
 

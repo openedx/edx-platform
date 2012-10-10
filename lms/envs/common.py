@@ -63,7 +63,6 @@ MITX_FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
