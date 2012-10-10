@@ -161,12 +161,28 @@ def edit_subsection(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest
 
-    logging.debug('Start = {0}'.format(item.start))
+    parent_locs = modulestore().get_parent_locations(location)
+
+    # we're for now assuming a single parent
+    if len(parent_locs) != 1:
+        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+
+    # this should blow up if we don't find any parents, which would be erroneous
+    parent = modulestore().get_item(parent_locs[0])
+
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+
+    policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
+        if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
+
+    logging.debug(policy_metadata)
 
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-                               'lms_link': lms_link
+                               'lms_link': lms_link,
+                               'parent_item' : parent,
+                               'policy_metadata' : policy_metadata
                                })
 
 
@@ -485,9 +501,12 @@ def save_item(request):
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
         for metadata_key in posted_metadata.keys():
-            # NOTE: We don't want clients to be able to delete 'system metadata' which are not intended to be user
-            # editable
-            if posted_metadata[metadata_key] is None and metadata_key not in existing_item.system_metadata_fields:
+
+            # let's strip out any metadata fields from the postback which have been identified as system metadata
+            # and therefore should not be user-editable, so we should accept them back from the client
+            if metadata_key in existing_item.system_metadata_fields:
+                del posted_metadata[metadata_key]
+            elif posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
                 if metadata_key in existing_item.metadata:
                     del existing_item.metadata[metadata_key]
