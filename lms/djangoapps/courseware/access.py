@@ -325,7 +325,7 @@ def _course_staff_group_name(location):
     if _does_course_group_name_exist(legacy_name):
         return legacy_name
 
-    return 'staff_%s' & loc.course_id
+    return 'staff_%s' % loc.course_id
 
 
 def _course_instructor_group_name(location):
