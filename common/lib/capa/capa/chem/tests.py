@@ -44,7 +44,18 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertFalse(chemical_equations_equal('H2 + O2 -> H2O2',
                                                   'O2 + H2 <-> 2H2O2'))
 
+    def test_exact_match(self):
+        self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
+                                                 '2O2 + 2H2 -> 2H2O2'))
 
+        self.assertFalse(chemical_equations_equal('H2 + O2 -> H2O2',
+                                                 '2O2 + 2H2 -> 2H2O2', exact=True))
+
+        # order still doesn't matter
+        self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
+                                                 'O2 + H2 -> H2O2', exact=True))
+
+        
     def test_syntax_errors(self):
         self.assertRaises(ParseException, chemical_equations_equal,
                           'H2 + O2 a-> H2O2',
