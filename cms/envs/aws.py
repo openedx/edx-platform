@@ -27,6 +27,8 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
+SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
