@@ -756,15 +756,26 @@ class NumericalResponse(LoncapaResponse):
     def get_score(self, student_answers):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
+
+        try:
+            correct_ans = complex(self.correct_answer)
+        except ValueError:
+            log.debug("Content error--answer '{0}' is not a valid complex number".format(self.correct_answer))
+            raise StudentInputError("There was a problem with the staff answer to this problem")
+
         try:
             correct = compare_with_tolerance(evaluator(dict(), dict(), student_answer),
-                                             complex(self.correct_answer), self.tolerance)
+                                             correct_ans, self.tolerance)
         # We should catch this explicitly.
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %
-                                    cgi.escape(student_answer))
+            # Use the traceback-preserving version of re-raising with a different type
+            import sys
+            type, value, traceback = sys.exc_info()
+
+            raise StudentInputError, ("Invalid input: could not interpret '%s' as a number" %
+                                      cgi.escape(student_answer)), traceback
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
