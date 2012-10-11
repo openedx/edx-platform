@@ -517,6 +517,17 @@ def password_reset(request):
     ''' Attempts to send a password reset e-mail. '''
     if request.method != "POST":
         raise Http404
+    
+    # By default, Django doesn't allow Users with is_active = False to reset their passwords,
+    # but this bites people who signed up a long time ago, never activated, and forgot their 
+    # password. So for their sake, we'll auto-activate a user for whome password_reset is called.
+    try:
+        user = User.objects.get(email=request.POST['email'])
+        user.is_active = True
+        user.save()
+    except:
+        log.exception("Tried to auto-activate user to enable password reset, but failed.")
+    
     form = PasswordResetForm(request.POST)
     if form.is_valid():
         form.save(use_https = request.is_secure(),
@@ -540,10 +551,6 @@ def reactivation_email(request):
     except User.DoesNotExist:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
-
-    if user.is_active:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': 'User is already active'}))
 
     reg = Registration.objects.get(user=user)
     reg.register(user)
