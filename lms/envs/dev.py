@@ -101,6 +101,10 @@ SUBDOMAIN_BRANDING = {
     'harvard': 'HarvardX',
 }
 
+# List of `university` landing pages to display, even though they may not
+# have an actual course with that org set
+VIRTUAL_UNIVERSITIES = []
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
 
