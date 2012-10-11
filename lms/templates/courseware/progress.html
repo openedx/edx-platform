@@ -65,16 +65,19 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")
                 %endif
               </p>
 
-              %if len(section['scores']) > 0:
-                <section class="scores">
+              <section class="scores">
+                %if len(section['scores']) > 0:
                   <h3> ${ "Problem Scores: " if section['graded'] else "Practice Scores: "} </h3>
                   <ol>
                     %for score in section['scores']:
                     <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
                     %endfor
                   </ol>
-                </section>
-              %endif
+                %else:
+                  <h3 class="no-scores"> No problem scores in this section </h3>
+                %endif
+              </section>
+
 
             </li> <!--End section-->
             %endfor
