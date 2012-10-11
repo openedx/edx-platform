@@ -285,6 +285,7 @@
   }
 
   .published-alert {
+    display: none;
     padding: 10px;
     border: 1px solid #edbd3c;
     border-radius: 3px;
@@ -430,7 +431,11 @@
     display: none;
   }
 
-  #create-draft {
+  .published-alert {
+    display: block;
+  }
+
+  .edit-draft-message {
     display: none;
   }
 }
@@ -438,11 +443,15 @@
 .edit-state-public {
   #save-draft,
   #delete-draft,
-  #publish-draft,
   .component-actions,
   .new-component-item,
-  #published-alert {
+  #published-alert,
+  .publish-draft-message {
     display: none;
+  }
+
+  .published-alert {
+    display: block;
   }
 
   .drag-handle {
