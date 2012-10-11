@@ -312,18 +312,24 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         return Fraction(treedic['1 factors'][0] / treedic['2 factors'][0])
 
 
-def chemical_equations_equal(eq1, eq2, ignoreFactor=True):
+def chemical_equations_equal(eq1, eq2, exact=False):
     """
-    Check whether two chemical equations are the same.  If ignoreFactor is True,
-    then they are considered equal if they differ by a constant factor.
+    Check whether two chemical equations are the same.
 
-    arrows matter: ->, and <-> are different.
+    If exact is False, then they are considered equal if they differ by a
+    constant factor.
+
+    arrows matter: -> and <-> are different.
 
     e.g.
     chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + H2 -> H2O2') -> True
     chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + 2H2 -> H2O2') -> False
 
     chemical_equations_equal('H2 + O2 -> H2O2', 'O2 + H2 <-> H2O2') -> False
+
+    chemical_equations_equal('H2 + O2 -> H2O2', '2 H2 + 2 O2 -> 2 H2O2') -> True
+    chemical_equations_equal('H2 + O2 -> H2O2', '2 H2 + 2 O2 -> 2 H2O2', exact=True) -> False
+
 
     If there's a syntax error, we raise pyparsing.ParseException.
     """
@@ -357,6 +363,10 @@ def chemical_equations_equal(eq1, eq2, ignoreFactor=True):
 
     if factor_left != factor_right:
         # factors don't match (molecule counts to add up)
+        return False
+
+    if exact and factor_left != 1:
+        # want an exact match.
         return False
 
     return True
