@@ -543,4 +543,6 @@ INSTALLED_APPS = (
 
     # Discussion
     'django_comment_client',
+
+    'django.contrib.admin',
 )
