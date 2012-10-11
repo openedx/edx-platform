@@ -1,12 +1,15 @@
 .ui-datepicker {
   border-color: $darkGrey;
-  background: $lightGrey;
+  border-radius: 2px;
+  background: #fff;
   font-family: $sans-serif;
   font-size: 12px;
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
 
   .ui-widget-header {
     background: $darkGrey;
     border: none;
+    border-radius: 2px;
   }
 
   .ui-datepicker-next,
