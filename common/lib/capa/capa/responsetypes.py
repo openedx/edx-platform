@@ -710,7 +710,7 @@ class NumericalResponse(LoncapaResponse):
                                            id=xml.get('id'))[0]
             self.tolerance = contextualize_text(self.tolerance_xml, context)
         except Exception:
-            self.tolerance = 0
+            self.tolerance = '0'
         try:
             self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
                                        id=xml.get('id'))[0]
