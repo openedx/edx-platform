@@ -1,3 +1,4 @@
+import traceback 
 from util.json_request import expect_json
 import exceptions
 import json
@@ -44,7 +45,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display
 
 from xmodule.templates import all_templates
 
@@ -618,7 +619,7 @@ def upload_asset(request, org, course, coursename):
     if not has_access(request.user, location):
         return HttpResponseForbidden()
     
-    # Does the course actually exist?!?
+    # Does the course actually exist?!? Get anything from it to prove its existance
     
     try:
         item = modulestore().get_item(location)
@@ -635,23 +636,11 @@ def upload_asset(request, org, course, coursename):
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 
-    file_location = StaticContent.compute_location(org, course, name)
+    thumbnail_file_location = None
 
-    content = StaticContent(file_location, name, mime_type, filedata)
-
-    # first commit to the DB
-    contentstore().save(content)
-
-    # then remove the cache so we're not serving up stale content
-    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
-    # which is used when serving up static content. This integrity is needed for
-    # browser-side caching support. We *could* re-fetch the saved content so that we have the
-    # timestamp populated, but we might as well wait for the first real request to come in
-    # to re-populate the cache.
-    del_cached_content(content.location)
-
-    # if we're uploading an image, then let's generate a thumbnail so that we can
-    # serve it up when needed without having to rescale on the fly
+    # if the upload asset is an image, we can generate a thumbnail from it
+    # let's do so now, so that we have the thumbnail location which we need 
+    # so that the asset can point to it
     if mime_type.split('/')[0] == 'image':
         try:
             # not sure if this is necessary, but let's rewind the stream just in case
@@ -673,24 +662,45 @@ def upload_asset(request, org, course, coursename):
             thumbnail_file.seek(0)
         
             # use a naming convention to associate originals with the thumbnail
-            thumbnail_name = content.generate_thumbnail_name()
+            thumbnail_name = StaticContent.generate_thumbnail_name(name)
 
             # then just store this thumbnail as any other piece of content
             thumbnail_file_location = StaticContent.compute_location(org, course, 
-                                                                              thumbnail_name)
+                                                                              thumbnail_name, is_thumbnail=True)
             thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                               'image/jpeg', thumbnail_file)
             contentstore().save(thumbnail_content)
-
+            
             # remove any cached content at this location, as thumbnails are treated just like any
             # other bit of static content
             del_cached_content(thumbnail_content.location)
+
+            # not sure if this is necessary, but let's rewind the stream just in case
+            request.FILES['file'].seek(0)
         except:
             # catch, log, and continue as thumbnails are not a hard requirement
             logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
+            thumbnail_file_location = None
 
 
-    return HttpResponse('Upload completed')
+    file_location = StaticContent.compute_location(org, course, name)
+
+    # create a StaticContent entity and point to the thumbnail
+    content = StaticContent(file_location, name, mime_type, filedata, thumbnail_location = thumbnail_file_location)
+
+    # first commit to the DB
+    contentstore().save(content)
+
+    # then remove the cache so we're not serving up stale content
+    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
+    # which is used when serving up static content. This integrity is needed for
+    # browser-side caching support. We *could* re-fetch the saved content so that we have the
+    # timestamp populated, but we might as well wait for the first real request to come in
+    # to re-populate the cache.
+    del_cached_content(content.location)
+    response = HttpResponse('Upload completed')
+    response['asset_url'] = StaticContent.get_url_path_from_location(file_location)
+    return response
 
 '''
 This view will return all CMS users who are editors for the specified course
@@ -772,23 +782,69 @@ def remove_user(request, location):
 
     return create_json_response()
 
-@login_required
-@ensure_csrf_cookie
-def asset_index(request, location):
-    return render_to_response('asset_index.html',{})
 
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
 
+
 def static_pages(request, org, course, coursename):
     return render_to_response('static-pages.html', {})
+
 
 def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
+
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 
+
 def server_error(request):
     return render_to_response('error.html', {'error': '500'})
+
+
+@login_required
+@ensure_csrf_cookie
+def asset_index(request, org, course, name):
+    """
+    Display an editable asset library
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    upload_asset_callback_url = reverse('upload_asset', kwargs = {
+            'org' : org,
+            'course' : course,
+            'coursename' : name
+            })
+    
+    course_reference = StaticContent.compute_location(org, course, name)
+    assets = contentstore().get_all_content_for_course(course_reference)
+    thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
+    asset_display = []
+    for asset in assets:
+        id = asset['_id']
+        display_info = {}
+        display_info['displayname'] = asset['displayname']
+        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
+        
+        asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
+        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        
+        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        thumbnail_location = Location(asset.get('thumbnail_location', None))
+
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location)
+        
+        asset_display.append(display_info)
+
+    return render_to_response('asset_index.html', {
+        'assets': asset_display,
+        'upload_asset_callback_url': upload_asset_callback_url
+    })
