@@ -5,10 +5,67 @@ import mimetypes
 from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
-from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
+def import_static_content(modules, data_dir, static_content_store):
+    
+    remap_dict = {}
+
+    course_data_dir = None
+    course_loc = None
+
+    # quick scan to find the course module and pull out the data_dir and location
+    # maybe there an easier way to look this up?!?
+
+    for module in modules.itervalues():
+        if module.category == 'course':
+            course_loc = module.location
+            course_data_dir = module.metadata['data_dir']
+
+    if course_data_dir is None or course_loc is None:
+        return remap_dict
+
+    ''' 
+    now import all static assets
+    '''
+    static_dir = '{0}/{1}/static/'.format(data_dir, course_data_dir)
+
+    for dirname, dirnames, filenames in os.walk(static_dir):
+        for filename in filenames:
+
+            try:
+                content_path = os.path.join(dirname, filename)
+                fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
+                content_loc = StaticContent.compute_location(course_loc.org, course_loc.course, fullname_with_subpath)
+                mime_type = mimetypes.guess_type(filename)[0]
+
+                print 'importing static asset {0} of mime-type {1} from path {2}'.format(content_loc, 
+                    mime_type, content_path)
+
+                f = open(content_path, 'rb')
+                data = f.read()
+                f.close()
+
+                content = StaticContent(content_loc, filename, mime_type, data)
+
+                # first let's save a thumbnail so we can get back a thumbnail location
+                thumbnail_content = static_content_store.generate_thumbnail(content)
+
+                if thumbnail_content is not None:
+                    content.thumbnail_location = thumbnail_content.location
+
+                #then commit the content
+                static_content_store.save(content)
+
+                #store the remapping information which will be needed to subsitute in the module data
+                remap_dict[fullname_with_subpath] = content_loc.name
+
+            except:
+                raise    
+
+    return remap_dict
 
 def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor',
@@ -29,56 +86,34 @@ def import_from_xml(store, data_dir, course_dirs=None,
     )
 
     for course_id in module_store.modules.keys():
-        course_data_dir = None
-        course_loc = None
+
+        remap_dict = {}
+        if static_content_store is not None:
+            remap_dict = import_static_content(module_store.modules[course_id], data_dir, static_content_store)
 
         for module in module_store.modules[course_id].itervalues():
 
             if module.category == 'course':
                 course_loc = module.location
+                course_data_dir = module.metadata['data_dir']
 
             if 'data' in module.definition:
-                store.update_item(module.location, module.definition['data'])
+                module_data = module.definition['data']
+
+                # cdodge: update any references to the static content paths
+                # This is a bit brute force - simple search/replace - but it's unlikely that such references to '/static/....'
+                # would occur naturally (in the wild)
+                if '/static/' in module_data:
+                    for subkey in remap_dict.keys():
+                        module_data = module_data.replace('/static/' + subkey, 'xasset:' + remap_dict[subkey])
+                    logging.debug("was {0} now {1}".format(module.definition['data'], module_data))
+
+                store.update_item(module.location, module_data)
             if 'children' in module.definition:
                 store.update_children(module.location, module.definition['children'])
             # NOTE: It's important to use own_metadata here to avoid writing
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(module.own_metadata))
-            course_data_dir = module.metadata['data_dir']
-
-        if static_content_store is not None:
-            ''' 
-            now import all static assets
-            '''
-            static_dir = '{0}/{1}/static/'.format(data_dir, course_data_dir)
-
-            for dirname, dirnames, filenames in os.walk(static_dir):
-                for filename in filenames:
-
-                    try:
-                        content_path = os.path.join(dirname, filename)
-                        fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
-                        content_loc = StaticContent.compute_location(course_loc.org, course_loc.course, fullname_with_subpath)
-                        mime_type = mimetypes.guess_type(filename)[0]
-
-                        print 'importing static asset {0} of mime-type {1} from path {2}'.format(content_loc, 
-                            mime_type, content_path)
-
-                        f = open(content_path, 'rb')
-                        data = f.read()
-                        f.close()
-
-                        content = StaticContent(content_loc, filename, mime_type, data)
-
-                        # first let's save a thumbnail so we can get back a thumbnail location
-                        thumbnail_content = static_content_store.generate_thumbnail(content)
-
-                        if thumbnail_content is not None:
-                            content.thumbnail_location = thumbnail_content.location
-
-                        #then commit the content
-                        static_content_store.save(content)
-                    except:
-                        raise
+            
 
     return module_store
