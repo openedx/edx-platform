@@ -8,13 +8,12 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 from .dev import *
 import socket
 
 WIKI_ENABLED = False
 MITX_FEATURES['ENABLE_TEXTBOOK'] = False
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = False

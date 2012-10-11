@@ -14,9 +14,13 @@ from xmodule.exceptions import NotFoundError
 
 
 class MongoContentStore(ContentStore):
-    def __init__(self, host, db, port=27017):
+    def __init__(self, host, db, port=27017, user=None, password=None, **kwargs):
         logging.debug( 'Using MongoDB for static content serving at host={0} db={1}'.format(host,db))
-        _db = Connection(host=host, port=port)[db]
+        _db = Connection(host=host, port=port, **kwargs)[db]
+
+        if self.user is not None and self.password is not None:
+            _db.authenticate(user, password)
+
         self.fs = gridfs.GridFS(_db)
         self.fs_files = _db["fs.files"] # the underlying collection GridFS uses
 

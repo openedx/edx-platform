@@ -44,6 +44,8 @@ urlpatterns = ('',
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
+
+    url(r'^heartbeat$', include('heartbeat.urls')),
 )
 
 # User creation and updating views
