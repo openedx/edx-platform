@@ -27,9 +27,8 @@ def import_static_content(modules, data_dir, static_content_store):
     if course_data_dir is None or course_loc is None:
         return remap_dict
 
-    ''' 
-    now import all static assets
-    '''
+   
+    # now import all static assets
     static_dir = '{0}/{1}/static/'.format(data_dir, course_data_dir)
 
     for dirname, dirnames, filenames in os.walk(static_dir):
@@ -85,8 +84,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
         load_error_modules=load_error_modules,
     )
 
+    # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
+    # to enumerate the entire collection of course modules. It will be left as a TBD to implement that
+    # method on XmlModuleStore.
     for course_id in module_store.modules.keys():
-
         remap_dict = {}
         if static_content_store is not None:
             remap_dict = import_static_content(module_store.modules[course_id], data_dir, static_content_store)
@@ -103,10 +104,15 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 # cdodge: update any references to the static content paths
                 # This is a bit brute force - simple search/replace - but it's unlikely that such references to '/static/....'
                 # would occur naturally (in the wild)
-                if '/static/' in module_data:
-                    for subkey in remap_dict.keys():
-                        module_data = module_data.replace('/static/' + subkey, 'xasset:' + remap_dict[subkey])
-                        
+                # @TODO, sorry a bit of technical debt here. There are some helper methods in xmodule_modifiers.py and static_replace.py which could
+                # better do the url replace on the html rendering side rather than on the ingest side
+                try:
+                    if '/static/' in module_data:
+                        for subkey in remap_dict.keys():
+                            module_data = module_data.replace('/static/' + subkey, 'xasset:' + remap_dict[subkey])
+                except:
+                    pass    # part of the techincal debt is that module_data might not be a string (e.g. ABTest)
+
                 store.update_item(module.location, module_data)
 
 
