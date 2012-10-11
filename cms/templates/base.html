@@ -18,8 +18,7 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block>">
-
-    <%include file="widgets/header.html"/>
+    <%include file="widgets/header.html" args="active_tab=active_tab"/>
     <%include file="courseware_vendor_js.html"/>
 
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>

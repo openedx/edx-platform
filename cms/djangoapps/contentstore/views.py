@@ -157,6 +157,8 @@ def course_index(request, org, course, name):
     sections = course.get_children()
 
     return render_to_response('overview.html', {
+        'active_tab': 'courseware',
+        'context_course': course,
         'sections': sections,
         'parent_location': course.location,
         'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
@@ -198,6 +200,7 @@ def edit_subsection(request, location):
 
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
+                               'context_course': course,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
                                'parent_item' : parent,
@@ -256,6 +259,7 @@ def edit_unit(request, location):
         published_date = None
 
     return render_to_response('unit.html', {
+        'context_course': course,
         'unit': item,
         'unit_location': location,
         'components': components,
@@ -679,7 +683,11 @@ def manage_users(request, location):
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
 
+    course_module = modulestore().get_item(location)
+
     return render_to_response('manage_users.html', {
+        'active_tab': 'users',
+        'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
         'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/')
@@ -755,7 +763,19 @@ def landing(request, org, course, coursename):
 
 
 def static_pages(request, org, course, coursename):
-    return render_to_response('static-pages.html', {})
+
+    location = ['i4x', org, course, 'course', coursename]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course = modulestore().get_item(location)
+
+    return render_to_response('static-pages.html', {
+        'active_tab': 'pages',
+        'context_course': course,
+    })
 
 
 def edit_static(request, org, course, coursename):
@@ -784,11 +804,14 @@ def asset_index(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
+
     upload_asset_callback_url = reverse('upload_asset', kwargs = {
             'org' : org,
             'course' : course,
             'coursename' : name
             })
+
+    course_module = modulestore().get_item(location)
     
     course_reference = StaticContent.compute_location(org, course, name)
     assets = contentstore().get_all_content_for_course(course_reference)
@@ -811,6 +834,8 @@ def asset_index(request, org, course, name):
         asset_display.append(display_info)
 
     return render_to_response('asset_index.html', {
+        'active_tab': 'assets',
+        'context_course': course_module,
         'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url
     })
