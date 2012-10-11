@@ -786,3 +786,9 @@ def static_pages(request, org, course, coursename):
 
 def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
+
+def not_found(request):
+    return render_to_response('error.html', {'error': '404'})
+
+def server_error(request):
+    return render_to_response('error.html', {'error': '500'})
