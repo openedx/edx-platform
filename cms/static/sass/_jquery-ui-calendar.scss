@@ -1,0 +1,24 @@
+.ui-datepicker {
+  font-family: $sans-serif;
+  font-size: 12px;
+
+  .ui-widget-header {
+    background: $darkGrey;
+    border: none;
+  }
+
+  .ui-datepicker-next,
+  .ui-datepicker-prev {
+    @include transition(none);
+
+    &.ui-state-hover {
+      border-color: transparent;
+      background: $mediumGrey;
+
+      .ui-icon-circle-triangle-e,
+      .ui-icon-circle-triangle-w {
+        background-image: url(/static/css/vendor/ui-lightness/images/ui-icons_ffffff_256x240.png);
+      }
+    }
+  }
+}
