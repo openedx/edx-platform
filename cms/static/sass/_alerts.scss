@@ -26,3 +26,40 @@
 		}
 	}
 }
+
+body.error {
+	background: $darkGrey;
+	color: #3c3c3c;
+
+	.primary-header {
+		display: none;
+	}
+
+	.error-prompt {
+		width: 700px;
+		margin: 150px auto;
+		padding: 60px 50px 90px;
+		border-radius: 3px;
+		background: #fff;
+		text-align: center;
+	}
+
+	h1 {
+		float: none;
+		margin: 0;
+		font-size: 60px;
+		font-weight: 300;		
+		color: #3c3c3c;
+	}
+
+	.description {
+		margin-bottom: 50px;
+		font-size: 21px;
+	}
+
+	.back-button {
+		@include blue-button;
+		padding: 14px 40px 18px;
+		font-size: 18px;
+	}
+}

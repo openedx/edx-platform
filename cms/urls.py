@@ -35,7 +35,10 @@ urlpatterns = ('',
     url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
 
     # temporary landing page for a course
-    url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing')
+    url(r'^landing/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing'),
+
+    url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
+    url(r'^server_error$', 'contentstore.views.server_error', name='server_error')
 
 )
 
