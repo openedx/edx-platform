@@ -23,6 +23,10 @@ $(document).ready(function() {
     $modalCover.bind('click', hideHistoryModal);
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
+
+    $('a.show-xml').toggle(showEmbeddableXML, hideEmbeddableXML);
+
+    $('a.copy-button').toggle(showEmbeddableXML, hideEmbeddableXML);
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
     $('.save-subsection').bind('click', saveSubsection);
@@ -72,6 +76,17 @@ function removePolicyMetadata(e) {
         _parent_el.remove();
     else
         _parent_el.appendTo("#policy-to-delete");
+
+function showEmbeddableXML(e) {
+    $ceiling = $(this).parents('tr');
+    if ($ceiling.length === 0) $ceiling = $(this).parents('.upload-modal');
+    $ceiling.find('.embeddable-xml').html('&lt;img src="'+$(this).attr('href')+'"/&gt;');
+}
+function hideEmbeddableXML(e) {
+    $ceiling = $(this).parents('tr');
+    console.log($ceiling.length)
+    if ($ceiling.length === 0) $ceiling = $(this).parents('.upload-modal');
+    $ceiling.find('.embeddable-xml').html("");
 }
 
 
@@ -233,20 +248,40 @@ function showFileSelectionMenu(e) {
 function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
     $('.upload-modal .file-name').html($('.file-input').val());
+    $('.upload-modal .file-chooser').ajaxSubmit({
+        beforeSend: resetUploadBar,
+        uploadProgress: showUploadFeedback,
+        complete: displayFinishedUpload
+    });
     $('.upload-modal .choose-file-button').hide();
     $('.upload-modal .progress-bar').removeClass('loaded').show();
-    $('.upload-modal .progress-fill').html('').css('width', '0').animate({
-        'width': '100%'
-    }, 1500);
-    setTimeout(markAsLoaded, 1500);
+}
+
+function resetUploadBar(){
+    var percentVal = '0%';
+    $('.upload-modal .progress-fill').width(percentVal)
+    $('.upload-modal .progress-fill').html(percentVal);
+}
+
+function showUploadFeedback(event, position, total, percentComplete) {
+    var percentVal = percentComplete + '%';
+    $('.upload-modal .progress-fill').width(percentVal);
+    $('.upload-modal .progress-fill').html(percentVal);
+}
+
+function displayFinishedUpload(xhr) {
+    if(xhr.status = 200){
+        markAsLoaded();
+    }
+    $('.upload-modal .copy-button').attr('href', xhr.getResponseHeader('asset_url'));
+    $('.upload-modal .progress-fill').html(xhr.responseText);
+    $('.upload-modal .choose-file-button').html('Load Another File').show();
 }
 
 function markAsLoaded() {
     $('.upload-modal .copy-button').css('display', 'inline-block');
     $('.upload-modal .progress-bar').addClass('loaded');
-    $('.upload-modal .progress-fill').html('loaded successfully');
-    $('.upload-modal .choose-file-button').html('Load Another File').show();
-}
+}    
 
 function hideModal(e) {
     e.preventDefault();

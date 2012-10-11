@@ -9,7 +9,8 @@
     <div class="inner-wrapper">
       <h1>Asset Library</h1>
       <div class="page-actions">
-        <a href="#" class="upload-button">Upload New File</a><input type="text" class="asset-search-input search wip-box" placeholder="search assets" />
+        <a href="#" class="upload-button">Upload New File</a>
+	      <input type="text" class="asset-search-input search wip-box" placeholder="search assets" />
       </div>
       <article class="asset-library">
         <table>
@@ -22,149 +23,26 @@
             </tr>
           </thead>
           <tbody>
+          % for asset in assets:
             <tr>
               <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
+                <div class="thumb"><img src="${asset['thumb_url']}"></div>
               </td>
               <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
+                <a href="${asset['url']}" class="filename">${asset['displayname']}</a>
+                <div class="embeddable-xml"></div>
               </td>
               <td class="date-col">
-                10/2/2012
+                ${asset['uploadDate']}
               </td>
               <td class="embed-col">
-                <a href="#">copy</a>
+                <a class="show-xml" href="${asset['url']}">XML</a>
               </td>
             </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/4573/screenshots/157708/final.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/15101/screenshots/228625/star_wars_lightsbaer_2.jpg"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-2.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
-            <tr>
-              <td class="thumb-col">
-                <div class="thumb"><img src="http://dribbble.s3.amazonaws.com/users/3185/screenshots/149571/picture_39.png"></div>
-              </td>
-              <td class="name-col">
-                <a href="#" class="filename">raygun-1.jpg</a>
-              </td>
-              <td class="date-col">
-                10/2/2012
-              </td>
-              <td class="embed-col">
-                <a href="#">copy</a>
-              </td>
-            </tr>
+          % endfor
           </tbody>
         </table>
-        <nav class="pagination">
+        <nav class="pagination wip-box">
           Page: 
           <ol class="pages">
             <li>1</li>
@@ -187,14 +65,17 @@
 			<div class="progress-bar">
 				<div class="progress-fill"></div>
 			</div>
-			<a href="#" class="copy-button">Copy Embed Link</a>
-			<div class="file-chooser">
+      <div class="embeddable-xml"></div>
+      <a href="#" class="copy-button">Show Embeddable XML</a>
+			<form class="file-chooser" action="${upload_asset_callback_url}"
+                                method="post" enctype="multipart/form-data">
 				<a href="#" class="choose-file-button">Choose File</a>
-				<input type="file" class="file-input">
-			</div>
+				<input type="file" class="file-input" name="file">
+			</form>
 		</div>
 	</div>
 
 	<div class="modal-cover"></div>
+
 
 </%block>

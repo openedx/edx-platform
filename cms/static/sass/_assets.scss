@@ -86,6 +86,9 @@
       }
     }
   }
+    .show-xml {
+    @include blue-button;
+  }
 }
 
 .upload-modal {
