@@ -851,8 +851,5 @@ def asset_index(request, org, course, name):
 
 
 # points to the temporary edge page
-def edge(request, org, course, coursename):
-    return render_to_response('temp-edge.html', {})
-
 def edge(request):
-    return render_to_response('temp-edge.html', {})
+    return render_to_response('university_profiles/edge.html', {})
