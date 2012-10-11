@@ -143,7 +143,7 @@ def course_index(request, org, course, name):
     return render_to_response('overview.html', {
         'sections': sections,
         'parent_location': course.location,
-        'new_section_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),
+        'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
         'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
         'upload_asset_callback_url': upload_asset_callback_url,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
