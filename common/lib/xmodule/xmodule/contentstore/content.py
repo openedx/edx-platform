@@ -118,11 +118,11 @@ class ContentStore(object):
                 thumbnail_file.seek(0)
             
                 # use a naming convention to associate originals with the thumbnail
-                thumbnail_name = content.generate_thumbnail_name()
+                thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
 
                 # then just store this thumbnail as any other piece of content
                 thumbnail_file_location = StaticContent.compute_location(content.location.org, content.location.course, 
-                                                                                  thumbnail_name)
+                                                                                  thumbnail_name, is_thumbnail = True)
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                                   'image/jpeg', thumbnail_file)
 

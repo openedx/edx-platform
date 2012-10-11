@@ -70,13 +70,15 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                         content = StaticContent(content_loc, filename, mime_type, data)
 
-                        static_content_store.save(content)
-
-                        # this will be a NOP if content is not an image
+                        # first let's save a thumbnail so we can get back a thumbnail location
                         thumbnail_content = static_content_store.generate_thumbnail(content)
 
+                        if thumbnail_content is not None:
+                            content.thumbnail_location = thumbnail_content.location
+
+                        #then commit the content
+                        static_content_store.save(content)
                     except:
                         raise
-
 
     return module_store
