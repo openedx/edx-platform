@@ -8,8 +8,8 @@ Common traits:
 """
 import json
 
-from .logsettings import get_logger_config
 from .common import *
+from logsettings import get_logger_config
 
 ############################### ALWAYS THE SAME ################################
 DEBUG = False
@@ -20,7 +20,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Disable askbot, enable Berkeley forums
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that 
@@ -37,6 +36,7 @@ with open(ENV_ROOT / "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
+SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
 BOOK_URL = ENV_TOKENS['BOOK_URL']
 MEDIA_URL = ENV_TOKENS['MEDIA_URL']
@@ -75,6 +75,11 @@ AWS_STORAGE_BUCKET_NAME = 'edxuploads'
 DATABASES = AUTH_TOKENS['DATABASES']
 
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
+
+# Get the MODULESTORE from auth.json, but if it doesn't exist,
+# use the one from common.py
+MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
+CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])

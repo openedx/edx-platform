@@ -8,7 +8,7 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 import os
 from path import path
 

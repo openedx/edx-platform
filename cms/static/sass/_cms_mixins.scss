@@ -92,6 +92,20 @@
 	}
 }
 
+@mixin dark-grey-button {
+	@include button;
+	border: 1px solid #1c1e20;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $extraDarkGrey;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+	color: #fff;
+
+	&:hover {
+		background-color: #595f64;
+		color: #fff;
+	}
+}
+
 @mixin edit-box {
 	padding: 15px 20px;
 	border-radius: 3px;

@@ -76,6 +76,7 @@ function removePolicyMetadata(e) {
         _parent_el.remove();
     else
         _parent_el.appendTo("#policy-to-delete");
+}
 
 function showEmbeddableXML(e) {
     $ceiling = $(this).parents('tr');

@@ -3,8 +3,8 @@ This is the default template for our main set of AWS servers.
 """
 import json
 
-from .logsettings import get_logger_config
 from .common import *
+from logsettings import get_logger_config
 
 ############################### ALWAYS THE SAME ################################
 DEBUG = False
@@ -27,6 +27,8 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
 
+SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
@@ -48,3 +50,4 @@ AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = AUTH_TOKENS['MODULESTORE']
+CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']

@@ -1,0 +1,36 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">edX edge</%block>
+<%block name="bodyclass">no-header edge-landing</%block>
+
+<%block name="content">
+
+<div class="main-wrapper">
+  <div class="edx-edge-logo-large"></div>
+  <div class="content">
+    <div class="log-in-form">
+      <h2>Log in to your courses</h2>
+      <form>
+        <div class="row">
+          <label>Email</label>
+          <input name="email" type="email" class="email-field" tabindex="1">
+        </div>
+        <div class="row">
+          <label>Password</label>
+          <input name="password" type="password" class="password-field" tabindex="2">
+        </div>
+        <div class="row submit">
+          <input name="submit" type="submit" value="Log In" class="log-in-submit-button" tabindex="3">
+          <a href="#" class="forgot-button">Forgot password?</a>
+        </div>
+      </form>
+    </div>
+    <div class="sign-up">
+      <h3>Register for classes</h3>
+      <p>Take free online courses from today's leading universities.</p>
+      <p><a href="#" class="register-button">Register</a></p>
+    </div>
+  </div>
+</div>
+
+</%block>
