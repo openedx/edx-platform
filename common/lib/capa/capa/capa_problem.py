@@ -481,8 +481,8 @@ class LoncapaProblem(object):
 
         problemid = problemtree.get('id')    # my ID
 
-        if problemtree.tag in inputtypes.get_input_xml_tags():
-
+        if problemtree.tag in inputtypes.registered_input_tags():
+            # If this is an inputtype subtree, let it render itself.
             status = "unsubmitted"
             msg = ''
             hint = ''
@@ -499,20 +499,17 @@ class LoncapaProblem(object):
                 value = self.student_answers[problemid]
 
             # do the rendering
-            render_object = inputtypes.SimpleInput(system=self.system,
-                                                   xml=problemtree,
-                                                   state={'value': value,
-                                                          'status': status,
-                                                          'id': problemtree.get('id'),
-                                                          'feedback': {'message': msg,
-                                                                       'hint': hint,
-                                                                       'hintmode': hintmode,
-                                                                       }
-                                                          },
-                                                   use='capa_input')
-            # function(problemtree, value, status, msg)
-            # render the special response (textline, schematic,...)
-            return render_object.get_html()
+
+            state = {'value': value,
+                   'status': status,
+                   'id': problemtree.get('id'),
+                   'feedback': {'message': msg,
+                                'hint': hint,
+                                'hintmode': hintmode,}}
+
+            input_type_cls = inputtypes.get_class_for_tag(problemtree.tag)
+            the_input = input_type_cls(self.system, problemtree, state)
+            return the_input.get_html()
 
         # let each Response render itself
         if problemtree in self.responders:
