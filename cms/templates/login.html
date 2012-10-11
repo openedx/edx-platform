@@ -30,36 +30,37 @@
 
 <script type="text/javascript">
 (function() {
-   function getCookie(name) {
-     return $.cookie(name);
-   }
-   function postJSON(url, data, callback) {
-     $.ajax({type:'POST',
-       url: url,
-       dataType: 'json',
-       data: data,
-       success: callback,
-       headers : {'X-CSRFToken':getCookie('csrftoken')}
-     });
-   }
+  function getCookie(name) {
+    return $.cookie(name);
+  }
+  function postJSON(url, data, callback) {
+    $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken':getCookie('csrftoken')}
+    });
+  }
 
-   $('form#login_form').submit(function(e) {
-     e.preventDefault();
-     var submit_data = $('#login_form').serialize();
+  $('form#login_form').submit(function(e) {
+    e.preventDefault();
+    var submit_data = $('#login_form').serialize();
 
-     postJSON('/login_post',
-       submit_data,
-       function(json) {
-       if(json.success) {
-        location.href="${reverse('index')}";
+    postJSON('/login_post',
+      submit_data,
+      function(json) {
+        if(json.success) {
+          location.href = "${reverse('index')}";
         } else if($('#login_error').length == 0) {
-        $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
+          $('#login_form').prepend('<div id="login_error">Email or password is incorrect.</div>');
+          $('#login_error').slideDown(150);
         } else {
-        $('#login_error').stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+          $('#login_error').stop().slideDown(150);
         }
-        }
-        );
-     });
+      }
+    );
+  });
 })(this)
 </script>
       

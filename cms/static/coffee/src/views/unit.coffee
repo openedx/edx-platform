@@ -65,24 +65,26 @@ class CMS.Views.UnitEdit extends Backbone.View
   showNewComponentForm: (event) =>
     event.preventDefault()
     @$newComponentItem.addClass('adding')
-    $(event.target).slideUp(150)
+    $(event.target).fadeOut(150)
+    @$newComponentItem.css('height', @$newComponentTypePicker.outerHeight())
     @$newComponentTypePicker.slideDown(250)
 
   showComponentTemplates: (event) =>
     event.preventDefault()
 
     type = $(event.currentTarget).data('type')
-    @$newComponentTypePicker.slideUp(250)
-    @$(".new-component-#{type}").slideDown(250)
+    @$newComponentTypePicker.fadeOut(250)
+    @$(".new-component-#{type}").fadeIn(250)
 
   closeNewComponent: (event) =>
     event.preventDefault()
 
     @$newComponentTypePicker.slideUp(250)
     @$newComponentTemplatePickers.slideUp(250)
-    @$newComponentButton.slideDown(250)
+    @$newComponentButton.fadeIn(250)
     @$newComponentItem.removeClass('adding')
     @$newComponentItem.find('.rendered-component').remove()
+    @$newComponentItem.css('height', @$newComponentButton.outerHeight())
 
   saveNewComponent: (event) =>
     event.preventDefault()

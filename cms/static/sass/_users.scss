@@ -1,0 +1,83 @@
+.users {
+  .user-overview {
+    @extend .window;
+    padding: 30px 40px;
+
+    .details {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  }
+
+  .new-user-button {
+    @include grey-button;
+    margin: 5px 8px;
+    padding: 3px 10px 4px 10px;
+    font-size: 12px;
+
+    .plus-icon {
+      position: relative;
+      top: 1px;
+    }
+  }
+
+  .list-header {
+    @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+    background-color: #ced2db;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .new-user-form {
+    display: none;
+    padding: 15px 20px;
+    background: $mediumGrey;
+
+    label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .email-input {
+      width: 350px;
+      padding: 8px 8px 10px;
+      border-color: $darkGrey;
+    }
+
+    .add-button {
+      @include blue-button;
+    }
+
+    .cancel-button {
+      @include white-button;
+    }
+  }
+
+  .user-list {
+    border: 1px solid $mediumGrey;
+    border-top: none;
+    background: $lightGrey;
+
+    li {
+      position: relative;
+      padding: 10px 20px;
+      border-bottom: 1px solid $mediumGrey;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span {
+        display: inline-block;
+      }
+
+      .user-name {
+        width: 30%;
+        font-weight: 700;
+      }
+
+      .item-actions {
+        top: 9px;
+      }
+    }
+  }
+}

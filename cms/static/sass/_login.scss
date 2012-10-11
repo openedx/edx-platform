@@ -77,4 +77,15 @@
 		text-align: right;
 		font-size: 13px;
 	}
+
+	#login_error,
+	#register_error {
+		display: none;
+		margin-bottom: 30px;
+		padding: 5px 10px;
+		border-radius: 3px;
+		background: $error-red;
+		font-size: 14px;
+		color: #fff;
+	}
 }

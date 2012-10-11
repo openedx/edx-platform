@@ -81,7 +81,7 @@
           if(json.success) {
             $('#register').html(json.value);
           } else {
-            $('#register_error').html(json.value).stop().css("background-color", "#933").animate({ backgroundColor: "#333"}, 2000);
+            $('#register_error').html(json.value).stop().slideDown(150);
           }
         }
       );
