@@ -94,8 +94,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
         for module in module_store.modules[course_id].itervalues():
 
             if module.category == 'course':
-                course_loc = module.location
-                course_data_dir = module.metadata['data_dir']
+                # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
+                module.metadata['hide_progress_tab'] = True
 
             if 'data' in module.definition:
                 module_data = module.definition['data']
@@ -106,11 +106,13 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 if '/static/' in module_data:
                     for subkey in remap_dict.keys():
                         module_data = module_data.replace('/static/' + subkey, 'xasset:' + remap_dict[subkey])
-                    logging.debug("was {0} now {1}".format(module.definition['data'], module_data))
-
+                        
                 store.update_item(module.location, module_data)
+
+
             if 'children' in module.definition:
                 store.update_children(module.location, module.definition['children'])
+
             # NOTE: It's important to use own_metadata here to avoid writing
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(module.own_metadata))
