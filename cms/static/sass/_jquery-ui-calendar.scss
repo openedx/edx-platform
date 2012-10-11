@@ -1,4 +1,6 @@
 .ui-datepicker {
+  border-color: $darkGrey;
+  background: $lightGrey;
   font-family: $sans-serif;
   font-size: 12px;
 
@@ -20,5 +22,29 @@
         background-image: url(/static/css/vendor/ui-lightness/images/ui-icons_ffffff_256x240.png);
       }
     }
+  }
+
+  .ui-state-default {
+    border-color: $mediumGrey;
+    color: $blue;
+    @include transition(none);
+
+    &.ui-state-hover {
+      background: $orange;
+      border-color: $orange;
+      color: #fff;
+    }
+  }
+
+  .ui-state-highlight {
+    background: $blue;
+    border-color: $blue;
+    color: #fff;
+  }
+
+  .ui-state-active {
+    background: $orange;
+    border-color: $orange;
+    color: #fff;
   }
 }
