@@ -157,7 +157,11 @@ class DraftModuleStore(ModuleStoreBase):
 
         location: Something that can be passed to Location
         """
-        return super(DraftModuleStore, self).delete_item(as_draft(location))
+
+        # cdodge: we should always delete both the draft and the original
+        super(DraftModuleStore, self).delete_item(as_draft(location))
+        if (location.revision == None):  # did caller request to delete the non-draft, if so be sure to do that
+            super(DraftModuleStore, self).delete_item(location)
 
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
