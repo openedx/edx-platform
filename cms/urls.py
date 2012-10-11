@@ -16,8 +16,14 @@ urlpatterns = ('',
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
+
+
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
+        'contentstore.views.import_course', name='import_course'),
+
     url(r'^github_service_hook$', 'github_sync.views.github_post_receive'),
     url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
@@ -46,8 +52,6 @@ urlpatterns = ('',
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
-
-    url(r'import_course$', 'contentstore.views.import_course', name='import_course'),
 )
 
 # User creation and updating views

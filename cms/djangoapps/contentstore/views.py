@@ -12,6 +12,7 @@ import tarfile
 import shutil
 from collections import defaultdict
 from uuid import uuid4
+from lxml import etree
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -24,6 +25,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django import forms
+from django.shortcuts import redirect
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
@@ -51,6 +53,7 @@ from .utils import get_course_location_for_item, get_lms_link_for_item, compute_
 
 from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml import edx_xml_parser
 
 log = logging.getLogger(__name__)
 
@@ -259,7 +262,8 @@ def edit_unit(request, location):
         published_date = None
 
     return render_to_response('unit.html', {
-        'context_course': course,
+        'context_course': item,
+        'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
         'components': components,
@@ -845,45 +849,62 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
-def import_course(request):
-    if request.method != 'POST':
-        # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
-        return HttpResponseBadRequest()
 
-    filename = request.FILES['file'].name
+def import_course(request, org, course, name):
 
-    if not filename.endswith('.tar.gz'):
-        return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+    location = ['i4x', org, course, 'course', name]
 
-    temp_filepath = settings.GITHUB_REPO_ROOT + '/' + filename
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    logging.debug('importing course to {0}'.format(temp_filepath))
+    if request.method == 'POST':
+        filename = request.FILES['file'].name
 
-    # stream out the uploaded files in chunks to disk
-    temp_file = open(temp_filepath, 'wb+')
-    for chunk in request.FILES['file'].chunks():
-        temp_file.write(chunk)
-    temp_file.close()
+        if not filename.endswith('.tar.gz'):
+            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
 
-    tf = tarfile.open(temp_filepath)
-    tf.extractall(settings.GITHUB_REPO_ROOT + '/')
+        temp_filepath = settings.GITHUB_REPO_ROOT + '/' + filename
 
-    os.remove(temp_filepath)    # remove the .tar.gz file
+        logging.debug('importing course to {0}'.format(temp_filepath))
 
-    # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
+        # stream out the uploaded files in chunks to disk
+        temp_file = open(temp_filepath, 'wb+')
+        for chunk in request.FILES['file'].chunks():
+            temp_file.write(chunk)
+        temp_file.close()
 
-    course_dir = filename.replace('.tar.gz','')
+        tf = tarfile.open(temp_filepath)
+        tf.extractall(settings.GITHUB_REPO_ROOT + '/')
 
-    module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT, 
-        [course_dir], load_error_modules=False,static_content_store=contentstore())
+        os.remove(temp_filepath)    # remove the .tar.gz file
 
-    # remove content directory - we *shouldn't* need this any longer :-)
-    shutil.rmtree(temp_filepath.replace('.tar.gz', ''))
+        # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
 
-    logging.debug('new course at {0}'.format(course_items[0].location))
+        course_dir = filename.replace('.tar.gz', '')
 
-    create_all_course_groups(request.user, course_items[0].location)
+        with open(temp_filepath / course_dir / 'course.xml', 'rw') as course_file:
+            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
+            course_data.set('org', org)
+            course_data.set('course', course)
+            course_data.set('url_name', name)
+            course_data.write(course_file)
 
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [course_dir], load_error_modules=False, static_content_store=contentstore())
 
+        # remove content directory - we *shouldn't* need this any longer :-)
+        shutil.rmtree(temp_filepath.replace('.tar.gz', ''))
 
-    return HttpResponse(json.dumps({'Status' : 'OK'}))
+        logging.debug('new course at {0}'.format(course_items[0].location))
+
+        create_all_course_groups(request.user, course_items[0].location)
+
+        return HttpResponse(json.dumps({'Status': 'OK'}))
+    else:
+        course_module = modulestore().get_item(location)
+
+        return render_to_response('import.html', {
+            'context_course': course_module,
+            'active_tab': 'import',
+        })
