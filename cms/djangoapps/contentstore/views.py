@@ -470,10 +470,16 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
+    _direct_delete_categories = ['course', 'chapter', 'sequential']
+
+    # @TODO: this probably leaves draft items dangling. 
+
     if delete_children:
-        _xmodule_recurse(item, lambda i: modulestore().delete_item(i.location))
+        _xmodule_recurse(item, lambda i: modulestore('direct' if 
+            i.location.category in _direct_delete_categories else 'direct').delete_item(i.location))
     else:
-        modulestore().delete_item(item.location)
+        modulestore('direct' if 
+            item.location.category in _direct_delete_categories else 'direct').delete_item(item.location)
 
     return HttpResponse()
 
