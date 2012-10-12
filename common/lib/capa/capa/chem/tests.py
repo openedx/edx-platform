@@ -1,3 +1,4 @@
+import codecs
 from fractions import Fraction
 from pyparsing import ParseException
 import unittest
@@ -55,15 +56,17 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
                                                  'O2 + H2 -> H2O2', exact=True))
 
-        
-    def test_syntax_errors(self):
-        self.assertRaises(ParseException, chemical_equations_equal,
-                          'H2 + O2 a-> H2O2',
-                          '2O2 + 2H2 -> 2H2O2')
 
-        self.assertRaises(ParseException, chemical_equations_equal,
-                          'H2 + O2 ==> H2O2',   # strange arrow
-                          '2O2 + 2H2 -> 2H2O2')
+    def test_syntax_errors(self):
+        self.assertFalse(chemical_equations_equal('H2 + O2 a-> H2O2',
+                                                  '2O2 + 2H2 -> 2H2O2'))
+
+        self.assertFalse(chemical_equations_equal('H2O( -> H2O2',
+                                                  'H2O -> H2O2'))
+
+
+        self.assertFalse(chemical_equations_equal('H2 + O2 ==> H2O2',   # strange arrow
+                                                  '2O2 + 2H2 -> 2H2O2'))
 
 
 class Test_Compare_Expressions(unittest.TestCase):
@@ -294,6 +297,29 @@ class Test_Render_Equations(unittest.TestCase):
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
+    def test_render_eq1(self):
+        s = "H^+ + OH^- -> H2O"
+        out = render_to_html(s)
+        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2192H<sub>2</sub>O</span>'
+        log(out + ' ------- ' + correct, 'html')
+        self.assertEqual(out, correct)
+
+    def test_render_eq2(self):
+        s = "H^+ + OH^- <-> H2O"
+        out = render_to_html(s)
+        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2194H<sub>2</sub>O</span>'
+        log(out + ' ------- ' + correct, 'html')
+        self.assertEqual(out, correct)
+
+        
+    def test_render_eq3(self):
+        s = "H^+ + OH^- <= H2O"   # unsupported arrow
+        out = render_to_html(s)
+        correct = u'<span class="math"><span class="inline-error inline">H^+ + OH^- <= H2O</span></span>'
+        log(out + ' ------- ' + correct, 'html')
+        self.assertEqual(out, correct)
+
+
 
 def suite():
 
@@ -305,6 +331,6 @@ def suite():
 
 if __name__ == "__main__":
     local_debug = True
-    with open('render.html', 'w') as f:
+    with codecs.open('render.html', 'w', encoding='utf-8') as f:
         unittest.TextTestRunner(verbosity=2).run(suite())
     # open render.html to look at rendered equations

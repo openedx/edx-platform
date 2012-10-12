@@ -218,6 +218,9 @@ def render_to_html(eq):
             return u'\u2192'
         if arrow == '<->':
             return u'\u2194'
+
+        # this won't be reached unless we add more arrow types, but keep it to avoid explosions when
+        # that happens.
         return arrow
 
     def render_expression(ex):
@@ -391,36 +394,40 @@ def chemical_equations_equal(eq1, eq2, exact=False):
     chemical_equations_equal('H2 + O2 -> H2O2', '2 H2 + 2 O2 -> 2 H2O2', exact=True) -> False
 
 
-    If there's a syntax error, we raise pyparsing.ParseException.
+    If there's a syntax error, we return False.
     """
 
     left1, arrow1, right1 = split_on_arrow(eq1)
     left2, arrow2, right2 = split_on_arrow(eq2)
 
     if arrow1 == '' or arrow2 == '':
-        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(ARROWS))
+        return False
 
     # TODO: may want to be able to give student helpful feedback about why things didn't work.
     if arrow1 != arrow2:
         # arrows don't match
         return False
 
-    factor_left = divide_chemical_expression(left1, left2)
-    if not factor_left:
-        # left sides don't match
-        return False
+    try:
+        factor_left = divide_chemical_expression(left1, left2)
+        if not factor_left:
+            # left sides don't match
+            return False
 
-    factor_right = divide_chemical_expression(right1, right2)
-    if not factor_right:
-        # right sides don't match
-        return False
+        factor_right = divide_chemical_expression(right1, right2)
+        if not factor_right:
+            # right sides don't match
+            return False
 
-    if factor_left != factor_right:
-        # factors don't match (molecule counts to add up)
-        return False
+        if factor_left != factor_right:
+            # factors don't match (molecule counts to add up)
+            return False
 
-    if exact and factor_left != 1:
-        # want an exact match.
-        return False
+        if exact and factor_left != 1:
+            # want an exact match.
+            return False
 
-    return True
+        return True
+    except ParseException:
+        # Don't want external users to have to deal with parsing exceptions.  Just return False.
+        return False
