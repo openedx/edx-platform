@@ -40,9 +40,6 @@ def import_static_content(modules, data_dir, static_content_store):
                 content_loc = StaticContent.compute_location(course_loc.org, course_loc.course, fullname_with_subpath)
                 mime_type = mimetypes.guess_type(filename)[0]
 
-                print 'importing static asset {0} of mime-type {1} from path {2}'.format(content_loc, 
-                    mime_type, content_path)
-
                 f = open(content_path, 'rb')
                 data = f.read()
                 f.close()
@@ -87,6 +84,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
     # to enumerate the entire collection of course modules. It will be left as a TBD to implement that
     # method on XmlModuleStore.
+    course_items = []
     for course_id in module_store.modules.keys():
         remap_dict = {}
         if static_content_store is not None:
@@ -97,6 +95,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
             if module.category == 'course':
                 # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
                 module.metadata['hide_progress_tab'] = True
+                course_items.append(module)
 
             if 'data' in module.definition:
                 module_data = module.definition['data']
@@ -124,4 +123,4 @@ def import_from_xml(store, data_dir, course_dirs=None,
             store.update_metadata(module.location, dict(module.own_metadata))
             
 
-    return module_store
+    return module_store, course_items

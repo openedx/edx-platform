@@ -46,7 +46,7 @@ def create_all_course_groups(creator, location):
 
 def create_new_course_group(creator, location, role):
     groupname = get_course_groupname_for_role(location, role)
-    (group, created) =Group.get_or_create(name=groupname)
+    (group, created) =Group.objects.get_or_create(name=groupname)
     if created:
         group.save()
 

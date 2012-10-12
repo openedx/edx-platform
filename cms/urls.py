@@ -42,6 +42,8 @@ urlpatterns = ('',
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index'),
 
+    url(r'import_course$', 'contentstore.views.import_course', name='import_course'),
+
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
 
