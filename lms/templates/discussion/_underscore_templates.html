@@ -1,5 +1,5 @@
 <script type="text/template" id="thread-template">
-    <article class="discussion-article" data-id="${'<%- id.toString() %>'}">
+    <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
@@ -7,10 +7,10 @@
         <div class="post-status-closed bottom-post-status" style="display: none">
           This thread is closed.
         </div>
-        <form class="discussion-reply-new" data-id="${'<%- id.toString() %>'}">
+        <form class="discussion-reply-new" data-id="${'<%- id %>'}">
             <h4>Post a response:</h4>
             <ul class="discussion-errors"></ul>
-            <div class="reply-body" data-id="${'<%- id.toString() %>'}"></div>
+            <div class="reply-body" data-id="${'<%- id %>'}"></div>
             <div class="reply-post-control">
                 <a class="discussion-submit-post control-button" href="#">Submit</a>
             </div>
@@ -117,7 +117,7 @@
 </script>
 
 <script type="text/template" id="response-comment-show-template">
-  <div id="comment_${'<%- id.toString() %>'}">
+  <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
@@ -128,7 +128,7 @@
 </script>
 
 <script type="text/template" id="thread-list-item-template">
-    <a href="${'<%- id.toString() %>'}" data-id="${'<%- id.toString() %>'}">
+    <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
             <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"}</span>
