@@ -25,6 +25,10 @@ class @DiscussionUtil
     staff = _.union(@roleIds['Staff'], @roleIds['Moderator'], @roleIds['Administrator'])
     _.include(staff, parseInt(user_id))
 
+  @isTA: (user_id) ->
+    ta = _.union(@roleIds['Community TA'])
+    _.include(ta, parseInt(user_id))
+
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
       Content.getContent(id).updateInfo(info)
