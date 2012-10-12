@@ -212,63 +212,63 @@ class Test_Render_Equations(unittest.TestCase):
     def test_render1(self):
         s = "H2O + CO2"
         out = render_to_html(s)
-        correct = "H<sub>2</sub>O+CO<sub>2</sub>"
+        correct = u'<span class="math">H<sub>2</sub>O+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_uncorrect_reaction(self):
         s = "O2C + OH2"
         out = render_to_html(s)
-        correct = "O<sub>2</sub>C+OH<sub>2</sub>"
+        correct = u'<span class="math">O<sub>2</sub>C+OH<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render2(self):
         s = "CO2 + H2O + Fe(OH)3"
         out = render_to_html(s)
-        correct = "CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub>"
+        correct = u'<span class="math">CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render3(self):
         s = "3H2O + 2CO2"
         out = render_to_html(s)
-        correct = "3H<sub>2</sub>O+2CO<sub>2</sub>"
+        correct = u'<span class="math">3H<sub>2</sub>O+2CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render4(self):
         s = "H^+ + OH^-"
         out = render_to_html(s)
-        correct = "H<sup>+</sup>+OH<sup>-</sup>"
+        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render5(self):
         s = "Fe(OH)^2- + (OH)^-"
         out = render_to_html(s)
-        correct = "Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup>"
+        correct = u'<span class="math">Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render6(self):
         s = "7/2H^+ + 3/5OH^-"
         out = render_to_html(s)
-        correct = "<sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup>"
+        correct = u'<span class="math"><sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render7(self):
         s = "5(H1H212)^70010- + 2H2O + 7/2HCl + H2O"
         out = render_to_html(s)
-        correct = "5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O"
+        correct = u'<span class="math">5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render8(self):
         s = "H2O(s) + CO2"
         out = render_to_html(s)
-        correct = "H<sub>2</sub>O(s)+CO<sub>2</sub>"
+        correct = u'<span class="math">H<sub>2</sub>O(s)+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
@@ -276,18 +276,21 @@ class Test_Render_Equations(unittest.TestCase):
         s = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
         #import ipdb; ipdb.set_trace()
         out = render_to_html(s)
-        correct = "5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup>"
+        correct = u'<span class="math">5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_error(self):
         s = "5.2H20"
-        self.assertRaises(ParseException, render_to_html, s)
+        out = render_to_html(s)
+        correct = u'<span class="math"><span class="inline-error inline">5.2H20</span></span>'
+        log(out + ' ------- ' + correct, 'html')
+        self.assertEqual(out, correct)
 
     def test_render_simple_brackets(self):
         s = "(Ar)"
         out = render_to_html(s)
-        correct = "(Ar)"
+        correct = u'<span class="math">(Ar)</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
