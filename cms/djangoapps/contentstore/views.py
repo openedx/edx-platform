@@ -13,6 +13,8 @@ import shutil
 from collections import defaultdict
 from uuid import uuid4
 from lxml import etree
+from path import path
+from shutil import rmtree
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -849,7 +851,8 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
-
+@ensure_csrf_cookie
+@login_required
 def import_course(request, org, course, name):
 
     location = ['i4x', org, course, 'course', name]
@@ -859,42 +862,48 @@ def import_course(request, org, course, name):
         raise PermissionDenied()
 
     if request.method == 'POST':
-        filename = request.FILES['file'].name
+        filename = request.FILES['course-data'].name
 
         if not filename.endswith('.tar.gz'):
             return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
 
-        temp_filepath = settings.GITHUB_REPO_ROOT + '/' + filename
+        data_root = path(settings.GITHUB_REPO_ROOT)
+
+        temp_filepath = data_root / filename
 
         logging.debug('importing course to {0}'.format(temp_filepath))
 
         # stream out the uploaded files in chunks to disk
         temp_file = open(temp_filepath, 'wb+')
-        for chunk in request.FILES['file'].chunks():
+        for chunk in request.FILES['course-data'].chunks():
             temp_file.write(chunk)
         temp_file.close()
 
+        # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
+        course_dir = filename.replace('.tar.gz', '')
+
         tf = tarfile.open(temp_filepath)
-        tf.extractall(settings.GITHUB_REPO_ROOT + '/')
+        shutil.rmtree(data_root / course_dir)
+        tf.extractall(data_root + '/')
 
         os.remove(temp_filepath)    # remove the .tar.gz file
 
-        # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
 
-        course_dir = filename.replace('.tar.gz', '')
+        with open(data_root / course_dir / 'course.xml', 'r') as course_file:
+            course_data = etree.parse(course_file, parser=edx_xml_parser)
+            course_data_root = course_data.getroot()
+            course_data_root.set('org', org)
+            course_data_root.set('course', course)
+            course_data_root.set('url_name', name)
 
-        with open(temp_filepath / course_dir / 'course.xml', 'rw') as course_file:
-            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
-            course_data.set('org', org)
-            course_data.set('course', course)
-            course_data.set('url_name', name)
+        with open(data_root / course_dir / 'course.xml', 'w') as course_file:
             course_data.write(course_file)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
             [course_dir], load_error_modules=False, static_content_store=contentstore())
 
         # remove content directory - we *shouldn't* need this any longer :-)
-        shutil.rmtree(temp_filepath.replace('.tar.gz', ''))
+        shutil.rmtree(data_root / course_dir)
 
         logging.debug('new course at {0}'.format(course_items[0].location))
 
