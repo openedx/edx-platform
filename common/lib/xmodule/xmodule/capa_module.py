@@ -133,6 +133,11 @@ class CapaModule(XModule):
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
+            # TODO: This line is badly broken:
+            # (1) We're passing student ID to xmodule.
+            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+            #     - analytics really needs small number of bins.
             self.seed = system.id
         else:
             self.seed = None
