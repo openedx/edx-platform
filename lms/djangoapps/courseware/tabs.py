@@ -11,7 +11,6 @@ actually generates the CourseTab.
 
 from collections import namedtuple
 import logging
-import codecs
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
