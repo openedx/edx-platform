@@ -182,6 +182,12 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
+
     lms_link = get_lms_link_for_item(location)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
@@ -229,6 +235,12 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
+
     # The non-draft location
     lms_link = get_lms_link_for_item(item.location._replace(revision=None))
 
@@ -265,7 +277,7 @@ def edit_unit(request, location):
         published_date = None
 
     return render_to_response('unit.html', {
-        'context_course': item,
+        'context_course': course,
         'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
@@ -909,7 +921,8 @@ def import_course(request, org, course, name):
         course_dir = filename.replace('.tar.gz', '')
 
         tf = tarfile.open(temp_filepath)
-        shutil.rmtree(data_root / course_dir)
+        if (data_root / course_dir).isdir():
+            shutil.rmtree(data_root / course_dir)
         tf.extractall(data_root + '/')
 
         os.remove(temp_filepath)    # remove the .tar.gz file
