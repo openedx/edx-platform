@@ -46,14 +46,31 @@
                function(data) {
                  if (data.success) {
                    $("#change_email_title").html("Please verify your new email");
-                   $("#change_email_body").html("<p>You'll receive a confirmation in your " +
+                   $("#change_email_form").html("<p>You'll receive a confirmation in your " +
                                                 "in-box. Please click the link in the " +
                                                 "email to confirm the email change.</p>");
                  } else {
-                   $("#change_email_error").html(data.error);
+                   $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
                });
       return false;
+    });
+
+    $("#change_name_form").submit(function(){
+      var new_name = $('#new_name_field').val();
+      var rationale = $('#name_rationale_field').val();
+
+      $.post('${reverse("change_name")}',
+             {"new_name":new_name, "rationale":rationale},
+             function(data) {
+               if(data.success) {
+                 location.reload();
+                 // $("#change_name_body").html("<p>Name changed.</p>");
+               } else {
+                 $("#change_name_error").html(data.error).stop().css("display", "block");
+               }
+             });
+       return false;
     });
 
   })(this)
@@ -75,13 +92,13 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon name-icon"></div>Full Name</span> <span class="data">${ user.profile.name | h }</span>
+          <span class="title"><div class="icon name-icon"></div>Full Name (<a href="#apply_name_change" rel="leanModal" class="edit-name">edit</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
           <span class="title"><div class="icon email-icon"></div>Email (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)</span> <span class="data">${ user.email | h }</span>
         </li>
         <li>
-          <span class="title"><a href="#" id="pwd_reset_button">Reset Password</a></span>
+          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Reset Password</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
@@ -180,15 +197,16 @@
 
 <section id="password_reset_complete" class="modal">
   <div class="inner-wrapper">
-    <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+    <header>
+      <h2>Password Reset Email Sent</h2>
+      <hr/>
+    </header>
     <div>
-      <header>
-        <h2>Password Reset Email Sent</h2>
-        <hr/>
-      </header>
-      <section>
-        <p><span>An email has been sent to ${user.email}. Follow the link in the email to change your password.</span></p>
-      </section>
+      <form> <!-- Here for styling reasons -->
+        <section>
+          <p>An email has been sent to ${user.email}. Follow the link in the email to change your password.</p>
+        </section>
+      </form>
     </div>
     <div class="close-modal">
       <div class="inner">
@@ -198,32 +216,28 @@
   </div>
 </section>
 
-<!-- Haven't Adapted this Yet -->
 <section id="change_email" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2><span id="change_email_title">Change e-mail</span></h2>
+      <h2><span id="change_email_title">Change Email</span></h2>
       <hr/>
     </header>
-    <div id="apply_name_change_error"></div>
     <div id="change_email_body">
       <form id="change_email_form">
-        <div id="change_email_error"> </div>
+        <div id="change_email_error" class="modal-form-error"> </div>
         <fieldset>
-          <ul>
-            <li>
-              <label>Please enter your new email address:</label>
-              <input id="new_email_field" type="email" value="" />
-            </li>
-            <li>
-              <label>Please confirm your password:</label>
-              <input id="new_email_password" value="" type="password" />
-            </li>
-          </ul>
+          <div class="input-group">
+            <label>Please enter your new email address:</label>
+            <input id="new_email_field" type="email" value="" />
+            <label>Please confirm your password:</label>
+            <input id="new_email_password" value="" type="password" />
+          </div>
           <section>
-            <p>We will send a confirmation to both ${user.email} and your new e-mail as part of the process.</p>
+            <p>We will send a confirmation to both ${user.email} and your new email as part of the process.</p>
           </section>
-          <input type="submit" id="submit_email_change" />
+          <div class="submit">
+            <input type="submit" id="submit_email_change" value="Change Email"/>
+          </div>
         </fieldset>
       </form>
     </div>
@@ -234,3 +248,36 @@
     </div>
   </div>
 </section>
+
+<section id="apply_name_change" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Change your name</h2>
+      <hr/>
+    </header>
+    <div id="change_name_body">
+      <form id="change_name_form">
+        <div id="change_name_error" class="modal-form-error"> </div>
+        <p>To uphold the credibility of edX certificates, all name changes will be logged and recorded.</p>
+        <br/>
+        <fieldset>
+          <div class="input-group">
+            <label>Enter your desired full name, as it will appear on the edX certificates: </label>
+            <input id="new_name_field" value="" type="text" />
+            <label>Reason for name change:</label>
+            <textarea id="name_rationale_field" value=""></textarea>
+          </div>
+          <div class="submit">
+            <input type="submit" id="submit" value="Change My Name">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
