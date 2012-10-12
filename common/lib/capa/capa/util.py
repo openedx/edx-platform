@@ -11,7 +11,7 @@ def compare_with_tolerance(v1, v2, tol):
 
      - v1    :  student result (number)
      - v2    :  instructor result (number)
-     - tol   :  tolerance (string or number)
+     - tol   :  tolerance (string representing a number)
 
     '''
     relative = tol.endswith('%')
