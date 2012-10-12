@@ -41,20 +41,26 @@ class @JavascriptLoader
           callbackCalled = true
           callback() if callback?
 
+    # Keep a map of what sources we're loaded from, and don't do it twice.
+    loaded = {}
     placeholders.each (index, placeholder) ->
       # TODO: Check if the script already exists in DOM. If so, (1) copy it
       #         into memory; (2) delete the DOM script element; (3) reappend it.
       #       This would prevent memory bloat and save a network request.
-      s = document.createElement('script')
-      s.setAttribute('src', $(placeholder).attr("data-src"))
-      s.setAttribute('type', "text/javascript")
+      src = $(placeholder).attr("data-src")
+      if src not of loaded
+        loaded[src] = true
+        s = document.createElement('script')
+        s.setAttribute('src', src)
+        s.setAttribute('type', "text/javascript")
+  
+        s.onload             = completionHandlerGenerator(index)
 
-      s.onload             = completionHandlerGenerator(index)
+        # s.onload does not fire in IE8; this does.
+        s.onreadystatechange = completionHandlerGeneratorIE(index)
 
-      # s.onload does not fire in IE8; this does.
-      s.onreadystatechange = completionHandlerGeneratorIE(index)
-
-      # Need to use the DOM elements directly or the scripts won't execute
-      # properly.
-      $('head')[0].appendChild(s)
-      $(placeholder).remove()
+        # Need to use the DOM elements directly or the scripts won't execute
+        # properly.
+        $('head')[0].appendChild(s)
+        $(placeholder).remove()
+      
