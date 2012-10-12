@@ -570,6 +570,7 @@ def unpublish_unit(request):
     return HttpResponse()
 
 
+
 @login_required
 @expect_json
 def clone_item(request):
@@ -581,10 +582,13 @@ def clone_item(request):
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = modulestore().get_item(parent_location)
+    # if we are creating a new section or subsection, then we don't want draft awareness
+    _modulestore = modulestore() if template.category not in ('sequential','chapter') else modulestore('direct')
+
+    parent = _modulestore.get_item(parent_location)
     dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
-    new_item = modulestore().clone_item(template, dest_location)
+    new_item = _modulestore.clone_item(template, dest_location)
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
@@ -593,7 +597,7 @@ def clone_item(request):
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
 
-    modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
+    _modulestore.update_metadata(new_item.location.url(), new_item.own_metadata)
 
     if parent_location.category not in ('vertical',):
         parent_update_modulestore = modulestore('direct')
