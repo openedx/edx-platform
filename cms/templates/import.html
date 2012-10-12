@@ -7,15 +7,22 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <h1>Import</h1>
-    <form>
-      <p>Importing a new course will delete all course content currently associated with your course
-      and replace it with the contents of the uploaded file.</p>
-      <p>File uploads must be zip files containing, at a minimum, a <pre>course.xml</pre> file.</p>
-      <p><strong>Please note that if your course has any problems with auto-generated <pre>url_name</pre>s,
-      re-importing your course could cause the loss of student data associated with those problems.</p>
-      <p>Course to import: <input type="file" name="course-data"></p>
-      <input type="submit" value="Delete my course and re-import!">
-    </form>
+    <article class="import-overview">
+      <div class="description">
+        <h3>Importing a new course will delete all course content currently associated with your course
+        and replace it with the contents of the uploaded file.</h3>
+        <p>File uploads must be zip files containing, at a minimum, a <code>course.xml</code> file.</p>
+        <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
+        re-importing your course could cause the loss of student data associated with those problems.</p>
+      </div>
+      <form class="import-form">
+        <h2>Course to import:</h2>
+        <a href="#" class="choose-file-button">Choose File</a>
+        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
+        <input type="file" name="course-data" class="file-input">
+        <input type="submit" value="Replace my course with the one above" class="submit-button">
+      </form>
+    </article>
   </div>
 </div>
 </%block>

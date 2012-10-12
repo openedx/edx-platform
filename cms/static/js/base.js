@@ -51,7 +51,21 @@ $(document).ready(function() {
     $('.remove-policy-data').bind('click', removePolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
+
+    // import form setup
+    $('.import .file-input').bind('change', showImportSubmit);
+    $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
+        e.preventDefault();
+        $('.import .file-input').click();
+    });
 });
+
+function showImportSubmit(e) {
+    $('.file-name').html($(this).val())
+    $('.file-name-block').show();
+    $('.import .choose-file-button').hide();
+    $('.submit-button').show();
+}
 
 function syncReleaseDate(e) {
     e.preventDefault();
