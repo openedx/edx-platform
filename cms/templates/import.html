@@ -1,0 +1,57 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Import</%block>
+<%block name="bodyclass">import</%block>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <h1>Import</h1>
+    <article class="import-overview">
+      <div class="description">
+        <h3>Importing a new course will delete all course content currently associated with your course
+        and replace it with the contents of the uploaded file.</h3>
+        <p>File uploads must be zip files containing, at a minimum, a <code>course.xml</code> file.</p>
+        <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
+        re-importing your course could cause the loss of student data associated with those problems.</p>
+      </div>
+      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
+        <h2>Course to import:</h2>
+        <a href="#" class="choose-file-button">Choose File</a>
+        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
+        <input type="file" name="course-data" class="file-input">
+        <input type="submit" value="Replace my course with the one above" class="submit-button">
+      </form>
+    </article>
+  </div>
+</div>
+</%block>
+
+<%block name="jsextra">
+<script src="http://malsup.github.com/jquery.form.js"></script>
+<script>
+(function() {
+    
+var bar = $('.bar');
+var percent = $('.percent');
+var status = $('#status');
+   
+$('form').ajaxForm({
+    beforeSend: function() {
+        status.empty();
+        var percentVal = '0%';
+        bar.width(percentVal)
+        percent.html(percentVal);
+    },
+    uploadProgress: function(event, position, total, percentComplete) {
+        var percentVal = percentComplete + '%';
+        bar.width(percentVal)
+        percent.html(percentVal);
+    },
+    complete: function(xhr) {
+      status.html(xhr.responseText);
+    }
+  }); 
+})();       
+</script>
+</%block>

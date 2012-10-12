@@ -1,16 +1,21 @@
 <%! from django.core.urlresolvers import reverse %>
 
-<header class="primary-header">
+<% active_tab_class = 'active-tab-' + active_tab if active_tab else '' %>
+<header class="primary-header ${active_tab_class}">
   <nav class="inner-wrapper">
     <div class="left">
       <a href="/"><span class="home-icon"></span></a>
-      <a href="#" class="class-name wip-box">6.002x Circuits and Electronics</a>
+      % if context_course:
+      <% ctx_loc = context_course.location %>
+      <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.display_name}</a>
       <ul class="class-nav">
-        <li><a href="#" class="active">Courseware</a></li>
-        <li><a href="#" class="wip-box">Pages</a></li>
-        <li><a href="#" class="wip-box">Assets</a></li>
-        <li><a href="#" class="wip-box">Users</a></li>
+        <li><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='courseware-tab'>Courseware</a></li>
+        <li><a href="${reverse('static_pages', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}" id='pages-tab'>Pages</a></li>
+        <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='assets-tab'>Assets</a></li>
+        <li><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}" id='users-tab'>Users</a></li>
+        <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab' class="wip-box">Import</a></li>
       </ul>
+      % endif
     </div>
     <div class="right">
       <span class="username">${ user.username }</span>

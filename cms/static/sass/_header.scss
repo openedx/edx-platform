@@ -4,6 +4,11 @@ body.no-header {
 	}
 }
 
+@mixin active {
+	@include linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+	@include box-shadow(0 2px 8px rgba(0, 0, 0, .7) inset);
+}
+
 .primary-header {
 	width: 100%;
 	height: 36px;
@@ -12,6 +17,30 @@ body.no-header {
 	font-size: 13px;
 	color: #fff;
 	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(255, 255, 255, 0.05) inset);
+
+	&.active-tab-courseware #courseware-tab {
+		@include active;
+	}
+
+	&.active-tab-assets #assets-tab {
+		@include active;
+	}
+	
+	&.active-tab-pages #pages-tab {
+		@include active;
+	}
+
+	&.active-tab-users #users-tab {
+		@include active;
+	}
+
+	&.active-tab-import #import-tab {
+		@include active;
+	}
+
+	#import-tab {
+		@include box-shadow(1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44);
+	}
 
 	.left {
 		width: 700px;
@@ -48,9 +77,5 @@ body.no-header {
 			background: rgba(255, 255, 255, .1);
 		}
 
-		&.active {
-			@include linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
-			@include box-shadow(0 2px 8px rgba(0, 0, 0, .7) inset);
-		}
 	}
 }

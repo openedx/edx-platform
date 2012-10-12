@@ -119,6 +119,13 @@ label {
     font-size: 12px;
 }
 
+code {
+    padding: 0 4px;
+    border-radius: 3px;
+    background: #eee;
+    font-family: Monaco, monospace;
+}
+
 .text-editor {
     width: 100%;
     min-height: 80px;

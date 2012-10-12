@@ -12,6 +12,9 @@ import tarfile
 import shutil
 from collections import defaultdict
 from uuid import uuid4
+from lxml import etree
+from path import path
+from shutil import rmtree
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -24,6 +27,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django import forms
+from django.shortcuts import redirect
 
 from xmodule.modulestore import Location
 from xmodule.x_module import ModuleSystem
@@ -51,6 +55,7 @@ from .utils import get_course_location_for_item, get_lms_link_for_item, compute_
 
 from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml import edx_xml_parser
 
 log = logging.getLogger(__name__)
 
@@ -157,6 +162,8 @@ def course_index(request, org, course, name):
     sections = course.get_children()
 
     return render_to_response('overview.html', {
+        'active_tab': 'courseware',
+        'context_course': course,
         'sections': sections,
         'parent_location': course.location,
         'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
@@ -198,6 +205,7 @@ def edit_subsection(request, location):
 
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
+                               'context_course': course,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
                                'parent_item' : parent,
@@ -256,6 +264,8 @@ def edit_unit(request, location):
         published_date = None
 
     return render_to_response('unit.html', {
+        'context_course': item,
+        'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
         'components': components,
@@ -679,7 +689,11 @@ def manage_users(request, location):
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
 
+    course_module = modulestore().get_item(location)
+
     return render_to_response('manage_users.html', {
+        'active_tab': 'users',
+        'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
         'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/')
@@ -755,7 +769,19 @@ def landing(request, org, course, coursename):
 
 
 def static_pages(request, org, course, coursename):
-    return render_to_response('static-pages.html', {})
+
+    location = ['i4x', org, course, 'course', coursename]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course = modulestore().get_item(location)
+
+    return render_to_response('static-pages.html', {
+        'active_tab': 'pages',
+        'context_course': course,
+    })
 
 
 def edit_static(request, org, course, coursename):
@@ -784,11 +810,14 @@ def asset_index(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
+
     upload_asset_callback_url = reverse('upload_asset', kwargs = {
             'org' : org,
             'course' : course,
             'coursename' : name
             })
+
+    course_module = modulestore().get_item(location)
     
     course_reference = StaticContent.compute_location(org, course, name)
     assets = contentstore().get_all_content_for_course(course_reference)
@@ -811,6 +840,8 @@ def asset_index(request, org, course, name):
         asset_display.append(display_info)
 
     return render_to_response('asset_index.html', {
+        'active_tab': 'assets',
+        'context_course': course_module,
         'assets': asset_display,
         'upload_asset_callback_url': upload_asset_callback_url
     })
@@ -820,45 +851,69 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
-def import_course(request):
-    if request.method != 'POST':
-        # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
-        return HttpResponseBadRequest()
+@ensure_csrf_cookie
+@login_required
+def import_course(request, org, course, name):
 
-    filename = request.FILES['file'].name
+    location = ['i4x', org, course, 'course', name]
 
-    if not filename.endswith('.tar.gz'):
-        return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    temp_filepath = settings.GITHUB_REPO_ROOT + '/' + filename
+    if request.method == 'POST':
+        filename = request.FILES['course-data'].name
 
-    logging.debug('importing course to {0}'.format(temp_filepath))
+        if not filename.endswith('.tar.gz'):
+            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
 
-    # stream out the uploaded files in chunks to disk
-    temp_file = open(temp_filepath, 'wb+')
-    for chunk in request.FILES['file'].chunks():
-        temp_file.write(chunk)
-    temp_file.close()
+        data_root = path(settings.GITHUB_REPO_ROOT)
 
-    tf = tarfile.open(temp_filepath)
-    tf.extractall(settings.GITHUB_REPO_ROOT + '/')
+        temp_filepath = data_root / filename
 
-    os.remove(temp_filepath)    # remove the .tar.gz file
+        logging.debug('importing course to {0}'.format(temp_filepath))
 
-    # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
+        # stream out the uploaded files in chunks to disk
+        temp_file = open(temp_filepath, 'wb+')
+        for chunk in request.FILES['course-data'].chunks():
+            temp_file.write(chunk)
+        temp_file.close()
 
-    course_dir = filename.replace('.tar.gz','')
+        # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
+        course_dir = filename.replace('.tar.gz', '')
 
-    module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT, 
-        [course_dir], load_error_modules=False,static_content_store=contentstore())
+        tf = tarfile.open(temp_filepath)
+        shutil.rmtree(data_root / course_dir)
+        tf.extractall(data_root + '/')
 
-    # remove content directory - we *shouldn't* need this any longer :-)
-    shutil.rmtree(temp_filepath.replace('.tar.gz', ''))
-
-    logging.debug('new course at {0}'.format(course_items[0].location))
-
-    create_all_course_groups(request.user, course_items[0].location)
+        os.remove(temp_filepath)    # remove the .tar.gz file
 
 
+        with open(data_root / course_dir / 'course.xml', 'r') as course_file:
+            course_data = etree.parse(course_file, parser=edx_xml_parser)
+            course_data_root = course_data.getroot()
+            course_data_root.set('org', org)
+            course_data_root.set('course', course)
+            course_data_root.set('url_name', name)
 
-    return HttpResponse(json.dumps({'Status' : 'OK'}))
+        with open(data_root / course_dir / 'course.xml', 'w') as course_file:
+            course_data.write(course_file)
+
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [course_dir], load_error_modules=False, static_content_store=contentstore())
+
+        # remove content directory - we *shouldn't* need this any longer :-)
+        shutil.rmtree(data_root / course_dir)
+
+        logging.debug('new course at {0}'.format(course_items[0].location))
+
+        create_all_course_groups(request.user, course_items[0].location)
+
+        return HttpResponse(json.dumps({'Status': 'OK'}))
+    else:
+        course_module = modulestore().get_item(location)
+
+        return render_to_response('import.html', {
+            'context_course': course_module,
+            'active_tab': 'import',
+        })
