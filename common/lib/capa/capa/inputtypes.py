@@ -143,7 +143,7 @@ class InputTypeBase(object):
 
     def get_html(self):
         """
-        Return a the html for this input, as an etree element.
+        Return the html for this input, as an etree element.
         """
         if self.template is None:
             raise NotImplementedError("no rendering template specified for class {0}".format(self.__class__))
@@ -473,8 +473,6 @@ def textline_dynamath(element, value, status, render_template, msg=''):
                'preprocessor': preprocessor,}
     html = render_template("textinput_dynamath.html", context)
     return etree.XML(html)
-
-_reg(textline_dynamath)
 
 
 #-----------------------------------------------------------------------------
