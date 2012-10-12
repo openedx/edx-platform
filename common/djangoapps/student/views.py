@@ -672,9 +672,12 @@ def change_name_request(request):
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
         return HttpResponse(json.dumps({'success': False, 'error': 'Name required'}))
-    if len(pnc.rationale) < 2:
-        return HttpResponse(json.dumps({'success': False, 'error': 'Rationale required'}))
     pnc.save()
+
+    # The following automatically accepts name change requests. Remove this to
+    # go back to the old system where it gets queued up for admin approval.
+    accept_name_change_by_id(pnc.id)
+
     return HttpResponse(json.dumps({'success': True}))
 
 
@@ -709,14 +712,9 @@ def reject_name_change(request):
     return HttpResponse(json.dumps({'success': True}))
 
 
-@ensure_csrf_cookie
-def accept_name_change(request):
-    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change '''
-    if not request.user.is_staff:
-        raise Http404
-
+def accept_name_change_by_id(id):
     try:
-        pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
+        pnc = PendingNameChange.objects.get(id=id)
     except PendingNameChange.DoesNotExist:
         return HttpResponse(json.dumps({'success': False, 'error': 'Invalid ID'}))
 
@@ -735,3 +733,12 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success': True}))
+
+
+@ensure_csrf_cookie
+def accept_name_change(request):
+    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change '''
+    if not request.user.is_staff:
+        raise Http404
+
+    return accept_name_change_by_id(int(request.POST['id']))

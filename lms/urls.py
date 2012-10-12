@@ -21,7 +21,7 @@ urlpatterns = ('',
 
     url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
-    url(r'^change_name$', 'student.views.change_name_request'),
+    url(r'^change_name$', 'student.views.change_name_request', name="change_name"),
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
