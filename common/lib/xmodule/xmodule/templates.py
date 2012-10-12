@@ -31,6 +31,8 @@ def all_templates():
 
     templates = defaultdict(list)
     for category, descriptor in XModuleDescriptor.load_classes():
+        if category == 'course':
+            logging.debug(descriptor.templates())
         templates[category] = descriptor.templates()
 
     return templates
@@ -65,8 +67,9 @@ def update_templates():
             template_location = Location('i4x', 'edx', 'templates', category, Location.clean_for_url_name(template.metadata['display_name']))
 
             try:
-                json_data = template._asdict()
+                json_data = {'definition': {'data': template.data, 'children' : template.children}}
                 json_data['location'] = template_location.dict()
+
                 XModuleDescriptor.load_from_json(json_data, TemplateTestSystem())
             except:
                 log.warning('Unable to instantiate {cat} from template {template}, skipping'.format(

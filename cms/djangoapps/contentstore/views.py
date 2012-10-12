@@ -109,6 +109,7 @@ def index(request):
     courses = filter(lambda course: has_access(request.user, course.location), courses)
 
     return render_to_response('index.html', {
+        'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.metadata.get('display_name'),
                     reverse('course_index', args=[
                         course.location.org,
@@ -597,7 +598,32 @@ def unpublish_unit(request):
 
     return HttpResponse()
 
+@login_required
+@expect_json
+def create_new_course(request):
+    template = Location(request.POST['template'])
+    org = request.POST.get('org')   
+    number = request.POST.get('number')  
+    display_name = request.POST.get('display_name')   
 
+    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+
+    logging.debug(dest_location)
+    logging.debug(template)
+
+    new_course = modulestore('direct').clone_item(template, dest_location)
+
+    if display_name is not None:
+        new_course.metadata['display_name'] = display_name
+
+    # we need a 'data_dir' for legacy reasons
+    new_course.metadata['data_dir'] = uuid4().hex
+
+    modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
+
+    create_all_course_groups(request.user, new_course.location)
+
+    return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 @login_required
 @expect_json
