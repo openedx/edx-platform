@@ -122,6 +122,7 @@ $paleYellow: #fffcf1;
         width: 130px;
         padding: 8px 20px 10px;
         font-size: 16px;
+        text-shadow: none;
       }
 
       .forgot-button {
@@ -175,7 +176,85 @@ $paleYellow: #fffcf1;
     overflow: hidden;
   }
 
-  #register .login-extra {
-    display: none;
+  #signup-modal {
+    padding: 0;
+    border: none;
+    background: none;
+
+    .inner-wrapper {
+      border-radius: 3px;
+    }
+  }
+
+  #register {
+    font-family: $sans-serif;
+
+    * {
+      font-family: $sans-serif;
+      font-style: normal;
+      letter-spacing: 0;
+      text-transform: none;
+      color: #3c3c3c;
+    }
+
+    header {
+      padding-top: 13px;
+      margin-bottom: 15px;
+      border: none;
+      background: none;
+    }
+
+    h2 {
+      font-size: 21px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"] {
+      height: 40px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    input[type="submit"] {
+      @include blue-button;
+      display: block;
+      color: #fff;
+      text-shadow: none;
+    }
+
+    textarea {
+      height: 50px;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      padding: 0;
+    }
+
+    .terms-of-service {
+      margin-bottom: 5px;
+    }
+
+    .honor-code {
+      margin-bottom: 20px;
+    }
+
+    .login-extra {
+      display: none;
+    }
+
+    .modal-form-error {
+      font-size: 14px;
+      color: #fff;
+    }
   }
 }
