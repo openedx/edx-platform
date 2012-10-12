@@ -895,7 +895,8 @@ def import_course(request, org, course, name):
         course_dir = filename.replace('.tar.gz', '')
 
         tf = tarfile.open(temp_filepath)
-        shutil.rmtree(data_root / course_dir)
+        if (data_root / course_dir).isdir():
+            shutil.rmtree(data_root / course_dir)
         tf.extractall(data_root + '/')
 
         os.remove(temp_filepath)    # remove the .tar.gz file
