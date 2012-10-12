@@ -161,7 +161,7 @@ class @DiscussionUtil
   @makeWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
     placeholder = elem.data('placeholder')
-    id = elem.data("id")
+    id = elem.attr("data-id") # use attr instead of data because we want to avoid type coercion
     appended_id = "-#{cls_identifier}-#{id}"
     imageUploadUrl = @urlFor('upload')
     _processor = (_this) ->
@@ -174,12 +174,12 @@ class @DiscussionUtil
 
   @getWmdEditor: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
-    id = elem.data("id")
+    id = elem.attr("data-id") # use attr instead of data because we want to avoid type coercion
     @wmdEditors["#{cls_identifier}-#{id}"]
 
   @getWmdInput: ($content, $local, cls_identifier) ->
     elem = $local(".#{cls_identifier}")
-    id = elem.data("id")
+    id = elem.attr("data-id") # use attr instead of data because we want to avoid type coercion
     $local("#wmd-input-#{cls_identifier}-#{id}")
 
   @getWmdContent: ($content, $local, cls_identifier) ->
