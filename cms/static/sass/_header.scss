@@ -40,11 +40,6 @@ body.no-header {
 
 	#import-tab {
 		@include box-shadow(1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44);
-		background: rgba(255, 0, 0, .5);
-
-		&:hover {
-			background: rgba(255, 0, 0, .7);
-		}
 	}
 
 	.left {
