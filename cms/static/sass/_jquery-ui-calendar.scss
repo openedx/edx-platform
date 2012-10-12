@@ -1,0 +1,53 @@
+.ui-datepicker {
+  border-color: $darkGrey;
+  border-radius: 2px;
+  background: #fff;
+  font-family: $sans-serif;
+  font-size: 12px;
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+
+  .ui-widget-header {
+    background: $darkGrey;
+    border: none;
+    border-radius: 2px;
+  }
+
+  .ui-datepicker-next,
+  .ui-datepicker-prev {
+    @include transition(none);
+
+    &.ui-state-hover {
+      border-color: transparent;
+      background: $mediumGrey;
+
+      .ui-icon-circle-triangle-e,
+      .ui-icon-circle-triangle-w {
+        background-image: url(/static/css/vendor/ui-lightness/images/ui-icons_ffffff_256x240.png);
+      }
+    }
+  }
+
+  .ui-state-default {
+    border-color: $mediumGrey;
+    color: $blue;
+    @include transition(none);
+
+    &.ui-state-hover {
+      background: $orange;
+      border-color: $orange;
+      color: #fff;
+    }
+  }
+
+  .ui-state-highlight {
+    background: $blue;
+    border-color: $blue;
+    color: #fff;
+  }
+
+  .ui-state-active {
+    background: $orange;
+    border-color: $orange;
+    color: #fff;
+  }
+}

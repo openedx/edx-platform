@@ -38,11 +38,10 @@
 		  	<li class="policy-list-element">
 		  		<input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/><a href="#" class="delete-icon remove-policy-data"></a>
 		  	</li>
-		  	% endfor 
-
-		    <a href="#" class="new-policy-item add-policy-data" >
-		      <span class="new-policy-icon"></span>New Policy Data
-		    </a>
+		  	% endfor
+        <a href="#" class="new-policy-item add-policy-data">
+          <span class="plus-icon-small"></span>New Policy Data
+        </a>
 		  </ol>
 		</div>					
       </article>

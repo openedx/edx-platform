@@ -20,6 +20,30 @@
 			@include tree-view;
 		}
 	}
+
+	.policy-list {
+		.policy-list-name {
+			margin-right: 5px;
+		}
+
+		.policy-list-value {
+			margin-right: 10px;
+		}
+
+		li {
+			margin-bottom: 10px;
+		}
+	}
+
+	.new-policy-item {
+		margin: 10px 0;
+
+		.plus-icon-small {
+			position: relative;
+			top: -1px;
+			vertical-align: middle;
+		}
+	}
 }
 
 .subsection-name-input {
