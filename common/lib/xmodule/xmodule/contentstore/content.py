@@ -127,8 +127,10 @@ class ContentStore(object):
                                                   'image/jpeg', thumbnail_file)
 
                 contentstore().save(thumbnail_content)
-            except:
-                raise
+
+            except Exception, e:
+                # log and continue as thumbnails are generally considered as optional
+                logging.exception("Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
 
         return thumbnail_content
 
