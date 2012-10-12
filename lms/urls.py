@@ -19,7 +19,7 @@ urlpatterns = ('',
     # (specifically missing get parameters in certain cases)
     url(r'^debug_request$', 'util.views.debug_request'),
 
-    url(r'^change_email$', 'student.views.change_email_request'),
+    url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request'),
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
