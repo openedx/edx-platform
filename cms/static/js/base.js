@@ -32,9 +32,11 @@ $(document).ready(function() {
     $('.save-subsection').bind('click', saveSubsection);
 
     // making the unit list sortable
-    $('.sortable-unit-list').sortable();
-    $('.sortable-unit-list').disableSelection();
-    $('.sortable-unit-list').bind('sortstop', onUnitReordered);
+    $('.sortable-unit-list').sortable({
+        axis: 'y',
+        handle: '.drag-handle',
+        update: onUnitReordered
+    });
 
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
@@ -57,6 +59,20 @@ $(document).ready(function() {
     $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
         $('.import .file-input').click();
+    });
+
+    // Subsection reordering
+    $('.unit-list ol').sortable({
+        axis: 'y',
+        handle: '.section-item .drag-handle',
+        update: onSubsectionReordered
+    });
+
+    // Section reordering
+    $('.courseware-overview').sortable({
+        axis: 'y',
+        handle: 'header .drag-handle',
+        update: onSectionReordered
     });
 });
 
@@ -110,12 +126,7 @@ function onUnitReordered() {
     var subsection_id = $(this).data('subsection-id');
 
     var _els = $(this).children('li:.leaf');
-
-    var children = new Array();
-    for(var i=0;i<_els.length;i++) {
-	el = _els[i];
-	children[i] = $(el).data('id');
-    }
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
 
     // call into server to commit the new order
     $.ajax({
@@ -125,6 +136,38 @@ function onUnitReordered() {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'metadata' : null, 'data': null, 'children' : children})
 	});
+}
+
+function onSubsectionReordered() {
+    var section_id = $(this).data('section-id');
+
+    var _els = $(this).children('li:.branch');
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+
+    // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : section_id, 'metadata' : null, 'data': null, 'children' : children})
+    });
+}
+
+function onSectionReordered() {
+    var course_id = $(this).data('course-id');
+
+    var _els = $(this).children('section:.branch');
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+
+    // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : course_id, 'metadata' : null, 'data': null, 'children' : children})
+    });
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
