@@ -141,6 +141,16 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
+
+        # TODO (vshnayder): This is a hack.  It creates a direct connection from
+        # the LMS to capa functionality, and really wants to go through the
+        # input types system so that previews can be context-specific.
+        # Unfortunately, we don't have time to think through the right way to do
+        # that (and implement it), and it's not a terrible thing to provide a
+        # generic chemican-equation rendering service.
+        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
+            name='preview_chemcalc'),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
