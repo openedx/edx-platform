@@ -306,7 +306,7 @@ function hideModal(e) {
 
 function onKeyUp(e) {
     if(e.which == 87) {
-        $body.toggleClass('show-wip');
+        $body.toggleClass('show-wip hide-wip');
     }
 }
 
