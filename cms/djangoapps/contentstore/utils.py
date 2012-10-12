@@ -77,5 +77,4 @@ def compute_unit_state(unit):
 
 
 def get_date_display(date):
-    print date, type(date)
     return date.strftime("%d %B, %Y at %I:%M %p")

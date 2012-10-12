@@ -85,7 +85,7 @@
               <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" id="publish-draft">replace it with this draft</a>.</p>
             </div>            
             <div class="row status">
-              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${subsection.start}</strong> with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
+              <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${release_date}</strong> with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
             </div>
             <div class="row unit-actions">
               <a id="save-draft" href="#" class="save-button">Save Draft</a>

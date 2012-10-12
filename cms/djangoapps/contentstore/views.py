@@ -10,6 +10,7 @@ import sys
 import time
 import tarfile
 import shutil
+from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from lxml import etree
@@ -287,6 +288,7 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
+        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.start))),
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
