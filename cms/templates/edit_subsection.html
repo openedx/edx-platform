@@ -19,31 +19,31 @@
   <div class="inner-wrapper">
     <div class="main-column">
       <article class="subsection-body window">
-		<div class="subsection-name-input">
-		  <label>Display Name:</label>
-		  <input type="text" value="${subsection.metadata['display_name']}" class="subsection-display-name-input" data-metadata-name="display_name"/>
-		</div>
-		<div>
-		  <label>Format:</label>
-		  <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
-		</div>
-		<div class="unit-list">
-		  <label>Units:</label>
-		  ${units.enum_units(subsection)}
-		</div>
-		<div>
-		  <label>Policy:</label>
-		  <ol class='policy-list'>
-		  	% for policy_name in policy_metadata.keys():
-		  	<li class="policy-list-element">
-		  		<input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/><a href="#" class="delete-icon remove-policy-data"></a>
-		  	</li>
-		  	% endfor
+        <div class="subsection-name-input">
+          <label>Display Name:</label>
+          <input type="text" value="${subsection.metadata['display_name']}" class="subsection-display-name-input" data-metadata-name="display_name"/>
+        </div>
+        <div>
+          <label>Format:</label>
+          <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
+        </div>
+        <div class="unit-list">
+          <label>Units:</label>
+          ${units.enum_units(subsection)}
+        </div>
+        <div>
+          <label>Policy:</label>
+          <ol class='policy-list'>
+              % for policy_name in policy_metadata.keys():
+              <li class="policy-list-element">
+                  <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/><a href="#" class="delete-icon remove-policy-data"></a>
+              </li>
+              % endfor
         <a href="#" class="new-policy-item add-policy-data">
           <span class="plus-icon-small"></span>New Policy Data
         </a>
-		  </ol>
-		</div>					
+          </ol>
+        </div>                    
       </article>
     </div>
 
@@ -51,46 +51,47 @@
     </div>
 
     <div id="add-new-policy-element-template" style="display:none">
- 	  	<li class="policy-list-element new-policy-list-element"><input type="text" class="policy-list-name" autocomplete="off" size="15"/>:&nbsp;<input type="text" class="policy-list-value" size=40 autocomplete="off"/><a href="#" class="delete-icon remove-policy-data"></a></li>   	
+           <li class="policy-list-element new-policy-list-element"><input type="text" class="policy-list-name" autocomplete="off" size="15"/>:&nbsp;<input type="text" class="policy-list-value" size=40 autocomplete="off"/><a href="#" class="delete-icon remove-policy-data"></a></li>       
     </div>
 
     <div class="sidebar">
       <div class="unit-properties window">
-	<h4>Subsection Settings</h4>
-	<div class="window-contents">
-	  <div class="scheduled-date-input row">
-	    <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
-	    <div class="datepair" data-language="javascript">
-	    	<%
-	    		start_date = datetime.fromtimestamp(mktime(subsection.start)) if subsection.start is not None else None
-	    		parent_start_date = datetime.fromtimestamp(mktime(parent_item.start)) if parent_item.start is not None else None
-	    	%>
-	      <input type="text" id="start_date" name="start_date" value="${start_date.strftime('%m/%d/%Y') if start_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-	      <input type="text" id="start_time" name="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
-	    </div>
-	    % if subsection.start != parent_item.start and subsection.start:
-	    <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}. <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
-	    % endif
-	  </div>
-	<div class="due-date-input row">
-	  <label>Due date:</label>
-	  <a href="#" class="set-date">Set a due date</a>
-	  <div class="datepair date-setter">
-	    <p class="date-description">
-	      <%
-	      	# due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
-		 	due_date = dateutil.parser.parse(subsection.metadata.get('due')) if 'due' in subsection.metadata else None
-		  %>
-	      <input type="text" id="due_date" name="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/> 
-	      <input type="text" id="due_time" name="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-	      <a href="#" class="remove-date">Remove due date</a>
-	    </p>
-	  </div>
-	</div>
-	<div class="row unit-actions">
-	  <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
-	  <a href="${lms_link}" target="_blank" class="preview-button">Preview</a>
-	</div>
+    <h4>Subsection Settings</h4>
+    <div class="window-contents">
+      <div class="scheduled-date-input row">
+        <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
+        <div class="datepair" data-language="javascript">
+            <%
+                start_date = datetime.fromtimestamp(mktime(subsection.start)) if subsection.start is not None else None
+                parent_start_date = datetime.fromtimestamp(mktime(parent_item.start)) if parent_item.start is not None else None
+            %>
+          <input type="text" id="start_date" name="start_date" value="${start_date.strftime('%m/%d/%Y') if start_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          <input type="text" id="start_time" name="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
+        </div>
+        % if subsection.start != parent_item.start and subsection.start:
+        <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}. <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
+        % endif
+      </div>
+    <div class="due-date-input row">
+      <label>Due date:</label>
+      <a href="#" class="set-date">Set a due date</a>
+      <div class="datepair date-setter">
+        <p class="date-description">
+          <%
+              # due date uses it own formatting for stringifying the date. As with capa_module.py, there's a utility module available for us to use
+             due_date = dateutil.parser.parse(subsection.metadata.get('due')) if 'due' in subsection.metadata else None
+          %>
+          <input type="text" id="due_date" name="due_date" value="${due_date.strftime('%m/%d/%Y') if due_date is not None else ''}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/> 
+          <input type="text" id="due_time" name="due_time" value="${due_date.strftime('%H:%M') if due_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          <a href="#" class="remove-date">Remove due date</a>
+        </p>
+      </div>
+    </div>
+    <div class="row unit-actions">
+      <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
+      <a href="${preview_link}" target="_blank" class="preview-button">Preview Drafts</a>
+      <a href="${lms_link}" target="_blank" class="preview-button">View Live</a>
+    </div>
       </div>
     </div>
   </div>
@@ -103,13 +104,13 @@
 <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
 <script src="${static.url('js/vendor/date.js')}"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		// expand the due-date area if the values are set
-		if ($('#due_date').val() != '') {
-		    var $block = $('.set-date').closest('.due-date-input');
-		    $('.set-date').hide();
-		    $block.find('.date-setter').show();
-		}
-	})
+    $(document).ready(function() {
+        // expand the due-date area if the values are set
+        if ($('#due_date').val() != '') {
+            var $block = $('.set-date').closest('.due-date-input');
+            $('.set-date').hide();
+            $block.find('.date-setter').show();
+        }
+    })
 </script>
 </%block>

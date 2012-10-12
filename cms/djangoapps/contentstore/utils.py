@@ -1,7 +1,6 @@
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft import DRAFT
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -35,13 +34,14 @@ def get_course_location_for_item(location):
     return location
 
 
-def get_lms_link_for_item(location):
+def get_lms_link_for_item(location, preview=False):
     location = Location(location)
     if settings.LMS_BASE is not None:
-        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
+        lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            preview='preview.' if preview else '',
             lms_base=settings.LMS_BASE,
             # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id = modulestore().get_containing_courses(location)[0].id,
+            course_id=modulestore().get_containing_courses(location)[0].id,
             location=location,
         )
     else:
