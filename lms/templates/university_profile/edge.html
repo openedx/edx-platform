@@ -1,15 +1,15 @@
 <%inherit file="../stripped-main.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%block name="title"><title>edX edge</title></%block>
 <%block name="bodyclass">no-header edge-landing</%block>
 
 <%block name="content">
-
 <div class="main-wrapper">
   <div class="edx-edge-logo-large">edX edge</div>
   <div class="content">
     <div class="log-in-form">
       <h2>Log in to your courses</h2>
-      <form>
+      <form id="login_form" data-remote="true" method="post" action="/login">
         <div class="row">
           <label>Email</label>
           <input name="email" type="email" class="email-field" tabindex="1">
@@ -27,9 +27,33 @@
     <div class="sign-up">
       <h3>Register for classes</h3>
       <p>Take free online courses from today's leading universities.</p>
-      <p><a href="#" class="register-button">Register</a></p>
+      <p><a href="#signup-modal" id="signup" rel="leanModal" class="register-button">Register</a></p>
     </div>
   </div>
 </div>
 
 </%block>
+
+<%block name="js_extra">
+<script type="text/javascript">
+  (function() {
+     $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+          next = getParameterByName('next');
+          if(next) {
+             location.href = next;
+         } else {
+             location.href = "${reverse('dashboard')}";
+         }
+       } else {
+         if($('#login_error').length == 0) {
+           $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
+         }
+         $('#login_error').html(json.value).stop().css("display", "block");
+       }
+     });
+  })(this)
+</script>
+</%block>
+
+<%include file="../signup_modal.html" />
