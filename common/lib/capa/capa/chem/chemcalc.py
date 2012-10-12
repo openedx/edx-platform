@@ -125,8 +125,13 @@ def _merge_children(tree, tags):
     (group 1 2 3 4)
     It has to handle this recursively:
     (group 1 (group 2 (group 3 (group 4))))
-    We do the cleanup of converting from the latter to the former (as a
+    We do the cleanup of converting from the latter to the former.
     '''
+    if tree is None:
+        # There was a problem--shouldn't have empty trees (NOTE: see this with input e.g. 'H2O(', or 'Xe+').
+        # Haven't grokked the code to tell if this is indeed the right thing to do.
+        raise ParseException("Shouldn't have empty trees")
+
     if type(tree) == str:
         return tree
 
@@ -195,14 +200,52 @@ def _render_to_html(tree):
             return children.replace(' ', '')
 
 
-def render_to_html(s):
-    ''' render a string to html '''
-    status = _render_to_html(_get_final_tree(s))
-    return status
+
+def render_to_html(eq):
+    '''
+    Render a chemical equation string to html.
+
+    Renders each molecule separately, and returns invalid input wrapped in a <span>.
+    '''
+    def err(s):
+        "Render as an error span"
+        return '<span class="inline-error inline">{0}</span>'.format(s)
+
+    def render_arrow(arrow):
+        """Turn text arrows into pretty ones"""
+        if arrow == '->':
+            return u'\u2192'
+        if arrow == '<->':
+            return u'\u2194'
+        return arrow
+
+    def render_expression(ex):
+        """
+        Render a chemical expression--no arrows.
+        """
+        try:
+            return _render_to_html(_get_final_tree(ex))
+        except ParseException:
+            return err(ex)
+
+    def spanify(s):
+        return u'<span class="math">{0}</span>'.format(s)
+
+    left, arrow, right = split_on_arrow(eq)
+    if arrow == '':
+        # only one side
+        return spanify(render_expression(left))
+
+
+    return spanify(render_expression(left) + render_arrow(arrow) + render_expression(right))
 
 
 def _get_final_tree(s):
-    '''  return final tree after merge and clean  '''
+    '''
+    Return final tree after merge and clean.
+
+    Raises pyparsing.ParseException if s is invalid.
+    '''
     tokenized = tokenizer.parseString(s)
     parsed = parser.parse(tokenized)
     merged = _merge_children(parsed, {'S','group'})
@@ -227,14 +270,14 @@ def _check_equality(tuple1, tuple2):
 
 
 def compare_chemical_expression(s1, s2, ignore_state=False):
-    ''' It does comparison between two equations.
+    ''' It does comparison between two expressions.
         It uses divide_chemical_expression and check if division is 1
     '''
     return divide_chemical_expression(s1, s2, ignore_state) == 1
 
 
 def divide_chemical_expression(s1, s2, ignore_state=False):
-    '''Compare two chemical equations for equivalence up to a multiplicative factor:
+    '''Compare two chemical expressions for equivalence up to a multiplicative factor:
 
     - If they are not the same chemicals, returns False.
     - If they are the same, "divide" s1 by s2 to returns a factor x such that s1 / s2 == x as a Fraction object.
@@ -248,7 +291,7 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
 
     Implementation sketch:
         - extract factors and phases to standalone lists,
-        - compare equations without factors and phases,
+        - compare expressions without factors and phases,
         - divide lists of factors for each other and check
              for equality of every element in list,
         - return result of factor division
@@ -294,7 +337,7 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
     treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'] = zip(
         *sorted(zip(treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'])))
 
-    # check if equations are correct without factors
+    # check if expressions are correct without factors
     if not _check_equality(treedic['1 cleaned_mm_list'], treedic['2 cleaned_mm_list']):
         return False
 
@@ -312,9 +355,26 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         return Fraction(treedic['1 factors'][0] / treedic['2 factors'][0])
 
 
+def split_on_arrow(eq):
+    """
+    Split a string on an arrow.  Returns left, arrow, right.  If there is no arrow, returns the
+    entire eq in left, and '' in arrow and right.
+
+    Return left, arrow, right.
+    """
+    # order matters -- need to try <-> first
+    arrows = ('<->', '->')
+    for arrow in arrows:
+        left, a, right = eq.partition(arrow)
+        if a != '':
+            return left, a, right
+
+    return eq, '', ''
+
+
 def chemical_equations_equal(eq1, eq2, exact=False):
     """
-    Check whether two chemical equations are the same.
+    Check whether two chemical equations are the same.  (equations have arrows)
 
     If exact is False, then they are considered equal if they differ by a
     constant factor.
@@ -333,18 +393,12 @@ def chemical_equations_equal(eq1, eq2, exact=False):
 
     If there's a syntax error, we raise pyparsing.ParseException.
     """
-    # for now, we do a manual parse for the arrow.
-    arrows = ('<->', '->')   # order matters -- need to try <-> first
-    def split_on_arrow(s):
-        """Split a string on an arrow.  Returns left, arrow, right, or raises ParseException if there isn't an arrow"""
-        for arrow in arrows:
-            left, a, right = s.partition(arrow)
-            if a != '':
-                return left, a, right
-        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(arrows))
 
     left1, arrow1, right1 = split_on_arrow(eq1)
     left2, arrow2, right2 = split_on_arrow(eq2)
+
+    if arrow1 == '' or arrow2 == '':
+        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(arrows))
 
     # TODO: may want to be able to give student helpful feedback about why things didn't work.
     if arrow1 != arrow2:

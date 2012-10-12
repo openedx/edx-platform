@@ -708,3 +708,34 @@ def imageinput(element, value, status, render_template, msg=''):
     return etree.XML(html)
 
 _reg(imageinput)
+
+
+#--------------------------------------------------------------------------------
+
+
+class ChemicalEquationInput(InputTypeBase):
+    """
+    An input type for entering chemical equations.  Supports live preview.
+
+    Example:
+
+    <chemicalequationinput size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "chemicalequationinput.html"
+    tags = ['chemicalequationinput']
+
+    def _get_render_context(self):
+        size = self.xml.get('size', '20')
+        context = {
+            'id': self.id,
+            'value': self.value,
+            'status': self.status,
+            'size': size,
+            'previewer': '/static/js/capa/chemical_equation_preview.js',
+            }
+        return context
+
+register_input_class(ChemicalEquationInput)

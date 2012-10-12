@@ -55,7 +55,8 @@ entry_types = ['textline',
                'radiogroup',
                'checkboxgroup',
                'filesubmission',
-               'javascriptinput',]
+               'javascriptinput',
+               'chemicalequationinput']
 
 # extra things displayed after "show answers" is pressed
 solution_types = ['solution']
