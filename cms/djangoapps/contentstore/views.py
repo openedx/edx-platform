@@ -234,6 +234,12 @@ def edit_unit(request, location):
 
     item = modulestore().get_item(location)
 
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
+
     # The non-draft location
     lms_link = get_lms_link_for_item(item.location._replace(revision=None))
 
@@ -270,7 +276,7 @@ def edit_unit(request, location):
         published_date = None
 
     return render_to_response('unit.html', {
-        'context_course': item,
+        'context_course': course,
         'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
