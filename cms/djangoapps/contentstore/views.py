@@ -636,74 +636,26 @@ def upload_asset(request, org, course, coursename):
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
 
-    name = request.FILES['file'].name
+    filename = request.FILES['file'].name
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 
-    thumbnail_file_location = None
+    content_loc = StaticContent.compute_location(org, course, filename)
+    content = StaticContent(content_loc, filename, mime_type, filedata)
 
-    # if the upload asset is an image, we can generate a thumbnail from it
-    # let's do so now, so that we have the thumbnail location which we need 
-    # so that the asset can point to it
-    if mime_type.split('/')[0] == 'image':
-        try:
-            # not sure if this is necessary, but let's rewind the stream just in case
-            request.FILES['file'].seek(0)
+    # first let's save a thumbnail so we can get back a thumbnail location
+    thumbnail_content = contentstore().generate_thumbnail(content)
 
-            # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
-            # My understanding is that PIL will maintain aspect ratios while restricting
-            # the max-height/width to be whatever you pass in as 'size'
-            # @todo: move the thumbnail size to a configuration setting?!?
-            im = Image.open(request.FILES['file'])
+    if thumbnail_content is not None:
+        content.thumbnail_location = thumbnail_content.location
+        del_cached_content(thumbnail_content.location)
 
-            # I've seen some exceptions from the PIL library when trying to save palletted 
-            # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
-            im = im.convert('RGB')
-            size = 128, 128
-            im.thumbnail(size, Image.ANTIALIAS)
-            thumbnail_file = StringIO.StringIO()
-            im.save(thumbnail_file, 'JPEG')
-            thumbnail_file.seek(0)
-        
-            # use a naming convention to associate originals with the thumbnail
-            thumbnail_name = StaticContent.generate_thumbnail_name(name)
-
-            # then just store this thumbnail as any other piece of content
-            thumbnail_file_location = StaticContent.compute_location(org, course, 
-                                                                              thumbnail_name, is_thumbnail=True)
-            thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
-                                              'image/jpeg', thumbnail_file)
-            contentstore().save(thumbnail_content)
-            
-            # remove any cached content at this location, as thumbnails are treated just like any
-            # other bit of static content
-            del_cached_content(thumbnail_content.location)
-
-            # not sure if this is necessary, but let's rewind the stream just in case
-            request.FILES['file'].seek(0)
-        except:
-            # catch, log, and continue as thumbnails are not a hard requirement
-            logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
-            thumbnail_file_location = None
-
-
-    file_location = StaticContent.compute_location(org, course, name)
-
-    # create a StaticContent entity and point to the thumbnail
-    content = StaticContent(file_location, name, mime_type, filedata, thumbnail_location = thumbnail_file_location)
-
-    # first commit to the DB
+    #then commit the content 
     contentstore().save(content)
-
-    # then remove the cache so we're not serving up stale content
-    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
-    # which is used when serving up static content. This integrity is needed for
-    # browser-side caching support. We *could* re-fetch the saved content so that we have the
-    # timestamp populated, but we might as well wait for the first real request to come in
-    # to re-populate the cache.
     del_cached_content(content.location)
+    
     response = HttpResponse('Upload completed')
-    response['asset_url'] = StaticContent.get_url_path_from_location(file_location)
+    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
 '''

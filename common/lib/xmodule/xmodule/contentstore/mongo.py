@@ -18,7 +18,7 @@ class MongoContentStore(ContentStore):
         logging.debug( 'Using MongoDB for static content serving at host={0} db={1}'.format(host,db))
         _db = Connection(host=host, port=port, **kwargs)[db]
 
-        if self.user is not None and self.password is not None:
+        if user is not None and password is not None:
             _db.authenticate(user, password)
 
         self.fs = gridfs.GridFS(_db)

@@ -5,6 +5,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
 
 
 unnamed_modules = 0
@@ -26,4 +27,4 @@ class Command(BaseCommand):
         print "Importing.  Data_dir={data}, course_dirs={courses}".format(
             data=data_dir,
             courses=course_dirs)
-        import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False)
+        import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False,static_content_store=contentstore())
