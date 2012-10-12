@@ -8,6 +8,8 @@ import os
 import StringIO
 import sys
 import time
+import tarfile
+import shutil
 from collections import defaultdict
 from uuid import uuid4
 
@@ -44,10 +46,11 @@ from xmodule.contentstore.content import StaticContent
 from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
-from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME
+from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
 from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display
 
 from xmodule.templates import all_templates
+from xmodule.modulestore.xml_importer import import_from_xml
 
 log = logging.getLogger(__name__)
 
@@ -809,3 +812,46 @@ def asset_index(request, org, course, name):
 # points to the temporary edge page
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
+
+def import_course(request):
+    if request.method != 'POST':
+        # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+
+    filename = request.FILES['file'].name
+
+    if not filename.endswith('.tar.gz'):
+        return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+
+    temp_filepath = settings.GITHUB_REPO_ROOT + '/' + filename
+
+    logging.debug('importing course to {0}'.format(temp_filepath))
+
+    # stream out the uploaded files in chunks to disk
+    temp_file = open(temp_filepath, 'wb+')
+    for chunk in request.FILES['file'].chunks():
+        temp_file.write(chunk)
+    temp_file.close()
+
+    tf = tarfile.open(temp_filepath)
+    tf.extractall(settings.GITHUB_REPO_ROOT + '/')
+
+    os.remove(temp_filepath)    # remove the .tar.gz file
+
+    # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
+
+    course_dir = filename.replace('.tar.gz','')
+
+    module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT, 
+        [course_dir], load_error_modules=False,static_content_store=contentstore())
+
+    # remove content directory - we *shouldn't* need this any longer :-)
+    shutil.rmtree(temp_filepath.replace('.tar.gz', ''))
+
+    logging.debug('new course at {0}'.format(course_items[0].location))
+
+    create_all_course_groups(request.user, course_items[0].location)
+
+
+
+    return HttpResponse(json.dumps({'Status' : 'OK'}))

@@ -46,6 +46,8 @@ urlpatterns = ('',
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'import_course$', 'contentstore.views.import_course', name='import_course'),
 )
 
 # User creation and updating views
