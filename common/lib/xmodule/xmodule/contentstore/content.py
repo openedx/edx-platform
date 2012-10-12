@@ -128,7 +128,7 @@ class ContentStore(object):
 
                 contentstore().save(thumbnail_content)
             except:
-                raise
+                pass  # thumbnails are ultimately optional
 
         return thumbnail_content
 
