@@ -14,6 +14,7 @@ from pyparsing import (Literal, Keyword, Word, nums, StringEnd, Optional,
 import nltk
 from nltk.tree import Tree
 
+ARROWS = ('<->', '->')
 
 ## Defines a simple pyparsing tokenizer for chemical equations
 elements = ['Ac','Ag','Al','Am','Ar','As','At','Au','B','Ba','Be',
@@ -363,8 +364,7 @@ def split_on_arrow(eq):
     Return left, arrow, right.
     """
     # order matters -- need to try <-> first
-    arrows = ('<->', '->')
-    for arrow in arrows:
+    for arrow in ARROWS:
         left, a, right = eq.partition(arrow)
         if a != '':
             return left, a, right
@@ -398,7 +398,7 @@ def chemical_equations_equal(eq1, eq2, exact=False):
     left2, arrow2, right2 = split_on_arrow(eq2)
 
     if arrow1 == '' or arrow2 == '':
-        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(arrows))
+        raise ParseException("Could not find arrow.  Legal arrows: {0}".format(ARROWS))
 
     # TODO: may want to be able to give student helpful feedback about why things didn't work.
     if arrow1 != arrow2:
