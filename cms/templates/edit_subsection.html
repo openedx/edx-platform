@@ -69,7 +69,12 @@
           <input type="text" id="start_time" name="start_time" value="${start_date.strftime('%H:%M') if start_date is not None else ''}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
         </div>
         % if subsection.start != parent_item.start and subsection.start:
-        <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}. <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
+            % if parent_start_date is None:
+            <p class="notice">The date above differs from the release date of ${parent_item.display_name}, which is unset.
+            % else:
+            <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}.
+            % endif
+            <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
         % endif
       </div>
     <div class="due-date-input row">
