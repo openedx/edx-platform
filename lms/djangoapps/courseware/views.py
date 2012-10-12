@@ -420,7 +420,7 @@ def university_profile(request, org_id):
     Return the profile for the particular org_id.  404 if it's not valid.
     """
     all_courses = modulestore().get_courses()
-    valid_org_ids = set(c.org for c in all_courses)
+    valid_org_ids = set(c.org for c in all_courses).union(settings.VIRTUAL_UNIVERSITIES)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 
