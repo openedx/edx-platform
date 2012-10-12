@@ -57,6 +57,18 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential']
+
+
+def _modulestore(location):
+    """
+    Returns the correct modulestore to use for modifying the specified location
+    """
+    if location.category in DIRECT_ONLY_CATEGORIES:
+        return modulestore('direct')
+    else:
+        return modulestore()
+
 
 # ==== Public views ==================================================
 
@@ -470,16 +482,13 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    _direct_delete_categories = ['course', 'chapter', 'sequential']
 
     # @TODO: this probably leaves draft items dangling. 
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: modulestore('direct' if 
-            i.location.category in _direct_delete_categories else 'direct').delete_item(i.location))
+        _xmodule_recurse(item, lambda i: _modulestore(i.location).delete_item(i.location))
     else:
-        modulestore('direct' if 
-            item.location.category in _direct_delete_categories else 'direct').delete_item(item.location)
+        _modulestore(item.location).delete_item(item.location)
 
     return HttpResponse()
 
@@ -591,28 +600,20 @@ def clone_item(request):
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    # if we are creating a new section or subsection, then we don't want draft awareness
-    _modulestore = modulestore() if template.category not in ('sequential','chapter') else modulestore('direct')
-
-    parent = _modulestore.get_item(parent_location)
+    parent = _modulestore(template).get_item(parent_location)
     dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
-    new_item = _modulestore.clone_item(template, dest_location)
+    new_item = _modulestore(template).clone_item(template, dest_location)
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
-    
+
     # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
 
-    _modulestore.update_metadata(new_item.location.url(), new_item.own_metadata)
-
-    if parent_location.category not in ('vertical',):
-        parent_update_modulestore = modulestore('direct')
-    else:
-        parent_update_modulestore = modulestore()
-    parent_update_modulestore.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+    _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
+    _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
