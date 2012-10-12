@@ -12,6 +12,7 @@ TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
+                            dev_env = True,
                             debug=True)
 
 modulestore_options = {
