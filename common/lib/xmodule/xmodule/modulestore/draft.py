@@ -159,6 +159,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         return super(DraftModuleStore, self).delete_item(as_draft(location))
 
+
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
