@@ -181,6 +181,12 @@ def edit_subsection(request, location):
 
     item = modulestore().get_item(location)
 
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
+
     lms_link = get_lms_link_for_item(location)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
