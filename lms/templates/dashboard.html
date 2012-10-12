@@ -16,19 +16,46 @@
     $(".unenroll").click(function(event) {
       $("#unenroll_course_id").val( $(event.target).data("course-id") );
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
-
     });
 
-     $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-       if(json.success) {
-         location.href="${reverse('dashboard')}";
-       } else {
-         if($('#unenroll_error').length == 0) {
-           $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-         }
-         $('#unenroll_error').text(json.error).stop().css("display", "block");
-       }
-     });
+    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+      if(json.success) {
+        location.href="${reverse('dashboard')}";
+      } else {
+        if($('#unenroll_error').length == 0) {
+          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
+        }
+        $('#unenroll_error').text(json.error).stop().css("display", "block");
+      }
+    });
+
+    $('#pwd_reset_button').click(function() {
+      $.post('${reverse("password_reset")}',
+             {"email"  : $('#id_email').val()},
+             function(data){
+               $("#password_reset_complete_link").click();
+             });
+    });
+
+    $("#change_email_form").submit(function(){
+      var new_email = $('#new_email_field').val();
+      var new_password = $('#new_email_password').val();
+
+      $.post('${reverse("change_email")}',
+               {"new_email" : new_email, "password" : new_password},
+               function(data) {
+                 if (data.success) {
+                   $("#change_email_title").html("Please verify your new email");
+                   $("#change_email_body").html("<p>You'll receive a confirmation in your " +
+                                                "in-box. Please click the link in the " +
+                                                "email to confirm the email change.</p>");
+                 } else {
+                   $("#change_email_error").html(data.error);
+                 }
+               });
+      return false;
+    });
+
   })(this)
   </script>
 </%block>
@@ -48,10 +75,17 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon name-icon"></div>Full Name</span><span class="data">${ user.profile.name | h }</span>
+          <span class="title"><div class="icon name-icon"></div>Full Name</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
-          <span class="title"><div class="icon email-icon"></div>Email</span><span class="data">${ user.email | h }</span>
+          <span class="title"><div class="icon email-icon"></div>Email (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)</span> <span class="data">${ user.email | h }</span>
+        </li>
+        <li>
+          <span class="title"><a href="#" id="pwd_reset_button">Reset Password</a></span>
+          <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
+            <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
+            <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
+          </form>
         </li>
       </ul>
     </section>
@@ -121,13 +155,11 @@
   </section>
 </section>
 
-
-
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
       <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
-      <hr>
+      <hr/>
     </header>
 
     <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
@@ -146,4 +178,59 @@
   </div>
 </section>
 
+<section id="password_reset_complete" class="modal">
+  <div class="inner-wrapper">
+    <a href="#password_reset_complete" rel="leanModal" id="password_reset_complete_link"></a>
+    <div>
+      <header>
+        <h2>Password Reset Email Sent</h2>
+        <hr/>
+      </header>
+      <section>
+        <p><span>An email has been sent to ${user.email}. Follow the link in the email to change your password.</span></p>
+      </section>
+    </div>
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- Haven't Adapted this Yet -->
+<section id="change_email" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2><span id="change_email_title">Change e-mail</span></h2>
+      <hr/>
+    </header>
+    <div id="apply_name_change_error"></div>
+    <div id="change_email_body">
+      <form id="change_email_form">
+        <div id="change_email_error"> </div>
+        <fieldset>
+          <ul>
+            <li>
+              <label>Please enter your new email address:</label>
+              <input id="new_email_field" type="email" value="" />
+            </li>
+            <li>
+              <label>Please confirm your password:</label>
+              <input id="new_email_password" value="" type="password" />
+            </li>
+          </ul>
+          <section>
+            <p>We will send a confirmation to both ${user.email} and your new e-mail as part of the process.</p>
+          </section>
+          <input type="submit" id="submit_email_change" />
+        </fieldset>
+      </form>
+    </div>
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
