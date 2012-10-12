@@ -57,7 +57,8 @@ entry_types = ['textline',
                'filesubmission',
                'javascriptinput',
                'crystallography',
-               'chemicalequationinput',]
+               'chemicalequationinput',
+               'vsepr_input']
 
 # extra things displayed after "show answers" is pressed
 solution_types = ['solution']
