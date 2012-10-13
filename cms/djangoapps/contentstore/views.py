@@ -528,13 +528,15 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
+    store = _modulestore(Location(item_location));
+
     if request.POST['data']:
         data = request.POST['data']
-        modulestore().update_item(item_location, data)
+        store.update_item(item_location, data)
         
     if request.POST['children']:
         children = request.POST['children']
-        modulestore().update_children(item_location, children)
+        store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
@@ -564,7 +566,7 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
 
         # commit to datastore
-        modulestore().update_metadata(item_location, existing_item.metadata)
+        store.update_metadata(item_location, existing_item.metadata)
 
     return HttpResponse()
 
