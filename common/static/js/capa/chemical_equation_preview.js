@@ -1,22 +1,23 @@
 (function () {
-    update = function(index, input) {
-        preview_div = $(input).siblings('div.equation');
+    update = function() {
+        preview_div = $(this).siblings('div.equation');
 
-        $.get("/preview/chemcalc/", {"formula" : input.value}, function(response) {
-            if (response.error) {
-                preview_div.html("<span class='error'>" + response.error + "</span>");
-            } else {
-                preview_div.html(response.preview);
-            }
-        });
+        function create_handler(saved_div) {
+            return (function(response) {
+                if (response.error) {
+                    saved_div.html("<span class='error'>" + response.error + "</span>");
+                } else {
+                    saved_div.html(response.preview);
+                }
+            });
+        }
+
+        $.get("/preview/chemcalc/", {"formula" : this.value}, create_handler(preview_div));
     }
 
     inputs = $('.chemicalequationinput input');
     // update on load
     inputs.each(update); 
     // and on every change
-    inputs.bind("input", function(event) { 
-        // pass a dummy index
-        update(0, event.target); 
-    });
+    inputs.bind("input", update);
 }).call(this);
