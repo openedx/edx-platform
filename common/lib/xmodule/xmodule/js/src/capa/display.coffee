@@ -334,10 +334,13 @@ class @Problem
   inputtypeShowAnswerMethods:
     choicegroup: (element, display, answers) =>
       element = $(element)
-      for key, value of answers
-        element.find('input').attr('disabled', 'disabled')
-        for choice in value
-          element.find("label[for='input_#{key}_#{choice}']").addClass 'choicegroup_correct'
+
+      element.find('input').attr('disabled', 'disabled')
+
+      input_id = element.attr('id').replace(/inputtype_/,'')
+      answer = answers[input_id]
+      for choice in answer
+        element.find("label[for='input_#{input_id}_#{choice}']").addClass 'choicegroup_correct'
 
     javascriptinput: (element, display, answers) =>
       answer_id = $(element).attr('id').split("_")[1...].join("_")
