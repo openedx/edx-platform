@@ -49,3 +49,4 @@ networkx
 pygraphviz
 -r repo-requirements.txt
 pil
+nltk
