@@ -2,13 +2,28 @@
 <%block name="bodyclass">index</%block>
 <%block name="title">Courses</%block>
 
-<%block name="content">
+<%block name="header_extras">
+  <script type="text/template" id="new-course-template">
+    <section class="courseware-section new-course">
+      <header>
+        <div class="item-details">
+          <h3 class="course-info">
+          	<input type="text" placeholder="Organization" class="new-course-org" />
+          	<input type="text" placeholder="Course Number" class="new-course-number" />
+          	<input type="text" placeholder="Course Name" class="new-course-name" />
+          	<a href="#" class="new-course-save" data-template="${new_course_template}">Save</a><a href="#" class="new-course-cancel">Cancel</a></h3>
+        </div>
+      </header>
+    </section>
+  </script>
+ </%block>
 
+<%block name="content">
 	<div class="main-wrapper">
 		<div class="inner-wrapper">
 			<h1>My Courses</h1>
 			<article class="my-classes">
-				<a href="#" class="new-course-button wip-box"><span class="plus-icon"></span> New Course</a>
+				<a href="#" class="new-course-button"><span class="plus-icon"></span> New Course</a>
 				<ul class="class-list">
 					%for course, url in courses:
 			    <li>

@@ -58,6 +58,8 @@ $(document).ready(function() {
         e.preventDefault();
         $('.import .file-input').click();
     });
+
+    $('.new-course-button').bind('click', addNewCourse);
 });
 
 function showImportSubmit(e) {
@@ -65,6 +67,7 @@ function showImportSubmit(e) {
     $('.file-name-block').show();
     $('.import .choose-file-button').hide();
     $('.submit-button').show();
+    $('.progress').show();
 }
 
 function syncReleaseDate(e) {
@@ -406,6 +409,7 @@ function addNewSection(e) {
     $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
 }
 
+
 function saveNewSection(e) {
     e.preventDefault();
 
@@ -428,6 +432,48 @@ function saveNewSection(e) {
 function cancelNewSection(e) {
     e.preventDefault();
     $(this).parents('section.new-section').remove();
+}
+
+
+function addNewCourse(e) {
+    e.preventDefault();
+    var $newCourse = $($('#new-course-template').html());
+    $('.new-course-button').after($newCourse);
+    $newCourse.find('.new-course-org').focus().select();
+    $newCourse.find('.new-course-save').bind('click', saveNewCourse);
+    $newCourse.find('.new-course-cancel').bind('click', cancelNewCourse);
+}
+
+function saveNewCourse(e) {
+    e.preventDefault();
+
+    template = $(this).data('template');
+
+    org = $(this).prevAll('.new-course-org').val();
+    number = $(this).prevAll('.new-course-number').val();
+    display_name = $(this).prevAll('.new-course-name').val();
+
+    if (org == '' || number == '' || display_name == ''){
+        alert('You must specify all fields in order to create a new course.')
+    }
+
+    $.post('/create_new_course',
+       { 'template' : template,
+           'org' : org,
+           'number' : number,
+           'display_name': display_name,
+           },
+       function(data) {
+            if (data.id != undefined)
+               location.reload(); 
+            else if (data.ErrMsg != undefined)
+                alert(data.ErrMsg);
+       });    
+}
+
+function cancelNewCourse(e) {
+    e.preventDefault();
+    $(this).parents('section.new-course').remove();
 }
 
 function addNewSubsection(e) {

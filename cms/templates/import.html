@@ -1,4 +1,6 @@
 <%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">Import</%block>
 <%block name="bodyclass">import</%block>
@@ -21,6 +23,10 @@
         <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
         <input type="file" name="course-data" class="file-input">
         <input type="submit" value="Replace my course with the one above" class="submit-button">
+        <div class="progress" style="position:relative; margin-top:5px; width:250px; height:15px; border: 1px solid #ddd; padding: 1px; border-radius: 3px; display:none;">
+          <div class="bar" style="background-color: #B4F5B4; width:0%; height:10px; border-radius: 3px;"></div>
+          <div class="percent" style="margin-top:5px;">0%</div>
+        </div>
       </form>
     </article>
   </div>
@@ -28,7 +34,6 @@
 </%block>
 
 <%block name="jsextra">
-<script src="//malsup.github.com/jquery.form.js"></script>
 <script>
 (function() {
     
@@ -49,7 +54,12 @@ $('form').ajaxForm({
         percent.html(percentVal);
     },
     complete: function(xhr) {
-      status.html(xhr.responseText);
+      if (xhr.status == 200) {
+        alert('Your import has been successful.');
+        window.location = '${successful_import_redirect_url}';
+      }
+      else
+        alert('Your import has failed.\n\n' + xhr.responseText);
     }
   }); 
 })();       
