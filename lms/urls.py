@@ -141,6 +141,16 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
+
+        # TODO (vshnayder): This is a hack.  It creates a direct connection from
+        # the LMS to capa functionality, and really wants to go through the
+        # input types system so that previews can be context-specific.
+        # Unfortunately, we don't have time to think through the right way to do
+        # that (and implement it), and it's not a terrible thing to provide a
+        # generic chemican-equation rendering service.
+        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
+            name='preview_chemcalc'),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
@@ -244,7 +254,7 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
-        url(r'^openid/provider/login/(?:[\w%\. ]+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
+        url(r'^openid/provider/login/(?:.+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
         url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
         url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
     )

@@ -30,6 +30,8 @@ import sys
 from lxml import etree
 from xml.sax.saxutils import unescape
 
+import chem
+import chem.chemcalc
 import calc
 from correctmap import CorrectMap
 import eia
@@ -54,7 +56,8 @@ entry_types = ['textline',
                'checkboxgroup',
                'filesubmission',
                'javascriptinput',
-               'crystallography',]
+               'crystallography',
+               'chemicalequationinput',]
 
 # extra things displayed after "show answers" is pressed
 solution_types = ['solution']
@@ -73,7 +76,8 @@ global_context = {'random': random,
                   'math': math,
                   'scipy': scipy,
                   'calc': calc,
-                  'eia': eia}
+                  'eia': eia,
+                  'chemcalc': chem.chemcalc}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
@@ -437,7 +441,7 @@ class LoncapaProblem(object):
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
-            
+
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript
@@ -479,8 +483,8 @@ class LoncapaProblem(object):
 
         problemid = problemtree.get('id')    # my ID
 
-        if problemtree.tag in inputtypes.get_input_xml_tags():
-
+        if problemtree.tag in inputtypes.registered_input_tags():
+            # If this is an inputtype subtree, let it render itself.
             status = "unsubmitted"
             msg = ''
             hint = ''
@@ -497,20 +501,17 @@ class LoncapaProblem(object):
                 value = self.student_answers[problemid]
 
             # do the rendering
-            render_object = inputtypes.SimpleInput(system=self.system,
-                                                   xml=problemtree,
-                                                   state={'value': value,
-                                                          'status': status,
-                                                          'id': problemtree.get('id'),
-                                                          'feedback': {'message': msg,
-                                                                       'hint': hint,
-                                                                       'hintmode': hintmode,
-                                                                       }
-                                                          },
-                                                   use='capa_input')
-            # function(problemtree, value, status, msg)
-            # render the special response (textline, schematic,...)
-            return render_object.get_html()
+
+            state = {'value': value,
+                   'status': status,
+                   'id': problemtree.get('id'),
+                   'feedback': {'message': msg,
+                                'hint': hint,
+                                'hintmode': hintmode,}}
+
+            input_type_cls = inputtypes.get_class_for_tag(problemtree.tag)
+            the_input = input_type_cls(self.system, problemtree, state)
+            return the_input.get_html()
 
         # let each Response render itself
         if problemtree in self.responders:

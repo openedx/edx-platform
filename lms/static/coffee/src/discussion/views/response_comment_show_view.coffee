@@ -32,3 +32,5 @@ if Backbone?
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.find("a.profile-link").after('<span class="staff-label">staff</span>')
+      else if DiscussionUtil.isTA(@model.get("user_id"))
+        @$el.find("a.profile-link").after('<span class="community-ta-label">Community&nbsp;&nbsp;TA</span>')
