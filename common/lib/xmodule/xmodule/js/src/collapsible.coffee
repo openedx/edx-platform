@@ -16,6 +16,7 @@ class @Collapsible
     el.find('.collapsible header a').click @toggleHint
 
   @toggleFull: (event) =>
+    event.preventDefault()
     $(event.target).parent().siblings().slideToggle()
     $(event.target).parent().parent().toggleClass('open')
     if $(event.target).text() == 'See full output'
