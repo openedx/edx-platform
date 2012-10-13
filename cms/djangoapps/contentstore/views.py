@@ -30,6 +30,7 @@ from django import forms
 from django.shortcuts import redirect
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -40,6 +41,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
+from xmodule.timeparse import parse_time, stringify_time
 from functools import partial
 from itertools import groupby
 from operator import attrgetter
@@ -106,7 +108,7 @@ def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location), courses)
+    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates', courses)
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
@@ -610,32 +612,7 @@ def unpublish_unit(request):
 
     return HttpResponse()
 
-@login_required
-@expect_json
-def create_new_course(request):
-    template = Location(request.POST['template'])
-    org = request.POST.get('org')   
-    number = request.POST.get('number')  
-    display_name = request.POST.get('display_name')   
 
-    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
-
-    logging.debug(dest_location)
-    logging.debug(template)
-
-    new_course = modulestore('direct').clone_item(template, dest_location)
-
-    if display_name is not None:
-        new_course.metadata['display_name'] = display_name
-
-    # we need a 'data_dir' for legacy reasons
-    new_course.metadata['data_dir'] = uuid4().hex
-
-    modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
-
-    create_all_course_groups(request.user, new_course.location)
-
-    return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 @login_required
 @expect_json
@@ -889,6 +866,46 @@ def asset_index(request, org, course, name):
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
 
+@login_required
+@expect_json
+def create_new_course(request):
+    template = Location(request.POST['template'])
+    org = request.POST.get('org')   
+    number = request.POST.get('number')  
+    display_name = request.POST.get('display_name')   
+
+    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+
+    # see if the course already exists
+    existing_course = None
+    try:
+        existing_course = modulestore('direct').get_item(dest_location)
+    except ItemNotFoundError:
+        pass
+
+    if existing_course is not None:
+        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
+
+    logging.debug(dest_location)
+    logging.debug(template)
+
+    new_course = modulestore('direct').clone_item(template, dest_location)
+
+    if display_name is not None:
+        new_course.metadata['display_name'] = display_name
+
+    # we need a 'data_dir' for legacy reasons
+    new_course.metadata['data_dir'] = uuid4().hex
+
+    # set a default start date to now
+    new_course.metadata['start'] = stringify_time(time.gmtime())
+
+    modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
+
+    create_all_course_groups(request.user, new_course.location)
+
+    return HttpResponse(json.dumps({'id': new_course.location.url()}))
+
 @ensure_csrf_cookie
 @login_required
 def import_course(request, org, course, name):
@@ -955,4 +972,8 @@ def import_course(request, org, course, name):
         return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
+            'successful_import_redirect_url' : reverse('course_index', args=[
+                        course_module.location.org,
+                        course_module.location.course,
+                        course_module.location.name])
         })

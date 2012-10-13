@@ -67,6 +67,7 @@ function showImportSubmit(e) {
     $('.file-name-block').show();
     $('.import .choose-file-button').hide();
     $('.submit-button').show();
+    $('.progress').show();
 }
 
 function syncReleaseDate(e) {
@@ -452,6 +453,10 @@ function saveNewCourse(e) {
     number = $(this).prevAll('.new-course-number').val();
     display_name = $(this).prevAll('.new-course-name').val();
 
+    if (org == '' || number == '' || display_name == ''){
+        alert('You must specify all fields in order to create a new course.')
+    }
+
     $.post('/create_new_course',
        { 'template' : template,
            'org' : org,
@@ -460,7 +465,9 @@ function saveNewCourse(e) {
            },
        function(data) {
             if (data.id != undefined)
-               location.reload();
+               location.reload(); 
+            else if (data.ErrMsg != undefined)
+                alert(data.ErrMsg);
        });    
 }
 
