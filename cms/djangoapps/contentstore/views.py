@@ -848,9 +848,9 @@ def asset_index(request, org, course, name):
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
         
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
-        thumbnail_location = Location(asset.get('thumbnail_location', None))
-
-        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location)
+        _thumbnail_location = asset.get('thumbnail_location', None)
+        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
         
         asset_display.append(display_info)
 
