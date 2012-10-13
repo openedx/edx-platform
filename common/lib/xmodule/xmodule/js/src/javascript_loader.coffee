@@ -62,5 +62,9 @@ class @JavascriptLoader
         # Need to use the DOM elements directly or the scripts won't execute
         # properly.
         $('head')[0].appendChild(s)
-        $(placeholder).remove()
+      else
+        # just call the completion callback directly, without reloading the file
+        completionHandlerGenerator(index)()
+      $(placeholder).remove()
+        
       
