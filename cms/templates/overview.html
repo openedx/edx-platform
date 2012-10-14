@@ -46,7 +46,7 @@
     <div class="inner-wrapper">
       <h1>Courseware</h1>
       <div class="page-actions"></div>
-      <article class="courseware-overview">
+      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
         <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
@@ -58,7 +58,7 @@
             </div>
             <div class="item-actions">
               <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" class="drag-handle wip"></a>
+              <a href="#" class="drag-handle"></a>
             </div>
           </header>
           <div class="unit-list">
@@ -67,7 +67,7 @@
                 <span class="new-folder-icon"></span>New Subsection
               </a>
             </div>
-            <ol>
+            <ol data-section-id="${section.location.url()}">
               % for subsection in section.get_children():
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
@@ -80,7 +80,7 @@
                   </div>
                   <div class="item-actions">
                     <a href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                    <a href="#" class="drag-handle wip"></a>
+                    <a href="#" class="drag-handle"></a>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}
