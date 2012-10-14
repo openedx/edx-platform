@@ -5,13 +5,13 @@ metadata:
     source_code: |
         \subsection{Example of E-text in LaTeX}
 
-	It is very convenient to write complex equations in LaTeX.        
+        It is very convenient to write complex equations in LaTeX.        
 
-	\begin{equation}
-		x = \frac{-b\pm\sqrt{b^2-4*a*c}}{2a}
-	\end{equation}
+        \begin{equation}
+                x = \frac{-b\pm\sqrt{b^2-4*a*c}}{2a}
+        \end{equation}
 
-	Seize the moment.
+        Seize the moment.
 
 data: |
     <html>
