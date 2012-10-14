@@ -262,10 +262,15 @@ def login_user(request, error=""):
         try_change_enrollment(request)
 
         return HttpResponse(json.dumps({'success': True}))
-
-    log.warning("Login failed - Account not active for user {0}".format(username))
+    
+    log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
+    
+    reactivation_email_for_user(user)
+    not_activated_msg = "This account has not been activated. We have " + \
+                        "sent another activation message. Please check your " + \
+                        "e-mail for the activation instructions."
     return HttpResponse(json.dumps({'success': False,
-                                    'value': 'This account has not been activated. Please check your e-mail for the activation instructions.'}))
+                                    'value': not_activated_msg}))
 
 
 @ensure_csrf_cookie
@@ -540,7 +545,6 @@ def password_reset(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid e-mail'}))
 
-
 @ensure_csrf_cookie
 def reactivation_email(request):
     ''' Send an e-mail to reactivate a deactivated account, or to
@@ -551,21 +555,23 @@ def reactivation_email(request):
     except User.DoesNotExist:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
+    return reactivation_email_for_user(user)
 
+def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
     reg.register(user)
 
-    d = {'name': UserProfile.get(user=user).name,
-       'key': r.activation_key}
+    d = {'name': user.profile.name,
+         'key': reg.activation_key}
 
-    subject = render_to_string('reactivation_email_subject.txt', d)
+    subject = render_to_string('emails/activation_email_subject.txt', d)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('reactivation_email.txt', d)
+    message = render_to_string('emails/activation_email.txt', d)
 
     res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return HttpResponse(json.dumps({'success': True}))
-
+    
 
 @ensure_csrf_cookie
 def change_email_request(request):
