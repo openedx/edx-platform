@@ -10,7 +10,7 @@
       <h1>Asset Library</h1>
       <div class="page-actions">
         <a href="#" class="upload-button">Upload New File</a>
-	      <input type="text" class="asset-search-input search wip-box" placeholder="search assets" />
+	      <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
       </div>
       <article class="asset-library">
         <table>
@@ -26,7 +26,11 @@
           % for asset in assets:
             <tr>
               <td class="thumb-col">
-                <div class="thumb"><img src="${asset['thumb_url']}"></div>
+                <div class="thumb">
+                  % if asset['thumb_url'] is not None:
+                  <img src="${asset['thumb_url']}">
+                  % endif
+                </div>
               </td>
               <td class="name-col">
                 <a href="${asset['url']}" class="filename">${asset['displayname']}</a>

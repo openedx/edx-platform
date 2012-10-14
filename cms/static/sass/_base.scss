@@ -217,6 +217,12 @@ code {
     }
 }
 
+body.hide-wip {
+    .wip, .wip-box {
+        display: none !important;
+    }
+}
+
 body.show-wip {
     .wip {
         outline: 1px solid #f00 !important;

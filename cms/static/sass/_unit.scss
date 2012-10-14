@@ -310,7 +310,7 @@
     }
   }
 
-  .preview-button {
+  .preview-button, .view-button {
     @include white-button;
     margin-bottom: 10px;
   }
@@ -325,7 +325,8 @@
 
   .save-button,
   .preview-button,
-  .publish-button {
+  .publish-button,
+  .view-button {
     font-size: 11px;
     margin-top: 10px;
     padding: 6px 15px 8px;
@@ -427,16 +428,14 @@
 }
 
 .edit-state-draft {
-  .visibility {
+  .visibility,
+  .edit-draft-message,
+  .view-button {
     display: none;
   }
 
   .published-alert {
     display: block;
-  }
-
-  .edit-draft-message {
-    display: none;
   }
 }
 
@@ -446,7 +445,8 @@
   .component-actions,
   .new-component-item,
   #published-alert,
-  .publish-draft-message {
+  .publish-draft-message,
+  .preview-button {
     display: none;
   }
 
@@ -463,7 +463,8 @@
   #delete-draft,
   #publish-draft,
   #published-alert,
-  #create-draft, {
+  #create-draft,
+  .view-button {
     display: none;
   }
 }

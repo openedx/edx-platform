@@ -10,6 +10,7 @@ import sys
 import time
 import tarfile
 import shutil
+from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from lxml import etree
@@ -30,6 +31,7 @@ from django import forms
 from django.shortcuts import redirect
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -40,6 +42,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
+from xmodule.timeparse import parse_time, stringify_time
 from functools import partial
 from itertools import groupby
 from operator import attrgetter
@@ -106,9 +109,10 @@ def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location), courses)
+    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates', courses)
 
     return render_to_response('index.html', {
+        'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.metadata.get('display_name'),
                     reverse('course_index', args=[
                         course.location.org,
@@ -188,6 +192,7 @@ def edit_subsection(request, location):
             break
 
     lms_link = get_lms_link_for_item(location)
+    preview_link = get_lms_link_for_item(location, preview=True)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -207,14 +212,13 @@ def edit_subsection(request, location):
     policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
         if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
 
-    logging.debug(policy_metadata)
-
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'context_course': course,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
-                               'parent_item' : parent,
+                               'preview_link': preview_link,
+                               'parent_item': parent,
                                'policy_metadata' : policy_metadata
                                })
 
@@ -240,8 +244,8 @@ def edit_unit(request, location):
             course.location.course == item.location.course):
             break
 
-    # The non-draft location
-    lms_link = get_lms_link_for_item(item.location._replace(revision=None))
+    lms_link = get_lms_link_for_item(item.location)
+    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
 
     component_templates = defaultdict(list)
 
@@ -282,9 +286,10 @@ def edit_unit(request, location):
         'unit_location': location,
         'components': components,
         'component_templates': component_templates,
-        'draft_preview_link': lms_link,
+        'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
+        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.start))) if containing_subsection.start is not None else 'Unset',
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
@@ -480,20 +485,13 @@ def _xmodule_recurse(item, action):
         _xmodule_recurse(child, action)
 
     action(item)
-
-def _delete_item(item, recurse=False):
-    if recurse:
-        children = item.get_children()
-        for child in children:
-            _delete_item(child, recurse)
-        
-    modulestore().delete_item(item.location);
     
 
 @login_required
 @expect_json
 def delete_item(request):
     item_location = request.POST['id']
+    item_loc = Location(item_location)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -501,16 +499,28 @@ def delete_item(request):
 
     # optional parameter to delete all children (default False)
     delete_children = request.POST.get('delete_children', False)
+    delete_all_versions = request.POST.get('delete_all_versions', False)
 
     item = modulestore().get_item(item_location)
 
+    store = _modulestore(item_loc)
 
-    # @TODO: this probably leaves draft items dangling. 
+
+    # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
+    # if item.location.revision=None, then delete both draft and published version
+    # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: _modulestore(i.location).delete_item(i.location))
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location))
     else:
-        _modulestore(item.location).delete_item(item.location)
+        store.delete_item(item.location)
+
+    # cdodge: this is a bit of a hack until I can talk with Cale about the
+    # semantics of delete_item whereby the store is draft aware. Right now calling
+    # delete_item on a vertical tries to delete the draft version leaving the
+    # requested delete to never occur
+    if item.location.revision is None and item.location.category=='vertical' and delete_all_versions:
+        modulestore('direct').delete_item(item.location)       
 
     return HttpResponse()
 
@@ -524,13 +534,15 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
+    store = _modulestore(Location(item_location));
+
     if request.POST['data']:
         data = request.POST['data']
-        modulestore().update_item(item_location, data)
+        store.update_item(item_location, data)
         
     if request.POST['children']:
         children = request.POST['children']
-        modulestore().update_children(item_location, children)
+        store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
@@ -560,7 +572,7 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
 
         # commit to datastore
-        modulestore().update_metadata(item_location, existing_item.metadata)
+        store.update_metadata(item_location, existing_item.metadata)
 
     return HttpResponse()
 
@@ -845,9 +857,9 @@ def asset_index(request, org, course, name):
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
         
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
-        thumbnail_location = Location(asset.get('thumbnail_location', None))
-
-        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location)
+        _thumbnail_location = asset.get('thumbnail_location', None)
+        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
         
         asset_display.append(display_info)
 
@@ -862,6 +874,43 @@ def asset_index(request, org, course, name):
 # points to the temporary edge page
 def edge(request):
     return render_to_response('university_profiles/edge.html', {})
+
+@login_required
+@expect_json
+def create_new_course(request):
+    template = Location(request.POST['template'])
+    org = request.POST.get('org')   
+    number = request.POST.get('number')  
+    display_name = request.POST.get('display_name')   
+
+    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+
+    # see if the course already exists
+    existing_course = None
+    try:
+        existing_course = modulestore('direct').get_item(dest_location)
+    except ItemNotFoundError:
+        pass
+
+    if existing_course is not None:
+        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
+
+    new_course = modulestore('direct').clone_item(template, dest_location)
+
+    if display_name is not None:
+        new_course.metadata['display_name'] = display_name
+
+    # we need a 'data_dir' for legacy reasons
+    new_course.metadata['data_dir'] = uuid4().hex
+
+    # set a default start date to now
+    new_course.metadata['start'] = stringify_time(time.gmtime())
+
+    modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
+
+    create_all_course_groups(request.user, new_course.location)
+
+    return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 @ensure_csrf_cookie
 @login_required
@@ -929,4 +978,8 @@ def import_course(request, org, course, name):
         return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
+            'successful_import_redirect_url' : reverse('course_index', args=[
+                        course_module.location.org,
+                        course_module.location.course,
+                        course_module.location.name])
         })

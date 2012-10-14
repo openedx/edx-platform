@@ -32,9 +32,11 @@ $(document).ready(function() {
     $('.save-subsection').bind('click', saveSubsection);
 
     // making the unit list sortable
-    $('.sortable-unit-list').sortable();
-    $('.sortable-unit-list').disableSelection();
-    $('.sortable-unit-list').bind('sortstop', onUnitReordered);
+    $('.sortable-unit-list').sortable({
+        axis: 'y',
+        handle: '.drag-handle',
+        update: onUnitReordered
+    });
 
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
@@ -58,6 +60,23 @@ $(document).ready(function() {
         e.preventDefault();
         $('.import .file-input').click();
     });
+
+    // Subsection reordering
+    $('.unit-list ol').sortable({
+        axis: 'y',
+        handle: '.section-item .drag-handle',
+        update: onSubsectionReordered
+    });
+
+    // Section reordering
+    $('.courseware-overview').sortable({
+        axis: 'y',
+        handle: 'header .drag-handle',
+        update: onSectionReordered
+    });
+
+    $('.new-course-button').bind('click', addNewCourse);
+
 });
 
 function showImportSubmit(e) {
@@ -65,6 +84,7 @@ function showImportSubmit(e) {
     $('.file-name-block').show();
     $('.import .choose-file-button').hide();
     $('.submit-button').show();
+    $('.progress').show();
 }
 
 function syncReleaseDate(e) {
@@ -110,12 +130,7 @@ function onUnitReordered() {
     var subsection_id = $(this).data('subsection-id');
 
     var _els = $(this).children('li:.leaf');
-
-    var children = new Array();
-    for(var i=0;i<_els.length;i++) {
-	el = _els[i];
-	children[i] = $(el).data('id');
-    }
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
 
     // call into server to commit the new order
     $.ajax({
@@ -125,6 +140,38 @@ function onUnitReordered() {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'metadata' : null, 'data': null, 'children' : children})
 	});
+}
+
+function onSubsectionReordered() {
+    var section_id = $(this).data('section-id');
+
+    var _els = $(this).children('li:.branch');
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+
+    // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : section_id, 'metadata' : null, 'data': null, 'children' : children})
+    });
+}
+
+function onSectionReordered() {
+    var course_id = $(this).data('course-id');
+
+    var _els = $(this).children('section:.branch');
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+
+    // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : course_id, 'metadata' : null, 'data': null, 'children' : children})
+    });
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
@@ -241,7 +288,7 @@ function _deleteItem($el) {
     var id = $el.data('id');
     
     $.post('/delete_item', 
-       {'id': id, 'delete_children' : true}, 
+       {'id': id, 'delete_children' : true, 'delete_all_versions' : true}, 
        function(data) {
            $el.remove();
        });
@@ -306,7 +353,7 @@ function hideModal(e) {
 
 function onKeyUp(e) {
     if(e.which == 87) {
-        $body.toggleClass('show-wip');
+        $body.toggleClass('show-wip hide-wip');
     }
 }
 
@@ -406,6 +453,7 @@ function addNewSection(e) {
     $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
 }
 
+
 function saveNewSection(e) {
     e.preventDefault();
 
@@ -428,6 +476,48 @@ function saveNewSection(e) {
 function cancelNewSection(e) {
     e.preventDefault();
     $(this).parents('section.new-section').remove();
+}
+
+
+function addNewCourse(e) {
+    e.preventDefault();
+    var $newCourse = $($('#new-course-template').html());
+    $('.new-course-button').after($newCourse);
+    $newCourse.find('.new-course-org').focus().select();
+    $newCourse.find('.new-course-save').bind('click', saveNewCourse);
+    $newCourse.find('.new-course-cancel').bind('click', cancelNewCourse);
+}
+
+function saveNewCourse(e) {
+    e.preventDefault();
+
+    template = $(this).data('template');
+
+    org = $(this).prevAll('.new-course-org').val();
+    number = $(this).prevAll('.new-course-number').val();
+    display_name = $(this).prevAll('.new-course-name').val();
+
+    if (org == '' || number == '' || display_name == ''){
+        alert('You must specify all fields in order to create a new course.')
+    }
+
+    $.post('/create_new_course',
+       { 'template' : template,
+           'org' : org,
+           'number' : number,
+           'display_name': display_name,
+           },
+       function(data) {
+            if (data.id != undefined)
+               location.reload(); 
+            else if (data.ErrMsg != undefined)
+                alert(data.ErrMsg);
+       });    
+}
+
+function cancelNewCourse(e) {
+    e.preventDefault();
+    $(this).parents('section.new-course').remove();
 }
 
 function addNewSubsection(e) {
