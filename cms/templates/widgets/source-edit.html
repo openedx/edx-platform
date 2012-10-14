@@ -1,0 +1,109 @@
+<%
+  import hashlib
+  hlskey = hashlib.md5(module.location.url()).hexdigest()
+%>
+
+  <section id="hls-modal-${hlskey}" class="upload-modal modal" style="width:80%!important; left:30%!important; height:90%; overflow:auto; background:#ECF7D3;" >
+  <a href="#" class="close-button"><span class="close-icon"></span></a>
+  <div id="hls-div">
+    <header>
+      <h2>High Level Source Editing</h2>
+    </header>
+
+    <form id="hls-form">
+      <section class="source-edit">
+          <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${metadata['source_code']|h}</textarea>
+      </section>
+      <div class="submit">
+        <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
+        <button type="reset" class="hls-save">Save</button>
+        <button type="reset" class="hls-refresh">Refresh</button>
+      </div>
+    </form>
+
+  </div>
+  </section>
+    
+  <script type="text/javascript" src="/static/js/vendor/CodeMirror/stex.js"></script>
+  <script type="text/javascript">
+     $('#hls-trig-${hlskey}').leanModal({ top:40, overlay:0.8, closeButton: ".close-button"});
+
+     $('#hls-modal-${hlskey}').data('editor',CodeMirror.fromTextArea($('#hls-modal-${hlskey}').find('.hls-data')[0], {lineNumbers: true, mode: 'stex'}));
+
+     $('#hls-trig-${hlskey}').click(function(){slow_refresh_hls($('#hls-modal-${hlskey}'))})
+
+     // refresh button
+
+     $('#hls-modal-${hlskey}').find('.hls-refresh').click(function(){refresh_hls($('#hls-modal-${hlskey}'))});
+
+     function refresh_hls(el){
+	 el.data('editor').refresh();
+      }
+
+     function slow_refresh_hls(el){
+         el.delay(200).queue(function(){ 
+	       refresh_hls(el);
+	       $(this).dequeue(); 
+	   });
+     }
+
+     // compile & save button
+
+     $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
+     
+     function compile_hls_${hlskey}(){
+
+          editor = $('#hls-modal-${hlskey}').data('editor')
+          var myquery = { latexin: editor.getValue() };
+
+          $.ajax({
+              url: '${metadata.get('source_processor_url','https://qisx.mit.edu:5443/latex2edx')}',
+              type: 'GET',
+              contentType: 'application/json',
+              data: escape(JSON.stringify(myquery)),
+              crossDomain: true,
+              dataType: 'jsonp',
+              jsonpCallback: 'process_return_${hlskey}',
+              beforeSend: function (xhr) { xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
+              timeout : 7000,
+              success: function(result) {
+		  console.log(result);
+              },
+              error: function() {
+                  alert('Error: cannot connect to latex2edx server');
+                  console.log('error!');
+              }
+          });
+	  // $('#hls-modal-${hlskey}').hide();
+     }
+
+     function process_return_${hlskey}(datadict){
+          // datadict is json of array with "xml" and "message"
+          // if "xml" value is '' then the conversion failed
+          xml = datadict.xml;
+          console.log('xml:');
+          console.log(xml);
+          if (xml.length==0){
+              alert('Conversion failed!  error:'+ datadict.message);
+          }else{
+              set_raw_edit_box(xml,'${hlskey}');
+              save_hls($('#hls-modal-${hlskey}'));
+          }
+     }
+
+     function set_raw_edit_box(data,key){
+         // get the codemirror editor for the raw-edit-box
+         // it's a CodeMirror-wrap class element
+          $('#hls-modal-'+key).closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
+     }
+
+     // save button
+
+     $('#hls-modal-${hlskey}').find('.hls-save').click(function(){save_hls($('#hls-modal-${hlskey}'))});
+     
+     function save_hls(el){
+          el.find('.hls-data').val(el.data('editor').getValue());
+          el.closest('.component').find('.save-button').click();
+     }
+
+  </script>
