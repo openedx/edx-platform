@@ -210,8 +210,6 @@ def edit_subsection(request, location):
     policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
         if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
 
-    logging.debug(policy_metadata)
-
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'context_course': course,
@@ -483,20 +481,13 @@ def _xmodule_recurse(item, action):
         _xmodule_recurse(child, action)
 
     action(item)
-
-def _delete_item(item, recurse=False):
-    if recurse:
-        children = item.get_children()
-        for child in children:
-            _delete_item(child, recurse)
-        
-    modulestore().delete_item(item.location);
     
 
 @login_required
 @expect_json
 def delete_item(request):
     item_location = request.POST['id']
+    item_loc = Location(item_location)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -504,16 +495,28 @@ def delete_item(request):
 
     # optional parameter to delete all children (default False)
     delete_children = request.POST.get('delete_children', False)
+    delete_all_versions = request.POST.get('delete_all_versions', False)
 
     item = modulestore().get_item(item_location)
 
+    store = _modulestore(item_loc)
 
-    # @TODO: this probably leaves draft items dangling. 
+
+    # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
+    # if item.location.revision=None, then delete both draft and published version
+    # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: _modulestore(i.location).delete_item(i.location))
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location))
     else:
-        _modulestore(item.location).delete_item(item.location)
+        store.delete_item(item.location)
+
+    # cdodge: this is a bit of a hack until I can talk with Cale about the
+    # semantics of delete_item whereby the store is draft aware. Right now calling
+    # delete_item on a vertical tries to delete the draft version leaving the
+    # requested delete to never occur
+    if item.location.revision is None and item.location.category=='vertical' and delete_all_versions:
+        modulestore('direct').delete_item(item.location)       
 
     return HttpResponse()
 
@@ -885,9 +888,6 @@ def create_new_course(request):
 
     if existing_course is not None:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
-
-    logging.debug(dest_location)
-    logging.debug(template)
 
     new_course = modulestore('direct').clone_item(template, dest_location)
 

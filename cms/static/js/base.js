@@ -244,7 +244,7 @@ function _deleteItem($el) {
     var id = $el.data('id');
     
     $.post('/delete_item', 
-       {'id': id, 'delete_children' : true}, 
+       {'id': id, 'delete_children' : true, 'delete_all_versions' : true}, 
        function(data) {
            $el.remove();
        });
