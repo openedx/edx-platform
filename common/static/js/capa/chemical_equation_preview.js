@@ -1,7 +1,5 @@
 (function () {
     update = function() {
-        preview_div = $(this).siblings('div.equation');
-
         function create_handler(saved_div) {
             return (function(response) {
                 if (response.error) {
@@ -11,6 +9,9 @@
                 }
             });
         }
+
+        prev_id = "#" + this.id + "_preview";
+        preview_div = $(prev_id)
 
         $.get("/preview/chemcalc/", {"formula" : this.value}, create_handler(preview_div));
     }
