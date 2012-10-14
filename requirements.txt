@@ -16,7 +16,7 @@ beautifulsoup
 beautifulsoup4
 feedparser
 requests
-sympy
+http://sympy.googlecode.com/files/sympy-0.7.1.tar.gz
 newrelic
 glob2
 pymongo
