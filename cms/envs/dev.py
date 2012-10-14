@@ -53,7 +53,7 @@ DATABASES = {
     }
 }
 
-LMS_BASE = "http://localhost:8000"
+LMS_BASE = "localhost:8000"
 
 REPOS = {
     'edx4edx': {

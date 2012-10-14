@@ -10,6 +10,7 @@ import sys
 import time
 import tarfile
 import shutil
+from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from lxml import etree
@@ -191,6 +192,7 @@ def edit_subsection(request, location):
             break
 
     lms_link = get_lms_link_for_item(location)
+    preview_link = get_lms_link_for_item(location, preview=True)
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
@@ -215,7 +217,8 @@ def edit_subsection(request, location):
                                'context_course': course,
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
-                               'parent_item' : parent,
+                               'preview_link': preview_link,
+                               'parent_item': parent,
                                'policy_metadata' : policy_metadata
                                })
 
@@ -241,8 +244,8 @@ def edit_unit(request, location):
             course.location.course == item.location.course):
             break
 
-    # The non-draft location
-    lms_link = get_lms_link_for_item(item.location._replace(revision=None))
+    lms_link = get_lms_link_for_item(item.location)
+    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
 
     component_templates = defaultdict(list)
 
@@ -283,9 +286,10 @@ def edit_unit(request, location):
         'unit_location': location,
         'components': components,
         'component_templates': component_templates,
-        'draft_preview_link': lms_link,
+        'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
+        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.start))) if containing_subsection.start is not None else 'Unset',
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
@@ -530,13 +534,15 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
+    store = _modulestore(Location(item_location));
+
     if request.POST['data']:
         data = request.POST['data']
-        modulestore().update_item(item_location, data)
+        store.update_item(item_location, data)
         
     if request.POST['children']:
         children = request.POST['children']
-        modulestore().update_children(item_location, children)
+        store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
@@ -566,7 +572,7 @@ def save_item(request):
         existing_item.metadata.update(posted_metadata)
 
         # commit to datastore
-        modulestore().update_metadata(item_location, existing_item.metadata)
+        store.update_metadata(item_location, existing_item.metadata)
 
     return HttpResponse()
 

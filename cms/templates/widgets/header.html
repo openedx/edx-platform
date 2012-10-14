@@ -10,10 +10,10 @@
       <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.display_name}</a>
       <ul class="class-nav">
         <li><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='courseware-tab'>Courseware</a></li>
-        <li><a href="${reverse('static_pages', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}" id='pages-tab'>Pages</a></li>
+        <li><a href="${reverse('static_pages', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}" id='pages-tab' class="wip-box">Pages</a></li>
         <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='assets-tab'>Assets</a></li>
         <li><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}" id='users-tab'>Users</a></li>
-        <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab' class="">Import</a></li>
+        <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab'>Import</a></li>
       </ul>
       % endif
     </div>
