@@ -7,7 +7,6 @@ data: |
     <problem>
       <startouttext />
       Your goal for this lab is to design a circuit that implements a
-      <!-- \overline doesn't seem to render correctly -->
       3-input logic gate that implements \(Z = \lnot{(C(A+B))}\) where the
       \(\lnot\) symbol stands for logical negation. This function is
       enumerated in the following truth table:
