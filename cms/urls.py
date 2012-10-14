@@ -16,8 +16,7 @@ urlpatterns = ('',
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
-
-
+    url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),

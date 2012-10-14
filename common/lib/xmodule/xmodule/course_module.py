@@ -16,6 +16,8 @@ log = logging.getLogger(__name__)
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
+    template_dir_name = 'course'
+
     class Textbook:
         def __init__(self, title, book_url):
             self.title = title
@@ -64,7 +66,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-
         self.textbooks = []
         for title, book_url in self.definition['data']['textbooks']:
             try:
