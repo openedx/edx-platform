@@ -13,9 +13,4 @@ MITX_FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 for nginx ssl proxy
 
-MITX_ROOT_URL = 'https://qisx.mit.edu:442'
-#MITX_ROOT_URL = 'cms'
-
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/login'
-LOGIN_URL = MITX_ROOT_URL + '/login'
 
