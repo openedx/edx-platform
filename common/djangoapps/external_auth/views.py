@@ -293,6 +293,8 @@ def add_openid_simple_registration(request, response, data):
                 sreg_data['email'] = data['email']
             elif field == 'fullname' and 'fullname' in data:
                 sreg_data['fullname'] = data['fullname']
+            elif field == 'nickname' and 'nickname' in data:
+                sreg_data['nickname'] = data['nickname']
 
         # construct sreg response
         sreg_response = sreg.SRegResponse.extractResponse(sreg_request,
@@ -486,13 +488,22 @@ def provider_login(request):
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
 
-            return provider_respond(server,
-                                    openid_request,
-                                    response,
-                                    {
-                                        'fullname': profile.name,
-                                        'email': user.email
-                                    })
+            # TODO: for CS50 we are forcibly returning only the
+            # username. Following the OpenID simple registration
+            # extension, we don't have to return any fields we don't
+            # want to, even if they were marked as required by the
+            # Consumer. The behavior of what to do when there are
+            # missing fields is up to the Consumer. The proper change
+            # will only return the username, however this will likely
+            # break the CS50 client. Temporarily we will be returning
+            # username filling in for email and fullname in addition
+            # to username as sreg nickname.
+            results = {
+                'nickname': user.username,
+                'email': user.username,
+                'fullname': user.username
+                }
+            return provider_respond(server, openid_request, response, results)
 
         request.session['openid_error'] = True
         msg = "Login failed - Account not active for user {0}".format(username)
