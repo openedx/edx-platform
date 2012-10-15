@@ -102,6 +102,12 @@ input.courseware-unit-search-input {
 			border-top-width: 0;
 		}
 	}
+
+	&.new-section {
+		.expand-collapse-icon {
+			visibility: hidden;
+		}
+	}
 }
 
 .new-section-name,
