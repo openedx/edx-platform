@@ -483,7 +483,7 @@ function addNewCourse(e) {
     e.preventDefault();
     var $newCourse = $($('#new-course-template').html());
     $('.new-course-button').after($newCourse);
-    $newCourse.find('.new-course-org').focus().select();
+    $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('.new-course-save').bind('click', saveNewCourse);
     $newCourse.find('.new-course-cancel').bind('click', cancelNewCourse);
 }
