@@ -109,7 +109,7 @@ def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates', courses)
+    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates' and course.location.org!='' and course.location.course!='' and course.location.name!='', courses)
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
@@ -272,6 +272,26 @@ def edit_unit(request, location):
 
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
+
+    # cdodge hack. We're having trouble previewing drafts via jump_to redirect
+    # so let's generate the link url here 
+
+    # need to figure out where this item is in the list of children as the preview will need this
+    index =1
+    for child in containing_subsection.get_children():
+        if child.location == item.location:
+            break
+        index = index + 1
+
+    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview='preview.',
+            lms_base=settings.LMS_BASE,            
+            org=course.location.org,
+            course=course.location.course, 
+            course_name=course.location.name, 
+            section=containing_section.location.name, 
+            subsection=containing_subsection.location.name, 
+            index=index)
 
     unit_state = compute_unit_state(item)
 

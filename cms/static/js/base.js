@@ -491,11 +491,13 @@ function addNewCourse(e) {
 function saveNewCourse(e) {
     e.preventDefault();
 
+    var $newCourse = $(this).closest('.new-course');
+
     template = $(this).data('template');
 
-    org = $(this).prevAll('.new-course-org').val();
-    number = $(this).prevAll('.new-course-number').val();
-    display_name = $(this).prevAll('.new-course-name').val();
+    org = $newCourse.find('.new-course-org').val();
+    number = $newCourse.find('.new-course-number').val();
+    display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == ''){
         alert('You must specify all fields in order to create a new course.');

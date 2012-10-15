@@ -67,4 +67,28 @@
       white-space: normal;
     }
   }
+
+  .progress-bar {
+    display: none;
+    width: 350px;
+    height: 30px;
+    margin: 30px auto 10px;
+    border: 1px solid $blue;
+
+    &.loaded {
+      border-color: #66b93d;
+
+      .progress-fill {
+        background: #66b93d;
+      }
+    }
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 30px;
+    background: $blue;
+    color: #fff;
+    line-height: 48px;
+  }
 }
