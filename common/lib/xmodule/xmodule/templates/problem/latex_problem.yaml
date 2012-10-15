@@ -64,85 +64,93 @@ metadata:
         \edXabox{expect="[1,9]" type="custom" cfn="sumtest"}
 
 data: |
-        <?xml version="1.0"?>
-        <problem>
-          <text>
-            <p>
-              <h4>Example "option" problem</h4>
-            </p>
-            <p>
-        Where is the earth? </p>
-            <p>
-              <optionresponse>
-                <optioninput options="('up','down')" correct="down"/>
-              </optionresponse>
-            </p>
-            <p>
-              <h4>Example "symbolic" problem</h4>
-            </p>
-            <p>
-        What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]? </p>
-            <p>
-              <symbolicresponse expect="m*c^2">
-                <textline size="90" correct_answer="m*c^2" math="1"/>
-              </symbolicresponse>
-            </p>
-            <p>
-              <h4>Example "numerical" problem</h4>
-            </p>
-            <p>
-        Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low flow shower heads. </p>
-            <p>
-              <p style="display:inline">Energy saved = </p>
-              <numericalresponse answer="0.52">
-                <textline inline="1">
-                  <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
-                </textline>
-              </numericalresponse>
-              <p style="display:inline">&#xA0;EJ/year</p>
-            </p>
-            <p>
-              <h4>Example "multiple choice" problem</h4>
-            </p>
-            <p>
-        What color is a bannana? </p>
-            <p>
-              <multiplechoiceresponse>
-                <choicegroup direction="vertical">
-                  <choice correct="false" name="1">&lt;span&gt; Red&lt;/span&gt;</choice>
-                  <choice correct="false" name="2">&lt;span&gt; Green&lt;/span&gt;</choice>
-                  <choice correct="true" name="3">&lt;span&gt; Yellow&lt;/span&gt;</choice>
-                  <choice correct="false" name="4">&lt;span&gt; Blue&lt;/span&gt;</choice>
-                </choicegroup>
-              </multiplechoiceresponse>
-            </p>
-            <p>
-              <h4>Example "string response" problem</h4>
-            </p>
-            <p>
-        In what U.S. state is Detroit located? </p>
-            <p>
-              <stringresponse answer="Michigan">
-                <textline/>
-              </stringresponse>
-            </p>
-            <p>
-              <h4>Example "custom response" problem</h4>
-            </p>
-            <p>
-        This problem demonstrates the use of a custom python script used for checking the answer. </p>
-            <script type="text/python" system_path="python_lib">
-        def sumtest(expect,ans):
-            (a1,a2) = map(float,eval(ans))
-            return (a1+a2)==10
-        </script>
-            <p>
-        Enter a python list of two numbers which sum to 10, eg [9,1]: </p>
-            <p>
-              <customresponse cfn="sumtest" expect="[1,9]">
-                <textline correct_answer="[1,9]"/>
-              </customresponse>
-            </p>
-          </text>
-        </problem>
+    <?xml version="1.0"?>
+    <problem>
+      <text>
+        <p>
+          <h4>Example "option" problem</h4>
+        </p>
+        <p>
+    Where is the earth? </p>
+        <p>
+          <optionresponse>
+            <optioninput options="('up','down')" correct="down"/>
+          </optionresponse>
+        </p>
+        <p>
+          <h4>Example "symbolic" problem</h4>
+        </p>
+        <p>
+    What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]? </p>
+        <p>
+          <symbolicresponse expect="m*c^2">
+            <textline size="90" correct_answer="m*c^2" math="1"/>
+          </symbolicresponse>
+        </p>
+        <p>
+          <h4>Example "numerical" problem</h4>
+        </p>
+        <p>
+    Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low flow shower heads. </p>
+        <p>
+          <p style="display:inline">Energy saved = </p>
+          <numericalresponse inline="1" answer="0.52">
+            <textline inline="1">
+              <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
+            </textline>
+          </numericalresponse>
+          <p style="display:inline">&#xA0;EJ/year</p>
+        </p>
+        <p>
+          <h4>Example "multiple choice" problem</h4>
+        </p>
+        <p>
+    What color is a bannana? </p>
+        <p>
+          <choiceresponse>
+            <checkboxgroup>
+              <choice correct="false" name="1">
+                <text>Red</text>
+              </choice>
+              <choice correct="false" name="2">
+                <text>Green</text>
+              </choice>
+              <choice correct="true" name="3">
+                <text>Yellow</text>
+              </choice>
+              <choice correct="false" name="4">
+                <text>Blue</text>
+              </choice>
+            </checkboxgroup>
+          </choiceresponse>
+        </p>
+        <p>
+          <h4>Example "string response" problem</h4>
+        </p>
+        <p>
+    In what U.S. state is Detroit located? </p>
+        <p>
+          <stringresponse answer="Michigan">
+            <textline/>
+          </stringresponse>
+        </p>
+        <p>
+          <h4>Example "custom response" problem</h4>
+        </p>
+        <p>
+    This problem demonstrates the use of a custom python script used for checking the answer. </p>
+        <script type="text/python" system_path="python_lib">
+    def sumtest(expect,ans):
+        (a1,a2) = map(float,eval(ans))
+        return (a1+a2)==10
+    </script>
+        <p>
+    Enter a python list of two numbers which sum to 10: </p>
+        <p>
+          <customresponse cfn="sumtest" expect="[1,9]">
+            <textline correct_answer="[1,9]"/>
+          </customresponse>
+        </p>
+      </text>
+    </problem>
 children: []
