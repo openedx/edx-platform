@@ -1,4 +1,6 @@
 <%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+
 <%block name="title">Sign up</%block>
 <%block name="bodyclass">no-header</%block>
 
@@ -82,7 +84,7 @@
         submit_data,
         function(json) {
           if(json.success) {
-            $('#register').html(json.value);
+            location.href = "${reverse('index')}";
           } else {
             $('#register_error').html(json.value).stop().slideDown(150);
           }

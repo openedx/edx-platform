@@ -23,6 +23,7 @@
 		<div class="inner-wrapper">
 			<h1>My Courses</h1>
 			<article class="my-classes">
+				% if user.is_active:
 				<a href="#" class="new-course-button"><span class="plus-icon"></span> New Course</a>
 				<ul class="class-list">
 					%for course, url in courses:
@@ -35,8 +36,15 @@
 							-->
 						</a>
 					</li>
-			    %endfor
+			    	%endfor
 				</ul>
+				% else:
+					<div class='warn-msg'>
+						<p>
+						In order to start authoring courses using edX studio, please click on the activation link in your email.
+						</p>
+					</div>
+				% endif
 			</article>
 		</div>
 	</div>
