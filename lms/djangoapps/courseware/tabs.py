@@ -97,6 +97,18 @@ def _textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
+
+# This is a hack for fall 2012 -- pull cs50 grades from their API when a student
+# clicks on the progress tab.  This might be a reasonable thing to do more
+# broadly later, but will need a well defined and documented API.
+def _cs50_progress(tab, user, course, active_page):
+    """
+    Generates a tab that calls the CS50 gradebook API and renders progress.
+    """
+    link = reverse('progress50', args=[course.id])
+    return [CourseTab(tab['name'], link, active_page=='progress50')]
+
+
 #### Validators
 
 
@@ -132,6 +144,7 @@ VALID_TAB_TYPES = {
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
+    'cs50_progress': TabImpl(key_checker(['name', 'link']), _cs50_progress),
     }
 
 
