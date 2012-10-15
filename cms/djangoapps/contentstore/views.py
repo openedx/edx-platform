@@ -118,7 +118,8 @@ def index(request):
                         course.location.org,
                         course.location.course,
                         course.location.name]))
-                    for course in courses]
+                    for course in courses],
+        'user': request.user
     })
 
 
