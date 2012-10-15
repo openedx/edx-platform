@@ -369,6 +369,9 @@ class ResourceTemplates(object):
             return []
 
         for template_file in resource_listdir(__name__, dirname):
+            if not template_file.endswith('.yaml'):
+                log.warning("Skipping unknown template file %s" % template_file)
+                continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
             template = yaml.load(template_content)
             templates.append(Template(**template))

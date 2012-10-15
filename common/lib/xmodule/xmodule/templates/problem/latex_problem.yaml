@@ -47,6 +47,13 @@ metadata:
         
         \edXabox{ type="string" expect="Michigan" options="ci" }
         
+        An explanation of the answer can be provided by using the edXsolution
+        macro.  Click on "Show Answer" to see the solution.
+        
+        \begin{edXsolution}
+        Detroit is near Canada, but it is actually in the United States.
+        \end{edXsolution}
+                
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \subsection{Example "custom response" problem}
         
@@ -62,6 +69,23 @@ metadata:
         Enter a python list of two numbers which sum to 10, eg [9,1]:
         
         \edXabox{expect="[1,9]" type="custom" cfn="sumtest"}
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example image}
+        
+        Include image by using the edXxml macro:
+        
+        \edXxml{<img src="http://autoid.mit.edu/images/mit_dome.jpg"/>}
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example show/hide explanation}
+        
+        Extra explanations can be tucked away behind a "showhide" toggle flag:
+        
+        \edXshowhide{sh1}{More explanation}{This is a hidden explanation.  It
+        can contain equations: $\alpha = \frac{2}{\sqrt{1+\gamma}}$ }
+        
+        This is some text after the showhide example.
 
 data: |
     <?xml version="1.0"?>
@@ -135,6 +159,14 @@ data: |
           </stringresponse>
         </p>
         <p>
+    An explanation of the answer can be provided by using the edXsolution macro: </p>
+        <p>
+          <solution>
+            <font color="blue">Answer: </font>
+            <font color="blue">Detroit is near Canada, but it is actually in the United States. </font>
+          </solution>
+        </p>
+        <p>
           <h4>Example "custom response" problem</h4>
         </p>
         <p>
@@ -145,11 +177,41 @@ data: |
         return (a1+a2)==10
     </script>
         <p>
-    Enter a python list of two numbers which sum to 10: </p>
+    Enter a python list of two numbers which sum to 10, eg [9,1]: </p>
         <p>
           <customresponse cfn="sumtest" expect="[1,9]">
             <textline correct_answer="[1,9]"/>
           </customresponse>
+        </p>
+        <p>
+          <h4>Example image</h4>
+        </p>
+        <p>
+    Include image by using the edXxml macro: </p>
+        <p>
+          <img src="http://autoid.mit.edu/images/mit_dome.jpg"/>
+        </p>
+        <p>
+          <h4>Example show/hide explanation</h4>
+        </p>
+        <p>
+    Extra explanations can be tucked away behind a "showhide" toggle flag: </p>
+        <p>
+          <table class="wikitable collapsible collapsed">
+            <tbody>
+              <tr>
+                <th> More explanation [<a href="javascript:$('#sh1').toggle()" id="sh1l">show</a>]</th>
+              </tr>
+              <tr id="sh1" style="display:none">
+                <td>
+                  <p>
+    This is a hidden explanation. It can contain equations: [mathjaxinline]\alpha = \frac{2}{\sqrt {1+\gamma }}[/mathjaxinline]  </p>
+                  <p>
+    This is some text after the showhide example. </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </p>
       </text>
     </problem>
