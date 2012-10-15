@@ -117,6 +117,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
+    if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
+      return
     $component = $(event.currentTarget).parents('.component')
     $.post('/delete_item', {
       id: $component.data('id')
