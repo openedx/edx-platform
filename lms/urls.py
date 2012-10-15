@@ -52,6 +52,7 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
+    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'UTx'}),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -88,6 +89,8 @@ urlpatterns = ('',
         {'template': 'press_releases/edX_announces_proctored_exam_testing.html'}, name="press/edX-announces-proctored-exam-testing"),
     url(r'^press/elsevier-collaborates-with-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Elsevier_collaborates_with_edX.html'}, name="press/elsevier-collaborates-with-edx"),
+    url(r'^press/ut-joins-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
 
 
     # Should this always update to point to the latest press release?

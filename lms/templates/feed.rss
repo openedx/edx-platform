@@ -6,16 +6,24 @@
   <link type="text/html" rel="alternate" href="http://blog.edx.org/"/>
   ##<link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
   <title>EdX Blog</title>
-  <updated>2012-07-16T14:08:12-07:00</updated>
+  <updated>2012-10-14T14:08:12-07:00</updated>
   <entry>
-    <id>tag:www.edx.org,2012:Post/5</id>
-    <published>2012-09-25T14:00:00-07:00</published>
-    <updated>2012-09-25T14:00:00-07:00</updated>
-    <link type="text/html" rel="alternate" href="${reverse('press/elsevier-collaborates-with-edx')}"/>
-    <title>Elsevier collaborates with edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/foundations-of-analog-109x84.jpg')}&quot; /&gt;
-      &lt;p&gt;Free course textbook made available to edX students&lt;/p&gt;</content>
+    <id>tag:www.edx.org,2012:Post/6</id>
+    <published>2012-10-15T14:00:00-07:00</published>
+    <updated>2012-10-14T14:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="${reverse('press/ut-joins-edx')}"/>
+    <title>The University of Texas System joins edX</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/uts-seal_109x84.jpg')}&quot; /&gt;</content>
   </entry>
+  <!-- <entry> -->
+  <!--   <id>tag:www.edx.org,2012:Post/5</id> -->
+  <!--   <published>2012-09-25T14:00:00-07:00</published> -->
+  <!--   <updated>2012-09-25T14:00:00-07:00</updated> -->
+  <!--   <link type="text/html" rel="alternate" href="${reverse('press/elsevier-collaborates-with-edx')}"/> -->
+  <!--   <title>Elsevier collaborates with edX</title> -->
+  <!--   <content type="html">&lt;img src=&quot;${static.url('images/press/foundations-of-analog-109x84.jpg')}&quot; /&gt; -->
+  <!--     &lt;p&gt;Free course textbook made available to edX students&lt;/p&gt;</content> -->
+  <!-- </entry> -->
   <entry>
     <id>tag:www.edx.org,2012:Post/4</id>
     <published>2012-09-06T14:00:00-07:00</published>
