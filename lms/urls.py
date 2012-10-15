@@ -154,6 +154,14 @@ if settings.COURSEWARE_ENABLED:
         url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
             name='preview_chemcalc'),
 
+        # Software Licenses
+
+        # TODO: for now, this is the endpoint of an ajax replay
+        # service that retrieve and assigns license numbers for
+        # software assigned to a course. The numbers have to be loaded
+        # into the database.
+        url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
