@@ -498,7 +498,8 @@ function saveNewCourse(e) {
     display_name = $(this).prevAll('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == ''){
-        alert('You must specify all fields in order to create a new course.')
+        alert('You must specify all fields in order to create a new course.');
+        return;
     }
 
     $.post('/create_new_course',
