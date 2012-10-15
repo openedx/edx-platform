@@ -63,7 +63,7 @@ class StudentInputError(Exception):
 
 
 class LoncapaResponse(object):
-    '''
+    """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
     which is part of a capa problem) is represented as a subclass,
     which should provide the following methods:
@@ -89,7 +89,7 @@ class LoncapaResponse(object):
       - required_attributes  : list of required attributes (each a string) on the main response XML stanza
       - hint_tag             : xhtml tag identifying hint associated with this response inside hintgroup
 
-    '''
+    """
     __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
     response_tag = None
@@ -164,6 +164,8 @@ class LoncapaResponse(object):
           - renderer : procedure which produces HTML given an ElementTree
         '''
         tree = etree.Element('span')			# render ourself as a <span> + our content
+        if self.xml.get('inline',''):			# problem author can make this span display:inline
+            tree.set('class','inline')
         for item in self.xml:
             item_xhtml = renderer(item)			# call provided procedure to do the rendering
             if item_xhtml is not None: tree.append(item_xhtml)

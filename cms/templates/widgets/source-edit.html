@@ -45,6 +45,9 @@
 	       refresh_hls(el);
 	       $(this).dequeue(); 
 	   });
+	 // resize the codemirror box
+	 h = el.height();
+	 el.find('.CodeMirror-scroll').height(h-100);
      }
 
      // compile & save button
