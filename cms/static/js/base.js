@@ -80,11 +80,17 @@ $(document).ready(function() {
 });
 
 function showImportSubmit(e) {
-    $('.file-name').html($(this).val())
-    $('.file-name-block').show();
-    $('.import .choose-file-button').hide();
-    $('.submit-button').show();
-    $('.progress').show();
+    var filepath = $(this).val();
+    if(filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
+        $('.error-block').hide();
+        $('.file-name').html($(this).val());
+        $('.file-name-block').show();
+        $('.import .choose-file-button').hide();
+        $('.submit-button').show();
+        $('.progress').show();    
+    } else {
+        $('.error-block').html('File format not supported. Please upload a file with a <code>tar.gz</code> extension.').show();
+    }
 }
 
 function syncReleaseDate(e) {

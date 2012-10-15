@@ -11,15 +11,17 @@
     <h1>Import</h1>
     <article class="import-overview">
       <div class="description">
-        <h3>Importing a new course will delete all course content currently associated with your course
-        and replace it with the contents of the uploaded file.</h3>
+        <h2>Please <a href="#">read the documentation</a> before attempting an import!</h2>
+        <p><strong>Importing a new course will delete all content currently associated with your course
+        and replace it with the contents of the uploaded file.</strong></p>
         <p>File uploads must be zip files containing, at a minimum, a <code>course.xml</code> file.</p>
         <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
         re-importing your course could cause the loss of student data associated with those problems.</p>
       </div>
       <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
         <h2>Course to import:</h2>
-        <a href="#" class="choose-file-button">Choose File</a>
+        <p class="error-block"></p>
+        <a href="#" class="choose-file-button">Choose File</a>        
         <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
         <input type="file" name="course-data" class="file-input">
         <input type="submit" value="Replace my course with the one above" class="submit-button">

@@ -11,11 +11,15 @@
     margin-right: 3%;
     font-size: 14px;
 
-    h3 {
-      margin-bottom: 20px;
-      font-size: 18px;
+    h2 {
       font-weight: 700;
-      color: $error-red;
+      font-size: 19px;
+      margin-bottom: 20px;
+    }
+
+    strong {
+      font-weight: 700;
+      // color: $error-red;
     }
 
     p + p {
@@ -39,10 +43,15 @@
       font-weight: 300;
     }
 
-    .file-name-block {
+    .file-name-block,
+    .error-block {
       display: none;
       margin-bottom: 15px;
       font-size: 13px;
+    }
+
+    .error-block {
+      color: $error-red;
     }
 
     .choose-file-button {
