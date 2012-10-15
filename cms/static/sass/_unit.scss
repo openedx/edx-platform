@@ -57,7 +57,7 @@
       border: 1px solid #d1ddec;
       border-radius: 3px;
       background: #fff;
-      @include transition(border-color .15s);
+      @include transition(none);
 
       &:hover {
         border-color: #6696d7;
