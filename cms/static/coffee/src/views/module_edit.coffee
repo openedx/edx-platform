@@ -57,12 +57,12 @@ class CMS.Views.ModuleEdit extends Backbone.View
     data = @module.save()
     data.metadata = @metadata()
     @model.save(data).done( =>
-      alert("Your changes have been saved.")
+      showToastMessage("Your changes have been saved.", null, 3)
       @module = null
       @render()
       @$el.removeClass('editing')
     ).fail( ->
-      alert("There was an error saving your changes. Please try again.")
+      showToastMessage("There was an error saving your changes. Please try again.", null, 3)
     )
 
   clickCancelButton: (event) ->
