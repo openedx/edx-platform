@@ -500,7 +500,7 @@ def provider_login(request):
             # to username as sreg nickname.
             results = {
                 'nickname': user.username,
-                'email': user.username,
+                'email': user.email,
                 'fullname': user.username
                 }
             return provider_respond(server, openid_request, response, results)
