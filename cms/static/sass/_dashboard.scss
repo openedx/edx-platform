@@ -42,3 +42,56 @@
 	padding: 20px;
 	text-align: center;
 }
+
+.new-course {
+	padding: 15px 25px;
+	margin-top: 20px;
+	border-radius: 3px;
+	border: 1px solid $darkGrey;	
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	@include clearfix;
+
+	.row {
+		margin-bottom: 15px;
+		@include clearfix;
+	}
+
+	.column {
+		float: left;
+		width: 48%;
+	}
+
+	.column:first-child {
+		margin-right: 4%;
+	}
+
+	.course-info {
+		width: 600px;
+	}
+
+	label {
+		display: block;
+		font-size: 13px;
+		font-weight: 700;
+	}
+
+	.new-course-org,
+	.new-course-number,
+	.new-course-name {
+		width: 100%;
+	}
+
+	.new-course-name {
+		font-size: 19px;
+		font-weight: 300;
+	}
+
+	.new-course-save {
+		@include blue-button;
+	}
+
+	.new-course-cancel {
+		@include white-button;
+	}
+}

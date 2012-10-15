@@ -109,7 +109,7 @@ def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates', courses)
+    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates' and course.location.org!='' and course.location.course!='' and course.location.name!='', courses)
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
