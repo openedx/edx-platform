@@ -98,22 +98,6 @@ DATABASES = {
         'NAME': PROJECT_ROOT / "db" / "mitx.db",
     },
 
-    # The following are for testing purposes...
-    'edX/toy/2012_Fall': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course1.db",
-    },
-
-    'edx/full/6.002_Spring_2012': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course2.db",
-    },
-
-    'edX/toy/TT_2012_Fall': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course3.db",
-    },
-
 }
 
 CACHES = {
