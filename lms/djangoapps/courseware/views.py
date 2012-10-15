@@ -325,6 +325,11 @@ def jump_to(request, course_id, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
+    if position is None:
+        return redirect('courseware_section', course_id=course_id,
+                    chapter=chapter,
+                    section=section)
+
     # Rely on index to do all error handling and access control.
     return redirect('courseware_position',
                     course_id=course_id,
