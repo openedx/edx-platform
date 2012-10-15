@@ -499,8 +499,6 @@ function saveNewCourse(e) {
     number = $newCourse.find('.new-course-number').val();
     display_name = $newCourse.find('.new-course-name').val();
 
-    console.log(org);
-
     if (org == '' || number == '' || display_name == ''){
         alert('You must specify all fields in order to create a new course.')
     }
