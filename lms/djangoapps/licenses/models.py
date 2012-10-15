@@ -65,7 +65,7 @@ def _create_license(user, software):
         # table/rows with select_for_update to prevent race conditions
         with transaction.commit_on_success():
             selected = UserLicense.objects.select_for_update()
-            license = selected.filter(user__isnull=True)[0]
+            license = selected.filter(user__isnull=True, software=software)[0]
             license.user = user
             license.save()
     except IndexError:
