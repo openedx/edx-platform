@@ -325,10 +325,11 @@ def jump_to(request, course_id, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
+    # cdodge: the CAS is generating a link to the LMS for 'subsections' (aka sequentials)
+    # and there is no associated 'Position' for this. The above Path_to_location is returning None for Position
+    # however, this ends up producing a 404 on the redirect
     if position is None:
-        return redirect('courseware_section', course_id=course_id,
-                    chapter=chapter,
-                    section=section)
+        position = 0
 
     # Rely on index to do all error handling and access control.
     return redirect('courseware_position',
