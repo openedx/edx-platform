@@ -45,7 +45,7 @@ input.courseware-unit-search-input {
 	}
 
 	header {
-		height: 67px;
+		height: 47px;
 
 		.item-details {
 			float: left;
@@ -80,6 +80,7 @@ input.courseware-unit-search-input {
 	}
 
 	h4 {
+		display: none;
 		font-size: 12px;
 		color: #878e9d;
 
@@ -104,6 +105,11 @@ input.courseware-unit-search-input {
 	}
 
 	&.new-section {
+		header {
+			height: auto;
+			@include clearfix;
+		}
+
 		.expand-collapse-icon {
 			visibility: hidden;
 		}
@@ -120,12 +126,14 @@ input.courseware-unit-search-input {
 	@include blue-button;
 	padding: 2px 20px 5px;
 	margin: 0 5px;
+	color: #fff !important;
 }
 
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
 	padding: 2px 20px 5px;
+	color: #8891a1 !important;
 }
 
 .dummy-calendar {
