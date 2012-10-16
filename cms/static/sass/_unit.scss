@@ -323,6 +323,7 @@
 
   .save-button {
     @include blue-button;
+    display: none;
   }
 
   .save-button,

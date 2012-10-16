@@ -4,6 +4,8 @@ var $modalCover;
 var $newComponentItem;
 var $newComponentStep1;
 var $newComponentStep2;
+var $changedInput;
+var $spinner;
 
 $(document).ready(function() {
     $body = $('body');
@@ -13,6 +15,7 @@ $(document).ready(function() {
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
+    $spinner = $('<span class="spinner-in-field-icon"></span>');
     $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
@@ -30,6 +33,14 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
     $('.save-subsection').bind('click', saveSubsection);
+
+    // autosave when a field is updated on the subsection page
+    $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value', checkForNewValue);
+    $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function(i) {
+        this.nameString = $(this).val();
+    });
+    $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
+    $('.sync-date, .remove-date').bind('click', autosaveInput);
 
     // making the unit list sortable
     $('.sortable-unit-list').sortable({
@@ -207,8 +218,45 @@ function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
     return getEdxTimeFromDateTimeVals(input_date, input_time, format);
 }
 
+function checkForNewValue(e) {
+    this.hasChanged = this.nameString != $(this).val() && this.nameString;
+    this.nameString = $(this).val();
+    if(this.hasChanged) {
+        if(this.saveTimer) {
+            clearTimeout(this.saveTimer);
+        }
+
+        this.saveTimer = setTimeout(function() {
+            $changedInput = $(e.target);
+            $('.save-subsection').click();
+            this.saveTimer = null;
+        }, 500);
+    }
+}
+
+function autosaveInput(e) {
+    if(this.saveTimer) {
+        clearTimeout(this.saveTimer);
+    }
+
+    this.saveTimer = setTimeout(function() {
+        $changedInput = $(e.target);
+        $('.save-subsection').click();
+        this.saveTimer = null;
+    }, 500);
+}
+
 function saveSubsection(e) {
     e.preventDefault();
+
+    // add an inline spinner
+    $spinner.css({
+        'position': 'absolute',
+        'top': Math.floor($changedInput.position().top + ($changedInput.outerHeight() / 2) + 3),
+        'left': $changedInput.position().left + $changedInput.outerWidth() - 24,
+        'margin-top': '-10px'
+    });
+    $changedInput.after($spinner);
     
     var id = $(this).data('id');
 
@@ -252,10 +300,10 @@ function saveSubsection(e) {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : id, 'metadata' : metadata, 'data': null, 'children' : children}),
 		success: function() {
-        showToastMessage('Your changes have been saved.', null, 3);
+            $spinner.delay(500).fadeOut(150);
 	    },
 		error: function() {
-        showToastMessage('There has been an error while saving your changes.', null, 3);
+            showToastMessage('There has been an error while saving your changes.');
 	    }
 	});
 }
