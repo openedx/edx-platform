@@ -188,6 +188,14 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     $('.unit-location .editing .unit-name').html(metadata.display_name)
     @model.set('metadata', metadata)
 
+    # save the name after a slight delay
+    if @timer
+      clearTimeout @timer      
+    @timer = setTimeout( =>
+      @model.save()
+      @timer = null
+    , 500)
+
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
     @model.on('change:state', @render)
