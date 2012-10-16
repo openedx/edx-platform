@@ -618,12 +618,14 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Problem is closed"
+            return {'success': False,
+                    'error': "Problem is closed"}
 
         if not self.lcp.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Refresh the page and make an attempt before resetting."
+            return {'success': False,
+                    'error': "Refresh the page and make an attempt before resetting."}
 
         self.lcp.do_reset()
         if self.rerandomize in ["always", "onreset"]:

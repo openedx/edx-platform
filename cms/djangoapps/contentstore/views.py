@@ -37,6 +37,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from github_sync import export_to_github
 from static_replace import replace_urls
+from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
@@ -88,7 +89,7 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
-
+@ssl_login_shortcut
 @ensure_csrf_cookie
 def login_page(request):
     """

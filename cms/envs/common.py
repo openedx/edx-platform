@@ -32,7 +32,8 @@ from xmodule.static_content import write_descriptor_styles, write_descriptor_js,
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
-    'ENABLE_DISCUSSION_SERVICE': False
+    'ENABLE_DISCUSSION_SERVICE': False,
+    'AUTH_USE_MIT_CERTIFICATES' : False,
 }
 
 # needed to use lms student app

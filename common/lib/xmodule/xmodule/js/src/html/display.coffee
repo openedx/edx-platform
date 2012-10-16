@@ -1,8 +1,9 @@
 class @HTMLModule
 
   constructor: (@element) ->
-  	@el = $(@element)
-  	@setCollapsibles()
+    @el = $(@element)
+    @setCollapsibles()
+    MathJax.Hub.Queue ["Typeset", MathJax.Hub, @el[0]]
 
   $: (selector) ->
     $(selector, @el)
