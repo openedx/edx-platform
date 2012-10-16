@@ -726,6 +726,9 @@ def crystallography(element, value, status, render_template, msg=''):
     escapedict = {'"': '&quot;'}
     value = saxutils.escape(value, escapedict)
 
+    molecules = element.get('molecules')
+    geometries = element.get('geometries')
+
     context = {'id': eid,
                'value': value,
                'state': status,
@@ -782,6 +785,8 @@ def vsepr_input(element, value, status, render_template, msg=''):
                'width': width,
                'height': height,
                'display_file': display_file,
+               'molecules': molecules,
+               'geometries': geometries,
                }
 
     html = render_template("vsepr_input.html", context)
