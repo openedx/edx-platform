@@ -732,7 +732,7 @@ This view will return all CMS users who are editors for the specified course
 def manage_users(request, location):
     
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=EDITOR_ROLE_NAME):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(location)
@@ -742,7 +742,9 @@ def manage_users(request, location):
         'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
-        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/')
+        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/'),
+        'allow_actions' : has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
+        'request_user_id' : request.user.id
     })
     
 
