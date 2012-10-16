@@ -190,7 +190,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 
     # save the name after a slight delay
     if @timer
-      clearTimeout @timer      
+      clearTimeout @timer
     @timer = setTimeout( =>
       @model.save()
       @timer = null
