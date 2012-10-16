@@ -15,7 +15,7 @@
 		width: 100%;
 	}
 
-	.unit-list {
+	.sortable-unit-list {
 		ol {
 			@include tree-view;
 		}

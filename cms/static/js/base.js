@@ -62,7 +62,7 @@ $(document).ready(function() {
     });
 
     // Subsection reordering
-    $('.unit-list ol').sortable({
+    $('.subsection-list > ol').sortable({
         axis: 'y',
         handle: '.section-item .drag-handle',
         update: onSubsectionReordered

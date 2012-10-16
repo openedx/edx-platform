@@ -38,8 +38,8 @@ input.courseware-unit-search-input {
 		}
 	}
 
-	&.collapsed .unit-list,
-	.collapsed .unit-list,
+	&.collapsed .subsection-list,
+	.collapsed .subsection-list,
 	.collapsed > ol {
 		display: none !important;
 	}
@@ -94,7 +94,7 @@ input.courseware-unit-search-input {
 		border-radius: 3px 3px 0 0;
 	}
 
-	.unit-list {
+	.subsection-list {
 		margin: 0 12px;
 
 		> ol {

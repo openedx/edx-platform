@@ -27,7 +27,7 @@
           <label>Format:</label>
           <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
         </div>
-        <div class="unit-list">
+        <div class="sortable-unit-list">
           <label>Units:</label>
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
