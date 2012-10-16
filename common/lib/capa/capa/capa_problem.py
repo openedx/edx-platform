@@ -32,6 +32,8 @@ from xml.sax.saxutils import unescape
 
 import chem
 import chem.chemcalc
+import chem.chemtools
+
 import calc
 from correctmap import CorrectMap
 import eia
@@ -78,7 +80,8 @@ global_context = {'random': random,
                   'scipy': scipy,
                   'calc': calc,
                   'eia': eia,
-                  'chemcalc': chem.chemcalc}
+                  'chemcalc': chem.chemcalc,
+                  'chemtools': chem.chemtools}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
