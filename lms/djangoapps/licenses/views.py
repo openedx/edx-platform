@@ -62,8 +62,6 @@ def user_software_license(request):
     software_name = request.POST.get('software')
     generate = request.POST.get('generate', False) == 'true'
 
-    print user_id, software_name, generate
-
     try:
         software = CourseSoftware.objects.get(name=software_name,
                                               course_id=course_id)
