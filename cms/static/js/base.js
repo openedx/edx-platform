@@ -252,10 +252,10 @@ function saveSubsection(e) {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : id, 'metadata' : metadata, 'data': null, 'children' : children}),
 		success: function() {
-		alert('Your changes have been saved.');
+        showToastMessage('Your changes have been saved.', null, 3);
 	    },
 		error: function() {
-		alert('There has been an error while saving your changes.');
+        showToastMessage('There has been an error while saving your changes.', null, 3);
 	    }
 	});
 }
