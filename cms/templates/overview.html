@@ -52,9 +52,18 @@
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
             <a href="#" class="expand-collapse-icon collapse"></a>
-            <div class="item-details">
-              <h3>${section.display_name}</h3>
-              <h4><strong>Unscheduled:</strong> <a href="#">click here to set</a></h4>
+            <div class="item-details" data-id="${section.location}">
+              <h3 class="section-name">
+                <span class="section-name-span">${section.display_name}</span>
+                <div class="section-name-edit" style="display:none">
+                  <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
+                  <a href="#" class="edit-section-name-save">Save</a><a href="#" class="edit-section-name-cancel">Cancel</a>
+                </div>
+              </h3>
+              <h4>
+                <strong>Unscheduled:</strong> 
+                <a href="#" class="set-publish-date">click here to set</a>
+              </h4>
             </div>
             <div class="item-actions">
               <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>

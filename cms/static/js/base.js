@@ -77,6 +77,10 @@ $(document).ready(function() {
 
     $('.new-course-button').bind('click', addNewCourse);
 
+    // section name editing
+    $('.section-name').bind('click', editSectionName);
+    $('.edit-section-name-cancel').bind('click', cancelEditSectionName);
+    $('.edit-section-name-save').bind('click', saveEditSectionName);
 });
 
 function showImportSubmit(e) {
@@ -575,4 +579,41 @@ function saveNewSubsection(e) {
 function cancelNewSubsection(e) {
     e.preventDefault();
     $(this).parents('li.branch').remove();
+}
+
+function editSectionName(e) {
+    e.preventDefault();
+    $(this).children('div.section-name-edit').show();
+    $(this).children('span.section-name-span').hide();   
+}
+
+function cancelEditSectionName(e) {
+    e.preventDefault();
+    $(this).parent().hide();
+    $(this).parent().siblings('span.section-name-span').show();
+    e.stopPropagation();
+}
+
+function saveEditSectionName(e) {
+    e.preventDefault();
+
+    id = $(this).closest("section.courseware-section").data("id");
+    display_name = $(this).prev('.edit-section-name').val();
+
+    var $_this = $(this);
+        // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : id, 'metadata' : {'display_name' : display_name}, 'data': null, 'children' : null})
+    }).success(function()
+    {
+        alert('Your changes have been saved.');
+        $_this.parent().siblings('span.section-name-span').html(display_name);
+        $_this.parent().siblings('span.section-name-span').show();
+        $_this.parent().hide();
+        e.stopPropagation();        
+    });
 }
