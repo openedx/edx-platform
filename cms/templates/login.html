@@ -17,17 +17,15 @@
         <input name="email" type="email" class="email-field">
       </div>
       <div class="row">
-        <label>Password</label>
+        <label>Password <a href="#" class="forgot-button">Forgot password?</a></label>
         <input name="password" type="password" class="password-field">
       </div>
       <div class="row form-actions">
         <input name="submit" type="submit" value="Log In" class="log-in-button">
-        <a href="#" class="forgot-button">Forgot password?</a>
-      </div>      
+        <span class="or">or</span>
+        <a href="${reverse('signup')}" class="sign-up-button">Sign up</a>        
+      </div>
     </form>
-    <div class="log-in-extra">
-      <p>Not enrolled? <a href="${reverse('signup')}">Sign up.</a></p>
-    </div>
   </article>
 
 <script type="text/javascript">
