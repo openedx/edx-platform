@@ -79,6 +79,7 @@
 		@include blue-button;
 		padding: 8px 0 10px;
 		font-family: $sans-serif;
+		@include transition(all .15s);
 	}
 
 	.create-account-button {
