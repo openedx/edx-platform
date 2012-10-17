@@ -117,6 +117,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
+    if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
+      return
     $component = $(event.currentTarget).parents('.component')
     $.post('/delete_item', {
       id: $component.data('id')
@@ -183,6 +185,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     # Treat the metadata dictionary as immutable
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = @$('.unit-display-name-input').val()
+    $('.unit-location .editing .unit-name').html(metadata.display_name)
     @model.set('metadata', metadata)
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View

@@ -37,6 +37,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from github_sync import export_to_github
 from static_replace import replace_urls
+from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
@@ -88,7 +89,7 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
-
+@ssl_login_shortcut
 @ensure_csrf_cookie
 def login_page(request):
     """
@@ -109,7 +110,7 @@ def index(request):
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
     # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates', courses)
+    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates' and course.location.org!='' and course.location.course!='' and course.location.name!='', courses)
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
@@ -118,7 +119,8 @@ def index(request):
                         course.location.org,
                         course.location.course,
                         course.location.name]))
-                    for course in courses]
+                    for course in courses],
+        'user': request.user
     })
 
 
@@ -271,6 +273,26 @@ def edit_unit(request, location):
 
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
+
+    # cdodge hack. We're having trouble previewing drafts via jump_to redirect
+    # so let's generate the link url here 
+
+    # need to figure out where this item is in the list of children as the preview will need this
+    index =1
+    for child in containing_subsection.get_children():
+        if child.location == item.location:
+            break
+        index = index + 1
+
+    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview='preview.',
+            lms_base=settings.LMS_BASE,            
+            org=course.location.org,
+            course=course.location.course, 
+            course_name=course.location.name, 
+            section=containing_section.location.name, 
+            subsection=containing_subsection.location.name, 
+            index=index)
 
     unit_state = compute_unit_state(item)
 
@@ -697,8 +719,18 @@ def upload_asset(request, org, course, coursename):
     #then commit the content 
     contentstore().save(content)
     del_cached_content(content.location)
+
+    # readback the saved content - we need the database timestamp
+    readback = contentstore().find(content.location)
     
-    response = HttpResponse('Upload completed')
+    response_payload = {'displayname' : content.name, 
+        'uploadDate' : get_date_display(readback.last_modified_at), 
+        'url' : StaticContent.get_url_path_from_location(content.location),
+        'thumb_url' : StaticContent.get_url_path_from_location(thumbnail_content.location) if thumbnail_content is not None else None,
+        'msg' : 'Upload completed'
+        }
+
+    response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
@@ -710,7 +742,7 @@ This view will return all CMS users who are editors for the specified course
 def manage_users(request, location):
     
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=EDITOR_ROLE_NAME):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(location)
@@ -720,7 +752,9 @@ def manage_users(request, location):
         'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
-        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/')
+        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/'),
+        'allow_actions' : has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
+        'request_user_id' : request.user.id
     })
     
 
@@ -845,6 +879,10 @@ def asset_index(request, org, course, name):
     
     course_reference = StaticContent.compute_location(org, course, name)
     assets = contentstore().get_all_content_for_course(course_reference)
+
+    # sort in reverse upload date order
+    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+
     thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
     asset_display = []
     for asset in assets:

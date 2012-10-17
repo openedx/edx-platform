@@ -11,21 +11,23 @@
     <h1>Import</h1>
     <article class="import-overview">
       <div class="description">
-        <h3>Importing a new course will delete all course content currently associated with your course
-        and replace it with the contents of the uploaded file.</h3>
+        <h2>Please <a href="https://edge.edx.org/courses/edX/edx101/edX_Studio_Reference/about" target="_blank">read the documentation</a> before attempting an import!</h2>
+        <p><strong>Importing a new course will delete all content currently associated with your course
+        and replace it with the contents of the uploaded file.</strong></p>
         <p>File uploads must be zip files containing, at a minimum, a <code>course.xml</code> file.</p>
         <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
         re-importing your course could cause the loss of student data associated with those problems.</p>
       </div>
       <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
         <h2>Course to import:</h2>
-        <a href="#" class="choose-file-button">Choose File</a>
+        <p class="error-block"></p>
+        <a href="#" class="choose-file-button">Choose File</a>        
         <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
         <input type="file" name="course-data" class="file-input">
         <input type="submit" value="Replace my course with the one above" class="submit-button">
-        <div class="progress" style="position:relative; margin-top:5px; width:250px; height:15px; border: 1px solid #ddd; padding: 1px; border-radius: 3px; display:none;">
-          <div class="bar" style="background-color: #B4F5B4; width:0%; height:10px; border-radius: 3px;"></div>
-          <div class="percent" style="margin-top:5px;">0%</div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+          <div class="percent">0%</div>
         </div>
       </form>
     </article>
@@ -37,29 +39,35 @@
 <script>
 (function() {
     
-var bar = $('.bar');
+var bar = $('.progress-bar');
+var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
+var submitBtn = $('.submit-button');
    
 $('form').ajaxForm({
     beforeSend: function() {
         status.empty();
         var percentVal = '0%';
-        bar.width(percentVal)
+        bar.show();
+        fill.width(percentVal);
         percent.html(percentVal);
+        submitBtn.hide();
     },
     uploadProgress: function(event, position, total, percentComplete) {
         var percentVal = percentComplete + '%';
-        bar.width(percentVal)
+        fill.width(percentVal);
         percent.html(percentVal);
     },
     complete: function(xhr) {
       if (xhr.status == 200) {
-        alert('Your import has been successful.');
+        alert('Your import was successful.');
         window.location = '${successful_import_redirect_url}';
       }
       else
         alert('Your import has failed.\n\n' + xhr.responseText);
+        submitBtn.show();
+        bar.hide();
     }
   }); 
 })();       

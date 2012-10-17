@@ -1,10 +1,38 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">assets</%block>
-<%block name="title">CMS Courseware Overview</%block>
+<%block name="title">Courseware Assets</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="jsextra">
+<script src="${static.url('js/vendor/mustache.js')}"></script>
+</%block>
 
 <%block name="content">
   
+  <script type="text/template" id="new-asset-element">
+    <tr data-id='{{url}}'>
+      <td class="thumb-col">
+        <div class="thumb">
+          {{#thumb_url}}
+          <img src="{{thumb_url}}">
+          {{/thumb_url}}
+        </div>
+      </td>
+      <td class="name-col">
+        <a href="{{url}}" class="filename">{{displayname}}</a>
+        <div class="embeddable-xml"></div>
+      </td>
+      <td class="date-col">
+        {{uploadDate}}
+      </td>
+      <td class="embed-col">
+        <a class="show-xml" href="{{url}}">XML</a>
+      </td>
+    </tr>
+  </script>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <h1>Asset Library</h1>
@@ -22,9 +50,9 @@
               <th class="embed-col">Embed</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="asset_table_body">
           % for asset in assets:
-            <tr>
+            <tr data-id="${asset['url']}">
               <td class="thumb-col">
                 <div class="thumb">
                   % if asset['thumb_url'] is not None:

@@ -80,11 +80,17 @@ $(document).ready(function() {
 });
 
 function showImportSubmit(e) {
-    $('.file-name').html($(this).val())
-    $('.file-name-block').show();
-    $('.import .choose-file-button').hide();
-    $('.submit-button').show();
-    $('.progress').show();
+    var filepath = $(this).val();
+    if(filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
+        $('.error-block').hide();
+        $('.file-name').html($(this).val());
+        $('.file-name-block').show();
+        $('.import .choose-file-button').hide();
+        $('.submit-button').show();
+        $('.progress').show();    
+    } else {
+        $('.error-block').html('File format not supported. Please upload a file with a <code>tar.gz</code> extension.').show();
+    }
 }
 
 function syncReleaseDate(e) {
@@ -321,7 +327,7 @@ function startUpload(e) {
 
 function resetUploadBar(){
     var percentVal = '0%';
-    $('.upload-modal .progress-fill').width(percentVal)
+    $('.upload-modal .progress-fill').width(percentVal);
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
@@ -335,9 +341,21 @@ function displayFinishedUpload(xhr) {
     if(xhr.status = 200){
         markAsLoaded();
     }
+    var resp = JSON.parse(xhr.responseText);
     $('.upload-modal .copy-button').attr('href', xhr.getResponseHeader('asset_url'));
-    $('.upload-modal .progress-fill').html(xhr.responseText);
+    $('.upload-modal .progress-fill').html(resp.msg);
     $('.upload-modal .choose-file-button').html('Load Another File').show();
+    $('.upload-modal .progress-fill').width('100%');
+
+    // see if this id already exists, if so, then user must have updated an existing piece of content
+    $("tr[data-id='" + resp.url + "']").remove();
+
+    var template = $('#new-asset-element').html();
+    var html = Mustache.to_html(template, resp);
+    $('table > tbody > tr:first').before(html);
+
+    $("tr[data-id='" + resp.url + "'] a.show-xml").toggle(showEmbeddableXML, hideEmbeddableXML);
+
 }
 
 function markAsLoaded() {
@@ -483,7 +501,7 @@ function addNewCourse(e) {
     e.preventDefault();
     var $newCourse = $($('#new-course-template').html());
     $('.new-course-button').after($newCourse);
-    $newCourse.find('.new-course-org').focus().select();
+    $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('.new-course-save').bind('click', saveNewCourse);
     $newCourse.find('.new-course-cancel').bind('click', cancelNewCourse);
 }
@@ -491,14 +509,17 @@ function addNewCourse(e) {
 function saveNewCourse(e) {
     e.preventDefault();
 
+    var $newCourse = $(this).closest('.new-course');
+
     template = $(this).data('template');
 
-    org = $(this).prevAll('.new-course-org').val();
-    number = $(this).prevAll('.new-course-number').val();
-    display_name = $(this).prevAll('.new-course-name').val();
+    org = $newCourse.find('.new-course-org').val();
+    number = $newCourse.find('.new-course-number').val();
+    display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == ''){
-        alert('You must specify all fields in order to create a new course.')
+        alert('You must specify all fields in order to create a new course.');
+        return;
     }
 
     $.post('/create_new_course',

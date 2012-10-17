@@ -11,11 +11,14 @@
     margin-right: 3%;
     font-size: 14px;
 
-    h3 {
-      margin-bottom: 20px;
-      font-size: 18px;
+    h2 {
       font-weight: 700;
-      color: $error-red;
+      font-size: 19px;
+      margin-bottom: 20px;
+    }
+
+    strong {
+      font-weight: 700;
     }
 
     p + p {
@@ -39,10 +42,15 @@
       font-weight: 300;
     }
 
-    .file-name-block {
+    .file-name-block,
+    .error-block {
       display: none;
       margin-bottom: 15px;
       font-size: 13px;
+    }
+
+    .error-block {
+      color: $error-red;
     }
 
     .choose-file-button {
@@ -66,5 +74,29 @@
       padding: 8px 20px 10px;
       white-space: normal;
     }
+  }
+
+  .progress-bar {
+    display: none;
+    width: 350px;
+    height: 30px;
+    margin: 30px auto 10px;
+    border: 1px solid $blue;
+
+    &.loaded {
+      border-color: #66b93d;
+
+      .progress-fill {
+        background: #66b93d;
+      }
+    }
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 30px;
+    background: $blue;
+    color: #fff;
+    line-height: 48px;
   }
 }
