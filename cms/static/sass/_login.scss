@@ -74,10 +74,20 @@
 		text-align: center;
 	}
 
-	.log-in-button {
+	.log-in-button,
+	.create-account-button {
 		@include blue-button;
 		padding: 8px 0 10px;
 		font-family: $sans-serif;
+	}
+
+	.create-account-button {
+		padding: 10px 40px 12px;
+		margin-bottom: 10px;
+	}
+
+	.enrolled {
+		font-size: 14px;
 	}
 
 	.sign-up-button {
