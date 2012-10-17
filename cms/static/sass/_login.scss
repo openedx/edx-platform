@@ -40,6 +40,7 @@
 
 	label {
 		display: block;
+		margin-bottom: 5px;
 		font-size: 13px;
 		font-weight: 700;
 	}
@@ -67,17 +68,45 @@
 	}
 
 	.form-actions {
-		margin-bottom: 0;
+		@include clearfix;
+		margin-top: 32px;
+		margin-bottom: 5px;
+		text-align: center;
 	}
 
-	input[type="submit"] {
+	.log-in-button {
 		@include blue-button;
-		margin-right: 10px;
-		padding: 8px 20px 10px;
+		padding: 8px 0 10px;
+		font-family: $sans-serif;
+	}
+
+	.sign-up-button {
+		@include white-button;
+		padding: 7px 0 9px;
+	}
+
+	.log-in-button,
+	.sign-up-button {
+		@include box-sizing(border-box);
+		float: left;
+		width: 45%;
+	}
+
+	.or {
+		float: left;
+		display: inline-block;
+		width: 10%;
+		font-size: 15px;
+		line-height: 36px;
+		color: $darkGrey;
+		text-align: center;
 	}
 
 	.forgot-button {
-		font-size: 13px;
+		float: right;
+		font-size: 11px;
+		font-weight: 400;
+		line-height: 21px;
 	}
 
 	.log-in-extra {
