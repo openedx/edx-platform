@@ -1,19 +1,27 @@
 ---
 metadata:
     display_name: Option Response
+    rerandomize: never
+    showanswer: always
 data: |
-    <problem>
-      <text>
-        <h2>Example: Option Response Problem</h2>
-        <p>
-          An option response problem presents option boxes for students to select from.  Correctness of input is evaluated based
-          on which option is defined as correct in the optioninput statement.  
-        </p>
-        <p>Select the correct options:</p>
-        <optionresponse direction="vertical" randomize="yes">
-        <p><text class="inline">The location of the sky is: </text><optioninput inline="1" options="('Up','Down')" correct="Up"></optioninput></p>
-        <p><text>The location of the earth is: </text><optioninput options="('Up','Down')" correct="Down"></optioninput></p>
-        </optionresponse>
-      </text>
-    </problem>
+  <problem>
+  <p>OptionResponse gives a limited set of options for students to respond with, and presents those options
+  in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
+
+  <p>
+  The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag. 
+  </p>
+  <p>Translation between Option Response and __________ is extremely straightforward:
+      
+  <optionresponse>
+        <optioninput options="('Multiple Choice','String Response','Numerical Response','External Response','Image Response')" correct="Multiple Choice"></optioninput>
+  </optionresponse>
+  </p>
+      <solution>
+          <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
+          </div>
+      </solution>
+  </problem>
 children: []

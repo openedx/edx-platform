@@ -1,130 +1,62 @@
 ---
 metadata:
     display_name: Circuit Schematic
+    rerandomize: never
+    showanswer: always
 data: |
- <!-- Logic gate: cjt 2/13/12 -->
-    
-    <problem>
-      <startouttext />
-      Your goal for this lab is to design a circuit that implements a
-      3-input logic gate that implements \(Z = \lnot{(C(A+B))}\) where the
-      \(\lnot\) symbol stands for logical negation. This function is
-      enumerated in the following truth table:
-      
-      <center><pre>
-      C B A | Z
-      =========
-      0 0 0 | 1
-      0 0 1 | 1
-      0 1 0 | 1
-      0 1 1 | 1
-      1 0 0 | 1
-      1 0 1 | 0
-      1 1 0 | 0
-      1 1 1 | 0
-      </pre></center>
-      
-      The schematic diagram below includes the resistive pullup for the logic
-      gate and some voltage sources that serve as the power supply and 
-      generators for the signals that will be the inputs to the gate.
-      The voltage sources generate the three input signals (A, B and C), timed so that all
-      possible combinations of the inputs will be generated over a \(4\mu s\)
-      interval.
-      
-      <br/><br/>Please add the appropriate pulldown network of mosfet
-      switches connected to node Z to implement the truth table above, with
-      \(R_{ON}\) of the mosfets chosen so that \(V_{ol}\) of the logic gate is less than
-      \(0.25V\) for any combination of inputs.  In the schematic tool, the mosfet
-      model has \(V_{th} = 0.5V\), so \(V_{ol} \lt 0.25V\)
-      will ensure that when the output of the logic gate is 0, if it is used
-      as the input to some other logic gate, the mosfet to which
-      it connects will be off.
-      
-      <br/><br/>On <A href="/book-shifted/305">page 305</A> of the text we
-      see from Equation (6) that \(R_{ON} = R_n \frac{L}{W}\).  In the
-      schematic tool, the mosfet model has \(R_n \approx 26.5k\Omega\) when
-      using a \(3V\) power supply.  To adjust \(R_{ON}\), double click the
-      mosfet and select an appropriate value for the W/L parameter.  For
-      example, setting a mosfet's W/L to 10 would result in \(R_{ON} =
-      2.65k\Omega\).
-      
-      <br/><br/>Note that the "Plot offset" property of the scope probes
-      on the A, B and C signals has been set so that the plots will not
-      overlap, making it easier to see what's happening.
-      
-      <br/><br/>Please do not change the voltages of the voltage sources or the
-      resistance of the pullup resistor.
-      
-      <endouttext />
-      
-      <schematicresponse>
-    <center>
-    <schematic height="500" width="600" parts="g,n,s" analyses="dc,tran"
-        submit_analyses="{&quot;tran&quot;:[[&quot;Z&quot;,0.0000004,0.0000009,0.0000014,0.0000019,0.0000024,0.0000029,0.0000034,0.000039]]}"
-        initial_value="[[&quot;w&quot;,[112,96,128,96]],[&quot;w&quot;,[256,96,240,96]],[&quot;w&quot;,[192,96,240,96]],[&quot;s&quot;,[240,96,0],{&quot;color&quot;:&quot;cyan&quot;,&quot;offset&quot;:&quot;&quot;,&quot;plot offset&quot;:&quot;0&quot;,&quot;_json_&quot;:3},[&quot;Z&quot;]],[&quot;w&quot;,[32,224,192,224]],[&quot;w&quot;,[96,48,192,48]],[&quot;L&quot;,[256,96,3],{&quot;label&quot;:&quot;Z&quot;,&quot;_json_&quot;:6},[&quot;Z&quot;]],[&quot;r&quot;,[192,48,0],{&quot;name&quot;:&quot;Rpullup&quot;,&quot;r&quot;:&quot;10K&quot;,&quot;_json_&quot;:7},[&quot;1&quot;,&quot;Z&quot;]],[&quot;w&quot;,[32,144,32,192]],[&quot;w&quot;,[32,224,32,192]],[&quot;w&quot;,[48,192,32,192]],[&quot;w&quot;,[32,96,32,144]],[&quot;w&quot;,[48,144,32,144]],[&quot;w&quot;,[32,48,32,96]],[&quot;w&quot;,[48,96,32,96]],[&quot;w&quot;,[32,48,48,48]],[&quot;g&quot;,[32,224,0],{&quot;_json_&quot;:16},[&quot;0&quot;]],[&quot;v&quot;,[96,192,1],{&quot;name&quot;:&quot;VC&quot;,&quot;value&quot;:&quot;square(3,0,250K)&quot;,&quot;_json_&quot;:17},[&quot;C&quot;,&quot;0&quot;]],[&quot;v&quot;,[96,144,1],{&quot;name&quot;:&quot;VB&quot;,&quot;value&quot;:&quot;square(3,0,500K)&quot;,&quot;_json_&quot;:18},[&quot;B&quot;,&quot;0&quot;]],[&quot;v&quot;,[96,96,1],{&quot;name&quot;:&quot;VA&quot;,&quot;value&quot;:&quot;square(3,0,1000K)&quot;,&quot;_json_&quot;:19},[&quot;A&quot;,&quot;0&quot;]],[&quot;v&quot;,[96,48,1],{&quot;name&quot;:&quot;Vpwr&quot;,&quot;value&quot;:&quot;dc(3)&quot;,&quot;_json_&quot;:20},[&quot;1&quot;,&quot;0&quot;]],[&quot;L&quot;,[96,96,2],{&quot;label&quot;:&quot;A&quot;,&quot;_json_&quot;:21},[&quot;A&quot;]],[&quot;w&quot;,[96,96,104,96]],[&quot;L&quot;,[96,144,2],{&quot;label&quot;:&quot;B&quot;,&quot;_json_&quot;:23},[&quot;B&quot;]],[&quot;w&quot;,[96,144,104,144]],[&quot;L&quot;,[96,192,2],{&quot;label&quot;:&quot;C&quot;,&quot;_json_&quot;:25},[&quot;C&quot;]],[&quot;w&quot;,[96,192,104,192]],[&quot;w&quot;,[192,96,192,112]],[&quot;s&quot;,[112,96,0],{&quot;color&quot;:&quot;red&quot;,&quot;offset&quot;:&quot;15&quot;,&quot;plot offset&quot;:&quot;0&quot;,&quot;_json_&quot;:28},[&quot;A&quot;]],[&quot;w&quot;,[104,96,112,96]],[&quot;s&quot;,[112,144,0],{&quot;color&quot;:&quot;green&quot;,&quot;offset&quot;:&quot;10&quot;,&quot;plot offset&quot;:&quot;0&quot;,&quot;_json_&quot;:30},[&quot;B&quot;]],[&quot;w&quot;,[104,144,112,144]],[&quot;w&quot;,[128,144,112,144]],[&quot;s&quot;,[112,192,0],{&quot;color&quot;:&quot;blue&quot;,&quot;offset&quot;:&quot;5&quot;,&quot;plot offset&quot;:&quot;0&quot;,&quot;_json_&quot;:33},[&quot;C&quot;]],[&quot;w&quot;,[104,192,112,192]],[&quot;w&quot;,[128,192,112,192]],[&quot;view&quot;,0,0,2,&quot;5&quot;,&quot;10&quot;,&quot;10MEG&quot;,null,&quot;100&quot;,&quot;4us&quot;]]"
-       />
-    </center>
- <answer type="loncapa/python">
-   # for a schematic response, submission[i] is the json representation
-   # of the diagram and analysis results for the i-th schematic tag
-   
-   def get_tran(json,signal):
-     for element in json:
-       if element[0] == 'transient':
-         return element[1].get(signal,[])
-     return []
-   
-   def get_value(at,output):
-     for (t,v) in output:
-       if at == t: return v
-     return None
-   
-   output = get_tran(submission[0],'Z')
-   okay = True
-   
-   # output should be 1, 1, 1, 1, 1, 0, 0, 0
-   if get_value(0.0000004,output) &lt; 2.7: okay = False;
-   if get_value(0.0000009,output) &lt; 2.7: okay = False;
-   if get_value(0.0000014,output) &lt; 2.7: okay = False;
-   if get_value(0.0000019,output) &lt; 2.7: okay = False;
-   if get_value(0.0000024,output) &lt; 2.7: okay = False;
-   if get_value(0.0000029,output) &gt; 0.25: okay = False;
-   if get_value(0.0000034,output) &gt; 0.25: okay = False;
-   if get_value(0.0000039,output) &gt; 0.25: okay = False;
-   
-   correct = ['correct' if okay else 'incorrect']
-   
- </answer>
-      </schematicresponse>
-      
-      <startouttext />
-      
-      When your circuit is ready for testing, run a \(4\mu s\) transient
-      simulation to verify correct functionality and appropriate \(V_{ol}\)
-      when the output of the gate is logic 0.  To submit, please click
-      CHECK.  The checker will be verifying the voltage of the
-      output node at several different times, so you'll earn a checkmark
-      only <i>after</i> you've performed the transient simulation so that
-      the checker will have a waveform to check!
-      
-      <br/><br/>Hint: you'll only need 3 mosfet switches to implement the gate.
-      
-      <br/><br/>When the gate is correctly implemented, the plot produced by the transient
-      analysis should like similar to the following figure.
-      
-      <center>
- <img src="/static/Lab3_1.png"/>
- <br/>Figure 1.  Example plot output
-      </center>
-      
-      <br/><br/>Food for thought: You'll notice there are little spikes,
-      sometimes called <i>glitches</i>, in the output waveform (see the
-      bottom cyan-colored waveform in Figure 1).  These only occur when the
-      A and B inputs are changing simultaneously and the C input is high.
-      Can you explain why?  Think about what is happening in the pulldown
-      circuitry at the time the glitches occur.
-      
-      <endouttext />
-      
-    </problem>
+  <problem >
+    Please make a voltage divider that splits the provided voltage evenly.
+
+  <schematicresponse>
+  <center>
+  <schematic height="500" width="600" parts="g,r" analyses="dc"
+  initial_value="[[&quot;v&quot;,[168,144,0],{&quot;value&quot;:&quot;dc(1)&quot;,&quot;_json_&quot;:0},[&quot;1&quot;,&quot;0&quot;]],[&quot;r&quot;,[296,120,0],{&quot;r&quot;:&quot;1&quot;,&quot;_json_&quot;:1},[&quot;1&quot;,&quot;output&quot;]],[&quot;L&quot;,[296,168,3],{&quot;label&quot;:&quot;output&quot;,&quot;_json_&quot;:2},[&quot;output&quot;]],[&quot;w&quot;,[296,216,168,216]],[&quot;w&quot;,[168,216,168,192]],[&quot;w&quot;,[168,144,168,120]],[&quot;w&quot;,[168,120,296,120]],[&quot;g&quot;,[168,216,0],{&quot;_json_&quot;:7},[&quot;0&quot;]],[&quot;view&quot;,-67.49999999999994,-78.49999999999994,1.6000000000000003,&quot;50&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;1&quot;,&quot;1000&quot;]]"
+  />
+  </center>
+  <answer type="loncapa/python">
+  dc_value = "dc analysis not found"
+  for response in submission[0]:
+    if response[0] == 'dc':
+        for node in response[1:]:
+            dc_value = node['output']
+
+  if dc_value == .5:
+    correct = ['correct']
+  else:
+    correct = ['incorrect']
+  </answer>
+  </schematicresponse>
+  <schematicresponse>
+  <p>Make a high pass filter</p>
+  <center>
+  <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
+  submit_analyses="{&quot;ac&quot;:[[&quot;NodeA&quot;,1,9]]}"
+  initial_value="[[&quot;v&quot;,[160,152,0],{&quot;name&quot;:&quot;v1&quot;,&quot;value&quot;:&quot;sin(0,1,1,0,0)&quot;,&quot;_json_&quot;:0},[&quot;1&quot;,&quot;0&quot;]],[&quot;w&quot;,[160,200,240,200]],[&quot;g&quot;,[160,200,0],{&quot;_json_&quot;:2},[&quot;0&quot;]],[&quot;L&quot;,[240,152,3],{&quot;label&quot;:&quot;NodeA&quot;,&quot;_json_&quot;:3},[&quot;NodeA&quot;]],[&quot;s&quot;,[240,152,0],{&quot;color&quot;:&quot;cyan&quot;,&quot;offset&quot;:&quot;0&quot;,&quot;_json_&quot;:4},[&quot;NodeA&quot;]],[&quot;view&quot;,64.55878906250004,54.114697265625054,2.5000000000000004,&quot;50&quot;,&quot;10&quot;,&quot;1G&quot;,null,&quot;100&quot;,&quot;1&quot;,&quot;1000&quot;]]"/>
+  </center>
+  <answer type="loncapa/python">
+  ac_values = None
+  for response in submission[0]:
+    if response[0] == 'ac':
+        for node in response[1:]:
+            ac_values = node['NodeA']
+  print "the ac analysis value:", ac_values
+  if ac_values == None:
+    correct = ['incorrect']
+  elif ac_values[0][1] &lt; ac_values[1][1]:
+    correct = ['correct']
+  else:
+    correct = ['incorrect']
+  </answer>
+  </schematicresponse>
+
+      <solution>
+          <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>A voltage divider that evenly divides the input voltage can be formed with two identically valued resistors, with the sampled voltage taken in between the two.</p>
+              <p><img src="/static/images/voltage_divider.png"/></p>
+              <p>A simple high-pass filter without any further constaints can be formed by simply putting a resister in series with a capacitor. The actual values of the components do not really matter in order to meet the constraints of the problem.</p>
+              <p><img src="/static/images/high_pass_filter.png"/></p>
+          </div>
+      </solution>
+  </problem>
 children: []
