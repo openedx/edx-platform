@@ -57,7 +57,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     data = @module.save()
     data.metadata = @metadata()
     @model.save(data).done( =>
-      showToastMessage("Your changes have been saved.", null, 3)
+    #   # showToastMessage("Your changes have been saved.", null, 3)
       @module = null
       @render()
       @$el.removeClass('editing')
