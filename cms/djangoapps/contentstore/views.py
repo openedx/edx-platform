@@ -55,7 +55,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState
 
 from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -214,6 +214,14 @@ def edit_subsection(request, location):
     policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
         if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
 
+    can_view_live = False
+    subsection_units = item.get_children()
+    for unit in subsection_units:
+        state = compute_unit_state(unit)
+        if state == UnitState.public or state == UnitState.draft:
+            can_view_live = True
+            break
+
     return render_to_response('edit_subsection.html',
                               {'subsection': item,
                                'context_course': course,
@@ -221,7 +229,9 @@ def edit_subsection(request, location):
                                'lms_link': lms_link,
                                'preview_link': preview_link,
                                'parent_item': parent,
-                               'policy_metadata' : policy_metadata
+                               'policy_metadata' : policy_metadata,
+                               'subsection_units' : subsection_units,
+                               'can_view_live' : can_view_live
                                })
 
 

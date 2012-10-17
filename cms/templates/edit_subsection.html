@@ -29,7 +29,7 @@
         </div>
         <div class="unit-list">
           <label>Units:</label>
-          ${units.enum_units(subsection)}
+          ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
         <div>
           <label>Policy:</label>
@@ -95,7 +95,9 @@
     <div class="row unit-actions">
       <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
       <a href="${preview_link}" target="_blank" class="preview-button">Preview Drafts</a>
+      %if can_view_live:
       <a href="${lms_link}" target="_blank" class="preview-button">View Live</a>
+      %endif
     </div>
       </div>
     </div>
