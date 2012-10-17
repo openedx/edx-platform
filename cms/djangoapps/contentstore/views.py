@@ -215,7 +215,8 @@ def edit_subsection(request, location):
         if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
 
     can_view_live = False
-    for unit in item.get_children():
+    subsection_units = item.get_children()
+    for unit in subsection_units:
         state = compute_unit_state(unit)
         if state == UnitState.public or state == UnitState.draft:
             can_view_live = True
@@ -229,6 +230,7 @@ def edit_subsection(request, location):
                                'preview_link': preview_link,
                                'parent_item': parent,
                                'policy_metadata' : policy_metadata,
+                               'subsection_units' : subsection_units,
                                'can_view_live' : can_view_live
                                })
 

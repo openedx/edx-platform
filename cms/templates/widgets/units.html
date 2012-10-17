@@ -4,9 +4,13 @@
 <!--
 This def will enumerate through a passed in subsection and list all of the units
 -->
-<%def name="enum_units(subsection, actions=True, selected=None, sortable=True)">
+<%def name="enum_units(subsection, actions=True, selected=None, sortable=True, subsection_units=None)">
 <ol ${'class="sortable-unit-list"' if sortable else ''} data-subsection-id="${subsection.location}">
-  % for unit in subsection.get_children():
+  <%
+    if subsection_units is None:
+      subsection_units = subsection.get_children()
+  %>
+  % for unit in subsection_units:
   <li class="leaf unit" data-id="${unit.location}">
     <%
       unit_state = compute_unit_state(unit)
