@@ -69,6 +69,7 @@
       }
 
       .embeddable-xml-input {
+        @include box-shadow(none);
         width: 100%;
       }
 
@@ -180,7 +181,8 @@
     }
   }
 
-  .embeddable-xml-input {    
+  .embeddable-xml-input {
+    @include box-shadow(none);
     width: 400px;
   }
 
