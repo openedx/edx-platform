@@ -47,6 +47,10 @@
           }
         }
 
+        .name-col {
+          font-size: 14px;
+        }
+
         .date-col {
           font-size: 12px;
         }
@@ -164,6 +168,21 @@
 		line-height: 29px;
 		text-align: center;
 	}
+
+  .embeddable {
+    display: none;
+    margin: 30px 0 130px;
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+  }
+
+  .embeddable-xml-input {    
+    width: 400px;
+  }
 
 	.copy-button {
 		@include white-button;

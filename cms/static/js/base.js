@@ -21,13 +21,12 @@ $(document).ready(function() {
     $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideModal);
     $modalCover.bind('click', hideHistoryModal);
+    $modalCover.bind('click', hideModal);
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
 
-    $('a.show-xml').toggle(showEmbeddableXML, hideEmbeddableXML);
     $('.embeddable-xml-input').bind('click', function(){ $(this).select(); });
 
-    $('a.copy-button').toggle(showEmbeddableXML, hideEmbeddableXML);
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
     $('.save-subsection').bind('click', saveSubsection);
@@ -117,18 +116,6 @@ function removePolicyMetadata(e) {
         _parent_el.remove();
     else
         _parent_el.appendTo("#policy-to-delete");
-}
-
-function showEmbeddableXML(e) {
-    $ceiling = $(this).parents('tr');
-    if ($ceiling.length === 0) $ceiling = $(this).parents('.upload-modal');
-    $ceiling.find('.embeddable-xml').html('&lt;img src="'+$(this).attr('href')+'"/&gt;');
-}
-function hideEmbeddableXML(e) {
-    $ceiling = $(this).parents('tr');
-    console.log($ceiling.length)
-    if ($ceiling.length === 0) $ceiling = $(this).parents('.upload-modal');
-    $ceiling.find('.embeddable-xml').html("");
 }
 
 
@@ -342,8 +329,11 @@ function displayFinishedUpload(xhr) {
     if(xhr.status = 200){
         markAsLoaded();
     }
+
     var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .copy-button').attr('href', xhr.getResponseHeader('asset_url'));
+    $('.upload-modal .embeddable-xml-input').val('<img src="' + xhr.getResponseHeader('asset_url') + '"/>');
+    $('.upload-modal .embeddable').show();
+    $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);
     $('.upload-modal .choose-file-button').html('Load Another File').show();
     $('.upload-modal .progress-fill').width('100%');
