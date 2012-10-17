@@ -76,5 +76,6 @@ def compute_unit_state(unit):
         return UnitState.public
 
 
-def get_date_display(date):
+def get_date_display(date, convertToLocalTime=False):
+    print date.__class__.__name__
     return date.strftime("%d %B, %Y at %I:%M %p")

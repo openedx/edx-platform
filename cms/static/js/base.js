@@ -321,7 +321,7 @@ function startUpload(e) {
 
 function resetUploadBar(){
     var percentVal = '0%';
-    $('.upload-modal .progress-fill').width(percentVal)
+    $('.upload-modal .progress-fill').width(percentVal);
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
@@ -338,6 +338,7 @@ function displayFinishedUpload(xhr) {
     $('.upload-modal .copy-button').attr('href', xhr.getResponseHeader('asset_url'));
     $('.upload-modal .progress-fill').html(xhr.responseText);
     $('.upload-modal .choose-file-button').html('Load Another File').show();
+    $('.upload-modal .progress-fill').width('100%');
 }
 
 function markAsLoaded() {
@@ -349,6 +350,7 @@ function hideModal(e) {
     e.preventDefault();
     $('.modal').hide();
     $modalCover.hide();
+    location.reload();
 }
 
 function onKeyUp(e) {
