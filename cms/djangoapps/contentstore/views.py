@@ -872,7 +872,7 @@ def asset_index(request, org, course, name):
         id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_date_display(asset['uploadDate'], True)
+        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
         
         asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
