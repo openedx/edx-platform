@@ -335,10 +335,21 @@ function displayFinishedUpload(xhr) {
     if(xhr.status = 200){
         markAsLoaded();
     }
+    var resp = JSON.parse(xhr.responseText);
     $('.upload-modal .copy-button').attr('href', xhr.getResponseHeader('asset_url'));
-    $('.upload-modal .progress-fill').html(xhr.responseText);
+    $('.upload-modal .progress-fill').html(resp.msg);
     $('.upload-modal .choose-file-button').html('Load Another File').show();
     $('.upload-modal .progress-fill').width('100%');
+
+    // see if this id already exists, if so, then user must have updated an existing piece of content
+    $("tr[data-id='" + resp.url + "']").remove();
+
+    var template = $('#new-asset-element').html();
+    var html = Mustache.to_html(template, resp);
+    $('table > tbody > tr:first').before(html);
+
+    $("tr[data-id='" + resp.url + "'] a.show-xml").toggle(showEmbeddableXML, hideEmbeddableXML);
+
 }
 
 function markAsLoaded() {
@@ -350,7 +361,6 @@ function hideModal(e) {
     e.preventDefault();
     $('.modal').hide();
     $modalCover.hide();
-    location.reload();
 }
 
 function onKeyUp(e) {

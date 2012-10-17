@@ -718,8 +718,18 @@ def upload_asset(request, org, course, coursename):
     #then commit the content 
     contentstore().save(content)
     del_cached_content(content.location)
+
+    # readback the saved content - we need the database timestamp
+    readback = contentstore().find(content.location)
     
-    response = HttpResponse('Upload completed')
+    response_payload = {'displayname' : content.name, 
+        'uploadDate' : get_date_display(readback.last_modified_at), 
+        'url' : StaticContent.get_url_path_from_location(content.location),
+        'thumb_url' : StaticContent.get_url_path_from_location(thumbnail_content.location) if thumbnail_content is not None else None,
+        'msg' : 'Upload completed'
+        }
+
+    response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
@@ -866,6 +876,10 @@ def asset_index(request, org, course, name):
     
     course_reference = StaticContent.compute_location(org, course, name)
     assets = contentstore().get_all_content_for_course(course_reference)
+
+    # sort in reverse upload date order
+    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+
     thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
     asset_display = []
     for asset in assets:
