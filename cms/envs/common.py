@@ -118,6 +118,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'contentserver.middleware.StaticContentServer',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,7 +131,7 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
+    'django.middleware.transaction.TransactionMiddleware'
 )
 
 ############################ SIGNAL HANDLERS ################################
@@ -324,6 +325,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
+    'auth',
     'github_sync',
     'student',  # misleading name due to sharing with lms
 

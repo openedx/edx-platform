@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import pyparsing
 import sys
 
 from django.conf import settings
@@ -13,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
+from capa.chem import chemcalc
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
@@ -29,7 +31,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 log = logging.getLogger("mitx.courseware")
 
 
-if settings.XQUEUE_INTERFACE['basic_auth'] is not None:
+if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
     requests_auth = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
 else:
     requests_auth = None
@@ -435,6 +437,10 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         oldgrade = instance_module.grade
+        # The max grade shouldn't change under normal circumstances, but
+        # sometimes the problem changes with the same name but a new max grade.
+        # This updates the module if that happens.
+        old_instance_max_grade = instance_module.max_grade
         old_instance_state = instance_module.state
         old_shared_state = shared_module.state if shared_module is not None else None
 
@@ -452,9 +458,12 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         instance_module.state = instance.get_instance_state()
+        instance_module.max_grade=instance.max_score()
         if instance.get_score():
             instance_module.grade = instance.get_score()['score']
-        if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
+        if (instance_module.grade != oldgrade or
+            instance_module.state != old_instance_state or
+            instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
 
     if shared_module is not None:
@@ -464,3 +473,42 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
+
+def preview_chemcalc(request):
+    """
+    Render an html preview of a chemical formula or equation.  The fact that
+    this is here is a bit of hack.  See the note in lms/urls.py about why it's
+    here. (Victor is to blame.)
+
+    request should be a GET, with a key 'formula' and value 'some formula string'.
+
+    Returns a json dictionary:
+    {
+       'preview' : 'the-preview-html' or ''
+       'error' : 'the-error' or ''
+    }
+    """
+    if request.method != "GET":
+        raise Http404
+
+    result = {'preview': '',
+              'error': '' }
+    formula = request.GET.get('formula')
+    if formula is None:
+        result['error'] = "No formula specified."
+
+        return HttpResponse(json.dumps(result))
+
+    try:
+        result['preview'] = chemcalc.render_to_html(formula)
+    except pyparsing.ParseException as p:
+        result['error'] = "Couldn't parse formula: {0}".format(p)
+    except Exception:
+        # this is unexpected, so log
+        log.warning("Error while previewing chemical formula", exc_info=True)
+        result['error'] = "Error while rendering preview"
+
+    return HttpResponse(json.dumps(result))
+
+
+

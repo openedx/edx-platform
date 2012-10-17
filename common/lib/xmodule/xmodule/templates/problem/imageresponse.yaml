@@ -1,0 +1,26 @@
+---
+metadata:
+    display_name: Image Response
+data: |
+ <problem>
+      <text>
+ <h2>Example: Image Response Problem</h2>
+ 
+ <p>
+   When teaching conventionally, a common check for understanding is to ask the student to point 
+   at something which satisfies a set of contraints. This use case is captured in the imageresponse. 
+   An image response problem presents an image for the student.  Input is
+   given by the location of mouse clicks on the image. Correctness of input can only be evaluated based on expected dimensions of a rectangle.
+   
+ </p>
+ 
+ <text>
+   Click on the cow in this image:
+   <imageresponse>
+     <imageinput src="/static/cow.png" width="715" height="511" rectangle="(404,150)-(715,480)" />
+   </imageresponse>
+ </text>
+      </text>
+ </problem>
+    
+children: []

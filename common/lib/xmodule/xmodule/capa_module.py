@@ -10,6 +10,7 @@ import sys
 
 from datetime import timedelta
 from lxml import etree
+from lxml.html import rewrite_links
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
@@ -75,9 +76,13 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                    ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
+
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
@@ -128,6 +133,11 @@ class CapaModule(XModule):
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
+            # TODO: This line is badly broken:
+            # (1) We're passing student ID to xmodule.
+            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+            #     - analytics really needs small number of bins.
             self.seed = system.id
         else:
             self.seed = None
@@ -332,6 +342,15 @@ class CapaModule(XModule):
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
+        # cdodge: OK, we have to do two rounds of url reference subsitutions
+        # one which uses the 'asset library' that is served by the contentstore and the
+        # more global /static/ filesystem based static content.
+        # NOTE: rewrite_content_links is defined in XModule
+        # This is a bit unfortunate and I'm sure we'll try to considate this into
+        # a one step process.
+        html = rewrite_links(html, self.rewrite_content_links)
+
+        # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
@@ -605,12 +624,14 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Problem is closed"
+            return {'success': False,
+                    'error': "Problem is closed"}
 
         if not self.lcp.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Refresh the page and make an attempt before resetting."
+            return {'success': False,
+                    'error': "Refresh the page and make an attempt before resetting."}
 
         self.lcp.do_reset()
         if self.rerandomize in ["always", "onreset"]:
@@ -638,13 +659,12 @@ class CapaDescriptor(RawDescriptor):
 
     stores_state = True
     has_score = True
+    template_dir_name = 'problem'
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-
-    template_dir_name = 'problem'
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

@@ -4,26 +4,40 @@ import logging
 import os
 import sys
 from lxml import etree
+from lxml.html import rewrite_links
 from path import path
 
-from .x_module import XModule, Template
+from .x_module import XModule
+from pkg_resources import resource_string
 from .xml_module import XmlDescriptor, name_to_pathname
 from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .html_checker import check_html
+from xmodule.modulestore import Location
+
+from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
 
 class HtmlModule(XModule):
+    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/html/display.coffee')
+                    ]
+         }
+    js_module_name = "HTMLModule"
+    
     def get_html(self):
-        return self.html
+        # cdodge: perform link substitutions for any references to course static content (e.g. images)
+        return rewrite_links(self.html, self.rewrite_content_links)
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
+
 
 
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
@@ -34,6 +48,9 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
+
+    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    js_module_name = "HTMLEditingDescriptor"
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms

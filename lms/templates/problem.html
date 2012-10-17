@@ -31,35 +31,3 @@
     % endif
   </section>
 </section>
-
-<%block name="js_extra">
-<script type="text/javascript" charset="utf-8">
-  var collapsibleSet;
-  
-  $(function(){
-      // this should be brought back into problems
-      $('.longform').hide();
-      $('.shortform').append('<a href="#" class="full">See full output</a>');
-
-      $('.full').click(function() {
-        $(this).parent().siblings().slideToggle();
-        $(this).parent().parent().toggleClass('open');
-        var text = $(this).text() == 'See full output' ? 'Hide output' : 'See full output';
-        $(this).text(text);
-        return false;
-      });
-
-      function toggleHint(e) {
-        $(this).parent().siblings().slideToggle();
-        $(this).parent().parent().toggleClass('open');
-        return false;
-      }
-
-      if(!collapsibleSet) {
-        collapsibleSet = true;
-        $('.collapsible section').hide();
-        $('.collapsible header a').bind('click', toggleHint);
-      }      
-    });
-</script>
-</%block>

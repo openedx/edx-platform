@@ -143,6 +143,7 @@ That's basically all there is to the organizational structure.  Read the next se
 * `chapter` -- top level organization unit of a course.   The courseware display code currently expects the top level `course` element to contain only chapters, though there is no philosophical reason why this is required, so we may change it to properly display non-chapters at the top level.
 * `course` -- top level tag.  Contains everything else.
 * `customtag` -- render an html template, filling in some parameters, and return the resulting html.  See below for details.
+* `discussion` -- Inline discussion forum
 * `html` -- a reference to an html file.
 * `error`  -- don't put these in by hand :)   The internal representation of content that has an error, such as malformed xml or some broken invariant.  You may see this in the xml once the CMS is in use...
 * `problem` -- a problem.  See elsewhere in edx4edx for documentation on the format.
@@ -171,6 +172,33 @@ When we see `<customtag impl="special" animal="unicorn" hat="blue"/>`, we will:
 
 Since `customtag` is already a pointer, there is generally no need to put it into a separate file--just use it in place: <customtag url_name="my_custom_tag" impl="blah" attr1="..."/>
 
+### `discussion`
+
+The discussion tag embeds an inline discussion module. The XML format is:
+```
+<discussion for="Course overview" id="6002x_Fall_2012_Overview" discussion_category="Week 1 / Overview" />
+``` 
+The meaning of each attribute is as follows:
+* `for`: A string that describes the discussion. Purely for descriptive purposes (to the student).
+* `id`: The identifier that the discussion forum service uses to refer to this inline discussion module. Since the `id` must be unique and lives in a common namespace with all other courses, the preferred convention is to use `<course_name>_<course_run>_<descriptor>` as in the above example. The `id` should be "machine-friendly", e.g. use alphanumeric characters, underscores. Do **not** use a period (e.g. `6.002x_Fall_2012_Overview`).
+* `discussion_category`: The inline module will be indexed in the main "Discussion" tab of the course. The inline discussions are organized into a directory-like hierarchy. Note that the forward slash indicates depth, as in conventional filesytems. In the above example, this discussion module will show up in the following "directory":
+```
+Week 1 / Overview / Course overview
+```
+
+Further discussion on `discussion_category`:
+Note that the `for` tag has been appended to the end of the `discussion_category`. This can often lead into deeply nested subforums, which may not be intended. In the above example, if we were to use instead:
+
+```
+<discussion for="Course overview" id="6002x_Fall_2012_Overview" discussion_category="Week 1" />
+``` 
+
+this discussion module would show up in the main forums as:
+```
+Week 1 / Course overview
+```
+
+which is more succinct.
 
 ### `html`
 

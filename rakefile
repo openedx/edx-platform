@@ -49,7 +49,7 @@ default_options = {
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -e common/lib/xmodule')
+    sh('pip install -e common/lib/xmodule -e common/lib/capa')
     sh('git submodule update --init')
 end
 
@@ -169,6 +169,12 @@ desc "Run django-admin <action> against the specified system and environment"
 task "django-admin", [:action, :system, :env, :options] => [:predjango] do |t, args|
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
+end
+
+desc "Set the staff bit for a user"
+task :set_staff, [:user, :system, :env] do |t, args|
+    args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
+    sh(django_admin(args.system, args.env, 'set_staff', args.user))
 end
 
 task :package do

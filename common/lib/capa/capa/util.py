@@ -11,7 +11,7 @@ def compare_with_tolerance(v1, v2, tol):
 
      - v1    :  student result (number)
      - v2    :  instructor result (number)
-     - tol   :  tolerance (string or number)
+     - tol   :  tolerance (string representing a number)
 
     '''
     relative = tol.endswith('%')
@@ -53,8 +53,4 @@ def is_file(file_to_test):
     '''
     Duck typing to check if 'file_to_test' is a File object
     '''
-    is_file = True
-    for method in ['read', 'name']:
-        if not hasattr(file_to_test, method):
-            is_file = False
-    return is_file 
+    return all(hasattr(file_to_test, method) for method in ['read', 'name'])

@@ -3,8 +3,9 @@
 #
 # Nomenclature:
 #
-# A capa Problem is a collection of text and capa Response questions.  Each Response may have one or more
-# Input entry fields.  The capa Problem may include a solution.
+# A capa Problem is a collection of text and capa Response questions.
+# Each Response may have one or more Input entry fields.
+# The capa problem may include a solution.
 #
 '''
 Main module which shows problems (of "capa" type).
@@ -29,6 +30,8 @@ import sys
 from lxml import etree
 from xml.sax.saxutils import unescape
 
+import chem
+import chem.chemcalc
 import calc
 from correctmap import CorrectMap
 import eia
@@ -42,9 +45,25 @@ import responsetypes
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
-entry_types = ['textline', 'schematic', 'textbox', 'imageinput', 'optioninput', 'choicegroup', 'radiogroup', 'checkboxgroup', 'filesubmission', 'javascriptinput']
-solution_types = ['solution']    			# extra things displayed after "show answers" is pressed
-response_properties = ["codeparam", "responseparam", "answer"]    	# these get captured as student responses
+# Different ways students can input code
+entry_types = ['textline',
+               'schematic',
+               'textbox',
+               'imageinput',
+               'optioninput',
+               'choicegroup',
+               'radiogroup',
+               'checkboxgroup',
+               'filesubmission',
+               'javascriptinput',
+               'crystallography',
+               'chemicalequationinput',]
+
+# extra things displayed after "show answers" is pressed
+solution_types = ['solution']
+
+# these get captured as student responses
+response_properties = ["codeparam", "responseparam", "answer"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -57,7 +76,8 @@ global_context = {'random': random,
                   'math': math,
                   'scipy': scipy,
                   'calc': calc,
-                  'eia': eia}
+                  'eia': eia,
+                  'chemcalc': chem.chemcalc}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
@@ -83,7 +103,8 @@ class LoncapaProblem(object):
          - id           (string): identifier for this problem; often a filename (no spaces)
          - state        (dict): student state
          - seed         (int): random number generator seed (int)
-         - system       (ModuleSystem): ModuleSystem instance which provides OS, rendering, and user context
+         - system       (ModuleSystem): ModuleSystem instance which provides OS,
+                                        rendering, and user context
 
         '''
 
@@ -107,19 +128,24 @@ class LoncapaProblem(object):
         if not self.seed:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
-        problem_text = re.sub("startouttext\s*/", "text", problem_text)   # Convert startouttext and endouttext to proper <text></text>
+        # Convert startouttext and endouttext to proper <text></text>
+        problem_text = re.sub("startouttext\s*/", "text", problem_text)
         problem_text = re.sub("endouttext\s*/", "/text", problem_text)
         self.problem_text = problem_text
 
-        self.tree = etree.XML(problem_text)  # parse problem XML file into an element tree
-        self._process_includes()		# handle any <include file="foo"> tags
+        # parse problem XML file into an element tree
+        self.tree = etree.XML(problem_text)
+
+        # handle any <include file="foo"> tags
+        self._process_includes()
 
         # construct script processor context (eg for customresponse problems)
         self.context = self._extract_context(self.tree, seed=self.seed)
 
-        # pre-parse the XML tree: modifies it to add ID's and perform some in-place transformations
-        # this also creates the dict (self.responders) of Response instances for each question in the problem.
-        # the dict has keys = xml subtree of Response, values = Response instance
+        # Pre-parse the XML tree: modifies it to add ID's and perform some in-place
+        # transformations.  This also creates the dict (self.responders) of Response
+        # instances for each question in the problem. The dict has keys = xml subtree of
+        # Response, values = Response instance
         self._preprocess_problem(self.tree)
 
         if not self.student_answers:  # True when student_answers is an empty dict
@@ -134,6 +160,9 @@ class LoncapaProblem(object):
         self.done = False
 
     def set_initial_display(self):
+        """
+        Set the student's answers to the responders' initial displays, if specified.
+        """
         initial_answers = dict()
         for responder in self.responders.values():
             if hasattr(responder, 'get_initial_display'):
@@ -145,9 +174,11 @@ class LoncapaProblem(object):
         return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
-        ''' Stored per-user session data neeeded to:
+        '''
+        Stored per-user session data neeeded to:
             1) Recreate the problem
-            2) Populate any student answers. '''
+            2) Populate any student answers.
+        '''
 
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
@@ -156,7 +187,7 @@ class LoncapaProblem(object):
 
     def get_max_score(self):
         '''
-        Return maximum score for this problem.
+        Return the maximum score for this problem.
         '''
         maxscore = 0
         for response, responder in self.responders.iteritems():
@@ -164,11 +195,11 @@ class LoncapaProblem(object):
         return maxscore
 
     def get_score(self):
-        '''
+        """
         Compute score for this problem.  The score is the number of points awarded.
         Returns a dictionary {'score': integer, from 0 to get_max_score(),
                               'total': get_max_score()}.
-        '''
+        """
         correct = 0
         for key in self.correct_map:
             try:
@@ -204,22 +235,25 @@ class LoncapaProblem(object):
     def is_queued(self):
         '''
         Returns True if any part of the problem has been submitted to an external queue
+        (e.g. for grading.)
         '''
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
 
 
     def get_recentmost_queuetime(self):
         '''
-        Returns a DateTime object that represents the timestamp of the most recent queueing request, or None if not queued
+        Returns a DateTime object that represents the timestamp of the most recent
+        queueing request, or None if not queued
         '''
         if not self.is_queued():
             return None
 
         # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
         queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
-                          for answer_id in self.correct_map 
+                          for answer_id in self.correct_map
                           if self.correct_map.is_queued(answer_id)]
-        queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat) for qt_str in queuetime_strs]
+        queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat)
+                      for qt_str in queuetime_strs]
 
         return max(queuetimes)
 
@@ -235,14 +269,20 @@ class LoncapaProblem(object):
         Calls the Response for each question in this problem, to do the actual grading.
         '''
 
+        # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
 
-        oldcmap = self.correct_map				# old CorrectMap
-        newcmap = CorrectMap()					# start new with empty CorrectMap
+        # old CorrectMap
+        oldcmap = self.correct_map
+
+        # start new with empty CorrectMap
+        newcmap = CorrectMap()
         # log.debug('Responders: %s' % self.responders)
-        for responder in self.responders.values():                  # Call each responsetype instance to do actual grading
-            if 'filesubmission' in responder.allowed_inputfields:   # File objects are passed only if responsetype
-                                                                    #   explicitly allows for file submissions
+        # Call each responsetype instance to do actual grading
+        for responder in self.responders.values():
+            # File objects are passed only if responsetype explicitly allows for file
+            # submissions
+            if 'filesubmission' in responder.allowed_inputfields:
                 results = responder.evaluate_answers(answers, oldcmap)
             else:
                 results = responder.evaluate_answers(convert_files_to_filenames(answers), oldcmap)
@@ -252,28 +292,33 @@ class LoncapaProblem(object):
         return newcmap
 
     def get_question_answers(self):
-        """Returns a dict of answer_ids to answer values. If we cannot generate
+        """
+        Returns a dict of answer_ids to answer values. If we cannot generate
         an answer (this sometimes happens in customresponses), that answer_id is
         not included. Called by "show answers" button JSON request
         (see capa_module)
         """
+        # dict of (id, correct_answer)
         answer_map = dict()
         for response in self.responders.keys():
             results = self.responder_answers[response]
-            answer_map.update(results)                # dict of (id,correct_answer)
+            answer_map.update(results)
 
         # include solutions from <solution>...</solution> stanzas
         for entry in self.tree.xpath("//" + "|//".join(solution_types)):
             answer = etree.tostring(entry)
-            if answer: answer_map[entry.get('id')] = contextualize_text(answer, self.context)
+            if answer:
+                answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
         log.debug('answer_map = %s' % answer_map)
         return answer_map
 
     def get_answer_ids(self):
-        """Return the IDs of all the responses -- these are the keys used for
+        """
+        Return the IDs of all the responses -- these are the keys used for
         the dicts returned by grade_answers and get_question_answers. (Though
-        get_question_answers may only return a subset of these."""
+        get_question_answers may only return a subset of these.
+        """
         answer_ids = []
         for response in self.responders.keys():
             results = self.responder_answers[response]
@@ -298,7 +343,8 @@ class LoncapaProblem(object):
             file = inc.get('file')
             if file is not None:
                 try:
-                    ifp = self.system.filestore.open(file)  # open using ModuleSystem OSFS filestore
+                    # open using ModuleSystem OSFS filestore
+                    ifp = self.system.filestore.open(file)
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
@@ -311,7 +357,8 @@ class LoncapaProblem(object):
                     else:
                         continue
                 try:
-                    incxml = etree.XML(ifp.read())    # read in and convert to XML
+                    # read in and convert to XML
+                    incxml = etree.XML(ifp.read())
                 except Exception as err:
                     log.warning('Error %s in problem xml include: %s' % (
                             err, etree.tostring(inc, pretty_print=True)))
@@ -322,6 +369,7 @@ class LoncapaProblem(object):
                         raise
                     else:
                         continue
+
                 # insert new XML into tree in place of inlcude
                 parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
@@ -329,11 +377,13 @@ class LoncapaProblem(object):
                 log.debug('Included %s into %s' % (file, self.problem_id))
 
     def _extract_system_path(self, script):
-        '''
+        """
         Extracts and normalizes additional paths for code execution.
         For now, there's a default path of data/course/code; this may be removed
         at some point.
-        '''
+
+        script : ?? (TODO)
+        """
 
         DEFAULT_PATH = ['code']
 
@@ -351,7 +401,6 @@ class LoncapaProblem(object):
             # path is an absolute path or a path relative to the data dir
             dir = os.path.join(self.system.filestore.root_path, dir)
             abs_dir = os.path.normpath(dir)
-            #log.debug("appending to path: %s" % abs_dir)
             path.append(abs_dir)
 
         return path
@@ -362,13 +411,20 @@ class LoncapaProblem(object):
         context of this problem.  Provides ability to randomize problems, and also set
         variables for problem answer checking.
 
-        Problem XML goes to Python execution context. Runs everything in script tags
+        Problem XML goes to Python execution context. Runs everything in script tags.
         '''
         random.seed(self.seed)
-        context = {'global_context': global_context}    	# save global context in here also
-        context.update(global_context)            		# initialize context to have stuff in global_context
-        context['__builtins__'] = globals()['__builtins__']    	# put globals there also
-        context['the_lcp'] = self                		# pass instance of LoncapaProblem in
+        # save global context in here also
+        context = {'global_context': global_context}
+
+        # initialize context to have stuff in global_context
+        context.update(global_context)
+
+        # put globals there also
+        context['__builtins__'] = globals()['__builtins__']
+
+        # pass instance of LoncapaProblem in
+        context['the_lcp'] = self
         context['script_code'] = ''
 
         self._execute_scripts(tree.findall('.//script'), context)
@@ -385,7 +441,7 @@ class LoncapaProblem(object):
             sys.path = original_path + self._extract_system_path(script)
 
             stype = script.get('type')
-            
+
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript
@@ -395,12 +451,14 @@ class LoncapaProblem(object):
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
-            context['script_code'] += code		# store code source in context
+            # store code source in context
+            context['script_code'] += code
             try:
-                exec code in context, context        	# use "context" for global context; thus defs in code are global within code
+                # use "context" for global context; thus defs in code are global within code
+                exec code in context, context
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
-		msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
+                msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
             finally:
                 sys.path = original_path
@@ -415,7 +473,8 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
-        if problemtree.tag == 'script' and problemtree.get('type') and 'javascript' in problemtree.get('type'):
+        if (problemtree.tag == 'script' and problemtree.get('type')
+            and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return problemtree
 
@@ -424,8 +483,8 @@ class LoncapaProblem(object):
 
         problemid = problemtree.get('id')    # my ID
 
-        if problemtree.tag in inputtypes.get_input_xml_tags():
-
+        if problemtree.tag in inputtypes.registered_input_tags():
+            # If this is an inputtype subtree, let it render itself.
             status = "unsubmitted"
             msg = ''
             hint = ''
@@ -442,32 +501,34 @@ class LoncapaProblem(object):
                 value = self.student_answers[problemid]
 
             # do the rendering
-            render_object = inputtypes.SimpleInput(system=self.system,
-                                                   xml=problemtree,
-                                                   state={'value': value,
-                                                          'status': status,
-                                                          'id': problemtree.get('id'),
-                                                          'feedback': {'message': msg,
-                                                                       'hint': hint,
-                                                                       'hintmode': hintmode,
-                                                                       }
-                                                          },
-                                                   use='capa_input')
-            return render_object.get_html()  # function(problemtree, value, status, msg) # render the special response (textline, schematic,...)
 
-        if problemtree in self.responders:		# let each Response render itself
+            state = {'value': value,
+                   'status': status,
+                   'id': problemtree.get('id'),
+                   'feedback': {'message': msg,
+                                'hint': hint,
+                                'hintmode': hintmode,}}
+
+            input_type_cls = inputtypes.get_class_for_tag(problemtree.tag)
+            the_input = input_type_cls(self.system, problemtree, state)
+            return the_input.get_html()
+
+        # let each Response render itself
+        if problemtree in self.responders:
             return self.responders[problemtree].render_html(self._extract_html)
 
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            item_xhtml = self._extract_html(item)		# nothing special: recurse
+            # render child recursively
+            item_xhtml = self._extract_html(item)
             if item_xhtml is not None:
                     tree.append(item_xhtml)
 
         if tree.tag in html_transforms:
             tree.tag = html_transforms[problemtree.tag]['tag']
         else:
-            for (key, value) in problemtree.items():	 # copy attributes over if not innocufying
+            # copy attributes over if not innocufying
+            for (key, value) in problemtree.items():
                 tree.set(key, value)
 
         tree.text = problemtree.text
@@ -490,31 +551,41 @@ class LoncapaProblem(object):
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
-            response.set('id', response_id_str)				# create and save ID for this response
+            # create and save ID for this response
+            response.set('id', response_id_str)
             response_id += 1
 
             answer_id = 1
-            inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x for x in (entry_types + solution_types)]),
+            inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x
+                                               for x in (entry_types + solution_types)]),
                                     id=response_id_str)
-            for entry in inputfields:			                # assign one answer_id for each entry_type or solution_type
+
+            # assign one answer_id for each entry_type or solution_type
+            for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
-            responder = response_tag_dict[response.tag](response, inputfields, self.context, self.system)  # instantiate capa Response
-            self.responders[response] = responder                               # save in list in self
+            # instantiate capa Response
+            responder = response_tag_dict[response.tag](response, inputfields,
+                                                        self.context, self.system)
+            # save in list in self
+            self.responders[response] = responder
 
-        # get responder answers (do this only once, since there may be a performance cost, eg with externalresponse)
+        # get responder answers (do this only once, since there may be a performance cost,
+        # eg with externalresponse)
         self.responder_answers = {}
         for response in self.responders.keys():
             try:
                 self.responder_answers[response] = self.responders[response].get_answers()
             except:
-                log.debug('responder %s failed to properly return get_answers()' % self.responders[response])  # FIXME
+                log.debug('responder %s failed to properly return get_answers()',
+                          self.responders[response])  # FIXME
                 raise
 
-        # <solution>...</solution> may not be associated with any specific response; give IDs for those separately
+        # <solution>...</solution> may not be associated with any specific response; give
+        # IDs for those separately
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
         solution_id = 1
         for solution in tree.findall('.//solution'):
