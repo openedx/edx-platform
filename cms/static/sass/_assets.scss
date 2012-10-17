@@ -9,6 +9,7 @@
     @include blue-button;
     float: left;
     margin-right: 20px;
+    padding: 8px 30px 10px;
     font-size: 12px;
   }
 
@@ -45,6 +46,14 @@
             border-top: none;
           }
         }
+
+        .name-col {
+          font-size: 14px;
+        }
+
+        .date-col {
+          font-size: 12px;
+        }
       }
 
       .thumb-col {
@@ -52,11 +61,16 @@
       }
 
       .date-col {
-        width: 200px;
+        width: 220px;
       }
 
       .embed-col {
-        width: 70px;
+        width: 250px;
+      }
+
+      .embeddable-xml-input {
+        @include box-shadow(none);
+        width: 100%;
       }
 
       .thumb {
@@ -155,6 +169,22 @@
 		line-height: 29px;
 		text-align: center;
 	}
+
+  .embeddable {
+    display: none;
+    margin: 30px 0 130px;
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+  }
+
+  .embeddable-xml-input {
+    @include box-shadow(none);
+    width: 400px;
+  }
 
 	.copy-button {
 		@include white-button;
