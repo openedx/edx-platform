@@ -25,6 +25,7 @@ $(document).ready(function() {
     $('.upload-modal .close-button').bind('click', hideModal);
 
     $('a.show-xml').toggle(showEmbeddableXML, hideEmbeddableXML);
+    $('.embeddable-xml-input').bind('click', function(){ $(this).select(); });
 
     $('a.copy-button').toggle(showEmbeddableXML, hideEmbeddableXML);
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);

@@ -9,6 +9,7 @@
     @include blue-button;
     float: left;
     margin-right: 20px;
+    padding: 8px 30px 10px;
     font-size: 12px;
   }
 
@@ -45,6 +46,10 @@
             border-top: none;
           }
         }
+
+        .date-col {
+          font-size: 12px;
+        }
       }
 
       .thumb-col {
@@ -52,11 +57,15 @@
       }
 
       .date-col {
-        width: 200px;
+        width: 220px;
       }
 
       .embed-col {
-        width: 70px;
+        width: 250px;
+      }
+
+      .embeddable-xml-input {
+        width: 100%;
       }
 
       .thumb {
