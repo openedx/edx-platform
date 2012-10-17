@@ -177,6 +177,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
   initialize: =>
     @model.on('change:metadata', @render)
     @saveName
+    @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
   render: =>
     @$('.unit-display-name-input').val(@model.get('metadata').display_name)
@@ -186,7 +187,18 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = @$('.unit-display-name-input').val()
     $('.unit-location .editing .unit-name').html(metadata.display_name)
-    @model.set('metadata', metadata)
+    @model.set 'metadata', metadata
+
+    inputField = this.$el.find('input')
+
+    # add a spinner
+    @$spinner.css({
+        'position': 'absolute',
+        'top': Math.floor(inputField.position().top + (inputField.outerHeight() / 2) + 3),
+        'left': inputField.position().left + inputField.outerWidth() - 24,
+        'margin-top': '-10px'
+    });
+    inputField.after(@$spinner);
 
     # save the name after a slight delay
     if @timer
@@ -194,6 +206,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     @timer = setTimeout( =>
       @model.save()
       @timer = null
+      @$spinner.delay(500).fadeOut(150)
     , 500)
 
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
