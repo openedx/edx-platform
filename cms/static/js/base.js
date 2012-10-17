@@ -81,6 +81,11 @@ $(document).ready(function() {
     $('.section-name').bind('click', editSectionName);
     $('.edit-section-name-cancel').bind('click', cancelEditSectionName);
     $('.edit-section-name-save').bind('click', saveEditSectionName);
+
+    // section date setting
+    $('.set-publish-date').bind('click', setSectionScheduleDate);
+    $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
+    $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
 });
 
 function showImportSubmit(e) {
@@ -184,10 +189,7 @@ function onSectionReordered() {
     });
 }
 
-function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
-    var input_date = $('#'+date_id).val();
-    var input_time = $('#'+time_id).val();
-
+function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
     var edxTimeStr = null;
 
     if (input_date != '') {
@@ -203,6 +205,13 @@ function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
     }
 
     return edxTimeStr;
+}
+
+function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
+    var input_date = $('#'+date_id).val();
+    var input_time = $('#'+time_id).val();
+
+    return getEdxTimeFromDateTimeVals(input_date, input_time, format);
 }
 
 function saveSubsection(e) {
@@ -625,5 +634,42 @@ function saveEditSectionName(e) {
         $_this.parent().siblings('span.section-name-span').show();
         $_this.parent().hide();
         e.stopPropagation();        
+    });
+}
+
+function setSectionScheduleDate(e) {
+    e.preventDefault();
+    $(this).closest("h4").hide();
+    $(this).parent().siblings(".datepair").show();
+}
+
+function cancelSetSectionScheduleDate(e) {
+    e.preventDefault();
+    $(this).closest(".datepair").hide();
+    $(this).parent().siblings("h4").show();
+}
+
+function saveSetSectionScheduleDate(e) {
+    e.preventDefault();
+
+    input_date = $(this).siblings('input.date').val();
+    input_time = $(this).siblings('input.time').val();
+
+    start = getEdxTimeFromDateTimeVals(input_date, input_time);
+
+    id = $(this).closest("section.courseware-section").data("id");
+    var $_this = $(this);
+
+        // call into server to commit the new order
+    $.ajax({
+        url: "/save_item",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data:JSON.stringify({ 'id' : id, 'metadata' : {'start' : start}, 'data': null, 'children' : null})
+    }).success(function()
+    {
+        alert('Your changes have been saved.');
+        location.reload();     
     });
 }

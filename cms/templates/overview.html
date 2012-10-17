@@ -1,8 +1,22 @@
 <%inherit file="base.html" />
+<%!
+   from time import mktime
+   import dateutil.parser
+   import logging
+   from datetime import datetime
+%>
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">CMS Courseware Overview</%block>
 
+<%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
+
+<%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+<script src="${static.url('js/vendor/date.js')}"></script>
+</%block>
 
 <%block name="header_extras">
   <script type="text/template" id="new-section-template">
@@ -57,13 +71,27 @@
                 <span class="section-name-span">${section.display_name}</span>
                 <div class="section-name-edit" style="display:none">
                   <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
-                  <a href="#" class="edit-section-name-save">Save</a><a href="#" class="edit-section-name-cancel">Cancel</a>
+                  <a href="#" class="save-button edit-section-name-save">Save</a><a href="#" class="cancel-button edit-section-name-cancel">Cancel</a>
                 </div>
               </h3>
-              <h4>
-                <strong>Unscheduled:</strong> 
-                <a href="#" class="set-publish-date">click here to set</a>
+              <h4 class='section-published-date'>
+                <%
+                  start_date = datetime.fromtimestamp(mktime(section.start)) if section.start is not None else None
+                  start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
+                  start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
+                %>
+                %if start_date is None:
+                  <strong>Unscheduled:</strong> 
+                  <a href="#" class="set-publish-date">click here to set</a>
+                %else:
+                  <strong>${start_date_str} at ${start_time_str}</strong> <a href="#" class="set-publish-date">click here to edit</a>
+                %endif
               </h4>
+              <div class="datepair" data-language="javascript" style="display: none">
+                <input type="text" name="start_date" value="${start_date_str}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+                <input type="text" name="start_time" value="${start_time_str}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
+                <a href="#" class="save-button edit-section-start-save">Save</a><a href="#" class="cancel-button edit-section-start-cancel">Cancel</a>
+              </div>
             </div>
             <div class="item-actions">
               <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
