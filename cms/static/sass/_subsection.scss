@@ -35,6 +35,27 @@
 		}
 	}
 
+	.policy-list-element {
+		.save-button,
+		.cancel-button {
+			display: none;
+		}
+	}
+
+	.new-policy-list-element {
+		.save-button {
+			@include blue-button;
+		}
+
+		.cancel-button {
+			@include white-button;
+		}
+
+		.delete-icon {
+			display: none;
+		}
+	}
+
 	.new-policy-item {
 		margin: 10px 0;
 

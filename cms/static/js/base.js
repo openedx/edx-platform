@@ -35,7 +35,7 @@ $(document).ready(function() {
     $('.save-subsection').bind('click', saveSubsection);
 
     // autosave when a field is updated on the subsection page
-    $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value', checkForNewValue);
+    $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
     $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function(i) {
         this.nameString = $(this).val();
     });
@@ -112,7 +112,7 @@ function showImportSubmit(e) {
         $('.file-name-block').show();
         $('.import .choose-file-button').hide();
         $('.submit-button').show();
-        $('.progress').show();    
+        $('.progress').show();
     } else {
         $('.error-block').html('File format not supported. Please upload a file with a <code>tar.gz</code> extension.').show();
     }
@@ -120,27 +120,44 @@ function showImportSubmit(e) {
 
 function syncReleaseDate(e) {
     e.preventDefault();
+    $(this).closest('.notice').hide();
     $("#start_date").val("");
     $("#start_time").val("");
 }
 
 function addPolicyMetadata(e) {
     e.preventDefault();
-    var template =$('#add-new-policy-element-template > li'); 
+    var template =$('#add-new-policy-element-template > li');
     var newNode = template.clone();
     var _parent_el = $(this).parent('ol:.policy-list');
     newNode.insertBefore('.add-policy-data');
     $('.remove-policy-data').bind('click', removePolicyMetadata);
+    newNode.find('.policy-list-name').focus();
+    newNode.find('.save-button').bind('click', savePolicyMetadata);
+    newNode.find('.cancel-button').bind('click', cancelPolicyMetadata);
+}
+
+function savePolicyMetadata(e) {
+    e.preventDefault();
+    $('.save-subsection').click();
+    $(this).parents('.policy-list-element').removeClass('new-policy-list-element');
+}
+
+function cancelPolicyMetadata(e) {
+    e.preventDefault();
+    $(this).parents('.policy-list-element').remove();
 }
 
 function removePolicyMetadata(e) {
     e.preventDefault();
     policy_name = $(this).data('policy-name');
     var _parent_el = $(this).parent('li:.policy-list-element');
-    if ($(_parent_el).hasClass("new-policy-list-element"))
-        _parent_el.remove();
-    else
+    if ($(_parent_el).hasClass("new-policy-list-element")) {
+        _parent_el.remove();        
+    } else {
         _parent_el.appendTo("#policy-to-delete");
+    }
+    $('.save-subsection').click();
 }
 
 
@@ -219,6 +236,10 @@ function getEdxTimeFromDateTimeInputs(date_id, time_id, format) {
 }
 
 function checkForNewValue(e) {
+    if($(this).parents('.new-policy-list-element')[0]) {
+        return;
+    }
+
     this.hasChanged = this.nameString != $(this).val() && this.nameString;
     this.nameString = $(this).val();
     if(this.hasChanged) {
@@ -239,7 +260,7 @@ function autosaveInput(e) {
         clearTimeout(this.saveTimer);
     }
 
-    this.saveTimer = setTimeout(function() {
+    this.saveTimer = setTimeout(function() {        
         $changedInput = $(e.target);
         $('.save-subsection').click();
         this.saveTimer = null;
@@ -249,14 +270,15 @@ function autosaveInput(e) {
 function saveSubsection(e) {
     e.preventDefault();
 
-    // add an inline spinner
-    $spinner.css({
-        'position': 'absolute',
-        'top': Math.floor($changedInput.position().top + ($changedInput.outerHeight() / 2) + 3),
-        'left': $changedInput.position().left + $changedInput.outerWidth() - 24,
-        'margin-top': '-10px'
-    });
-    $changedInput.after($spinner);
+    if($changedInput && !$changedInput.hasClass('no-spinner')) {
+        $spinner.css({
+            'position': 'absolute',
+            'top': Math.floor($changedInput.position().top + ($changedInput.outerHeight() / 2) + 3),
+            'left': $changedInput.position().left + $changedInput.outerWidth() - 24,
+            'margin-top': '-10px'
+        });
+        $changedInput.after($spinner);
+    }
     
     var id = $(this).data('id');
 
@@ -598,7 +620,7 @@ function addNewSubsection(e) {
     e.preventDefault();
     var $section = $(this).closest('.courseware-section');
     var $newSubsection = $($('#new-subsection-template').html());
-    $section.find('.unit-list > ol').append($newSubsection);
+    $section.find('.subsection-list > ol').append($newSubsection);
     $section.find('.new-subsection-name-input').focus().select();
 
     var $saveButton = $newSubsection.find('.new-subsection-name-save');
@@ -609,7 +631,7 @@ function addNewSubsection(e) {
     $saveButton.data('parent', parent)
     $saveButton.data('template', $(this).data('template'));
 
-    $newSubsection.find('.new-subsection-name-cancel').bind('click', cancelNewSubsection);    
+    $newSubsection.find('.new-subsection-name-cancel').bind('click', cancelNewSubsection);
 }
 
 function saveNewSubsection(e) {
@@ -631,8 +653,6 @@ function saveNewSubsection(e) {
                 location.reload();             
             }
        });  
-
-            
 }
 
 function cancelNewSubsection(e) {
