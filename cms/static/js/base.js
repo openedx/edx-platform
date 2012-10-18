@@ -150,6 +150,10 @@ function cancelPolicyMetadata(e) {
 
 function removePolicyMetadata(e) {
     e.preventDefault();
+
+    if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
+       return;
+   
     policy_name = $(this).data('policy-name');
     var _parent_el = $(this).parent('li:.policy-list-element');
     if ($(_parent_el).hasClass("new-policy-list-element")) {
