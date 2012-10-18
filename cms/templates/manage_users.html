@@ -9,12 +9,14 @@
 
     <article class="user-overview">
       <div class="details">
-        <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional source staff below. Please note that they must have already registered and verified their account.</p>
+        <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional source staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
       </div>
       <div class="list-header">
+        %if allow_actions:
         <a href="#" class="new-user-button">
           <span class="plus-icon"></span>New User
         </a>
+        %endif
       </div>
       %if allow_actions:
       <div class="new-user-form">
