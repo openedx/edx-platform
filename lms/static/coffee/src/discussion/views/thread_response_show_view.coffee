@@ -37,6 +37,9 @@ if Backbone?
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.addClass("staff")
         @$el.prepend('<div class="staff-banner">staff</div>')
+      else if DiscussionUtil.isTA(@model.get("user_id"))
+        @$el.addClass("community-ta")
+        @$el.prepend('<div class="community-ta-banner">Community TA</div>')
 
     toggleVote: (event) ->
       event.preventDefault()

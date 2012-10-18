@@ -5,8 +5,6 @@
        % endif
   >${value|h}</textarea>
 
-  <span id="answer_${id}"></span>
-
   <div class="grader-status">
     % if state == 'unsubmitted':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
@@ -25,6 +23,8 @@
 
     <p class="debug">${state}</p>
   </div>
+
+  <span id="answer_${id}"></span>
 
   <div class="external-grader-message">
     ${msg|n}

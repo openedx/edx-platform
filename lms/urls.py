@@ -52,6 +52,7 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
+    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'UTx'}),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -88,6 +89,8 @@ urlpatterns = ('',
         {'template': 'press_releases/edX_announces_proctored_exam_testing.html'}, name="press/edX-announces-proctored-exam-testing"),
     url(r'^press/elsevier-collaborates-with-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Elsevier_collaborates_with_edX.html'}, name="press/elsevier-collaborates-with-edx"),
+    url(r'^press/ut-joins-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
 
 
     # Should this always update to point to the latest press release?
@@ -141,6 +144,24 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
+
+        # TODO (vshnayder): This is a hack.  It creates a direct connection from
+        # the LMS to capa functionality, and really wants to go through the
+        # input types system so that previews can be context-specific.
+        # Unfortunately, we don't have time to think through the right way to do
+        # that (and implement it), and it's not a terrible thing to provide a
+        # generic chemican-equation rendering service.
+        url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
+            name='preview_chemcalc'),
+
+        # Software Licenses
+
+        # TODO: for now, this is the endpoint of an ajax replay
+        # service that retrieve and assigns license numbers for
+        # software assigned to a course. The numbers have to be loaded
+        # into the database.
+        url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
@@ -244,7 +265,7 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
-        url(r'^openid/provider/login/(?:[\w%\. ]+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
+        url(r'^openid/provider/login/(?:.+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
         url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
         url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
     )
