@@ -1,28 +1,50 @@
 ---
 metadata:
     display_name: Numerical Response
+    rerandomize: never
+    showanswer: always
 data: |
- <problem>
-      <text>
- <h2>Example: Numerical Response Problem</h2>
- 
- <p>
+   <problem>
+   <p>
    A numerical response problem accepts a line of text input from the
    student, and evaluates the input for correctness based on its
    numerical value.  
- </p>
- 
- <p>
+   </p>
+
+   <p>
    The answer is correct if it is within a specified numerical tolerance
    of the expected answer.
- </p>
- 
- <p>Enter the numerical value of Pi:
-   <numericalresponse answer="3.14159">
-            <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
-            <textline />
-   </numericalresponse>
- </p>
-      </text>
- </problem>
+   </p>
+   <script type="loncapa/python">
+   computed_response = 502*9
+   </script>
+
+   <p>Enter the numerical value of Pi:
+       <numericalresponse answer="3.14159">
+           <responseparam type="tolerance" default=".02" />
+           <textline />
+       </numericalresponse>
+   </p>
+   <p>Enter the approximate value of 502*9:
+       <numericalresponse answer="$computed_response">
+           <responseparam type="tolerance" default="15%"/>
+           <textline />
+       </numericalresponse>
+   </p>
+
+   <p>Enter the number of fingers on a human hand:
+       <numericalresponse answer="5">
+           <textline />
+       </numericalresponse>
+   </p>
+       <solution>
+           <div class="detailed-solution">
+               <p>Explanation</p>
+               <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+               <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+               <p>If you look at your hand, you can count that you have five fingers.</p>
+           </div>
+       </solution>
+   </problem>
+
 children: []
