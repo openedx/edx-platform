@@ -559,7 +559,6 @@ def reactivation_email(request):
 
 def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
-    reg.register(user)
 
     d = {'name': user.profile.name,
          'key': reg.activation_key}
