@@ -180,12 +180,12 @@ function onSectionReordered() {
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
     var edxTimeStr = null;
 
-    if (input_date != '') {
-        if (input_time == '') 
-            input_time = '00:00';
+    if (date_val != '') {
+        if (time_val == '') 
+            time_val = '00:00';
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        date = Date.parse(input_date+" "+input_time);
+        date = Date.parse(date_val+" "+time_val);
         if (format == null)
             format = 'yyyy-MM-ddTHH:mm';
 
