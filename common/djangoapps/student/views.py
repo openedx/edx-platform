@@ -743,7 +743,12 @@ def accept_name_change_by_id(id):
 
 @ensure_csrf_cookie
 def accept_name_change(request):
-    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change '''
+    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change 
+    
+    We used this during the prototype but now we simply record name changes instead
+    of manually approving them. Still keeping this around in case we want to go
+    back to this approval method.
+    '''
     if not request.user.is_staff:
         raise Http404
 
