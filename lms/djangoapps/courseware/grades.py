@@ -329,9 +329,15 @@ def progress_summary(student, request, course, student_module_cache):
 def get_score(course_id, user, problem_descriptor, module_creator, student_module_cache):
     """
     Return the score for a user on a problem, as a tuple (correct, total).
+    e.g. (5,7) if you got 5 out of 7 points.
+
+    If this problem doesn't have a score, or we couldn't load it, returns (None,
+    None).
 
     user: a Student object
-    problem: an XModule
+    problem_descriptor: an XModuleDescriptor
+    module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.
+           Can return None if user doesn't have access, or if something else went wrong.
     cache: A StudentModuleCache
     """
     if not (problem_descriptor.stores_state and problem_descriptor.has_score):
@@ -339,14 +345,16 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         return (None, None)
 
     correct = 0.0
-    
+
     instance_module = student_module_cache.lookup(
         course_id, problem_descriptor.category, problem_descriptor.location.url())
-    
+
     if not instance_module:
         # If the problem was not in the cache, we need to instantiate the problem.
-        # Otherwise, the max score (cached in instance_module) won't be available 
+        # Otherwise, the max score (cached in instance_module) won't be available
         problem = module_creator(problem_descriptor)
+        if problem is None:
+            return (None, None)
         instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
     # If this problem is ungraded/ungradable, bail
@@ -361,7 +369,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         weight = getattr(problem_descriptor, 'weight', None)
         if weight is not None:
             if total == 0:
-                log.exception("Cannot reweight a problem with zero weight. Problem: " + str(instance_module))
+                log.exception("Cannot reweight a problem with zero total points. Problem: " + str(instance_module))
                 return (correct, total)
             correct = correct * weight / total
             total = weight

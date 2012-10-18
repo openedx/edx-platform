@@ -1,0 +1,51 @@
+<% doinline = "inline" if inline else "" %>
+
+<section id="textinput_${id}" class="textinput ${doinline}" >
+     <div id="holder" style="width:${width};height:${height}"></div>
+    <div class="script_placeholder" data-src="/static/js/raphael.js"></div><div class="script_placeholder" data-src="/static/js/sylvester.js"></div><div class="script_placeholder" data-src="/static/js/underscore-min.js"></div>
+    <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
+
+
+    % if state == 'unsubmitted':
+    <div class="unanswered ${doinline}" id="status_${id}">
+    % elif state == 'correct':
+    <div class="correct ${doinline}" id="status_${id}">
+    % elif state == 'incorrect':
+    <div class="incorrect ${doinline}" id="status_${id}">
+    % elif state == 'incomplete':
+    <div class="incorrect ${doinline}" id="status_${id}">
+    % endif
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+
+  <input type="text" name="input_${id}" id="input_${id}" value="${value}"
+   % if size:
+   size="${size}"
+   % endif
+   % if hidden:
+    style="display:none;"
+   % endif
+   />
+
+      <p class="status">
+        % if state == 'unsubmitted':
+        unanswered
+        % elif state == 'correct':
+        correct
+        % elif state == 'incorrect':
+        incorrect
+        % elif state == 'incomplete':
+        incomplete
+        % endif
+      </p>
+
+  <p id="answer_${id}" class="answer"></p>
+
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
+% if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete'] or hidden:
+</div>
+% endif
+</section>

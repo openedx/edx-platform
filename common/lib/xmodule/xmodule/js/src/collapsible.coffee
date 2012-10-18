@@ -11,11 +11,12 @@ class @Collapsible
     ###
     el.find('.longform').hide()
     el.find('.shortform').append('<a href="#" class="full">See full output</a>')
-    el.find('.collapsible section').hide()
+    el.find('.collapsible header + section').hide()
     el.find('.full').click @toggleFull
     el.find('.collapsible header a').click @toggleHint
 
   @toggleFull: (event) =>
+    event.preventDefault()
     $(event.target).parent().siblings().slideToggle()
     $(event.target).parent().parent().toggleClass('open')
     if $(event.target).text() == 'See full output'

@@ -156,7 +156,11 @@ if Backbone?
       @$(".post-list").append(view.el)
 
     threadSelected: (e) =>
-      thread_id = $(e.target).closest("a").data("id")
+      # Use .attr('data-id') rather than .data('id') because .data does type
+      # coercion. Usually, this is fine, but when Mongo gives an object id with
+      # no letters, it casts it to a Number.
+
+      thread_id = $(e.target).closest("a").attr("data-id")
       @setActiveThread(thread_id)
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
