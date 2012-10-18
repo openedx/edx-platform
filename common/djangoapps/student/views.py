@@ -654,9 +654,12 @@ def confirm_email_change(request, key):
     meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
     up.set_meta(meta)
     up.save()
+    # Send it to the old email...
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     user.email = pec.new_email
     user.save()
     pec.delete()
+    # And send it to the new email...
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return render_to_response("email_change_successful.html", d)
