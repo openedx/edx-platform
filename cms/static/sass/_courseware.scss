@@ -28,14 +28,45 @@ input.courseware-unit-search-input {
 
 	&.collapsed {
 		padding-bottom: 0;
+	}
 
-		header {
-			height: 47px;
-		}
-		
-		h4 {
-			display: none !important;
-		}
+	label {
+		float: left;
+		line-height: 29px;
+	}
+
+	.datepair {
+		float: left;
+		margin-left: 10px;
+	}
+
+	.section-published-date {
+		position: absolute;
+		top: 12px;
+		right: 90px;
+		width: 250px;
+		font-size: 13px;
+	}
+
+	.datepair .date,
+	.datepair .time {
+		padding-left: 0;
+		padding-right: 0;
+		border: none;
+		background: none;
+		@include box-shadow(none);
+		font-size: 13px;
+		font-weight: 700;
+		color: $blue;
+		cursor: pointer;
+	}
+
+	.datepair .date {
+		width: 80px;
+	}
+
+	.datepair .time {
+		width: 65px;
 	}
 
 	&.collapsed .subsection-list,
@@ -45,11 +76,11 @@ input.courseware-unit-search-input {
 	}
 
 	header {
-		height: 67px;
+		height: 55px;
 
 		.item-details {
 			float: left;
-			padding: 10px 0 0;
+			padding: 15px 0 0;
 		}
 
 		.item-actions {			
@@ -64,7 +95,7 @@ input.courseware-unit-search-input {
 
 		.expand-collapse-icon {
 			float: left;
-			margin: 16px 6px 16px 16px;
+			margin: 20px 6px 16px 16px;
 			@include transition(none);
 		}
 

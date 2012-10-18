@@ -734,7 +734,7 @@ function saveSetSectionScheduleDate(e) {
     id = $(this).closest("section.courseware-section").data("id");
     var $_this = $(this);
 
-        // call into server to commit the new order
+    // call into server to commit the new order
     $.ajax({
         url: "/save_item",
         type: "POST",
