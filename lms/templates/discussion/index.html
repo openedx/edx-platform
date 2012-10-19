@@ -2,8 +2,8 @@
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django.core.urlresolvers import reverse %>
 
-<%inherit file="../main.html" />
-<%namespace name='static' file='../static_content.html'/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">discussion</%block>
 <%block name="title"><title>Discussion – ${course.number | h}</title></%block>
 
