@@ -86,6 +86,11 @@ $(document).ready(function() {
     $('.set-publish-date').bind('click', setSectionScheduleDate);
     $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
     $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
+
+    // modal upload asset dialog. Bind it in the initializer otherwise multiple hanlders will get registered causing
+    // pretty wacky stuff to happen
+    $('.file-input').bind('change', startUpload);
+    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
 });
 
 function showImportSubmit(e) {
@@ -304,8 +309,6 @@ function _deleteItem($el) {
 function showUploadModal(e) {
     e.preventDefault();
     $('.upload-modal').show();
-    $('.file-input').bind('change', startUpload);
-    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $modalCover.show();
 }
 
@@ -357,8 +360,6 @@ function displayFinishedUpload(xhr) {
     var template = $('#new-asset-element').html();
     var html = Mustache.to_html(template, resp);
     $('table > tbody > tr:first').before(html);
-
-    $("tr[data-id='" + resp.url + "'] a.show-xml").toggle(showEmbeddableXML, hideEmbeddableXML);
 
 }
 
