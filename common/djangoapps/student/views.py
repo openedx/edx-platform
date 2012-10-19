@@ -635,7 +635,7 @@ def confirm_email_change(request, key):
     try:
         pec = PendingEmailChange.objects.get(activation_key=key)
     except PendingEmailChange.DoesNotExist:
-        return render_to_response("invalid_email_key.html", {})
+        return render_to_response("portal/invalid_email_key.html", {})
 
     user = pec.user
     d = {'old_email': user.email,

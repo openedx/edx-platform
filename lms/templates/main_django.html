@@ -23,13 +23,13 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %}">
-  {% include "navigation.html" %}
+  {% include "frame/navigation.html" %}
   <section class="content-wrapper">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
   </section>
   
-  {% include "footer.html" %}
+  {% include "frame/footer.html" %}
     
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}

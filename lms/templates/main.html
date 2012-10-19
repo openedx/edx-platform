@@ -39,13 +39,13 @@
 
 <body class="<%block name='bodyclass'/>">
 
-  <%include file="navigation.html" />
+  <%include file="frame/navigation.html" />
   <section class="content-wrapper">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-  <%include file="footer.html" />
+  <%include file="frame/footer.html" />
 
   <%static:js group='application'/>
   <%static:js group='module-js'/>
