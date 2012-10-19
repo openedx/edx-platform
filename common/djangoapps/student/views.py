@@ -642,7 +642,7 @@ def confirm_email_change(request, key):
          'new_email': pec.new_email}
 
     if len(User.objects.filter(email=pec.new_email)) != 0:
-        return render_to_response("email_exists.html", d)
+        return render_to_response("portal/email_exists.html", d)
 
     subject = render_to_string('emails/email_change_subject.txt', d)
     subject = ''.join(subject.splitlines())
@@ -662,7 +662,7 @@ def confirm_email_change(request, key):
     # And send it to the new email...
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
-    return render_to_response("email_change_successful.html", d)
+    return render_to_response("portal/email_change_successful.html", d)
 
 
 @ensure_csrf_cookie

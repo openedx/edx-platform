@@ -18,7 +18,7 @@ def index(request, course_id, book_index, page=None):
     if page is None:
         page = textbook.start_page
 
-    return render_to_response('staticbook.html',
+    return render_to_response('courseware/staticbook.html',
                               {'book_index': book_index, 'page': int(page),
                                'course': course, 'book_url': textbook.book_url,
                                'table_of_contents': table_of_contents,
