@@ -76,7 +76,7 @@ def courses(request):
     '''
     universities = get_courses_by_university(request.user,
                                              domain=request.META.get('HTTP_HOST'))
-    return render_to_response("courses.html", {'universities': universities})
+    return render_to_response("portal/courses.html", {'universities': universities})
 
 
 def render_accordion(request, course, chapter, section):

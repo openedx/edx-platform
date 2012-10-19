@@ -86,7 +86,7 @@ def index(request, extra_context={}, user=None):
                                              domain=domain)
     context = {'universities': universities, 'entries': entries}
     context.update(extra_context)
-    return render_to_response('index.html', context)
+    return render_to_response('portal/index.html', context)
 
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""
