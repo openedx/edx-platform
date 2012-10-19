@@ -610,6 +610,11 @@ function saveEditSectionName(e) {
     id = $(this).closest("section.courseware-section").data("id");
     display_name = $(this).prev('.edit-section-name').val();
 
+    if (display_name == '') {
+        alert("You must specify a name before saving.")
+        return;
+    }
+
     var $_this = $(this);
         // call into server to commit the new order
     $.ajax({
