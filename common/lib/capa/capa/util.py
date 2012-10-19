@@ -28,7 +28,17 @@ def contextualize_text(text, context):  # private
     Does a substitution of those variables from the context '''
     if not text: return text
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
-        text = text.replace('$' + key, str(context[key]))
+        # TODO (vshnayder): This whole replacement thing is a big hack
+        # right now--context contains not just just the vars defined
+        # in the program, but also e.g. a reference to the numpy
+        # module.  Should be a separate dict of variables that are
+        # should be replaced.
+        if '$' + key in text:
+            try:
+                s = str(context[key])
+            except UnicodeEncodeError:
+                s = context[key].encode('utf8', errors='ignore')
+            text = text.replace('$' + key, s)
     return text
 
 
