@@ -826,6 +826,10 @@ def remove_user(request, location):
     if user is None:
         return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
 
+    # make sure we're not removing ourselves
+    if user.id == request.user.id:
+        raise PermissionDenied()
+
     remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()

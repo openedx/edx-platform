@@ -185,7 +185,7 @@ function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
             time_val = '00:00';
 
         // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        date = Date.parse(date_val+" "+time_val);
+        date = Date.parse(date_val + " " + time_val);
         if (format == null)
             format = 'yyyy-MM-ddTHH:mm';
 
