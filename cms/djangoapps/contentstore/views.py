@@ -537,6 +537,19 @@ def delete_item(request):
 
     store = _modulestore(item_loc)
 
+    # when deleting containers, we need to update any parent modules that point to this deleted item
+    parent_locs = modulestore().get_parent_locations(item_loc)
+
+    if item_loc.category in DIRECT_ONLY_CATEGORIES or item_loc.category=='vertical':
+        for parent_loc in parent_locs:
+            parent = modulestore('direct').get_item(parent_loc)
+            if parent.definition['children'] is not None:
+                children = parent.definition['children']
+                try:
+                    children.remove(item_loc.url())
+                except:
+                    pass  #assuming that element was not in the parent
+                modulestore('direct').update_children(parent_loc, children)
 
     # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
     # if item.location.revision=None, then delete both draft and published version
@@ -553,6 +566,8 @@ def delete_item(request):
     # requested delete to never occur
     if item.location.revision is None and item.location.category=='vertical' and delete_all_versions:
         modulestore('direct').delete_item(item.location)       
+
+
 
     return HttpResponse()
 
