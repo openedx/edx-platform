@@ -614,13 +614,11 @@ INSTALLED_APPS = (
     'staticfiles',
 
     # Our courseware
-    'circuit',
     'courseware',
     'perfstats',
     'student',
     'static_template_view',
     'staticbook',
-    'simplewiki',
     'track',
     'util',
     'certificates',
