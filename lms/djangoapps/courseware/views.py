@@ -27,8 +27,6 @@ from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
 from student.models import UserProfile
 
-from multicourse import multicourse_settings
-
 from django_comment_client.utils import get_discussion_title
 
 from student.models import UserTestGroup, CourseEnrollment
