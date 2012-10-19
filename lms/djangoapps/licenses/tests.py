@@ -8,7 +8,7 @@ from django.core.management import call_command
 
 from models import CourseSoftware, UserLicense
 
-COURSE_1 = 'MITx/6.002x/2012_Fall'
+COURSE_1 = 'edX/toy/2012_Fall'
 
 SOFTWARE_1 = 'matlab'
 SOFTWARE_2 = 'stata'
