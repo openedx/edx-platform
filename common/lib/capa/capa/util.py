@@ -26,13 +26,14 @@ def compare_with_tolerance(v1, v2, tol):
 def contextualize_text(text, context):  # private
     ''' Takes a string with variables. E.g. $a+$b.
     Does a substitution of those variables from the context '''
-    if not text: return text
+    if not text:
+        return text
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
         # TODO (vshnayder): This whole replacement thing is a big hack
-        # right now--context contains not just just the vars defined
-        # in the program, but also e.g. a reference to the numpy
-        # module.  Should be a separate dict of variables that are
-        # should be replaced.
+        # right now--context contains not just the vars defined in the
+        # program, but also e.g. a reference to the numpy module.
+        # Should be a separate dict of variables that should be
+        # replaced.
         if '$' + key in text:
             try:
                 s = str(context[key])
