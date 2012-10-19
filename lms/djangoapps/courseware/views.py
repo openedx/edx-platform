@@ -95,7 +95,7 @@ def render_accordion(request, course, chapter, section):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
-    return render_to_string('accordion.html', context)
+    return render_to_string('courseware/accordion.html', context)
 
 
 def get_current_child(xmodule):

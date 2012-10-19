@@ -147,7 +147,7 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for' : show_courseware_links_for}
 
-    return render_to_response('dashboard.html', context)
+    return render_to_response('portal/dashboard.html', context)
 
 
 def try_change_enrollment(request):
