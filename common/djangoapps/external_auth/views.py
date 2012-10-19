@@ -547,7 +547,7 @@ def provider_xrds(request):
     XRDS for endpoint discovery
     """
 
-    response = render_to_response('xrds.xml',
+    response = render_to_response('extauth/xrds.xml',
                                   {'url': get_xrds_url('login', request)},
                                   mimetype='text/xml')
 

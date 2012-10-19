@@ -446,7 +446,7 @@ def render_notifications(request, course, notifications):
         'get_discussion_title': partial(get_discussion_title, request=request, course=course),
         'course': course,
     }
-    return render_to_string('notifications.html', context)
+    return render_to_string('courseware/notifications.html', context)
 
 @login_required
 def news(request, course_id):

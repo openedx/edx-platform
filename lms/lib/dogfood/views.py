@@ -142,10 +142,10 @@ def df_capa_problem(request, id=None):
     request.session['dogfood_id'] = id
 
     # hand over to quickedit to do the rest
-    return quickedit(request, id=id, qetemplate='dogfood.html', coursename=coursename)
+    return quickedit(request, id=id, qetemplate='dogfood/dogfood.html', coursename=coursename)
 
 
-def quickedit(request, id=None, qetemplate='quickedit.html', coursename=None):
+def quickedit(request, id=None, qetemplate='dogfood/quickedit.html', coursename=None):
     '''
     quick-edit capa problem.
 
@@ -321,5 +321,5 @@ def quickedit_git_reload(request):
                'csrf': csrf(request)['csrf_token'],
                }
 
-    result = render_to_response("gitupdate.html", context)
+    result = render_to_response("dogfood/gitupdate.html", context)
     return result

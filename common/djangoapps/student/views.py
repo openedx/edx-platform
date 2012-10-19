@@ -68,7 +68,7 @@ def index(request, extra_context={}, user=None):
         if hasattr(settings, 'RSS_URL'):
             feed_data = urllib.urlopen(settings.RSS_URL).read()
         else:
-            feed_data = render_to_string("feed.rss", None)
+            feed_data = render_to_string("portal/feed.rss", None)
         cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
 
     feed = feedparser.parse(feed_data)
@@ -101,7 +101,7 @@ def press(request):
             content = urllib.urlopen(settings.PRESS_URL).read()
             json_articles = json.loads(content)
         else:
-            content = open(settings.PROJECT_ROOT / "templates" / "press.json").read()
+            content = open(settings.PROJECT_ROOT / "templates" / "portal/press.json").read()
             json_articles = json.loads(content)
         cache.set("student_press_json_articles", json_articles)
     articles = [Article(**article) for article in json_articles]
