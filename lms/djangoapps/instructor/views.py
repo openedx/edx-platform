@@ -361,7 +361,7 @@ def enroll_students(request, course_id):
         except:
             rejected_students.append(student)
 
-    return render_to_response("enroll_students.html", {'course': course_id,
+    return render_to_response("courseware/enroll_students.html", {'course': course_id,
                                                        'existing_students': existing_students,
                                                        'added_students': added_students,
                                                        'rejected_students': rejected_students,

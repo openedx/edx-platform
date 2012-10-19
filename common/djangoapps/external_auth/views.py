@@ -47,7 +47,7 @@ log = logging.getLogger("mitx.external_auth")
 def default_render_failure(request,
                            message,
                            status=403,
-                           template_name='extauth_failure.html',
+                           template_name='extauth/extauth_failure.html',
                            exception=None):
     """Render an Openid error page to the user"""
 
@@ -518,7 +518,7 @@ def provider_login(request):
         return_to = matches.group(1)
 
     # display login page
-    response = render_to_response('provider_login.html', {
+    response = render_to_response('extauth/provider_login.html', {
         'error': error,
         'return_to': return_to
     })
@@ -533,7 +533,7 @@ def provider_identity(request):
     XRDS for identity discovery
     """
 
-    response = render_to_response('identity.xml',
+    response = render_to_response('extauth/identity.xml',
                                   {'url': get_xrds_url('login', request)},
                                   mimetype='text/xml')
 

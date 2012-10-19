@@ -459,7 +459,7 @@ def news(request, course_id):
         'content': render_notifications(request, course, notifications),
     }
 
-    return render_to_response('news.html', context)
+    return render_to_response('courseware/news.html', context)
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

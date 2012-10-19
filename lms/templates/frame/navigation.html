@@ -92,7 +92,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 %if not user.is_authenticated():
-  <%include file="login_modal.html" />
-  <%include file="signup_modal.html" />
-  <%include file="forgot_password_modal.html" />
+  <%include file="/frame/login_modal.html" />
+  <%include file="/frame/signup_modal.html" />
+  <%include file="/frame/forgot_password_modal.html" />
 %endif
