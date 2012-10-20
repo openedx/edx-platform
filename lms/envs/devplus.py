@@ -57,7 +57,7 @@ DEBUG_TOOLBAR_PANELS = (
    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
    'debug_toolbar.panels.headers.HeaderDebugPanel',
    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-   #'debug_toolbar.panels.sql.SQLDebugPanel',
+   'debug_toolbar.panels.sql.SQLDebugPanel',
    'debug_toolbar.panels.signals.SignalDebugPanel',
    'debug_toolbar.panels.logger.LoggingPanel',
 
@@ -68,11 +68,4 @@ DEBUG_TOOLBAR_PANELS = (
   'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-}
-
-# PIPELINE = True
-MITX_FEATURES['DISABLE_START_DATES'] = True
-
-#GENERATE_PROFILE_SCORES = True
+#PIPELINE = True
