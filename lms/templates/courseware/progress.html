@@ -9,10 +9,6 @@
 
 <%block name="title"><title>${course.number} Progress</title></%block>
 
-<%!
-    from django.core.urlresolvers import reverse
-%>
-
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>

@@ -1,4 +1,3 @@
-<%! from django.core.urlresolvers import reverse %>\
 <?xml version="1.0" encoding="UTF-8"?>
 <%namespace name='static' file='static_content.html'/>
 <feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">

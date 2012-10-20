@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from mako.template import Template as MakoTemplate
 
 from mitxmako import middleware
@@ -53,6 +54,7 @@ class Template(MakoTemplate):
         context_dictionary['settings'] = settings
         context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
         context_dictionary['django_context'] = context_instance
+        context_dictionary['reverse'] = reverse
                 
         return super(Template, self).render(**context_dictionary)
         
