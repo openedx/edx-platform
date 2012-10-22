@@ -10,6 +10,7 @@ import sys
 import time
 import tarfile
 import shutil
+import tempfile
 from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
@@ -943,6 +944,12 @@ def create_new_course(request):
     if existing_course is not None:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
 
+    course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
+    courses = modulestore().get_items(course_search_location)
+
+    if len(courses) > 0:
+        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
+
     new_course = modulestore('direct').clone_item(template, dest_location)
 
     if display_name is not None:
@@ -978,7 +985,11 @@ def import_course(request, org, course, name):
 
         data_root = path(settings.GITHUB_REPO_ROOT)
 
-        temp_filepath = data_root / filename
+        course_dir = data_root / "{0}-{1}-{2}".format(org, course, name)
+        if not course_dir.isdir():
+            os.mkdir(course_dir)
+
+        temp_filepath = course_dir / filename
 
         logging.debug('importing course to {0}'.format(temp_filepath))
 
@@ -988,32 +999,42 @@ def import_course(request, org, course, name):
             temp_file.write(chunk)
         temp_file.close()
 
-        # @todo: don't assume the top-level directory that was unziped was the same name (but without .tar.gz)
-        course_dir = filename.replace('.tar.gz', '')
-
         tf = tarfile.open(temp_filepath)
-        if (data_root / course_dir).isdir():
-            shutil.rmtree(data_root / course_dir)
-        tf.extractall(data_root + '/')
+        tf.extractall(course_dir + '/')
 
-        os.remove(temp_filepath)    # remove the .tar.gz file
+        # find the 'course.xml' file
 
+        for r,d,f in os.walk(course_dir):
+            for files in f:
+                if files == 'course.xml':
+                    break
+            if files == 'course.xml':
+                break
 
-        with open(data_root / course_dir / 'course.xml', 'r') as course_file:
+        if files != 'course.xml':
+            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
+
+        logging.debug('found course.xml at {0}'.format(r))
+
+        if r != course_dir:
+            for fname in os.listdir(r):
+                shutil.move(r/fname, course_dir)
+
+        with open(course_dir / 'course.xml', 'r') as course_file:
             course_data = etree.parse(course_file, parser=edx_xml_parser)
             course_data_root = course_data.getroot()
             course_data_root.set('org', org)
             course_data_root.set('course', course)
             course_data_root.set('url_name', name)
 
-        with open(data_root / course_dir / 'course.xml', 'w') as course_file:
+        with open(course_dir / 'course.xml', 'w') as course_file:
             course_data.write(course_file)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
             [course_dir], load_error_modules=False, static_content_store=contentstore())
 
-        # remove content directory - we *shouldn't* need this any longer :-)
-        shutil.rmtree(data_root / course_dir)
+        # we can blow this away when we're done importing.
+        shutil.rmtree(course_dir)
 
         logging.debug('new course at {0}'.format(course_items[0].location))
 
