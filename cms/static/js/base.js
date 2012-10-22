@@ -37,7 +37,7 @@ $(document).ready(function() {
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
     $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function(i) {
-        this.nameString = $(this).val();
+        this.val = $(this).val();
     });
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
@@ -244,8 +244,13 @@ function checkForNewValue(e) {
         return;
     }
 
-    this.hasChanged = this.nameString != $(this).val() && this.nameString;
-    this.nameString = $(this).val();
+    if(this.val) {
+        this.hasChanged = this.val != $(this).val();    
+    } else {
+        this.hasChanged = false;
+    }
+
+    this.val = $(this).val();
     if(this.hasChanged) {
         if(this.saveTimer) {
             clearTimeout(this.saveTimer);
