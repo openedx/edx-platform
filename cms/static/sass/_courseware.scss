@@ -135,6 +135,32 @@ input.courseware-unit-search-input {
 		color: $blue;
 	}
 
+	.section-name-span {
+		cursor: pointer;
+		@include transition(color .15s);
+
+		&:hover {
+			color: $orange;
+		}
+	}
+
+	.section-name-edit {
+		input {
+			font-size: 16px;	
+		}
+		
+		.save-button {
+			@include blue-button;
+			padding: 7px 20px 7px;
+			margin-right: 5px;
+		}
+
+		.cancel-button {
+			@include white-button;
+			padding: 7px 20px 7px;
+		}
+	}
+
 	h4 {
 		font-size: 12px;
 		color: #878e9d;
