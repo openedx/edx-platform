@@ -27,7 +27,7 @@
           <label>Format:</label>
           <input type="text" value="${subsection.metadata['format'] if 'format' in subsection.metadata else ''}" class="unit-subtitle" data-metadata-name="format"/>
         </div>
-        <div class="unit-list">
+        <div class="sortable-unit-list">
           <label>Units:</label>
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
@@ -51,11 +51,16 @@
     </div>
 
     <div id="add-new-policy-element-template" style="display:none">
-           <li class="policy-list-element new-policy-list-element"><input type="text" class="policy-list-name" autocomplete="off" size="15"/>:&nbsp;<input type="text" class="policy-list-value" size=40 autocomplete="off"/><a href="#" class="delete-icon remove-policy-data"></a></li>       
+           <li class="policy-list-element new-policy-list-element">
+             <input type="text" class="policy-list-name" autocomplete="off" size="15"/>:&nbsp;<input type="text" class="policy-list-value" size=40 autocomplete="off"/>
+             <a href="#" class="save-button">Save</a>
+             <a href="#" class="cancel-button">Cancel</a>
+             <a href="#" class="delete-icon remove-policy-data"></a>
+           </li>       
     </div>
 
     <div class="sidebar">
-      <div class="unit-properties window">
+      <div class="unit-settings window">
     <h4>Subsection Settings</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
@@ -74,7 +79,7 @@
             % else:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name} – ${parent_start_date.strftime('%m/%d/%Y')} at ${parent_start_date.strftime('%H:%M')}.
             % endif
-            <a href="#" class="sync-date">Sync to ${parent_item.display_name}.</a></p>
+            <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name}.</a></p>
         % endif
       </div>
     <div class="due-date-input row">

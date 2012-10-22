@@ -276,7 +276,7 @@
   }
 }
 
-.unit-properties {
+.unit-settings {
   .window-contents {
     padding: 10px 20px;
   }
@@ -323,6 +323,7 @@
 
   .save-button {
     @include blue-button;
+    display: none;
   }
 
   .save-button,

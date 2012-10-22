@@ -15,7 +15,7 @@
 		width: 100%;
 	}
 
-	.unit-list {
+	.sortable-unit-list {
 		ol {
 			@include tree-view;
 		}
@@ -24,14 +24,38 @@
 	.policy-list {
 		.policy-list-name {
 			margin-right: 5px;
+			margin-bottom: 10px;
 		}
 
 		.policy-list-value {
 			margin-right: 10px;
 		}
+	}
 
-		li {
+	.policy-list-element {
+		.save-button,
+		.cancel-button {
+			display: none;
+		}
+	}
+
+	.new-policy-list-element {
+		padding: 10px 10px 0;
+		margin: 0 -10px;
+		border-radius: 3px;
+		background: $mediumGrey;
+
+		.save-button {
+			@include blue-button;
 			margin-bottom: 10px;
+		}
+
+		.cancel-button {
+			@include white-button;
+		}
+
+		.delete-icon {
+			display: none;
 		}
 	}
 
