@@ -27,7 +27,7 @@ def get_course_location_for_item(location):
             raise BaseException('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise BaseException('Found more than one course at {0}. There should only be one!!!'.format(course_search_location))
+            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
 
         location = courses[0].location
 
