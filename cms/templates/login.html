@@ -14,16 +14,16 @@
     <form class="log-in-form" id="login_form" action="login_post" method="post">
       <div class="row">
         <label>Email</label>
-        <input name="email" type="email" class="email-field">
+        <input name="email" type="email" class="email-field" tabindex="1">
       </div>
       <div class="row">
         <label>Password <a href="#" class="forgot-button">Forgot password?</a></label>
-        <input name="password" type="password" class="password-field">
+        <input name="password" type="password" class="password-field" tabindex="2">
       </div>
       <div class="row form-actions">
-        <input name="submit" type="submit" value="Log In" class="log-in-button">
+        <input name="submit" type="submit" value="Log In" class="log-in-button" tabindex="3">
         <span class="or">or</span>
-        <a href="${reverse('signup')}" class="sign-up-button">Sign up</a>        
+        <a href="${reverse('signup')}" class="sign-up-button" tabindex="4">Sign up</a>
       </div>
     </form>
   </article>
