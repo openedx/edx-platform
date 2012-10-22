@@ -27,12 +27,18 @@ SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
-NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
-             # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
-             '--cover-inclusive', '--cover-html-dir',
-             os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
-for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
-    NOSE_ARGS += ['--cover-package', app]
+NOSE_ARGS = []
+
+# Turning off coverage speeds up tests dramatically... until we have better config,
+# leave it here for manual fiddling.
+_coverage = True
+if _coverage:
+    NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
+                 # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
+                 '--cover-inclusive', '--cover-html-dir',
+                 os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
+    for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
+        NOSE_ARGS += ['--cover-package', app]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Local Directories
@@ -98,22 +104,6 @@ DATABASES = {
         'NAME': PROJECT_ROOT / "db" / "mitx.db",
     },
 
-    # The following are for testing purposes...
-    'edX/toy/2012_Fall': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course1.db",
-    },
-
-    'edx/full/6.002_Spring_2012': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course2.db",
-    },
-
-    'edX/toy/TT_2012_Fall': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "course3.db",
-    },
-
 }
 
 CACHES = {
@@ -171,4 +161,16 @@ FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
+
+################### Make tests faster
+
+#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+PASSWORD_HASHERS = (
+    # 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    # 'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    # 'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
