@@ -56,6 +56,20 @@
 </%block>
 
 <%block name="content">
+  <div class="edit-subsection-publish-settings">
+    <div class="settings">
+      <h3>Section Release Date</h3>
+      <div class="picker datepair">
+        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+        <div class="description">
+          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students along with the 5 subsections within it. Any units marked private will only be visible to admins.</p>
+        </div>
+      </div>
+      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+    </div>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <h1>Courseware</h1>
@@ -75,18 +89,19 @@
                 </div>
               </h3>
               <div class="section-published-date">
-                <label>Release Date:</label>
                 <%
                   start_date = datetime.fromtimestamp(mktime(section.start)) if section.start is not None else None
                   start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
                   start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
                 %>
-                <div class="datepair" data-language="javascript">
-                  <input type="text" name="start_date" value="${start_date_str}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-                  <input type="text" name="start_time" value="${start_time_str}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/> 
-                  <!--<a href="#" class="save-button edit-section-start-save">Save</a><a href="#" class="cancel-button edit-section-start-cancel">Cancel</a>-->
-                </div>
-              </div>              
+                %if start_date is None:
+                  <span class="published-status">This section has not been released.</span>
+                  <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
+                %else:
+                  <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
+                  <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
+                %endif
+              </div>
             </div>
             <div class="item-actions">
               <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>

@@ -10,7 +10,8 @@ var $spinner;
 $(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
-    $modalCover = $('.modal-cover');
+    $modalCover = $('<div class="modal-cover">');
+    $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
     $newComponentTemplatePickers = $('.new-component-templates');
@@ -102,7 +103,34 @@ $(document).ready(function() {
     // pretty wacky stuff to happen
     $('.file-input').bind('change', startUpload);
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+
+    $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
+    $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
+    $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
+    $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal)
+    $body.on('change', '.edit-subsection-publish-settings .start-date', function() {
+        if($('.edit-subsection-publish-settings').find('.start-time').val() == '') {
+            $('.edit-subsection-publish-settings').find('.start-time').val('12:00am');    
+        }
+    });
+    $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function() {
+        $('.edit-subsection-publish-settings').find('.save-button').show();
+    });
 });
+
+function editSectionPublishDate(e) {
+    e.preventDefault();
+    $modal = $('.edit-subsection-publish-settings').show();
+    $modal = $('.edit-subsection-publish-settings').show();
+    $modal.attr('data-id', $(this).attr('data-id'));
+    $modal.find('.start-date').val($(this).attr('data-date'));
+    $modal.find('.start-time').val($(this).attr('data-time'));
+    if($modal.find('.start-date').val() == '' && $modal.find('.start-time').val() == '') {
+        $modal.find('.save-button').hide();
+    }    
+    $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
+    $modalCover.show();
+}
 
 function showImportSubmit(e) {
     var filepath = $(this).val();
@@ -387,7 +415,9 @@ function _deleteItem($el) {
 
 function showUploadModal(e) {
     e.preventDefault();
-    $('.upload-modal').show();
+    $modal = $('.upload-modal').show();
+    $('.file-input').bind('change', startUpload);
+    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $modalCover.show();
 }
 
@@ -448,8 +478,10 @@ function markAsLoaded() {
 }    
 
 function hideModal(e) {
-    e.preventDefault();
-    $('.modal').hide();
+    if(e) {
+        e.preventDefault();
+    }
+    $modal.hide();
     $modalCover.hide();
 }
 
@@ -726,12 +758,12 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    input_date = $(this).siblings('input.date').val();
-    input_time = $(this).siblings('input.time').val();
+    input_date = $('.edit-subsection-publish-settings .start-date').val();
+    input_time = $('.edit-subsection-publish-settings .start-time').val();
 
     start = getEdxTimeFromDateTimeVals(input_date, input_time);
 
-    id = $(this).closest("section.courseware-section").data("id");
+    id = $modal.attr('data-id');
     var $_this = $(this);
 
     // call into server to commit the new order
@@ -743,7 +775,18 @@ function saveSetSectionScheduleDate(e) {
         data:JSON.stringify({ 'id' : id, 'metadata' : {'start' : start}, 'data': null, 'children' : null})
     }).success(function()
     {
-        alert('Your changes have been saved.');
-        location.reload();     
+        var $thisSection = $('.courseware-section[data-id="' + id + '"]');
+        $thisSection.find('.section-published-date').html('<span class="published-status"><strong>Will Release:</strong> ' + input_date + ' at ' + input_time + '</span><a href="#" class="edit-button" data-date="' + input_date + '" data-time="' + input_time + '" data-id="' + id + '">Edit</a>');
+        $thisSection.find('.section-published-date').animate({
+            'background-color': 'rgb(182,37,104)'
+        }, 300).animate({
+            'background-color': '#edf1f5'
+        }, 300).animate({
+            'background-color': 'rgb(182,37,104)'
+        }, 300).animate({
+            'background-color': '#edf1f5'
+        }, 300);
+        
+        hideModal();
     });
 }
