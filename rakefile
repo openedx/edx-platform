@@ -151,6 +151,13 @@ Dir["common/lib/*"].each do |lib|
         sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
     TEST_TASKS << task_name
+
+    desc "Run tests for common lib #{lib} (without coverage)"
+    task "fasttest_#{lib}" do 
+        sh("nosetests #{lib}")
+    end
+
+
 end
 
 task :test do
