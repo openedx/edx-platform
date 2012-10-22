@@ -2,7 +2,7 @@
 # class used to store graded responses to CAPA questions
 #
 # Used by responsetypes and capa_problem
-
+from statsd import statsd
 
 class CorrectMap(object):
     """
@@ -53,6 +53,11 @@ class CorrectMap(object):
                                     'hintmode': hintmode,
                                     'queuestate': queuestate,
                                     }
+                                    
+        if correctness=="correct":
+            statsd.increment("user.correct_answer")
+        else:
+            statsd.increment("user.incorrect_answer)
 
     def __repr__(self):
         return repr(self.cmap)
