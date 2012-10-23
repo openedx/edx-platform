@@ -338,12 +338,6 @@ TEMPLATE_LOADERS = (
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-<<<<<<< HEAD
-    
-=======
-
-    #'askbot.skins.loaders.filesystem_load_template_source',
->>>>>>> origin/master
     # 'django.template.loaders.eggs.Loader',
 )
 
