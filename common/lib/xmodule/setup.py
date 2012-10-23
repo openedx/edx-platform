@@ -26,7 +26,7 @@ setup(
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
-            "problemset = xmodule.vertical_module:VerticalDescriptor",
+            "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
