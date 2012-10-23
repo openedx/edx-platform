@@ -27,14 +27,17 @@ class OptionInputTest(unittest.TestCase):
     '''
     Make sure option inputs work
     '''
-    def test_rendering_new(self):
-        xml = """<optioninput options="('Up','Down')" id="sky_input" correct="Up"/>"""
-        element = etree.fromstring(xml)
 
-        value = 'Down'
-        status = 'answered'
-        context = inputtypes._optioninput(element, value, status, test_system.render_template)
-        print 'context: ', context
+    def test_rendering(self):
+        xml_str = """<optioninput options="('Up','Down')" id="sky_input" correct="Up"/>"""
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'Down',
+                 'id': 'sky_input',
+                 'status': 'answered'}
+        option_input = inputtypes.OptionInput(system, element, state)
+
+        context = option_input._get_render_context()
 
         expected = {'value': 'Down',
                     'options': [('Up', 'Up'), ('Down', 'Down')],
@@ -45,9 +48,30 @@ class OptionInputTest(unittest.TestCase):
 
         self.assertEqual(context, expected)
 
-
-    def test_rendering(self):
-        xml_str = """<optioninput options="('Up','Down')" id="sky_input" correct="Up"/>"""
+class ChoiceGroupTest(unittest.TestCase):
+    '''
+    Test choice groups.
+    '''
+    def test_mult_choice(self):
+        xml_str = """
+  <choicegroup>
+    <choice correct="false" name="foil1">
+      <startouttext />This is foil One.<endouttext />
+    </choice>
+    <choice correct="false" name="foil2">
+      <startouttext />This is foil Two.<endouttext />
+    </choice>
+    <choice correct="true" name="foil3">
+      <startouttext />This is foil Three.<endouttext />
+    </choice>
+    <choice correct="false" name="foil4">
+      <startouttext />This is foil Four.<endouttext />
+    </choice>
+    <choice correct="false" name="foil5">
+      <startouttext />This is foil Five.<endouttext />
+    </choice>
+  </choicegroup>
+        """
         element = etree.fromstring(xml_str)
 
         state = {'value': 'Down',
