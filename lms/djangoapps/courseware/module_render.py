@@ -396,7 +396,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run), 
-                                  "score_bucket:{0}".format(score_bucket)), 
+                                  "score_bucket:{0}".format(score_bucket), 
                                   "type:xqueue"])
     return HttpResponse("")
 
@@ -494,7 +494,7 @@ def modx_dispatch(request, dispatch, location, course_id):
                                 tags=["org:{0}".format(org),
                                       "course:{0}".format(course_num),
                                       "run:{0}".format(run), 
-                                      "score_bucket:{0}".format(score_bucket)), 
+                                      "score_bucket:{0}".format(score_bucket), 
                                       "type:ajax"])
 
 
