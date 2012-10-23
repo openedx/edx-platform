@@ -195,48 +195,37 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
+    def __init__(self, system, xml, state):
+        super(OptionInput, self).__init__(system, xml, state)
+
+        # Extract the options...
+        options = self.xml.get('options')
+        if not options:
+            raise Exception(
+                "[courseware.capa.inputtypes.optioninput] Missing options specification in "
+                + etree.tostring(self.xml))
+
+        # parse the set of possible options
+        oset = shlex.shlex(options[1:-1])
+        oset.quotes = "'"
+        oset.whitespace = ","
+        oset = [x[1:-1] for x  in list(oset)]
+
+        # make ordered list with (key, value) same
+        self.osetdict = [(oset[x], oset[x]) for x in range(len(oset))]
+        # TODO: allow ordering to be randomized
+
     def _get_render_context(self):
-        return _optioninput(self.xml, self.value, self.status, self.system.render_template, self.msg)
 
-
-def optioninput(element, value, status, render_template, msg=''):
-    context = _optioninput(element, value, status, render_template, msg)
-    html = render_template("optioninput.html", context)
-    return etree.XML(html)
-
-def _optioninput(element, value, status, render_template, msg=''):
-    """
-    Select option input type.
-
-    Example:
-
-    <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
-    """
-    eid = element.get('id')
-    options = element.get('options')
-    if not options:
-        raise Exception(
-            "[courseware.capa.inputtypes.optioninput] Missing options specification in "
-            + etree.tostring(element))
-
-    # parse the set of possible options
-    oset = shlex.shlex(options[1:-1])
-    oset.quotes = "'"
-    oset.whitespace = ","
-    oset = [x[1:-1] for x  in list(oset)]
-
-    # make ordered list with (key, value) same
-    osetdict = [(oset[x], oset[x]) for x in range(len(oset))]
-    # TODO: allow ordering to be randomized
-
-    context = {'id': eid,
-             'value': value,
-             'state': status,
-             'msg': msg,
-             'options': osetdict,
-             'inline': element.get('inline',''),
-             }
-    return context
+        context = {
+            'id': self.id,
+            'value': self.value,
+            'state': self.status,
+            'msg': self.msg,
+            'options': self.osetdict,
+            'inline': self.xml.get('inline',''),
+            }
+        return context
 
 register_input_class(OptionInput)
 
@@ -245,7 +234,6 @@ register_input_class(OptionInput)
 
 # TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
 # desired semantics.
-# @register_render_function
 def choicegroup(element, value, status, render_template, msg=''):
     '''
     Radio button inputs: multiple choice or true/false
