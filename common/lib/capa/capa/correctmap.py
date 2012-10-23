@@ -57,7 +57,7 @@ class CorrectMap(object):
         if correctness=="correct":
             statsd.increment("user.correct_answer")
         else:
-            statsd.increment("user.incorrect_answer)
+            statsd.increment("user.incorrect_answer")
 
     def __repr__(self):
         return repr(self.cmap)
