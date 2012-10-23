@@ -1,18 +1,38 @@
+from optparse import make_option
+
 from django.core.management.base import BaseCommand, CommandError
-from django_comment_client.models import Permission, Role
+from django_comment_client.models import Role
 from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
-    args = 'user role course_id'
-    help = 'Assign a role to a user'
+    option_list = BaseCommand.option_list + (
+        make_option('--remove',
+                    action='store_true',
+                    dest='remove',
+                    default=False,
+                    help='Remove the role instead of adding it'),
+        )
+
+    args = '<user|email> <role> <course_id>'
+    help = 'Assign a discussion forum role to a user '
 
     def handle(self, *args, **options):
-        role = Role.objects.get(name=args[1], course_id=args[2])
+        if len(args) != 3:
+            raise CommandError('Usage is assign_role {0}'.format(self.args))
 
-        if '@' in args[0]:
-            user = User.objects.get(email=args[0])
+        name_or_email, role, course_id = args
+
+        role = Role.objects.get(name=role, course_id=course_id)
+
+        if '@' in name_or_email:
+            user = User.objects.get(email=name_or_email)
         else:
-            user = User.objects.get(username=args[0])
+            user = User.objects.get(username=name_or_email)
 
-        user.roles.add(role)
+        if options['remove']:
+            user.roles.remove(role)
+        else:
+            user.roles.add(role)
+
+        print 'Success!'
