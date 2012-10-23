@@ -223,9 +223,9 @@ def change_enrollment(request):
             
             org, course_num, run=course_id.split("/")        
             statsd.increment("lms.user.unenrollment",
-                        tags=["org:{0}".format(org),
-                              "course:{0}".format(course_num),
-                              "run:{0}".format(run)])
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run)])
                               
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
