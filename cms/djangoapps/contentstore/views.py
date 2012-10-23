@@ -36,7 +36,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from github_sync import export_to_github
 from static_replace import replace_urls
 from external_auth.views import ssl_login_shortcut
 
