@@ -206,7 +206,10 @@ def change_enrollment(request):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
-        statsd.increment("lms.user.enrollment",tags=["course:" + str(course_id)])
+                    
+        split_course=course_id.split("/")
+        statsd.increment("lms.user.enrollment",tags=["org:" + str(split_course[0]),"course:" + str(split_course[1]),"run:" + str(split_course[2])])
+        
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
 
@@ -214,7 +217,10 @@ def change_enrollment(request):
         try:
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
-            statsd.increment("lms.user.unenrollment", tags=["course:"+ str(course_id)])
+            
+            split_course=course_id.split("/")
+            statsd.increment("lms.user.unenrollment",tags=["org:" + str(split_course[0]),"course:" + str(split_course[1]),"run:" + str(split_course[2])])
+        
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
             return {'success': False, 'error': 'You are not enrolled for this course.'}
@@ -263,7 +269,9 @@ def login_user(request, error=""):
         log.info("Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
+        
         statsd.increment("lms.user.successful_login")
+        
         return HttpResponse(json.dumps({'success': True}))
     
     log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
@@ -469,7 +477,9 @@ def create_account(request, post_override=None):
             log.debug('bypassing activation email')
             login_user.is_active = True
             login_user.save()
+            
     statsd.increment("lms.user.account_created")
+    
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 

@@ -28,6 +28,8 @@ from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
+from statsd import statsd
+
 log = logging.getLogger("mitx.courseware")
 
 
@@ -381,6 +383,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         instance_module.grade = instance.get_score()['score']
     if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
         instance_module.save()
+        
+        course_split=course_id.split("/")        
+        if(instance_module.state=="correct" or instance_module.state=="incorrect"):
+            statsd.increment("lms.user.question_answered",tags=["org:" + str(course_split[0]),"course:" + str(course_split[1]), "run:" + str(course_split[2]), "answer:" + str(instance_module.state), "score:" + str(instance_module.grade), "type:xqueue"])
 
     return HttpResponse("")
 
@@ -465,6 +471,11 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.state != old_instance_state or
             instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
+            
+            course_split=course_id.split("/")        
+            if(instance_module.state=="correct" or instance_module.state=="incorrect"):
+                statsd.increment("lms.user.question_answered",tags=["org:" + str(course_split[0]),"course:" + str(course_split[1]), "run:" + str(course_split[2]), "answer:" + str(instance_module.state), "score:" + str(instance_module.grade), "type:ajax"])
+
 
     if shared_module is not None:
         shared_module.state = instance.get_shared_state()
