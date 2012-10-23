@@ -391,13 +391,12 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
             score_bucket=2
             
         org, course_num, run=course_id.split("/")        
-        if(instance_module.state=="correct" or instance_module.state=="incorrect"):
-            statsd.increment("lms.user.question_answered",
-                            tags=["org:{0}".format(org),
-                                  "course:{0}".format(course_num),
-                                  "run:{0}".format(run), 
-                                  "score_bucket:{0}".format(score_bucket), 
-                                  "type:xqueue"])
+        statsd.increment("lms.user.question_answered",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run), 
+                              "score_bucket:{0}".format(score_bucket), 
+                              "type:xqueue"])
     return HttpResponse("")
 
 
@@ -489,13 +488,12 @@ def modx_dispatch(request, dispatch, location, course_id):
                 score_bucket=2
             
             org, course_num, run=course_id.split("/")        
-            if(instance_module.state=="correct" or instance_module.state=="incorrect"):
-                statsd.increment("lms.user.question_answered",
-                                tags=["org:{0}".format(org),
-                                      "course:{0}".format(course_num),
-                                      "run:{0}".format(run), 
-                                      "score_bucket:{0}".format(score_bucket), 
-                                      "type:ajax"])
+            statsd.increment("lms.user.question_answered",
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run), 
+                                  "score_bucket:{0}".format(score_bucket), 
+                                  "type:ajax"])
 
 
     if shared_module is not None:
