@@ -207,8 +207,11 @@ def change_enrollment(request):
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
                     
-        split_course=course_id.split("/")
-        statsd.increment("lms.user.enrollment",tags=["org:" + str(split_course[0]),"course:" + str(split_course[1]),"run:" + str(split_course[2])])
+        org, course_num, run=course_id.split("/")        
+        statsd.increment("lms.user.enrollment",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run)])
         
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
@@ -218,9 +221,12 @@ def change_enrollment(request):
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
             
-            split_course=course_id.split("/")
-            statsd.increment("lms.user.unenrollment",tags=["org:" + str(split_course[0]),"course:" + str(split_course[1]),"run:" + str(split_course[2])])
-        
+            org, course_num, run=course_id.split("/")        
+            statsd.increment("lms.user.unenrollment",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run)])
+                              
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
             return {'success': False, 'error': 'You are not enrolled for this course.'}
