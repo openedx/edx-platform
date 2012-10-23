@@ -77,7 +77,6 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    ASKBOT_ROOT / "askbot" / "skins",
 ]
 STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
