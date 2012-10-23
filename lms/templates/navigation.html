@@ -8,19 +8,41 @@ from django.core.urlresolvers import reverse
 
 # App that handles subdomain specific branding
 import branding
+# app that handles site status messages
+from status.status import get_site_status_msg
 %>
 
-%if course:
+<%block cached="False">
+<%
+try:
+    course_id = course.id
+except:
+    # can't figure out a better way to get at a possibly-defined course var
+    course_id = None
+site_status_msg = get_site_status_msg(course_id)
+%>
+% if site_status_msg:
+<div class="site-status">
+  <div class="inner-wrapper">
+    <span class="white-error-icon"></span>
+    <p>${site_status_msg}</p>
+  </div>
+</div>
+% endif
+</%block>
+
+
+% if course:
   <header class="global slim" aria-label="Global Navigation">
-%else:
+% else:
   <header class="global" aria-label="Global Navigation">
-%endif
+% endif
   <nav>
   <h1 class="logo"><a href="${reverse('root')}"><img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}"/></a></h1>
 
-    %if course:
+    % if course:
       <h2><span class="provider">${course.org}:</span> ${course.number} ${course.title}</h2>
-    %endif
+    % endif
 
     <ol class="left find-courses-button">
       <li class="primary">
@@ -28,7 +50,7 @@ import branding
       </li>
     </ol>
 
-  %if user.is_authenticated():
+  % if user.is_authenticated():
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
@@ -46,7 +68,7 @@ import branding
       </li>
     </ol>
 
-  %else:
+  % else:
     <ol class="guest">
       <li class="secondary">
         <a href="${reverse('about_edx')}">About</a>
@@ -62,9 +84,12 @@ import branding
       </li>
 % endif
     </ol>
-  </nav>
   %endif
+  </nav>
 </header>
+% if course:
+<div class="ie-banner"><strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> or <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
+% endif
 
 %if not user.is_authenticated():
   <%include file="login_modal.html" />

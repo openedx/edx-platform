@@ -7,6 +7,7 @@ import string
 import fnmatch
 
 from external_auth.models import ExternalAuthMap
+from external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
@@ -30,7 +31,6 @@ from openid.consumer.consumer import SUCCESS
 
 from openid.server.server import Server
 from openid.server.trustroot import TrustRoot
-from openid.store.filestore import FileOpenIDStore
 from openid.extensions import ax, sreg
 
 import student.views as student_views
@@ -307,10 +307,7 @@ def get_xrds_url(resource, request):
     """
     Return the XRDS url for a resource
     """
-    host = request.META['HTTP_HOST']
-
-    if not host.endswith('edx.org'):
-        return None
+    host = request.get_host()
 
     location = host + '/openid/provider/' + resource + '/'
 
@@ -332,6 +329,8 @@ def add_openid_simple_registration(request, response, data):
                 sreg_data['email'] = data['email']
             elif field == 'fullname' and 'fullname' in data:
                 sreg_data['fullname'] = data['fullname']
+            elif field == 'nickname' and 'nickname' in data:
+                sreg_data['nickname'] = data['nickname']
 
         # construct sreg response
         sreg_response = sreg.SRegResponse.extractResponse(sreg_request,
@@ -436,7 +435,7 @@ def provider_login(request):
         return default_render_failure(request, "Invalid OpenID request")
 
     # initialize store and server
-    store = FileOpenIDStore('/tmp/openid_provider')
+    store = DjangoOpenIDStore()
     server = Server(store, endpoint)
 
     # handle OpenID request
@@ -525,13 +524,22 @@ def provider_login(request):
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
 
-            return provider_respond(server,
-                                    openid_request,
-                                    response,
-                                    {
-                                        'fullname': profile.name,
-                                        'email': user.email
-                                    })
+            # TODO: for CS50 we are forcibly returning the username
+            # instead of fullname. In the OpenID simple registration
+            # extension, we don't have to return any fields we don't
+            # want to, even if they were marked as required by the
+            # Consumer. The behavior of what to do when there are
+            # missing fields is up to the Consumer. The proper change
+            # should only return the username, however this will likely
+            # break the CS50 client. Temporarily we will be returning
+            # username filling in for fullname in addition to username 
+            # as sreg nickname.
+            results = {
+                'nickname': user.username,
+                'email': user.email,
+                'fullname': user.username
+                }
+            return provider_respond(server, openid_request, response, results)
 
         request.session['openid_error'] = True
         msg = "Login failed - Account not active for user {0}".format(username)

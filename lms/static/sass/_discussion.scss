@@ -1376,6 +1376,11 @@ body.discussion {
         border-color: #009fe2;
       }
 
+      &.community-ta{
+        padding-top: 38px;
+        border-color: #449944;
+      }
+
       .staff-banner {
         position: absolute;
         top: 0;
@@ -1391,6 +1396,23 @@ body.discussion {
         color: #fff;
         text-transform: uppercase;
       }
+
+      .community-ta-banner{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 14px;
+        padding: 1px 5px;
+        @include box-sizing(border-box);
+        border-radius: 2px 2px 0 0;
+        background: #449944;
+        font-size: 9px;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+      }
+
 
       &.loading {
         height: 0;
@@ -1423,8 +1445,7 @@ body.discussion {
     color: #333;
 
     .plus-icon {
-      float: left;
-      display: block;
+      display: inline-block;
       width: 10px;
       height: 10px;
       margin: 8px 6px 0 0;
@@ -1557,11 +1578,11 @@ body.discussion {
     }
   }
 
-  .moderator-label {
+  .community-ta-label{
     margin-left: 2px;
     padding: 0 4px;
     border-radius: 2px;
-    background: #55dc9e;
+    background: #449944;
     font-size: 9px;
     font-weight: 700;
     font-style: normal;   

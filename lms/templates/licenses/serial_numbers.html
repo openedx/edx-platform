@@ -1,0 +1,10 @@
+<dl>
+% for license in licenses:
+  <dt> ${license.software.name}: </dt>
+  % if license.serial:
+    <dd> ${license.serial} </dd>
+  % else:
+    <dd> None Available </dd>
+  % endif
+% endfor
+</dl>
