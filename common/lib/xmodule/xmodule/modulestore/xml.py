@@ -341,27 +341,6 @@ class XMLModuleStore(ModuleStoreBase):
         return {}
 
 
-    def read_grading_policy(self, paths, tracker):
-        """Load a grading policy from the specified paths, in order, if it exists."""
-        # Default to a blank policy
-        policy_str = ""
-
-        for policy_path in paths:
-            if not os.path.exists(policy_path):
-                continue
-            log.debug("Loading grading policy from {0}".format(policy_path))
-            try:
-                with open(policy_path) as grading_policy_file:
-                    policy_str = grading_policy_file.read()
-                    # if we successfully read the file, stop looking at backups
-                    break
-            except (IOError):
-                msg = "Unable to load course settings file from '{0}'".format(policy_path)
-                tracker(msg)
-                log.warning(msg)
-
-        return policy_str
-
 
     def load_course(self, course_dir, tracker):
         """
@@ -443,14 +422,6 @@ class XMLModuleStore(ModuleStoreBase):
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
-
-            # Try to load grading policy
-            paths = [self.data_dir / course_dir / 'grading_policy.json']
-            if policy_dir:
-                paths = [policy_dir / 'grading_policy.json'] + paths
-
-            policy_str = self.read_grading_policy(paths, tracker)
-            course_descriptor.set_grading_policy(policy_str)
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor

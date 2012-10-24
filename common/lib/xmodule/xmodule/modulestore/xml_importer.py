@@ -76,11 +76,12 @@ def import_from_xml(store, data_dir, course_dirs=None,
     all course dirs
 
     """
+    
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
         course_dirs=course_dirs,
-        load_error_modules=load_error_modules,
+        load_error_modules=load_error_modules
     )
 
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
@@ -123,6 +124,5 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # NOTE: It's important to use own_metadata here to avoid writing
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(module.own_metadata))
-            
 
     return module_store, course_items

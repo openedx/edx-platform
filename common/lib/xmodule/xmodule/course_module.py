@@ -1,17 +1,23 @@
 from fs.errors import ResourceNotFoundError
 import logging
+import json
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 import time
+from cStringIO import StringIO
 
 from xmodule.util.decorators import lazyproperty
-from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.xml_module import XmlDescriptor
 from xmodule.timeparse import parse_time, stringify_time
+from xmodule.graders import grader_from_conf
 
 log = logging.getLogger(__name__)
+
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -96,16 +102,119 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
-    def set_grading_policy(self, policy_str):
-        """Parse the policy specified in policy_str, and save it"""
-        try:
-            self._grading_policy = load_grading_policy(policy_str)
-        except:
-            self.system.error_tracker("Failed to load grading policy")
-            # Setting this to an empty dictionary will lead to errors when
-            # grading needs to happen, but should allow course staff to see
-            # the error log.
-            self._grading_policy = {}
+        self.set_grading_policy(self.definition['data'].get('grading_policy', None))
+
+
+    def set_grading_policy(self, course_policy):
+        if course_policy is None:
+            course_policy = {}
+
+        """
+        The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
+        missing, it reverts to the default.
+        """
+
+        default_policy_string = """
+        {
+            "GRADER" : [
+                {
+                    "type" : "Homework",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "short_label" : "HW",
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Lab",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "category" : "Labs",
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Midterm",
+                    "name" : "Midterm Exam",
+                    "short_label" : "Midterm",
+                    "weight" : 0.3
+                },
+                {
+                    "type" : "Final",
+                    "name" : "Final Exam",
+                    "short_label" : "Final",
+                    "weight" : 0.4
+                }
+            ],
+            "GRADE_CUTOFFS" : {
+                "A" : 0.87,
+                "B" : 0.7,
+                "C" : 0.6
+            }
+        }
+        """
+
+        # Load the global settings as a dictionary
+        grading_policy = json.loads(default_policy_string)
+
+        # Override any global settings with the course settings
+        grading_policy.update(course_policy)
+
+        # Here is where we should parse any configurations, so that we can fail early
+        grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
+        self._grading_policy = grading_policy
+
+
+
+    @classmethod
+    def read_grading_policy(cls, paths, system):
+        """Load a grading policy from the specified paths, in order, if it exists."""
+        # Default to a blank policy
+        policy_str = ""
+
+        for policy_path in paths:
+            if not system.resources_fs.exists(policy_path):
+                continue
+            log.debug("Loading grading policy from {0}".format(policy_path))
+            try:
+                with system.resources_fs.open(policy_path) as grading_policy_file:
+                    policy_str = grading_policy_file.read()
+                    # if we successfully read the file, stop looking at backups
+                    break
+            except (IOError):
+                msg = "Unable to load course settings file from '{0}'".format(policy_path)
+                log.warning(msg)
+
+        return policy_str
+
+    
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+
+        # bleh, have to parse the XML here to just pull out the url_name attribute
+        course_file = StringIO(xml_data)
+        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+
+        policy_dir = None
+        url_name = xml_obj.get('url_name', xml_obj.get('slug'))
+        if url_name:
+            policy_dir = 'policies/' + url_name
+
+        # Try to load grading policy
+        paths = ['grading_policy.json']
+        if policy_dir:
+            paths = [policy_dir + 'grading_policy.json'] + paths
+
+        policy = json.loads(cls.read_grading_policy(paths, system))
+        
+        # cdodge: import the grading policy information that is on disk and put into the
+        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
+        instance.definition['data']['grading_policy'] = policy
+
+        # now set the current instance. set_grading_policy() will apply some inheritance rules
+        instance.set_grading_policy(policy)
+
+        return instance
+    
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -283,4 +392,5 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+
 

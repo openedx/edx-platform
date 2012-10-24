@@ -13,69 +13,6 @@ log = logging.getLogger("mitx.courseware")
 # Section either indicates the name of the problem or the name of the section
 Score = namedtuple("Score", "earned possible graded section")
 
-def load_grading_policy(course_policy_string):
-    """
-    This loads a grading policy from a string (usually read from a file),
-    which can be a JSON object or an empty string.
-
-    The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
-    missing, it reverts to the default.
-    """
-
-    default_policy_string = """
-    {
-        "GRADER" : [
-            {
-                "type" : "Homework",
-                "min_count" : 12,
-                "drop_count" : 2,
-                "short_label" : "HW",
-                "weight" : 0.15
-            },
-            {
-                "type" : "Lab",
-                "min_count" : 12,
-                "drop_count" : 2,
-                "category" : "Labs",
-                "weight" : 0.15
-            },
-            {
-                "type" : "Midterm",
-                "name" : "Midterm Exam",
-                "short_label" : "Midterm",
-                "weight" : 0.3
-            },
-            {
-                "type" : "Final",
-                "name" : "Final Exam",
-                "short_label" : "Final",
-                "weight" : 0.4
-            }
-        ],
-        "GRADE_CUTOFFS" : {
-            "A" : 0.87,
-            "B" : 0.7,
-            "C" : 0.6
-        }
-    }
-    """
-
-    # Load the global settings as a dictionary
-    grading_policy = json.loads(default_policy_string)
-
-    # Load the course policies as a dictionary
-    course_policy = {}
-    if course_policy_string:
-        course_policy = json.loads(course_policy_string)
-
-    # Override any global settings with the course settings
-    grading_policy.update(course_policy)
-
-    # Here is where we should parse any configurations, so that we can fail early
-    grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
-
-    return grading_policy
-
 
 def aggregate_scores(scores, section_name="summary"):
     """
