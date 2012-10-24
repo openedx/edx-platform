@@ -452,6 +452,10 @@ class XMLModuleStore(ModuleStoreBase):
             policy_str = self.read_grading_policy(paths, tracker)
             course_descriptor.set_grading_policy(policy_str)
 
+            # cdodge: import the grading policy information that is on disk and put into the
+            # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
+            course_descriptor.definition['data']['grading_policy'] = json.loads(policy_str)
+
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 

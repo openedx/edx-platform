@@ -13,6 +13,16 @@ log = logging.getLogger("mitx.courseware")
 Score = namedtuple("Score", "earned possible graded section")
 
 def load_grading_policy(course_policy_string):
+    course_policy = {}
+    if course_policy_string:
+        course_policy = json.loads(course_policy_string)
+        
+    return load_grading_policy_from_dict(course_policy)
+
+def load_grading_policy_from_dict(course_policy):
+    if course_policy is None:
+        course_policy = {}
+
     """
     This loads a grading policy from a string (usually read from a file),
     which can be a JSON object or an empty string.
@@ -62,11 +72,6 @@ def load_grading_policy(course_policy_string):
     # Load the global settings as a dictionary
     grading_policy = json.loads(default_policy_string)
 
-    # Load the course policies as a dictionary
-    course_policy = {}
-    if course_policy_string:
-        course_policy = json.loads(course_policy_string)
-
     # Override any global settings with the course settings
     grading_policy.update(course_policy)
 
@@ -74,6 +79,7 @@ def load_grading_policy(course_policy_string):
     grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
 
     return grading_policy
+
 
 
 def aggregate_scores(scores, section_name="summary"):

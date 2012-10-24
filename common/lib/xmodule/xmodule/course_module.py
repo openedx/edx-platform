@@ -11,6 +11,8 @@ from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
 
+from xmodule.graders import load_grading_policy_from_dict
+
 log = logging.getLogger(__name__)
 
 class CourseDescriptor(SequenceDescriptor):
@@ -95,6 +97,9 @@ class CourseDescriptor(SequenceDescriptor):
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+
+        self._grading_policy = load_grading_policy_from_dict(self.definition['data'].get('grading_policy', None))
+
 
     def set_grading_policy(self, policy_str):
         """Parse the policy specified in policy_str, and save it"""
@@ -283,4 +288,5 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+
 
