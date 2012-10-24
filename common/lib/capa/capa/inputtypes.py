@@ -16,7 +16,7 @@ class ClassName(InputTypeBase):
     def _get_render_context(self):
 
         context = {'id': self.id,
-               
+
                }
         return context
 
@@ -394,92 +394,58 @@ register_input_class(JavascriptInput)
 
 #-----------------------------------------------------------------------------
 
-def textline(element, value, status, render_template, msg=""):
-    '''
-    Simple text line input, with optional size specification.
-    '''
-    # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
-    if element.get('math') or element.get('dojs'):
-        return textline_dynamath(element, value, status, render_template, msg)
-    eid = element.get('id')
-    if eid is None:
-        msg = 'textline has no id: it probably appears outside of a known response type'
-        msg += "\nSee problem XML source line %s" % getattr(element, 'sourceline', '<unavailable>')
-        raise Exception(msg)
+class TextLine(InputTypeBase):
+    """
 
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    # if specified, then textline is hidden and id is stored in div of name given by hidden
-    hidden = element.get('hidden', '')
+    """
 
-    # Escape answers with quotes, so they don't crash the system!
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
+    template = "textinput.html"
+    tags = ['textline']
 
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'count': count,
-               'size': size,
-               'msg': msg,
-               'hidden': hidden,
-               'inline': element.get('inline',''),
+    def __init__(self, system, xml, state):
+        super(TextLine, self).__init__(system, xml, state)
+        self.size = self.xml.get('size')
+
+        # if specified, then textline is hidden and input id is stored
+        # in div with name=self.hidden.
+        self.hidden = self.xml.get('hidden', False)
+
+        # TODO (vshnayder): can we get rid of inline?  Was it one of
+        # the styling hacks early this semester?
+        self.inline = self.xml.get('inline', False)
+
+        # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
+        self.do_math = bool(self.xml.get('math') or self.xml.get('dojs'))
+        # TODO: do math checking using ajax instead of using js, so
+        # that we only have one math parser.
+        self.preprocessor = None
+        if self.do_math:
+            # Preprocessor to insert between raw input and Mathjax
+            self.preprocessor = {'class_name': self.xml.get('preprocessorClassName',''),
+                            'script_src': self.xml.get('preprocessorSrc','')}
+            if '' in self.preprocessor.values():
+                self.preprocessor = None
+
+
+
+    def _get_render_context(self):
+        # Escape answers with quotes, so they don't crash the system!
+        escapedict = {'"': '&quot;'}
+        value = saxutils.escape(self.value, escapedict)
+
+        context = {'id': self.id,
+                   'value': value,
+                   'state': self.status,
+                   'size': self.size,
+                   'msg': self.msg,
+                   'hidden': self.hidden,
+                   'inline': self.inline,
+                   'do_math': self.do_math,
+                   'preprocessor': self.preprocessor,
                }
+        return context
 
-    html = render_template("textinput.html", context)
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        # TODO: needs to be self.system.DEBUG - but can't access system
-        if True:
-            log.debug('[inputtypes.textline] failed to parse XML for:\n%s' % html)
-            raise
-    return xhtml
-
-_reg(textline)
-
-#-----------------------------------------------------------------------------
-
-
-def textline_dynamath(element, value, status, render_template, msg=''):
-    '''
-    Text line input with dynamic math display (equation rendered on client in real time
-    during input).
-    '''
-    # TODO: Make a wrapper for <formulainput>
-    # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-    '''
-    textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
-    uses a <span id=display_eid>`{::}`</span>
-    and a hidden textarea with id=input_eid_fromjs for the mathjax rendering and return.
-    '''
-    eid = element.get('id')
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    # if specified, then textline is hidden and id is stored in div of name given by hidden
-    hidden = element.get('hidden', '')
-
-    # Preprocessor to insert between raw input and Mathjax
-    preprocessor = {'class_name': element.get('preprocessorClassName',''),
-                    'script_src': element.get('preprocessorSrc','')}
-    if '' in preprocessor.values():
-        preprocessor = None
-
-    # Escape characters in student input for safe XML parsing
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
-
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'count': count,
-               'size': size,
-               'msg': msg,
-               'hidden': hidden,
-               'preprocessor': preprocessor,}
-    html = render_template("textinput_dynamath.html", context)
-    return etree.XML(html)
-
+register_input_class(TextLine)
 
 #-----------------------------------------------------------------------------
 def filesubmission(element, value, status, render_template, msg=''):

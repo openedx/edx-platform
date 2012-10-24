@@ -169,3 +169,60 @@ class JavascriptInputTest(unittest.TestCase):
                     'evaluation': '',}
 
         self.assertEqual(context, expected)
+
+
+class TextLineTest(unittest.TestCase):
+    '''
+    Check that textline inputs work, with and without math.
+    '''
+
+    def test_rendering(self):
+        size = "42"
+        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(size=size)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'BumbleBee',}
+        the_input = inputtypes.get_class_for_tag('textline')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'BumbleBee',
+                    'state': 'unanswered',
+                    'size': size,
+                    'msg': '',
+                    'hidden': False,
+                    'inline': False,
+                    'do_math': False,
+                    'preprocessor': None}
+        self.assertEqual(context, expected)
+
+
+    def test_math_rendering(self):
+        size = "42"
+        preprocessorClass = "preParty"
+        script = "foo/party.js"
+
+        xml_str = """<textline math="True" id="prob_1_2" size="{size}"
+        preprocessorClassName="{pp}"
+        preprocessorSrc="{sc}"/>""".format(size=size, pp=preprocessorClass, sc=script)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'BumbleBee',}
+        the_input = inputtypes.get_class_for_tag('textline')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'BumbleBee',
+                    'state': 'unanswered',
+                    'size': size,
+                    'msg': '',
+                    'hidden': False,
+                    'inline': False,
+                    'do_math': True,
+                    'preprocessor': {'class_name': preprocessorClass,
+                                     'script_src': script}}
+        self.assertEqual(context, expected)
