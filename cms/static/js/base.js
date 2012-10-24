@@ -441,7 +441,7 @@ function showFileSelectionMenu(e) {
 
 function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
-    $('.upload-modal .file-name').html($('.file-input').val().replace(/.+\\/g, ''));
+    $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
         uploadProgress: showUploadFeedback,
