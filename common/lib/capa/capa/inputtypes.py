@@ -318,7 +318,7 @@ def extract_choices(element):
         choices.append((choice.get("name"), choice_text))
 
     return choices
-    
+
 
 register_input_class(ChoiceGroup)
 
@@ -326,37 +326,44 @@ register_input_class(ChoiceGroup)
 #-----------------------------------------------------------------------------
 
 
-def javascriptinput(element, value, status, render_template, msg='null'):
-    '''
+class JavascriptInput(InputTypeBase):
+    """
     Hidden field for javascript to communicate via; also loads the required
     scripts for rendering the problem and passes data to the problem.
-    '''
-    eid = element.get('id')
-    params = element.get('params')
-    problem_state = element.get('problem_state')
-    display_class = element.get('display_class')
-    display_file = element.get('display_file')
+    """
 
-    # Need to provide a value that JSON can parse if there is no
-    # student-supplied value yet.
-    if value == "":
-        value = 'null'
+    template = "javascriptinput.html"
+    tags = ['javascriptinput']
 
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
-    msg   = saxutils.escape(msg, escapedict)
-    context = {'id': eid,
-               'params': params,
-               'display_file': display_file,
-               'display_class': display_class,
-               'problem_state': problem_state,
+    def __init__(self, system, xml, state):
+        super(JavascriptInput, self).__init__(system, xml, state)
+        # Need to provide a value that JSON can parse if there is no
+        # student-supplied value yet.
+        if self.value == "":
+            self.value = 'null'
+
+        self.params = self.xml.get('params')
+        self.problem_state = self.xml.get('problem_state')
+        self.display_class = self.xml.get('display_class')
+        self.display_file = self.xml.get('display_file')
+
+
+    def _get_render_context(self):
+        escapedict = {'"': '&quot;'}
+        value = saxutils.escape(self.value, escapedict)
+        msg   = saxutils.escape(self.msg, escapedict)
+
+        context = {'id': self.id,
+               'params': self.params,
+               'display_file': self.display_file,
+               'display_class': self.display_class,
+               'problem_state': self.problem_state,
                'value': value,
                'evaluation': msg,
                }
-    html = render_template("javascriptinput.html", context)
-    return etree.XML(html)
+        return context
 
-_reg(javascriptinput)
+register_input_class(JavascriptInput)
 
 
 def textline(element, value, status, render_template, msg=""):

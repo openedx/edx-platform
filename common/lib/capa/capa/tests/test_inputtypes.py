@@ -8,6 +8,7 @@ from mock import Mock
 from nose.plugins.skip import SkipTest
 import os
 import unittest
+import xml.sax.saxutils as saxutils
 
 from . import test_system
 from capa import inputtypes
@@ -128,6 +129,43 @@ class ChoiceGroupTest(unittest.TestCase):
 
     def test_radiogroup(self):
         self.check_group('radiogroup', 'radio', '[]')
-        
+
     def test_checkboxgroup(self):
         self.check_group('checkboxgroup', 'checkbox', '[]')
+
+
+
+class JavascriptInputTest(unittest.TestCase):
+    '''
+    The javascript input is a pretty straightforward pass-thru, but test it anyway
+    '''
+
+    def test_rendering(self):
+        params = "(1,2,3)"
+
+        problem_state = "abc12',12&hi<there>"
+        display_class = "a_class"
+        display_file = "my_files/hi.js"
+
+        xml_str = """<javascriptinput id="prob_1_2" params="{params}" problem_state="{ps}"
+                                      display_class="{dc}" display_file="{df}"/>""".format(
+                                          params=params,
+                                          ps=saxutils.quoteattr(problem_state)[1:-1],  # don't want the outer quotes
+                                          dc=display_class, df=display_file)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': '3',}
+        the_input = inputtypes.get_class_for_tag('javascriptinput')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'params': params,
+                    'display_file': display_file,
+                    'display_class': display_class,
+                    'problem_state': problem_state,
+                    'value': '3',
+                    'evaluation': '',}
+
+        self.assertEqual(context, expected)
