@@ -165,14 +165,6 @@ function addPolicyMetadata(e) {
     newNode.find('.policy-list-name').focus();
 }
 
-function editPolicyMetadata(e) {
-    e.preventDefault();
-
-    var $policyElement = $(this).parents('.policy-list-element');
-    $policyElement.data('currentValues', [$policyElement.find('.policy-list-name').val(), $policyElement.find('.policy-list-value').val()]);
-    $policyElement.addClass('new-policy-list-element').addClass('editing');
-}
-
 function savePolicyMetadata(e) {
     e.preventDefault();
 
