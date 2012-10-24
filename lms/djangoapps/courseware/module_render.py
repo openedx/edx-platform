@@ -147,7 +147,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
-    if not has_access(user, descriptor, 'load'):
+    if not has_access(user, descriptor, 'load', course_id):
         return None
 
     # Anonymized student identifier
@@ -244,7 +244,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
         # make an ErrorDescriptor -- assuming that the descriptor's system is ok
         import_system = descriptor.system
-        if has_access(user, location, 'staff'):
+        if has_access(user, location, 'staff', course_id):
             err_descriptor = ErrorDescriptor.from_xml(str(descriptor), import_system,
                                                       error_msg=exc_info_to_str(sys.exc_info()))
         else:
@@ -263,7 +263,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     module.get_html = replace_course_urls(module.get_html, course_id)
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
-        if has_access(user, module, 'staff'):
+        if has_access(user, module, 'staff', course_id):
             module.get_html = add_histogram(module.get_html, module, user)
 
     return module
