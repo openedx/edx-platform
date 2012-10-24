@@ -237,3 +237,4 @@ class CMS.Views.UnitEdit.SaveDraftButton extends Backbone.View
 
   enable: =>
     @$el.removeClass('disabled')
+    @model.save()

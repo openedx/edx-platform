@@ -36,7 +36,10 @@
           <ol class='policy-list'>
               % for policy_name in policy_metadata.keys():
               <li class="policy-list-element">
-                  <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/><a href="#" class="delete-icon remove-policy-data"></a>
+                  <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/>
+                  <a href="#" class="save-button">Save</a>
+                  <a href="#" class="cancel-button">Cancel</a>
+                  <a href="#" class="delete-icon remove-policy-data"></a>
               </li>
               % endfor
         <a href="#" class="new-policy-item add-policy-data">
