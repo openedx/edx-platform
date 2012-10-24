@@ -22,13 +22,13 @@ class CourseDescriptor(SequenceDescriptor):
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
             self.start_page = int(self.table_of_contents[0].attrib['page'])
-            
+
             # The last page should be the last element in the table of contents,
             # but it may be nested. So recurse all the way down the last element
             last_el = self.table_of_contents[-1]
             while last_el.getchildren():
                 last_el = last_el[-1]
-            
+
             self.end_page = int(last_el.attrib['page'])
 
         @property
@@ -87,6 +87,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.enrollment_start = self._try_parse_time("enrollment_start")
         self.enrollment_end = self._try_parse_time("enrollment_end")
+        self.end = self._try_parse_time("end")
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -126,6 +127,16 @@ class CourseDescriptor(SequenceDescriptor):
         definition['data']['wiki_slug'] = wiki_slug
 
         return definition
+
+    def has_ended(self):
+        """
+        Returns True if the current time is after the specified course end date.
+        Returns False if there is no end date specified.
+        """
+        if self.end_date is None:
+            return False
+
+        return time.gmtime() > self.end
 
     def has_started(self):
         return time.gmtime() > self.start
