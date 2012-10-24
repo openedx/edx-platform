@@ -315,6 +315,7 @@ function saveSubsection(e) {
             'margin-top': '-10px'
         });
         $changedInput.after($spinner);
+        $spinner.show();
     }
     
     var id = $(this).data('id');
