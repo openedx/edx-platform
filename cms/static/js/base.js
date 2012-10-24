@@ -63,6 +63,9 @@ $(document).ready(function() {
     // add/remove policy metadata button click handlers
     $('.add-policy-data').bind('click', addPolicyMetadata);
     $('.remove-policy-data').bind('click', removePolicyMetadata);
+    $body.on('click', '.edit-policy-data', editPolicyMetadata);
+    $body.on('click', '.policy-list-element .save-button', savePolicyMetadata);
+    $body.on('click', '.policy-list-element .cancel-button', cancelPolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
 
@@ -161,19 +164,40 @@ function addPolicyMetadata(e) {
     newNode.insertBefore('.add-policy-data');
     $('.remove-policy-data').bind('click', removePolicyMetadata);
     newNode.find('.policy-list-name').focus();
-    newNode.find('.save-button').bind('click', savePolicyMetadata);
-    newNode.find('.cancel-button').bind('click', cancelPolicyMetadata);
+}
+
+function editPolicyMetadata(e) {
+    e.preventDefault();
+
+    var $policyElement = $(this).parents('.policy-list-element');
+    $policyElement.data('currentValues', [$policyElement.find('.policy-list-name').val(), $policyElement.find('.policy-list-value').val()]);
+    $policyElement.addClass('new-policy-list-element').addClass('editing');
+    $policyElement.find('.policy-list-name, .policy-list-value').removeAttr('disabled');
 }
 
 function savePolicyMetadata(e) {
     e.preventDefault();
+
+    var $policyElement = $(this).parents('.policy-list-element');
     $('.save-subsection').click();
-    $(this).parents('.policy-list-element').removeClass('new-policy-list-element');
+    $policyElement.removeClass('new-policy-list-element');
+    $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
+    $policyElement.find('.policy-list-value').attr('disabled', 'disabled');
+    $policyElement.removeClass('editing');
 }
 
 function cancelPolicyMetadata(e) {
     e.preventDefault();
-    $(this).parents('.policy-list-element').remove();
+
+    var $policyElement = $(this).parents('.policy-list-element');
+    if(!$policyElement.hasClass('editing')) {
+        $policyElement.remove();
+    } else {
+        $policyElement.removeClass('new-policy-list-element');
+        $policyElement.find('.policy-list-name').val($policyElement.data('currentValues')[0]);
+        $policyElement.find('.policy-list-value').val($policyElement.data('currentValues')[1]);
+    }
+    $policyElement.removeClass('editing');
 }
 
 function removePolicyMetadata(e) {
