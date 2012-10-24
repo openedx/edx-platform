@@ -308,7 +308,7 @@ __Inherited:__
 * `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
-*	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+*	`rerandomize` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
                                                             'onreset' (randomize question when reset button is pressed by the student)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
