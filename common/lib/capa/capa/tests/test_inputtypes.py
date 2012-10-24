@@ -24,6 +24,9 @@ def tst_render_template(template, context):
 
 system = Mock(render_template=tst_render_template)
 
+def quote_attr(s):
+    return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
+
 class OptionInputTest(unittest.TestCase):
     '''
     Make sure option inputs work
@@ -150,7 +153,7 @@ class JavascriptInputTest(unittest.TestCase):
         xml_str = """<javascriptinput id="prob_1_2" params="{params}" problem_state="{ps}"
                                       display_class="{dc}" display_file="{df}"/>""".format(
                                           params=params,
-                                          ps=saxutils.quoteattr(problem_state)[1:-1],  # don't want the outer quotes
+                                          ps=quote_attr(problem_state),
                                           dc=display_class, df=display_file)
 
         element = etree.fromstring(xml_str)
@@ -226,3 +229,43 @@ class TextLineTest(unittest.TestCase):
                     'preprocessor': {'class_name': preprocessorClass,
                                      'script_src': script}}
         self.assertEqual(context, expected)
+
+
+class FileSubmissionTest(unittest.TestCase):
+    '''
+    Check that file submission inputs work
+    '''
+
+    def test_rendering(self):
+        allowed_files = "runme.py nooooo.rb ohai.java"
+        required_files = "cookies.py"
+
+        xml_str = """<filesubmission id="prob_1_2"
+        allowed_files="{af}"
+        required_files="{rf}"
+        />""".format(af=allowed_files,
+                     rf=required_files,)
+
+
+        element = etree.fromstring(xml_str)
+
+        escapedict = {'"': '&quot;'}
+        esc = lambda s: saxutils.escape(s, escapedict)
+        
+        state = {'value': 'BumbleBee.py',
+                 'status': 'incomplete',
+                 'feedback' : {'message': '3'}, }
+        the_input = inputtypes.get_class_for_tag('filesubmission')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                   'state': 'queued',
+                   'msg': 'Submitted to grader.',
+                   'value': 'BumbleBee.py',
+                   'queue_len': '3',
+                   'allowed_files': esc('["runme.py", "nooooo.rb", "ohai.java"]'),
+                   'required_files': esc('["cookies.py"]')}
+
+        self.assertEqual(context, expected)
+
