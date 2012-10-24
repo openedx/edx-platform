@@ -208,7 +208,7 @@ def change_enrollment(request):
                     .format(course.display_name)}
                     
         org, course_num, run=course_id.split("/")        
-        statsd.increment("lms.user.enrollment",
+        statsd.increment("common.student.enrollment",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
                               "run:{0}".format(run)])
@@ -222,7 +222,7 @@ def change_enrollment(request):
             enrollment.delete()
             
             org, course_num, run=course_id.split("/")        
-            statsd.increment("lms.user.unenrollment",
+            statsd.increment("common.student.unenrollment",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run)])
@@ -276,7 +276,7 @@ def login_user(request, error=""):
 
         try_change_enrollment(request)
         
-        statsd.increment("lms.user.successful_login")
+        statsd.increment("common.student.successful_login")
         
         return HttpResponse(json.dumps({'success': True}))
     
@@ -484,7 +484,7 @@ def create_account(request, post_override=None):
             login_user.is_active = True
             login_user.save()
             
-    statsd.increment("lms.user.account_created")
+    statsd.increment("common.student.account_created")
     
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
