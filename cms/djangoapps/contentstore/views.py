@@ -36,7 +36,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from github_sync import export_to_github
 from static_replace import replace_urls
 from external_auth.views import ssl_login_shortcut
 
@@ -110,8 +109,14 @@ def index(request):
     """
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
-    # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location) and course.location.course != 'templates' and course.location.org!='' and course.location.course!='' and course.location.name!='', courses)
+    # filter out courses that we don't have access too
+    def course_filter(course):
+        return (has_access(request.user, course.location)
+                and course.location.course != 'templates'
+                and course.location.org != ''
+                and course.location.course != ''
+                and course.location.name != '')
+    courses = filter(course_filter, courses)
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
