@@ -383,15 +383,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         instance_module.grade = instance.get_score()['score']
     if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
         instance_module.save()
-        
-        score_bucket=0
-        if(instance_module.grade>0 and instance_module.grade<instance_module.max_grade):
-            score_bucket=1
-        elif(instance_module.grade==instance_module.max_grade):
-            score_bucket=2
-            
+
+        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
         org, course_num, run=course_id.split("/")        
-        statsd.increment("lms.user.question_answered",
+        statsd.increment("lms.courseware.question_answered",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
                               "run:{0}".format(run), 
@@ -480,15 +475,10 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.state != old_instance_state or
             instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
-            
-            score_bucket=0
-            if(instance_module.grade>0 and instance_module.grade<instance_module.max_grade):
-                score_bucket=1
-            elif(instance_module.grade==instance_module.max_grade):
-                score_bucket=2
-            
+
+            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
             org, course_num, run=course_id.split("/")        
-            statsd.increment("lms.user.question_answered",
+            statsd.increment("lms.courseware.question_answered",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run), 
@@ -540,5 +530,15 @@ def preview_chemcalc(request):
 
     return HttpResponse(json.dumps(result))
 
+#Function to split arbitrary score ranges into 3 buckets.
+#Used with statsd tracking.
+def get_score_bucket(grade,max_grade):
+    score_bucket="incorrect"
+    if(grade>0 and grade<max_grade):
+        score_bucket="partial"
+    elif(grade==max_grade):
+        score_bucket="correct"
+
+    return score_bucket
 
 
