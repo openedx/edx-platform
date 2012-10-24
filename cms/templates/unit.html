@@ -17,7 +17,7 @@
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
-      <div class="alert" id="published-alert">
+      <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>You are editing a draft.</strong>
         % if published_date:
         This unit was originally published on ${published_date}.
@@ -75,21 +75,20 @@
           <div class="window-contents">
             <div class="row visibility">
               <label class="inline-label">Visibility:</label>
-              <select id='visibility'>
+              <select class='visibility-select'>
                 <option value="public">Public</option>
                 <option value="private">Private</option>
               </select>
             </div>
             <div class="row published-alert">
-              <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" id="create-draft">edit a draft</a>.</p>
-              <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" id="publish-draft">replace it with this draft</a>.</p>
+              <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
+              <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
             </div>            
             <div class="row status">
               <p>This unit is scheduled to be released to <strong>students</strong> on <strong>${release_date}</strong> with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
             </div>
             <div class="row unit-actions">
-              <a id="save-draft" href="#" class="save-button">Save Draft</a>
-              <a id="delete-draft" href="#" class="save-button">Delete Draft</a>
+              <a href="#" class="delete-draft delete-button">Delete Draft</a>
               <a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
               <a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
             </div>

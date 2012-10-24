@@ -18,7 +18,7 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
-      <article class="subsection-body window">
+      <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
           <label>Display Name:</label>
           <input type="text" value="${subsection.metadata['display_name']}" class="subsection-display-name-input" data-metadata-name="display_name"/>
@@ -37,7 +37,6 @@
               % for policy_name in policy_metadata.keys():
               <li class="policy-list-element">
                   <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/>
-                  <a href="#" class="save-button">Save</a>
                   <a href="#" class="cancel-button">Cancel</a>
                   <a href="#" class="delete-icon remove-policy-data"></a>
               </li>
@@ -101,7 +100,6 @@
       </div>
     </div>
     <div class="row unit-actions">
-      <a href="#" class="save-button save-subsection" data-id="${subsection.location}">Save</a>
       <a href="${preview_link}" target="_blank" class="preview-button">Preview Drafts</a>
       %if can_view_live:
       <a href="${lms_link}" target="_blank" class="preview-button">View Live</a>

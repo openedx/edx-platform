@@ -574,11 +574,11 @@ def save_item(request):
 
     store = _modulestore(Location(item_location));
 
-    if request.POST['data']:
+    if request.POST['data'] is not None:
         data = request.POST['data']
         store.update_item(item_location, data)
         
-    if request.POST['children']:
+    if request.POST['children'] is not None:
         children = request.POST['children']
         store.update_children(item_location, children)
 
@@ -587,7 +587,7 @@ def save_item(request):
     # NOTE, that the postback is not the complete metadata, as there's system metadata which is
     # not presented to the end-user for editing. So let's fetch the original and
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
-    if request.POST['metadata']:
+    if request.POST['metadata'] is not None:
         posted_metadata = request.POST['metadata']
         # fetch original
         existing_item = modulestore().get_item(item_location)
