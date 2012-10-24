@@ -133,6 +133,72 @@ class UserProfile(models.Model):
     def set_meta(self, js):
         self.meta = json.dumps(js)
 
+class TestCenterUser(models.Model):
+    """This is our representation of the User for in-person testing, and 
+    specifically for Pearson at this point. A few things to note:
+    
+    * Pearson only supports Latin-1, so we have to make sure that the data we
+      capture here will work with that encoding.
+    * While we have a lot of this demographic data in UserProfile, it's much
+      more free-structured there. We'll try to pre-pop the form with data from
+      UserProfile, but we'll need to have a step where people who are signing
+      up re-enter their demographic data into the fields we specify.
+    * Users are only created here if they register to take an exam in person.
+    
+    The field names and lengths are modeled on the conventions and constraints
+    of Pearson's data import system, including oddities such as suffix having 
+    a limit of 255 while last_name only gets 50.
+    """
+    # Our own record keeping...
+    # user = models.ForeignKey(User, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    # user_updated_at happens only when the user makes a change to their data,
+    # and is something Pearson needs to know to manage updates. Unlike
+    # updated_at, this will not get incremented when we do a batch data import.
+    user_updated_at = models.DateTimeField(db_index=True)
+    
+    # Unique ID given to us for this User by the Testing Center. It's null when
+    # we first create the User entry, and is assigned by Pearson later.
+    candidate_id = models.IntegerField(null=True, db_index=True)
+    
+    # Unique ID we assign our user for a the Test Center.
+    client_candidate_id = models.CharField(max_length=50, db_index=True)
+    
+    # Name
+    first_name = models.CharField(max_length=30, db_index=True)
+    last_name = models.CharField(max_length=50, db_index=True)
+    middle_name = models.CharField(max_length=30, blank=True)
+    suffix = models.CharField(max_length=255, blank=True)
+    salutation = models.CharField(max_length=50, blank=True)
+    
+    # Address
+    address_1 = models.CharField(max_length=40)
+    address_2 = models.CharField(max_length=40, blank=True)
+    address_3 = models.CharField(max_length=40, blank=True)
+    city = models.CharField(max_length=32, db_index=True)
+    # state example: HI -- they have an acceptable list that we'll just plug in
+    # state is required if you're in the US or Canada, but otherwise not.
+    state = models.CharField(max_length=20, blank=True, db_index=True)
+    # postal_code required if you're in the US or Canada
+    postal_code = models.CharField(max_length=16, blank=True, db_index=True)
+    # country is a ISO 3166-1 alpha-3 country code (e.g. "USA", "CAN", "MNG")
+    country = models.CharField(max_length=3, db_index=True)
+    
+    # Phone
+    phone = models.CharField(max_length=35)
+    extension = models.CharField(max_length=8, blank=True, db_index=True)
+    phone_country_code = models.CharField(max_length=3, db_index=True)
+    fax = models.CharField(max_length=35, blank=True)
+    # fax_country_code required *if* fax is present.
+    fax_country_code = models.CharField(max_length=3, blank=True)
+    
+    # Company
+    company_name = models.CharField(max_length=50, blank=True)
+    
+    @property
+    def email(self):
+        return "" # should return user.email, but stub for now
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
