@@ -428,7 +428,6 @@ function showUploadModal(e) {
     e.preventDefault();
     $modal = $('.upload-modal').show();
     $('.file-input').bind('change', startUpload);
-    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $modalCover.show();
 }
 
@@ -439,7 +438,7 @@ function showFileSelectionMenu(e) {
 
 function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
-    $('.upload-modal .file-name').html($('.file-input').val());
+    $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
         uploadProgress: showUploadFeedback,
