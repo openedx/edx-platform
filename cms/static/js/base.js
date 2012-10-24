@@ -63,7 +63,6 @@ $(document).ready(function() {
     // add/remove policy metadata button click handlers
     $('.add-policy-data').bind('click', addPolicyMetadata);
     $('.remove-policy-data').bind('click', removePolicyMetadata);
-    $body.on('click', '.edit-policy-data', editPolicyMetadata);
     $body.on('click', '.policy-list-element .save-button', savePolicyMetadata);
     $body.on('click', '.policy-list-element .cancel-button', cancelPolicyMetadata);
 
@@ -172,7 +171,6 @@ function editPolicyMetadata(e) {
     var $policyElement = $(this).parents('.policy-list-element');
     $policyElement.data('currentValues', [$policyElement.find('.policy-list-name').val(), $policyElement.find('.policy-list-value').val()]);
     $policyElement.addClass('new-policy-list-element').addClass('editing');
-    $policyElement.find('.policy-list-name, .policy-list-value').removeAttr('disabled');
 }
 
 function savePolicyMetadata(e) {
@@ -182,7 +180,6 @@ function savePolicyMetadata(e) {
     $('.save-subsection').click();
     $policyElement.removeClass('new-policy-list-element');
     $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
-    $policyElement.find('.policy-list-value').attr('disabled', 'disabled');
     $policyElement.removeClass('editing');
 }
 

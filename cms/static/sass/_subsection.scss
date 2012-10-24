@@ -22,8 +22,7 @@
 	}
 
 	.policy-list {
-		.policy-list-name,
-		.policy-list-value {
+		input[disabled] {
 			border: none;
 			@include box-shadow(none);
 		}
