@@ -33,7 +33,6 @@ $(document).ready(function() {
 
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-    $('.save-subsection').bind('click', saveSubsection);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -169,7 +168,7 @@ function savePolicyMetadata(e) {
     e.preventDefault();
 
     var $policyElement = $(this).parents('.policy-list-element');
-    $('.save-subsection').click();
+    saveSubsection()
     $policyElement.removeClass('new-policy-list-element');
     $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
     $policyElement.removeClass('editing');
@@ -202,7 +201,7 @@ function removePolicyMetadata(e) {
     } else {
         _parent_el.appendTo("#policy-to-delete");
     }
-    $('.save-subsection').click();
+    saveSubsection()
 }
 
 
@@ -299,7 +298,7 @@ function checkForNewValue(e) {
 
         this.saveTimer = setTimeout(function() {
             $changedInput = $(e.target);
-            $('.save-subsection').click();
+            saveSubsection()
             this.saveTimer = null;
         }, 500);
     }
@@ -312,14 +311,12 @@ function autosaveInput(e) {
 
     this.saveTimer = setTimeout(function() {        
         $changedInput = $(e.target);
-        $('.save-subsection').click();
+        saveSubsection()
         this.saveTimer = null;
     }, 500);
 }
 
-function saveSubsection(e) {
-    e.preventDefault();
-
+function saveSubsection() {
     if($changedInput && !$changedInput.hasClass('no-spinner')) {
         $spinner.css({
             'position': 'absolute',
@@ -331,7 +328,7 @@ function saveSubsection(e) {
         $spinner.show();
     }
     
-    var id = $(this).data('id');
+    var id = $('.subsection-body').data('id');
 
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
