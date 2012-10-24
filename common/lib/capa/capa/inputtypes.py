@@ -1,3 +1,29 @@
+
+
+# template:
+'''
+class ClassName(InputTypeBase):
+    """
+    """
+
+    template = "tagname.html"
+    tags = ['tagname']
+
+    def __init__(self, system, xml, state):
+        super(ClassName, self).__init__(system, xml, state)
+
+
+    def _get_render_context(self):
+
+        context = {'id': self.id,
+               
+               }
+        return context
+
+register_input_class(ClassName)
+'''
+
+
 #
 # File:   courseware/capa/inputtypes.py
 #
@@ -366,6 +392,8 @@ class JavascriptInput(InputTypeBase):
 register_input_class(JavascriptInput)
 
 
+#-----------------------------------------------------------------------------
+
 def textline(element, value, status, render_template, msg=""):
     '''
     Simple text line input, with optional size specification.
@@ -677,8 +705,8 @@ def imageinput(element, value, status, render_template, msg=''):
         'src': src,
         'gx': gx,
         'gy': gy,
-        'state': status,	 # to change
-        'msg': msg,			# to change
+        'state': status,    # to change
+        'msg': msg,         # to change
         }
     html = render_template("imageinput.html", context)
     return etree.XML(html)
