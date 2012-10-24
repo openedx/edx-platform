@@ -731,6 +731,9 @@ function saveEditSectionName(e) {
     id = $(this).closest("section.courseware-section").data("id");
     display_name = $.trim($(this).prev('.edit-section-name').val());
 
+    $(this).closest('.courseware-section .section-name').append($spinner);
+    $spinner.show();
+
     if (display_name == '') {
         alert("You must specify a name before saving.")
         return;
@@ -746,7 +749,7 @@ function saveEditSectionName(e) {
         data:JSON.stringify({ 'id' : id, 'metadata' : {'display_name' : display_name}, 'data': null, 'children' : null})
     }).success(function()
     {
-        alert('Your changes have been saved.');
+        $spinner.delay(250).fadeOut(250);
         $_this.parent().siblings('span.section-name-span').html(display_name);
         $_this.parent().siblings('span.section-name-span').show();
         $_this.parent().hide();
