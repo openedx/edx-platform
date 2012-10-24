@@ -77,18 +77,27 @@ class LoncapaResponse(object):
 
     In addition, these methods are optional:
 
-      - setup_response       : find and note the answer input field IDs for the response; called by __init__
-      - check_hint_condition : check to see if the student's answers satisfy a particular condition for a hint to be displayed
-      - render_html          : render this Response as HTML (must return XHTML compliant string)
+      - setup_response : find and note the answer input field IDs for the response; called
+                         by __init__
+
+      - check_hint_condition : check to see if the student's answers satisfy a particular
+                         condition for a hint to be displayed
+
+      - render_html          : render this Response as HTML (must return XHTML-compliant string)
       - __unicode__          : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
-      - max_inputfields      : (int) maximum number of answer input fields (checked in __init__ if not None)
-      - allowed_inputfields  : list of allowed input fields (each a string) for this Response
-      - required_attributes  : list of required attributes (each a string) on the main response XML stanza
-      - hint_tag             : xhtml tag identifying hint associated with this response inside hintgroup
+      - max_inputfields      : (int) maximum number of answer input fields (checked in __init__
+                               if not None)
 
+      - allowed_inputfields  : list of allowed input fields (each a string) for this Response
+
+      - required_attributes  : list of required attributes (each a string) on the main
+                               response XML stanza
+
+      - hint_tag             : xhtml tag identifying hint associated with this response inside
+                               hintgroup
     """
     __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
@@ -121,26 +130,32 @@ class LoncapaResponse(object):
                 raise LoncapaProblemError(msg)
 
         if self.max_inputfields and len(inputfields) > self.max_inputfields:
-            msg = "%s: cannot have more than %s input fields" % (unicode(self), self.max_inputfields)
+            msg = "%s: cannot have more than %s input fields" % (
+                unicode(self), self.max_inputfields)
             msg += "\nSee XML source line %s" % getattr(xml, 'sourceline', '<unavailable>')
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
             if not xml.get(prop):
-                msg = "Error in problem specification: %s missing required attribute %s" % (unicode(self), prop)
+                msg = "Error in problem specification: %s missing required attribute %s" % (
+                    unicode(self), prop)
                 msg += "\nSee XML source line %s" % getattr(xml, 'sourceline', '<unavailable>')
                 raise LoncapaProblemError(msg)
 
-        self.answer_ids = [x.get('id') for x in self.inputfields]	 # ordered list of answer_id values for this response
+        # ordered list of answer_id values for this response
+        self.answer_ids = [x.get('id') for x in self.inputfields]
         if self.max_inputfields == 1:
-            self.answer_id = self.answer_ids[0]		# for convenience
+            # for convenience
+            self.answer_id = self.answer_ids[0]
 
         self.maxpoints = dict()
         for inputfield in self.inputfields:
-            maxpoints = inputfield.get('points','1') # By default, each answerfield is worth 1 point
+            # By default, each answerfield is worth 1 point
+            maxpoints = inputfield.get('points', '1')
             self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
 
-        self.default_answer_map = {}			# dict for default answer map (provided in input elements)
+        # dict for default answer map (provided in input elements)
+        self.default_answer_map = {}
         for entry in self.inputfields:
             answer = entry.get('correct_answer')
             if answer:
@@ -163,12 +178,18 @@ class LoncapaResponse(object):
 
           - renderer : procedure which produces HTML given an ElementTree
         '''
-        tree = etree.Element('span')			# render ourself as a <span> + our content
-        if self.xml.get('inline',''):			# problem author can make this span display:inline
+        # render ourself as a <span> + our content
+        tree = etree.Element('span')
+
+        # problem author can make this span display:inline
+        if self.xml.get('inline',''):
             tree.set('class','inline')
+            
         for item in self.xml:
-            item_xhtml = renderer(item)			# call provided procedure to do the rendering
-            if item_xhtml is not None: tree.append(item_xhtml)
+            # call provided procedure to do the rendering
+            item_xhtml = renderer(item)
+            if item_xhtml is not None:
+                tree.append(item_xhtml)
         tree.tail = self.xml.tail
         return tree
 
@@ -194,21 +215,21 @@ class LoncapaResponse(object):
         Modifies new_cmap, by adding hints to answer_id entries as appropriate.
         '''
         hintgroup = self.xml.find('hintgroup')
-        if hintgroup is None: return
+        if hintgroup is None:
+            return
 
         # hint specified by function?
         hintfn = hintgroup.get('hintfn')
         if hintfn:
             '''
-            Hint is determined by a function defined in the <script> context; evaluate that function to obtain
-            list of hint, hintmode for each answer_id.
+            Hint is determined by a function defined in the <script> context; evaluate
+            that function to obtain list of hint, hintmode for each answer_id.
 
             The function should take arguments (answer_ids, student_answers, new_cmap, old_cmap)
             and it should modify new_cmap as appropriate.
 
-            We may extend this in the future to add another argument which provides a callback procedure
-            to a social hint generation system.
-
+            We may extend this in the future to add another argument which provides a
+            callback procedure to a social hint generation system.
             '''
             if not hintfn in self.context:
                 msg = 'missing specified hint function %s in script context' % hintfn
@@ -239,14 +260,20 @@ class LoncapaResponse(object):
         #   </hintgroup>
         # </formularesponse>
 
-        if self.hint_tag is not None and hintgroup.find(self.hint_tag) is not None and hasattr(self, 'check_hint_condition'):
+        if (self.hint_tag is not None
+            and hintgroup.find(self.hint_tag) is not None
+            and hasattr(self, 'check_hint_condition')):
+
             rephints = hintgroup.findall(self.hint_tag)
             hints_to_show = self.check_hint_condition(rephints, student_answers)
-            hintmode = hintgroup.get('mode', 'always')	 # can be 'on_request' or 'always' (default)
+
+            # can be 'on_request' or 'always' (default)
+            hintmode = hintgroup.get('mode', 'always')
             for hintpart in hintgroup.findall('hintpart'):
                 if hintpart.get('on') in hints_to_show:
                     hint_text = hintpart.find('text').text
-                    aid = self.answer_ids[-1]		# make the hint appear after the last answer box in this response
+                    # make the hint appear after the last answer box in this response
+                    aid = self.answer_ids[-1]
                     new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
             log.debug('after hint: new_cmap = %s' % new_cmap)
 
@@ -257,10 +284,10 @@ class LoncapaResponse(object):
         (correctness, npoints, msg) for each answer_id.
 
         Arguments:
-
          - student_answers : dict of (answer_id,answer) where answer = student input (string)
-         - old_cmap        : previous CorrectMap (may be empty); useful for analyzing or recording history of responses
 
+         - old_cmap        : previous CorrectMap (may be empty); useful for analyzing or
+                             recording history of responses
         '''
         pass
 
@@ -275,10 +302,13 @@ class LoncapaResponse(object):
         '''
         Return a list of hints to show.
 
-          - hxml_set        : list of Element trees, each specifying a condition to be satisfied for a named hint condition
+          - hxml_set        : list of Element trees, each specifying a condition to be
+                              satisfied for a named hint condition
+
           - student_answers : dict of student answers
 
-        Returns a list of names of hint conditions which were satisfied.  Those are used to determine which hints are displayed.
+        Returns a list of names of hint conditions which were satisfied.  Those are used
+        to determine which hints are displayed.
         '''
         pass
 
@@ -292,10 +322,10 @@ class LoncapaResponse(object):
 #-----------------------------------------------------------------------------
 
 class JavascriptResponse(LoncapaResponse):
-    '''
+    """
     This response type is used when the student's answer is graded via
     Javascript using Node.js.
-    '''
+    """
 
     response_tag = 'javascriptresponse'
     max_inputfields = 1
@@ -314,11 +344,11 @@ class JavascriptResponse(LoncapaResponse):
             self.problem_state = self.generate_problem_state()
         else:
             self.problem_state = None
-        
+
         self.solution = None
 
         self.prepare_inputfield()
-    
+
     def compile_display_javascript(self):
 
         # TODO FIXME
@@ -357,10 +387,10 @@ class JavascriptResponse(LoncapaResponse):
         self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
                                             id=self.xml.get('id'))[0]
 
-        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader', 
+        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader',
                                          id=self.xml.get('id'))[0]
 
-        self.display_xml = self.xml.xpath('//*[@id=$id]//display', 
+        self.display_xml = self.xml.xpath('//*[@id=$id]//display',
                                          id=self.xml.get('id'))[0]
 
         self.xml.remove(self.generator_xml)
@@ -387,7 +417,7 @@ class JavascriptResponse(LoncapaResponse):
             self.display_dependencies = []
 
         self.display_class = self.display_xml.get("class")
-    
+
     def get_node_env(self):
 
         js_dir = os.path.join(self.system.filestore.root_path, 'js')
@@ -395,7 +425,7 @@ class JavascriptResponse(LoncapaResponse):
         node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
         return tmp_env
-    
+
     def call_node(self, args):
 
         subprocess_args = ["node"]
@@ -408,7 +438,7 @@ class JavascriptResponse(LoncapaResponse):
 
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
         output = self.call_node([generator_file,
-                                 self.generator, 
+                                 self.generator,
                                  json.dumps(self.generator_dependencies),
                                  json.dumps(str(self.context['the_lcp'].seed)),
                                  json.dumps(self.params)]).strip()
@@ -418,18 +448,18 @@ class JavascriptResponse(LoncapaResponse):
     def extract_params(self):
 
         params = {}
-    
-        for param in self.xml.xpath('//*[@id=$id]//responseparam', 
+
+        for param in self.xml.xpath('//*[@id=$id]//responseparam',
                                         id=self.xml.get('id')):
 
             raw_param = param.get("value")
             params[param.get("name")] = json.loads(contextualize_text(raw_param, self.context))
-        
+
         return params
 
     def prepare_inputfield(self):
 
-        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput', 
+        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput',
                                         id=self.xml.get('id')):
 
             escapedict = {'"': '&quot;'}
@@ -456,36 +486,36 @@ class JavascriptResponse(LoncapaResponse):
         else:
             points = 0
         return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
-    
+
     def run_grader(self, submission):
         if submission is None or submission == '':
             submission = json.dumps(None)
 
         grader_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_grader.js'
-        outputs = self.call_node([grader_file, 
-                                  self.grader, 
+        outputs = self.call_node([grader_file,
+                                  self.grader,
                                   json.dumps(self.grader_dependencies),
-                                  submission, 
-                                  json.dumps(self.problem_state), 
+                                  submission,
+                                  json.dumps(self.problem_state),
                                   json.dumps(self.params)]).split('\n')
 
         all_correct = json.loads(outputs[0].strip())
         evaluation  = outputs[1].strip()
         solution    = outputs[2].strip()
         return (all_correct, evaluation, solution)
-    
+
     def get_answers(self):
         if self.solution is None:
             (_, _, self.solution) = self.run_grader(None)
 
         return {self.answer_id: self.solution}
 
-            
+
 
 #-----------------------------------------------------------------------------
 
 class ChoiceResponse(LoncapaResponse):
-    '''
+    """
     This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
     supplied by the student, and no extraneous choices may be included.
@@ -530,7 +560,7 @@ class ChoiceResponse(LoncapaResponse):
     choices must be given names. This behavior seems like a leaky abstraction,
     and it'd be nice to change this at some point.
 
-    '''
+    """
 
     response_tag = 'choiceresponse'
     max_inputfields = 1
@@ -596,7 +626,8 @@ class MultipleChoiceResponse(LoncapaResponse):
     allowed_inputfields = ['choicegroup']
 
     def setup_response(self):
-        self.mc_setup_response()	 # call secondary setup for MultipleChoice questions, to set name attributes
+        # call secondary setup for MultipleChoice questions, to set name attributes
+        self.mc_setup_response()
 
         # define correct choices (after calling secondary setup)
         xml = self.xml
@@ -611,7 +642,8 @@ class MultipleChoiceResponse(LoncapaResponse):
         for response in self.xml.xpath("choicegroup"):
             rtype = response.get('type')
             if rtype not in ["MultipleChoice"]:
-                response.set("type", "MultipleChoice")		# force choicegroup to be MultipleChoice if not valid
+                # force choicegroup to be MultipleChoice if not valid
+                response.set("type", "MultipleChoice")
             for choice in list(response):
                 if choice.get("name") is None:
                     choice.set("name", "choice_" + str(i))
@@ -623,8 +655,10 @@ class MultipleChoiceResponse(LoncapaResponse):
         '''
         grade student response.
         '''
-        # log.debug('%s: student_answers=%s, correct_choices=%s' % (unicode(self),student_answers,self.correct_choices))
-        if self.answer_id in student_answers and student_answers[self.answer_id] in self.correct_choices:
+        # log.debug('%s: student_answers=%s, correct_choices=%s' % (
+        #   unicode(self), student_answers, self.correct_choices))
+        if (self.answer_id in student_answers
+            and student_answers[self.answer_id] in self.correct_choices):
             return CorrectMap(self.answer_id, 'correct')
         else:
             return CorrectMap(self.answer_id, 'incorrect')
@@ -664,10 +698,14 @@ class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
     '''
-    snippets = [{'snippet': '''<optionresponse direction="vertical" randomize="yes">
-        <optioninput options="('Up','Down')" correct="Up"><text>The location of the sky</text></optioninput>
-        <optioninput options="('Up','Down')" correct="Down"><text>The location of the earth</text></optioninput>
-    </optionresponse>'''}]
+    snippets = [{'snippet': """<optionresponse direction="vertical" randomize="yes">
+        <optioninput options="('Up','Down')" correct="Up">
+          <text>The location of the sky</text>
+        </optioninput>
+        <optioninput options="('Up','Down')" correct="Down">
+          <text>The location of the earth</text>
+        </optioninput>
+    </optionresponse>"""}]
 
     response_tag = 'optionresponse'
     hint_tag = 'optionhint'
@@ -722,21 +760,33 @@ class NumericalResponse(LoncapaResponse):
     def get_score(self, student_answers):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
+
         try:
-            correct = compare_with_tolerance(evaluator(dict(), dict(), student_answer), complex(self.correct_answer), self.tolerance)
+            correct_ans = complex(self.correct_answer)
+        except ValueError:
+            log.debug("Content error--answer '{0}' is not a valid complex number".format(self.correct_answer))
+            raise StudentInputError("There was a problem with the staff answer to this problem")
+
+        try:
+            correct = compare_with_tolerance(evaluator(dict(), dict(), student_answer),
+                                             correct_ans, self.tolerance)
         # We should catch this explicitly.
         # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
         # But we'd need to confirm
         except:
-            raise StudentInputError("Invalid input: could not interpret '%s' as a number" %\
-                                    cgi.escape(student_answer))
+            # Use the traceback-preserving version of re-raising with a different type
+            import sys
+            type, value, traceback = sys.exc_info()
+
+            raise StudentInputError, ("Invalid input: could not interpret '%s' as a number" %
+                                      cgi.escape(student_answer)), traceback
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
         else:
             return CorrectMap(self.answer_id, 'incorrect')
 
-    # TODO: add check_hint_condition(self,hxml_set,student_answers)
+    # TODO: add check_hint_condition(self, hxml_set, student_answers)
 
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
@@ -786,7 +836,7 @@ class CustomResponse(LoncapaResponse):
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     '''
-    snippets = [{'snippet': '''<customresponse>
+    snippets = [{'snippet': """<customresponse>
     <text>
     <br/>
     Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
@@ -804,8 +854,8 @@ class CustomResponse(LoncapaResponse):
     if not(r=="IS*u(t-t0)"):
         correct[0] ='incorrect'
     </answer>
-    </customresponse>'''},
-    {'snippet': '''<script type="loncapa/python"><![CDATA[
+    </customresponse>"""},
+    {'snippet': """<script type="loncapa/python"><![CDATA[
 
 def sympy_check2():
   messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
@@ -818,10 +868,10 @@ def sympy_check2():
   <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
     <textline size="40" dojs="math" />
     <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
-  </customresponse>'''}]
+  </customresponse>"""}]
 
     response_tag = 'customresponse'
-    allowed_inputfields = ['textline', 'textbox']
+    allowed_inputfields = ['textline', 'textbox', 'crystallography', 'chemicalequationinput']
 
     def setup_response(self):
         xml = self.xml
@@ -832,7 +882,8 @@ def sympy_check2():
 
         log.debug('answer_ids=%s' % self.answer_ids)
 
-        # the <answer>...</answer> stanza should be local to the current <customresponse>.  So try looking there first.
+        # the <answer>...</answer> stanza should be local to the current <customresponse>.
+        # So try looking there first.
         self.code = None
         answer = None
         try:
@@ -840,8 +891,9 @@ def sympy_check2():
         except IndexError:
             # print "xml = ",etree.tostring(xml,pretty_print=True)
 
-            # if we have a "cfn" attribute then look for the function specified by cfn, in the problem context
-            # ie the comparison function is defined in the <script>...</script> stanza instead
+            # if we have a "cfn" attribute then look for the function specified by cfn, in
+            # the problem context ie the comparison function is defined in the
+            # <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
                 log.debug("cfn = %s" % cfn)
@@ -849,13 +901,14 @@ def sympy_check2():
                     self.code = self.context[cfn]
                 else:
                     msg = "%s: can't find cfn %s in context" % (unicode(self), cfn)
-                    msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline', '<unavailable>')
+                    msg += "\nSee XML source line %s" % getattr(self.xml, 'sourceline',
+                                                                '<unavailable>')
                     raise LoncapaProblemError(msg)
 
         if not self.code:
             if answer is None:
-                # raise Exception,"[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid
-                log.error("[courseware.capa.responsetypes.customresponse] missing code checking script! id=%s" % self.myid)
+                log.error("[courseware.capa.responsetypes.customresponse] missing"
+                          " code checking script! id=%s" % self.myid)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -872,43 +925,70 @@ def sympy_check2():
 
         log.debug('%s: student_answers=%s' % (unicode(self), student_answers))
 
-        idset = sorted(self.answer_ids)				# ordered list of answer id's
+        # ordered list of answer id's
+        idset = sorted(self.answer_ids)
         try:
-            submission = [student_answers[k] for k in idset]	 # ordered list of answers
+            # ordered list of answers
+            submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = '[courseware.capa.responsetypes.customresponse] error getting student answer from %s' % student_answers
+            msg = ('[courseware.capa.responsetypes.customresponse] error getting'
+                   ' student answer from %s' % student_answers)
             msg += '\n idset = %s, error = %s' % (idset, err)
             log.error(msg)
             raise Exception(msg)
 
         # global variable in context which holds the Presentation MathML from dynamic math input
-        dynamath = [student_answers.get(k + '_dynamath', None) for k in idset]	 # ordered list of dynamath responses
+        # ordered list of dynamath responses
+        dynamath = [student_answers.get(k + '_dynamath', None) for k in idset]
 
         # if there is only one box, and it's empty, then don't evaluate
         if len(idset) == 1 and not submission[0]:
-            # default to no error message on empty answer (to be consistent with other responsetypes)
-            # but allow author to still have the old behavior by setting empty_answer_err attribute
-            msg = '<span class="inline-error">No answer entered!</span>' if self.xml.get('empty_answer_err') else ''
+            # default to no error message on empty answer (to be consistent with other
+            # responsetypes) but allow author to still have the old behavior by setting
+            # empty_answer_err attribute
+            msg = ('<span class="inline-error">No answer entered!</span>'
+                   if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
-        # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are not expecting 'unknown's
+        # NOTE: correct = 'unknown' could be dangerous. Inputtypes such as textline are
+        # not expecting 'unknown's
         correct = ['unknown'] * len(idset)
         messages = [''] * len(idset)
 
         # put these in the context of the check function evaluator
         # note that this doesn't help the "cfn" version - only the exec version
-        self.context.update({'xml': self.xml,		# our subtree
-                             'response_id': self.myid,	 # my ID
-                             'expect': self.expect,		# expected answer (if given as attribute)
-                             'submission': submission,		# ordered list of student answers from entry boxes in our subtree
-                             'idset': idset,			# ordered list of ID's of all entry boxes in our subtree
-                             'dynamath': dynamath,		# ordered list of all javascript inputs in our subtree
-                             'answers': student_answers,		# dict of student's responses, with keys being entry box IDs
-                             'correct': correct,			# the list to be filled in by the check function
-                             'messages': messages,		# the list of messages to be filled in by the check function
-                             'options': self.xml.get('options'),	 # any options to be passed to the cfn
-                             'testdat': 'hello world',
-                             })
+        self.context.update({
+            # our subtree
+            'xml': self.xml,
+
+            # my ID
+            'response_id': self.myid,
+
+            # expected answer (if given as attribute)
+            'expect': self.expect,
+
+            # ordered list of student answers from entry boxes in our subtree
+            'submission': submission,
+
+            # ordered list of ID's of all entry boxes in our subtree
+            'idset': idset,
+
+            # ordered list of all javascript inputs in our subtree
+            'dynamath': dynamath,
+
+            # dict of student's responses, with keys being entry box IDs
+            'answers': student_answers,
+
+            # the list to be filled in by the check function
+            'correct': correct,
+
+            # the list of messages to be filled in by the check function
+            'messages': messages,
+
+            # any options to be passed to the cfn
+            'options': self.xml.get('options'),
+            'testdat': 'hello world',
+            })
 
         # pass self.system.debug to cfn
         self.context['debug'] = self.system.DEBUG
@@ -923,8 +1003,10 @@ def sympy_check2():
                 print "oops in customresponse (code) error %s" % err
                 print "context = ", self.context
                 print traceback.format_exc()
-                raise StudentInputError("Error: Problem could not be evaluated with your input") # Notify student
-        else:					# self.code is not a string; assume its a function
+                # Notify student
+                raise StudentInputError("Error: Problem could not be evaluated with your input")
+        else:
+            # self.code is not a string; assume its a function
 
             # this is an interface to the Tutor2 check functions
             fn = self.code
@@ -960,7 +1042,8 @@ def sympy_check2():
                     msg = '<html>' + msg + '</html>'
                     msg = msg.replace('&#60;', '&lt;')
                     #msg = msg.replace('&lt;','<')
-                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None), pretty_print=True)
+                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
+                                         pretty_print=True)
                     #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
                     msg = msg.replace('&#13;', '')
                     #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
@@ -1024,18 +1107,19 @@ class SymbolicResponse(CustomResponse):
 
 
 class CodeResponse(LoncapaResponse):
-    '''
+    """
     Grade student code using an external queueing server, called 'xqueue'
 
     Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
         system.xqueue = { 'interface': XqueueInterface object,
-                          'callback_url': Per-StudentModule callback URL where results are posted (string),
+                          'callback_url': Per-StudentModule callback URL
+                                          where results are posted (string),
                           'default_queuename': Default queuename to submit request (string)
                         }
 
-    External requests are only submitted for student submission grading 
+    External requests are only submitted for student submission grading
         (i.e. and not for getting reference answers)
-    '''
+    """
 
     response_tag = 'coderesponse'
     allowed_inputfields = ['textbox', 'filesubmission']
@@ -1048,7 +1132,8 @@ class CodeResponse(LoncapaResponse):
         TODO: Determines whether in synchronous or asynchronous (queued) mode
         '''
         xml = self.xml
-        self.url = xml.get('url', None) # TODO: XML can override external resource (grader/queue) URL
+        # TODO: XML can override external resource (grader/queue) URL
+        self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
         # VS[compat]:
@@ -1109,7 +1194,8 @@ class CodeResponse(LoncapaResponse):
 
         # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
         #   (1) Internal edX code, i.e. NOT student submissions, and
-        #   (2) The code should only define the strings 'initial_display', 'answer', 'preamble', 'test_program'
+        #   (2) The code should only define the strings 'initial_display', 'answer',
+        #           'preamble', 'test_program'
         #           following the ExternalResponse XML format
         penv = {}
         penv['__builtins__'] = globals()['__builtins__']
@@ -1122,10 +1208,12 @@ class CodeResponse(LoncapaResponse):
             self.answer = penv['answer']
             self.initial_display = penv['initial_display']
         except Exception as err:
-            log.error("Error in CodeResponse %s: Problem reference code does not define 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
+            log.error("Error in CodeResponse %s: Problem reference code does not define"
+                      " 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
             raise Exception(err)
 
-        # Finally, make the ExternalResponse input XML format conform to the generic exteral grader interface
+        # Finally, make the ExternalResponse input XML format conform to the generic
+        # exteral grader interface
         #   The XML tagging of grader_payload is pyxserver-specific
         grader_payload  = '<pyxserver>'
         grader_payload += '<tests>' + tests + '</tests>\n'
@@ -1135,14 +1223,16 @@ class CodeResponse(LoncapaResponse):
 
     def get_score(self, student_answers):
         try:
-            submission = student_answers[self.answer_id] # Note that submission can be a file
+            # Note that submission can be a file
+            submission = student_answers[self.answer_id]
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s; student_answers=%s' %
+            log.error('Error in CodeResponse %s: cannot get student answer for %s;'
+                      ' student_answers=%s' %
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
 
         # Prepare xqueue request
-        #------------------------------------------------------------ 
+        #------------------------------------------------------------
 
         qinterface = self.system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
@@ -1151,19 +1241,20 @@ class CodeResponse(LoncapaResponse):
 
         # Generate header
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
-                                                 anonymous_student_id +  
+                                                 anonymous_student_id +
                                                  self.answer_id)
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
                                                 lms_key=queuekey,
                                                 queue_name=self.queue_name)
-        
+
         # Generate body
         if is_list_of_files(submission):
-            self.context.update({'submission': ''}) # TODO: Get S3 pointer from the Queue
+            # TODO: Get S3 pointer from the Queue
+            self.context.update({'submission': ''})
         else:
             self.context.update({'submission': submission})
 
-        contents = self.payload.copy() 
+        contents = self.payload.copy()
 
         # Metadata related to the student submission revealed to the external grader
         student_info = {'anonymous_student_id': anonymous_student_id,
@@ -1173,7 +1264,8 @@ class CodeResponse(LoncapaResponse):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         if is_list_of_files(submission):
-            contents.update({'student_response': ''}) # TODO: Is there any information we want to send here?
+            # TODO: Is there any information we want to send here?
+            contents.update({'student_response': ''})
             (error, msg) = qinterface.send_to_queue(header=xheader,
                                                     body=json.dumps(contents),
                                                     files_to_upload=submission)
@@ -1184,44 +1276,51 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
-                      'time': qtime,
-                     }
+                      'time': qtime,}
 
-        cmap = CorrectMap() 
+        cmap = CorrectMap()
         if error:
             cmap.set(self.answer_id, queuestate=None,
-                     msg='Unable to deliver your submission to grader. (Reason: %s.) Please try again later.' % msg)
+                     msg='Unable to deliver your submission to grader. (Reason: %s.)'
+                         ' Please try again later.' % msg)
         else:
             # Queueing mechanism flags:
-            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that the problem has been queued
-            #   2) Frontend: correctness='incomplete' eventually trickles down through inputtypes.textbox 
-            #       and .filesubmission to inform the browser to poll the LMS
+            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
+            #      the problem has been queued
+            #   2) Frontend: correctness='incomplete' eventually trickles down
+            #      through inputtypes.textbox and .filesubmission to inform the
+            #      browser to poll the LMS
             cmap.set(self.answer_id, queuestate=queuestate, correctness='incomplete', msg=msg)
 
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
 
-        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg) 
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
-            oldcmap.set(self.answer_id, msg='Invalid grader reply. Please contact the course staff.')
+            oldcmap.set(self.answer_id,
+                        msg='Invalid grader reply. Please contact the course staff.')
             return oldcmap
-        
+
         correctness = 'correct' if correct else 'incorrect'
 
-        self.context['correct'] = correctness # TODO: Find out how this is used elsewhere, if any
+        # TODO: Find out how this is used elsewhere, if any
+        self.context['correct'] = correctness
 
-        # Replace 'oldcmap' with new grading results if queuekey matches.
-        #   If queuekey does not match, we keep waiting for the score_msg whose key actually matches
+        # Replace 'oldcmap' with new grading results if queuekey matches.  If queuekey
+        # does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            # Sanity check on returned points 
+            # Sanity check on returned points
             if points < 0:
                 points = 0
             elif points > self.maxpoints[self.answer_id]:
                 points = self.maxpoints[self.answer_id]
-            oldcmap.set(self.answer_id, npoints=points, correctness=correctness, msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)  # Queuestate is consumed
+            # Queuestate is consumed
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
+                        msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
-            log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' % (queuekey, self.answer_id))
+            log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' %
+                      (queuekey, self.answer_id))
 
         return oldcmap
 
@@ -1233,7 +1332,7 @@ class CodeResponse(LoncapaResponse):
         return {self.answer_id: self.initial_display}
 
     def _parse_score_msg(self, score_msg):
-        '''
+        """
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
              'score': Numeric value (floating point is okay) to assign to answer
@@ -1244,22 +1343,25 @@ class CodeResponse(LoncapaResponse):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
             msg:             Message from grader to display to student (string)
-        '''
+        """
         fail = (False, False, 0, '')
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
-            log.error("External grader message should be a JSON-serialized dict. Received score_msg = %s" % score_msg)
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_msg = %s" % score_msg)
             return fail
         if not isinstance(score_result, dict):
-            log.error("External grader message should be a JSON-serialized dict. Received score_result = %s" % score_result)
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_result = %s" % score_result)
             return fail
         for tag in ['correct', 'score', 'msg']:
             if tag not in score_result:
-                log.error("External grader message is missing one or more required tags: 'correct', 'score', 'msg'")
+                log.error("External grader message is missing one or more required"
+                          " tags: 'correct', 'score', 'msg'")
                 return fail
 
-        # Next, we need to check that the contents of the external grader message 
+        # Next, we need to check that the contents of the external grader message
         #   is safe for the LMS.
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
@@ -1267,11 +1369,12 @@ class CodeResponse(LoncapaResponse):
         try:
             etree.fromstring(msg)
         except etree.XMLSyntaxError as err:
-            log.error("Unable to parse external grader message as valid XML: score_msg['msg']=%s" % msg)
+            log.error("Unable to parse external grader message as valid"
+                      " XML: score_msg['msg']=%s" % msg)
             return fail
-            
+
         return (True, score_result['correct'], score_result['score'], msg)
-        
+
 
 #-----------------------------------------------------------------------------
 
@@ -1327,9 +1430,9 @@ main()
 
     def setup_response(self):
         xml = self.xml
-        self.url = xml.get('url') or "http://qisx.mit.edu:8889/pyloncapa"	 # FIXME - hardcoded URL
+        # FIXME - hardcoded URL
+        self.url = xml.get('url') or "http://qisx.mit.edu:8889/pyloncapa"
 
-        # answer = xml.xpath('//*[@id=$id]//answer',id=xml.get('id'))[0]	# FIXME - catch errors
         answer = xml.find('answer')
         if answer is not None:
             answer_src = answer.get('src')
@@ -1337,7 +1440,8 @@ main()
                 self.code = self.system.filesystem.open('src/' + answer_src).read()
             else:
                 self.code = answer.text
-        else:					# no <answer> stanza; get code from <script>
+        else:
+            # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
                 msg = '%s: Missing answer script code for externalresponse' % unicode(self)
@@ -1364,19 +1468,22 @@ main()
         payload.update(extra_payload)
 
         try:
-            r = requests.post(self.url, data=payload)          # call external server
+            # call external server. TODO: synchronous call, can block for a long time
+            r = requests.post(self.url, data=payload)
         except Exception as err:
             msg = 'Error %s - cannot connect to external server url=%s' % (err, self.url)
             log.error(msg)
             raise Exception(msg)
 
-        if self.system.DEBUG: log.info('response = %s' % r.text)
+        if self.system.DEBUG:
+            log.info('response = %s' % r.text)
 
         if (not r.text) or (not r.text.strip()):
             raise Exception('Error: no response from external server url=%s' % self.url)
 
         try:
-            rxml = etree.fromstring(r.text)         # response is XML; prase it
+            # response is XML; parse it
+            rxml = etree.fromstring(r.text)
         except Exception as err:
             msg = 'Error %s - cannot parse response from external server r.text=%s' % (err, r.text)
             log.error(msg)
@@ -1390,7 +1497,8 @@ main()
         try:
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            log.error('Error %s: cannot get student answer for %s; student_answers=%s' % (err, self.answer_ids, student_answers))
+            log.error('Error %s: cannot get student answer for %s; student_answers=%s' %
+                      (err, self.answer_ids, student_answers))
             raise Exception(err)
 
         self.context.update({'submission': submission})
@@ -1403,7 +1511,9 @@ main()
             log.error('Error %s' % err)
             if self.system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(self.answer_ids), ['incorrect'] * len(idset))))
-                cmap.set_property(self.answer_ids[0], 'msg', '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
+                cmap.set_property(
+                    self.answer_ids[0], 'msg',
+                    '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
                 return cmap
 
         ad = rxml.find('awarddetail').text
@@ -1437,7 +1547,8 @@ main()
                 exans[0] = msg
 
         if not (len(exans) == len(self.answer_ids)):
-            log.error('Expected %d answers from external server, only got %d!' % (len(self.answer_ids), len(exans)))
+            log.error('Expected %d answers from external server, only got %d!' %
+                      (len(self.answer_ids), len(exans)))
             raise Exception('Short response from external server')
         return dict(zip(self.answer_ids, exans))
 
@@ -1489,11 +1600,14 @@ class FormulaResponse(LoncapaResponse):
             typeslist = []
         else:
             typeslist = ts.split(',')
-        if 'ci' in typeslist:  # Case insensitive
+        if 'ci' in typeslist:
+            # Case insensitive
             self.case_sensitive = False
-        elif 'cs' in typeslist:  # Case sensitive
+        elif 'cs' in typeslist:
+            # Case sensitive
             self.case_sensitive = True
-        else:  # Default
+        else:
+            # Default
             self.case_sensitive = False
 
     def get_score(self, student_answers):
@@ -1511,12 +1625,14 @@ class FormulaResponse(LoncapaResponse):
         for i in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
             student_variables = dict()
-            for var in ranges:				# ranges give numerical ranges for testing
+            # ranges give numerical ranges for testing
+            for var in ranges:
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
             #log.debug('formula: instructor_vars=%s, expected=%s' % (instructor_variables,expected))
-            instructor_result = evaluator(instructor_variables, dict(), expected, cs=self.case_sensitive)
+            instructor_result = evaluator(instructor_variables, dict(),
+                                          expected, cs=self.case_sensitive)
             try:
                 #log.debug('formula: student_vars=%s, given=%s' % (student_variables,given))
                 student_result = evaluator(student_variables,
@@ -1542,9 +1658,9 @@ class FormulaResponse(LoncapaResponse):
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
         '''
-        d = dict([(k, numpy.complex(d[k])) for k in d if type(k) == str and \
-                    k.isalnum() and \
-                    isinstance(d[k], numbers.Number)])
+        d = dict([(k, numpy.complex(d[k])) for k in d if type(k) == str and
+                  k.isalnum() and
+                  isinstance(d[k], numbers.Number)])
         return d
 
     def check_hint_condition(self, hxml_set, student_answers):
@@ -1579,7 +1695,8 @@ class SchematicResponse(LoncapaResponse):
         answer = xml.xpath('//*[@id=$id]//answer', id=xml.get('id'))[0]
         answer_src = answer.get('src')
         if answer_src is not None:
-            self.code = self.system.filestore.open('src/' + answer_src).read()  # Untested; never used
+            # Untested; never used
+            self.code = self.system.filestore.open('src/' + answer_src).read()
         else:
             self.code = answer.text
 
@@ -1635,17 +1752,19 @@ class ImageResponse(LoncapaResponse):
 
             # parse expected answer
             # TODO: Compile regexp on file load
-            m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]', expectedset[aid].strip().replace(' ', ''))
+            m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                         expectedset[aid].strip().replace(' ', ''))
             if not m:
-                msg = 'Error in problem specification! cannot parse rectangle in %s' % (etree.tostring(self.ielements[aid],
-                                                                                                       pretty_print=True))
+                msg = 'Error in problem specification! cannot parse rectangle in %s' % (
+                    etree.tostring(self.ielements[aid], pretty_print=True))
                 raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
             (llx, lly, urx, ury) = [int(x) for x in m.groups()]
 
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not m:
-                raise Exception('[capamodule.capa.responsetypes.imageinput] error grading %s (input=%s)' % (aid, given))
+                raise Exception('[capamodule.capa.responsetypes.imageinput] '
+                                'error grading %s (input=%s)' % (aid, given))
             (gx, gy) = [int(x) for x in m.groups()]
 
             # answer is correct if (x,y) is within the specified rectangle
@@ -1662,4 +1781,17 @@ class ImageResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-__all__ = [CodeResponse, NumericalResponse, FormulaResponse, CustomResponse, SchematicResponse, ExternalResponse, ImageResponse, OptionResponse, SymbolicResponse, StringResponse, ChoiceResponse, MultipleChoiceResponse, TrueFalseResponse, JavascriptResponse]
+__all__ = [CodeResponse,
+           NumericalResponse,
+           FormulaResponse,
+           CustomResponse,
+           SchematicResponse,
+           ExternalResponse,
+           ImageResponse,
+           OptionResponse,
+           SymbolicResponse,
+           StringResponse,
+           ChoiceResponse,
+           MultipleChoiceResponse,
+           TrueFalseResponse,
+           JavascriptResponse]

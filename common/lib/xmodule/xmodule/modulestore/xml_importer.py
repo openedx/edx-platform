@@ -29,7 +29,9 @@ def import_static_content(modules, data_dir, static_content_store):
 
    
     # now import all static assets
-    static_dir = '{0}/{1}/static/'.format(data_dir, course_data_dir)
+    static_dir = '{0}/static/'.format(course_data_dir)
+
+    logging.debug("Importing static assets in {0}".format(static_dir))
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:

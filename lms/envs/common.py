@@ -89,6 +89,7 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
+
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -96,7 +97,6 @@ COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 COURSES_ROOT = ENV_ROOT / "data"
 
-# FIXME: To support multiple courses, we should walk the courses dir at startup
 DATA_DIR = COURSES_ROOT
 
 sys.path.append(REPO_ROOT)
@@ -118,8 +118,11 @@ node_paths = [COMMON_ROOT / "static/js/vendor",
 NODE_PATH = ':'.join(node_paths)
 
 
+# Where to look for a status message
+STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
+
 ############################ OpenID Provider  ##################################
-OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net'] 
+OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -147,7 +150,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
-    
+
     # Added for django-wiki
     'django.core.context_processors.media',
     'django.core.context_processors.tz',
@@ -315,7 +318,7 @@ WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
-WIKI_LINK_DEFAULT_LEVEL = 2 
+WIKI_LINK_DEFAULT_LEVEL = 2
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -332,10 +335,9 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'mitxmako.makoloader.MakoFilesystemLoader',
     'mitxmako.makoloader.MakoAppDirectoriesLoader',
- 
+
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-    
     # 'django.template.loaders.eggs.Loader',
 )
 
@@ -353,7 +355,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
-    
+
     'course_wiki.course_nav.Middleware',
 
     'django.middleware.transaction.TransactionMiddleware',
@@ -487,8 +489,6 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
-    "*.py",
-    "*.pyc"
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
@@ -526,7 +526,8 @@ INSTALLED_APPS = (
     'certificates',
     'instructor',
     'psychometrics',
-    
+    'licenses',
+
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
     'django_notify',

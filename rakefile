@@ -151,6 +151,13 @@ Dir["common/lib/*"].each do |lib|
         sh("nosetests #{lib} --cover-erase --with-xunit --with-xcoverage --cover-html --cover-inclusive --cover-package #{File.basename(lib)} --cover-html-dir #{File.join(report_dir, "cover")}")
     end
     TEST_TASKS << task_name
+
+    desc "Run tests for common lib #{lib} (without coverage)"
+    task "fasttest_#{lib}" do 
+        sh("nosetests #{lib}")
+    end
+
+
 end
 
 task :test do
@@ -169,6 +176,12 @@ desc "Run django-admin <action> against the specified system and environment"
 task "django-admin", [:action, :system, :env, :options] => [:predjango] do |t, args|
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
+end
+
+desc "Set the staff bit for a user"
+task :set_staff, [:user, :system, :env] do |t, args|
+    args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
+    sh(django_admin(args.system, args.env, 'set_staff', args.user))
 end
 
 task :package do

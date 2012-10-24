@@ -362,7 +362,7 @@ def static_tab(request, course_id, tab_slug):
     tab = tabs.get_static_tab_by_slug(course, tab_slug)
     if tab is None:
         raise Http404
-    
+
     contents = tabs.get_static_tab_contents(course, tab)
     if contents is None:
         raise Http404
@@ -418,6 +418,16 @@ def course_about(request, course_id):
                                'course_target': course_target,
                                'show_courseware_link' : show_courseware_link})
 
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def static_university_profile(request, org_id):
+    """
+    Return the profile for the particular org_id that does not have any courses.
+    """
+    template_file = "university_profile/{0}.html".format(org_id).lower()
+    context = dict(courses=[], org_id=org_id)
+    return render_to_response(template_file, context)
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -491,7 +501,7 @@ def progress(request, course_id, student_id=None):
     courseware_summary = grades.progress_summary(student, request, course,
                                                  student_module_cache)
     grade_summary = grades.grade(student, request, course, student_module_cache)
-    
+
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
         raise Http404
@@ -504,4 +514,3 @@ def progress(request, course_id, student_id=None):
     context.update()
 
     return render_to_response('courseware/progress.html', context)
-

@@ -154,6 +154,53 @@ mark {
   color: #333;
 }
 
+.site-status {
+  display: none;
+  padding: 10px;
+  @include linear-gradient(top, rgba(0, 0, 0, .1), rgba(0, 0, 0, .0));
+  background-color: $pink;
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, .3) inset;
+  font-size: 14px;
+
+  .white-error-icon {
+    position: relative;
+    top: -4px;
+    float: left;
+    display: block;
+    width: 27px;
+    height: 24px;
+    margin-right: 15px;
+    background: url(../images/large-white-error-icon.png) no-repeat;
+  }
+
+  .inner-wrapper {
+    margin: auto;
+    max-width: 1180px;
+    min-width: 760px;
+  }
+
+  p {
+    line-height: 1.3;
+    color: #fff;
+  }
+}
+
+.ie-banner {
+  display: none;
+  max-width: 1140px;
+  min-width: 720px;
+  margin: auto;
+  @include border-radius(0 0 3px 3px);
+  background: #f4f4e0;
+  color: #3c3c3c;
+  padding: 5px 20px 8px;
+  font-size: 13px;
+  text-align: center;
+
+  strong {
+    font-weight: 700;
+  }
+}
 
 
 

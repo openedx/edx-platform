@@ -76,9 +76,13 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                    ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
+
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
@@ -129,6 +133,11 @@ class CapaModule(XModule):
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
+            # TODO: This line is badly broken:
+            # (1) We're passing student ID to xmodule.
+            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+            #     - analytics really needs small number of bins.
             self.seed = system.id
         else:
             self.seed = None

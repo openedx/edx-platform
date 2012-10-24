@@ -28,14 +28,70 @@ input.courseware-unit-search-input {
 
 	&.collapsed {
 		padding-bottom: 0;
+	}
 
-		header {
-			height: 47px;
+	label {
+		float: left;
+		line-height: 29px;
+	}
+
+	.datepair {
+		float: left;
+		margin-left: 10px;
+	}
+
+	.section-published-date {
+		position: absolute;
+		top: 19px;
+		right: 90px;
+		padding: 4px 10px;
+		border-radius: 3px;
+		background: $lightGrey;
+		text-align: right;
+
+		.published-status {
+			font-size: 12px;
+			margin-right: 15px;
+
+			strong {
+				font-weight: 700;
+			}
 		}
-		
-		h4 {
-			display: none !important;
+
+		.schedule-button {
+			@include blue-button;
 		}
+
+		.edit-button {
+			@include blue-button;
+		}
+
+		.schedule-button,
+		.edit-button {
+			font-size: 11px;
+			padding: 3px 15px 5px;
+		}
+	}
+
+	.datepair .date,
+	.datepair .time {
+		padding-left: 0;
+		padding-right: 0;
+		border: none;
+		background: none;
+		@include box-shadow(none);
+		font-size: 13px;
+		font-weight: 700;
+		color: $blue;
+		cursor: pointer;
+	}
+
+	.datepair .date {
+		width: 80px;
+	}
+
+	.datepair .time {
+		width: 65px;
 	}
 
 	&.collapsed .subsection-list,
@@ -45,15 +101,15 @@ input.courseware-unit-search-input {
 	}
 
 	header {
-		height: 67px;
+		height: 75px;
 
 		.item-details {
 			float: left;
-			padding: 10px 0 0;
+			padding: 21px 0 0;
 		}
 
 		.item-actions {			
-			margin-top: 11px;
+			margin-top: 21px;
 			margin-right: 12px;
 
 			.edit-button,
@@ -64,7 +120,7 @@ input.courseware-unit-search-input {
 
 		.expand-collapse-icon {
 			float: left;
-			margin: 16px 6px 16px 16px;
+			margin: 29px 6px 16px 16px;
 			@include transition(none);
 		}
 
@@ -74,9 +130,35 @@ input.courseware-unit-search-input {
 	}
 
 	h3 {
-		font-size: 16px;
+		font-size: 19px;
 		font-weight: 700;
 		color: $blue;
+	}
+
+	.section-name-span {
+		cursor: pointer;
+		@include transition(color .15s);
+
+		&:hover {
+			color: $orange;
+		}
+	}
+
+	.section-name-edit {
+		input {
+			font-size: 16px;	
+		}
+		
+		.save-button {
+			@include blue-button;
+			padding: 7px 20px 7px;
+			margin-right: 5px;
+		}
+
+		.cancel-button {
+			@include white-button;
+			padding: 7px 20px 7px;
+		}
 	}
 
 	h4 {
@@ -160,4 +242,58 @@ input.courseware-unit-search-input {
 
 .preview {
 	background: url(../img/preview.jpg) center top no-repeat;
+}
+
+.edit-subsection-publish-settings {
+	display: none;
+	position: fixed;
+	top: 100px;
+	left: 50%;
+	z-index: 99999;
+	width: 600px;
+	margin-left: -300px;
+	background: #fff;
+	text-align: center;
+
+	.settings {
+		padding: 40px;
+	}
+
+	h3 {
+		font-size: 34px;
+		font-weight: 300;
+	}
+
+	.picker {
+		margin: 30px 0 65px;
+	}
+
+	.description {
+		margin-top: 30px;
+		font-size: 14px;
+		line-height: 20px;
+	}
+
+	strong {
+		font-weight: 700;
+	}
+
+	.start-date,
+	.start-time {
+		font-size: 19px;
+	}
+
+	.save-button {
+		@include blue-button;
+		margin-right: 10px;
+	}
+
+	.cancel-button {
+		@include white-button;
+	}
+
+	.save-button,
+	.cancel-button {
+		font-size: 16px;
+	}
 }
