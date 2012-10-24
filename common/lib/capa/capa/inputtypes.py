@@ -448,36 +448,44 @@ class TextLine(InputTypeBase):
 register_input_class(TextLine)
 
 #-----------------------------------------------------------------------------
-def filesubmission(element, value, status, render_template, msg=''):
-    '''
-    Upload a single file (e.g. for programming assignments)
-    '''
-    eid = element.get('id')
-    escapedict = {'"': '&quot;'}
-    allowed_files  = json.dumps(element.get('allowed_files', '').split())
-    allowed_files  = saxutils.escape(allowed_files, escapedict)
-    required_files = json.dumps(element.get('required_files', '').split())
-    required_files = saxutils.escape(required_files, escapedict)
 
-    # Check if problem has been queued
-    queue_len = 0
-    # Flag indicating that the problem has been queued, 'msg' is length of queue
-    if status == 'incomplete':
-        status = 'queued'
-        queue_len = msg
-        msg = 'Submitted to grader.'
+class FileSubmission(InputTypeBase):
+    """
+    Upload some files (e.g. for programming assignments)
+    """
 
-    context = { 'id': eid,
-                'state': status,
-                'msg': msg,
-                'value': value,
-                'queue_len': queue_len,
-                'allowed_files': allowed_files,
-                'required_files': required_files,}
-    html = render_template("filesubmission.html", context)
-    return etree.XML(html)
+    template = "filesubmission.html"
+    tags = ['filesubmission']
 
-_reg(filesubmission)
+    def __init__(self, system, xml, state):
+        super(FileSubmission, self).__init__(system, xml, state)
+        escapedict = {'"': '&quot;'}
+        self.allowed_files  = json.dumps(xml.get('allowed_files', '').split())
+        self.allowed_files  = saxutils.escape(self.allowed_files, escapedict)
+        self.required_files = json.dumps(xml.get('required_files', '').split())
+        self.required_files = saxutils.escape(self.required_files, escapedict)
+
+        # Check if problem has been queued
+        queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = 'Submitted to grader.'
+
+
+    def _get_render_context(self):
+
+        context = {'id': self.id,
+                   'state': self.status,
+                   'msg': self.msg,
+                   'value': self.value,
+                   'queue_len': self.queue_len,
+                   'allowed_files': self.allowed_files,
+                   'required_files': self.required_files,}
+        return context
+
+register_input_class(FileSubmission)
 
 
 #-----------------------------------------------------------------------------
