@@ -97,8 +97,8 @@ class InputTypeBase(object):
                       have a render_template function.
         - xml       : Element tree of this Input element
         - state     : a dictionary with optional keys:
-                      * 'value'
-                      * 'id'
+                      * 'value'  -- the current value of this input (what the student entered last time)
+                      * 'id' -- the id of this input, typically "{problem-location}_{response-num}_{input-num}"
                       * 'status' (answered, unanswered, unsubmitted)
                       * 'feedback' (dictionary containing keys for hints, errors, or other
                          feedback from previous attempt.  Specifically 'message', 'hint', 'hintmode'.  If 'hintmode'
@@ -234,49 +234,70 @@ register_input_class(OptionInput)
 
 # TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
 # desired semantics.
-def choicegroup(element, value, status, render_template, msg=''):
-    '''
-    Radio button inputs: multiple choice or true/false
+
+class ChoiceGroup(InputTypeBase):
+    """
+    Radio button or checkbox inputs: multiple choice or true/false
 
     TODO: allow order of choices to be randomized, following lon-capa spec.  Use
     "location" attribute, ie random, top, bottom.
-    '''
-    eid = element.get('id')
-    if element.get('type') == "MultipleChoice":
-        element_type = "radio"
-    elif element.get('type') == "TrueFalse":
-        element_type = "checkbox"
-    else:
-        element_type = "radio"
-    choices = []
-    for choice in element:
-        if not choice.tag == 'choice':
-            raise Exception("[courseware.capa.inputtypes.choicegroup] "
-                            "Error: only <choice> tags should be immediate children "
-                            "of a <choicegroup>, found %s instead" % choice.tag)
-        ctext = ""
-        # TODO: what if choice[0] has math tags in it?
-        ctext += ''.join([etree.tostring(x) for x in choice])
-        if choice.text is not None:
-            # TODO: fix order?
-            ctext += choice.text
-        choices.append((choice.get("name"), ctext))
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'input_type': element_type,
-               'choices': choices,
-               'name_array_suffix': ''}
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
 
-_reg(choicegroup)
+    Example:
 
-#-----------------------------------------------------------------------------
+    <choicegroup>
+      <choice correct="false" name="foil1">
+        <text>This is foil One.</text>
+      </choice>
+      <choice correct="false" name="foil2">
+        <text>This is foil Two.</text>
+      </choice>
+      <choice correct="true" name="foil3">
+        <text>This is foil Three.</text>
+      </choice>
+    </choicegroup>
+    """
+    template = "choicegroup.html"
+    tags = ['choicegroup', 'radiogroup', 'checkboxgroup']
+
+    def __init__(self, system, xml, state):
+        super(ChoiceGroup, self).__init__(system, xml, state)
+
+        if self.tag == 'choicegroup':
+            self.suffix = ''
+            if self.xml.get('type') == "MultipleChoice":
+                self.element_type = "radio"
+            elif self.xml.get('type') == "TrueFalse":
+                # Huh?  Why TrueFalse->checkbox?  Each input can be true / false separately?
+                self.element_type = "checkbox"
+            else:
+                self.element_type = "radio"
+
+        elif self.tag == 'radiogroup':
+            self.element_type = "radio"
+            self.suffix = '[]'
+        elif self.tag == 'checkboxgroup':
+            self.element_type = "checkbox"
+            self.suffix = '[]'
+        else:
+            raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
+
+        self.choices = extract_choices(self.xml)
+
+    def _get_render_context(self):
+        context = {'id': self.id,
+                   'value': self.value,
+                   'state': self.status,
+                   'input_type': self.element_type,
+                   'choices': self.choices,
+                   'name_array_suffix': self.suffix}
+        return context
+
 def extract_choices(element):
     '''
-    Extracts choices for a few input types, such as radiogroup and
-    checkboxgroup.
+    Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
+    CheckboxGroup.
+
+    returns list of (choice_name, choice_text) tuples
 
     TODO: allow order of choices to be randomized, following lon-capa spec.  Use
     "location" attribute, ie random, top, bottom.
@@ -285,63 +306,25 @@ def extract_choices(element):
     choices = []
 
     for choice in element:
-        if not choice.tag == 'choice':
+        if choice.tag != 'choice':
             raise Exception("[courseware.capa.inputtypes.extract_choices] \
                              Expected a <choice> tag; got %s instead"
                              % choice.tag)
         choice_text = ''.join([etree.tostring(x) for x in choice])
+        if choice.text is not None:
+            # TODO: fix order?
+            choice_text += choice.text
 
         choices.append((choice.get("name"), choice_text))
 
     return choices
+    
+
+register_input_class(ChoiceGroup)
 
 
-# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
-# desired semantics.
-def radiogroup(element, value, status, render_template, msg=''):
-    '''
-    Radio button inputs: (multiple choice)
-    '''
+#-----------------------------------------------------------------------------
 
-    eid = element.get('id')
-
-    choices = extract_choices(element)
-
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'input_type': 'radio',
-               'choices': choices,
-               'name_array_suffix': '[]'}
-
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
-
-
-_reg(radiogroup)
-
-# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
-# desired semantics.
-def checkboxgroup(element, value, status, render_template, msg=''):
-    '''
-    Checkbox inputs: (select one or more choices)
-    '''
-
-    eid = element.get('id')
-
-    choices = extract_choices(element)
-
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'input_type': 'checkbox',
-               'choices': choices,
-               'name_array_suffix': '[]'}
-
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
-
-_reg(checkboxgroup)
 
 def javascriptinput(element, value, status, render_template, msg='null'):
     '''
