@@ -391,6 +391,7 @@ main_vendor_js = [
   'js/vendor/jquery.cookie.js',
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
+  'js/vendor/jquery.ba-bbq.min.js',
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
