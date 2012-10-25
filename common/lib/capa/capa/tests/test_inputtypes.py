@@ -251,7 +251,7 @@ class FileSubmissionTest(unittest.TestCase):
 
         escapedict = {'"': '&quot;'}
         esc = lambda s: saxutils.escape(s, escapedict)
-        
+
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
@@ -266,6 +266,55 @@ class FileSubmissionTest(unittest.TestCase):
                    'queue_len': '3',
                    'allowed_files': esc('["runme.py", "nooooo.rb", "ohai.java"]'),
                    'required_files': esc('["cookies.py"]')}
+
+        self.assertEqual(context, expected)
+
+
+class CodeInputTest(unittest.TestCase):
+    '''
+    Check that codeinput inputs work
+    '''
+
+    def test_rendering(self):
+        mode = "parrot"
+        linenumbers = 'false'
+        rows = '37'
+        cols = '11'
+        tabsize = '7'
+
+        xml_str = """<codeinput id="prob_1_2"
+        mode="{m}"
+        cols="{c}"
+        rows="{r}"
+        linenumbers="{ln}"
+        tabsize="{ts}"
+        />""".format(m=mode, c=cols, r=rows, ln=linenumbers, ts=tabsize)
+
+        element = etree.fromstring(xml_str)
+
+        escapedict = {'"': '&quot;'}
+        esc = lambda s: saxutils.escape(s, escapedict)
+
+        state = {'value': 'print "good evening"',
+                 'status': 'incomplete',
+                 'feedback' : {'message': '3'}, }
+
+        the_input = inputtypes.get_class_for_tag('codeinput')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'print "good evening"',
+                   'state': 'queued',
+                   'msg': 'Submitted to grader.',
+                   'mode': mode,
+                   'linenumbers': linenumbers,
+                   'rows': rows,
+                   'cols': cols,
+                   'hidden': '',
+                   'tabsize': int(tabsize),
+                   'queue_len': '3',
+                   }
 
         self.assertEqual(context, expected)
 
