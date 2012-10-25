@@ -3,6 +3,8 @@ from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
 
+from lxml.html import rewrite_links
+
 from path import path
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -11,7 +13,9 @@ from django.http import Http404
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.x_module import XModule
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
@@ -136,6 +140,25 @@ def get_course_about_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
+def get_course_info_section_from_db(course, section_key):
+    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    html = ''
+    try:
+        item = modulestore().get_item(loc)
+        # return the raw HTML here which is stored as part of the definition. If we call get_html here, HTMLModule's parent 
+        # descriptors will try to return an 'editing' rendering of the HTML
+        _html = item.definition['data']  
+        try:   
+            # apply link transforms which are defined in XModule, maybe that should actually be a static method in
+            # Content.py
+            html = rewrite_links(_html, XModule.rewrite_content_links)
+        except:
+            logging.error('error rewriting links on the following HTML content: {0}'.format(_html))
+
+    except Exception, e:
+        logging.exception("Could not find course_info section {0} at {1}: {2}".format(section_key, loc, str(e)))
+    return html
+
 
 def get_course_info_section(course, section_key):
     """
@@ -152,6 +175,9 @@ def get_course_info_section(course, section_key):
     # Many of these are stored as html files instead of some semantic
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
+
+    if not isinstance(modulestore(), XMLModuleStore):
+        return get_course_info_section_from_db(course, section_key)
 
     if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
         try:

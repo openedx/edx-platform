@@ -17,6 +17,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
+from xmodule.html_module import HtmlDescriptor
+
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
 
@@ -422,6 +424,25 @@ class XMLModuleStore(ModuleStoreBase):
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+
+            # now import all pieces of course_info which is expected to be stored
+            # in <content_dir>/info or <content_dir>/info/<url_name>
+            if url_name:
+                info_path = self.data_dir / course_dir / 'info' / url_name
+
+            if not os.path.exists(info_path):
+                info_path = self.data_dir / course_dir / 'info'
+
+            # we have a fixed number of .html info files that we expect there
+            for info_filename in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
+                filepath = info_path / info_filename + '.html'
+                if os.path.exists(filepath):
+                    with open(filepath) as info_file:
+                        html = info_file.read()
+                        loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, 'course_info', info_filename)
+                        html_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                        self.modules[course_id][html_module.location] = html_module
+
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
