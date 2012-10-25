@@ -38,6 +38,7 @@ class CustomTagModule(XModule):
 class CustomTagDescriptor(RawDescriptor):
     """ Descriptor for custom tags.  Loads the template when created."""
     module_class = CustomTagModule
+    template_dir_name = 'customtag'
 
     @staticmethod
     def render_template(system, xml_data):
