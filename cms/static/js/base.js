@@ -218,7 +218,7 @@ function onUnitReordered() {
 		type: "POST",
 		dataType: "json",
 		contentType: "application/json",
-		data:JSON.stringify({ 'id' : subsection_id, 'metadata' : null, 'data': null, 'children' : children})
+		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
 }
 
@@ -234,7 +234,7 @@ function onSubsectionReordered() {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data:JSON.stringify({ 'id' : section_id, 'metadata' : null, 'data': null, 'children' : children})
+        data:JSON.stringify({ 'id' : section_id, 'children' : children})
     });
 }
 
@@ -250,7 +250,7 @@ function onSectionReordered() {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data:JSON.stringify({ 'id' : course_id, 'metadata' : null, 'data': null, 'children' : children})
+        data:JSON.stringify({ 'id' : course_id, 'children' : children})
     });
 }
 
@@ -360,15 +360,12 @@ function saveSubsection() {
     metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
     metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time', 'MMMM dd HH:mm');
 
-    // reordering is done through immediate callbacks when the resorting has completed in the UI
-    children =[];
-
     $.ajax({
 	    url: "/save_item",
 		type: "POST",
 		dataType: "json",
 		contentType: "application/json",
-		data:JSON.stringify({ 'id' : id, 'metadata' : metadata, 'data': null, 'children' : children}),
+		data:JSON.stringify({ 'id' : id, 'metadata' : metadata}),
 		success: function() {
             $spinner.delay(500).fadeOut(150);
 	    },
@@ -745,7 +742,7 @@ function saveEditSectionName(e) {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data:JSON.stringify({ 'id' : id, 'metadata' : {'display_name' : display_name}, 'data': null, 'children' : null})
+        data:JSON.stringify({ 'id' : id, 'metadata' : {'display_name' : display_name}})
     }).success(function()
     {
         $spinner.delay(250).fadeOut(250);
@@ -785,7 +782,7 @@ function saveSetSectionScheduleDate(e) {
         type: "POST",
         dataType: "json",
         contentType: "application/json",
-        data:JSON.stringify({ 'id' : id, 'metadata' : {'start' : start}, 'data': null, 'children' : null})
+        data:JSON.stringify({ 'id' : id, 'metadata' : {'start' : start}})
     }).success(function()
     {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
