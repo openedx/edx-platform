@@ -35,6 +35,8 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
+            "course_info = xmodule.html_module:HtmlDescriptor",
+            "static_tab = xmodule.html_module:HtmlDescriptor",
         ]
     }
 )

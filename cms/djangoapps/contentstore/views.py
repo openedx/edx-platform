@@ -1029,18 +1029,8 @@ def import_course(request, org, course, name):
             for fname in os.listdir(r):
                 shutil.move(r/fname, course_dir)
 
-        with open(course_dir / 'course.xml', 'r') as course_file:
-            course_data = etree.parse(course_file, parser=edx_xml_parser)
-            course_data_root = course_data.getroot()
-            course_data_root.set('org', org)
-            course_data_root.set('course', course)
-            course_data_root.set('url_name', name)
-
-        with open(course_dir / 'course.xml', 'w') as course_file:
-            course_data.write(course_file)
-
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_dir], load_error_modules=False, static_content_store=contentstore())
+            [course_dir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

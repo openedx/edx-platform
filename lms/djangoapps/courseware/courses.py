@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
+from module_render import get_module
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -19,6 +20,8 @@ from xmodule.x_module import XModule
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
+
+
 
 log = logging.getLogger(__name__)
 
@@ -140,27 +143,9 @@ def get_course_about_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
-def get_course_info_section_from_db(course, section_key):
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
-    html = ''
-    try:
-        item = modulestore().get_item(loc)
-        # return the raw HTML here which is stored as part of the definition. If we call get_html here, HTMLModule's parent 
-        # descriptors will try to return an 'editing' rendering of the HTML
-        _html = item.definition['data']  
-        try:   
-            # apply link transforms which are defined in XModule, maybe that should actually be a static method in
-            # Content.py
-            html = rewrite_links(_html, XModule.rewrite_content_links)
-        except:
-            logging.error('error rewriting links on the following HTML content: {0}'.format(_html))
-
-    except Exception, e:
-        logging.exception("Could not find course_info section {0} at {1}: {2}".format(section_key, loc, str(e)))
-    return html
 
 
-def get_course_info_section(course, section_key):
+def get_course_info_section(request, cache, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -172,34 +157,18 @@ def get_course_info_section(course, section_key):
     - guest_updates
     """
 
-    # Many of these are stored as html files instead of some semantic
-    # markup. This can change without effecting this interface when we find a
-    # good format for defining so many snippets of text/html.
+    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    course_module = get_module(request.user, request, loc, cache, course.id)
 
-    if not isinstance(modulestore(), XMLModuleStore):
-        return get_course_info_section_from_db(course, section_key)
+    logging.debug('course_module = {0}'.format(course_module))
 
-    if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
-        try:
-            fs = course.system.resources_fs
-            # first look for a run-specific version
-            dirs = [path("info") / course.url_name, path("info")]
-            filepath = find_file(fs, dirs, section_key + ".html")
+    html = ''
 
-            with fs.open(filepath) as htmlFile:
-                # Replace '/static/' urls
-                info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
+    if course_module is not None:
+        html = course_module.get_html()
 
-                # Replace '/course/' urls
-                course_root = reverse('course_root', args=[course.id])[:-1] # Remove trailing slash
-                info_html = replace_urls(info_html, course_root, '/course/')
-                return info_html
-        except ResourceNotFoundError:
-            log.exception("Missing info section {key} in course {url}".format(
-                key=section_key, url=course.location.url()))
-            return "! Info section missing !"
+    return html
 
-    raise KeyError("Invalid about key " + str(section_key))
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

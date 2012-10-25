@@ -347,8 +347,13 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'course': course,
-                                            'staff_access': staff_access,})
+
+
+    cache = StudentModuleCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2)
+
+    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : cache, 
+            'course': course, 'staff_access': staff_access})
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -363,7 +368,10 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(course, tab)
+    cache = StudentModuleCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2)
+
+    contents = tabs.get_static_tab_contents(request, cache, course, tab)
     if contents is None:
         raise Http404
 

@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import glob
 
 from collections import defaultdict
 from cStringIO import StringIO
@@ -333,7 +334,6 @@ class XMLModuleStore(ModuleStoreBase):
         if not os.path.exists(policy_path):
             return {}
         try:
-            log.debug("Loading policy from {0}".format(policy_path))
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
@@ -388,6 +388,7 @@ class XMLModuleStore(ModuleStoreBase):
             if url_name:
                 policy_dir = self.data_dir / course_dir / 'policies' / url_name
                 policy_path = policy_dir / 'policy.json'
+
                 policy = self.load_policy(policy_path, tracker)
 
                 # VS[compat]: remove once courses use the policy dirs.
@@ -404,7 +405,6 @@ class XMLModuleStore(ModuleStoreBase):
                 else:
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
-
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
             system = ImportSystem(
@@ -438,11 +438,27 @@ class XMLModuleStore(ModuleStoreBase):
                 filepath = info_path / info_filename + '.html'
                 if os.path.exists(filepath):
                     with open(filepath) as info_file:
-                        html = info_file.read()
+                        html = info_file.read().decode('utf-8')
                         loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, 'course_info', info_filename)
-                        html_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
-                        self.modules[course_id][html_module.location] = html_module
+                        info_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                        self.modules[course_id][info_module.location] = info_module
 
+            # now import all static tabs which are expected to be stored in
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
+            if url_name:
+                tabs_path = self.data_dir / course_dir / 'tabs' / url_name
+
+            if not os.path.exists(tabs_path):
+                tabs_path = self.data_dir / course_dir / 'tabs'
+
+            for tab_filepath in glob.glob(tabs_path / '*.html'):
+                with open(tab_filepath) as tab_file:
+                    html = tab_file.read().decode('utf-8')
+                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                    slug = os.path.splitext(os.path.basename(tab_filepath))[0]
+                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, 'static_tab', slug)
+                    tab_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    self.modules[course_id][tab_module.location] = tab_module               
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor

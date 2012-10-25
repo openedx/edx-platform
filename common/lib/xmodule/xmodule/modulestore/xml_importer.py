@@ -67,13 +67,18 @@ def import_static_content(modules, data_dir, static_content_store):
 
 def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None):
+                    load_error_modules=True, static_content_store=None, target_location_namespace = None):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
 
     course_dirs: If specified, the list of course_dirs to load. Otherwise, load
     all course dirs
+
+    target_location_namespace is the namespace [passed as Location] (i.e. {tag},{org},{course}) that all modules in the should be remapped to
+    after import off disk. We do this remapping as a post-processing step because there's logic in the importing which
+    expects a 'url_name' as an identifier to where things are on disk e.g. ../policies/<url_name>/policy.json as well as metadata keys in
+    the policy.json. so we need to keep the original url_name during import
 
     """
     
@@ -94,6 +99,27 @@ def import_from_xml(store, data_dir, course_dirs=None,
             remap_dict = import_static_content(module_store.modules[course_id], data_dir, static_content_store)
 
         for module in module_store.modules[course_id].itervalues():
+
+            # remap module to the new namespace
+            if target_location_namespace is not None:
+
+                # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
+                # the caller passed in
+                module.location = Location(target_location_namespace.tag, 
+                    target_location_namespace.org, target_location_namespace.course, module.location.category, 
+                    module.location.name if module.location.category != 'course' else target_location_namespace.name)
+
+                # then remap children pointers since they too will be re-namespaced
+                children_locs = module.definition.get('children')
+                if children_locs is not None:
+                    new_locs = []
+                    for child in children_locs:
+                        child_loc = Location(child)
+                        new_locs.append(Location(target_location_namespace.tag, target_location_namespace.org, 
+                            target_location_namespace.course, child_loc.category, child_loc.name).url())
+
+                    module.definition['children'] = new_locs
+
 
             if module.category == 'course':
                 # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
