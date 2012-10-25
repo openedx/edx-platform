@@ -33,7 +33,6 @@ $(document).ready(function() {
 
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
-    $('.save-subsection').bind('click', saveSubsection);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -63,6 +62,8 @@ $(document).ready(function() {
     // add/remove policy metadata button click handlers
     $('.add-policy-data').bind('click', addPolicyMetadata);
     $('.remove-policy-data').bind('click', removePolicyMetadata);
+    $body.on('click', '.policy-list-element .save-button', savePolicyMetadata);
+    $body.on('click', '.policy-list-element .cancel-button', cancelPolicyMetadata);
 
     $('.sync-date').bind('click', syncReleaseDate);
 
@@ -161,19 +162,30 @@ function addPolicyMetadata(e) {
     newNode.insertBefore('.add-policy-data');
     $('.remove-policy-data').bind('click', removePolicyMetadata);
     newNode.find('.policy-list-name').focus();
-    newNode.find('.save-button').bind('click', savePolicyMetadata);
-    newNode.find('.cancel-button').bind('click', cancelPolicyMetadata);
 }
 
 function savePolicyMetadata(e) {
     e.preventDefault();
-    $('.save-subsection').click();
-    $(this).parents('.policy-list-element').removeClass('new-policy-list-element');
+
+    var $policyElement = $(this).parents('.policy-list-element');
+    saveSubsection()
+    $policyElement.removeClass('new-policy-list-element');
+    $policyElement.find('.policy-list-name').attr('disabled', 'disabled');
+    $policyElement.removeClass('editing');
 }
 
 function cancelPolicyMetadata(e) {
     e.preventDefault();
-    $(this).parents('.policy-list-element').remove();
+
+    var $policyElement = $(this).parents('.policy-list-element');
+    if(!$policyElement.hasClass('editing')) {
+        $policyElement.remove();
+    } else {
+        $policyElement.removeClass('new-policy-list-element');
+        $policyElement.find('.policy-list-name').val($policyElement.data('currentValues')[0]);
+        $policyElement.find('.policy-list-value').val($policyElement.data('currentValues')[1]);
+    }
+    $policyElement.removeClass('editing');
 }
 
 function removePolicyMetadata(e) {
@@ -189,7 +201,7 @@ function removePolicyMetadata(e) {
     } else {
         _parent_el.appendTo("#policy-to-delete");
     }
-    $('.save-subsection').click();
+    saveSubsection()
 }
 
 
@@ -286,7 +298,7 @@ function checkForNewValue(e) {
 
         this.saveTimer = setTimeout(function() {
             $changedInput = $(e.target);
-            $('.save-subsection').click();
+            saveSubsection()
             this.saveTimer = null;
         }, 500);
     }
@@ -299,14 +311,12 @@ function autosaveInput(e) {
 
     this.saveTimer = setTimeout(function() {        
         $changedInput = $(e.target);
-        $('.save-subsection').click();
+        saveSubsection()
         this.saveTimer = null;
     }, 500);
 }
 
-function saveSubsection(e) {
-    e.preventDefault();
-
+function saveSubsection() {
     if($changedInput && !$changedInput.hasClass('no-spinner')) {
         $spinner.css({
             'position': 'absolute',
@@ -315,9 +325,10 @@ function saveSubsection(e) {
             'margin-top': '-10px'
         });
         $changedInput.after($spinner);
+        $spinner.show();
     }
     
-    var id = $(this).data('id');
+    var id = $('.subsection-body').data('id');
 
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
@@ -417,7 +428,6 @@ function showUploadModal(e) {
     e.preventDefault();
     $modal = $('.upload-modal').show();
     $('.file-input').bind('change', startUpload);
-    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $modalCover.show();
 }
 
@@ -428,7 +438,7 @@ function showFileSelectionMenu(e) {
 
 function startUpload(e) {
     $('.upload-modal h1').html('Uploading…');
-    $('.upload-modal .file-name').html($('.file-input').val());
+    $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
     $('.upload-modal .file-chooser').ajaxSubmit({
         beforeSend: resetUploadBar,
         uploadProgress: showUploadFeedback,
@@ -720,6 +730,9 @@ function saveEditSectionName(e) {
     id = $(this).closest("section.courseware-section").data("id");
     display_name = $.trim($(this).prev('.edit-section-name').val());
 
+    $(this).closest('.courseware-section .section-name').append($spinner);
+    $spinner.show();
+
     if (display_name == '') {
         alert("You must specify a name before saving.")
         return;
@@ -735,7 +748,7 @@ function saveEditSectionName(e) {
         data:JSON.stringify({ 'id' : id, 'metadata' : {'display_name' : display_name}, 'data': null, 'children' : null})
     }).success(function()
     {
-        alert('Your changes have been saved.');
+        $spinner.delay(250).fadeOut(250);
         $_this.parent().siblings('span.section-name-span').html(display_name);
         $_this.parent().siblings('span.section-name-span').show();
         $_this.parent().hide();

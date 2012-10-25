@@ -22,12 +22,18 @@
 	}
 
 	.policy-list {
+		input[disabled] {
+			border: none;
+			@include box-shadow(none);
+		}
+
 		.policy-list-name {
 			margin-right: 5px;
 			margin-bottom: 10px;
 		}
 
 		.policy-list-value {
+			width: 320px;
 			margin-right: 10px;
 		}
 	}
@@ -37,11 +43,26 @@
 		.cancel-button {
 			display: none;
 		}
+
+		.edit-icon {
+			margin-right: 8px;
+		}
+
+		&.editing,
+		&.new-policy-list-element {
+			.policy-list-name,
+			.policy-list-value {
+				border: 1px solid #b0b6c2;
+		    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
+		    background-color: #edf1f5;
+		    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+			}
+		}
 	}
 
 	.new-policy-list-element {
 		padding: 10px 10px 0;
-		margin: 0 -10px;
+		margin: 0 -10px 10px;
 		border-radius: 3px;
 		background: $mediumGrey;
 
@@ -52,6 +73,10 @@
 
 		.cancel-button {
 			@include white-button;
+		}
+
+		.edit-icon {
+			display: none;
 		}
 
 		.delete-icon {

@@ -168,7 +168,7 @@ class CourseDescriptor(SequenceDescriptor):
     def read_grading_policy(cls, paths, system):
         """Load a grading policy from the specified paths, in order, if it exists."""
         # Default to a blank policy
-        policy_str = ""
+        policy_str = '""'
 
         for policy_path in paths:
             if not system.resources_fs.exists(policy_path):

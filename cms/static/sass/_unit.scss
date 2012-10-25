@@ -321,12 +321,15 @@
     @include orange-button;
   }
 
-  .save-button {
+  .delete-button {
     @include blue-button;
-    display: none;
   }
 
-  .save-button,
+  .delete-draft {
+    display: inline-block;
+  }
+
+  .delete-button,
   .preview-button,
   .publish-button,
   .view-button {
@@ -443,11 +446,10 @@
 }
 
 .edit-state-public {
-  #save-draft,
-  #delete-draft,
+  .delete-draft,
   .component-actions,
   .new-component-item,
-  #published-alert,
+  .editing-draft-alert,
   .publish-draft-message,
   .preview-button {
     display: none;
@@ -463,10 +465,10 @@
 }
 
 .edit-state-private {
-  #delete-draft,
-  #publish-draft,
-  #published-alert,
-  #create-draft,
+  .delete-draft,
+  .publish-draft,
+  .editing-draft-alert,
+  .create-draft,
   .view-button {
     display: none;
   }

@@ -5,20 +5,14 @@ class CMS.Views.UnitEdit extends Backbone.View
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'
     'click .new-component-button': 'showNewComponentForm'
-    'click #save-draft': 'saveDraft'
-    'click #delete-draft': 'deleteDraft'
-    'click #create-draft': 'createDraft'
-    'click #publish-draft': 'publishDraft'
-    'change #visibility': 'setVisibility'
+    'click .delete-draft': 'deleteDraft'
+    'click .create-draft': 'createDraft'
+    'click .publish-draft': 'publishDraft'
+    'change .visibility-select': 'setVisibility'
 
   initialize: =>
     @visibilityView = new CMS.Views.UnitEdit.Visibility(
       el: @$('#visibility')
-      model: @model
-    )
-
-    @saveView = new CMS.Views.UnitEdit.SaveDraftButton(
-      el: @$('#save-draft')
       model: @model
     )
 
@@ -41,7 +35,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$('.components').sortable(
       handle: '.drag-handle'
-      update: (event, ui) => @model.set('children', @components())
+      update: (event, ui) => @model.save(children: @components())
       helper: 'clone'
       opacity: '0.5'
       placeholder: 'component-placeholder'
@@ -58,7 +52,6 @@ class CMS.Views.UnitEdit extends Backbone.View
                 id: $(element).data('id'),
             )
         )
-        update: (event, ui) => @model.set('children', @components())
     )
 
   # New component creation
@@ -124,7 +117,7 @@ class CMS.Views.UnitEdit extends Backbone.View
       id: $component.data('id')
     }, =>
       $component.remove()
-      @model.set('children', @components())
+      @model.save(children: @components())
     )
 
   deleteDraft: (event) ->
@@ -167,7 +160,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     $.post(target_url, {
       id: @$el.data('id')
     }, =>
-      @model.set('state', @$('#visibility').val())
+      @model.set('state', @$('.visibility-select').val())
     )
 
 class CMS.Views.UnitEdit.NameEdit extends Backbone.View
@@ -187,7 +180,6 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     metadata = $.extend({}, @model.get('metadata'))
     metadata.display_name = @$('.unit-display-name-input').val()
     $('.unit-location .editing .unit-name').html(metadata.display_name)
-    @model.set 'metadata', metadata
 
     inputField = this.$el.find('input')
 
@@ -204,7 +196,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     if @timer
       clearTimeout @timer
     @timer = setTimeout( =>
-      @model.save()
+      @model.save(metadata: metadata)
       @timer = null
       @$spinner.delay(500).fadeOut(150)
     , 500)
@@ -223,17 +215,3 @@ class CMS.Views.UnitEdit.Visibility extends Backbone.View
 
   render: =>
     @$el.val(@model.get('state'))
-
-class CMS.Views.UnitEdit.SaveDraftButton extends Backbone.View
-  initialize: =>
-    @model.on('change:children', @enable)
-    @model.on('change:metadata', @enable)
-    @model.on('sync', @disable)
-
-    @disable()
-  
-  disable: =>
-    @$el.addClass('disabled')
-
-  enable: =>
-    @$el.removeClass('disabled')
