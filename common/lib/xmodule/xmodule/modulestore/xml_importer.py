@@ -105,9 +105,12 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
                 # the caller passed in
-                module.location = Location(target_location_namespace.tag, 
-                    target_location_namespace.org, target_location_namespace.course, module.location.category, 
-                    module.location.name if module.location.category != 'course' else target_location_namespace.name)
+                if module.location.category != 'course':
+                    module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+                        course=target_location_namespace.course)
+                else:
+                    module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+                        course=target_location_namespace.course, name=target_location_namespace.name)
 
                 # then remap children pointers since they too will be re-namespaced
                 children_locs = module.definition.get('children')
@@ -115,8 +118,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     new_locs = []
                     for child in children_locs:
                         child_loc = Location(child)
-                        new_locs.append(Location(target_location_namespace.tag, target_location_namespace.org, 
-                            target_location_namespace.course, child_loc.category, child_loc.name).url())
+                        new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+                            course=target_location_namespace.course)
+                        
+                        new_locs.append(new_child_loc)
 
                     module.definition['children'] = new_locs
 
