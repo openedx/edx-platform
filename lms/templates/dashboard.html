@@ -14,6 +14,48 @@
   <script type="text/javascript">
   (function() {
 
+    var carouselPageHeight = 0;
+    var carouselIndex = 0;
+    var carouselDelay = 5000;
+    var carouselPages = $('.news-carousel .page').length;
+
+
+    $('.news-carousel .page').each(function() {
+      console.log($(this).outerHeight());
+      carouselPageHeight = Math.max($(this).outerHeight(), carouselPageHeight);
+    });
+    $('.news-carousel .pages').css('height', carouselPageHeight);
+    $('.news-carousel .page-dot').bind('click', setCarouselPage);
+    var carouselTimer = setInterval(nextCarouselPage, carouselDelay);
+
+    function nextCarouselPage() {
+      carouselIndex = carouselIndex + 1 < carouselPages ? carouselIndex + 1 : 0;
+      setCarouselPage(null, carouselIndex);
+    }
+
+    function setCarouselPage(e, index) {
+      console.log('set');
+      var $pageToShow;
+      var transitionSpeed;
+      $('.news-carousel .page-dots').find('.current').removeClass('current');
+
+      if(e) {
+        clearInterval(carouselTimer);
+        carouselTimer = setInterval(nextCarouselPage, carouselDelay);
+        carouselIndex = $(this).closest('li').index();
+        transitionSpeed = 250;
+        $pageToShow = $('.news-carousel .page').eq($(this).closest('li').index());
+        $(this).addClass('current');
+      } else {
+        transitionSpeed = 750;
+        $pageToShow = $('.news-carousel .page').eq(index);
+        $('.news-carousel .page-dot').eq(index).addClass('current');
+      }
+
+      $pageToShow.fadeIn(transitionSpeed);
+      $('.news-carousel .page').not($pageToShow).fadeOut(transitionSpeed);
+    }
+
     $(".unenroll").click(function(event) {
       $("#unenroll_course_id").val( $(event.target).data("course-id") );
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
@@ -107,6 +149,51 @@
         </li>
       </ul>
     </section>
+
+    <article class="news-carousel">
+      <header>
+        <h4>edX News</h4>
+        <nav class="page-dots">
+          <ol>
+            <li><a href="#" class="page-dot current"></a></li>
+            <li><a href="#" class="page-dot"></a></li>
+            <li><a href="#" class="page-dot"></a></li>
+          </ol>
+        </nav>
+      </header>
+      <div class="pages">
+        <section class="page">
+          <div class="news-image">
+            <a href="#"><img src="/static/content-berkeley-cs169x/images/course_image.jpg" /></a>
+          </div>
+          <h5><a href="#">BerkeleyX to offer Computer Graphics course</a></h5>
+          <div class="excerpt">
+            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
+            <p><a href="#">Learn More ›</a></p>
+          </div>
+        </section>
+        <section class="page">
+          <div class="news-image">
+            <a href="#"><img src="/static/content-mit-6002x/images/course_image.jpg" /></a>
+          </div>
+          <h5><a href="#">MIT has a new class</a></h5>
+          <div class="excerpt">
+            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
+            <p><a href="#">Learn More ›</a></p>
+          </div>
+        </section>
+        <section class="page">
+          <div class="news-image">
+            <a href="#"><img src="/static/6.00x/images/course_image.jpg" /></a>
+          </div>
+          <h5><a href="#">Look at this class, too!</a></h5>
+          <div class="excerpt">
+            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
+            <p><a href="#">Learn More ›</a></p>
+          </div>
+        </section>
+      </div>
+    </article>
   </section>
 
   <section class="my-courses">
