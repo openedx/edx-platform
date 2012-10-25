@@ -137,7 +137,7 @@ function showImportSubmit(e) {
     var filepath = $(this).val();
     if(filepath.substr(filepath.length - 6, 6) == 'tar.gz') {
         $('.error-block').hide();
-        $('.file-name').html($(this).val());
+        $('.file-name').html($(this).val().replace('C:\\fakepath\\', ''));
         $('.file-name-block').show();
         $('.import .choose-file-button').hide();
         $('.submit-button').show();
