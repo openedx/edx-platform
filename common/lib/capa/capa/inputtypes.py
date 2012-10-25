@@ -489,66 +489,61 @@ register_input_class(FileSubmission)
 
 
 #-----------------------------------------------------------------------------
-## TODO: Make a wrapper for <codeinput>
-def textbox(element, value, status, render_template, msg=''):
-    '''
-    The textbox is used for code input.  The message is the return HTML string from
-    evaluating the code, eg error messages, and output from the code tests.
 
-    '''
-    eid = element.get('id')
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    rows = element.get('rows') or '30'
-    cols = element.get('cols') or '80'
-    # if specified, then textline is hidden and id is stored in div of name given by hidden
-    hidden = element.get('hidden', '')
+class CodeInput(InputTypeBase):
+    """
+    A text area input for code--uses codemirror, does syntax highlighting, special tab handling,
+    etc.
+    """
 
-    # if no student input yet, then use the default input given by the problem
-    if not value:
-        value = element.text
+    template = "codeinput.html"
+    tags = ['codeinput',
+            'textbox',        # Old name for this.  Still supported, but deprecated.
+            ]
 
-    # Check if problem has been queued
-    queue_len = 0
-    # Flag indicating that the problem has been queued, 'msg' is length of queue
-    if status == 'incomplete':
-        status = 'queued'
-        queue_len = msg
-        msg = 'Submitted to grader.'
+    def __init__(self, system, xml, state):
+        super(CodeInput, self).__init__(system, xml, state)
 
-    # For CodeMirror
-    mode = element.get('mode','python')
-    linenumbers = element.get('linenumbers','true')
-    tabsize = element.get('tabsize','4')
-    tabsize = int(tabsize)
+        self.rows = xml.get('rows') or '30'
+        self.cols = xml.get('cols') or '80'
+        # if specified, then textline is hidden and id is stored in div of name given by hidden
+        self.hidden = xml.get('hidden', '')
 
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'count': count,
-               'size': size,
-               'msg': msg,
-               'mode': mode,
-               'linenumbers': linenumbers,
-               'rows': rows,
-               'cols': cols,
-               'hidden': hidden,
-               'tabsize': tabsize,
-               'queue_len': queue_len,
+        # if no student input yet, then use the default input given by the problem
+        if not self.value:
+            self.value = xml.text
+
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = 'Submitted to grader.'
+
+        # For CodeMirror
+        self.mode = xml.get('mode', 'python')
+        self.linenumbers = xml.get('linenumbers', 'true')
+        self.tabsize = int(xml.get('tabsize', '4'))
+
+    def _get_render_context(self):
+
+        context = {'id': self.id,
+                   'value': self.value,
+                   'state': self.status,
+                   'msg': self.msg,
+                   'mode': self.mode,
+                   'linenumbers': self.linenumbers,
+                   'rows': self.rows,
+                   'cols': self.cols,
+                   'hidden': self.hidden,
+                   'tabsize': self.tabsize,
+                   'queue_len': self.queue_len,
                }
-    html = render_template("textbox.html", context)
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        newmsg = 'error %s in rendering message' % (str(err).replace('<', '&lt;'))
-        newmsg += '<br/>Original message: %s' % msg.replace('<', '&lt;')
-        context['msg'] = newmsg
-        html = render_template("textbox.html", context)
-        xhtml = etree.XML(html)
-    return xhtml
+        return context
 
+register_input_class(CodeInput)
 
-_reg(textbox)
 
 #-----------------------------------------------------------------------------
 def schematic(element, value, status, render_template, msg=''):
