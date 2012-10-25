@@ -37,21 +37,26 @@
 <%block name="js_extra">
 <script type="text/javascript">
   (function() {
-     $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
-       if(json.success) {
-          next = getParameterByName('next');
-          if(next) {
-             location.href = next;
-         } else {
-             location.href = "${reverse('dashboard')}";
-         }
+    $(document).ready(function() {
+      if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
+        $('.pwd-reset').click();
+      }
+    })
+    $(document).delegate('#login_form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+        next = getParameterByName('next');
+        if(next) {
+           location.href = next;
        } else {
-         if($('#login_error').length == 0) {
-           $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
-         }
-         $('#login_error').html(json.value).stop().css("display", "block");
+           location.href = "${reverse('dashboard')}";
        }
-     });
+     } else {
+       if($('#login_error').length == 0) {
+         $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
+       }
+       $('#login_error').html(json.value).stop().css("display", "block");
+     }
+    });
   })(this)
 </script>
 </%block>
