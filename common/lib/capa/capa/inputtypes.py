@@ -647,9 +647,8 @@ _reg(solution)
 
 #-----------------------------------------------------------------------------
 
-
-def imageinput(element, value, status, render_template, msg=''):
-    '''
+class ImageInput(InputTypeBase):
+    """
     Clickable image as an input field.  Element should specify the image source, height,
     and width, e.g.
 
@@ -657,130 +656,120 @@ def imageinput(element, value, status, render_template, msg=''):
 
     TODO: showanswer for imageimput does not work yet - need javascript to put rectangle
     over acceptable area of image.
-    '''
-    eid = element.get('id')
-    src = element.get('src')
-    height = element.get('height')
-    width = element.get('width')
+    """
 
-    # if value is of the form [x,y] then parse it and send along coordinates of previous answer
-    m = re.match('\[([0-9]+),([0-9]+)]', value.strip().replace(' ', ''))
-    if m:
-        (gx, gy) = [int(x) - 15 for x in m.groups()]
-    else:
-        (gx, gy) = (0, 0)
+    template = "imageinput.html"
+    tags = ['imageinput']
 
-    context = {
-        'id': eid,
-        'value': value,
-        'height': height,
-        'width': width,
-        'src': src,
-        'gx': gx,
-        'gy': gy,
-        'state': status,    # to change
-        'msg': msg,         # to change
-        }
-    html = render_template("imageinput.html", context)
-    return etree.XML(html)
+    def __init__(self, system, xml, state):
+        super(ImageInput, self).__init__(system, xml, state)
+        self.src = xml.get('src')
+        self.height = xml.get('height')
+        self.width = xml.get('width')
 
-_reg(imageinput)
+        # if value is of the form [x,y] then parse it and send along coordinates of previous answer
+        m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
+        if m:
+            # TODO (vshnayder): why is there a "-15" here??
+            (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
+        else:
+            (self.gx, self.gy) = (0, 0)
 
 
-def crystallography(element, value, status, render_template, msg=''):
-    eid = element.get('id')
-    if eid is None:
-        msg = 'cryst has no id: it probably appears outside of a known response type'
-        msg += "\nSee problem XML source line %s" % getattr(element, 'sourceline', '<unavailable>')
-        raise Exception(msg)
-    height = element.get('height')
-    width = element.get('width')
-    display_file = element.get('display_file')
+    def _get_render_context(self):
 
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    # if specified, then textline is hidden and id is stored in div of name given by hidden
-    hidden = element.get('hidden', '')
-    # Escape answers with quotes, so they don't crash the system!
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
-
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'count': count,
-               'size': size,
-               'msg': msg,
-               'hidden': hidden,
-               'inline': element.get('inline', ''),
-               'width': width,
-               'height': height,
-               'display_file': display_file,
+        context = {'id': self.id,
+                   'value': self.value,
+                   'height': self.height,
+                   'width': self.width,
+                   'src': self.src,
+                   'gx': self.gx,
+                   'gy': self.gy,
+                   'state': self.status,    # to change (VS: to what??)
+                   'msg': self.msg,         # to change
                }
+        return context
 
-    html = render_template("crystallography.html", context)
+register_input_class(ImageInput)
 
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        # TODO: needs to be self.system.DEBUG - but can't access system
-        if True:
-            log.debug('[inputtypes.crystallography] failed to parse XML for:\n%s' % html)
-            raise
-    return xhtml
+#-----------------------------------------------------------------------------
 
-_reg(crystallography)
+class Crystallography(InputTypeBase):
+    """
+    An input for crystallography -- user selects 3 points on the axes, and we get a plane.
 
+    TODO: what's the actual value format?
+    """
 
-def vsepr_input(element, value, status, render_template, msg=''):
-    eid = element.get('id')
-    if eid is None:
-        msg = 'cryst has no id: it probably appears outside of a known response type'
-        msg += "\nSee problem XML source line %s" % getattr(element, 'sourceline', '<unavailable>')
-        raise Exception(msg)
-    height = element.get('height')
-    width = element.get('width')
-    display_file = element.get('display_file')
+    template = "crystallography.html"
+    tags = ['crystallography']
 
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    # if specified, then textline is hidden and id is stored in div of name given by hidden
-    hidden = element.get('hidden', '')
-    # Escape answers with quotes, so they don't crash the system!
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
+    def __init__(self, system, xml, state):
+        super(Crystallography, self).__init__(system, xml, state)
 
-    molecules = element.get('molecules')
-    geometries = element.get('geometries')
+        self.height = xml.get('height')
+        self.width = xml.get('width')
+        self.size = xml.get('size')
 
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'count': count,
-               'size': size,
-               'msg': msg,
-               'hidden': hidden,
-               'inline': element.get('inline', ''),
-               'width': width,
-               'height': height,
-               'display_file': display_file,
-               'molecules': molecules,
-               'geometries': geometries,
+        # if specified, then textline is hidden and id is stored in div of name given by hidden
+        self.hidden = xml.get('hidden', '')
+
+        # Escape answers with quotes, so they don't crash the system!
+        escapedict = {'"': '&quot;'}
+        self.value = saxutils.escape(self.value, escapedict)
+
+    def _get_render_context(self):
+        context = {'id': self.id,
+                   'value': self.value,
+                   'state': self.status,
+                   'size': self.size,
+                   'msg': self.msg,
+                   'hidden': self.hidden,
+                   'width': self.width,
+                   'height': self.height,
                }
+        return context
 
-    html = render_template("vsepr_input.html", context)
+register_input_class(Crystallography)
 
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        # TODO: needs to be self.system.DEBUG - but can't access system
-        if True:
-            log.debug('[inputtypes.vsepr_input] failed to parse XML for:\n%s' % html)
-            raise
-    return xhtml
+# -------------------------------------------------------------------------
 
-_reg(vsepr_input)
+class VseprInput(InputTypeBase):
+    """
+    Input for molecular geometry--show possible structures, let student
+    pick structure and label positions with atoms or electron pairs.
+    """
 
+    template = 'vsepr_input.html'
+    tags = ['vsepr_input']
+
+    def __init__(self, system, xml, state):
+        super(ImageInput, self).__init__(system, xml, state)
+
+        self.height = xml.get('height')
+        self.width = xml.get('width')
+
+        # Escape answers with quotes, so they don't crash the system!
+        escapedict = {'"': '&quot;'}
+        self.value = saxutils.escape(self.value, escapedict)
+
+        self.molecules = xml.get('molecules')
+        self.geometries = xml.get('geometries')
+
+    def _get_render_context(self):
+
+        context = {'id': self.id,
+                   'value': self.value,
+                   'state': self.status,
+                   'msg': self.msg,
+                   'width': self.width,
+                   'height': self.height,
+                   'molecules': self.molecules,
+                   'geometries': self.geometries,
+               }
+        return context
+
+register_input_class(VseprInput)
 
 #--------------------------------------------------------------------------------
 
