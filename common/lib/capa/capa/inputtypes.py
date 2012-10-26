@@ -707,7 +707,7 @@ def imageinput(element, value, status, render_template, msg=''):
 
 _reg(imageinput)
 
-#-----------------------------------------------------------------------------
+
 def crystallography(element, value, status, render_template, msg=''):
     eid = element.get('id')
     if eid is None:
@@ -740,16 +740,67 @@ def crystallography(element, value, status, render_template, msg=''):
                }
 
     html = render_template("crystallography.html", context)
+
     try:
         xhtml = etree.XML(html)
     except Exception as err:
         # TODO: needs to be self.system.DEBUG - but can't access system
         if True:
-            log.debug('[inputtypes.textline] failed to parse XML for:\n%s' % html)
+            log.debug('[inputtypes.crystallography] failed to parse XML for:\n%s' % html)
             raise
     return xhtml
 
 _reg(crystallography)
+
+
+def vsepr_input(element, value, status, render_template, msg=''):
+    eid = element.get('id')
+    if eid is None:
+        msg = 'cryst has no id: it probably appears outside of a known response type'
+        msg += "\nSee problem XML source line %s" % getattr(element, 'sourceline', '<unavailable>')
+        raise Exception(msg)
+    height = element.get('height')
+    width = element.get('width')
+    display_file = element.get('display_file')
+
+    count = int(eid.split('_')[-2]) - 1  # HACK
+    size = element.get('size')
+    # if specified, then textline is hidden and id is stored in div of name given by hidden
+    hidden = element.get('hidden', '')
+    # Escape answers with quotes, so they don't crash the system!
+    escapedict = {'"': '&quot;'}
+    value = saxutils.escape(value, escapedict)
+
+    molecules = element.get('molecules')
+    geometries = element.get('geometries')
+
+    context = {'id': eid,
+               'value': value,
+               'state': status,
+               'count': count,
+               'size': size,
+               'msg': msg,
+               'hidden': hidden,
+               'inline': element.get('inline', ''),
+               'width': width,
+               'height': height,
+               'display_file': display_file,
+               'molecules': molecules,
+               'geometries': geometries,
+               }
+
+    html = render_template("vsepr_input.html", context)
+
+    try:
+        xhtml = etree.XML(html)
+    except Exception as err:
+        # TODO: needs to be self.system.DEBUG - but can't access system
+        if True:
+            log.debug('[inputtypes.vsepr_input] failed to parse XML for:\n%s' % html)
+            raise
+    return xhtml
+
+_reg(vsepr_input)
 
 
 #--------------------------------------------------------------------------------

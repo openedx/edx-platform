@@ -1,0 +1,58 @@
+<% doinline = "inline" if inline else "" %>
+
+<section id="textinput_${id}" class="textinput ${doinline}" >
+     <table><tr><td height='600'>
+    <div id="vsepr_div_${id}" style="position:relative;" data-molecules="${molecules}" data-geometries="${geometries}">
+    <canvas id="vsepr_canvas_${id}" width="${width}" height="${height}">
+    </canvas>
+    </div>
+    </td><td valign ='top'>
+    <select class="molecule_select" id="molecule_select_${id}" size="18">
+    </select>
+    </td></tr></table>
+
+    <div class="script_placeholder" data-src="/static/js/vsepr/vsepr.js"></div>
+
+    % if state == 'unsubmitted':
+    <div class="unanswered ${doinline}" id="status_${id}">
+    % elif state == 'correct':
+    <div class="correct ${doinline}" id="status_${id}">
+    % elif state == 'incorrect':
+    <div class="incorrect ${doinline}" id="status_${id}">
+    % elif state == 'incomplete':
+    <div class="incorrect ${doinline}" id="status_${id}">
+    % endif
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+
+  <input type="text" name="input_${id}" id="input_${id}" value="${value}"
+   % if size:
+   size="${size}"
+   % endif
+   % if hidden:
+    style="display:none;"
+   % endif
+   />
+
+      <p class="status">
+        % if state == 'unsubmitted':
+        unanswered
+        % elif state == 'correct':
+        correct
+        % elif state == 'incorrect':
+        incorrect
+        % elif state == 'incomplete':
+        incomplete
+        % endif
+      </p>
+
+  <p id="answer_${id}" class="answer"></p>
+
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
+% if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete'] or hidden:
+</div>
+% endif
+</section>
