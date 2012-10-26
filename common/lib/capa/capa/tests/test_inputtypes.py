@@ -1,5 +1,9 @@
 """
-Tests of input types (and actually responsetypes too)
+Tests of input types (and actually responsetypes too).
+
+TODO:
+- test unicode in values, parameters, etc.
+- test various html escapes
 """
 
 from datetime import datetime
@@ -314,6 +318,55 @@ class CodeInputTest(unittest.TestCase):
                    'hidden': '',
                    'tabsize': int(tabsize),
                    'queue_len': '3',
+                   }
+
+        self.assertEqual(context, expected)
+
+
+class SchematicTest(unittest.TestCase):
+    '''
+    Check that schematic inputs work
+    '''
+
+    def test_rendering(self):
+        height = '12'
+        width = '33'
+        parts = 'resistors, capacitors, and flowers'
+        analyses = 'fast, slow, and pink'
+        initial_value = 'two large batteries'
+        submit_analyses = 'maybe'
+
+
+        xml_str = """<schematic id="prob_1_2"
+        height="{h}"
+        width="{w}"
+        parts="{p}"
+        analyses="{a}"
+        initial_value="{iv}"
+        submit_analyses="{sa}"
+        />""".format(h=height, w=width, p=parts, a=analyses,
+                     iv=initial_value, sa=submit_analyses)
+
+        element = etree.fromstring(xml_str)
+
+        value = 'three resistors and an oscilating pendulum'
+        state = {'value': value,
+                 'status': 'unsubmitted',
+                 'feedback' : {'message': '3'}, }
+
+        the_input = inputtypes.get_class_for_tag('schematic')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'initial_value': initial_value,
+                    'state': 'unsubmitted',
+                    'width': width,
+                    'height': height,
+                    'parts': parts,
+                    'analyses': analyses,
+                    'submit_analyses': submit_analyses,
                    }
 
         self.assertEqual(context, expected)
