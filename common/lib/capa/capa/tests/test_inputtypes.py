@@ -4,6 +4,7 @@ Tests of input types (and actually responsetypes too).
 TODO:
 - test unicode in values, parameters, etc.
 - test various html escapes
+- test funny xml chars -- should never get xml parse error if things are escaped properly.
 """
 
 from datetime import datetime
@@ -351,8 +352,7 @@ class SchematicTest(unittest.TestCase):
 
         value = 'three resistors and an oscilating pendulum'
         state = {'value': value,
-                 'status': 'unsubmitted',
-                 'feedback' : {'message': '3'}, }
+                 'status': 'unsubmitted'}
 
         the_input = inputtypes.get_class_for_tag('schematic')(system, element, state)
 
@@ -369,5 +369,122 @@ class SchematicTest(unittest.TestCase):
                     'submit_analyses': submit_analyses,
                    }
 
+        self.assertEqual(context, expected)
+
+
+class ImageInputTest(unittest.TestCase):
+    '''
+    Check that image inputs work
+    '''
+
+    def check(self, value, egx, egy):
+        height = '78'
+        width = '427'
+        src = 'http://www.edx.org/cowclicker.jpg'
+
+        xml_str = """<imageinput id="prob_1_2"
+        src="{s}"
+        height="{h}"
+        width="{w}"
+        />""".format(s=src, h=height, w=width)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': value,
+                 'status': 'unsubmitted'}
+
+        the_input = inputtypes.get_class_for_tag('imageinput')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'state': 'unsubmitted',
+                    'width': width,
+                    'height': height,
+                    'src': src,
+                    'gx': egx,
+                    'gy': egy,
+                    'state': 'unsubmitted',
+                    'msg': ''}
+
+        self.assertEqual(context, expected)
+
+    def test_with_value(self):
+        self.check('[50,40]', 35, 25)
+
+    def test_without_value(self):
+        self.check('', 0, 0)
+
+    def test_corrupt_values(self):
+        self.check('[12', 0, 0)
+        self.check('[12, a]', 0, 0)
+        self.check('[12 10]', 0, 0)
+        self.check('[12]', 0, 0)
+        self.check('[12 13 14]', 0, 0)
+
+
+
+class CrystallographyTest(unittest.TestCase):
+    '''
+    Check that crystallography inputs work
+    '''
+
+    def test_rendering(self):
+        height = '12'
+        width = '33'
+        size = '10'
+
+        xml_str = """<crystallography id="prob_1_2"
+        height="{h}"
+        width="{w}"
+        size="{s}"
+        />""".format(h=height, w=width, s=size)
+
+        element = etree.fromstring(xml_str)
+
+        value = 'abc'
+        state = {'value': value,
+                 'status': 'unsubmitted'}
+
+        the_input = inputtypes.get_class_for_tag('crystallography')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'state': 'unsubmitted',
+                    'size': size,
+                    'msg': '',
+                    'hidden': '',
+                    'width': width,
+                    'height': height,
+                   }
+
+        self.assertEqual(context, expected)
+
+
+class ChemicalEquationTest(unittest.TestCase):
+    '''
+    Check that chemical equation inputs work.
+    '''
+
+    def test_rendering(self):
+        size = "42"
+        xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=size)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'H2OYeah',}
+        the_input = inputtypes.get_class_for_tag('chemicalequationinput')(system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'H2OYeah',
+                    'status': 'unanswered',
+                    'size': size,
+                    'previewer': '/static/js/capa/chemical_equation_preview.js',
+                    }
         self.assertEqual(context, expected)
 
