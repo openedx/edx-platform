@@ -52,6 +52,14 @@
 
 	.close-button {
 		@include white-button;
-		margin-top: 13px;
+		position: absolute;
+		top: 0;
+		right: 15px;
+		width: 29px;
+		height: 29px;
+		padding: 0 !important;
+		border-radius: 17px !important;
+		line-height: 29px;
+		text-align: center;
 	}
 }

@@ -117,7 +117,17 @@ $(document).ready(function() {
     $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
+
+    $('.change-password-link').bind('click', changePassword);
 });
+
+function changePassword(e) {
+    e.preventDefault();
+
+    $modal = $('.password-modal').show();
+    $modal.find('.close-button').bind('click', hideModal);
+    $modalCover.show();
+}
 
 function editSectionPublishDate(e) {
     e.preventDefault();

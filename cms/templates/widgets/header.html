@@ -17,13 +17,32 @@
       </ul>
       % endif
     </div>
-    <div class="right">
-      <span class="username">${ user.username }</span>
-      % if user.is_authenticated():
-         <a href="${reverse('logout')}">Log out</a>
-      % else:
-         <a href="${reverse('login')}">Log in</a>
-      % endif
-    </ul>
+    <div class="user-menu">
+      <span class="username">${ user.username } <span class="drop-arrow">▾</span></span>
+      <div class="user-drop">
+        <ul class="user-drop-items">
+          <li>
+            <a href="#" class="change-password-link">Change Password</a>
+          </li>
+          <li>
+            % if user.is_authenticated():
+               <a href="${reverse('logout')}">Log out</a>
+            % else:
+               <a href="${reverse('login')}">Log in</a>
+            % endif
+          </li>
+        </ul>
+      </div>
+    </div>
   </nav>
 </header>
+
+<div class="password-modal modal">
+  <a href="#" class="close-button"><span class="close-icon"></span></a>
+  <div class="modal-body">
+    <h1>Change Password</h1>
+    <p>A link to reset your password has been sent to your email.</p>
+  </div>
+</div>
+
+<div class="modal-cover"></div>
