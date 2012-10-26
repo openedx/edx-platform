@@ -96,7 +96,10 @@ def login_page(request):
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    return render_to_response('login.html', {'csrf': csrf_token})
+    return render_to_response('login.html', {
+        'csrf': csrf_token,
+        'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
+    })
 
 
 # ==== Views for any logged-in user ==================================
@@ -574,11 +577,11 @@ def save_item(request):
 
     store = _modulestore(Location(item_location));
 
-    if request.POST['data'] is not None:
+    if request.POST.get('data') is not None:
         data = request.POST['data']
         store.update_item(item_location, data)
         
-    if request.POST['children'] is not None:
+    if request.POST.get('children') is not None:
         children = request.POST['children']
         store.update_children(item_location, children)
 
@@ -587,7 +590,7 @@ def save_item(request):
     # NOTE, that the postback is not the complete metadata, as there's system metadata which is
     # not presented to the end-user for editing. So let's fetch the original and
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
-    if request.POST['metadata'] is not None:
+    if request.POST.get('metadata') is not None:
         posted_metadata = request.POST['metadata']
         # fetch original
         existing_item = modulestore().get_item(item_location)
