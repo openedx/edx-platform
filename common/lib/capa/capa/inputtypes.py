@@ -726,9 +726,6 @@ def crystallography(element, value, status, render_template, msg=''):
     escapedict = {'"': '&quot;'}
     value = saxutils.escape(value, escapedict)
 
-    molecules = element.get('molecules')
-    geometries = element.get('geometries')
-
     context = {'id': eid,
                'value': value,
                'state': status,
@@ -773,6 +770,9 @@ def vsepr_input(element, value, status, render_template, msg=''):
     # Escape answers with quotes, so they don't crash the system!
     escapedict = {'"': '&quot;'}
     value = saxutils.escape(value, escapedict)
+
+    molecules = element.get('molecules')
+    geometries = element.get('geometries')
 
     context = {'id': eid,
                'value': value,
