@@ -596,18 +596,14 @@ def math(element, value, status, render_template, msg=''):
     '''
     mathstr = re.sub('\$(.*)\$', '[mathjaxinline]\\1[/mathjaxinline]', element.text)
     mtag = 'mathjax'
-    if not '\\displaystyle' in mathstr: mtag += 'inline'
-    else: mathstr = mathstr.replace('\\displaystyle', '')
+    if not '\\displaystyle' in mathstr:
+        mtag += 'inline'
+    else:
+        mathstr = mathstr.replace('\\displaystyle', '')
     mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
 
-    #if '\\displaystyle' in mathstr:
-    #    isinline = False
-    #    mathstr = mathstr.replace('\\displaystyle','')
-    #else:
-    #    isinline = True
-    # html = render_template("mathstring.html", {'mathstr':mathstr,
-    #                                            'isinline':isinline,'tail':element.tail})
 
+    # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
     html = '<html><html>%s</html><html>%s</html></html>' % (mathstr, saxutils.escape(element.tail))
     try:
         xhtml = etree.XML(html)
