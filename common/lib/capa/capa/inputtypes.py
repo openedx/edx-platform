@@ -546,29 +546,37 @@ register_input_class(CodeInput)
 
 
 #-----------------------------------------------------------------------------
-def schematic(element, value, status, render_template, msg=''):
-    eid = element.get('id')
-    height = element.get('height')
-    width = element.get('width')
-    parts = element.get('parts')
-    analyses = element.get('analyses')
-    initial_value = element.get('initial_value')
-    submit_analyses = element.get('submit_analyses')
-    context = {
-        'id': eid,
-        'value': value,
-        'initial_value': initial_value,
-        'state': status,
-        'width': width,
-        'height': height,
-        'parts': parts,
-        'analyses': analyses,
-        'submit_analyses': submit_analyses,
-        }
-    html = render_template("schematicinput.html", context)
-    return etree.XML(html)
+class Schematic(InputTypeBase):
+    """
+    """
 
-_reg(schematic)
+    template = "schematicinput.html"
+    tags = ['schematic']
+
+    def __init__(self, system, xml, state):
+        super(Schematic, self).__init__(system, xml, state)
+        self.height = xml.get('height')
+        self.width = xml.get('width')
+        self.parts = xml.get('parts')
+        self.analyses = xml.get('analyses')
+        self.initial_value = xml.get('initial_value')
+        self.submit_analyses = xml.get('submit_analyses')
+
+
+    def _get_render_context(self):
+
+        context = {'id': self.id,
+                   'value': self.value,
+                   'initial_value': self.initial_value,
+                   'state': self.status,
+                   'width': self.width,
+                   'height': self.height,
+                   'parts': self.parts,
+                   'analyses': self.analyses,
+                   'submit_analyses': self.submit_analyses,               }
+        return context
+
+register_input_class(Schematic)
 
 #-----------------------------------------------------------------------------
 ### TODO: Move out of inputtypes
