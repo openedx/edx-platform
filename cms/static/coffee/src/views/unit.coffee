@@ -12,7 +12,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   initialize: =>
     @visibilityView = new CMS.Views.UnitEdit.Visibility(
-      el: @$('#visibility')
+      el: @$('.visibility-select')
       model: @model
     )
 
@@ -150,7 +150,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     )
 
   setVisibility: (event) ->
-    if @$('#visibility').val() == 'private'
+    if @$('.visibility-select').val() == 'private'
       target_url = '/unpublish_unit'
     else
       target_url = '/publish_draft'
