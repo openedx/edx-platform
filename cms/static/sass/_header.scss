@@ -18,6 +18,10 @@ body.no-header {
 	color: #fff;
 	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(255, 255, 255, 0.05) inset);
 
+	.inner-wrapper {
+		position: relative;
+	}
+
 	&.active-tab-courseware #courseware-tab {
 		@include active;
 	}
@@ -73,7 +77,7 @@ body.no-header {
 	.user-drop {
 		display: none;
 		position: absolute;
-		top: 36px;
+		top: 35px;
 		right: 0;
 		z-index: 999;
 		width: 170px;
@@ -100,7 +104,7 @@ body.no-header {
 		position: relative;
 		float: left;
 		display: inline-block;
-		height: 29px;
+		height: 28px;
 		padding: 7px 15px 0;		
 		color: #e4e6ee;
 	}
@@ -147,11 +151,5 @@ body.no-header {
 	.modal-body {
 		overflow: hidden;
 		height: auto;
-	}
-
-	.close-button {
-		position: absolute;
-		top: 5px;
-		right: 5px;
 	}
 }
