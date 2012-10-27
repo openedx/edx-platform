@@ -1,5 +1,5 @@
 """
-Tests of input types (and actually responsetypes too).
+Tests of input types.
 
 TODO:
 - test unicode in values, parameters, etc.
@@ -7,27 +7,16 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 """
 
-from datetime import datetime
-import json
-from mock import Mock
-from nose.plugins.skip import SkipTest
-import os
+from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
 
 from . import test_system
 from capa import inputtypes
 
-from lxml import etree
+# just a handy shortcut
+lookup_tag = inputtypes.registry.get_class_for_tag
 
-def tst_render_template(template, context):
-    """
-    A test version of render to template.  Renders to the repr of the context, completely ignoring the template name.
-    """
-    return repr(context)
-
-
-system = Mock(render_template=tst_render_template)
 
 def quote_attr(s):
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
@@ -44,7 +33,7 @@ class OptionInputTest(unittest.TestCase):
         state = {'value': 'Down',
                  'id': 'sky_input',
                  'status': 'answered'}
-        option_input = inputtypes.get_class_for_tag('optioninput')(system, element, state)
+        option_input = lookup_tag('optioninput')(test_system, element, state)
 
         context = option_input._get_render_context()
 
@@ -80,7 +69,7 @@ class ChoiceGroupTest(unittest.TestCase):
                      'id': 'sky_input',
                      'status': 'answered'}
 
-            option_input = inputtypes.get_class_for_tag('choicegroup')(system, element, state)
+            option_input = lookup_tag('choicegroup')(test_system, element, state)
 
             context = option_input._get_render_context()
 
@@ -119,7 +108,7 @@ class ChoiceGroupTest(unittest.TestCase):
                  'id': 'sky_input',
                  'status': 'answered'}
 
-        the_input = inputtypes.get_class_for_tag(tag)(system, element, state)
+        the_input = lookup_tag(tag)(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -164,7 +153,7 @@ class JavascriptInputTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': '3',}
-        the_input = inputtypes.get_class_for_tag('javascriptinput')(system, element, state)
+        the_input = lookup_tag('javascriptinput')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -191,7 +180,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee',}
-        the_input = inputtypes.get_class_for_tag('textline')(system, element, state)
+        the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -219,7 +208,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee',}
-        the_input = inputtypes.get_class_for_tag('textline')(system, element, state)
+        the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -260,7 +249,7 @@ class FileSubmissionTest(unittest.TestCase):
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
-        the_input = inputtypes.get_class_for_tag('filesubmission')(system, element, state)
+        the_input = lookup_tag('filesubmission')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -304,7 +293,7 @@ class CodeInputTest(unittest.TestCase):
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
 
-        the_input = inputtypes.get_class_for_tag('codeinput')(system, element, state)
+        the_input = lookup_tag('codeinput')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -354,7 +343,7 @@ class SchematicTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = inputtypes.get_class_for_tag('schematic')(system, element, state)
+        the_input = lookup_tag('schematic')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -393,7 +382,7 @@ class ImageInputTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = inputtypes.get_class_for_tag('imageinput')(system, element, state)
+        the_input = lookup_tag('imageinput')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -447,7 +436,7 @@ class CrystallographyTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = inputtypes.get_class_for_tag('crystallography')(system, element, state)
+        the_input = lookup_tag('crystallography')(test_system, element, state)
 
         context = the_input._get_render_context()
 
@@ -476,7 +465,7 @@ class ChemicalEquationTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah',}
-        the_input = inputtypes.get_class_for_tag('chemicalequationinput')(system, element, state)
+        the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
         context = the_input._get_render_context()
 
