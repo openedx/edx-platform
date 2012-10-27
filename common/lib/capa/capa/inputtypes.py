@@ -584,7 +584,7 @@ class VseprInput(InputTypeBase):
     tags = ['vsepr_input']
 
     def __init__(self, system, xml, state):
-        super(ImageInput, self).__init__(system, xml, state)
+        super(VseprInput, self).__init__(system, xml, state)
 
         self.height = xml.get('height')
         self.width = xml.get('width')
@@ -609,7 +609,7 @@ class VseprInput(InputTypeBase):
                }
         return context
 
-register_input_class(VseprInput)
+registry.register(VseprInput)
 
 #--------------------------------------------------------------------------------
 
