@@ -1,29 +1,3 @@
-
-
-# template:
-'''
-class ClassName(InputTypeBase):
-    """
-    """
-
-    template = "tagname.html"
-    tags = ['tagname']
-
-    def __init__(self, system, xml, state):
-        super(ClassName, self).__init__(system, xml, state)
-
-
-    def _get_render_context(self):
-
-        context = {'id': self.id,
-
-               }
-        return context
-
-register_input_class(ClassName)
-'''
-
-
 #
 # File:   courseware/capa/inputtypes.py
 #
@@ -32,11 +6,9 @@ register_input_class(ClassName)
 Module containing the problem elements which render into input objects
 
 - textline
-- textbox     (change this to textarea?)
-- schemmatic
-- choicegroup
-- radiogroup
-- checkboxgroup
+- textbox (aka codeinput)
+- schematic
+- choicegroup (aka radiogroup, checkboxgroup)
 - javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
@@ -60,53 +32,13 @@ import json
 
 from lxml import etree
 import xml.sax.saxutils as saxutils
+from registry import TagRegistry
 
 log = logging.getLogger('mitx.' + __name__)
 
 #########################################################################
 
-_TAGS_TO_CLASSES = {}
-
-def register_input_class(cls):
-    """
-    Register cls as a supported input type.  It is expected to have the same constructor as
-    InputTypeBase, and to define cls.tags as a list of tags that it implements.
-
-    If an already-registered input type has claimed one of those tags, will raise ValueError.
-
-    If there are no tags in cls.tags, will also raise ValueError.
-    """
-
-    # Do all checks and complain before changing any state.
-    if len(cls.tags) == 0:
-        raise ValueError("No supported tags for class {0}".format(cls.__name__))
-
-    for t in cls.tags:
-        if t in _TAGS_TO_CLASSES:
-            other_cls = _TAGS_TO_CLASSES[t]
-            if cls == other_cls:
-                # registering the same class multiple times seems silly, but ok
-                continue
-            raise ValueError("Tag {0} already registered by class {1}. Can't register for class {2}"
-                             .format(t, other_cls.__name__, cls.__name__))
-
-    # Ok, should be good to change state now.
-    for t in cls.tags:
-        _TAGS_TO_CLASSES[t] = cls
-
-def registered_input_tags():
-    """
-    Get a list of all the xml tags that map to known input types.
-    """
-    return _TAGS_TO_CLASSES.keys()
-
-
-def get_class_for_tag(tag):
-    """
-    For any tag in registered_input_tags(), return the corresponding class.  Otherwise, will raise KeyError.
-    """
-    return _TAGS_TO_CLASSES[tag]
-
+registry = TagRegistry()
 
 class InputTypeBase(object):
     """
@@ -119,16 +51,18 @@ class InputTypeBase(object):
         """
         Instantiate an InputType class.  Arguments:
 
-        - system    : ModuleSystem instance which provides OS, rendering, and user context.  Specifically, must
-                      have a render_template function.
+        - system    : ModuleSystem instance which provides OS, rendering, and user context.
+                      Specifically, must have a render_template function.
         - xml       : Element tree of this Input element
         - state     : a dictionary with optional keys:
-                      * 'value'  -- the current value of this input (what the student entered last time)
-                      * 'id' -- the id of this input, typically "{problem-location}_{response-num}_{input-num}"
+                      * 'value'  -- the current value of this input
+                                    (what the student entered last time)
+                      * 'id' -- the id of this input, typically
+                                "{problem-location}_{response-num}_{input-num}"
                       * 'status' (answered, unanswered, unsubmitted)
                       * 'feedback' (dictionary containing keys for hints, errors, or other
-                         feedback from previous attempt.  Specifically 'message', 'hint', 'hintmode'.  If 'hintmode'
-                         is 'always', the hint is always displayed.)
+                         feedback from previous attempt.  Specifically 'message', 'hint',
+                         'hintmode'.  If 'hintmode' is 'always', the hint is always displayed.)
         """
 
         self.xml = xml
@@ -172,38 +106,11 @@ class InputTypeBase(object):
         Return the html for this input, as an etree element.
         """
         if self.template is None:
-            raise NotImplementedError("no rendering template specified for class {0}".format(self.__class__))
+            raise NotImplementedError("no rendering template specified for class {0}"
+                                      .format(self.__class__))
 
         html = self.system.render_template(self.template, self._get_render_context())
         return etree.XML(html)
-
-
-## TODO: Remove once refactor is complete
-def make_class_for_render_function(fn):
-    """
-    Take an old-style render function, return a new-style input class.
-    """
-
-    class Impl(InputTypeBase):
-        """
-        Inherit all the constructor logic from InputTypeBase...
-        """
-        tags = [fn.__name__]
-        def get_html(self):
-            """...delegate to the render function to do the work"""
-            return fn(self.xml, self.value, self.status, self.system.render_template, self.msg)
-
-    # don't want all the classes to be called Impl (confuses register_input_class).
-    Impl.__name__ = fn.__name__.capitalize()
-    return Impl
-
-
-def _reg(fn):
-    """
-    Register an old-style inputtype render function as a new-style subclass of InputTypeBase.
-    This will go away once converting all input types to the new format is complete. (TODO)
-    """
-    register_input_class(make_class_for_render_function(fn))
 
 
 #-----------------------------------------------------------------------------
@@ -253,7 +160,7 @@ class OptionInput(InputTypeBase):
             }
         return context
 
-register_input_class(OptionInput)
+registry.register(OptionInput)
 
 #-----------------------------------------------------------------------------
 
@@ -346,7 +253,7 @@ def extract_choices(element):
     return choices
 
 
-register_input_class(ChoiceGroup)
+registry.register(ChoiceGroup)
 
 
 #-----------------------------------------------------------------------------
@@ -389,7 +296,7 @@ class JavascriptInput(InputTypeBase):
                }
         return context
 
-register_input_class(JavascriptInput)
+registry.register(JavascriptInput)
 
 
 #-----------------------------------------------------------------------------
@@ -445,7 +352,7 @@ class TextLine(InputTypeBase):
                }
         return context
 
-register_input_class(TextLine)
+registry.register(TextLine)
 
 #-----------------------------------------------------------------------------
 
@@ -485,7 +392,7 @@ class FileSubmission(InputTypeBase):
                    'required_files': self.required_files,}
         return context
 
-register_input_class(FileSubmission)
+registry.register(FileSubmission)
 
 
 #-----------------------------------------------------------------------------
@@ -542,7 +449,7 @@ class CodeInput(InputTypeBase):
                }
         return context
 
-register_input_class(CodeInput)
+registry.register(CodeInput)
 
 
 #-----------------------------------------------------------------------------
@@ -576,74 +483,7 @@ class Schematic(InputTypeBase):
                    'submit_analyses': self.submit_analyses,               }
         return context
 
-register_input_class(Schematic)
-
-#-----------------------------------------------------------------------------
-### TODO: Move out of inputtypes
-def math(element, value, status, render_template, msg=''):
-    '''
-    This is not really an input type.  It is a convention from Lon-CAPA, used for
-    displaying a math equation.
-
-    Examples:
-
-    <m display="jsmath">$\displaystyle U(r)=4 U_0 </m>
-    <m>$r_0$</m>
-
-    We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
-
-    TODO: use shorter tags (but this will require converting problem XML files!)
-    '''
-    mathstr = re.sub('\$(.*)\$', '[mathjaxinline]\\1[/mathjaxinline]', element.text)
-    mtag = 'mathjax'
-    if not '\\displaystyle' in mathstr:
-        mtag += 'inline'
-    else:
-        mathstr = mathstr.replace('\\displaystyle', '')
-    mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
-
-
-    # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
-    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr, saxutils.escape(element.tail))
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        if False:  # TODO needs to be self.system.DEBUG - but can't access system
-            msg = '<html><div class="inline-error"><p>Error %s</p>' % str(err).replace('<', '&lt;')
-            msg += ('<p>Failed to construct math expression from <pre>%s</pre></p>' %
-                    html.replace('<', '&lt;'))
-            msg += "</div></html>"
-            log.error(msg)
-            return etree.XML(msg)
-        else:
-            raise
-    # xhtml.tail = element.tail     # don't forget to include the tail!
-    return xhtml
-
-_reg(math)
-
-#-----------------------------------------------------------------------------
-
-
-def solution(element, value, status, render_template, msg=''):
-    '''
-    This is not really an input type.  It is just a <span>...</span> which is given an ID,
-    that is used for displaying an extended answer (a problem "solution") after "show answers"
-    is pressed.  Note that the solution content is NOT sent with the HTML. It is obtained
-    by an ajax call.
-    '''
-    eid = element.get('id')
-    size = element.get('size')
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'size': size,
-               'msg': msg,
-               }
-    html = render_template("solutionspan.html", context)
-    return etree.XML(html)
-
-_reg(solution)
+registry.register(Schematic)
 
 #-----------------------------------------------------------------------------
 
@@ -690,7 +530,7 @@ class ImageInput(InputTypeBase):
                }
         return context
 
-register_input_class(ImageInput)
+registry.register(ImageInput)
 
 #-----------------------------------------------------------------------------
 
@@ -730,7 +570,7 @@ class Crystallography(InputTypeBase):
                }
         return context
 
-register_input_class(Crystallography)
+registry.register(Crystallography)
 
 # -------------------------------------------------------------------------
 
@@ -799,4 +639,4 @@ class ChemicalEquationInput(InputTypeBase):
             }
         return context
 
-register_input_class(ChemicalEquationInput)
+registry.register(ChemicalEquationInput)
