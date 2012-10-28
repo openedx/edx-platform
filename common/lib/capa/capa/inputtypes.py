@@ -25,6 +25,13 @@ graded status as'status'
 # problem ID for the input element, but it will turn into a dict containing both the
 # answer and any associated message for the problem ID for the input element.
 
+# TODO: there is a lot of repetitive "grab these elements from xml attributes, with these defaults,
+# put them in the context" code.  Refactor so class just specifies required and optional attrs (with
+# defaults for latter), and InputTypeBase does the right thing.
+
+# TODO: Quoting and unquoting is handled in a pretty ad-hoc way.  Also something that could be done
+# properly once in InputTypeBase.
+
 import logging
 import re
 import shlex  # for splitting quoted strings
