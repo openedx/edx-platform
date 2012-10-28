@@ -493,7 +493,7 @@ def filesubmission(element, value, status, render_template, msg=''):
     if status == 'incomplete':
         status = 'queued'
         queue_len = msg
-        msg = 'Submitted to grader.'
+        msg = "Your file(s) have been submitted; as soon as your submission is graded, this message will be replaced with the grader's feedback."
 
     context = { 'id': eid,
                 'state': status,
