@@ -53,12 +53,22 @@ class ImageResponseTest(unittest.TestCase):
         imageresponse_file = os.path.dirname(__file__) + "/test_files/imageresponse.xml"
         test_lcp = lcp.LoncapaProblem(open(imageresponse_file).read(), '1', system=test_system)
         correct_answers = {'1_2_1': '(490,11)-(556,98)',
-                           '1_2_2': '(242,202)-(296,276)'}
+                           '1_2_2': '(242,202)-(296,276)',
+                           '1_2_3': '(490,11)-(556,98);(242,202)-(296,276)',
+                           '1_2_4': '(490,11)-(556,98);(242,202)-(296,276)',
+                           '1_2_5': '(490,11)-(556,98);(242,202)-(296,276)',
+                          }
         test_answers = {'1_2_1': '[500,20]',
                         '1_2_2': '[250,300]',
+                        '1_2_3': '[500,20]',
+                        '1_2_4': '[250,250]',
+                        '1_2_5': '[10,10]',
                         }
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_3'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_4'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_5'), 'incorrect')
 
 
 class SymbolicResponseTest(unittest.TestCase):
