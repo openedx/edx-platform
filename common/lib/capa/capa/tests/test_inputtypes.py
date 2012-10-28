@@ -400,6 +400,7 @@ class ImageInputTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
     def test_with_value(self):
+        # Check that compensating for the dot size works properly.
         self.check('[50,40]', 35, 25)
 
     def test_without_value(self):

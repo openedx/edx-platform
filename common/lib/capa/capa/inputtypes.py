@@ -510,7 +510,8 @@ class ImageInput(InputTypeBase):
         # if value is of the form [x,y] then parse it and send along coordinates of previous answer
         m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
         if m:
-            # TODO (vshnayder): why is there a "-15" here??
+            # Note: we subtract 15 to compensate for the size of the dot on the screen.
+            # (which supposedly has size 30).
             (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
         else:
             (self.gx, self.gy) = (0, 0)
