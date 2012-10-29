@@ -1,12 +1,6 @@
 <% doinline = "inline" if inline else "" %>
 
-<%
-# TODO: 
-# Is id inputtype_${id} vs textinput_${id} important?
-# Is class capa_inputtype vs textinput important?
-# should really just use one.
-%>
-<section id="${'inputtype' if do_math else 'textinput'}_${id}" class="${'text-input-dynamath capa_inputtype' if do_math else 'textinput'} ${doinline}" >
+<section id="inputtype_${id}" class="${'text-input-dynamath' if do_math else ''} capa_inputtype ${doinline}" >
 
     % if preprocessor is not None:
     <div class="text-input-dynamath_data" data-preprocessor="${preprocessor['class_name']}"/>
