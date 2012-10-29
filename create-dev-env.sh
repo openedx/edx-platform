@@ -190,7 +190,7 @@ case `uname -s` in
         }
         distro=`lsb_release -cs`
         case $distro in
-            maya|lisa|natty|oneiric|precise)
+            maya|lisa|natty|oneiric|precise|quantal)
                 output "Installing ubuntu requirements"
                 sudo apt-get -y update
                 sudo apt-get -y install $APT_PKGS
