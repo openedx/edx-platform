@@ -327,7 +327,7 @@ class TextLine(InputTypeBase):
 
     """
 
-    template = "textinput.html"
+    template = "textline.html"
     tags = ['textline']
 
     def setup(self):
