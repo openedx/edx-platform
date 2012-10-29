@@ -32,13 +32,14 @@ graded status as'status'
 # TODO: Quoting and unquoting is handled in a pretty ad-hoc way.  Also something that could be done
 # properly once in InputTypeBase.
 
+import json
 import logging
+from lxml import etree
 import re
 import shlex  # for splitting quoted strings
-import json
-
-from lxml import etree
+import sys
 import xml.sax.saxutils as saxutils
+
 from registry import TagRegistry
 
 log = logging.getLogger('mitx.' + __name__)
@@ -99,6 +100,26 @@ class InputTypeBase(object):
 
         self.status = state.get('status', 'unanswered')
 
+        # Call subclass "constructor" -- means they don't have to worry about calling
+        # super().__init__, and are isolated from changes to the input constructor interface.
+        try:
+            self.setup()
+        except Exception as err:
+            # Something went wrong: add xml to message, but keep the traceback
+            msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
+            raise Exception, msg, sys.exc_info()[2]
+
+
+    def setup(self):
+        """
+        InputTypes should override this to do any needed initialization.  It is called after the
+        constructor, so all base attributes will be set.
+
+        If this method raises an exception, it will be wrapped with a message that includes the
+        problem xml.
+        """
+        pass
+
     def _get_render_context(self):
         """
         Abstract method.  Subclasses should implement to return the dictionary
@@ -135,15 +156,11 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
-    def __init__(self, system, xml, state):
-        super(OptionInput, self).__init__(system, xml, state)
-
+    def setup(self):
         # Extract the options...
         options = self.xml.get('options')
         if not options:
-            raise Exception(
-                "[courseware.capa.inputtypes.optioninput] Missing options specification in "
-                + etree.tostring(self.xml))
+            raise ValueError("optioninput: Missing 'options' specification.")
 
         # parse the set of possible options
         oset = shlex.shlex(options[1:-1])
@@ -199,9 +216,7 @@ class ChoiceGroup(InputTypeBase):
     template = "choicegroup.html"
     tags = ['choicegroup', 'radiogroup', 'checkboxgroup']
 
-    def __init__(self, system, xml, state):
-        super(ChoiceGroup, self).__init__(system, xml, state)
-
+    def setup(self):
         # suffix is '' or [] to change the way the input is handled in --as a scalar or vector
         # value.  (VS: would be nice to make to this less hackish).
         if self.tag == 'choicegroup':
@@ -242,9 +257,9 @@ def extract_choices(element):
 
     for choice in element:
         if choice.tag != 'choice':
-            raise Exception("[courseware.capa.inputtypes.extract_choices] \
-                             Expected a <choice> tag; got %s instead"
-                             % choice.tag)
+            raise Exception(
+                "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
+                % choice.tag)
         choice_text = ''.join([etree.tostring(x) for x in choice])
         if choice.text is not None:
             # TODO: fix order?
@@ -270,8 +285,7 @@ class JavascriptInput(InputTypeBase):
     template = "javascriptinput.html"
     tags = ['javascriptinput']
 
-    def __init__(self, system, xml, state):
-        super(JavascriptInput, self).__init__(system, xml, state)
+    def setup(self):
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
         if self.value == "":
@@ -311,8 +325,7 @@ class TextLine(InputTypeBase):
     template = "textinput.html"
     tags = ['textline']
 
-    def __init__(self, system, xml, state):
-        super(TextLine, self).__init__(system, xml, state)
+    def setup(self):
         self.size = self.xml.get('size')
 
         # if specified, then textline is hidden and input id is stored
@@ -366,12 +379,11 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
-    def __init__(self, system, xml, state):
-        super(FileSubmission, self).__init__(system, xml, state)
+    def setup(self):
         escapedict = {'"': '&quot;'}
-        self.allowed_files  = json.dumps(xml.get('allowed_files', '').split())
+        self.allowed_files  = json.dumps(self.xml.get('allowed_files', '').split())
         self.allowed_files  = saxutils.escape(self.allowed_files, escapedict)
-        self.required_files = json.dumps(xml.get('required_files', '').split())
+        self.required_files = json.dumps(self.xml.get('required_files', '').split())
         self.required_files = saxutils.escape(self.required_files, escapedict)
 
         # Check if problem has been queued
@@ -410,17 +422,16 @@ class CodeInput(InputTypeBase):
             'textbox',        # Old name for this.  Still supported, but deprecated.
             ]
 
-    def __init__(self, system, xml, state):
-        super(CodeInput, self).__init__(system, xml, state)
 
-        self.rows = xml.get('rows') or '30'
-        self.cols = xml.get('cols') or '80'
+    def setup(self):
+        self.rows = self.xml.get('rows') or '30'
+        self.cols = self.xml.get('cols') or '80'
         # if specified, then textline is hidden and id is stored in div of name given by hidden
-        self.hidden = xml.get('hidden', '')
+        self.hidden = self.xml.get('hidden', '')
 
         # if no student input yet, then use the default input given by the problem
         if not self.value:
-            self.value = xml.text
+            self.value = self.xml.text
 
         # Check if problem has been queued
         self.queue_len = 0
@@ -431,9 +442,9 @@ class CodeInput(InputTypeBase):
             self.msg = 'Submitted to grader.'
 
         # For CodeMirror
-        self.mode = xml.get('mode', 'python')
-        self.linenumbers = xml.get('linenumbers', 'true')
-        self.tabsize = int(xml.get('tabsize', '4'))
+        self.mode = self.xml.get('mode', 'python')
+        self.linenumbers = self.xml.get('linenumbers', 'true')
+        self.tabsize = int(self.xml.get('tabsize', '4'))
 
     def _get_render_context(self):
 
@@ -462,14 +473,13 @@ class Schematic(InputTypeBase):
     template = "schematicinput.html"
     tags = ['schematic']
 
-    def __init__(self, system, xml, state):
-        super(Schematic, self).__init__(system, xml, state)
-        self.height = xml.get('height')
-        self.width = xml.get('width')
-        self.parts = xml.get('parts')
-        self.analyses = xml.get('analyses')
-        self.initial_value = xml.get('initial_value')
-        self.submit_analyses = xml.get('submit_analyses')
+    def setup(self):
+        self.height = self.xml.get('height')
+        self.width = self.xml.get('width')
+        self.parts = self.xml.get('parts')
+        self.analyses = self.xml.get('analyses')
+        self.initial_value = self.xml.get('initial_value')
+        self.submit_analyses = self.xml.get('submit_analyses')
 
 
     def _get_render_context(self):
@@ -482,7 +492,7 @@ class Schematic(InputTypeBase):
                    'height': self.height,
                    'parts': self.parts,
                    'analyses': self.analyses,
-                   'submit_analyses': self.submit_analyses,               }
+                   'submit_analyses': self.submit_analyses,}
         return context
 
 registry.register(Schematic)
@@ -503,11 +513,10 @@ class ImageInput(InputTypeBase):
     template = "imageinput.html"
     tags = ['imageinput']
 
-    def __init__(self, system, xml, state):
-        super(ImageInput, self).__init__(system, xml, state)
-        self.src = xml.get('src')
-        self.height = xml.get('height')
-        self.width = xml.get('width')
+    def setup(self):
+        self.src = self.xml.get('src')
+        self.height = self.xml.get('height')
+        self.width = self.xml.get('width')
 
         # if value is of the form [x,y] then parse it and send along coordinates of previous answer
         m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
@@ -547,15 +556,14 @@ class Crystallography(InputTypeBase):
     template = "crystallography.html"
     tags = ['crystallography']
 
-    def __init__(self, system, xml, state):
-        super(Crystallography, self).__init__(system, xml, state)
 
-        self.height = xml.get('height')
-        self.width = xml.get('width')
-        self.size = xml.get('size')
+    def setup(self):
+        self.height = self.xml.get('height')
+        self.width = self.xml.get('width')
+        self.size = self.xml.get('size')
 
         # if specified, then textline is hidden and id is stored in div of name given by hidden
-        self.hidden = xml.get('hidden', '')
+        self.hidden = self.xml.get('hidden', '')
 
         # Escape answers with quotes, so they don't crash the system!
         escapedict = {'"': '&quot;'}
@@ -586,18 +594,16 @@ class VseprInput(InputTypeBase):
     template = 'vsepr_input.html'
     tags = ['vsepr_input']
 
-    def __init__(self, system, xml, state):
-        super(VseprInput, self).__init__(system, xml, state)
-
-        self.height = xml.get('height')
-        self.width = xml.get('width')
+    def setup(self):
+        self.height = self.xml.get('height')
+        self.width = self.xml.get('width')
 
         # Escape answers with quotes, so they don't crash the system!
         escapedict = {'"': '&quot;'}
         self.value = saxutils.escape(self.value, escapedict)
 
-        self.molecules = xml.get('molecules')
-        self.geometries = xml.get('geometries')
+        self.molecules = self.xml.get('molecules')
+        self.geometries = self.xml.get('geometries')
 
     def _get_render_context(self):
 
@@ -631,13 +637,15 @@ class ChemicalEquationInput(InputTypeBase):
     template = "chemicalequationinput.html"
     tags = ['chemicalequationinput']
 
+    def setup(self):
+        self.size = self.xml.get('size', '20')
+
     def _get_render_context(self):
-        size = self.xml.get('size', '20')
         context = {
             'id': self.id,
             'value': self.value,
             'status': self.status,
-            'size': size,
+            'size': self.size,
             'previewer': '/static/js/capa/chemical_equation_preview.js',
             }
         return context
