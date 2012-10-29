@@ -202,16 +202,11 @@ class ChoiceGroup(InputTypeBase):
     def __init__(self, system, xml, state):
         super(ChoiceGroup, self).__init__(system, xml, state)
 
+        # suffix is '' or [] to change the way the input is handled in --as a scalar or vector
+        # value.  (VS: would be nice to make to this less hackish).
         if self.tag == 'choicegroup':
             self.suffix = ''
-            if self.xml.get('type') == "MultipleChoice":
-                self.element_type = "radio"
-            elif self.xml.get('type') == "TrueFalse":
-                # Huh?  Why TrueFalse->checkbox?  Each input can be true / false separately?
-                self.element_type = "checkbox"
-            else:
-                self.element_type = "radio"
-
+            self.element_type = "radio"
         elif self.tag == 'radiogroup':
             self.element_type = "radio"
             self.suffix = '[]'
