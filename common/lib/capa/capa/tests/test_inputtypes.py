@@ -39,7 +39,7 @@ class OptionInputTest(unittest.TestCase):
 
         expected = {'value': 'Down',
                     'options': [('Up', 'Up'), ('Down', 'Down')],
-                    'state': 'answered',
+                    'status': 'answered',
                     'msg': '',
                     'inline': '',
                     'id': 'sky_input'}
@@ -72,7 +72,7 @@ class ChoiceGroupTest(unittest.TestCase):
 
         expected = {'id': 'sky_input',
                     'value': 'foil3',
-                    'state': 'answered',
+                    'status': 'answered',
                     'input_type': expected_input_type,
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
@@ -147,7 +147,7 @@ class TextLineTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': 'BumbleBee',
-                    'state': 'unanswered',
+                    'status': 'unanswered',
                     'size': size,
                     'msg': '',
                     'hidden': False,
@@ -175,7 +175,7 @@ class TextLineTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': 'BumbleBee',
-                    'state': 'unanswered',
+                    'status': 'unanswered',
                     'size': size,
                     'msg': '',
                     'hidden': False,
@@ -215,7 +215,7 @@ class FileSubmissionTest(unittest.TestCase):
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
-                   'state': 'queued',
+                   'status': 'queued',
                    'msg': 'Submitted to grader.',
                    'value': 'BumbleBee.py',
                    'queue_len': '3',
@@ -260,7 +260,7 @@ class CodeInputTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
-                   'state': 'queued',
+                   'status': 'queued',
                    'msg': 'Submitted to grader.',
                    'mode': mode,
                    'linenumbers': linenumbers,
@@ -311,7 +311,7 @@ class SchematicTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'initial_value': initial_value,
-                    'state': 'unsubmitted',
+                    'status': 'unsubmitted',
                     'width': width,
                     'height': height,
                     'parts': parts,
@@ -349,13 +349,12 @@ class ImageInputTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': value,
-                    'state': 'unsubmitted',
+                    'status': 'unsubmitted',
                     'width': width,
                     'height': height,
                     'src': src,
                     'gx': egx,
                     'gy': egy,
-                    'state': 'unsubmitted',
                     'msg': ''}
 
         self.assertEqual(context, expected)
@@ -404,7 +403,7 @@ class CrystallographyTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': value,
-                    'state': 'unsubmitted',
+                    'status': 'unsubmitted',
                     'size': size,
                     'msg': '',
                     'hidden': '',
