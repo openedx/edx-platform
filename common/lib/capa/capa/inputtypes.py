@@ -280,6 +280,11 @@ class JavascriptInput(InputTypeBase):
     """
     Hidden field for javascript to communicate via; also loads the required
     scripts for rendering the problem and passes data to the problem.
+
+    TODO (arjun?): document this in detail.  Initial notes:
+    - display_class is a subclass of XProblemClassDisplay (see
+        xmodule/xmodule/js/src/capa/display.coffee),
+    - display_file is the js script to be in /static/js/ where display_class is defined.
     """
 
     template = "javascriptinput.html"
