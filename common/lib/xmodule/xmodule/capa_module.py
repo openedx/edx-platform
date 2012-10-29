@@ -120,6 +120,8 @@ class CapaModule(XModule):
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
+        self.force_save_button = self.metadata.get('force_save_button', False)
+
         if self.show_answer == "":
             self.show_answer = "closed"
 
@@ -322,7 +324,7 @@ class CapaModule(XModule):
 
         # We don't need a "save" button if infinite number of attempts and
         # non-randomized
-        if self.max_attempts is None and self.rerandomize != "always":
+        if not self.force_save_button and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
