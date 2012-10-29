@@ -28,6 +28,12 @@ graded status as'status'
 # TODO: Quoting and unquoting is handled in a pretty ad-hoc way.  Also something that could be done
 # properly once in InputTypeBase.
 
+# Possible todo: make inline the default for textlines and other "one-line" inputs.  It probably
+# makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
+# general css and layout strategy for capa, document it, then implement it.
+
+
+
 import json
 import logging
 from lxml import etree
@@ -214,7 +220,7 @@ class ChoiceGroup(InputTypeBase):
 
     def setup(self):
         # suffix is '' or [] to change the way the input is handled in --as a scalar or vector
-        # value.  (VS: would be nice to make to this less hackish).
+        # value.  (VS: would be nice to make this less hackish).
         if self.tag == 'choicegroup':
             self.suffix = ''
             self.element_type = "radio"
@@ -333,8 +339,6 @@ class TextLine(InputTypeBase):
         # in div with name=self.hidden.
         self.hidden = self.xml.get('hidden', False)
 
-        # TODO (vshnayder): can we get rid of inline?  Was it one of
-        # the styling hacks early this semester?
         self.inline = self.xml.get('inline', False)
 
         # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
@@ -383,7 +387,7 @@ class FileSubmission(InputTypeBase):
     # pulled out for testing
     submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
                      " graded, this message will be replaced with the grader's feedback.")
-    
+
     def setup(self):
         escapedict = {'"': '&quot;'}
         self.allowed_files  = json.dumps(self.xml.get('allowed_files', '').split())
@@ -423,7 +427,8 @@ class CodeInput(InputTypeBase):
 
     template = "codeinput.html"
     tags = ['codeinput',
-            'textbox',        # Old name for this.  Still supported, but deprecated.
+            'textbox',        # Another (older) name--at some point we may want to make it use a
+                              # non-codemirror editor.
             ]
 
 
@@ -526,7 +531,7 @@ class ImageInput(InputTypeBase):
         m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.
-            # (which supposedly has size 30).
+            # (is a 30x30 image--lms/static/green-pointer.png).
             (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
         else:
             (self.gx, self.gy) = (0, 0)
@@ -541,8 +546,8 @@ class ImageInput(InputTypeBase):
                    'src': self.src,
                    'gx': self.gx,
                    'gy': self.gy,
-                   'status': self.status,    # to change (VS: to what??)
-                   'msg': self.msg,         # to change
+                   'status': self.status,
+                   'msg': self.msg,
                }
         return context
 
