@@ -21,7 +21,11 @@ log = logging.getLogger("mitx.courseware")
 
 
 class HtmlModule(XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/html/display.coffee')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/html/display.coffee')
+                    ]
+         }
     js_module_name = "HTMLModule"
     
     def get_html(self):

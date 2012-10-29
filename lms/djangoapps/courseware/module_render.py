@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import pyparsing
 import sys
 
 from django.conf import settings
@@ -13,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
+from capa.chem import chemcalc
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
@@ -25,6 +27,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+
+from statsd import statsd
 
 log = logging.getLogger("mitx.courseware")
 
@@ -380,6 +384,15 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
         instance_module.save()
 
+        #Bin score into range and increment stats
+        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
+        org, course_num, run=course_id.split("/")        
+        statsd.increment("lms.courseware.question_answered",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run), 
+                              "score_bucket:{0}".format(score_bucket), 
+                              "type:xqueue"])
     return HttpResponse("")
 
 
@@ -464,6 +477,17 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
 
+            #Bin score into range and increment stats
+            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
+            org, course_num, run=course_id.split("/")        
+            statsd.increment("lms.courseware.question_answered",
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run), 
+                                  "score_bucket:{0}".format(score_bucket), 
+                                  "type:ajax"])
+
+
     if shared_module is not None:
         shared_module.state = instance.get_shared_state()
         if shared_module.state != old_shared_state:
@@ -471,3 +495,55 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
+
+def preview_chemcalc(request):
+    """
+    Render an html preview of a chemical formula or equation.  The fact that
+    this is here is a bit of hack.  See the note in lms/urls.py about why it's
+    here. (Victor is to blame.)
+
+    request should be a GET, with a key 'formula' and value 'some formula string'.
+
+    Returns a json dictionary:
+    {
+       'preview' : 'the-preview-html' or ''
+       'error' : 'the-error' or ''
+    }
+    """
+    if request.method != "GET":
+        raise Http404
+
+    result = {'preview': '',
+              'error': '' }
+    formula = request.GET.get('formula')
+    if formula is None:
+        result['error'] = "No formula specified."
+
+        return HttpResponse(json.dumps(result))
+
+    try:
+        result['preview'] = chemcalc.render_to_html(formula)
+    except pyparsing.ParseException as p:
+        result['error'] = "Couldn't parse formula: {0}".format(p)
+    except Exception:
+        # this is unexpected, so log
+        log.warning("Error while previewing chemical formula", exc_info=True)
+        result['error'] = "Error while rendering preview"
+
+    return HttpResponse(json.dumps(result))
+
+
+def get_score_bucket(grade,max_grade):
+    """
+    Function to split arbitrary score ranges into 3 buckets.
+    Used with statsd tracking.
+    """
+    score_bucket="incorrect"
+    if(grade>0 and grade<max_grade):
+        score_bucket="partial"
+    elif(grade==max_grade):
+        score_bucket="correct"
+
+    return score_bucket
+
+

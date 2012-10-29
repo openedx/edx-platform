@@ -48,7 +48,7 @@ general_whitespace = re.compile('[^\w]+')
 
 
 def check_variables(string, variables):
-    '''  Confirm the only variables in string are defined.
+    '''Confirm the only variables in string are defined.
 
     Pyparsing uses a left-to-right parser, which makes the more
     elegant approach pretty hopeless.
@@ -56,7 +56,8 @@ def check_variables(string, variables):
     achar = reduce(lambda a,b:a|b ,map(Literal,alphas)) # Any alphabetic character
     undefined_variable = achar + Word(alphanums)
     undefined_variable.setParseAction(lambda x:UndefinedVariable("".join(x)).raiseself())
-    varnames = varnames | undefined_variable'''
+    varnames = varnames | undefined_variable
+    '''
     possible_variables = re.split(general_whitespace, string)  # List of all alnums in string
     bad_variables = list()
     for v in possible_variables:
@@ -71,7 +72,8 @@ def check_variables(string, variables):
 
 
 def evaluator(variables, functions, string, cs=False):
-    ''' Evaluate an expression. Variables are passed as a dictionary
+    '''
+    Evaluate an expression. Variables are passed as a dictionary
     from string to value. Unary functions are passed as a dictionary
     from string to function. Variables must be floats.
     cs: Case sensitive
@@ -108,6 +110,7 @@ def evaluator(variables, functions, string, cs=False):
 
     if string.strip() == "":
         return float('nan')
+
     ops = {"^": operator.pow,
             "*": operator.mul,
             "/": operator.truediv,
@@ -169,14 +172,19 @@ def evaluator(variables, functions, string, cs=False):
     def func_parse_action(x):
         return [all_functions[x[0]](x[1])]
 
-    number_suffix = reduce(lambda a, b: a | b, map(Literal, suffixes.keys()), NoMatch())  # SI suffixes and percent
+    # SI suffixes and percent
+    number_suffix = reduce(lambda a, b: a | b, map(Literal, suffixes.keys()), NoMatch())
     (dot, minus, plus, times, div, lpar, rpar, exp) = map(Literal, ".-+*/()^")
 
     number_part = Word(nums)
-    inner_number = (number_part + Optional("." + number_part)) | ("." + number_part)  # 0.33 or 7 or .34
-    number = Optional(minus | plus) + inner_number + \
-        Optional(CaselessLiteral("E") + Optional("-") + number_part) + \
-        Optional(number_suffix)  # 0.33k or -17
+
+    # 0.33 or 7 or .34
+    inner_number = (number_part + Optional("." + number_part)) | ("." + number_part)
+
+    # 0.33k or -17
+    number = (Optional(minus | plus) + inner_number
+              + Optional(CaselessLiteral("E") + Optional("-") + number_part)
+              + Optional(number_suffix))
     number = number.setParseAction(number_parse_action)  # Convert to number
 
     # Predefine recursive variables
@@ -201,9 +209,11 @@ def evaluator(variables, functions, string, cs=False):
         varnames.setParseAction(lambda x: map(lambda y: all_variables[y], x))
     else:
         varnames = NoMatch()
+
     # Same thing for functions.
     if len(all_functions) > 0:
-        funcnames = sreduce(lambda x, y: x | y, map(lambda x: CasedLiteral(x), all_functions.keys()))
+        funcnames = sreduce(lambda x, y: x | y,
+                            map(lambda x: CasedLiteral(x), all_functions.keys()))
         function = funcnames + lpar.suppress() + expr + rpar.suppress()
         function.setParseAction(func_parse_action)
     else:

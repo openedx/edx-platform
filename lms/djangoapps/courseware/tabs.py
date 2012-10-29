@@ -15,6 +15,8 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from fs.errors import ResourceNotFoundError
+
 from courseware.access import has_access
 from static_replace import replace_urls
 
@@ -266,7 +268,8 @@ def get_static_tab_contents(course, tab):
             try:
                 with fs.open(p) as tabfile:
                     # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
-                    contents = replace_urls(tabfile.read(), course.metadata['data_dir'])
+                    text = tabfile.read().decode('utf-8')
+                    contents = replace_urls(text, course.metadata['data_dir'])
                     return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
             except (ResourceNotFoundError) as err:
                 log.exception("Couldn't load tab contents from '{0}': {1}".format(p, err))

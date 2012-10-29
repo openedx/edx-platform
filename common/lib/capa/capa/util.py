@@ -11,7 +11,7 @@ def compare_with_tolerance(v1, v2, tol):
 
      - v1    :  student result (number)
      - v2    :  instructor result (number)
-     - tol   :  tolerance (string or number)
+     - tol   :  tolerance (string representing a number)
 
     '''
     relative = tol.endswith('%')
@@ -26,9 +26,20 @@ def compare_with_tolerance(v1, v2, tol):
 def contextualize_text(text, context):  # private
     ''' Takes a string with variables. E.g. $a+$b.
     Does a substitution of those variables from the context '''
-    if not text: return text
+    if not text:
+        return text
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
-        text = text.replace('$' + key, str(context[key]))
+        # TODO (vshnayder): This whole replacement thing is a big hack
+        # right now--context contains not just the vars defined in the
+        # program, but also e.g. a reference to the numpy module.
+        # Should be a separate dict of variables that should be
+        # replaced.
+        if '$' + key in text:
+            try:
+                s = str(context[key])
+            except UnicodeEncodeError:
+                s = context[key].encode('utf8', errors='ignore')
+            text = text.replace('$' + key, s)
     return text
 
 
@@ -53,8 +64,4 @@ def is_file(file_to_test):
     '''
     Duck typing to check if 'file_to_test' is a File object
     '''
-    is_file = True
-    for method in ['read', 'name']:
-        if not hasattr(file_to_test, method):
-            is_file = False
-    return is_file 
+    return all(hasattr(file_to_test, method) for method in ['read', 'name'])

@@ -76,9 +76,13 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                    ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
+
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
@@ -116,6 +120,8 @@ class CapaModule(XModule):
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
+        self.force_save_button = self.metadata.get('force_save_button', 'false')
+
         if self.show_answer == "":
             self.show_answer = "closed"
 
@@ -129,6 +135,11 @@ class CapaModule(XModule):
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
+            # TODO: This line is badly broken:
+            # (1) We're passing student ID to xmodule.
+            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+            #     - analytics really needs small number of bins.
             self.seed = system.id
         else:
             self.seed = None
@@ -311,9 +322,10 @@ class CapaModule(XModule):
         if not self.lcp.done:
             reset_button = False
 
-        # We don't need a "save" button if infinite number of attempts and
-        # non-randomized
-        if self.max_attempts is None and self.rerandomize != "always":
+        # We may not need a "save" button if infinite number of attempts and
+        # non-randomized. The problem author can force it. It's a bit weird for
+        # randomization to control this; should perhaps be cleaned up.
+        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
@@ -615,12 +627,14 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Problem is closed"
+            return {'success': False,
+                    'error': "Problem is closed"}
 
         if not self.lcp.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Refresh the page and make an attempt before resetting."
+            return {'success': False,
+                    'error': "Refresh the page and make an attempt before resetting."}
 
         self.lcp.do_reset()
         if self.rerandomize in ["always", "onreset"]:

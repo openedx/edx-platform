@@ -11,8 +11,8 @@
 
 function image_input_click(id,event){
     iidiv = document.getElementById("imageinput_"+id);
-    pos_x = event.offsetX?(event.offsetX):event.pageX-document.iidiv.offsetLeft;
-    pos_y = event.offsetY?(event.offsetY):event.pageY-document.iidiv.offsetTop;
+    pos_x = event.offsetX?(event.offsetX):event.pageX-iidiv.offsetLeft;
+    pos_y = event.offsetY?(event.offsetY):event.pageY-iidiv.offsetTop;
     result = "[" + pos_x + "," + pos_y + "]";
     cx = (pos_x-15) +"px";
     cy = (pos_y-15)  +"px" ;
