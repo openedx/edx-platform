@@ -21,10 +21,6 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 graded status as'status'
 """
 
-# TODO: rename "state" to "status" for all below.  status is currently the answer for the
-# problem ID for the input element, but it will turn into a dict containing both the
-# answer and any associated message for the problem ID for the input element.
-
 # TODO: there is a lot of repetitive "grab these elements from xml attributes, with these defaults,
 # put them in the context" code.  Refactor so class just specifies required and optional attrs (with
 # defaults for latter), and InputTypeBase does the right thing.
@@ -177,7 +173,7 @@ class OptionInput(InputTypeBase):
         context = {
             'id': self.id,
             'value': self.value,
-            'state': self.status,
+            'status': self.status,
             'msg': self.msg,
             'options': self.osetdict,
             'inline': self.xml.get('inline',''),
@@ -236,7 +232,7 @@ class ChoiceGroup(InputTypeBase):
     def _get_render_context(self):
         context = {'id': self.id,
                    'value': self.value,
-                   'state': self.status,
+                   'status': self.status,
                    'input_type': self.element_type,
                    'choices': self.choices,
                    'name_array_suffix': self.suffix}
@@ -362,7 +358,7 @@ class TextLine(InputTypeBase):
 
         context = {'id': self.id,
                    'value': value,
-                   'state': self.status,
+                   'status': self.status,
                    'size': self.size,
                    'msg': self.msg,
                    'hidden': self.hidden,
@@ -403,7 +399,7 @@ class FileSubmission(InputTypeBase):
     def _get_render_context(self):
 
         context = {'id': self.id,
-                   'state': self.status,
+                   'status': self.status,
                    'msg': self.msg,
                    'value': self.value,
                    'queue_len': self.queue_len,
@@ -455,7 +451,7 @@ class CodeInput(InputTypeBase):
 
         context = {'id': self.id,
                    'value': self.value,
-                   'state': self.status,
+                   'status': self.status,
                    'msg': self.msg,
                    'mode': self.mode,
                    'linenumbers': self.linenumbers,
@@ -492,7 +488,7 @@ class Schematic(InputTypeBase):
         context = {'id': self.id,
                    'value': self.value,
                    'initial_value': self.initial_value,
-                   'state': self.status,
+                   'status': self.status,
                    'width': self.width,
                    'height': self.height,
                    'parts': self.parts,
@@ -542,7 +538,7 @@ class ImageInput(InputTypeBase):
                    'src': self.src,
                    'gx': self.gx,
                    'gy': self.gy,
-                   'state': self.status,    # to change (VS: to what??)
+                   'status': self.status,    # to change (VS: to what??)
                    'msg': self.msg,         # to change
                }
         return context
@@ -577,7 +573,7 @@ class Crystallography(InputTypeBase):
     def _get_render_context(self):
         context = {'id': self.id,
                    'value': self.value,
-                   'state': self.status,
+                   'status': self.status,
                    'size': self.size,
                    'msg': self.msg,
                    'hidden': self.hidden,
@@ -614,7 +610,7 @@ class VseprInput(InputTypeBase):
 
         context = {'id': self.id,
                    'value': self.value,
-                   'state': self.status,
+                   'status': self.status,
                    'msg': self.msg,
                    'width': self.width,
                    'height': self.height,

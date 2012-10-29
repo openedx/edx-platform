@@ -6,13 +6,13 @@
     <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
 
 
-    % if state == 'unsubmitted':
+    % if status == 'unsubmitted':
     <div class="unanswered" id="status_${id}">
-    % elif state == 'correct':
+    % elif status == 'correct':
     <div class="correct" id="status_${id}">
-    % elif state == 'incorrect':
+    % elif status == 'incorrect':
     <div class="incorrect" id="status_${id}">
-    % elif state == 'incomplete':
+    % elif status == 'incomplete':
     <div class="incorrect" id="status_${id}">
     % endif
     % if hidden:
@@ -29,13 +29,13 @@
    />
 
       <p class="status">
-        % if state == 'unsubmitted':
+        % if status == 'unsubmitted':
         unanswered
-        % elif state == 'correct':
+        % elif status == 'correct':
         correct
-        % elif state == 'incorrect':
+        % elif status == 'incorrect':
         incorrect
-        % elif state == 'incomplete':
+        % elif status == 'incomplete':
         incomplete
         % endif
       </p>
@@ -45,7 +45,7 @@
   % if msg:
       <span class="message">${msg|n}</span>
   % endif
-% if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
 </div>
 % endif
 </section>

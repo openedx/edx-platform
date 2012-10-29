@@ -1,16 +1,16 @@
 <section id="filesubmission_${id}" class="filesubmission">
   <div class="grader-status file">
-    % if state == 'unsubmitted':
+    % if status == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
-    % elif state == 'correct':
+    % elif status == 'correct':
     <span class="correct" id="status_${id}">Correct</span>
-    % elif state == 'incorrect':
+    % elif status == 'incorrect':
     <span class="incorrect" id="status_${id}">Incorrect</span>
-    % elif state == 'queued':
+    % elif status == 'queued':
     <span class="processing" id="status_${id}">Queued</span>
     <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
     % endif
-    <p class="debug">${state}</p>
+    <p class="debug">${status}</p>
 
     <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files}" data-allowed_files="${allowed_files}"/>
   </div>

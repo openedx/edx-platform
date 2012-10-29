@@ -7,13 +7,13 @@
     <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
     % endif
 
-    % if state == 'unsubmitted':
+    % if status == 'unsubmitted':
     <div class="unanswered ${doinline}" id="status_${id}">
-    % elif state == 'correct':
+    % elif status == 'correct':
     <div class="correct ${doinline}" id="status_${id}">
-    % elif state == 'incorrect':
+    % elif status == 'incorrect':
     <div class="incorrect ${doinline}" id="status_${id}">
-    % elif state == 'incomplete':
+    % elif status == 'incomplete':
     <div class="incorrect ${doinline}" id="status_${id}">
     % endif
     % if hidden:
@@ -33,13 +33,13 @@
    />
 
       <p class="status">
-        % if state == 'unsubmitted':
+        % if status == 'unsubmitted':
         unanswered
-        % elif state == 'correct':
+        % elif status == 'correct':
         correct
-        % elif state == 'incorrect':
+        % elif status == 'incorrect':
         incorrect
-        % elif state == 'incomplete':
+        % elif status == 'incomplete':
         incomplete
         % endif
       </p>
@@ -53,7 +53,7 @@
 
       % endif
 
-% if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
 </div>
 % endif
 
