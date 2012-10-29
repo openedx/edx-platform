@@ -120,6 +120,8 @@ class CapaModule(XModule):
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
+        self.force_save_button = self.metadata.get('force_save_button', 'false')
+
         if self.show_answer == "":
             self.show_answer = "closed"
 
@@ -320,9 +322,10 @@ class CapaModule(XModule):
         if not self.lcp.done:
             reset_button = False
 
-        # We don't need a "save" button if infinite number of attempts and
-        # non-randomized
-        if self.max_attempts is None and self.rerandomize != "always":
+        # We may not need a "save" button if infinite number of attempts and
+        # non-randomized. The problem author can force it. It's a bit weird for
+        # randomization to control this; should perhaps be cleaned up.
+        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
