@@ -217,6 +217,56 @@ def ssl_dn_extract_info(dn):
     return (user, email, fullname)
 
 
+def ssl_get_cert_from_request(request):
+    """
+    Extract user information from certificate, if it exists, returning (user, email, fullname).
+    Else return None.
+    """
+    certkey = "SSL_CLIENT_S_DN"  # specify the request.META field to use
+
+    cert = request.META.get(certkey, '')
+    if not cert:
+        cert = request.META.get('HTTP_' + certkey, '')
+    if not cert:
+        try:
+            # try the direct apache2 SSL key
+            cert = request._req.subprocess_env.get(certkey, '')
+        except Exception:
+            return ''
+
+    return cert
+
+    (user, email, fullname) = ssl_dn_extract_info(cert)
+    return (user, email, fullname)
+
+
+def ssl_login_shortcut(fn):
+    """
+    Python function decorator for login procedures, to allow direct login
+    based on existing ExternalAuth record and MIT ssl certificate.
+    """
+    def wrapped(*args, **kwargs):
+        if not settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES',''):
+            return fn(*args, **kwargs)
+        request = args[0]
+        cert = ssl_get_cert_from_request(request)
+        if not cert:            # no certificate information - show normal login window
+            return fn(*args, **kwargs)
+
+        (user, email, fullname) = ssl_dn_extract_info(cert)
+
+        def continue_login():
+            return fn(*args, **kwargs)
+
+        return external_login_or_signup(request,
+                                        external_id=email,
+                                        external_domain="ssl:MIT",
+                                        credentials=cert,
+                                        email=email,
+                                        fullname=fullname,
+                                        retfun=continue_login)
+    return wrapped
+
 @csrf_exempt
 def ssl_login(request):
     """

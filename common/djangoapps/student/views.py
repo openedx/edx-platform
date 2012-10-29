@@ -38,6 +38,7 @@ from datetime import date
 from collections import namedtuple
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
+from courseware.courses import get_course_with_access
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -145,6 +146,38 @@ def dashboard(request):
 
     return render_to_response('dashboard.html', context)
 
+
+def auto_enroll(fn):
+    """
+    Automatically enroll user in course (if has access)
+
+    This function may be used as a decorator.
+    """
+    def wrapped(*args, **kwargs):
+        if not settings.MITX_FEATURES.get('ENABLE_AUTO_COURSE_REGISTRATION',''):
+            return fn(*args, **kwargs)
+        if 'course_id' not in kwargs:
+            log.debug('[auto_enroll] no course_id - kwargs=%s' % kwargs)
+            return fn(*args, **kwargs)
+        request = args[0]
+        course_id = kwargs['course_id']
+        user = request.user
+        try:
+            course = get_course_with_access(request.user, course_id, 'load')
+        except ItemNotFoundError:
+            log.warning("User {0} tried to enroll in non-existant course {1}"
+                      .format(user.username, course_id))
+
+        registered = CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+        if registered:
+            return fn(*args, **kwargs)
+        if has_access(user, course, 'enroll'):
+            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+            log.debug('User %s enrolled in %s' % (user, course_id))
+        return fn(*args, **kwargs)
+        
+    return wrapped
+    #return fn
 
 def try_change_enrollment(request):
     """

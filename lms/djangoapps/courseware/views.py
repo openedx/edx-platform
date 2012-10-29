@@ -30,6 +30,8 @@ from multicourse import multicourse_settings
 
 from django_comment_client.utils import get_discussion_title
 
+from student.views import auto_enroll
+from external_auth.views import ssl_login_shortcut
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
@@ -158,6 +160,8 @@ def save_child_position(seq_module, child_name, instance_module):
                 instance_module.save()
 
 @login_required
+@auto_enroll
+@ssl_login_shortcut
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def index(request, course_id, chapter=None, section=None,
