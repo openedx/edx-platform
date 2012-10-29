@@ -210,13 +210,14 @@ class FileSubmissionTest(unittest.TestCase):
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
-        the_input = lookup_tag('filesubmission')(test_system, element, state)
+        input_class = lookup_tag('filesubmission')
+        the_input = input_class(test_system, element, state)
 
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                    'status': 'queued',
-                   'msg': 'Submitted to grader.',
+                   'msg': input_class.submitted_msg,
                    'value': 'BumbleBee.py',
                    'queue_len': '3',
                    'allowed_files': esc('["runme.py", "nooooo.rb", "ohai.java"]'),

@@ -380,6 +380,10 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
+    # pulled out for testing
+    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
+                     " graded, this message will be replaced with the grader's feedback.")
+    
     def setup(self):
         escapedict = {'"': '&quot;'}
         self.allowed_files  = json.dumps(self.xml.get('allowed_files', '').split())
@@ -393,8 +397,7 @@ class FileSubmission(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = 'Submitted to grader.'
-
+            self.msg = FileSubmission.submitted_msg
 
     def _get_render_context(self):
 
