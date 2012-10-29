@@ -414,6 +414,48 @@ class CrystallographyTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
 
+class VseprTest(unittest.TestCase):
+    '''
+    Check that vsepr inputs work
+    '''
+
+    def test_rendering(self):
+        height = '12'
+        width = '33'
+        molecules = "H2O, C2O"
+        geometries = "AX12,TK421"
+
+        xml_str = """<vsepr id="prob_1_2"
+        height="{h}"
+        width="{w}"
+        molecules="{m}"
+        geometries="{g}"
+        />""".format(h=height, w=width, m=molecules, g=geometries)
+
+        element = etree.fromstring(xml_str)
+
+        value = 'abc'
+        state = {'value': value,
+                 'status': 'unsubmitted'}
+
+        the_input = lookup_tag('vsepr_input')(test_system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'status': 'unsubmitted',
+                    'msg': '',
+                    'width': width,
+                    'height': height,
+                    'molecules': molecules,
+                    'geometries': geometries,
+                   }
+
+        self.assertEqual(context, expected)
+
+
+
 class ChemicalEquationTest(unittest.TestCase):
     '''
     Check that chemical equation inputs work.
