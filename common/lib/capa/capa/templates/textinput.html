@@ -48,6 +48,9 @@
 
       % if do_math:
       <div id="display_${id}" class="equation">`{::}`</div>
+      <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath">
+      </textarea>
+
       % endif
 
 % if state in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
