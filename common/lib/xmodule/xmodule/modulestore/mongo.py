@@ -50,7 +50,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 self.load_item, resources_fs, error_tracker, render_template)
         self.modulestore = modulestore
         self.module_data = module_data
-
         self.default_class = default_class
 
     def load_item(self, location):

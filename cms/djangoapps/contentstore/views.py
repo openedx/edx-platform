@@ -288,12 +288,9 @@ def edit_unit(request, location):
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
 
-    logging.debug('looking for parent of {0}'.format(location))
-
     containing_subsection_locs = modulestore().get_parent_locations(location)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
 
-    logging.debug('looking for parent of {0}'.format(containing_subsection.location))
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
