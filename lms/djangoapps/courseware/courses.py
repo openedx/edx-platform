@@ -157,8 +157,6 @@ def get_course_about_section(course, section_key):
             if course_module is not None:
                 html = course_module.get_html()
 
-            item = modulestore().get_instance(course.id, loc)
-
             return html
 
         except ItemNotFoundError:
