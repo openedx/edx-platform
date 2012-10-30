@@ -17,7 +17,6 @@ INSTALLED_APPS = [
     app
     for app
     in INSTALLED_APPS
-    if not app.startswith('askbot')
 ]
 
 # Nose Test Runner
@@ -52,8 +51,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
-    # functioning cache -- it relies on caching to load its settings in places.
+    # This is the cache used for most things. 
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -77,13 +75,3 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############################ FILE UPLOADS (ASKBOT) #############################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_ROOT = PROJECT_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
-STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
-FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
-FILE_UPLOAD_HANDLERS = (
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
