@@ -146,9 +146,6 @@ def get_course_about_section(course, section_key):
 
             request = get_request_for_thread()
 
-            student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                course.id, request.user, course, depth=2)
-
             loc = course.location._replace(category='about', name=section_key)
             course_module = get_module(request.user, request, loc, None, course.id)
 

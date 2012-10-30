@@ -59,7 +59,6 @@ def replace_static_urls(get_html, prefix, course_namespace=None):
 
     @wraps(get_html)
     def _get_html():
-        logging.debug('in replace_static_urls')
         return replace_urls(get_html(), staticfiles_prefix=prefix, course_namespace = course_namespace)
     return _get_html
 
