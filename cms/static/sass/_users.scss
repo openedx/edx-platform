@@ -32,6 +32,21 @@
     padding: 15px 20px;
     background: $mediumGrey;
 
+    #result {
+      display: none;
+      float: left;
+      margin-bottom: 15px;
+      padding: 3px 15px;
+      border-radius: 3px;
+      background: $error-red;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .form-elements {
+      clear: both;
+    }
+
     label {
       display: inline-block;
       margin-right: 10px;
