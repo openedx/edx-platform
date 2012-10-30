@@ -23,13 +23,14 @@ on the course overview page.
 
 class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User)
-    course_id = models.CharField(max_length=255)
-    certificate_id = models.CharField(max_length=32)
-    graded_certificate_id = models.CharField(max_length=32)
+    course_id = models.CharField(max_length=255, default=False)
+    certificate_id = models.CharField(max_length=32, default=False)
+    graded_certificate_id = models.CharField(max_length=32, default=False)
 
-    download_url = models.CharField(max_length=128)
-    graded_download_url = models.CharField(max_length=128)
-    grade = models.CharField(max_length=5)
+    download_url = models.CharField(max_length=128, default=False)
+    graded_download_url = models.CharField(max_length=128, default=False)
+    grade = models.CharField(max_length=5, default=False)
+    key = models.CharField(max_length=32, default=False)
 
     # enabled should only be true if the student has earned a passing grade
     # in the course.
