@@ -537,9 +537,6 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
-    # For testing
-    'django_jasmine',
-
     # Discussion
     'django_comment_client',
 

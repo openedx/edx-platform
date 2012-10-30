@@ -28,4 +28,8 @@ PIPELINE_JS['spec'] = {
     'output_filename': 'js/lms-spec.js'
 }
 
+JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+
 STATICFILES_DIRS.append(COMMON_ROOT / 'test' / 'phantom-jasmine' / 'lib')
+
+INSTALLED_APPS += ('django_jasmine', )

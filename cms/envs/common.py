@@ -68,9 +68,7 @@ MAKO_TEMPLATES['main'] = [
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
     MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
-TEMPLATE_DIRS = (
-    PROJECT_ROOT / "templates",
-)
+TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
 MITX_ROOT_URL = ''
 
@@ -87,10 +85,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 LMS_BASE = None
-
-################################# Jasmine ###################################
-JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
-
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
@@ -289,7 +283,4 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
-
-    # For testing
-    'django_jasmine',
 )
