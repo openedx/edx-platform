@@ -43,7 +43,14 @@ body.no-header {
 	}
 
 	.left {
-		width: 700px;
+		width: 750px;
+	}
+
+	.class-name {
+		max-width: 350px;
+		text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 	}
 
 	.drop-icon {
