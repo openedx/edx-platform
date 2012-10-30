@@ -1,65 +1,55 @@
-import traceback 
-from util.json_request import expect_json
-import exceptions
-import json
-import logging
-import mimetypes
-import os
-import StringIO
-import sys
-import time
-import tarfile
-import shutil
-import tempfile
-from datetime import datetime
-from collections import defaultdict
-from uuid import uuid4
-from lxml import etree
-from path import path
-from shutil import rmtree
-
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+from .utils import get_course_location_for_item, get_lms_link_for_item, \
+    compute_unit_state, get_date_display, UnitState
 from PIL import Image
-
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.core.context_processors import csrf
-from django_future.csrf import ensure_csrf_cookie
-from django.core.urlresolvers import reverse
+from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, \
+    create_all_course_groups, get_user_by_email, add_user_to_course_group, \
+    remove_user_from_course_group, is_user_in_course_group_role, \
+    get_users_in_course_group_by_role
+from cache_toolbox.core import del_cached_content
+from collections import defaultdict
+from datetime import datetime
 from django.conf import settings
-from django import forms
-from django.shortcuts import redirect
-
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import ModuleSystem
+from django.contrib.auth.decorators import login_required
+from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, \
+    HttpResponseForbidden
+from django_future.csrf import ensure_csrf_cookie
+from external_auth.views import ssl_login_shortcut
+from functools import partial
+from mitxmako.shortcuts import render_to_response, render_to_string
+from path import path
+from static_replace import replace_urls
+from util.json_request import expect_json
+from uuid import uuid4
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from static_replace import replace_urls
-from external_auth.views import ssl_login_shortcut
-
-from mitxmako.shortcuts import render_to_response, render_to_string
-from xmodule.modulestore.django import modulestore
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
-from xmodule.timeparse import parse_time, stringify_time
-from functools import partial
-from itertools import groupby
-from operator import attrgetter
-
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-
-from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
-from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
-from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
-from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState
-
-from xmodule.templates import all_templates
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml import edx_xml_parser
+from xmodule.timeparse import stringify_time
+from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_static_urls, wrap_xmodule
+import json
+import logging
+import os
+import shutil
+import sys
+import tarfile
+import time
+
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+
+
+
+
+
+
 
 log = logging.getLogger(__name__)
 
