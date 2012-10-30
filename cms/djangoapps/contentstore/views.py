@@ -287,9 +287,13 @@ def edit_unit(request, location):
     # TODO (cpennington): If we share units between courses,
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
+
+    logging.debug('looking for parent of {0}'.format(location))
+
     containing_subsection_locs = modulestore().get_parent_locations(location)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
 
+    logging.debug('looking for parent of {0}'.format(containing_subsection.location))
     containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
@@ -997,7 +1001,8 @@ def import_course(request, org, course, name):
 
         data_root = path(settings.GITHUB_REPO_ROOT)
 
-        course_dir = data_root / "{0}-{1}-{2}".format(org, course, name)
+        course_subdir = "{0}-{1}-{2}".format(org, course, name)
+        course_dir = data_root / course_subdir
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
@@ -1033,7 +1038,7 @@ def import_course(request, org, course, name):
                 shutil.move(r/fname, course_dir)
 
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_dir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

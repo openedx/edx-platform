@@ -247,6 +247,7 @@ class PageLoader(ActivateLoginTestCase):
         all_ok = True
         for descriptor in modstore.get_items(
                 Location(None, None, None, None, None)):
+
             n += 1
             print "Checking ", descriptor.location.url()
             #print descriptor.__class__, descriptor.location
@@ -256,9 +257,13 @@ class PageLoader(ActivateLoginTestCase):
             msg = str(resp.status_code)
 
             if resp.status_code != 302:
-                msg = "ERROR " + msg
-                all_ok = False
-                num_bad += 1
+                # cdodge: we're adding new module category as part of the Studio work
+                # such as 'course_info', etc, which are not supposed to be jump_to'able
+                # so a successful return value here should be a 404
+                if descriptor.location.category not in ['about', 'static_tab', 'course_info', 'custom_tag_template'] or resp.status_code != 404:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1
             print msg
             self.assertTrue(all_ok)  # fail fast
 

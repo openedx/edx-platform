@@ -50,7 +50,7 @@ def replace_course_urls(get_html, course_id):
         return replace_urls(get_html(), staticfiles_prefix='/courses/'+course_id, replace_prefix='/course/')
     return _get_html
 
-def replace_static_urls(get_html, prefix):
+def replace_static_urls(get_html, prefix, course_namespace=None):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -59,7 +59,7 @@ def replace_static_urls(get_html, prefix):
 
     @wraps(get_html)
     def _get_html():
-        return replace_urls(get_html(), staticfiles_prefix=prefix)
+        return replace_urls(get_html(), staticfiles_prefix=prefix, course_namespace = course_namespace)
     return _get_html
 
 

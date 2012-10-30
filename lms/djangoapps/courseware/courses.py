@@ -14,6 +14,7 @@ from module_render import get_module
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
@@ -68,8 +69,13 @@ def get_opt_course_with_access(user, course_id, action):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    path = course.metadata['data_dir'] + "/images/course_image.jpg"
-    return try_staticfiles_lookup(path)
+    if isinstance(modulestore(), XMLModuleStore):
+        path = course.metadata['data_dir'] + "/images/course_image.jpg"
+        return try_staticfiles_lookup(path)
+    else:
+        loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
+        path = StaticContent.get_url_path_from_location(loc)
+        return path
 
 def find_file(fs, dirs, filename):
     """
@@ -123,14 +129,12 @@ def get_course_about_section(course, section_key):
                        'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
-            fs = course.system.resources_fs
-            # first look for a run-specific version
-            dirs = [path("about") / course.url_name, path("about")]
-            filepath = find_file(fs, dirs, section_key + ".html")
-            with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'])
-        except ResourceNotFoundError:
+            loc = course.location._replace(category='about', name=section_key)
+            item = modulestore().get_instance(course.id, loc)
+
+            return item.definition['data']
+
+        except ItemNotFoundError:
             log.warning("Missing about section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
             return None
@@ -159,8 +163,6 @@ def get_course_info_section(request, cache, course, section_key):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
     course_module = get_module(request.user, request, loc, cache, course.id)
-
-    logging.debug('course_module = {0}'.format(course_module))
 
     html = ''
 

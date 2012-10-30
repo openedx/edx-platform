@@ -202,7 +202,7 @@ class CourseDescriptor(SequenceDescriptor):
         # Try to load grading policy
         paths = ['grading_policy.json']
         if policy_dir:
-            paths = [policy_dir + 'grading_policy.json'] + paths
+            paths = [policy_dir + '/grading_policy.json'] + paths
 
         policy = json.loads(cls.read_grading_policy(paths, system))
         
@@ -392,5 +392,6 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+
 
 

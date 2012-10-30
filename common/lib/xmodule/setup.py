@@ -37,6 +37,8 @@ setup(
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
             "course_info = xmodule.html_module:HtmlDescriptor",
             "static_tab = xmodule.html_module:HtmlDescriptor",
+            "custom_tag_template = xmodule.raw_module:RawDescriptor",
+            "about = xmodule.html_module:HtmlDescriptor"
         ]
     }
 )

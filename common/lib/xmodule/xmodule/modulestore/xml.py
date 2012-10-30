@@ -427,42 +427,38 @@ class XMLModuleStore(ModuleStoreBase):
 
             # now import all pieces of course_info which is expected to be stored
             # in <content_dir>/info or <content_dir>/info/<url_name>
-            if url_name:
-                info_path = self.data_dir / course_dir / 'info' / url_name
-
-            if not os.path.exists(info_path):
-                info_path = self.data_dir / course_dir / 'info'
-
-            # we have a fixed number of .html info files that we expect there
-            for info_filename in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
-                filepath = info_path / info_filename + '.html'
-                if os.path.exists(filepath):
-                    with open(filepath) as info_file:
-                        html = info_file.read().decode('utf-8')
-                        loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, 'course_info', info_filename)
-                        info_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
-                        self.modules[course_id][info_module.location] = info_module
+            self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
 
             # now import all static tabs which are expected to be stored in
-            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
-            if url_name:
-                tabs_path = self.data_dir / course_dir / 'tabs' / url_name
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>           
+            self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
 
-            if not os.path.exists(tabs_path):
-                tabs_path = self.data_dir / course_dir / 'tabs'
+            self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
 
-            for tab_filepath in glob.glob(tabs_path / '*.html'):
-                with open(tab_filepath) as tab_file:
-                    html = tab_file.read().decode('utf-8')
-                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
-                    slug = os.path.splitext(os.path.basename(tab_filepath))[0]
-                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, 'static_tab', slug)
-                    tab_module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
-                    self.modules[course_id][tab_module.location] = tab_module               
+            self.load_extra_content(system, course_descriptor, 'about', self.data_dir / course_dir / 'about', course_dir, url_name)
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
+    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
+        if url_name:
+            path =  base_dir / url_name
+
+        if not os.path.exists(path):
+            path = base_dir
+
+        for filepath in glob.glob(path/ '*'):
+            with open(filepath) as f:
+                try:
+                    html = f.read().decode('utf-8')
+                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                    slug = os.path.splitext(os.path.basename(filepath))[0]
+                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                    module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    module.metadata['data_dir'] = course_dir
+                    self.modules[course_descriptor.id][module.location] = module   
+                except Exception, e:
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))          
 
     def get_instance(self, course_id, location, depth=0):
         """

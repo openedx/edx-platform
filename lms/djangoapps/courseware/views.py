@@ -421,7 +421,7 @@ def course_about(request, course_id):
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     return render_to_response('portal/course_about.html',
-                              {'course': course,
+                              { 'course': course,
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link' : show_courseware_link})

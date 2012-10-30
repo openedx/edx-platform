@@ -256,7 +256,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '')
+        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
