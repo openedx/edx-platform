@@ -70,7 +70,6 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    ASKBOT_ROOT / "askbot" / "skins",
 ]
 STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
@@ -100,8 +99,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a
-    # functioning cache -- it relies on caching to load its settings in places.
+    # This is the cache used for most things. 
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -130,11 +128,7 @@ MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
-############################ FILE UPLOADS (ASKBOT) #############################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-MEDIA_ROOT = TEST_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
-STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+############################ STATIC FILES #############################
 
 new_staticfiles_dirs = []
 # Strip out any static files that aren't in the repository root
@@ -149,12 +143,6 @@ for static_dir in STATICFILES_DIRS:
     if data_dir.startswith(REPO_ROOT):
         new_staticfiles_dirs.append(static_dir)
 STATICFILES_DIRS = new_staticfiles_dirs
-
-FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
-FILE_UPLOAD_HANDLERS = (
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
 
 ################### Make tests faster
 

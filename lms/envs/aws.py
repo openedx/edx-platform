@@ -19,11 +19,10 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
-# Disable askbot, enable Berkeley forums
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
+# Enable Berkeley forums
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
-# IMPORTANT: With this enabled, the server must always be behind a proxy that 
+# IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
 # a user can fool our server into thinking it was an https connection.
 # See https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
