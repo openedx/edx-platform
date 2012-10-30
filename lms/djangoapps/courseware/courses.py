@@ -2,6 +2,7 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
+import inspect
 
 from lxml.html import rewrite_links
 
@@ -21,10 +22,23 @@ from xmodule.x_module import XModule
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
-
-
+from courseware.models import StudentModuleCache
 
 log = logging.getLogger(__name__)
+
+def get_request_for_thread():
+    """Walk up the stack, return the nearest first argument named "request"."""
+    frame = None
+    try:
+        for f in inspect.stack()[1:]:
+            frame = f[0]
+            code = frame.f_code
+            if code.co_varnames[:1] == ("request",):
+                return frame.f_locals["request"]
+            elif code.co_varnames[:2] == ("self", "request",):
+                return frame.f_locals["request"]
+    finally:
+        del frame
 
 
 def get_course_by_id(course_id):
@@ -129,10 +143,23 @@ def get_course_about_section(course, section_key):
                        'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
+
+            request = get_request_for_thread()
+
+            student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+                course.id, request.user, course, depth=2)
+
             loc = course.location._replace(category='about', name=section_key)
+            course_module = get_module(request.user, request, loc, student_module_cache, course.id)
+
+            html = ''
+
+            if course_module is not None:
+                html = course_module.get_html()
+
             item = modulestore().get_instance(course.id, loc)
 
-            return item.definition['data']
+            return html
 
         except ItemNotFoundError:
             log.warning("Missing about section {key} in course {url}".format(
@@ -160,6 +187,7 @@ def get_course_info_section(request, cache, course, section_key):
     - updates
     - guest_updates
     """
+
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
     course_module = get_module(request.user, request, loc, cache, course.id)

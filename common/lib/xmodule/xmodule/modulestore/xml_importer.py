@@ -30,7 +30,7 @@ def import_static_content(modules, data_dir, static_content_store, target_locati
 
    
     # now import all static assets
-    static_dir = '{0}/static/'.format(course_data_dir)
+    static_dir = '{0}/static/'.format(data_dir / course_data_dir)
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:
@@ -185,7 +185,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 # it as a StaticContent asset
                 try:   
                     remap_dict = {}
-                    
+
                     # use the rewrite_links as a utility means to enumerate through all links
                     # in the module data. We use that to load that reference into our asset store
                     # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
