@@ -8,7 +8,7 @@ from logsettings import get_logger_config
 ENABLE_JASMINE = True
 DEBUG = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
+LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             dev_env=True,
