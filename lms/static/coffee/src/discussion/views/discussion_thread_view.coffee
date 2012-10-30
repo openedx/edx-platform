@@ -112,7 +112,6 @@ if Backbone?
       @renderEditView()
 
     update: (event) =>
-
       newTitle = @editView.$(".edit-post-title").val()
       newBody  = @editView.$(".edit-post-body textarea").val()
       newCommentableId  = @editView.$("#commentable-id-edit").val()
@@ -153,7 +152,6 @@ if Backbone?
                 body: newBody
                 commentable_id: newCommentableId
                 tags: response.content.tags
-                
               @createShowView()
               @renderShowView()
               

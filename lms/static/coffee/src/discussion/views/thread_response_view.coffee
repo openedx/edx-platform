@@ -159,7 +159,6 @@ if Backbone?
       @hideCommentForm()
 
     update: (event) =>
-
       newBody  = @editView.$(".edit-post-body textarea").val()
 
       url = DiscussionUtil.urlFor('update_comment', @model.id)
