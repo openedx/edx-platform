@@ -347,12 +347,7 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-
-
-    cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2)
-
-    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : cache, 
+    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
             'course': course, 'staff_access': staff_access})
 
 @ensure_csrf_cookie

@@ -260,13 +260,13 @@ def get_static_tab_by_slug(course, tab_slug):
 def get_static_tab_contents(request, cache, course, tab):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    course_module = get_module(request.user, request, loc, cache, course.id)
+    tab_module = get_module(request.user, request, loc, cache, course.id)
 
-    logging.debug('course_module = {0}'.format(course_module))
+    logging.debug('course_module = {0}'.format(tab_module))
 
     html = ''
 
-    if course_module is not None:
-        html = course_module.get_html()
+    if tab_module is not None:
+        html = tab_module.get_html()
 
     return html
