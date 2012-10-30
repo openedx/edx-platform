@@ -7,7 +7,12 @@
 
 <%inherit file="../main.html" />
 
+<%block name="headextra">
+  <%include file="../google_analytics.html" />
+</%block>
+
 <%block name="js_extra">
+
   % if not registered:
     %if user.is_authenticated():
       ## If the user is authenticated, clicking the enroll button just submits a form
