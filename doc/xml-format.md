@@ -251,6 +251,7 @@ Supported fields at the course level:
 
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
+* "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
 * TODO: there are others
 
@@ -308,7 +309,7 @@ __Inherited:__
 * `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
-*	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+*	`rerandomize` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
                                                             'onreset' (randomize question when reset button is pressed by the student)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)

@@ -39,6 +39,8 @@ from collections import namedtuple
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
+from statsd import statsd
+
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
@@ -204,7 +206,13 @@ def change_enrollment(request):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
-
+                    
+        org, course_num, run=course_id.split("/")        
+        statsd.increment("common.student.enrollment",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run)])
+        
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
 
@@ -212,6 +220,13 @@ def change_enrollment(request):
         try:
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
+            
+            org, course_num, run=course_id.split("/")        
+            statsd.increment("common.student.unenrollment",
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run)])
+                              
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
             return {'success': False, 'error': 'You are not enrolled for this course.'}
@@ -260,7 +275,9 @@ def login_user(request, error=""):
         log.info("Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
-
+        
+        statsd.increment("common.student.successful_login")
+        
         return HttpResponse(json.dumps({'success': True}))
     
     log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
@@ -466,7 +483,9 @@ def create_account(request, post_override=None):
             log.debug('bypassing activation email')
             login_user.is_active = True
             login_user.save()
-
+            
+    statsd.increment("common.student.account_created")
+    
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
