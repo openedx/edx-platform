@@ -20,9 +20,12 @@
       </div>
       %if allow_actions:
       <div class="new-user-form">
-        <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
-        <a href="#" id="add_user" class="add-button">add user</a>
-        <a href="#" class="cancel-button">cancel</a>
+        <div id="result"></div>
+        <div class="form-elements">
+          <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
+          <a href="#" id="add_user" class="add-button">add user</a>
+          <a href="#" class="cancel-button">cancel</a>
+        </div>
       </div>
       %endif
       <div>
@@ -42,8 +45,6 @@
           % endfor
         </ol>
       </div>
-      
-      <div id="result"></div>
     </article>
   </div>
 </div>
@@ -61,6 +62,8 @@
   function hideNewUserForm(e) {
     e.preventDefault();
     $newUserForm.slideUp(150);
+    $('#result').hide();
+    $('#email').val('');
   }
 
   $(document).ready(function() {
@@ -78,7 +81,7 @@
         data:JSON.stringify({ 'email': $('#email').val()}),
       }).done(function(data) {
         if (data.ErrMsg != undefined)
-          $('#result').empty().append(data.ErrMsg);
+          $('#result').show().empty().append(data.ErrMsg);
         else
           location.reload();
       })
