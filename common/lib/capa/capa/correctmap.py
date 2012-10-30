@@ -68,7 +68,7 @@ class CorrectMap(object):
 
         correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This
         means that when the definition of CorrectMap (e.g. its properties) are altered,
-        an existing correct_map dict not coincide with the newest CorrectMap format as
+        an existing correct_map dict will not coincide with the newest CorrectMap format as
         defined by self.set.
 
         For graceful migration, feed the contents of each correct map to self.set, rather than
