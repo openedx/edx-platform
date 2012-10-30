@@ -68,7 +68,7 @@ urlpatterns += (
 
     )
 
-if settings.DEBUG:
+if settings.ENABLE_JASMINE:
     ## Jasmine
     urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
 

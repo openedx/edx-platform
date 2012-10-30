@@ -446,15 +446,12 @@ PIPELINE_JS = {
         'source_filenames': module_js,
         'output_filename': 'js/lms-modules.js',
     },
-    'spec': {
-        'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.coffee')),
-        'output_filename': 'js/lms-spec.js'
-    },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js'
-    }
+    },
 }
+
 
 PIPELINE_DISABLE_WRAPPER = True
 
