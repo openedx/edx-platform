@@ -16,7 +16,7 @@ class @VideoControl extends Subview
           <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
         </div>
       </div>
-      """
+      """#"
 
     unless onTouchBasedDevice()
       @$('.video_control').addClass('play').html('Play')
