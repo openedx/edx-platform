@@ -41,9 +41,13 @@ def django_admin(system, env, command, *args)
     return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
-def django_for_jasmine(system)
+def django_for_jasmine(system, django_reload)
+    if !django_reload
+        reload_arg = '--noreload'
+    end
+
     django_pid = fork do
-        exec(*django_admin(system, 'jasmine', 'runserver', '12345').split(' '))
+        exec(*django_admin(system, 'jasmine', 'runserver', "12345", reload_arg).split(' '))
     end
     puts django_pid
     jasmine_url = 'http://localhost:12345/_jasmine/'
@@ -67,7 +71,11 @@ def django_for_jasmine(system)
     begin
         yield jasmine_url
     ensure
-        Process.kill(:SIGKILL, -Process.getpgid(django_pid))
+        if django_reload
+            Process.kill(:SIGKILL, -Process.getpgid(django_pid))
+        else
+            Process.kill(:SIGKILL, django_pid)
+        end
         Process.wait(django_pid)
     end
 end
@@ -116,7 +124,7 @@ end
 
     desc "Open jasmine tests in your default browser"
     task "browse_jasmine_#{system}" do
-        django_for_jasmine(system) do |jasmine_url|
+        django_for_jasmine(system, true) do |jasmine_url|
             Launchy.open(jasmine_url)
             puts "Press ENTER to terminate".red
             $stdin.gets
@@ -126,7 +134,7 @@ end
     desc "Use phantomjs to run jasmine tests from the console"
     task "phantomjs_jasmine_#{system}" do
         phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
-        django_for_jasmine(system) do |jasmine_url|
+        django_for_jasmine(system, false) do |jasmine_url|
             sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
         end
     end
