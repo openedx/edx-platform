@@ -35,6 +35,7 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
 }
+ENABLE_JASMINE = False
 
 # needed to use lms student app
 GENERATE_RANDOM_USER_CREDENTIALS = False

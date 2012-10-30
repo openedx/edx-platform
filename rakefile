@@ -48,7 +48,11 @@ def django_for_jasmine(system)
     puts django_pid
     jasmine_url = 'http://localhost:12345/_jasmine/'
     up = false
+    start_time = Time.now
     until up do
+        if Time.now - start_time > 30
+            abort "Timed out waiting for server to start to run jasmine tests"
+        end
         begin
             response = Net::HTTP.get_response(URI(jasmine_url))
             puts response.code

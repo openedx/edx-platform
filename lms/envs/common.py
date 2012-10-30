@@ -30,6 +30,7 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
+ENABLE_JASMINE = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
