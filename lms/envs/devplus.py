@@ -5,7 +5,7 @@ you're running memcached. You'll want to use this to test caching and database
 migrations.
 
 Assumptions:
-* MySQL 5.1 (version important -- askbot breaks on 5.5)
+* MySQL 5.1 (version important?  (askbot breaks on 5.5, but that's gone now))
 
 Dir structure:
 /envroot/
