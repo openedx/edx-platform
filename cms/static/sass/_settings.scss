@@ -1,0 +1,39 @@
+.settings {
+  .settings-overview {
+    @extend .window;
+    padding: 30px 40px;
+
+    .details {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .row {
+      margin-bottom: 20px;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    label {
+      display: inline-block;
+      width: 200px;
+      font-size: 14px;
+
+      &.check-label {
+        display: inline;
+      }
+    }
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 300;   
+  }
+
+  section {
+    border-bottom: 1px solid $mediumGrey;
+    margin-bottom: 40px;
+    padding-bottom: 40px;
+  }
+}

@@ -869,6 +869,10 @@ def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
 
+def settings(request, org, course, coursename):
+    return render_to_response('settings.html', {})
+
+
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 

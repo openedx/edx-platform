@@ -1,0 +1,48 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">settings</%block>
+<%block name="title">Settings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="jsextra">
+
+</%block>
+
+<%block name="content">
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <h1>Settings</h1>
+      <article class="settings-overview">
+        <section>
+          <h2>Details</h2>
+          <div class="row">
+            <label>Course Name:</label>
+            <input type="text" class="course-name-input">
+          </div>
+          <div class="row">
+            <label>Organization:</label>
+            <input type="text" class="course-organization-input">
+          </div>
+          <div class="row">
+            <label>Course Number:</label>
+            <input type="text" class="course-number-input">
+          </div>
+        </section>
+        <section>
+          <h2>Grading</h2>
+          <div class="row">
+            <label>Course Name:</label>
+            <input type="text" class="course-name-input">
+          </div>
+        </section>
+        <section>
+          <h2>Problems</h2>
+          <div class="row">
+            <input type="checkbox" id="randomize-problems"><label for="randomize-problems" class="check-label">Randomize Problems</label>            
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+</%block>
