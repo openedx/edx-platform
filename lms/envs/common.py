@@ -359,10 +359,7 @@ MIDDLEWARE_CLASSES = (
 
     'course_wiki.course_nav.Middleware',
 
-<<<<<<< HEAD
     'django.middleware.transaction.TransactionMiddleware',
-=======
->>>>>>> remove (almost) all references to askbot.
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
