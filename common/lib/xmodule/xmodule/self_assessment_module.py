@@ -19,7 +19,12 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
+problem_form=('<form action="show()"><input type="text" name="answer" '
+'id="answer"/><br/><input type="submit" value="Check"/></form>')
 
+rubric_form=('<form action="save()"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
+            '<input type="radio" name="assessment" value="incorrect">'
+            'Incorrect<input type="submit" value="Submit"/></form>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -53,15 +58,17 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
 
         dom2=etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
-        rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
-        problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
+        self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
+        self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
+
+        self.problem=''.join([self.problem,problem_form])
+
+        self.rubric=''.join([self.rubric,rubric_form])
 
         #print(etree.tostring(rubric))
         #print(etree.tostring(problem))
 
-        self.html = etree.tostring(problem)
-
-        #self.html=self.definition['data']
+        self.html = self.problem
 
 
 
