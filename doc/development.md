@@ -33,6 +33,8 @@ Both the LMS and Studio can be started using the following shortcut tasks
 
     rake lms  # Start the LMS
     rake cms  # Start studio
+    rake lms[cms.dev]  # Start LMS to run alongside Studio
+    rake lms[cms.dev_preview]  # Start LMS to run alongside Studio in preview mode
 
 Under the hood, this executes `django-admin.py runserver --pythonpath=$WORKING_DIRECTORY --settings=lms.envs.dev`,
 which starts a local development server.
