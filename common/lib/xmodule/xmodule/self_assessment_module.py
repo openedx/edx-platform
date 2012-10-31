@@ -19,12 +19,12 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-problem_form=('<form action="show()"><input type="text" name="answer" '
-'id="answer"/><br/><input type="submit" value="Check"/></form>')
+problem_form=('<form action="save()"><input type="text" name="answer" '
+'id="answer"/><br/><input type="submit" value="Check" id ="save"/></form><p id="rubric"></p>')
 
-rubric_form=('<form action="save()"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
+rubric_form=('<form action="show()"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
             '<input type="radio" name="assessment" value="incorrect">'
-            'Incorrect<input type="submit" value="Submit"/></form>')
+            'Incorrect<input type="submit" value="Submit" id="show"/></form>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -46,7 +46,7 @@ class SelfAssessmentModule(XModule):
                      resource_string(__name__, 'js/src/selfassessment/display.coffee')
     ]
     }
-    js_module_name = "SelfAssessmentModule"
+    js_module_name = "SelfAssessment"
 
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
@@ -71,17 +71,18 @@ class SelfAssessmentModule(XModule):
         self.html = self.problem
 
     def handle_ajax(self, dispatch, get):
-            '''
-            This is called by courseware.module_render, to handle an AJAX call.
-            "get" is request.POST.
+        '''
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
 
-            Returns a json dictionary:
-            { 'progress_changed' : True/False,
-            'progress' : 'none'/'in_progress'/'done',
-            <other request-specific values here > }
-            '''
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+        'progress' : 'none'/'in_progress'/'done',
+        <other request-specific values here > }
+        '''
+
         handlers = {
-            'sa_get' : self.show_problem
+            'sa_get' : self.show_problem,
             'sa_show': self.show_rubric,
             'sa_save': self.save_problem,
             }
@@ -97,6 +98,19 @@ class SelfAssessmentModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def save_problem(self, get):
+        '''
+        Save the passed in answers.
+        Returns a dict { 'success' : bool, ['error' : error-msg]},
+        with the error key only present if success is False.
+        '''
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['problem_id'] = self.location.url()
+
+        return {'success': True, 'rubric' : self.rubric}
+
 
 
 

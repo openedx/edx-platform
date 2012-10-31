@@ -580,76 +580,76 @@ class CapaModule(XModule):
                 'contents': html,
                 }
 
-def save_problem(self, get):
-    '''
-    Save the passed in answers.
-    Returns a dict { 'success' : bool, ['error' : error-msg]},
-    with the error key only present if success is False.
-    '''
-    event_info = dict()
-    event_info['state'] = self.lcp.get_state()
-    event_info['problem_id'] = self.location.url()
+    def save_problem(self, get):
+        '''
+        Save the passed in answers.
+        Returns a dict { 'success' : bool, ['error' : error-msg]},
+        with the error key only present if success is False.
+        '''
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['problem_id'] = self.location.url()
 
-    answers = self.make_dict_of_responses(get)
-    event_info['answers'] = answers
+        answers = self.make_dict_of_responses(get)
+        event_info['answers'] = answers
 
-    # Too late. Cannot submit
-    if self.closed():
-        event_info['failure'] = 'closed'
+        # Too late. Cannot submit
+        if self.closed():
+            event_info['failure'] = 'closed'
+            self.system.track_function('save_problem_fail', event_info)
+            return {'success': False,
+                    'error': "Problem is closed"}
+
+        # Problem submitted. Student should reset before saving
+        # again.
+        if self.lcp.done and self.rerandomize == "always":
+            event_info['failure'] = 'done'
+            self.system.track_function('save_problem_fail', event_info)
+            return {'success': False,
+                    'error': "Problem needs to be reset prior to save."}
+
+        self.lcp.student_answers = answers
+
+        # TODO: should this be save_problem_fail? Looks like success to me...
         self.system.track_function('save_problem_fail', event_info)
-        return {'success': False,
-                'error': "Problem is closed"}
+        return {'success': True}
 
-    # Problem submitted. Student should reset before saving
-    # again.
-    if self.lcp.done and self.rerandomize == "always":
-        event_info['failure'] = 'done'
-        self.system.track_function('save_problem_fail', event_info)
-        return {'success': False,
-                'error': "Problem needs to be reset prior to save."}
+    def reset_problem(self, get):
+        ''' Changes problem state to unfinished -- removes student answers,
+        and causes problem to rerender itself.
 
-    self.lcp.student_answers = answers
+        Returns problem html as { 'html' : html-string }.
+        '''
+        event_info = dict()
+        event_info['old_state'] = self.lcp.get_state()
+        event_info['problem_id'] = self.location.url()
 
-    # TODO: should this be save_problem_fail? Looks like success to me...
-    self.system.track_function('save_problem_fail', event_info)
-    return {'success': True}
+        if self.closed():
+            event_info['failure'] = 'closed'
+            self.system.track_function('reset_problem_fail', event_info)
+            return {'success': False,
+                    'error': "Problem is closed"}
 
-def reset_problem(self, get):
-    ''' Changes problem state to unfinished -- removes student answers,
-    and causes problem to rerender itself.
+        if not self.lcp.done:
+            event_info['failure'] = 'not_done'
+            self.system.track_function('reset_problem_fail', event_info)
+            return {'success': False,
+                    'error': "Refresh the page and make an attempt before resetting."}
 
-    Returns problem html as { 'html' : html-string }.
-    '''
-    event_info = dict()
-    event_info['old_state'] = self.lcp.get_state()
-    event_info['problem_id'] = self.location.url()
+        self.lcp.do_reset()
+        if self.rerandomize in ["always", "onreset"]:
+            # reset random number generator seed (note the self.lcp.get_state()
+            # in next line)
+            self.lcp.seed = None
 
-    if self.closed():
-        event_info['failure'] = 'closed'
-        self.system.track_function('reset_problem_fail', event_info)
-        return {'success': False,
-                'error': "Problem is closed"}
+        self.lcp = LoncapaProblem(self.definition['data'],
+            self.location.html_id(), self.lcp.get_state(),
+            system=self.system)
 
-    if not self.lcp.done:
-        event_info['failure'] = 'not_done'
-        self.system.track_function('reset_problem_fail', event_info)
-        return {'success': False,
-                'error': "Refresh the page and make an attempt before resetting."}
+        event_info['new_state'] = self.lcp.get_state()
+        self.system.track_function('reset_problem', event_info)
 
-    self.lcp.do_reset()
-    if self.rerandomize in ["always", "onreset"]:
-        # reset random number generator seed (note the self.lcp.get_state()
-        # in next line)
-        self.lcp.seed = None
-
-    self.lcp = LoncapaProblem(self.definition['data'],
-        self.location.html_id(), self.lcp.get_state(),
-        system=self.system)
-
-    event_info['new_state'] = self.lcp.get_state()
-    self.system.track_function('reset_problem', event_info)
-
-    return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html(encapsulate=False)}
 
 
 class CapaDescriptor(RawDescriptor):
