@@ -363,10 +363,7 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2)
-
-    contents = tabs.get_static_tab_contents(request, cache, course, tab)
+    contents = tabs.get_static_tab_contents(request, None, course, tab)
     if contents is None:
         raise Http404
 

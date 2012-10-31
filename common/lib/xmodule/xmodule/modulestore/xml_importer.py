@@ -41,9 +41,8 @@ def import_static_content(modules, data_dir, static_content_store, target_locati
                 content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
                 mime_type = mimetypes.guess_type(filename)[0]
 
-                f = open(content_path, 'rb')
-                data = f.read()
-                f.close()
+                with open(content_path, 'rb') as f:
+                    data = f.read()
 
                 content = StaticContent(content_loc, filename, mime_type, data)
 
@@ -76,9 +75,8 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 filename = os.path.basename(path)
                 mime_type = mimetypes.guess_type(filename)[0]
 
-                f = open(static_pathname, 'rb')
-                data = f.read()
-                f.close()
+                with open(static_pathname, 'rb') as f:
+                    data = f.read()
 
                 content = StaticContent(content_loc, filename, mime_type, data) 
 
