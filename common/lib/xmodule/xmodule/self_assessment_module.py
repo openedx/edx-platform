@@ -70,6 +70,34 @@ class SelfAssessmentModule(XModule):
 
         self.html = self.problem
 
+    def handle_ajax(self, dispatch, get):
+            '''
+            This is called by courseware.module_render, to handle an AJAX call.
+            "get" is request.POST.
+
+            Returns a json dictionary:
+            { 'progress_changed' : True/False,
+            'progress' : 'none'/'in_progress'/'done',
+            <other request-specific values here > }
+            '''
+        handlers = {
+            'sa_get' : self.show_problem
+            'sa_show': self.show_rubric,
+            'sa_save': self.save_problem,
+            }
+
+        if dispatch not in handlers:
+            return 'Error'
+
+        before = self.get_progress()
+        d = handlers[dispatch](get)
+        after = self.get_progress()
+        d.update({
+            'progress_changed': after != before,
+            'progress_status': Progress.to_js_status_str(after),
+            })
+        return json.dumps(d, cls=ComplexEncoder)
+
 
 
 
