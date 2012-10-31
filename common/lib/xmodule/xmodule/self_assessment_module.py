@@ -45,7 +45,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     Module for putting raw html in a course
     """
     mako_template = "widgets/html-edit.html"
-    module_class = HtmlModule
+    module_class = SelfAssessmentModule
     filename_extension = "xml"
     template_dir_name = "selfassessment"
 
