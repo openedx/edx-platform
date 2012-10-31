@@ -29,10 +29,10 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 
 def only_one(lst, default="", process=lambda x: x):
     """
-If lst is empty, returns default
-If lst has a single element, applies process to that element and returns it
-Otherwise, raises an exeception
-"""
+    If lst is empty, returns default
+    If lst has a single element, applies process to that element and returns it
+    Otherwise, raises an exeception
+    """
     if len(lst) == 0:
         return default
     elif len(lst) == 1:
@@ -43,14 +43,14 @@ Otherwise, raises an exeception
 
 def parse_timedelta(time_str):
     """
-time_str: A string with the following components:
-<D> day[s] (optional)
-<H> hour[s] (optional)
-<M> minute[s] (optional)
-<S> second[s] (optional)
+    time_str: A string with the following components:
+    <D> day[s] (optional)
+    <H> hour[s] (optional)
+    <M> minute[s] (optional)
+    <S> second[s] (optional)
 
-Returns a datetime.timedelta parsed from the string
-"""
+    Returns a datetime.timedelta parsed from the string
+    """
     parts = TIMEDELTA_REGEX.match(time_str)
     if not parts:
         return
@@ -71,9 +71,9 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaModule(XModule):
     '''
-An XModule implementing LonCapa format problems, implemented by way of
-capa.capa_problem.LoncapaProblem
-'''
+    An XModule implementing LonCapa format problems, implemented by way of
+    capa.capa_problem.LoncapaProblem
+    '''
     icon_class = 'problem'
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
@@ -175,9 +175,9 @@ capa.capa_problem.LoncapaProblem
     @property
     def rerandomize(self):
         """
-Property accessor that returns self.metadata['rerandomize'] in a
-canonical form
-"""
+        Property accessor that returns self.metadata['rerandomize'] in a
+        canonical form
+        """
         rerandomize = self.metadata.get('rerandomize', 'always')
         if rerandomize in ("", "always", "true"):
             return "always"
@@ -203,7 +203,7 @@ canonical form
 
     def get_progress(self):
         ''' For now, just return score / max_score
-'''
+        '''
         d = self.get_score()
         score = d['score']
         total = d['total']
@@ -224,7 +224,7 @@ canonical form
 
     def get_problem_html(self, encapsulate=True):
         '''Return html for the problem. Adds check, reset, save buttons
-as necessary based on the problem config and state.'''
+        as necessary based on the problem config and state.'''
 
         try:
             html = self.lcp.get_html()
@@ -358,14 +358,14 @@ as necessary based on the problem config and state.'''
 
     def handle_ajax(self, dispatch, get):
         '''
-This is called by courseware.module_render, to handle an AJAX call.
-"get" is request.POST.
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
 
-Returns a json dictionary:
-{ 'progress_changed' : True/False,
-'progress' : 'none'/'in_progress'/'done',
-<other request-specific values here > }
-'''
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+        'progress' : 'none'/'in_progress'/'done',
+        <other request-specific values here > }
+        '''
         handlers = {
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
@@ -398,7 +398,7 @@ Returns a json dictionary:
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
-'''
+        '''
         if self.show_answer == '':
             return False
 
@@ -425,14 +425,14 @@ Returns a json dictionary:
 
     def update_score(self, get):
         """
-Delivers grading response (e.g. from asynchronous code checking) to
-the capa problem, so its score can be updated
+        Delivers grading response (e.g. from asynchronous code checking) to
+        the capa problem, so its score can be updated
 
-'get' must have a field 'response' which is a string that contains the
-grader's response
+        'get' must have a field 'response' which is a string that contains the
+        grader's response
 
-No ajax return is needed. Return empty dict.
-"""
+        No ajax return is needed. Return empty dict.
+        """
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
@@ -441,10 +441,10 @@ No ajax return is needed. Return empty dict.
 
     def get_answer(self, get):
         '''
-For the "show answer" button.
+        For the "show answer" button.
 
-Returns the answers: {'answers' : answers}
-'''
+        Returns the answers: {'answers' : answers}
+        '''
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         self.system.track_function('show_answer', event_info)
@@ -469,18 +469,18 @@ Returns the answers: {'answers' : answers}
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
         ''' Return results of get_problem_html, as a simple dict for json-ing.
-{ 'html': <the-html> }
+        { 'html': <the-html> }
 
-Used if we want to reconfirm we have the right thing e.g. after
-several AJAX calls.
-'''
+        Used if we want to reconfirm we have the right thing e.g. after
+        several AJAX calls.
+        '''
         return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-get is POST dictionary.
-'''
+        get is POST dictionary.
+        '''
         answers = dict()
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
@@ -500,11 +500,11 @@ get is POST dictionary.
 
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
-returns a map of correct/incorrect answers:
+        returns a map of correct/incorrect answers:
 
-{'success' : bool,
-'contents' : html}
-'''
+        {'success' : bool,
+        'contents' : html}
+        '''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
@@ -567,18 +567,18 @@ returns a map of correct/incorrect answers:
         # 'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-event_info['attempts'] = self.attempts
-self.system.track_function('save_problem_check', event_info)
+        event_info['attempts'] = self.attempts
+        self.system.track_function('save_problem_check', event_info)
 
-if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
-    self.system.psychometrics_handler(self.get_instance_state())
+        if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_instance_state())
 
-# render problem into HTML
-html = self.get_problem_html(encapsulate=False)
+        # render problem into HTML
+        html = self.get_problem_html(encapsulate=False)
 
-return {'success': success,
-        'contents': html,
-        }
+        return {'success': success,
+                'contents': html,
+                }
 
 def save_problem(self, get):
     '''
@@ -654,9 +654,9 @@ def reset_problem(self, get):
 
 class CapaDescriptor(RawDescriptor):
     """
-Module implementing problems in the LON-CAPA format,
-as implemented by capa.capa_problem
-"""
+    Module implementing problems in the LON-CAPA format,
+    as implemented by capa.capa_problem
+    """
 
     module_class = CapaModule
 
