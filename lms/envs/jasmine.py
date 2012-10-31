@@ -17,8 +17,9 @@ LOGGING = get_logger_config(TEST_ROOT / "log",
 PIPELINE_JS['js-test-source'] = {
     'source_filenames': sum([
         pipeline_group['source_filenames']
-        for pipeline_group
-        in PIPELINE_JS.values()
+        for group_name, pipeline_group
+        in PIPELINE_JS.items()
+        if group_name != 'spec'
     ], []),
     'output_filename': 'js/lms-test-source.js'
 }
