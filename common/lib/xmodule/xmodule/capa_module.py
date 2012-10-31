@@ -29,10 +29,10 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 
 def only_one(lst, default="", process=lambda x: x):
     """
-    If lst is empty, returns default
-    If lst has a single element, applies process to that element and returns it
-    Otherwise, raises an exeception
-    """
+If lst is empty, returns default
+If lst has a single element, applies process to that element and returns it
+Otherwise, raises an exeception
+"""
     if len(lst) == 0:
         return default
     elif len(lst) == 1:
@@ -43,14 +43,14 @@ def only_one(lst, default="", process=lambda x: x):
 
 def parse_timedelta(time_str):
     """
-    time_str: A string with the following components:
-        <D> day[s] (optional)
-        <H> hour[s] (optional)
-        <M> minute[s] (optional)
-        <S> second[s] (optional)
+time_str: A string with the following components:
+<D> day[s] (optional)
+<H> hour[s] (optional)
+<M> minute[s] (optional)
+<S> second[s] (optional)
 
-    Returns a datetime.timedelta parsed from the string
-    """
+Returns a datetime.timedelta parsed from the string
+"""
     parts = TIMEDELTA_REGEX.match(time_str)
     if not parts:
         return
@@ -71,15 +71,15 @@ class ComplexEncoder(json.JSONEncoder):
 
 class CapaModule(XModule):
     '''
-    An XModule implementing LonCapa format problems, implemented by way of
-    capa.capa_problem.LoncapaProblem
-    '''
+An XModule implementing LonCapa format problems, implemented by way of
+capa.capa_problem.LoncapaProblem
+'''
     icon_class = 'problem'
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                    ],
+                     ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
 
@@ -89,7 +89,7 @@ class CapaModule(XModule):
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor, instance_state,
-                         shared_state, **kwargs)
+            shared_state, **kwargs)
 
         self.attempts = 0
         self.max_attempts = None
@@ -100,7 +100,7 @@ class CapaModule(XModule):
         if display_due_date_string is not None:
             self.display_due_date = dateutil.parser.parse(display_due_date_string)
             #log.debug("Parsed " + display_due_date_string +
-            #          " to " + str(self.display_due_date))
+            # " to " + str(self.display_due_date))
         else:
             self.display_due_date = None
 
@@ -109,7 +109,7 @@ class CapaModule(XModule):
             self.grace_period = parse_timedelta(grace_period_string)
             self.close_date = self.display_due_date + self.grace_period
             #log.debug("Then parsed " + grace_period_string +
-            #          " to closing date" + str(self.close_date))
+            # " to closing date" + str(self.close_date))
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
@@ -137,9 +137,9 @@ class CapaModule(XModule):
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
             # TODO: This line is badly broken:
             # (1) We're passing student ID to xmodule.
-            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-            #     - analytics really needs small number of bins.
+            # (2) There aren't bins of students. -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts. So e.g. hash(your-id, problem_id) % num_bins.
+            # - analytics really needs small number of bins.
             self.seed = system.id
         else:
             self.seed = None
@@ -148,7 +148,7 @@ class CapaModule(XModule):
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=self.seed, system=self.system)
+                instance_state, seed=self.seed, system=self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -175,9 +175,9 @@ class CapaModule(XModule):
     @property
     def rerandomize(self):
         """
-        Property accessor that returns self.metadata['rerandomize'] in a
-        canonical form
-        """
+Property accessor that returns self.metadata['rerandomize'] in a
+canonical form
+"""
         rerandomize = self.metadata.get('rerandomize', 'always')
         if rerandomize in ("", "always", "true"):
             return "always"
@@ -203,7 +203,7 @@ class CapaModule(XModule):
 
     def get_progress(self):
         ''' For now, just return score / max_score
-        '''
+'''
         d = self.get_score()
         score = d['score']
         total = d['total']
@@ -220,11 +220,11 @@ class CapaModule(XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
-        })
+            })
 
     def get_problem_html(self, encapsulate=True):
-        '''Return html for the problem.  Adds check, reset, save buttons
-        as necessary based on the problem config and state.'''
+        '''Return html for the problem. Adds check, reset, save buttons
+as necessary based on the problem config and state.'''
 
         try:
             html = self.lcp.get_html()
@@ -242,15 +242,15 @@ class CapaModule(XModule):
                 html = msg
             else:
                 # We're in non-debug mode, and possibly even in production. We want
-                #   to avoid bricking of problem as much as possible
+                # to avoid bricking of problem as much as possible
 
                 # Presumably, student submission has corrupted LoncapaProblem HTML.
-                #   First, pull down all student answers
+                # First, pull down all student answers
                 student_answers = self.lcp.student_answers
                 answer_ids = student_answers.keys()
 
                 # Some inputtypes, such as dynamath, have additional "hidden" state that
-                #   is not exposed to the student. Keep those hidden
+                # is not exposed to the student. Keep those hidden
                 # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
                 hidden_state_keywords = ['dynamath']
                 for answer_id in answer_ids:
@@ -258,17 +258,17 @@ class CapaModule(XModule):
                         if answer_id.find(hidden_state_keyword) >= 0:
                             student_answers.pop(answer_id)
 
-                #   Next, generate a fresh LoncapaProblem
+                # Next, generate a fresh LoncapaProblem
                 self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None, # Tabula rasa
-                               seed=self.seed, system=self.system)
+                    state=None, # Tabula rasa
+                    seed=self.seed, system=self.system)
 
                 # Prepend a scary warning to the student
-                warning  = '<div class="capa_reset">'\
-                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                           'The problem\'s state was corrupted by an invalid submission. ' \
-                           'The submission consisted of:'\
-                           '<ul>'
+                warning = '<div class="capa_reset">'\
+                          '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                          'The problem\'s state was corrupted by an invalid submission. '\
+                          'The submission consisted of:'\
+                          '<ul>'
                 for student_answer in student_answers.values():
                     if student_answer != '':
                         warning += '<li>' + cgi.escape(student_answer) + '</li>'
@@ -292,11 +292,11 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+        if self.max_attempts is None or self.attempts < self.max_attempts-1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
-            check_button = "Final Check" 
+            check_button = "Final Check"
 
         reset_button = True
         save_button = True
@@ -358,14 +358,14 @@ class CapaModule(XModule):
 
     def handle_ajax(self, dispatch, get):
         '''
-        This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+This is called by courseware.module_render, to handle an AJAX call.
+"get" is request.POST.
 
-        Returns a json dictionary:
-        { 'progress_changed' : True/False,
-          'progress' : 'none'/'in_progress'/'done',
-          <other request-specific values here > }
-        '''
+Returns a json dictionary:
+{ 'progress_changed' : True/False,
+'progress' : 'none'/'in_progress'/'done',
+<other request-specific values here > }
+'''
         handlers = {
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
@@ -398,7 +398,7 @@ class CapaModule(XModule):
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
-        '''
+'''
         if self.show_answer == '':
             return False
 
@@ -425,26 +425,26 @@ class CapaModule(XModule):
 
     def update_score(self, get):
         """
-        Delivers grading response (e.g. from asynchronous code checking) to
-            the capa problem, so its score can be updated
+Delivers grading response (e.g. from asynchronous code checking) to
+the capa problem, so its score can be updated
 
-        'get' must have a field 'response' which is a string that contains the
-            grader's response
+'get' must have a field 'response' which is a string that contains the
+grader's response
 
-        No ajax return is needed. Return empty dict.
-        """
+No ajax return is needed. Return empty dict.
+"""
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
 
-        return dict()  # No AJAX return is needed
+        return dict() # No AJAX return is needed
 
     def get_answer(self, get):
         '''
-        For the "show answer" button.
+For the "show answer" button.
 
-        Returns the answers: {'answers' : answers}
-        '''
+Returns the answers: {'answers' : answers}
+'''
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         self.system.track_function('show_answer', event_info)
@@ -453,8 +453,8 @@ class CapaModule(XModule):
         else:
             answers = self.lcp.get_question_answers()
 
-	    # answers (eg <solution>) may have embedded images
-        #   but be careful, some problems are using non-string answer dicts
+        # answers (eg <solution>) may have embedded images
+        # but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
             try:
@@ -469,18 +469,18 @@ class CapaModule(XModule):
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
         ''' Return results of get_problem_html, as a simple dict for json-ing.
-        { 'html': <the-html> }
+{ 'html': <the-html> }
 
-            Used if we want to reconfirm we have the right thing e.g. after
-            several AJAX calls.
-        '''
+Used if we want to reconfirm we have the right thing e.g. after
+several AJAX calls.
+'''
         return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary.
-        '''
+get is POST dictionary.
+'''
         answers = dict()
         for key in get:
             # e.g. input_resistor_1 ==> resistor_1
@@ -500,11 +500,11 @@ class CapaModule(XModule):
 
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
-            returns a map of correct/incorrect answers:
+returns a map of correct/incorrect answers:
 
-            {'success' : bool,
-             'contents' : html}
-            '''
+{'success' : bool,
+'contents' : html}
+'''
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
@@ -527,11 +527,11 @@ class CapaModule(XModule):
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
-            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
+                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -540,13 +540,13 @@ class CapaModule(XModule):
         except StudentInputError as inst:
             # TODO (vshnayder): why is this line here?
             #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
+            # id=lcp_id, state=old_state, system=self.system)
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
             # TODO: why is this line here?
             #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
+            # id=lcp_id, state=old_state, system=self.system)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -564,99 +564,99 @@ class CapaModule(XModule):
                 success = 'incorrect'
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
-        #       'success' will always be incorrect
+        # 'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-	event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_check', event_info)
+event_info['attempts'] = self.attempts
+self.system.track_function('save_problem_check', event_info)
 
-	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
-		self.system.psychometrics_handler(self.get_instance_state())
+if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
+    self.system.psychometrics_handler(self.get_instance_state())
 
-        # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
+# render problem into HTML
+html = self.get_problem_html(encapsulate=False)
 
-        return {'success': success,
-                'contents': html,
-                }
+return {'success': success,
+        'contents': html,
+        }
 
-    def save_problem(self, get):
-        '''
-        Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
-        event_info = dict()
-        event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+def save_problem(self, get):
+    '''
+    Save the passed in answers.
+    Returns a dict { 'success' : bool, ['error' : error-msg]},
+    with the error key only present if success is False.
+    '''
+    event_info = dict()
+    event_info['state'] = self.lcp.get_state()
+    event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
-        event_info['answers'] = answers
+    answers = self.make_dict_of_responses(get)
+    event_info['answers'] = answers
 
-        # Too late. Cannot submit
-        if self.closed():
-            event_info['failure'] = 'closed'
-            self.system.track_function('save_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Problem is closed"}
-
-        # Problem submitted. Student should reset before saving
-        # again.
-        if self.lcp.done and self.rerandomize == "always":
-            event_info['failure'] = 'done'
-            self.system.track_function('save_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Problem needs to be reset prior to save."}
-
-        self.lcp.student_answers = answers
-
-        # TODO: should this be save_problem_fail?  Looks like success to me...
+    # Too late. Cannot submit
+    if self.closed():
+        event_info['failure'] = 'closed'
         self.system.track_function('save_problem_fail', event_info)
-        return {'success': True}
+        return {'success': False,
+                'error': "Problem is closed"}
 
-    def reset_problem(self, get):
-        ''' Changes problem state to unfinished -- removes student answers,
-            and causes problem to rerender itself.
+    # Problem submitted. Student should reset before saving
+    # again.
+    if self.lcp.done and self.rerandomize == "always":
+        event_info['failure'] = 'done'
+        self.system.track_function('save_problem_fail', event_info)
+        return {'success': False,
+                'error': "Problem needs to be reset prior to save."}
 
-            Returns problem html as { 'html' : html-string }.
-        '''
-        event_info = dict()
-        event_info['old_state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+    self.lcp.student_answers = answers
 
-        if self.closed():
-            event_info['failure'] = 'closed'
-            self.system.track_function('reset_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Problem is closed"}
+    # TODO: should this be save_problem_fail? Looks like success to me...
+    self.system.track_function('save_problem_fail', event_info)
+    return {'success': True}
 
-        if not self.lcp.done:
-            event_info['failure'] = 'not_done'
-            self.system.track_function('reset_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Refresh the page and make an attempt before resetting."}
+def reset_problem(self, get):
+    ''' Changes problem state to unfinished -- removes student answers,
+    and causes problem to rerender itself.
 
-        self.lcp.do_reset()
-        if self.rerandomize in ["always", "onreset"]:
-            # reset random number generator seed (note the self.lcp.get_state()
-            # in next line)
-            self.lcp.seed = None
+    Returns problem html as { 'html' : html-string }.
+    '''
+    event_info = dict()
+    event_info['old_state'] = self.lcp.get_state()
+    event_info['problem_id'] = self.location.url()
 
-        self.lcp = LoncapaProblem(self.definition['data'],
-                                  self.location.html_id(), self.lcp.get_state(),
-                                  system=self.system)
+    if self.closed():
+        event_info['failure'] = 'closed'
+        self.system.track_function('reset_problem_fail', event_info)
+        return {'success': False,
+                'error': "Problem is closed"}
 
-        event_info['new_state'] = self.lcp.get_state()
-        self.system.track_function('reset_problem', event_info)
+    if not self.lcp.done:
+        event_info['failure'] = 'not_done'
+        self.system.track_function('reset_problem_fail', event_info)
+        return {'success': False,
+                'error': "Refresh the page and make an attempt before resetting."}
 
-        return {'html': self.get_problem_html(encapsulate=False)}
+    self.lcp.do_reset()
+    if self.rerandomize in ["always", "onreset"]:
+        # reset random number generator seed (note the self.lcp.get_state()
+        # in next line)
+        self.lcp.seed = None
+
+    self.lcp = LoncapaProblem(self.definition['data'],
+        self.location.html_id(), self.lcp.get_state(),
+        system=self.system)
+
+    event_info['new_state'] = self.lcp.get_state()
+    self.system.track_function('reset_problem', event_info)
+
+    return {'html': self.get_problem_html(encapsulate=False)}
 
 
 class CapaDescriptor(RawDescriptor):
     """
-    Module implementing problems in the LON-CAPA format,
-    as implemented by capa.capa_problem
-    """
+Module implementing problems in the LON-CAPA format,
+as implemented by capa.capa_problem
+"""
 
     module_class = CapaModule
 
@@ -665,7 +665,7 @@ class CapaDescriptor(RawDescriptor):
     template_dir_name = 'problem'
 
     # Capa modules have some additional metadata:
-    # TODO (vshnayder): do problems have any other metadata?  Do they
+    # TODO (vshnayder): do problems have any other metadata? Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
 
@@ -677,11 +677,11 @@ class CapaDescriptor(RawDescriptor):
         return [
             'problems/' + path[8:],
             path[8:],
-        ]
-        
+            ]
+
     def __init__(self, *args, **kwargs):
         super(CapaDescriptor, self).__init__(*args, **kwargs)
-        
+
         weight_string = self.metadata.get('weight', None)
         if weight_string:
             self.weight = float(weight_string)
