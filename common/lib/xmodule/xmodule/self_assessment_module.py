@@ -23,7 +23,7 @@ log = logging.getLogger("mitx.courseware")
 class SelfAssessmentModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/html/display.coffee')
+                     resource_string(__name__, 'js/src/selfassessment/display.coffee')
     ]
     }
     js_module_name = "SelfAssessmentModule"
@@ -38,6 +38,33 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
 
+    def handle_ajax(self, dispatch, get):
+            '''
+            This is called by courseware.module_render, to handle an AJAX call.
+            "get" is request.POST.
+
+            Returns a json dictionary:
+            { 'progress_changed' : True/False,
+            'progress' : 'none'/'in_progress'/'done',
+            <other request-specific values here > }
+            '''
+        handlers = {
+            'problem_get': self.get_problem,
+            'problem_check': self.check_problem,
+            'problem_save': self.save_problem,
+            }
+
+        if dispatch not in handlers:
+            return 'Error'
+
+        before = self.get_progress()
+        d = handlers[dispatch](get)
+        after = self.get_progress()
+        d.update({
+            'progress_changed': after != before,
+            'progress_status': Progress.to_js_status_str(after),
+            })
+        return json.dumps(d, cls=ComplexEncoder)
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
