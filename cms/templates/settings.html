@@ -6,42 +6,181 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="jsextra">
+  <script type="text/javascript">
+    var $body;
+    var $gradeBar;
+    var $draggingBar;
+    var barOrigin;
+    var barWidth;
+    var gradeThresholds;
 
+    (function() {
+      $body = $('body');
+      $gradeBar = $('.grade-bar');
+      gradeThresholds = [100, 80, 70];
+      $('.settings-page-menu a').bind('click', showSettingsTab);
+      $('.drag-bar').bind('mousedown', startDragBar);
+    })();
+
+    function showSettingsTab(e) {
+      e.preventDefault();
+      $('.settings-page-section > section').hide();
+      $('.settings-' + $(this).attr('data-section')).show();
+      $('.settings-page-menu .is-shown').removeClass('is-shown');
+      $(e.target).addClass('is-shown');
+    }
+
+    function startDragBar(e) {
+      e.preventDefault();
+      barOrigin = $gradeBar.offset().left;
+      barWidth = $gradeBar.width();
+      $draggingBar = $(e.target).closest('li');
+      $body.bind('mousemove', moveBar);
+      $body.bind('mouseup', stopDragBar);
+    }
+
+    function moveBar(e) {
+      var percentage = (e.pageX - barOrigin) / barWidth * 100;
+      $draggingBar.css('width', percentage + '%');
+      gradeThresholds[$draggingBar.index()] = Math.round(percentage);
+      renderGradeRanges();
+    }
+
+    function stopDragBar(e) {
+      $body.unbind('mousemove', moveBar);
+      $body.unbind('mouseup', stopDragBar);
+    }
+
+    function renderGradeRanges() {
+      $('.range').each(function(i) {
+        var min = gradeThresholds[i + 1] || 0;
+        var max = gradeThresholds[i];
+        $(this).text(min + '–' + max);
+      });
+    }
+  </script>
 </%block>
 
 <%block name="content">
   <div class="main-wrapper">
-    <div class="inner-wrapper">
+    <div class="inner-wrapper">      
       <h1>Settings</h1>
       <article class="settings-overview">
-        <section>
-          <h2>Details</h2>
-          <div class="row">
-            <label>Course Name:</label>
-            <input type="text" class="course-name-input">
-          </div>
-          <div class="row">
-            <label>Organization:</label>
-            <input type="text" class="course-organization-input">
-          </div>
-          <div class="row">
-            <label>Course Number:</label>
-            <input type="text" class="course-number-input">
-          </div>
-        </section>
-        <section>
-          <h2>Grading</h2>
-          <div class="row">
-            <label>Course Name:</label>
-            <input type="text" class="course-name-input">
-          </div>
-        </section>
-        <section>
-          <h2>Problems</h2>
-          <div class="row">
-            <input type="checkbox" id="randomize-problems"><label for="randomize-problems" class="check-label">Randomize Problems</label>            
-          </div>
-        </section>
+        <div class="sidebar">
+          <nav class="settings-page-menu">
+            <ul>
+              <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
+              <li><a href="#" data-section="grading">Grading</a></li>
+              <li><a href="#" data-section="problems">Problems</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="settings-page-section main-column">
+          <section class="settings-details">
+            <h2>Course Details</h2>
+            <div class="row">
+              <label>Course Name:</label>
+              <input type="text" class="course-name-input long">
+            </div>
+            <div class="row">
+              <label>Organization:</label>
+              <input type="text" class="course-organization-input long">
+            </div>
+            <div class="row">
+              <label>Course Number:</label>
+              <input type="text" class="course-number-input short">
+            </div>
+            <div class="row">
+              <label>Start Date:</label>
+              <input type="text" class="start-date-input date">
+            </div>
+            <div class="row">
+              <label>Enrollment End Date:</label>
+              <input type="text" class="start-date-input date">
+            </div>
+          </section>
+          <section class="is-shown settings-grading">
+            <h2>Grading</h2>
+            <section>
+              <label class="cutoff">Cutoffs:</label>
+              <div class="grade-slider">
+                <div class="grade-bar">
+                  <ol class="increments">
+                    <li class="increment-0">0</li>
+                    <li class="increment-10">10</li>
+                    <li class="increment-20">20</li>
+                    <li class="increment-30">30</li>
+                    <li class="increment-40">40</li>
+                    <li class="increment-50">50</li>
+                    <li class="increment-60">60</li>
+                    <li class="increment-70">70</li>
+                    <li class="increment-80">80</li>
+                    <li class="increment-90">90</li>
+                    <li class="increment-100">100</li>
+                  </ol>
+                  <ol class="grades">
+                    <li class="bar-a">
+                      <span class="letter-grade">A</span>
+                      <span class="range">80–100</span>                      
+                    </li>
+                    <li class="bar-b">
+                      <span class="letter-grade">B</span>
+                      <span class="range">70–80</span>
+                      <a href="#" class="drag-bar"></a>
+                    </li>
+                    <li class="bar-c">
+                      <span class="letter-grade">C</span>
+                      <span class="range">0–70</span>
+                      <a href="#" class="drag-bar"></a>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </section>
+            <section>
+              <div class="row">
+                <label>Grace Period:</label>
+                <input type="text" class="grace-period">
+              </div>
+            </section>
+            <section>
+              <h3>Homework</h3>
+              <div class="row">
+                <label>Minimum Count:</label>
+                <input type="text" class="minimum-count-input short">
+              </div>
+              <div class="row">
+                <label>Drop Count:</label>
+                <input type="text" class="drop-count-input short">
+              </div>
+              <div class="row">
+                <label>Weight:</label>
+                <input type="text" class="weight-input short">
+              </div>
+            </section>
+            <section>
+              <h3>Lab</h3>
+              <div class="row">
+                <label>Minimum Count:</label>
+                <input type="text" class="minimum-count-input short">
+              </div>
+              <div class="row">
+                <label>Drop Count:</label>
+                <input type="text" class="drop-count-input short">
+              </div>
+              <div class="row">
+                <label>Weight:</label>
+                <input type="text" class="weight-input short">
+              </div>
+            </section>
+          </section>
+          <section class="settings-problems">
+            <h2>Problems</h2>
+            <div class="row">
+              <input type="checkbox" id="randomize-problems"><label for="randomize-problems" class="check-label">Randomize Problems</label>            
+            </div>
+          </section>
+        </div>
       </article>
     </div>
   </div>

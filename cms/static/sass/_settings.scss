@@ -1,39 +1,251 @@
 .settings {
   .settings-overview {
     @extend .window;
-    padding: 30px 40px;
+    @include clearfix;
+    display: table;
+    width: 100%;
 
-    .details {
-      margin-bottom: 20px;
-      font-size: 14px;
+    .sidebar {
+      display: table-cell;
+      float: none;
+      width: 20%;
+      padding: 30px 0 30px 20px;
+      border-radius: 3px 0 0 3px;
+      background: $lightGrey;      
     }
 
-    .row {
-      margin-bottom: 20px;
-      padding-bottom: 0;
-      border-bottom: none;
+    .main-column {
+      display: table-cell;
+      float: none;
+      width: 80%;
+      padding: 30px 40px 30px 60px;
     }
 
     label {
       display: inline-block;
       width: 200px;
-      font-size: 14px;
+      font-size: 15px;
+      font-weight: 400;
 
       &.check-label {
         display: inline;
+        margin-left: 10px;
+      }
+
+      &.cutoff {
+        float: left;
+        width: 90px;
+        line-height: 38px;
+      }
+    }
+
+    input {
+      font-size: 15px;
+
+      &.long {
+        width: 400px;
+      }
+
+      &.short {
+        width: 100px;
+      }
+
+      &.date {
+        width: 140px;
+      }
+    }
+
+    .settings-page-section {
+      > section {
+        display: none;
+        margin-bottom: 40px;
+
+        &.is-shown {
+          display: block;
+        }
+
+        .row {
+          margin-bottom: 20px;
+          padding: 0;
+          border-bottom: none;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        > section {
+          padding-bottom: 40px;
+          margin-bottom: 40px;
+          border-radius: 3px;
+          border-bottom: 1px solid $mediumGrey;
+          @include clearfix;
+
+          &:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+          }
+        }
+      }
+    }
+
+    .settings-page-menu {
+      a {
+        display: block;
+        padding-left: 20px;
+        line-height: 52px;
+
+        &.is-shown {
+          background: #fff;
+          border-radius: 5px 0 0 5px;
+        }
       }
     }
   }
 
   h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: 300;   
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 300;
+    color: $blue;
   }
 
-  section {
-    border-bottom: 1px solid $mediumGrey;
-    margin-bottom: 40px;
-    padding-bottom: 40px;
+  h3 {
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 34px;
+    color: $blue;
+  }
+
+  .grade-slider {
+    float: left;
+    width: 500px;
+
+    .grade-bar {
+      position: relative;
+      width: 100%;
+      height: 40px;
+      background: $lightGrey;
+
+      .increments {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 42px;
+          width: 30px;
+          margin-left: -15px;
+          font-size: 9px;
+          text-align: center;
+
+          &.increment-0 {
+            left: 0;
+          }
+
+          &.increment-10 {
+            left: 10%;
+          }
+
+          &.increment-20 {
+            left: 20%;
+          }
+
+          &.increment-30 {
+            left: 30%;
+          }
+
+          &.increment-40 {
+            left: 40%;
+          }
+
+          &.increment-50 {
+            left: 50%;
+          }
+
+          &.increment-60 {
+            left: 60%;
+          }
+
+          &.increment-70 {
+            left: 70%;
+          }
+
+          &.increment-80 {
+            left: 80%;
+          }
+
+          &.increment-90 {
+            left: 90%;
+          }
+
+          &.increment-100 {
+            left: 100%;
+          }
+        }
+      }
+
+      .grades {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 0;
+          height: 40px;     
+          text-align: right;
+          color: rgba(0, 0, 0, .5);          
+
+          &.bar-a {
+            background: #4fe696;
+            width: 100%;
+          }
+
+          &.bar-b {
+            background: #ffdf7e;
+            width: 80%;
+          }
+
+          &.bar-c {
+            background: #ef68a6;
+            width: 70%;
+          }
+
+          .letter-grade {
+            display: block;
+            margin: 6px 5px 0 0;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 14px;
+          }
+
+          .range {
+            display: block;
+            margin-right: 5px;
+            font-size: 10px;
+            line-height: 12px;
+          }
+
+          .drag-bar {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 40px;
+            width: 2px;
+            background-color: #fff;
+            cursor: ew-resize;
+            @include transition(none);
+
+            &:hover {
+              width: 4px;
+              right: -2px;
+            }
+          }
+        }
+      }
+    }
   }
 }
