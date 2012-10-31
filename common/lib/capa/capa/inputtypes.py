@@ -32,8 +32,7 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
-
-
+from collections import namedtuple
 import json
 import logging
 from lxml import etree
@@ -49,6 +48,58 @@ log = logging.getLogger('mitx.' + __name__)
 #########################################################################
 
 registry = TagRegistry()
+
+class Attribute(object):
+    """
+    Allows specifying required and optional attributes for input types.
+    """
+
+    # want to allow default to be None, but also allow required objects
+    _sentinel = object()
+
+    def __init__(self, name, default=_sentinel, transform=None, validate=None):
+        """
+        Define an attribute
+
+        name (str): then name of the attribute--should be alphanumeric (valid for an XML attribute)
+
+        default (any type): If not specified, this attribute is required.  If specified, use this as the default value
+                        if the attribute is not specified.  Note that this value will not be transformed or validated.
+
+        transform (function str -> any type): If not None, will be called to transform the parsed value into an internal
+                        representation.
+
+        validate (function str-or-return-type-of-tranform -> unit or exception): If not None, called to validate the
+                       (possibly transformed) value of the attribute.  Should raise ValueError with a helpful message if
+                       the value is invalid.
+        """
+        self.name = name
+        self.default = default
+        self.validate = validate
+        self.transform = transform
+
+    def parse_from_xml(self, element):
+        """
+        Given an etree xml element that should have this attribute, do the obvious thing:
+          - look for it.  raise ValueError if not found and required.
+          - transform and validate.  pass through any exceptions from transform or validate.
+        """
+        val = element.get(self.name)
+        if self.default == self._sentinel and val is None:
+            raise ValueError('Missing required attribute {0}.'.format(self.name))
+
+        if val is None:
+            # not required, so return default
+            return self.default
+
+        if self.transform is not None:
+            val = self.transform(val)
+
+        if self.validate is not None:
+            self.validate(val)
+
+        return val
+
 
 class InputTypeBase(object):
     """
@@ -102,15 +153,44 @@ class InputTypeBase(object):
 
         self.status = state.get('status', 'unanswered')
 
-        # Call subclass "constructor" -- means they don't have to worry about calling
-        # super().__init__, and are isolated from changes to the input constructor interface.
         try:
+            # Pre-parse and propcess all the declared requirements.
+            self.process_requirements()
+
+            # Call subclass "constructor" -- means they don't have to worry about calling
+            # super().__init__, and are isolated from changes to the input constructor interface.
             self.setup()
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
             msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
             raise Exception, msg, sys.exc_info()[2]
 
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Should return a list of Attribute objects (see docstring there for details). Subclasses should override.  e.g.
+
+        return super(MyClass, cls).attributes + [Attribute('unicorn', True),
+                                                 Attribute('num_dragons', 12, transform=int), ...]
+        """
+        return []
+
+
+    def process_requirements(self):
+        """
+        Subclasses can declare lists of required and optional attributes.  This
+        function parses the input xml and pulls out those attributes.  This
+        isolates most simple input types from needing to deal with xml parsing at all.
+
+        Processes attributes, putting the results in the self.loaded_attributes dictionary.
+        """
+        # Use a local dict so that if there are exceptions, we don't end up in a partially-initialized state.
+        d = {}
+        for a in self.get_attributes():
+            d[a.name] = a.parse_from_xml(self.xml)
+
+        self.loaded_attributes = d
 
     def setup(self):
         """
@@ -122,14 +202,28 @@ class InputTypeBase(object):
         """
         pass
 
+
     def _get_render_context(self):
         """
-        Abstract method.  Subclasses should implement to return the dictionary
-        of keys needed to render their template.
+        Should return a dictionary of keys needed to render the template for the input type.
 
         (Separate from get_html to faciliate testing of logic separately from the rendering)
+
+        The default implementation gets the following rendering context: basic things like value, id,
+        status, and msg, as well as everything in self.loaded_attributes.
+
+        This means that input types that only parse attributes get everything they need, and don't need
+        to override this method.
         """
-        raise NotImplementedError
+        context = {
+            'id': self.id,
+            'value': self.value,
+            'status': self.status,
+            'msg': self.msg,
+            }
+        context.update(self.loaded_attributes)
+        return context
+
 
     def get_html(self):
         """
@@ -139,7 +233,10 @@ class InputTypeBase(object):
             raise NotImplementedError("no rendering template specified for class {0}"
                                       .format(self.__class__))
 
-        html = self.system.render_template(self.template, self._get_render_context())
+        context = self._default_render_context()
+        context.update(self._get_render_context())
+
+        html = self.system.render_template(self.template, context)
         return etree.XML(html)
 
 
@@ -158,33 +255,28 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
-    def setup(self):
-        # Extract the options...
-        options = self.xml.get('options')
-        if not options:
-            raise ValueError("optioninput: Missing 'options' specification.")
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
 
-        # parse the set of possible options
-        oset = shlex.shlex(options[1:-1])
-        oset.quotes = "'"
-        oset.whitespace = ","
-        oset = [x[1:-1] for x  in list(oset)]
+        def parse_options(options):
+            """Given options string, convert it into an ordered list of (option, option) tuples
+            (Why? I don't know--that's what the template uses at the moment)
+            """
+            # parse the set of possible options
+            oset = shlex.shlex(options[1:-1])
+            oset.quotes = "'"
+            oset.whitespace = ","
+            oset = [x[1:-1] for x  in list(oset)]
 
-        # make ordered list with (key, value) same
-        self.osetdict = [(oset[x], oset[x]) for x in range(len(oset))]
-        # TODO: allow ordering to be randomized
+            # make ordered list with (key, value) same
+            return [(oset[x], oset[x]) for x in range(len(oset))]
 
-    def _get_render_context(self):
-
-        context = {
-            'id': self.id,
-            'value': self.value,
-            'status': self.status,
-            'msg': self.msg,
-            'options': self.osetdict,
-            'inline': self.xml.get('inline',''),
-            }
-        return context
+        return super(OptionInput, cls).get_attributes() + [
+            Attribute('options', transform=parse_options),
+            Attribute('inline', '')]
 
 registry.register(OptionInput)
 
