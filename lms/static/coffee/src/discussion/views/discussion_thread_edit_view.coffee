@@ -92,6 +92,7 @@ if Backbone?
           $hidden = $("#commentable-id-edit")
           if $hidden
             $hidden.val(@topicId)
+            $hidden.attr('display_name',@topicText);
 
       getFullTopicName: (topicElement) ->
           name = topicElement.html()

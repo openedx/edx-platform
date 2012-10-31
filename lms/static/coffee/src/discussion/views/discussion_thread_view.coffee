@@ -115,13 +115,14 @@ if Backbone?
       newTitle = @editView.$(".edit-post-title").val()
       newBody  = @editView.$(".edit-post-body textarea").val()
       newCommentableId  = @editView.$("#commentable-id-edit").val()
+      newCoursewareTitle  = @editView.$("#commentable-id-edit").attr('display_name')
 
       # TODO tags
       # Until we decide what to do w/ tags, removing them.
       #newTags  = @editView.$(".edit-post-tags").val()
 
       url = DiscussionUtil.urlFor('update_thread', @model.id)
-      
+
       DiscussionUtil.safeAjax
           $elem: $(event.target)
           $loading: $(event.target) if event
@@ -133,6 +134,7 @@ if Backbone?
               title: newTitle
               body: newBody
               commentable_id: newCommentableId
+              courseware_title: newCoursewareTitle
 
               # TODO tags
               # Until we decide what to do w/ tags, removing them.
@@ -146,12 +148,15 @@ if Backbone?
               @editView.$(".edit-post-tags").val("")
               @editView.$(".edit-post-tags").importTags("")
               @editView.$(".wmd-preview p").html("")
-
+              
               @model.set
                 title: newTitle
                 body: newBody
                 commentable_id: newCommentableId
+                courseware_title: newCoursewareTitle
                 tags: response.content.tags
+                courseware_url: response.content["courseware_url"]
+                
               @createShowView()
               @renderShowView()
               

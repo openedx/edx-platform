@@ -106,8 +106,8 @@ def update_thread(request, course_id, thread_id):
     thread.save()
     courseware_context = get_courseware_context(thread, course)
     data = thread.to_dict()
-    
-    data.update(courseware_context)        
+    if courseware_context:
+        data.update(courseware_context)
       
     if request.is_ajax():
         return ajax_content_response(request, course_id, data, 'discussion/ajax_update_thread.html')
