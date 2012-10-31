@@ -1995,7 +1995,7 @@ cktsim = (function() {
 // set up each schematic entry widget
 function update_schematics() {
     // set up each schematic on the page
-    var schematics = document.getElementsByClassName('schematic');
+    var schematics = $('.schematic');
     for (var i = 0; i < schematics.length; ++i)
 	if (schematics[i].getAttribute("loaded") != "true") {
 	    try {
@@ -2036,7 +2036,7 @@ function add_schematic_handler(other_onload) {
 
 // ask each schematic input widget to update its value field for submission
 function prepare_schematics() {
-    var schematics = document.getElementsByClassName('schematic');
+    var schematics = $('.schematic');
     for (var i = schematics.length - 1; i >= 0; i--)
 	schematics[i].schematic.update_value();
 }
@@ -3339,7 +3339,7 @@ schematic = (function() {
 	}
 
 	// add method to canvas to compute relative coords for event
-	HTMLCanvasElement.prototype.relMouseCoords = function(event){
+	if (HTMLCanvasElement) HTMLCanvasElement.prototype.relMouseCoords = function(event){
 	    // run up the DOM tree to figure out coords for top,left of canvas
 	    var totalOffsetX = 0;
 	    var totalOffsetY = 0;
@@ -3718,7 +3718,7 @@ schematic = (function() {
 	    // look for property input fields in the content and give
 	    // them a keypress listener that interprets ENTER as
 	    // clicking OK.
-	    var plist = content.getElementsByClassName('property');
+	    var plist = $(content).find('.property');
 	    for (var i = plist.length - 1; i >= 0; --i) {
 		var field = plist[i];
 		field.dialog = dialog;  // help event handler find us...
