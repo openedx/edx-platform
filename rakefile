@@ -197,6 +197,20 @@ TEST_TASKS = []
     end
 end
 
+
+desc "Reset the relational database used by django. WARNING: this will delete all of your existing users"
+task :resetdb, [:env] do |t, args|
+    args.with_defaults(:env => 'dev')
+    sh(django_admin(:lms, args.env, 'syncdb'))
+    sh(django_admin(:lms, args.env, 'migrate'))
+end
+
+desc "Update the relational database to the latest migration"
+task :migrate, [:env] do |t, args|
+    args.with_defaults(:env => 'dev')
+    sh(django_admin(:lms, args.env, 'migrate'))
+end
+
 Dir["common/lib/*"].each do |lib|
     task_name = "test_#{lib}"
 
