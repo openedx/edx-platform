@@ -14,7 +14,6 @@ import socket
 
 WIKI_ENABLED = False
 MITX_FEATURES['ENABLE_TEXTBOOK'] = False
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = False

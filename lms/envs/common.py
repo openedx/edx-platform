@@ -66,7 +66,6 @@ MITX_FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
@@ -360,6 +359,7 @@ MIDDLEWARE_CLASSES = (
 
     'course_wiki.course_nav.Middleware',
 
+    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
@@ -594,6 +594,7 @@ INSTALLED_APPS = (
 
     # For testing
     'django_jasmine',
+    'django.contrib.admin',   # only used in DEBUG mode
 
     # Discussion forums
     'django_comment_client',
