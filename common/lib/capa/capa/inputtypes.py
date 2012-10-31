@@ -396,7 +396,7 @@ class FileSubmission(InputTypeBase):
         self.required_files = saxutils.escape(self.required_files, escapedict)
 
         # Check if problem has been queued
-        queue_len = 0
+        self.queue_len = 0
         # Flag indicating that the problem has been queued, 'msg' is length of queue
         if self.status == 'incomplete':
             self.status = 'queued'
