@@ -15,8 +15,7 @@ class @Problem
     @inputs = @$("[id^=input_#{problem_prefix}_]")
     
     @$('section.action input:button').click @refreshAnswers
-    @$('section.action input.check').click @check_fd
-    #@$('section.action input.check').click @check
+    @$('section.action input.check').click @check
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
 
@@ -46,88 +45,6 @@ class @Problem
         setupMethod = @inputtypeSetupMethods[cls]
         if setupMethod?
           @inputtypeDisplays[id] = setupMethod(inputtype)
-
-
-  ###
-  # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
-  #      in addition to simple querystring-based answers
-  #
-  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
-  #       maybe preferable to consolidate all dispatches to use FormData
-  ###
-  check_fd: =>
-    Logger.log 'problem_check', @answers
-
-    # If there are no file inputs in the problem, we can fall back on @check
-    if $('input:file').length == 0 
-      @check()
-      return
-
-    if not window.FormData
-      alert "Submission aborted! Sorry, your browser does not support file uploads. If you can, please use Chrome or Safari which have been verified to support file uploads."
-      return
-
-    fd = new FormData()
-    
-    # Sanity checks on submission
-    max_filesize = 4*1000*1000 # 4 MB
-    file_too_large = false
-    file_not_selected = false
-    required_files_not_submitted = false
-    unallowed_file_submitted = false
-
-    errors = []
-
-    @inputs.each (index, element) ->
-      if element.type is 'file'
-        required_files = $(element).data("required_files")
-        allowed_files  = $(element).data("allowed_files")
-        for file in element.files
-          if allowed_files.length != 0 and file.name not in allowed_files
-              unallowed_file_submitted = true
-              errors.push "You submitted #{file.name}; only #{allowed_files} are allowed."
-          if file.name in required_files
-              required_files.splice(required_files.indexOf(file.name), 1)
-          if file.size > max_filesize
-            file_too_large = true
-            errors.push 'Your file "' + file.name '" is too large (max size: ' + max_filesize/(1000*1000) + ' MB)'
-          fd.append(element.id, file)
-        if element.files.length == 0 
-          file_not_selected = true
-          fd.append(element.id, '') # In case we want to allow submissions with no file
-        if required_files.length != 0
-          required_files_not_submitted = true
-          errors.push "You did not submit the required files: #{required_files}."
-      else
-        fd.append(element.id, element.value)
-
-    
-    if file_not_selected
-      errors.push 'You did not select any files to submit'
-
-    error_html = '<ul>\n'
-    for error in errors
-      error_html += '<li>' + error + '</li>\n'
-    error_html += '</ul>'
-    @gentle_alert error_html
-
-    abort_submission = file_too_large or file_not_selected or unallowed_file_submitted or required_files_not_submitted
-
-    settings = 
-      type: "POST"
-      data: fd
-      processData: false
-      contentType: false
-      success: (response) => 
-        switch response.success
-          when 'incorrect', 'correct'
-            @render(response.contents)
-            @updateProgress response
-          else
-            @gentle_alert response.success
-    
-    if not abort_submission
-      $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
     Logger.log 'problem_check', @answers
