@@ -1,3 +1,0 @@
-[submodule "askbot"]
-	path = askbot
-	url = git@github.com:MITx/askbot-devel.git
