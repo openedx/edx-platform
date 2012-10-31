@@ -136,6 +136,10 @@ MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ############################ STATIC FILES #############################
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = TEST_ROOT / "uploads"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
 new_staticfiles_dirs = []
 # Strip out any static files that aren't in the repository root
@@ -150,6 +154,12 @@ for static_dir in STATICFILES_DIRS:
     if data_dir.startswith(REPO_ROOT):
         new_staticfiles_dirs.append(static_dir)
 STATICFILES_DIRS = new_staticfiles_dirs
+
+FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
 
 ################### Make tests faster
 
