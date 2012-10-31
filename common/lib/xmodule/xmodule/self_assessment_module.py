@@ -42,7 +42,7 @@ class SelfAssessmentModule(XModule):
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     """
-    Module for putting raw html in a course
+    Module for putting self assessment questions into a course
     """
     mako_template = "widgets/html-edit.html"
     module_class = SelfAssessmentModule
