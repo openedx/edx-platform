@@ -125,30 +125,6 @@ class @Problem
         @gentle_alert saveMessage
       @updateProgress response
 
-  refreshMath: (event, element) =>
-    element = event.target unless element
-    elid = element.id.replace(/^input_/,'')
-    target = "display_" + elid
-
-    # MathJax preprocessor is loaded by 'setupInputTypes'
-    preprocessor_tag = "inputtype_" + elid
-    mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
-
-    if jax = MathJax.Hub.getAllJax(target)[0]
-      eqn = $(element).val()
-      if mathjax_preprocessor
-        eqn = mathjax_preprocessor(eqn)
-      MathJax.Hub.Queue(['Text', jax, eqn], [@updateMathML, jax, element])
-
-    return # Explicit return for CoffeeScript
-    
-  updateMathML: (jax, element) =>
-    try
-      $("##{element.id}_dynamath").val(jax.root.toMathML '')
-    catch exception
-      throw exception unless exception.restart
-      MathJax.Callback.After [@refreshMath, jax], exception.restart
-
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->
       element.schematic.update_value()
