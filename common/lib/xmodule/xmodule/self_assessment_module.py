@@ -452,7 +452,7 @@ class SelfAssessmentDescriptor(RawDescriptor):
 
     stores_state = True
     has_score = True
-    template_dir_name = 'selfassessment'
+    template_dir_name = 'problem'
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata? Do they
@@ -465,7 +465,7 @@ class SelfAssessmentDescriptor(RawDescriptor):
     @classmethod
     def backcompat_paths(cls, path):
         return [
-            'problems/' + path[8:],
+            'problem/' + path[8:],
             path[8:],
             ]
 
