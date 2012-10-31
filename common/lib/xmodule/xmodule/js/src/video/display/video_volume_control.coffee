@@ -17,7 +17,7 @@ class @VideoVolumeControl extends Subview
           <div class="volume-slider"></div>
         </div>
       </div>
-      """
+      """#"
     @slider = @$('.volume-slider').slider
       orientation: "vertical"
       range: "min"
