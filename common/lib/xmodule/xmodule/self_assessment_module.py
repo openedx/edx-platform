@@ -74,6 +74,30 @@ class SelfAssessmentModule(XModule):
 
         self.answers={}
 
+        self.score=0
+
+        self.max_score=1
+
+    def get_score(self):
+        return self.score
+
+    def max_score(self):
+        return self.max_score
+
+    def get_progress(self):
+        ''' For now, just return score / max_score
+        '''
+        score = self.get_score()
+        score = d['score']
+        total = self.max_score()
+        if total > 0:
+            try:
+                return Progress(score, total)
+            except Exception as err:
+                log.exception("Got bad progress")
+                return None
+        return None
+
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -105,8 +129,8 @@ class SelfAssessmentModule(XModule):
 
 
 
-    def show_rubric:
-        return {'success': True}
+    def show_rubric(self,get):
+        return {'success': True, 'rubric':rubric_form}
 
 
     def save_problem(self, get):
