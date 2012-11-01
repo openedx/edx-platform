@@ -19,9 +19,9 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-rubric_form=('<section class="sa-wrapper" sa_id="two"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
-            '<input type="radio" name="assessment" value="incorrect">'
-            'Incorrect<br/><input type="button" value="Save" id="show" name="show"/></section>')
+rubric_form=('<section class="sa-wrapper"><input type="radio" name="assessment" id="assessment_correct" value="correct"/>Correct<br/>'
+            '<input type="radio" id="assessment_incorrect" name="assessment" value="incorrect">'
+            'Incorrect<br/><input type="button" value="Save" id="save" name="save"/></section>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -58,9 +58,9 @@ class SelfAssessmentModule(XModule):
         self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
 
-        problem_form=('<section class="sa-wrapper" sa_id="one"><input type="text" name="answer" '
+        problem_form=('<section class="sa-wrapper"><input type="text" name="answer" '
                       'id="answer"/><br/>'
-                      '<input type="button" value="Check" id ="save" name="save" url="{0}"/>'
+                      '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
                       '<p id="rubric"></p></section>').format(self.location)
 
         self.problem=''.join([self.problem,problem_form])
@@ -87,7 +87,6 @@ class SelfAssessmentModule(XModule):
         '''
 
         handlers = {
-            'sa_get' : self.show_problem,
             'sa_show': self.show_rubric,
             'sa_save': self.save_problem,
             }
@@ -103,6 +102,12 @@ class SelfAssessmentModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+
+
+    def show_rubric:
+        return {'success': True}
+
 
     def save_problem(self, get):
         '''
@@ -129,7 +134,7 @@ class SelfAssessmentModule(XModule):
 
         self.system.track_function('save_problem_succeed', event_info)
 
-        return {'success': True, 'rubric' : self.rubric}
+        return {'success': True}
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
@@ -143,8 +148,6 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "html"
-
-
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
