@@ -57,7 +57,6 @@
 
     function moveBar(e) {
       var barIndex = $draggingBar.index();
-      console.log(barIndex);
       var min = gradeThresholds[barIndex + 1] || 0;
       var max = gradeThresholds[barIndex - 1] || 100;
       var percentage = Math.min(Math.max((e.pageX - barOrigin) / barWidth * 100, min), max);
