@@ -8,6 +8,8 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
       $('section.sa-wrapper textarea#answer').remove()
       $('section.sa-wrapper p#rubric').append(answer)
       $('section.sa-wrapper p#rubric').append(response.rubric)
+    else
+      $('section.sa-wrapper p#rubric').append(response.message)
 ));
 
 $(document).on('click', 'section.sa-wrapper input#save', ( ->
