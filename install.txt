@@ -73,5 +73,11 @@ There is also a script "create-dev-env.sh" that automates these steps.
         $ cd ~/mitx_all/mitx
         $ django-admin.py syncdb --settings=envs.dev --pythonpath=.
         $ django-admin.py migrate --settings=envs.dev --pythonpath=.
-        $ django-admin.py runserver --settings=envs.dev --pythonpath=.   
+        $ django-admin.py runserver --settings=envs.dev --pythonpath=.  
+        
+   To allow other machines (such as a local vm) to connect to your dev server
+   		$ django-admin.py runserver --settings=envs.dev --pythonpath=. 0.0.0.0:8000
+   	If you're on a Mac, use http://servername.local:8000/ to connect to the server (you may need to turn off your firewall (preferences>security>firewall) If someone can figure out the instructions for opening just 8000, please post them.)
+   	 
+   		 
 
