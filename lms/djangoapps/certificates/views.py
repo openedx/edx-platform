@@ -6,6 +6,7 @@ import json
 
 log = logging.getLogger("mitx.certificates")
 
+
 @csrf_exempt
 def update_certificate(request):
     """
@@ -25,7 +26,7 @@ def update_certificate(request):
                    key=xqueue_header['lms_key'])
 
         except GeneratedCertificate.DoesNotExist:
-            log.critical('Unable to lookup certificate\n' 
+            log.critical('Unable to lookup certificate\n'
                          'xqueue_body: {0}\n'
                          'xqueue_header: {1}'.format(
                                       xqueue_body, xqueue_header))
@@ -42,5 +43,3 @@ def update_certificate(request):
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),
                              mimetype='application/json')
-
-
