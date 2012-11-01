@@ -19,9 +19,6 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-problem_form=('<section class="sa-wrapper" sa_id="one"><input type="text" name="answer" '
-'id="answer"/><br/><input type="button" value="Check" id ="save" name="save"/><p id="rubric"></p></section>')
-
 rubric_form=('<section class="sa-wrapper" sa_id="two"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
             '<input type="radio" name="assessment" value="incorrect">'
             'Incorrect<br/><input type="button" value="Save" id="show" name="show"/></section>')
@@ -61,6 +58,11 @@ class SelfAssessmentModule(XModule):
         self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
 
+        problem_form=('<section class="sa-wrapper" sa_id="one"><input type="text" name="answer" '
+                      'id="answer"/><br/>'
+                      '<input type="button" value="Check" id ="save" name="save" url="{0}"/>'
+                      '<p id="rubric"></p></section>').format(self.location)
+
         self.problem=''.join([self.problem,problem_form])
 
         self.rubric=''.join([self.rubric,rubric_form])
@@ -69,6 +71,9 @@ class SelfAssessmentModule(XModule):
         #print(etree.tostring(problem))
 
         self.html = self.problem
+
+        self.answers={}
+
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -106,14 +111,25 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False.
         '''
         event_info = dict()
-        event_info['state'] = self.lcp.get_state()
+        event_info['state'] = {'seed': 1,
+                              'student_answers': self.answers,
+                              'correct_map': {'self_assess' : {'correctness': False,
+                                               'npoints': 0,
+                                               'msg': "",
+                                               'hint': "",
+                                               'hintmode': "",
+                                               'queuestate': "",
+                                               }},
+                              'done': True}
+
         event_info['problem_id'] = self.location.url()
 
+        answers = self.make_dict_of_responses(get)
+        event_info['answers'] = answers
+
+        self.system.track_function('save_problem_succeed', event_info)
+
         return {'success': True, 'rubric' : self.rubric}
-
-
-
-
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
