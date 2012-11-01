@@ -1,10 +1,12 @@
 import logging
 from certificates.models import GeneratedCertificate
-from pprint import pprint
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+import json
 
 log = logging.getLogger("mitx.certificates")
 
-
+@csrf_exempt
 def update_certificate(request):
     """
     Will update GeneratedCertificate for a new certificate or
@@ -12,20 +14,33 @@ def update_certificate(request):
     """
 
     if request.method == "POST":
-        pprint(request)
-#        user = request.POST.get('user')
-#        try:
-#            generated_certificate = GeneratedCertificate.objects.get(
-#                   key=key)
-#        except GeneratedCertificate.DoesNotExist:
-#            generated_certificate = GeneratedCertificate(user=user)
-#
-#        enabled = request.POST.get('enabled')
-#        enabled = True if enabled == 'True' else False
-#        generated_certificate.grade = request.POST.get('grade')
-#        generated_certificate.download_url = request.POST.get('download_url')
-#        generated_certificate.graded_download_url = request.POST.get(
-#                'graded_download_url')
-#        generated_certificate.course_id = request.POST.get('course_id')
-#        generated_certificate.enabled = enabled
-#        generated_certificate.save()
+
+        xqueue_body = json.loads(request.POST.get('xqueue_body'))
+        xqueue_header = json.loads(request.POST.get('xqueue_header'))
+
+        try:
+            cert = GeneratedCertificate.objects.get(
+                   user__username=xqueue_body['username'],
+                   course_id=xqueue_body['course_id'],
+                   key=xqueue_header['lms_key'])
+
+        except GeneratedCertificate.DoesNotExist:
+            log.critical('Unable to lookup certificate\n' 
+                         'xqueue_body: {0}\n'
+                         'xqueue_header: {1}'.format(
+                                      xqueue_body, xqueue_header))
+
+            return HttpResponse(json.dumps({
+                            'return_code': 1,
+                            'content': 'unable to lookup key'}),
+                             mimetype='application/json')
+
+        cert.download_uuid = xqueue_body['download_uuid']
+        cert.verify_uuid = xqueue_body['download_uuid']
+        cert.download_url = xqueue_body['url']
+        cert.status = 'downloadable'
+        cert.save()
+        return HttpResponse(json.dumps({'return_code': 0}),
+                             mimetype='application/json')
+
+
