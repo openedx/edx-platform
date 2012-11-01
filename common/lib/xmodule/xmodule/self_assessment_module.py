@@ -72,7 +72,7 @@ class SelfAssessmentModule(XModule):
         self.problem=''.join([self.problem,problem_form])
         self.rubric=''.join([self.rubric,rubric_form])
         self.html = self.problem
-        self.answers={}
+        self.answer=""
         self.score=0
         self.top_score=1
 
@@ -124,11 +124,9 @@ class SelfAssessmentModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
-
-
     def show_rubric(self,get):
+        self.answer=get.keys()[0]
         return {'success': True, 'rubric' : self.rubric}
-
 
     def save_problem(self, get):
         '''
@@ -136,10 +134,13 @@ class SelfAssessmentModule(XModule):
         Returns a dict { 'success' : bool, ['error' : error-msg]},
         with the error key only present if success is False.
         '''
+
+        correctness=get.keys()[0]
+        log.debug(correctness)
         event_info = dict()
         event_info['state'] = {'seed': 1,
                               'student_answers': self.answers,
-                              'correct_map': {'self_assess' : {'correctness': False,
+                              'correct_map': {'self_assess' : {'correctness': correctness,
                                                'npoints': 0,
                                                'msg': "",
                                                'hint': "",
@@ -150,36 +151,11 @@ class SelfAssessmentModule(XModule):
 
         event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
-        log.debug(answers)
-        event_info['answers'] = answers
+        event_info['answers'] = self.answer
 
         self.system.track_function('save_problem_succeed', event_info)
 
         return {'success': True, 'message' : "Save Succcesful.  Thanks for participating!"}
-
-    @staticmethod
-    def make_dict_of_responses(get):
-        '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary.
-        '''
-        answers = dict()
-        for key in get:
-            # e.g. input_resistor_1 ==> resistor_1
-            _, _, name = key.partition('_')
-
-            # This allows for answers which require more than one value for
-            # the same form input (e.g. checkbox inputs). The convention is that
-            # if the name ends with '[]' (which looks like an array), then the
-            # answer will be an array.
-            if not name.endswith('[]'):
-                answers[name] = get[key]
-            else:
-                name = name[:-2]
-                answers[name] = get.getlist(key)
-
-        return answers
-
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     """
