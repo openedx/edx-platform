@@ -23,6 +23,7 @@ from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
 from courseware.models import StudentModuleCache
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -147,7 +148,7 @@ def get_course_about_section(course, section_key):
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
-            course_module = get_module(request.user, request, loc, None, course.id)
+            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True)
 
             html = ''
 
