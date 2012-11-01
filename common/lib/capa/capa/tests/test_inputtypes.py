@@ -46,6 +46,19 @@ class OptionInputTest(unittest.TestCase):
 
         self.assertEqual(context, expected)
 
+    def test_option_parsing(self):
+        f = inputtypes.OptionInput.parse_options
+        def check(input, options):
+            """Take list of options, confirm that output is in the silly doubled format"""
+            expected = [(o, o) for o in options]
+            self.assertEqual(f(input), expected)
+
+        check("('a','b')", ['a', 'b'])
+        check("('a', 'b')", ['a', 'b'])
+        check("('a b','b')", ['a b', 'b'])
+        check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
+
+
 class ChoiceGroupTest(unittest.TestCase):
     '''
     Test choice groups, radio groups, and checkbox groups
@@ -73,6 +86,7 @@ class ChoiceGroupTest(unittest.TestCase):
         expected = {'id': 'sky_input',
                     'value': 'foil3',
                     'status': 'answered',
+                    'msg': '',
                     'input_type': expected_input_type,
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
@@ -119,12 +133,13 @@ class JavascriptInputTest(unittest.TestCase):
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
+                    'status': 'unanswered',
+                    'msg': '',
+                    'value': '3',
                     'params': params,
                     'display_file': display_file,
                     'display_class': display_class,
-                    'problem_state': problem_state,
-                    'value': '3',
-                    'evaluation': '',}
+                    'problem_state': problem_state,}
 
         self.assertEqual(context, expected)
 
@@ -204,9 +219,6 @@ class FileSubmissionTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        escapedict = {'"': '&quot;'}
-        esc = lambda s: saxutils.escape(s, escapedict)
-
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
@@ -220,8 +232,8 @@ class FileSubmissionTest(unittest.TestCase):
                    'msg': input_class.submitted_msg,
                    'value': 'BumbleBee.py',
                    'queue_len': '3',
-                   'allowed_files': esc('["runme.py", "nooooo.rb", "ohai.java"]'),
-                   'required_files': esc('["cookies.py"]')}
+                   'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
+                   'required_files': '["cookies.py"]'}
 
         self.assertEqual(context, expected)
 
