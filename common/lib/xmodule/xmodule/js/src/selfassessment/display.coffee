@@ -13,10 +13,10 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
 ));
 
 $(document).on('click', 'section.sa-wrapper input#save', ( ->
-  assessment_correct=$('section.sa-wrapper #assessment').find(':selected').text()
+  assessment=$('section.sa-wrapper #assessment').find(':selected').text()
   post_url=$('section.sa-wrapper input#save').attr('url')
   final_url="#{post_url}/sa_save"
-  $.post final_url, assessment_correct, (response) ->
+  $.post final_url, assessment, (response) ->
     if response.success
       $('section.sa-wrapper p#save_message').append(response.message)
       $('section.sa-wrapper input#save').remove()
