@@ -19,12 +19,12 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-problem_form=('<form action="save()"><input type="text" name="answer" '
-'id="answer"/><br/><input type="submit" value="Check" id ="save"/></form><p id="rubric"></p>')
+problem_form=('<section class="sa-wrapper" sa_id="one"><input type="text" name="answer" '
+'id="answer"/><br/><input type="button" value="Check" id ="save" name="save"/><p id="rubric"></p></section>')
 
-rubric_form=('<form action="show()"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
+rubric_form=('<section class="sa-wrapper" sa_id="two"><input type="radio" name="assessment" value="correct"/>Correct<br/>'
             '<input type="radio" name="assessment" value="incorrect">'
-            'Incorrect<input type="submit" value="Submit" id="show"/></form>')
+            'Incorrect<br/><input type="button" value="Save" id="show" name="show"/></section>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
