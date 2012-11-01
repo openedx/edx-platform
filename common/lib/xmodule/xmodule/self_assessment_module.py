@@ -84,6 +84,21 @@ class SelfAssessmentModule(XModule):
         self.submit_message=etree.tostring(dom2.xpath('submitmessage')[0])
         log.debug(self.submit_message)
 
+        self.attempts = 0
+        self.max_attempts = 1
+        self.max_attempts = self.metadata.get('attempts', None)
+        if self.max_attempts is not None:
+            self.max_attempts = int(self.max_attempts)
+        else:
+            self.max_attempts=1
+
+        if instance_state is not None:
+            instance_state = json.loads(instance_state)
+        if instance_state is not None and 'attempts' in instance_state:
+            self.attempts = instance_state['attempts']
+
+        self.correctness="incorrect"
+
 
     def get_score(self):
         return self.score
@@ -145,15 +160,15 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False.
         '''
 
-        correctness=get.keys()[0].lower()
-        log.debug(correctness)
+        self.correctness=get.keys()[0].lower()
+        log.debug(self.correctness)
         points=0
-        if correctness=="correct" :
+        if self.correctness=="correct" :
             points=1
         event_info = dict()
         event_info['state'] = {'seed': 1,
                               'student_answers': self.answer,
-                              'correct_map': {'self_assess' : {'correctness': correctness,
+                              'correct_map': {'self_assess' : {'correctness': self.correctness,
                                                'npoints': points,
                                                'msg': "",
                                                'hint': "",
@@ -169,6 +184,24 @@ class SelfAssessmentModule(XModule):
         self.system.track_function('save_problem_succeed', event_info)
 
         return {'success': True, 'message' : self.submit_message}
+
+    def get_instance_state(self):
+        points=0
+        if self.correctness=="correct" :
+            points=1
+        state= return {'seed': 1,
+                       'student_answers': self.answer,
+                       'correct_map': {'self_assess' : {'correctness': self.correctness,
+                                                        'npoints': points,
+                                                        'msg': "",
+                                                        'hint': "",
+                                                        'hintmode': "",
+                                                        'queuestate': "",
+                                                        }},
+                       'done': self.done}
+        state['attempts'] = self.attempts
+        return json.dumps(state)
+
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     """
