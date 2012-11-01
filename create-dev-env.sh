@@ -193,7 +193,8 @@ case `uname -s` in
             maya|lisa|natty|oneiric|precise|quantal)
                 output "Installing ubuntu requirements"
                 sudo apt-get -y update
-                sudo apt-get -y install $APT_PKGS
+                # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
+                sudo DEBIAN_FRONTEND=noninteractive apt-get -y install $APT_PKGS
                 clone_repos
                 ;;
             *)
