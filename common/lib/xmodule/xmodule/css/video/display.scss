@@ -355,6 +355,34 @@ div.video {
           }
         }
 
+        a.quality_control {
+          background: url(../images/hd.png) center no-repeat;
+          border-right: 1px solid #000;
+          @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+          color: #797979;
+          display: block;
+          float: left;
+          line-height: 46px; //height of play pause buttons
+          margin-left: 0;
+          padding: 0 lh(.5);
+          text-indent: -9999px;
+          @include transition();
+          width: 30px;
+
+          &:hover {
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+          }
+
+          &.active {
+            background-color: #F44;
+            color: #0ff;
+            text-decoration: none;
+          }
+        }
+
+
         a.hide-subtitles {
           background: url('../images/cc.png') center no-repeat;
           color: #797979;
