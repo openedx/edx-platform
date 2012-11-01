@@ -21,10 +21,6 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-rubric_form=('<br/><br/>Please assess your performance given the above rubric: <br/><br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
-             '<option value="incorrect">Incorrect</option><option value="correct">Correct</option></select><br/>'
-             '<input type="button" value="Save" id="save" name="save"/><p id="save_message"></p></section><br/><br/>')
-
 def only_one(lst, default="", process=lambda x: x):
     """
     If lst is empty, returns default
@@ -63,18 +59,31 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
 
         dom2=etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
-        self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
+        self.rubric="<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
-        problem_form=('<section class="sa-wrapper"><input type="text" name="answer" '
-                      'id="answer"/><br/>'
+        problem_form=('<section class="sa-wrapper"><textarea name="answer" '
+                      'id="answer" cols="50" rows="5"/><br/>'
                       '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
                       '<p id="rubric"></p></section><br/><br/>').format(self.location)
+
+        rubric_form=('<br/><br/>Please assess your performance given the above rubric: <br/>'
+                     '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
+                     '<option value="incorrect">Incorrect</option><option value="correct">'
+                     'Correct</option></select><br/>'
+                     '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
+                     '<p id="save_message"></p></section><br/><br/>').format(self.location)
+
+
+
         self.problem=''.join([self.problem,problem_form])
         self.rubric=''.join([self.rubric,rubric_form])
         self.html = self.problem
         self.answer=""
         self.score=0
         self.top_score=1
+        self.submit_message=etree.tostring(dom2.xpath('submitmessage')[0])
+        log.debug(self.submit_message)
+
 
     def get_score(self):
         return self.score
@@ -126,6 +135,7 @@ class SelfAssessmentModule(XModule):
 
     def show_rubric(self,get):
         self.answer=get.keys()[0]
+        log.debug(self.answer)
         return {'success': True, 'rubric' : self.rubric}
 
     def save_problem(self, get):
@@ -135,13 +145,16 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False.
         '''
 
-        correctness=get.keys()[0]
+        correctness=get.keys()[0].lower()
         log.debug(correctness)
+        points=0
+        if correctness=="correct" :
+            points=1
         event_info = dict()
         event_info['state'] = {'seed': 1,
-                              'student_answers': self.answers,
+                              'student_answers': self.answer,
                               'correct_map': {'self_assess' : {'correctness': correctness,
-                                               'npoints': 0,
+                                               'npoints': points,
                                                'msg': "",
                                                'hint': "",
                                                'hintmode': "",
@@ -155,7 +168,7 @@ class SelfAssessmentModule(XModule):
 
         self.system.track_function('save_problem_succeed', event_info)
 
-        return {'success': True, 'message' : "Save Succcesful.  Thanks for participating!"}
+        return {'success': True, 'message' : self.submit_message}
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     """
