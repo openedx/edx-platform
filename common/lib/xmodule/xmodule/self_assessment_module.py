@@ -3,7 +3,6 @@ Add Self Assessment module so students can write essay, submit, then see a rubri
 Incredibly hacky solution to persist state and properly display information
 """
 
-
 import copy
 from fs.errors import ResourceNotFoundError
 import logging
@@ -28,7 +27,7 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 log = logging.getLogger("mitx.courseware")
 
 #Set the default number of max attempts.  Should be 1 for production
-max_attempts=100
+max_attempts = 100
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -42,6 +41,7 @@ def only_one(lst, default="", process=lambda x: x):
         return process(lst[0])
     else:
         raise Exception('Malformed XML')
+
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -87,48 +87,48 @@ class SelfAssessmentModule(XModule):
         """
 
         #Parse definition file
-        dom2=etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
+        dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
 
         #Extract problem, submission message and rubric from definition file
-        self.rubric="<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
-        self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
-        self.submit_message=etree.tostring(dom2.xpath('submitmessage')[0])
+        self.rubric = "<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
+        self.problem = ''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
+        self.submit_message = etree.tostring(dom2.xpath('submitmessage')[0])
 
         #Forms to append to problem and rubric that capture student responses.
         #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
-        problem_form=('<section class="sa-wrapper"><textarea name="answer" '
-                      'id="answer" cols="50" rows="5"/><br/>'
-                      '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
-                      '<p id="rubric"></p></section><br/><br/>').format(system.ajax_url)
+        problem_form = ('<section class="sa-wrapper"><textarea name="answer" '
+                        'id="answer" cols="50" rows="5"/><br/>'
+                        '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
+                        '<p id="rubric"></p></section><br/><br/>').format(system.ajax_url)
 
-        rubric_form=('<br/><br/>Please assess your performance given the above rubric: <br/>'
-                     '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
-                     '<option value="incorrect">Incorrect</option><option value="correct">'
-                     'Correct</option></select><br/>'
-                     '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
-                     '<p id="save_message"></p></section><br/><br/>').format(system.ajax_url)
+        rubric_form = ('<br/><br/>Please assess your performance given the above rubric: <br/>'
+                       '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
+                       '<option value="incorrect">Incorrect</option><option value="correct">'
+                       'Correct</option></select><br/>'
+                       '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
+                       '<p id="save_message"></p></section><br/><br/>').format(system.ajax_url)
 
         #Combine problem, rubric, and the forms
-        self.problem=''.join([self.problem,problem_form])
-        self.rubric=''.join([self.rubric,rubric_form])
+        self.problem = ''.join([self.problem, problem_form])
+        self.rubric = ''.join([self.rubric, rubric_form])
 
         #Display the problem to the student to begin with
         self.html = self.problem
 
         #Initialize variables
-        self.answer=""
-        self.score=0
-        self.top_score=1
+        self.answer = ""
+        self.score = 0
+        self.top_score = 1
         self.attempts = 0
-        self.correctness="incorrect"
-        self.done=False
+        self.correctness = "incorrect"
+        self.done = False
         self.max_attempts = self.metadata.get('attempts', None)
 
         #Pull variables from instance state if available
         if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
         else:
-            self.max_attempts=max_attempts
+            self.max_attempts = max_attempts
 
         if instance_state is not None:
             instance_state = json.loads(instance_state)
@@ -138,19 +138,19 @@ class SelfAssessmentModule(XModule):
             self.attempts = instance_state['attempts']
 
         if instance_state is not None and 'student_answers' in instance_state:
-            self.answer=instance_state['student_answers']
+            self.answer = instance_state['student_answers']
 
         if instance_state is not None and 'done' in instance_state:
-            self.done=instance_state['done']
+            self.done = instance_state['done']
 
         if instance_state is not None and 'correct_map' in instance_state:
             if 'self_assess' in instance_state['correct_map']:
-                self.score=instance_state['correct_map']['self_assess']['npoints']
-                self.correctness=instance_state['correct_map']['self_assess']['correctness']
+                self.score = instance_state['correct_map']['self_assess']['npoints']
+                self.correctness = instance_state['correct_map']['self_assess']['correctness']
 
 
     def get_score(self):
-        return {'score' : self.score}
+        return {'score': self.score}
 
     def max_score(self):
         return self.top_score
@@ -183,7 +183,7 @@ class SelfAssessmentModule(XModule):
         handlers = {
             'sa_show': self.show_rubric,
             'sa_save': self.save_problem,
-            }
+        }
 
         if dispatch not in handlers:
             return 'Error'
@@ -194,20 +194,20 @@ class SelfAssessmentModule(XModule):
         d.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
-            })
+        })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def show_rubric(self,get):
+    def show_rubric(self, get):
         """
         After the problem is submitted, show the rubric
         """
         #Check to see if attempts are less than max
-        if(self.attempts<self.max_attempts):
-            self.answer=get.keys()[0]
+        if(self.attempts < self.max_attempts):
+            self.answer = get.keys()[0]
             log.debug(self.answer)
-            return {'success': True, 'rubric' : self.rubric}
+            return {'success': True, 'rubric': self.rubric}
         else:
-            return{'success' : False, 'message' : 'Too many attempts.'}
+            return{'success': False, 'message': 'Too many attempts.'}
 
     def save_problem(self, get):
         '''
@@ -217,53 +217,53 @@ class SelfAssessmentModule(XModule):
         '''
 
         #Extract correctness from ajax and assign points
-        self.correctness=get.keys()[0].lower()
-        points=0
-        if self.correctness=="correct" :
-            points=1
+        self.correctness = get.keys()[0].lower()
+        points = 0
+        if self.correctness == "correct":
+            points = 1
 
         #Student is done, and increment attempts
-        self.done=True
+        self.done = True
         self.attempts = self.attempts + 1
 
         event_info = dict()
         event_info['state'] = {'seed': 1,
-                              'student_answers': self.answer,
-                              'correct_map': {'self_assess' : {'correctness': self.correctness,
-                                               'npoints': points,
-                                               'msg': "",
-                                               'hint': "",
-                                               'hintmode': "",
-                                               'queuestate': "",
-                                               }},
-                              'done': self.done}
+                               'student_answers': self.answer,
+                               'correct_map': {'self_assess': {'correctness': self.correctness,
+                                                               'npoints': points,
+                                                               'msg': "",
+                                                               'hint': "",
+                                                               'hintmode': "",
+                                                               'queuestate': "",
+                               }},
+                               'done': self.done}
 
         event_info['problem_id'] = self.location.url()
         event_info['answers'] = self.answer
 
         self.system.track_function('save_problem_succeed', event_info)
 
-        return {'success': True, 'message' : self.submit_message}
+        return {'success': True, 'message': self.submit_message}
 
     def get_instance_state(self):
         """
         Get the current correctness, points, and done status
         """
         #Assign points based on correctness
-        points=0
-        if self.correctness=="correct" :
-            points=1
+        points = 0
+        if self.correctness == "correct":
+            points = 1
 
-        state= {'seed': 1,
-                       'student_answers': self.answer,
-                       'correct_map': {'self_assess' : {'correctness': self.correctness,
-                                                        'npoints': points,
-                                                        'msg': "",
-                                                        'hint': "",
-                                                        'hintmode': "",
-                                                        'queuestate': "",
-                                                        }},
-                       'done': self.done}
+        state = {'seed': 1,
+                 'student_answers': self.answer,
+                 'correct_map': {'self_assess': {'correctness': self.correctness,
+                                                 'npoints': points,
+                                                 'msg': "",
+                                                 'hint': "",
+                                                 'hintmode': "",
+                                                 'queuestate': "",
+                 }},
+                 'done': self.done}
         state['attempts'] = self.attempts
         return json.dumps(state)
 
@@ -365,7 +365,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [ filepath, filename ]
+                    definition['filename'] = [filepath, filename]
 
                     return definition
 
