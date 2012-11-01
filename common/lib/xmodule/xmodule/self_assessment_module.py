@@ -72,48 +72,17 @@ class SelfAssessmentModule(XModule):
         Sample file:
 
         <selfassessment>
-        <problem>
-        Insert problem text here.
-        </problem>
-        <rubric>
-        Insert grading rubric here.
-        </rubric>
-        <submitmessage>
-        Thanks for submitting!
-        </submitmessage>
+            <problem>
+                Insert problem text here.
+            </problem>
+            <rubric>
+                Insert grading rubric here.
+            </rubric>
+            <submitmessage>
+                Thanks for submitting!
+            </submitmessage>
         </selfassessment>
-
-
         """
-
-        #Parse definition file
-        dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
-
-        #Extract problem, submission message and rubric from definition file
-        self.rubric = "<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
-        self.problem = ''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
-        self.submit_message = etree.tostring(dom2.xpath('submitmessage')[0])
-
-        #Forms to append to problem and rubric that capture student responses.
-        #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
-        problem_form = ('<section class="sa-wrapper"><textarea name="answer" '
-                        'id="answer" cols="50" rows="5"/><br/>'
-                        '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
-                        '<p id="rubric"></p></section><br/><br/>').format(system.ajax_url)
-
-        rubric_form = ('<br/><br/>Please assess your performance given the above rubric: <br/>'
-                       '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
-                       '<option value="incorrect">Incorrect</option><option value="correct">'
-                       'Correct</option></select><br/>'
-                       '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
-                       '<p id="save_message"></p></section><br/><br/>').format(system.ajax_url)
-
-        #Combine problem, rubric, and the forms
-        self.problem = ''.join([self.problem, problem_form])
-        self.rubric = ''.join([self.rubric, rubric_form])
-
-        #Display the problem to the student to begin with
-        self.html = self.problem
 
         #Initialize variables
         self.answer = ""
@@ -147,6 +116,40 @@ class SelfAssessmentModule(XModule):
             if 'self_assess' in instance_state['correct_map']:
                 self.score = instance_state['correct_map']['self_assess']['npoints']
                 self.correctness = instance_state['correct_map']['self_assess']['correctness']
+
+        #Parse definition file
+        dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
+
+        #Extract problem, submission message and rubric from definition file
+        self.rubric = "<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
+        self.problem = ''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
+        self.submit_message = etree.tostring(dom2.xpath('submitmessage')[0])
+
+        #Forms to append to problem and rubric that capture student responses.
+        #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
+        problem_form = ('<section class="sa-wrapper"><textarea name="answer" '
+                        'id="answer" cols="50" rows="5"/><br/>'
+                        '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
+                        '<p id="rubric"></p></section><br/><br/>').format(system.ajax_url)
+
+        rubric_form = ('<br/><br/>Please assess your performance given the above rubric: <br/>'
+                       '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
+                       '<option value="incorrect">Incorrect</option><option value="correct">'
+                       'Correct</option></select><br/>'
+                       '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
+                       '<p id="save_message"></p></section><br/><br/>').format(system.ajax_url)
+
+        #Combine problem, rubric, and the forms
+        if self.answer is not "" :
+            answer_html="<br/><br/>Previous Answer: <br/>{0}<br/><br/>".format(self.answer)
+            self.problem = ''.join([self.problem, answer_html, problem_form])
+        else:
+            self.problem = ''.join([self.problem, problem_form])
+
+        self.rubric = ''.join([self.rubric, rubric_form])
+
+        #Display the problem to the student to begin with
+        self.html = self.problem
 
 
     def get_score(self):
