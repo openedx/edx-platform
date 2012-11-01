@@ -57,7 +57,7 @@ class Attribute(object):
     # want to allow default to be None, but also allow required objects
     _sentinel = object()
 
-    def __init__(self, name, default=_sentinel, transform=None, validate=None):
+    def __init__(self, name, default=_sentinel, transform=None, validate=None, render=True):
         """
         Define an attribute
 
@@ -72,11 +72,14 @@ class Attribute(object):
         validate (function str-or-return-type-of-tranform -> unit or exception): If not None, called to validate the
                        (possibly transformed) value of the attribute.  Should raise ValueError with a helpful message if
                        the value is invalid.
+
+        render (bool): if False, don't include this attribute in the template context.
         """
         self.name = name
         self.default = default
         self.validate = validate
         self.transform = transform
+        self.render = render
 
     def parse_from_xml(self, element):
         """
@@ -171,8 +174,7 @@ class InputTypeBase(object):
         """
         Should return a list of Attribute objects (see docstring there for details). Subclasses should override.  e.g.
 
-        return super(MyClass, cls).attributes + [Attribute('unicorn', True),
-                                                 Attribute('num_dragons', 12, transform=int), ...]
+        return [Attribute('unicorn', True), Attribute('num_dragons', 12, transform=int), ...]
         """
         return []
 
@@ -183,14 +185,19 @@ class InputTypeBase(object):
         function parses the input xml and pulls out those attributes.  This
         isolates most simple input types from needing to deal with xml parsing at all.
 
-        Processes attributes, putting the results in the self.loaded_attributes dictionary.
+        Processes attributes, putting the results in the self.loaded_attributes dictionary.  Also creates a set
+        self.to_render, containing the names of attributes that should be included in the context by default.
         """
-        # Use a local dict so that if there are exceptions, we don't end up in a partially-initialized state.
-        d = {}
+        # Use local dicts and sets so that if there are exceptions, we don't end up in a partially-initialized state.
+        loaded = {}
+        to_render = set()
         for a in self.get_attributes():
-            d[a.name] = a.parse_from_xml(self.xml)
+            loaded[a.name] = a.parse_from_xml(self.xml)
+            if a.render:
+                to_render.add(a.name)
 
-        self.loaded_attributes = d
+        self.loaded_attributes = loaded
+        self.to_render = to_render
 
     def setup(self):
         """
@@ -209,11 +216,11 @@ class InputTypeBase(object):
 
         (Separate from get_html to faciliate testing of logic separately from the rendering)
 
-        The default implementation gets the following rendering context: basic things like value, id,
-        status, and msg, as well as everything in self.loaded_attributes.
+        The default implementation gets the following rendering context: basic things like value, id, status, and msg,
+        as well as everything in self.loaded_attributes, and everything returned by self._extra_context().
 
-        This means that input types that only parse attributes get everything they need, and don't need
-        to override this method.
+        This means that input types that only parse attributes and pass them to the template get everything they need,
+        and don't need to override this method.
         """
         context = {
             'id': self.id,
@@ -221,9 +228,17 @@ class InputTypeBase(object):
             'status': self.status,
             'msg': self.msg,
             }
-        context.update(self.loaded_attributes)
+        context.update((a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
+        context.update(self._extra_context())
         return context
 
+    def _extra_context(self):
+        """
+        Subclasses can override this to return extra context that should be passed to their templates for rendering.
+
+        This is useful when the input type requires computing new template variables from the parsed attributes.
+        """
+        return {}
 
     def get_html(self):
         """
@@ -233,8 +248,7 @@ class InputTypeBase(object):
             raise NotImplementedError("no rendering template specified for class {0}"
                                       .format(self.__class__))
 
-        context = self._default_render_context()
-        context.update(self._get_render_context())
+        context = self._get_render_context()
 
         html = self.system.render_template(self.template, context)
         return etree.XML(html)
@@ -255,28 +269,32 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
+    @staticmethod
+    def parse_options(options):
+        """
+        Given options string, convert it into an ordered list of (option_id, option_description) tuples, where
+        id==description for now.  TODO: make it possible to specify different id and descriptions.
+        """
+        # parse the set of possible options
+        lexer = shlex.shlex(options[1:-1])
+        lexer.quotes = "'"
+        # Allow options to be separated by whitespace as well as commas
+        lexer.whitespace = ", "
+
+        # remove quotes
+        tokens = [x[1:-1] for x in list(lexer)]
+
+        # make list of (option_id, option_description), with description=id
+        return [(t, t) for t in tokens]
+
+
     @classmethod
     def get_attributes(cls):
         """
         Convert options to a convenient format.
         """
-
-        def parse_options(options):
-            """Given options string, convert it into an ordered list of (option, option) tuples
-            (Why? I don't know--that's what the template uses at the moment)
-            """
-            # parse the set of possible options
-            oset = shlex.shlex(options[1:-1])
-            oset.quotes = "'"
-            oset.whitespace = ","
-            oset = [x[1:-1] for x  in list(oset)]
-
-            # make ordered list with (key, value) same
-            return [(oset[x], oset[x]) for x in range(len(oset))]
-
-        return super(OptionInput, cls).get_attributes() + [
-            Attribute('options', transform=parse_options),
-            Attribute('inline', '')]
+        return [Attribute('options', transform=cls.parse_options),
+                Attribute('inline', '')]
 
 registry.register(OptionInput)
 
@@ -315,26 +333,22 @@ class ChoiceGroup(InputTypeBase):
         # value.  (VS: would be nice to make this less hackish).
         if self.tag == 'choicegroup':
             self.suffix = ''
-            self.element_type = "radio"
+            self.html_input_type = "radio"
         elif self.tag == 'radiogroup':
-            self.element_type = "radio"
+            self.html_input_type = "radio"
             self.suffix = '[]'
         elif self.tag == 'checkboxgroup':
-            self.element_type = "checkbox"
+            self.html_input_type = "checkbox"
             self.suffix = '[]'
         else:
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         self.choices = extract_choices(self.xml)
 
-    def _get_render_context(self):
-        context = {'id': self.id,
-                   'value': self.value,
-                   'status': self.status,
-                   'input_type': self.element_type,
-                   'choices': self.choices,
-                   'name_array_suffix': self.suffix}
-        return context
+    def _extra_context(self):
+        return {'input_type': self.html_input_type,
+                'choices': self.choices,
+                'name_array_suffix': self.suffix}
 
 def extract_choices(element):
     '''
@@ -384,32 +398,22 @@ class JavascriptInput(InputTypeBase):
     template = "javascriptinput.html"
     tags = ['javascriptinput']
 
+    @classmethod
+    def get_attributes(cls):
+        """
+        Register the attributes.
+        """
+        return [Attribute('params', None),
+                Attribute('problem_state', None),
+                Attribute('display_class', None),
+                Attribute('display_file', None),]
+
+
     def setup(self):
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
         if self.value == "":
             self.value = 'null'
-
-        self.params = self.xml.get('params')
-        self.problem_state = self.xml.get('problem_state')
-        self.display_class = self.xml.get('display_class')
-        self.display_file = self.xml.get('display_file')
-
-
-    def _get_render_context(self):
-        escapedict = {'"': '&quot;'}
-        value = saxutils.escape(self.value, escapedict)
-        msg   = saxutils.escape(self.msg, escapedict)
-
-        context = {'id': self.id,
-               'params': self.params,
-               'display_file': self.display_file,
-               'display_class': self.display_class,
-               'problem_state': self.problem_state,
-               'value': value,
-               'evaluation': msg,
-               }
-        return context
 
 registry.register(JavascriptInput)
 
@@ -418,51 +422,53 @@ registry.register(JavascriptInput)
 
 class TextLine(InputTypeBase):
     """
-
+    A text line input.  Can do math preview if "math"="1" is specified.
     """
 
     template = "textline.html"
     tags = ['textline']
 
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Register the attributes.
+        """
+        return [
+            Attribute('size', None),
+
+            # if specified, then textline is hidden and input id is stored
+            # in div with name=self.hidden.  (TODO: is this functionality used by anyone?)
+            Attribute('hidden', False),
+            Attribute('inline', False),
+
+            # Attributes below used in setup(), not rendered directly.
+            Attribute('math', None, render=False),
+            # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
+            Attribute('dojs', None, render=False),
+            Attribute('preprocessorClassName', None, render=False),
+            Attribute('preprocessorSrc', None, render=False),
+            ]
+
+
     def setup(self):
-        self.size = self.xml.get('size')
+        self.do_math = bool(self.loaded_attributes['math'] or
+                            self.loaded_attributes['dojs'])
 
-        # if specified, then textline is hidden and input id is stored
-        # in div with name=self.hidden.
-        self.hidden = self.xml.get('hidden', False)
-
-        self.inline = self.xml.get('inline', False)
-
-        # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
-        self.do_math = bool(self.xml.get('math') or self.xml.get('dojs'))
         # TODO: do math checking using ajax instead of using js, so
         # that we only have one math parser.
         self.preprocessor = None
         if self.do_math:
             # Preprocessor to insert between raw input and Mathjax
-            self.preprocessor = {'class_name': self.xml.get('preprocessorClassName',''),
-                            'script_src': self.xml.get('preprocessorSrc','')}
-            if '' in self.preprocessor.values():
+            self.preprocessor = {'class_name': self.loaded_attributes['preprocessorClassName'],
+                                 'script_src': self.loaded_attributes['preprocessorSrc']}
+            if None in self.preprocessor.values():
                 self.preprocessor = None
 
 
-
-    def _get_render_context(self):
-        # Escape answers with quotes, so they don't crash the system!
-        escapedict = {'"': '&quot;'}
-        value = saxutils.escape(self.value, escapedict)
-
-        context = {'id': self.id,
-                   'value': value,
-                   'status': self.status,
-                   'size': self.size,
-                   'msg': self.msg,
-                   'hidden': self.hidden,
-                   'inline': self.inline,
-                   'do_math': self.do_math,
-                   'preprocessor': self.preprocessor,
-               }
-        return context
+    def _extra_context(self):
+        return {'do_math': self.do_math,
+                'preprocessor': self.preprocessor,}
 
 registry.register(TextLine)
 
@@ -480,13 +486,26 @@ class FileSubmission(InputTypeBase):
     submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
                      " graded, this message will be replaced with the grader's feedback.")
 
-    def setup(self):
-        escapedict = {'"': '&quot;'}
-        self.allowed_files  = json.dumps(self.xml.get('allowed_files', '').split())
-        self.allowed_files  = saxutils.escape(self.allowed_files, escapedict)
-        self.required_files = json.dumps(self.xml.get('required_files', '').split())
-        self.required_files = saxutils.escape(self.required_files, escapedict)
+    @staticmethod
+    def parse_files(files):
+        """
+        Given a string like 'a.py b.py c.out', split on whitespace and return as a json list.
+        """
+        return json.dumps(files.split())
 
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert the list of allowed files to a convenient format.
+        """
+        return [Attribute('allowed_files', '[]', transform=cls.parse_files),
+                Attribute('required_files', '[]', transform=cls.parse_files),]
+
+    def setup(self):
+        """
+        Do some magic to handle queueing status (render as "queued" instead of "incomplete"),
+        pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
+        """
         # Check if problem has been queued
         self.queue_len = 0
         # Flag indicating that the problem has been queued, 'msg' is length of queue
@@ -495,15 +514,8 @@ class FileSubmission(InputTypeBase):
             self.queue_len = self.msg
             self.msg = FileSubmission.submitted_msg
 
-    def _get_render_context(self):
-
-        context = {'id': self.id,
-                   'status': self.status,
-                   'msg': self.msg,
-                   'value': self.value,
-                   'queue_len': self.queue_len,
-                   'allowed_files': self.allowed_files,
-                   'required_files': self.required_files,}
+    def _extra_context(self):
+        return {'queue_len': self.queue_len,}
         return context
 
 registry.register(FileSubmission)
