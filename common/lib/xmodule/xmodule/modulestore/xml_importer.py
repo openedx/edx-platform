@@ -2,6 +2,7 @@ import logging
 import os
 import mimetypes
 from lxml.html import rewrite_links as lxml_rewrite_links
+from path import path
 
 from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
@@ -10,27 +11,12 @@ from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
-def import_static_content(modules, data_dir, static_content_store, target_location_namespace):
+def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace):
     
     remap_dict = {}
-
-    course_data_dir = None
-    course_loc = None
-
-    # quick scan to find the course module and pull out the data_dir and location
-    # maybe there an easier way to look this up?!?
-
-    for module in modules.itervalues():
-        if module.category == 'course':
-            course_loc = module.location
-            course_data_dir = module.metadata['data_dir']
-
-    if course_data_dir is None or course_loc is None:
-        return remap_dict
-
    
     # now import all static assets
-    static_dir = '{0}/static/'.format(data_dir / course_data_dir)
+    static_dir = course_data_path / 'static'
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:
@@ -130,13 +116,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
     course_items = []
     for course_id in module_store.modules.keys():
 
-        course_data_dir = None
+        course_data_path = None
+        course_location = None
+        # Quick scan to get course Location as well as the course_data_path
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
-                course_data_dir = module.metadata['data_dir']
+                course_data_path = path(data_dir) / module.metadata['data_dir']
+                course_location = module.location
 
         if static_content_store is not None:
-            import_static_content(module_store.modules[course_id], data_dir, static_content_store, 
+            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
                 target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location)
 
         for module in module_store.modules[course_id].itervalues():
@@ -172,7 +161,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
                 # so let's make sure we import in case there are no other references to it in the modules
-                verify_content_links(module, data_dir / course_data_dir, static_content_store, '/static/images/course_image.jpg')
+                verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
 
                 course_items.append(module)
 
@@ -192,7 +181,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
                     # no good, so we have to do this kludge
                     if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, data_dir / course_data_dir, 
+                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, 
                             static_content_store, link, remap_dict))                     
 
                         for key in remap_dict.keys():
