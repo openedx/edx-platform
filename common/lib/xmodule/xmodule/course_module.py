@@ -277,6 +277,22 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('discussion_link', None)
 
     @property
+    def forum_posts_allowed(self):
+        try:
+            blackout_periods = [(parse_time(start), parse_time(end))
+                                for start, end
+                                in self.metadata.get('discussion_blackouts', [])]
+            now = time.gmtime()
+            for start, end in blackout_periods:
+                if start <= now <= end:
+                    return False
+        except:
+            log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
+            raise
+        
+        return True
+
+    @property
     def hide_progress_tab(self):
         """TODO: same as above, intended to let internal CS50 hide the progress tab
         until we get grade integration set up."""
