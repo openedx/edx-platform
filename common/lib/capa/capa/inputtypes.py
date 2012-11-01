@@ -21,12 +21,14 @@ Each input type takes the xml tree as 'element', the previous answer as 'value',
 graded status as'status'
 """
 
-# TODO: there is a lot of repetitive "grab these elements from xml attributes, with these defaults,
-# put them in the context" code.  Refactor so class just specifies required and optional attrs (with
-# defaults for latter), and InputTypeBase does the right thing.
+# TODO: make hints do something
 
-# TODO: Quoting and unquoting is handled in a pretty ad-hoc way.  Also something that could be done
-# properly once in InputTypeBase.
+# TODO: make all inputtypes actually render msg
+
+# TODO: remove unused fields (e.g. 'hidden' in a few places)
+
+# TODO: add validators so that content folks get better error messages.
+
 
 # Possible todo: make inline the default for textlines and other "one-line" inputs.  It probably
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
@@ -39,7 +41,6 @@ from lxml import etree
 import re
 import shlex  # for splitting quoted strings
 import sys
-import xml.sax.saxutils as saxutils
 
 from registry import TagRegistry
 
@@ -535,13 +536,30 @@ class CodeInput(InputTypeBase):
                               # non-codemirror editor.
             ]
 
+    # pulled out for testing
+    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
+                     " graded, this message will be replaced with the grader's feedback.")
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [Attribute('rows', '30'),
+                Attribute('cols', '80'),
+                Attribute('hidden', ''),
+
+                # For CodeMirror
+                Attribute('mode', 'python'),
+                Attribute('linenumbers', 'true'),
+                # Template expects tabsize to be an int it can do math with
+                Attribute('tabsize', 4, transform=int),
+                ]
 
     def setup(self):
-        self.rows = self.xml.get('rows') or '30'
-        self.cols = self.xml.get('cols') or '80'
-        # if specified, then textline is hidden and id is stored in div of name given by hidden
-        self.hidden = self.xml.get('hidden', '')
-
+        """
+        Implement special logic: handle queueing state, and default input.
+        """
         # if no student input yet, then use the default input given by the problem
         if not self.value:
             self.value = self.xml.text
@@ -552,28 +570,11 @@ class CodeInput(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = 'Submitted to grader.'
+            self.msg = self.submitted_msg
 
-        # For CodeMirror
-        self.mode = self.xml.get('mode', 'python')
-        self.linenumbers = self.xml.get('linenumbers', 'true')
-        self.tabsize = int(self.xml.get('tabsize', '4'))
-
-    def _get_render_context(self):
-
-        context = {'id': self.id,
-                   'value': self.value,
-                   'status': self.status,
-                   'msg': self.msg,
-                   'mode': self.mode,
-                   'linenumbers': self.linenumbers,
-                   'rows': self.rows,
-                   'cols': self.cols,
-                   'hidden': self.hidden,
-                   'tabsize': self.tabsize,
-                   'queue_len': self.queue_len,
-               }
-        return context
+    def _extra_context(self):
+        """Defined queue_len, add it """
+        return {'queue_len': self.queue_len,}
 
 registry.register(CodeInput)
 
@@ -586,26 +587,19 @@ class Schematic(InputTypeBase):
     template = "schematicinput.html"
     tags = ['schematic']
 
-    def setup(self):
-        self.height = self.xml.get('height')
-        self.width = self.xml.get('width')
-        self.parts = self.xml.get('parts')
-        self.analyses = self.xml.get('analyses')
-        self.initial_value = self.xml.get('initial_value')
-        self.submit_analyses = self.xml.get('submit_analyses')
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [
+            Attribute('height', None),
+            Attribute('width', None),
+            Attribute('parts', None),
+            Attribute('analyses', None),
+            Attribute('initial_value', None),
+            Attribute('submit_analyses', None),]
 
-
-    def _get_render_context(self):
-
-        context = {'id': self.id,
-                   'value': self.value,
-                   'initial_value': self.initial_value,
-                   'status': self.status,
-                   'width': self.width,
-                   'height': self.height,
-                   'parts': self.parts,
-                   'analyses': self.analyses,
-                   'submit_analyses': self.submit_analyses,}
         return context
 
 registry.register(Schematic)
@@ -626,12 +620,20 @@ class ImageInput(InputTypeBase):
     template = "imageinput.html"
     tags = ['imageinput']
 
-    def setup(self):
-        self.src = self.xml.get('src')
-        self.height = self.xml.get('height')
-        self.width = self.xml.get('width')
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: src, height, and width are all required.
+        """
+        return [Attribute('src'),
+                Attribute('height'),
+                Attribute('width'),]
 
-        # if value is of the form [x,y] then parse it and send along coordinates of previous answer
+
+    def setup(self):
+        """
+        if value is of the form [x,y] then parse it and send along coordinates of previous answer
+        """
         m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.
@@ -641,19 +643,10 @@ class ImageInput(InputTypeBase):
             (self.gx, self.gy) = (0, 0)
 
 
-    def _get_render_context(self):
+    def _extra_context(self):
 
-        context = {'id': self.id,
-                   'value': self.value,
-                   'height': self.height,
-                   'width': self.width,
-                   'src': self.src,
-                   'gx': self.gx,
-                   'gy': self.gy,
-                   'status': self.status,
-                   'msg': self.msg,
-               }
-        return context
+        return {'gx': self.gx,
+                'gy': self.gy}
 
 registry.register(ImageInput)
 
@@ -669,30 +662,18 @@ class Crystallography(InputTypeBase):
     template = "crystallography.html"
     tags = ['crystallography']
 
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: height, width are required.
+        """
+        return [Attribute('size', None),
+                Attribute('height'),
+                Attribute('width'),
 
-    def setup(self):
-        self.height = self.xml.get('height')
-        self.width = self.xml.get('width')
-        self.size = self.xml.get('size')
-
-        # if specified, then textline is hidden and id is stored in div of name given by hidden
-        self.hidden = self.xml.get('hidden', '')
-
-        # Escape answers with quotes, so they don't crash the system!
-        escapedict = {'"': '&quot;'}
-        self.value = saxutils.escape(self.value, escapedict)
-
-    def _get_render_context(self):
-        context = {'id': self.id,
-                   'value': self.value,
-                   'status': self.status,
-                   'size': self.size,
-                   'msg': self.msg,
-                   'hidden': self.hidden,
-                   'width': self.width,
-                   'height': self.height,
-               }
-        return context
+                # can probably be removed (textline should prob be always-hidden)
+                Attribute('hidden', ''),
+                ]
 
 registry.register(Crystallography)
 
@@ -707,29 +688,16 @@ class VseprInput(InputTypeBase):
     template = 'vsepr_input.html'
     tags = ['vsepr_input']
 
-    def setup(self):
-        self.height = self.xml.get('height')
-        self.width = self.xml.get('width')
-
-        # Escape answers with quotes, so they don't crash the system!
-        escapedict = {'"': '&quot;'}
-        self.value = saxutils.escape(self.value, escapedict)
-
-        self.molecules = self.xml.get('molecules')
-        self.geometries = self.xml.get('geometries')
-
-    def _get_render_context(self):
-
-        context = {'id': self.id,
-                   'value': self.value,
-                   'status': self.status,
-                   'msg': self.msg,
-                   'width': self.width,
-                   'height': self.height,
-                   'molecules': self.molecules,
-                   'geometries': self.geometries,
-               }
-        return context
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: height, width are required.
+        """
+        return [Attribute('height'),
+                Attribute('width'),
+                Attribute('molecules'),
+                Attribute('geometries'),
+                ]
 
 registry.register(VseprInput)
 
@@ -750,17 +718,17 @@ class ChemicalEquationInput(InputTypeBase):
     template = "chemicalequationinput.html"
     tags = ['chemicalequationinput']
 
-    def setup(self):
-        self.size = self.xml.get('size', '20')
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('size', '20'),]
 
-    def _get_render_context(self):
-        context = {
-            'id': self.id,
-            'value': self.value,
-            'status': self.status,
-            'size': self.size,
-            'previewer': '/static/js/capa/chemical_equation_preview.js',
-            }
-        return context
+    def _extra_context(self):
+        """
+        TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
+        """
+        return {'previewer': '/static/js/capa/chemical_equation_preview.js',}
 
 registry.register(ChemicalEquationInput)

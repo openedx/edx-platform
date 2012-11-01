@@ -21,7 +21,7 @@
     <div class="incorrect" id="status_${id}">
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" value="${value}"
+  <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
       style="display:none;"
    />
 
