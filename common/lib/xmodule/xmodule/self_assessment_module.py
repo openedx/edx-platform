@@ -21,9 +21,9 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-rubric_form=('<section class="sa-wrapper"><input type="radio" name="assessment" id="assessment" value="correct"/>Correct<br/>'
-            '<input type="radio" id="assessment" name="assessment" value="incorrect">'
-            'Incorrect<br/><input type="button" value="Save" id="save" name="save"/><p id="save_message"></p></section><br/><br/>')
+rubric_form=('<br/><br/>Please assess your performance given the above rubric: <br/><br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
+             '<option value="incorrect">Incorrect</option><option value="correct">Correct</option></select><br/>'
+             '<input type="button" value="Save" id="save" name="save"/><p id="save_message"></p></section><br/><br/>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -68,7 +68,7 @@ class SelfAssessmentModule(XModule):
         problem_form=('<section class="sa-wrapper"><input type="text" name="answer" '
                       'id="answer"/><br/>'
                       '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
-                      '<p id="rubric"></p></section>').format(self.location)
+                      '<p id="rubric"></p></section><br/><br/>').format(self.location)
         self.problem=''.join([self.problem,problem_form])
         self.rubric=''.join([self.rubric,rubric_form])
         self.html = self.problem
@@ -151,6 +151,7 @@ class SelfAssessmentModule(XModule):
         event_info['problem_id'] = self.location.url()
 
         answers = self.make_dict_of_responses(get)
+        log.debug(answers)
         event_info['answers'] = answers
 
         self.system.track_function('save_problem_succeed', event_info)
