@@ -21,6 +21,8 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
+max_attempts=100
+
 def only_one(lst, default="", process=lambda x: x):
     """
     If lst is empty, returns default
@@ -88,7 +90,7 @@ class SelfAssessmentModule(XModule):
         if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
         else:
-            self.max_attempts=1
+            self.max_attempts=max_attempts
 
         self.correctness="incorrect"
         self.done=False
@@ -111,9 +113,8 @@ class SelfAssessmentModule(XModule):
                 self.correctness=instance_state['correct_map']['self_assess']['correctness']
 
 
-
     def get_score(self):
-        return self.score
+        return {'score' : self.score}
 
     def max_score(self):
         return self.top_score
@@ -121,8 +122,8 @@ class SelfAssessmentModule(XModule):
     def get_progress(self):
         ''' For now, just return score / max_score
         '''
-        score = self.get_score()
-        total = self.max_score()
+        score = self.score
+        total = self.top_score
         if total > 0:
             try:
                 return Progress(score, total)
@@ -161,9 +162,12 @@ class SelfAssessmentModule(XModule):
         return json.dumps(d, cls=ComplexEncoder)
 
     def show_rubric(self,get):
-        self.answer=get.keys()[0]
-        log.debug(self.answer)
-        return {'success': True, 'rubric' : self.rubric}
+        if(self.attempts<self.max_attempts):
+            self.answer=get.keys()[0]
+            log.debug(self.answer)
+            return {'success': True, 'rubric' : self.rubric}
+        else:
+            return{'success' : False, 'message' : 'Too many attempts.'}
 
     def save_problem(self, get):
         '''
