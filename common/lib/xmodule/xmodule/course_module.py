@@ -247,7 +247,8 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        return time.strftime("%b %d, %Y", self.start)
+        displayed_start = self._try_parse_time('advertised_start') or self.start
+        return time.strftime("%b %d, %Y", displayed_start)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
