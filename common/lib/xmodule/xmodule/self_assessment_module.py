@@ -121,7 +121,7 @@ class SelfAssessmentModule(XModule):
         dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
 
         #Extract problem, submission message and rubric from definition file
-        self.rubric = "<br/><br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
+        self.rubric = "<br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem = ''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
         self.submit_message = etree.tostring(dom2.xpath('submitmessage')[0])
 
@@ -133,8 +133,8 @@ class SelfAssessmentModule(XModule):
                         '<p id="rubric"></p><input type="hidden" '
                         'id="ajax_url" name="ajax_url" url="{0}"></section><br/><br/>').format(system.ajax_url)
 
-        rubric_form = ('<br/><br/>Please assess your performance given the above rubric: <br/>'
-                       '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
+        rubric_form = ('Please assess your performance given the above rubric: <br/>'
+                       '<section class="sa-wrapper"><select name="assessment" id="assessment">'
                        '<option value="incorrect">Incorrect</option><option value="correct">'
                        'Correct</option></select><br/>'
                        '<input type="button" value="Save" id="save" name="save"/>'
@@ -142,14 +142,16 @@ class SelfAssessmentModule(XModule):
                        'id="ajax_url" name="ajax_url" url="{0}">'
                        '</section><br/><br/>').format(system.ajax_url)
 
+        rubric_header=('<br/><br/><b>Rubric</b>')
+
         #Combine problem, rubric, and the forms
         if self.answer is not "" :
-            answer_html="<br/><br/>Previous Answer: <br/>{0}<br/><br/>".format(self.answer)
+            answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer)
             self.problem = ''.join([self.problem, answer_html, problem_form])
         else:
             self.problem = ''.join([self.problem, problem_form])
 
-        self.rubric = ''.join([self.rubric, rubric_form])
+        self.rubric = ''.join([rubric_header,self.rubric, rubric_form])
 
         #Display the problem to the student to begin with
         self.html = self.problem
@@ -284,7 +286,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     stores_state = True
     has_score = True
-    template_dir_name = "html"
+    template_dir_name = "selfassessment"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
