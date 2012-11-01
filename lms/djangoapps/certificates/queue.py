@@ -1,26 +1,20 @@
-from django.utils.simplejson import dumps
-from django.core.management.base import BaseCommand, CommandError
 from certificates.models import GeneratedCertificate
 from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
 
 from courseware import grades, courses
-from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
 from student.models import UserProfile
-from django.conf import settings
 
 import json
 import random
-import logging
+
 
 class XQueueCertInterface(object):
-
-    log = logging.getLogger("mitx.certificates")
 
     def __init__(self, request=None):
 
@@ -36,13 +30,11 @@ class XQueueCertInterface(object):
         else:
             self.request = request
 
-
         self.xqueue_interface = XQueueInterface(
                 settings.XQUEUE_INTERFACE['url'],
                 settings.XQUEUE_INTERFACE['django_auth'],
                 requests_auth,
                 )
-
 
     def regen_cert(self, student, course_id):
         """
@@ -86,14 +78,15 @@ class XQueueCertInterface(object):
                  'name': profile.name,
                 }
 
-
             key = cert.key
-            xheader = make_xheader('http://sandbox-jrjarvis-001.m.edx.org/certificate', key, 'test-pull')
+            # TODO - this needs to be read from settings
+            xheader = make_xheader(
+                    'http://sandbox-jrjarvis-001.m.edx.org/certificate',
+                    key, 'test-pull')
             (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
                                  body=json.dumps(contents))
 
         return cert_status
-
 
     def remove_cert(self, student, course_id):
         """
@@ -121,7 +114,6 @@ class XQueueCertInterface(object):
 
             cert = GeneratedCertificate.objects.get(
                 user=student, course_id=course_id)
-            username = cert.user.username
             cert.status = status.deleting
             cert.save()
 
@@ -132,14 +124,15 @@ class XQueueCertInterface(object):
                  'username': cert.user.username,
             }
 
-
             key = cert.key
-            xheader = make_xheader('http://sandbox-jrjarvis-001.m.edx.org/certificate', key, 'test-pull')
+            # TODO - this needs to be read from settings
+            xheader = make_xheader(
+                    'http://sandbox-jrjarvis-001.m.edx.org/certificate',
+                    key, 'test-pull')
             (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
                                  body=json.dumps(contents))
 
         return cert_status
-
 
     def add_cert_to_queue(self, student, course_id):
         """
@@ -169,7 +162,6 @@ class XQueueCertInterface(object):
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
 
-
         if cert_status in VALID_STATUSES:
             # grade the student
             course = courses.get_course_by_id(course_id)
@@ -195,10 +187,13 @@ class XQueueCertInterface(object):
                     'course_id': course_id,
                     'name': profile.name,
                 }
-                xheader = make_xheader('http://sandbox-jrjarvis-001.m.edx.org/update_certificate?{0}'.format(key), key, 'test-pull')
+                # TODO - this needs to be read from settings
+                xheader = make_xheader(
+                    'http://sandbox-jrjarvis-001.m.edx.org/'
+                    'update_certificate?{0}'.format(key), key, 'test-pull')
                 (error, msg) = self.xqueue_interface.send_to_queue(
                                   header=xheader, body=json.dumps(contents))
                 if error:
-                    log.critical('Unable to send message')
+                    raise Exception('Unable to send queue message')
 
         return cert_status
