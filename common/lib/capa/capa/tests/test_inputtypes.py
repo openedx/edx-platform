@@ -2,9 +2,18 @@
 Tests of input types.
 
 TODO:
+- refactor: so much repetive code (have factory methods that build xml elements directly, etc)
+
+- test error cases
+
+- check rendering -- e.g. msg should appear in the rendered output.  If possible, test that
+  templates are escaping things properly.
+
+  
 - test unicode in values, parameters, etc.
 - test various html escapes
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
+
 """
 
 from lxml import etree
@@ -267,14 +276,15 @@ class CodeInputTest(unittest.TestCase):
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
 
-        the_input = lookup_tag('codeinput')(test_system, element, state)
+        input_class = lookup_tag('codeinput')
+        the_input = input_class(test_system, element, state)
 
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
                    'status': 'queued',
-                   'msg': 'Submitted to grader.',
+                   'msg': input_class.submitted_msg,
                    'mode': mode,
                    'linenumbers': linenumbers,
                    'rows': rows,
@@ -323,8 +333,9 @@ class SchematicTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': value,
-                    'initial_value': initial_value,
                     'status': 'unsubmitted',
+                    'msg': '',
+                    'initial_value': initial_value,
                     'width': width,
                     'height': height,
                     'parts': parts,
@@ -488,6 +499,7 @@ class ChemicalEquationTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': 'H2OYeah',
                     'status': 'unanswered',
+                    'msg': '',
                     'size': size,
                     'previewer': '/static/js/capa/chemical_equation_preview.js',
                     }
