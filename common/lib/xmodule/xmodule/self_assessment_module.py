@@ -6,6 +6,8 @@ import sys
 from lxml import etree
 from lxml.html import rewrite_links
 from path import path
+import json
+from progress import Progress
 
 from .x_module import XModule
 from pkg_resources import resource_string
@@ -36,6 +38,12 @@ def only_one(lst, default="", process=lambda x: x):
     else:
         raise Exception('Malformed XML')
 
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, complex):
+            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
+        return json.JSONEncoder.default(self, obj)
+
 
 class SelfAssessmentModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -53,42 +61,31 @@ class SelfAssessmentModule(XModule):
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
             instance_state, shared_state, **kwargs)
-
+        
         dom2=etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
         self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
-
         problem_form=('<section class="sa-wrapper"><input type="text" name="answer" '
                       'id="answer"/><br/>'
                       '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
                       '<p id="rubric"></p></section>').format(self.location)
-
         self.problem=''.join([self.problem,problem_form])
-
         self.rubric=''.join([self.rubric,rubric_form])
-
-        #print(etree.tostring(rubric))
-        #print(etree.tostring(problem))
-
         self.html = self.problem
-
         self.answers={}
-
         self.score=0
-
-        self.max_score=1
+        self.top_score=1
 
     def get_score(self):
         return self.score
 
     def max_score(self):
-        return self.max_score
+        return self.top_score
 
     def get_progress(self):
         ''' For now, just return score / max_score
         '''
         score = self.get_score()
-        score = d['score']
         total = self.max_score()
         if total > 0:
             try:
@@ -130,7 +127,7 @@ class SelfAssessmentModule(XModule):
 
 
     def show_rubric(self,get):
-        return {'success': True, 'rubric':rubric_form}
+        return {'success': True, 'rubric':self.rubric}
 
 
     def save_problem(self, get):

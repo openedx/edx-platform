@@ -8,9 +8,7 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
     alert("posted")
     if response.success
       alert(response.rubric)
-      $('section.sa-wrapper p#rubric').replace(response.rubric)
-
-  alert("save")
+      $('section.sa-wrapper p#rubric').append(response.rubric)
 ));
 
 $(document).on('click', 'section.sa-wrapper input#save', ( ->
