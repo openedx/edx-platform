@@ -21,9 +21,9 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-rubric_form=('<section class="sa-wrapper"><input type="radio" name="assessment" id="assessment_correct" value="correct"/>Correct<br/>'
-            '<input type="radio" id="assessment_incorrect" name="assessment" value="incorrect">'
-            'Incorrect<br/><input type="button" value="Save" id="save" name="save"/></section>')
+rubric_form=('<section class="sa-wrapper"><input type="radio" name="assessment" id="assessment" value="correct"/>Correct<br/>'
+            '<input type="radio" id="assessment" name="assessment" value="incorrect">'
+            'Incorrect<br/><input type="button" value="Save" id="save" name="save"/><p id="save_message"></p></section><br/><br/>')
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -61,7 +61,7 @@ class SelfAssessmentModule(XModule):
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
             instance_state, shared_state, **kwargs)
-        
+
         dom2=etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
         self.rubric=''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
         self.problem=''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
@@ -127,7 +127,7 @@ class SelfAssessmentModule(XModule):
 
 
     def show_rubric(self,get):
-        return {'success': True, 'rubric':self.rubric}
+        return {'success': True, 'rubric' : self.rubric}
 
 
     def save_problem(self, get):
@@ -155,7 +155,29 @@ class SelfAssessmentModule(XModule):
 
         self.system.track_function('save_problem_succeed', event_info)
 
-        return {'success': True}
+        return {'success': True, 'message' : "Save Succcesful.  Thanks for participating!"}
+
+    @staticmethod
+    def make_dict_of_responses(get):
+        '''Make dictionary of student responses (aka "answers")
+        get is POST dictionary.
+        '''
+        answers = dict()
+        for key in get:
+            # e.g. input_resistor_1 ==> resistor_1
+            _, _, name = key.partition('_')
+
+            # This allows for answers which require more than one value for
+            # the same form input (e.g. checkbox inputs). The convention is that
+            # if the name ends with '[]' (which looks like an array), then the
+            # answer will be an array.
+            if not name.endswith('[]'):
+                answers[name] = get[key]
+            else:
+                name = name[:-2]
+                answers[name] = get.getlist(key)
+
+        return answers
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
