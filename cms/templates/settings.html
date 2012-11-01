@@ -13,14 +13,30 @@
     var barOrigin;
     var barWidth;
     var gradeThresholds;
+    var GRADES = ['A', 'B', 'C', 'D', 'E'];
 
     (function() {
       $body = $('body');
       $gradeBar = $('.grade-bar');
       gradeThresholds = [100, 80, 70];
       $('.settings-page-menu a').bind('click', showSettingsTab);
-      $('.drag-bar').bind('mousedown', startDragBar);
+      $body.on('mousedown', '.drag-bar', startDragBar);
+      $('.new-grade-button').bind('click', addNewGrade);
+      $body.on('click', '.remove-button', removeGrade);
     })();
+
+    function addNewGrade(e) {
+      e.preventDefault();
+      var $newGradeBar = $('<li style="width: 10%;"><span class="letter-grade" contenteditable>' + GRADES[$('.grades li').length] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
+      $('.grades').append($newGradeBar);
+    }
+
+    function removeGrade(e) {
+      e.preventDefault();
+      var index = $(this).closest('li').index();
+      gradeThresholds.splice(index, 1);
+      $(this).closest('li').remove();
+    }
 
     function showSettingsTab(e) {
       e.preventDefault();
@@ -34,28 +50,33 @@
       e.preventDefault();
       barOrigin = $gradeBar.offset().left;
       barWidth = $gradeBar.width();
-      $draggingBar = $(e.target).closest('li');
+      $draggingBar = $(e.target).closest('li').addClass('is-dragging');
       $body.bind('mousemove', moveBar);
       $body.bind('mouseup', stopDragBar);
     }
 
     function moveBar(e) {
-      var percentage = (e.pageX - barOrigin) / barWidth * 100;
+      var barIndex = $draggingBar.index();
+      console.log(barIndex);
+      var min = gradeThresholds[barIndex + 1] || 0;
+      var max = gradeThresholds[barIndex - 1] || 100;
+      var percentage = Math.min(Math.max((e.pageX - barOrigin) / barWidth * 100, min), max);
       $draggingBar.css('width', percentage + '%');
       gradeThresholds[$draggingBar.index()] = Math.round(percentage);
       renderGradeRanges();
     }
 
     function stopDragBar(e) {
+      $draggingBar.removeClass('is-dragging');
       $body.unbind('mousemove', moveBar);
       $body.unbind('mouseup', stopDragBar);
     }
 
     function renderGradeRanges() {
       $('.range').each(function(i) {
-        var min = gradeThresholds[i + 1] || 0;
+        var min = gradeThresholds[i + 1] + 1 || 0;
         var max = gradeThresholds[i];
-        $(this).text(min + '–' + max);
+        $(this).text(min + '-' + max);
       });
     }
   </script>
@@ -76,7 +97,7 @@
           </nav>
         </div>
         <div class="settings-page-section main-column">
-          <section class="settings-details">
+          <section class="is-shown settings-details">
             <h2>Course Details</h2>
             <div class="row">
               <label>Course Name:</label>
@@ -99,41 +120,47 @@
               <input type="text" class="start-date-input date">
             </div>
           </section>
-          <section class="is-shown settings-grading">
+          <section class="settings-grading">
             <h2>Grading</h2>
             <section>
-              <label class="cutoff">Cutoffs:</label>
-              <div class="grade-slider">
-                <div class="grade-bar">
-                  <ol class="increments">
-                    <li class="increment-0">0</li>
-                    <li class="increment-10">10</li>
-                    <li class="increment-20">20</li>
-                    <li class="increment-30">30</li>
-                    <li class="increment-40">40</li>
-                    <li class="increment-50">50</li>
-                    <li class="increment-60">60</li>
-                    <li class="increment-70">70</li>
-                    <li class="increment-80">80</li>
-                    <li class="increment-90">90</li>
-                    <li class="increment-100">100</li>
-                  </ol>
-                  <ol class="grades">
-                    <li class="bar-a">
-                      <span class="letter-grade">A</span>
-                      <span class="range">80–100</span>                      
-                    </li>
-                    <li class="bar-b">
-                      <span class="letter-grade">B</span>
-                      <span class="range">70–80</span>
-                      <a href="#" class="drag-bar"></a>
-                    </li>
-                    <li class="bar-c">
-                      <span class="letter-grade">C</span>
-                      <span class="range">0–70</span>
-                      <a href="#" class="drag-bar"></a>
-                    </li>
-                  </ol>
+              <label class="ranges">Grade Ranges:</label>
+              <div class="grade-controls">
+                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                <div class="grade-slider">
+                  <div class="grade-bar">
+                    <ol class="increments">
+                      <li class="increment-0">0</li>
+                      <li class="increment-10">10</li>
+                      <li class="increment-20">20</li>
+                      <li class="increment-30">30</li>
+                      <li class="increment-40">40</li>
+                      <li class="increment-50">50</li>
+                      <li class="increment-60">60</li>
+                      <li class="increment-70">70</li>
+                      <li class="increment-80">80</li>
+                      <li class="increment-90">90</li>
+                      <li class="increment-100">100</li>
+                    </ol>
+                    <ol class="grades">
+                      <li class="bar-a" style="width: 100%;">
+                        <span class="letter-grade" contenteditable>A</span>
+                        <span class="range">81-100</span>
+                        <a href="#" class="remove-button">remove</a>
+                      </li>
+                      <li class="bar-b" style="width: 80%;">
+                        <span class="letter-grade" contenteditable>B</span>
+                        <span class="range">71-80</span>
+                        <a href="#" class="drag-bar"></a>
+                        <a href="#" class="remove-button">remove</a>
+                      </li>
+                      <li class="bar-c" style="width: 70%;">
+                        <span class="letter-grade" contenteditable>C</span>
+                        <span class="range">0-70</span>
+                        <a href="#" class="drag-bar"></a>
+                        <a href="#" class="remove-button">remove</a>
+                      </li>
+                    </ol>
+                  </div>
                 </div>
               </div>
             </section>

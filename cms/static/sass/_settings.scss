@@ -32,10 +32,8 @@
         margin-left: 10px;
       }
 
-      &.cutoff {
-        float: left;
-        width: 90px;
-        line-height: 38px;
+      &.ranges {
+        margin-bottom: 20px;
       }
     }
 
@@ -115,16 +113,43 @@
   }
 
   h3 {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     font-size: 15px;
     font-weight: 700;
-    line-height: 34px;
     color: $blue;
+  }
+
+  .grade-controls {
+    @include clearfix;
+  }
+
+  .new-grade-button {
+    position: relative;
+    float: left;
+    display: block;
+    width: 29px;
+    height: 29px;
+    margin: 4px 10px 0 0;
+    border-radius: 20px;
+    border: 1px solid $darkGrey;
+    @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+    background-color: #d1dae3;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+    color: #6d788b;
+
+    .plus-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -6px;
+      margin-top: -6px;
+    }
   }
 
   .grade-slider {
     float: left;
-    width: 500px;
+    width: 560px;
+    height: 60px;
 
     .grade-bar {
       position: relative;
@@ -197,26 +222,46 @@
           top: 0;
           height: 40px;     
           text-align: right;
-          color: rgba(0, 0, 0, .5);          
 
-          &.bar-a {
+          &:hover,
+          &.is-dragging {
+            .remove-button {
+              display: block;
+            }
+          }
+
+          .remove-button {
+            display: none;
+            position: absolute;
+            top: -17px;
+            right: 1px;
+            height: 17px;
+            font-size: 10px;
+          }
+
+          &:nth-child(1) {
             background: #4fe696;
-            width: 100%;
           }
 
-          &.bar-b {
+          &:nth-child(2) {
             background: #ffdf7e;
-            width: 80%;
           }
 
-          &.bar-c {
-            background: #ef68a6;
-            width: 70%;
+          &:nth-child(3) {
+            background: #ffb657;
+          }
+
+          &:nth-child(4) {
+            background: #fb336c;
+          }
+
+          &:nth-child(5) {
+            background: #ef54a1;
           }
 
           .letter-grade {
             display: block;
-            margin: 6px 5px 0 0;
+            margin: 7px 5px 0 0;
             font-size: 14px;
             font-weight: 700;
             line-height: 14px;
@@ -225,7 +270,7 @@
           .range {
             display: block;
             margin-right: 5px;
-            font-size: 10px;
+            font-size: 9px;
             line-height: 12px;
           }
 
