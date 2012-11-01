@@ -288,7 +288,6 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-            raise
         
         return True
 
