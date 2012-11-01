@@ -7,7 +7,7 @@ Certificates are created for a student and an offering of a course.
 
 When a certificate is generated, a unique ID is generated so that
 the certificate can be verified later. The ID is a UUID4, so that
-it can't be easily guessed and so that it is unique. 
+it can't be easily guessed and so that it is unique.
 
 Certificates are generated in batches by a cron job, when a
 certificate is available for download the GeneratedCertificate
@@ -16,14 +16,16 @@ on the course overview page.
 
 '''
 
+
 class CertificateStatuses(object):
-    unavailable='unavailable'
-    generating='generating'
-    regenerating='regenerating'
-    deleting='deleting'
-    deleted='deleted'
-    downloadable='downloadable'
-    error='error'
+    unavailable = 'unavailable'
+    generating = 'generating'
+    regenerating = 'regenerating'
+    deleting = 'deleting'
+    deleted = 'deleted'
+    downloadable = 'downloadable'
+    error = 'error'
+
 
 class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User)
@@ -37,7 +39,8 @@ class GeneratedCertificate(models.Model):
     status = models.CharField(max_length=32, default='unavailable')
 
     class Meta:
-        unique_together= (('user', 'course_id'),)
+        unique_together = (('user', 'course_id'),)
+
 
 def certificate_status_for_student(student, course_id):
     '''
@@ -48,9 +51,9 @@ def certificate_status_for_student(student, course_id):
     generating   - A request has been made to generate a certificate,
                    but it has not been generated yet.
     regenerating - A request has been made to regenerate a certificate,
-                   but it has not been generated yet. 
+                   but it has not been generated yet.
     deleting     - A request has been made to delete a certificate.
-    
+
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
 
@@ -67,7 +70,7 @@ def certificate_status_for_student(student, course_id):
                       'status': CertificateStatuses.downloadable,
                       'download_url': generated_certificate.download_url,
                    }
-        else: 
+        else:
             return {'status': generated_certificate.status}
     except GeneratedCertificate.DoesNotExist:
         pass
