@@ -90,9 +90,6 @@ def vsepr_grade(user_input, correct_answer, convert_to_peripheral=False):
                 user_eq-2 = correct-eq-2
 
     """
-    # import ipdb; ipdb.set_trace()
-    # print user_input, type(user_input)
-    # print correct_answer, type(correct_answer)
     if user_input['geometry'] != correct_answer['geometry']:
         return False
 
