@@ -6,7 +6,7 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
     if response.success
       $('section.sa-wrapper input#show').remove()
       $('section.sa-wrapper textarea#answer').remove()
-      $('section.sa-wrapper p#rubric').append(answer)
+      $('section.sa-wrapper p#rubric').append("Your answer: #{answer}")
       $('section.sa-wrapper p#rubric').append(response.rubric)
     else
       $('section.sa-wrapper p#rubric').append(response.message)
