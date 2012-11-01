@@ -1,5 +1,5 @@
 $(document).on('click', 'section.sa-wrapper input#show', ( ->
-  post_url=$('section.sa-wrapper input#show').attr('url')
+  post_url=$('section.sa-wrapper input#ajax_url').attr('url')
   final_url="#{post_url}/sa_show"
   answer=$('section.sa-wrapper textarea#answer').val()
   $.post final_url, answer, (response) ->
@@ -14,7 +14,7 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
 
 $(document).on('click', 'section.sa-wrapper input#save', ( ->
   assessment=$('section.sa-wrapper #assessment').find(':selected').text()
-  post_url=$('section.sa-wrapper input#save').attr('url')
+  post_url=$('section.sa-wrapper input#ajax_url').attr('url')
   final_url="#{post_url}/sa_save"
   $.post final_url, assessment, (response) ->
     if response.success

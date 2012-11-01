@@ -129,15 +129,18 @@ class SelfAssessmentModule(XModule):
         #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
         problem_form = ('<section class="sa-wrapper"><textarea name="answer" '
                         'id="answer" cols="50" rows="5"/><br/>'
-                        '<input type="button" value="Check" id ="show" name="show" url="{0}"/>'
-                        '<p id="rubric"></p></section><br/><br/>').format(system.ajax_url)
+                        '<input type="button" value="Check" id ="show" name="show"/>'
+                        '<p id="rubric"></p><input type="hidden" '
+                        'id="ajax_url" name="ajax_url" url="{0}"></section><br/><br/>').format(system.ajax_url)
 
         rubric_form = ('<br/><br/>Please assess your performance given the above rubric: <br/>'
                        '<br/><section class="sa-wrapper"><select name="assessment" id="assessment">'
                        '<option value="incorrect">Incorrect</option><option value="correct">'
                        'Correct</option></select><br/>'
-                       '<input type="button" value="Save" id="save" name="save" url="{0}"/>'
-                       '<p id="save_message"></p></section><br/><br/>').format(system.ajax_url)
+                       '<input type="button" value="Save" id="save" name="save"/>'
+                       '<p id="save_message"></p><input type="hidden" '
+                       'id="ajax_url" name="ajax_url" url="{0}">'
+                       '</section><br/><br/>').format(system.ajax_url)
 
         #Combine problem, rubric, and the forms
         if self.answer is not "" :
