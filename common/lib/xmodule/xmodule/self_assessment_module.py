@@ -82,22 +82,34 @@ class SelfAssessmentModule(XModule):
         self.score=0
         self.top_score=1
         self.submit_message=etree.tostring(dom2.xpath('submitmessage')[0])
-        log.debug(self.submit_message)
 
         self.attempts = 0
-        self.max_attempts = 1
         self.max_attempts = self.metadata.get('attempts', None)
         if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
         else:
             self.max_attempts=1
 
+        self.correctness="incorrect"
+        self.done=False
         if instance_state is not None:
             instance_state = json.loads(instance_state)
+            log.debug(instance_state)
+
         if instance_state is not None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
-        self.correctness="incorrect"
+        if instance_state is not None and 'student_answers' in instance_state:
+            self.answer=instance_state['student_answers']
+
+        if instance_state is not None and 'done' in instance_state:
+            self.done=instance_state['done']
+
+        if instance_state is not None and 'correct_map' in instance_state:
+            if 'self_assess' in instance_state['correct_map']:
+                self.score=instance_state['correct_map']['self_assess']['npoints']
+                self.correctness=instance_state['correct_map']['self_assess']['correctness']
+
 
 
     def get_score(self):
@@ -166,6 +178,7 @@ class SelfAssessmentModule(XModule):
         if self.correctness=="correct" :
             points=1
         event_info = dict()
+        self.done=True
         event_info['state'] = {'seed': 1,
                               'student_answers': self.answer,
                               'correct_map': {'self_assess' : {'correctness': self.correctness,
@@ -181,6 +194,8 @@ class SelfAssessmentModule(XModule):
 
         event_info['answers'] = self.answer
 
+        self.attempts = self.attempts + 1
+
         self.system.track_function('save_problem_succeed', event_info)
 
         return {'success': True, 'message' : self.submit_message}
@@ -189,7 +204,7 @@ class SelfAssessmentModule(XModule):
         points=0
         if self.correctness=="correct" :
             points=1
-        state= return {'seed': 1,
+        state= {'seed': 1,
                        'student_answers': self.answer,
                        'correct_map': {'self_assess' : {'correctness': self.correctness,
                                                         'npoints': points,
