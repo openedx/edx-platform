@@ -16,12 +16,11 @@ def vsepr_build_correct_answer(geometry, atoms):
     return correct_answer
 
 
-def vsepr_grade(user_input, correct_answer, ignore_p_order=False, ignore_a_order=False, ignore_e_order=False):
-    """ Flags ignore_(a,p,e)_order are for checking order in axial, perepherial or equatorial positions.
+def vsepr_grade(user_input, correct_answer, convert_to_perepherial=False):
+    """
         Allowed cases:
             c0, a, e
             c0, p
-        Not implemented and not tested cases when p with a or e (no need for now)
     """
     # print user_input, type(user_input)
     # print correct_answer, type(correct_answer)
@@ -31,31 +30,20 @@ def vsepr_grade(user_input, correct_answer, ignore_p_order=False, ignore_a_order
     if user_input['atoms']['c0'] != correct_answer['atoms']['c0']:
         return False
 
-    # not order-aware comparisons
-    for ignore in [(ignore_p_order, 'p'), (ignore_e_order, 'e'), (ignore_a_order, 'a')]:
-        if ignore[0]:
-            # collecting atoms:
-            a_user = [v for k, v in user_input['atoms'].items() if k.startswith(ignore[1])]
-            a_correct = [v for k, v in correct_answer['atoms'].items() if k.startswith(ignore[1])]
-            # print ignore[0], ignore[1], a_user, a_correct
-            if len(a_user) != len(a_correct):
-                return False
-            if sorted(a_user) != sorted(a_correct):
-                return False
+    if convert_to_perepherial:
+        # convert user_input from (a,e,e1,e2) to (p)
+        # correct_answer must be set in (p) using this flag
+        user_input['atoms'] = {'p' + str(i): v for i, v in enumerate(user_input['atoms'].values())}
 
-    # order-aware comparisons
-    for ignore in [(ignore_p_order, 'p'), (ignore_e_order, 'e'), (ignore_a_order, 'a')]:
-        if not ignore[0]:
-            # collecting atoms:
-            a_user = [v for k, v in user_input['atoms'].items() if k.startswith(ignore[1])]
-            a_correct = [v for k, v in correct_answer['atoms'].items() if k.startswith(ignore[1])]
-            # print '2nd', ignore[0], ignore[1], a_user, a_correct
-            if len(a_user) != len(a_correct):
-                return False
-            if len(a_correct) == 0:
-                continue
-            if a_user != a_correct:
-                return False
+    for ea_position in ['p', 'a', 'e', 'e1', 'e2']:
+        # collecting atoms:
+        a_user = [v for k, v in user_input['atoms'].items() if k.startswith(ea_position)]
+        a_correct = [v for k, v in correct_answer['atoms'].items() if k.startswith(ea_position)]
+        # print a_user, a_correct
+        if len(a_user) != len(a_correct):
+            return False
+        if sorted(a_user) != sorted(a_correct):
+            return False
 
     return True
 
