@@ -92,6 +92,7 @@ class SelfAssessmentModule(XModule):
         self.correctness = "incorrect"
         self.done = False
         self.max_attempts = self.metadata.get('attempts', None)
+        self.hint=""
 
         #Pull variables from instance state if available
         if self.max_attempts is not None:
@@ -111,6 +112,9 @@ class SelfAssessmentModule(XModule):
 
         if instance_state is not None and 'done' in instance_state:
             self.done = instance_state['done']
+
+        if instance_state is not None and 'hint' in instance_state:
+            self.hint = instance_state['hint']
 
         if instance_state is not None and 'correct_map' in instance_state:
             if 'self_assess' in instance_state['correct_map']:
@@ -227,9 +231,10 @@ class SelfAssessmentModule(XModule):
         '''
 
         #Extract correctness from ajax and assign points
-        log.debug(get.keys())
-        log.debug(get)
-        self.correctness = get.keys()[0].lower()
+        self.hint=get[get.keys()[1]]
+        self.correctness = get[get.keys()[0]].lower()
+        log.debug(self.hint)
+        log.debug(self.correctness)
         points = 0
         if self.correctness == "correct":
             points = 1
@@ -241,6 +246,7 @@ class SelfAssessmentModule(XModule):
         event_info = dict()
         event_info['state'] = {'seed': 1,
                                'student_answers': self.answer,
+                               'hint' : self.hint,
                                'correct_map': {'self_assess': {'correctness': self.correctness,
                                                                'npoints': points,
                                                                'msg': "",
