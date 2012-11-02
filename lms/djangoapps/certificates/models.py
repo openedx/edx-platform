@@ -14,6 +14,27 @@ certificate is available for download the GeneratedCertificate
 table is updated with information that will be displayed
 on the course overview page.
 
+
+State diagram:
+
+[deleted,error,unavailable] [error,downloadable]
+            +                +             +
+            |                |             |
+            |                |             |
+         add_cert       regen_cert     del_cert
+            |                |             |
+            v                v             v
+       [generating]    [regenerating]  [deleting]
+            +                +             +
+            |                |             |
+       certificate      certificate    certificate
+         created       removed,created   deleted
+            +----------------+-------------+------->[error]
+            |                |             |
+            |                |             |
+            v                v             v
+      [downloadable]   [downloadable]  [deleted]
+
 '''
 
 
@@ -37,6 +58,7 @@ class GeneratedCertificate(models.Model):
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
+    name = models.CharField(blank=True, max_length=255)
 
     class Meta:
         unique_together = (('user', 'course_id'),)
