@@ -28,6 +28,7 @@ log = logging.getLogger("mitx.courseware")
 
 #Set the default number of max attempts.  Should be 1 for production
 #Set higher for debugging/testing
+#maxattempts specified in xml definition overrides this
 max_attempts = 1
 
 def only_one(lst, default="", process=lambda x: x):
@@ -98,16 +99,18 @@ class SelfAssessmentModule(XModule):
         self.max_attempts = self.metadata.get('attempts', None)
         self.hint=""
 
-        #Pull variables from instance state if available
+        #Try setting maxattempts, use default if not available in metadata
         if self.max_attempts is not None:
             self.max_attempts = int(self.max_attempts)
         else:
             self.max_attempts = max_attempts
 
+        #Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
             log.debug(instance_state)
 
+        #Pull variables from instance state if available
         if instance_state is not None and 'attempts' in instance_state:
             self.attempts = instance_state['attempts']
 
@@ -131,8 +134,8 @@ class SelfAssessmentModule(XModule):
         #Parse definition file
         dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
 
+        #Try setting max_attempts from definition xml
         max_attempt_parsed=dom2.xpath('maxattempts')[0].text
-
         try:
             self.max_attempts=int(max_attempt_parsed)
         except:
