@@ -22,7 +22,7 @@ class @VideoCaption extends Subview
       """
     @$('.video-controls .secondary-controls').append """
       <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
-      """
+      """#"
     @$('.subtitles').css maxHeight: @$('.video-wrapper').height() - 5
     @fetchCaption()
 
@@ -144,7 +144,7 @@ class @VideoCaption extends Subview
       @el.removeClass('closed')
       @scrollCaption()
     $.cookie('hide_captions', hide_captions, expires: 3650, path: '/')
- 
+
   captionHeight: ->
     if @el.hasClass('fullscreen')
       $(window).height() - @$('.video-controls').height()

@@ -1,12 +1,12 @@
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
   <div class="indicator_container">
-    % if state == 'unsubmitted':
+    % if status == 'unsubmitted':
     <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-    % elif state == 'correct': 
+    % elif status == 'correct': 
     <span class="correct" id="status_${id}"></span>
-    % elif state == 'incorrect':
+    % elif status == 'incorrect':
     <span class="incorrect" id="status_${id}"></span>
-    % elif state == 'incomplete':
+    % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif
   </div>

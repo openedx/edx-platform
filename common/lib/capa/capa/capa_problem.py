@@ -32,10 +32,13 @@ from xml.sax.saxutils import unescape
 
 import chem
 import chem.chemcalc
+import chem.chemtools
+
 import calc
 from correctmap import CorrectMap
 import eia
 import inputtypes
+import customrender
 from util import contextualize_text, convert_files_to_filenames
 import xqueue_interface
 
@@ -45,22 +48,8 @@ import responsetypes
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
-# Different ways students can input code
-entry_types = ['textline',
-               'schematic',
-               'textbox',
-               'imageinput',
-               'optioninput',
-               'choicegroup',
-               'radiogroup',
-               'checkboxgroup',
-               'filesubmission',
-               'javascriptinput',
-               'crystallography',
-               'chemicalequationinput',]
-
 # extra things displayed after "show answers" is pressed
-solution_types = ['solution']
+solution_tags = ['solution']
 
 # these get captured as student responses
 response_properties = ["codeparam", "responseparam", "answer"]
@@ -77,7 +66,8 @@ global_context = {'random': random,
                   'scipy': scipy,
                   'calc': calc,
                   'eia': eia,
-                  'chemcalc': chem.chemcalc}
+                  'chemcalc': chem.chemcalc,
+                  'chemtools': chem.chemtools}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
@@ -305,7 +295,7 @@ class LoncapaProblem(object):
             answer_map.update(results)
 
         # include solutions from <solution>...</solution> stanzas
-        for entry in self.tree.xpath("//" + "|//".join(solution_types)):
+        for entry in self.tree.xpath("//" + "|//".join(solution_tags)):
             answer = etree.tostring(entry)
             if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
@@ -483,7 +473,7 @@ class LoncapaProblem(object):
 
         problemid = problemtree.get('id')    # my ID
 
-        if problemtree.tag in inputtypes.registered_input_tags():
+        if problemtree.tag in inputtypes.registry.registered_tags():
             # If this is an inputtype subtree, let it render itself.
             status = "unsubmitted"
             msg = ''
@@ -509,7 +499,7 @@ class LoncapaProblem(object):
                                 'hint': hint,
                                 'hintmode': hintmode,}}
 
-            input_type_cls = inputtypes.get_class_for_tag(problemtree.tag)
+            input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             the_input = input_type_cls(self.system, problemtree, state)
             return the_input.get_html()
 
@@ -517,9 +507,15 @@ class LoncapaProblem(object):
         if problemtree in self.responders:
             return self.responders[problemtree].render_html(self._extract_html)
 
+        # let each custom renderer render itself:
+        if problemtree.tag in customrender.registry.registered_tags():
+            renderer_class = customrender.registry.get_class_for_tag(problemtree.tag)
+            renderer = renderer_class(self.system, problemtree)
+            return renderer.get_html()
+
+        # otherwise, render children recursively, and copy over attributes
         tree = etree.Element(problemtree.tag)
         for item in problemtree:
-            # render child recursively
             item_xhtml = self._extract_html(item)
             if item_xhtml is not None:
                     tree.append(item_xhtml)
@@ -556,11 +552,12 @@ class LoncapaProblem(object):
             response_id += 1
 
             answer_id = 1
+            input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x
-                                               for x in (entry_types + solution_types)]),
+                                               for x in (input_tags + solution_tags)]),
                                     id=response_id_str)
 
-            # assign one answer_id for each entry_type or solution_type
+            # assign one answer_id for each input type or solution type
             for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
