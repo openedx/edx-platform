@@ -22,6 +22,9 @@ class XQueueCertInterface(object):
 
     def __init__(self, request=None):
 
+        # Get basic auth (username/password) for
+        # xqueue connection if it's in the settings
+
         if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
             requests_auth = HTTPBasicAuth(
                     *settings.XQUEUE_INTERFACE['basic_auth'])
