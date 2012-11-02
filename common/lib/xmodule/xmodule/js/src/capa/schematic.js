@@ -3723,7 +3723,7 @@ schematic = (function() {
 	    // look for property input fields in the content and give
 	    // them a keypress listener that interprets ENTER as
 	    // clicking OK.
-	    var plist = $(content).find('.property');
+	    var plist = content.$('.property');
 	    for (var i = plist.length - 1; i >= 0; --i) {
 		var field = plist[i];
 		field.dialog = dialog;  // help event handler find us...
