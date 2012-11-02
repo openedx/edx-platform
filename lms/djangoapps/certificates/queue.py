@@ -80,13 +80,11 @@ class XQueueCertInterface(object):
 
         Removes certificate for a student, will change
         the certificate status to 'regenerating'.
-        Will invalidate the old certificate and generate
-        a new one.
 
-        When completed the certificate status will change
-        to 'downloadable'
+        Certificate must be in the 'error' or 'downloadable' state
+        and the student must have a passing grade.
 
-        Returns the certificate status.
+        otherwise it will return the current state
 
         """
 
@@ -96,44 +94,49 @@ class XQueueCertInterface(object):
                               student, course_id)['status']
 
         if cert_status in VALID_STATUSES:
+            # grade the student
+            course = courses.get_course_by_id(course_id)
+            grade = grades.grade(student, self.request, course)
 
-            profile = UserProfile.objects.get(user=student)
-            try:
-                cert = GeneratedCertificate.objects.get(
-                    user=student, course_id=course_id)
-            except GeneratedCertificate.DoesNotExist:
-                logger.warning("Attempting to regenerate a certificate"
-                               "for a user that doesn't have one")
-                raise
+            if grade['grade'] is not None:
 
-            cert.status = status.regenerating
-            cert.name = profile.name
+                profile = UserProfile.objects.get(user=student)
+                try:
+                    cert = GeneratedCertificate.objects.get(
+                        user=student, course_id=course_id)
+                except GeneratedCertificate.DoesNotExist:
+                    logger.warning("Attempting to regenerate a certificate"
+                                   "for a user that doesn't have one")
+                    raise
 
-            contents = {
-                 'action': 'regen',
-                 'remove_verify_uuid': cert.verify_uuid,
-                 'remove_download_uuid': cert.download_uuid,
-                 'username': cert.user.username,
-                 'course_id': cert.course_id,
-                 'name': profile.name,
-                }
+                cert.status = status.regenerating
+                cert.name = profile.name
 
-            key = cert.key
-            xheader = make_xheader(
-                    'http://{0}/certificate'.format(settings.SITE_NAME),
-                    key, 'test-pull')
-            (error, msg) = self.xqueue_interface.send_to_queue(
-                    header=xheader, body=json.dumps(contents))
-            if error:
-                logger.critical('Unable to add a request to the queue')
-                raise Exception('Unable to send queue message')
-            cert.save()
+                contents = {
+                     'action': 'regen',
+                     'remove_verify_uuid': cert.verify_uuid,
+                     'remove_download_uuid': cert.download_uuid,
+                     'username': cert.user.username,
+                     'course_id': cert.course_id,
+                     'name': profile.name,
+                    }
+
+                key = cert.key
+                xheader = make_xheader(
+                        'http://{0}/certificate'.format(settings.SITE_NAME),
+                        key, 'test-pull')
+                (error, msg) = self.xqueue_interface.send_to_queue(
+                        header=xheader, body=json.dumps(contents))
+                if error:
+                    logger.critical('Unable to add a request to the queue')
+                    raise Exception('Unable to send queue message')
+                cert.save()
 
         return cert_status
 
     def del_cert(self, student, course_id):
-        """
 
+        """
         Arguments:
           student - User.object
           course_id - courseenrollment.course_id (string)
@@ -141,10 +144,8 @@ class XQueueCertInterface(object):
         Removes certificate for a student, will change
         the certificate status to 'deleting'.
 
-        When completed the certificate status will change
-        to 'deleted'.
-
-        Returns the certificate status.
+        Certificate must be in the 'error' or 'downloadable' state
+        otherwise it will return the current state
 
         """
 
@@ -189,19 +190,14 @@ class XQueueCertInterface(object):
           student - User.object
           course_id - courseenrollment.course_id (string)
 
-        Adds a new certificate request to the queue only if
-        the current certificate status is 'unavailable', 'error'
-        or 'deleted' and the student has a passing grade for
-        the course.
+        Request a new certificate for a student.
+        Will change the certificate status to 'deleting'.
 
-        When completed the certificate status will change
-        to 'downloadable'.
+        Certificate must be in the 'unavailable', 'error',
+        or 'deleted' state and the student must have
+        a passing grade.
 
-        If the current status is 'generating', 'regenerating'
-        or 'deleting' this function will return that status
-
-        Returns 'unavailable' if the student is eligible for
-        a certificate but does not have a passing grade.
+        otherwise it will return the current state
 
         """
 
