@@ -100,4 +100,4 @@ def certificate_status_for_student(student, course_id):
             return {'status': generated_certificate.status}
     except GeneratedCertificate.DoesNotExist:
         pass
-    return {'status': 'unavailable'}
+    return {'status': CertificateStatuses.unavailable}
