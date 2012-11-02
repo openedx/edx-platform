@@ -12,6 +12,10 @@ from student.models import UserProfile
 
 import json
 import random
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class XQueueCertInterface(object):
@@ -79,12 +83,14 @@ class XQueueCertInterface(object):
                 }
 
             key = cert.key
-            # TODO - this needs to be read from settings
             xheader = make_xheader(
-                    'http://sandbox-jrjarvis-001.m.edx.org/certificate',
+                    'http://{0}/certificate'.format(settings.SITE_NAME),
                     key, 'test-pull')
-            (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
-                                 body=json.dumps(contents))
+            (error, msg) = self.xqueue_interface.send_to_queue(
+                    header=xheader, body=json.dumps(contents))
+            if error:
+                logger.critical('Unable to add a request to the queue')
+                raise Exception('Unable to send queue message')
 
         return cert_status
 
@@ -125,9 +131,8 @@ class XQueueCertInterface(object):
             }
 
             key = cert.key
-            # TODO - this needs to be read from settings
             xheader = make_xheader(
-                    'http://sandbox-jrjarvis-001.m.edx.org/certificate',
+                    'http://{0}/certificate'.format(settings.SITE_NAME),
                     key, 'test-pull')
             (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
                                  body=json.dumps(contents))
@@ -187,13 +192,14 @@ class XQueueCertInterface(object):
                     'course_id': course_id,
                     'name': profile.name,
                 }
-                # TODO - this needs to be read from settings
                 xheader = make_xheader(
-                    'http://sandbox-jrjarvis-001.m.edx.org/'
-                    'update_certificate?{0}'.format(key), key, 'test-pull')
+                    'http://{0}/update_certificate?{1}'.format(
+                        key, settings.SITE_NAME), key, 'test-pull')
+
                 (error, msg) = self.xqueue_interface.send_to_queue(
                                   header=xheader, body=json.dumps(contents))
                 if error:
+                    logger.critical('Unable to post results to qserver')
                     raise Exception('Unable to send queue message')
 
         return cert_status
