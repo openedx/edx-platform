@@ -19,6 +19,35 @@ logger = logging.getLogger(__name__)
 
 
 class XQueueCertInterface(object):
+    """
+    XQueueCertificateInterface provides an
+    interface to the xqueue server for
+    managing student certificates.
+
+    Instantiating an object will create a new
+    connection to the queue server.
+
+    See models.py for valid state transitions,
+    summary of methods:
+
+       add_cert:   Add a new certificate.  Puts a single
+                   request on the queue for the student/course.
+                   Once the certificate is generated a post
+                   will be made to the update_certificate
+                   view which will save the certificate
+                   download URL.
+
+       regen_cert: Regenerate an existing certificate.
+                   For a user that already has a certificate
+                   this will delete the existing one and
+                   generate a new cert.
+
+
+       del_cert:   Delete an existing certificate
+                   For a user that already has a certificate
+                   this will delete his cert.
+
+    """
 
     def __init__(self, request=None):
 
@@ -45,7 +74,6 @@ class XQueueCertInterface(object):
 
     def regen_cert(self, student, course_id):
         """
-
         Arguments:
           student - User.object
           course_id - courseenrollment.course_id (string)
@@ -62,7 +90,7 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.downloadable]
+        VALID_STATUSES = [status.error, status.downloadable]
 
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
@@ -70,11 +98,16 @@ class XQueueCertInterface(object):
         if cert_status in VALID_STATUSES:
 
             profile = UserProfile.objects.get(user=student)
+            try:
+                cert = GeneratedCertificate.objects.get(
+                    user=student, course_id=course_id)
+            except GeneratedCertificate.DoesNotExist:
+                logger.warning("Attempting to regenerate a certificate"
+                               "for a user that doesn't have one")
+                raise
 
-            cert = GeneratedCertificate.objects.get(
-                user=student, course_id=course_id)
             cert.status = status.regenerating
-            cert.save()
+            cert.name = profile.name
 
             contents = {
                  'action': 'regen',
@@ -94,10 +127,11 @@ class XQueueCertInterface(object):
             if error:
                 logger.critical('Unable to add a request to the queue')
                 raise Exception('Unable to send queue message')
+            cert.save()
 
         return cert_status
 
-    def remove_cert(self, student, course_id):
+    def del_cert(self, student, course_id):
         """
 
         Arguments:
@@ -114,17 +148,22 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.downloadable]
+        VALID_STATUSES = [status.error, status.downloadable]
 
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
 
         if cert_status in VALID_STATUSES:
 
-            cert = GeneratedCertificate.objects.get(
-                user=student, course_id=course_id)
+            try:
+                cert = GeneratedCertificate.objects.get(
+                    user=student, course_id=course_id)
+            except GeneratedCertificate.DoesNotExist:
+                logger.warning("Attempting to delete a certificate"
+                               "for a user that doesn't have one")
+                raise
+
             cert.status = status.deleting
-            cert.save()
 
             contents = {
                  'action': 'remove',
@@ -140,9 +179,10 @@ class XQueueCertInterface(object):
             (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
                                  body=json.dumps(contents))
 
+            cert.save()
         return cert_status
 
-    def add_cert_to_queue(self, student, course_id):
+    def add_cert(self, student, course_id):
         """
 
         Arguments:
@@ -150,8 +190,8 @@ class XQueueCertInterface(object):
           course_id - courseenrollment.course_id (string)
 
         Adds a new certificate request to the queue only if
-        the current certificate status is 'unavailable' or
-        'deleted' and the student has a passing grade for
+        the current certificate status is 'unavailable', 'error'
+        or 'deleted' and the student has a passing grade for
         the course.
 
         When completed the certificate status will change
@@ -165,7 +205,7 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.unavailable, status.deleted]
+        VALID_STATUSES = [status.unavailable, status.deleted, status.error]
 
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
@@ -187,7 +227,7 @@ class XQueueCertInterface(object):
                 cert.user = student
                 cert.course_id = course_id
                 cert.key = key
-                cert.save()
+                cert.name = profile.name
 
                 contents = {
                     'action': 'create',
@@ -204,5 +244,6 @@ class XQueueCertInterface(object):
                 if error:
                     logger.critical('Unable to post results to qserver')
                     raise Exception('Unable to send queue message')
+                cert.save()
 
         return cert_status
