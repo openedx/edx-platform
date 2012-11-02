@@ -99,7 +99,7 @@ NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
-APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor nodejs npm graphviz graphviz-dev mysql-server libmysqlclient-dev"
+APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor nodejs npm graphviz graphviz-dev mysql-server libmysqlclient-dev geos"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
