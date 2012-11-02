@@ -16,7 +16,8 @@ $(document).on('click', 'section.sa-wrapper input#save', ( ->
   assessment=$('section.sa-wrapper #assessment').find(':selected').text()
   post_url=$('section.sa-wrapper input#ajax_url').attr('url')
   final_url="#{post_url}/sa_save"
-  $.post final_url, assessment, (response) ->
+  hint=$('section.sa-wrapper textarea#hint').val()
+  $.post final_url, {'assessment':assessment, 'hint':hint}, (response) ->
     if response.success
       $('section.sa-wrapper p#save_message').append(response.message)
       $('section.sa-wrapper input#save').remove()
