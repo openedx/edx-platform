@@ -38,6 +38,8 @@ class HtmlModule(XModule):
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
 
+
+
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     """
     Module for putting raw html in a course
