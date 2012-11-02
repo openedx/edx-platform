@@ -122,14 +122,7 @@ class XQueueCertInterface(object):
                     }
 
                 key = cert.key
-                xheader = make_xheader(
-                        'http://{0}/certificate'.format(settings.SITE_NAME),
-                        key, 'test-pull')
-                (error, msg) = self.xqueue_interface.send_to_queue(
-                        header=xheader, body=json.dumps(contents))
-                if error:
-                    logger.critical('Unable to add a request to the queue')
-                    raise Exception('Unable to send queue message')
+                self.__send_to_xqueue(contents, key)
                 cert.save()
 
         return cert_status
@@ -174,12 +167,7 @@ class XQueueCertInterface(object):
             }
 
             key = cert.key
-            xheader = make_xheader(
-                    'http://{0}/certificate'.format(settings.SITE_NAME),
-                    key, 'test-pull')
-            (error, msg) = self.xqueue_interface.send_to_queue(header=xheader,
-                                 body=json.dumps(contents))
-
+            self.__send_to_xqueue(contents, key)
             cert.save()
         return cert_status
 
@@ -231,15 +219,22 @@ class XQueueCertInterface(object):
                     'course_id': course_id,
                     'name': profile.name,
                 }
-                xheader = make_xheader(
-                    'http://{0}/update_certificate?{1}'.format(
-                        key, settings.SITE_NAME), key, 'test-pull')
 
-                (error, msg) = self.xqueue_interface.send_to_queue(
-                                  header=xheader, body=json.dumps(contents))
-                if error:
-                    logger.critical('Unable to post results to qserver')
-                    raise Exception('Unable to send queue message')
+                self.__send_to_xqueue(contents, key)
                 cert.save()
 
         return cert_status
+
+    def __send_to_xqueue(self, contents, key):
+
+        # TODO - need to read queue name from settings
+
+        xheader = make_xheader(
+            'http://{0}/update_certificate?{1}'.format(
+                key, settings.SITE_NAME), key, 'test-pull')
+
+        (error, msg) = self.xqueue_interface.send_to_queue(
+                header=xheader, body=json.dumps(contents))
+        if error:
+            logger.critical('Unable to add a request to the queue')
+            raise Exception('Unable to send queue message')
