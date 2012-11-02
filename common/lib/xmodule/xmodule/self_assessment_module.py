@@ -69,7 +69,7 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
 
         """
-        Definition file should have 3 blocks -- problem, rubric, and submitmessage
+        Definition file should have 4 blocks -- problem, rubric, submitmessage, and maxattempts
         Sample file:
 
         <selfassessment>
@@ -82,11 +82,14 @@ class SelfAssessmentModule(XModule):
             <submitmessage>
                 Thanks for submitting!
             </submitmessage>
+            <maxattempts>
+            1
+            </maxattempts>
         </selfassessment>
         """
 
         #Initialize variables
-        self.answer = ""
+        self.answer = []
         self.score = 0
         self.top_score = 1
         self.attempts = 0
@@ -109,7 +112,10 @@ class SelfAssessmentModule(XModule):
             self.attempts = instance_state['attempts']
 
         if instance_state is not None and 'student_answers' in instance_state:
-            self.answer = instance_state['student_answers']
+            if(type(instance_state['student_answers']) in [type(u''),type('')]):
+                self.answer = self.answer.append(instance_state['student_answers'])
+            elif(type(instance_state['student_answers'])==type([])):
+                self.answer = instance_state['student_answers']
 
         if instance_state is not None and 'done' in instance_state:
             self.done = instance_state['done']
@@ -124,6 +130,13 @@ class SelfAssessmentModule(XModule):
 
         #Parse definition file
         dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
+
+        max_attempt_parsed=dom2.xpath('maxattempts')[0].text
+
+        try:
+            self.max_attempts=int(max_attempt_parsed)
+        except:
+            pass
 
         #Extract problem, submission message and rubric from definition file
         self.rubric = "<br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
@@ -152,8 +165,8 @@ class SelfAssessmentModule(XModule):
         rubric_header=('<br/><br/><b>Rubric</b>')
 
         #Combine problem, rubric, and the forms
-        if self.answer is not "" :
-            answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer)
+        if type(self.answer)==type([]) and self.answer is not [] :
+            answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer[len(self.answer)-1])
             self.problem = ''.join([self.problem, answer_html, problem_form])
         else:
             self.problem = ''.join([self.problem, problem_form])
@@ -218,7 +231,7 @@ class SelfAssessmentModule(XModule):
         """
         #Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
-            self.answer = get.keys()[0]
+            self.answer = self.answer.append(get.keys()[0])
             log.debug(self.answer)
             return {'success': True, 'rubric': self.rubric}
         else:
