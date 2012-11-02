@@ -59,6 +59,8 @@ class GeneratedCertificate(models.Model):
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
     name = models.CharField(blank=True, max_length=255)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (('user', 'course_id'),)
