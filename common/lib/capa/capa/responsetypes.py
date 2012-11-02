@@ -23,6 +23,7 @@ import abc
 import os
 import subprocess
 import xml.sax.saxutils as saxutils
+from shapely.geometry import Polygon, Point
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -1720,12 +1721,20 @@ class ImageResponse(LoncapaResponse):
     Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.  That
     doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
     should contain one or more <imageinput> stanzas. Each <imageinput> should specify
-    a rectangle, given as an attribute, defining the correct answer.
+    a rectangle(s) or region(s), given as an attribute, defining the correct answer.
+
+    Rectangle(s) are more prioritized over regions due to simplicity and backward compatibility.
+    In this example regions will be ignored:
+    <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"  rectangle="(10,10)-(20,30);(12,12)-(40,60)" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+
+    Regions is list of lists [region1, region2, region3, ...] where regionN is ordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
     """
     snippets = [{'snippet': '''<imageresponse>
       <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
-      <imageinput src="image2.jpg" width="210" height="130" rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
+      <imageinput src="image3.jpg" width="210" height="130" rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
+      <imageinput src="image4.jpg" width="811" height="610"  rectangle="(10,10)-(20,30);(12,12)-(40,60)" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+      <imageinput src="image5.jpg" width="200" height="200" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]' />
     </imageresponse>'''}]
 
     response_tag = 'imageresponse'
@@ -1733,7 +1742,7 @@ class ImageResponse(LoncapaResponse):
 
     def setup_response(self):
         self.ielements = self.inputfields
-        self.answer_ids = [ie.get('id')  for ie in self.ielements]
+        self.answer_ids = [ie.get('id') for ie in self.ielements]
 
     def get_score(self, student_answers):
         correct_map = CorrectMap()
@@ -1743,7 +1752,7 @@ class ImageResponse(LoncapaResponse):
             given = student_answers[aid]	 # this should be a string of the form '[x,y]'
 
             correct_map.set(aid, 'incorrect')
-            if not given: # No answer to parse. Mark as incorrect and move on
+            if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
 
             # parse given answer
@@ -1753,29 +1762,37 @@ class ImageResponse(LoncapaResponse):
                                 'error grading %s (input=%s)' % (aid, given))
             (gx, gy) = [int(x) for x in m.groups()]
 
-            # Check whether given point lies in any of the solution rectangles
-            solution_rectangles = expectedset[aid].split(';')
-            for solution_rectangle in solution_rectangles:
-                # parse expected answer
-                # TODO: Compile regexp on file load
-                m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
-                             solution_rectangle.strip().replace(' ', ''))
-                if not m:
-                    msg = 'Error in problem specification! cannot parse rectangle in %s' % (
-                        etree.tostring(self.ielements[aid], pretty_print=True))
-                    raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
-                (llx, lly, urx, ury) = [int(x) for x in m.groups()]
+            rectangles, regions = expectedset
+            if rectangles[aid]:  # rectangles part - for backward compatibility
+                # Check whether given point lies in any of the solution rectangles
+                solution_rectangles = rectangles[aid].split(';')
+                for solution_rectangle in solution_rectangles:
+                    # parse expected answer
+                    # TODO: Compile regexp on file load
+                    m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                                 solution_rectangle.strip().replace(' ', ''))
+                    if not m:
+                        msg = 'Error in problem specification! cannot parse rectangle in %s' % (
+                            etree.tostring(self.ielements[aid], pretty_print=True))
+                        raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+                    (llx, lly, urx, ury) = [int(x) for x in m.groups()]
 
-                # answer is correct if (x,y) is within the specified rectangle
-                if (llx <= gx <= urx) and (lly <= gy <= ury):
-                    correct_map.set(aid, 'correct')
-                    break
-
+                    # answer is correct if (x,y) is within the specified rectangle
+                    if (llx <= gx <= urx) and (lly <= gy <= ury):
+                        correct_map.set(aid, 'correct')
+                        break
+            else:  # rectangles are more prioretized for same id
+                if regions[aid]:
+                    parsed_region = json.loads(regions[aid])
+                    for region in parsed_region:
+                        if Polygon(region).contains(Point(gx, gy)):
+                            correct_map.set(aid, 'correct')
+                            break
         return correct_map
 
     def get_answers(self):
-        return dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements])
-
+        return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
+                dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
