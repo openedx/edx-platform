@@ -113,7 +113,7 @@ class SelfAssessmentModule(XModule):
 
         if instance_state is not None and 'student_answers' in instance_state:
             if(type(instance_state['student_answers']) in [type(u''),type('')]):
-                self.answer = self.answer.append(instance_state['student_answers'])
+                self.answer.append(instance_state['student_answers'])
             elif(type(instance_state['student_answers'])==type([])):
                 self.answer = instance_state['student_answers']
 
@@ -165,9 +165,12 @@ class SelfAssessmentModule(XModule):
         rubric_header=('<br/><br/><b>Rubric</b>')
 
         #Combine problem, rubric, and the forms
-        if type(self.answer)==type([]) and self.answer is not [] :
-            answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer[len(self.answer)-1])
-            self.problem = ''.join([self.problem, answer_html, problem_form])
+        if type(self.answer)==type([]):
+            if len(self.answer)>0:
+                answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer[len(self.answer)-1])
+                self.problem = ''.join([self.problem, answer_html, problem_form])
+            else:
+                self.problem = ''.join([self.problem, problem_form])
         else:
             self.problem = ''.join([self.problem, problem_form])
 
@@ -231,8 +234,7 @@ class SelfAssessmentModule(XModule):
         """
         #Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
-            self.answer = self.answer.append(get.keys()[0])
-            log.debug(self.answer)
+            self.answer.append(get.keys()[0])
             return {'success': True, 'rubric': self.rubric}
         else:
             return{'success': False, 'message': 'Too many attempts.'}
@@ -247,8 +249,6 @@ class SelfAssessmentModule(XModule):
         #Extract correctness from ajax and assign points
         self.hint=get[get.keys()[1]]
         self.correctness = get[get.keys()[0]].lower()
-        log.debug(self.hint)
-        log.debug(self.correctness)
         points = 0
         if self.correctness == "correct":
             points = 1
