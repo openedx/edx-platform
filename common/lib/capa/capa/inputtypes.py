@@ -265,6 +265,8 @@ class OptionInput(InputTypeBase):
     Example:
 
     <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
+
+    # TODO: allow ordering to be randomized
     """
 
     template = "optioninput.html"
@@ -287,7 +289,6 @@ class OptionInput(InputTypeBase):
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
-
 
     @classmethod
     def get_attributes(cls):
@@ -344,39 +345,40 @@ class ChoiceGroup(InputTypeBase):
         else:
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
-        self.choices = extract_choices(self.xml)
+        self.choices = self.extract_choices(self.xml)
 
     def _extra_context(self):
         return {'input_type': self.html_input_type,
                 'choices': self.choices,
                 'name_array_suffix': self.suffix}
 
-def extract_choices(element):
-    '''
-    Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
-    CheckboxGroup.
+    @staticmethod
+    def extract_choices(element):
+        '''
+        Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
+        CheckboxGroup.
 
-    returns list of (choice_name, choice_text) tuples
+        returns list of (choice_name, choice_text) tuples
 
-    TODO: allow order of choices to be randomized, following lon-capa spec.  Use
-    "location" attribute, ie random, top, bottom.
-    '''
+        TODO: allow order of choices to be randomized, following lon-capa spec.  Use
+        "location" attribute, ie random, top, bottom.
+        '''
 
-    choices = []
+        choices = []
 
-    for choice in element:
-        if choice.tag != 'choice':
-            raise Exception(
-                "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
-                % choice.tag)
-        choice_text = ''.join([etree.tostring(x) for x in choice])
-        if choice.text is not None:
-            # TODO: fix order?
-            choice_text += choice.text
+        for choice in element:
+            if choice.tag != 'choice':
+                raise Exception(
+                    "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
+                    % choice.tag)
+            choice_text = ''.join([etree.tostring(x) for x in choice])
+            if choice.text is not None:
+                # TODO: fix order?
+                choice_text += choice.text
 
-        choices.append((choice.get("name"), choice_text))
+            choices.append((choice.get("name"), choice_text))
 
-    return choices
+        return choices
 
 
 registry.register(ChoiceGroup)
@@ -424,6 +426,9 @@ registry.register(JavascriptInput)
 class TextLine(InputTypeBase):
     """
     A text line input.  Can do math preview if "math"="1" is specified.
+
+    If the hidden attribute is specified, the textline is hidden and the input id is stored in a div with name equal
+    to the value of the hidden attribute.  This is used e.g. for embedding simulations turned into questions.
     """
 
     template = "textline.html"
@@ -438,8 +443,7 @@ class TextLine(InputTypeBase):
         return [
             Attribute('size', None),
 
-            # if specified, then textline is hidden and input id is stored
-            # in div with name=self.hidden.  (TODO: is this functionality used by anyone?)
+
             Attribute('hidden', False),
             Attribute('inline', False),
 
@@ -537,7 +541,7 @@ class CodeInput(InputTypeBase):
             ]
 
     # pulled out for testing
-    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
+    submitted_msg = ("Submitted.  As soon as your submission is"
                      " graded, this message will be replaced with the grader's feedback.")
 
     @classmethod
