@@ -61,8 +61,6 @@ function setup_debug_${element_id}(){
     $('#${element_id}_xqa_form').submit(sendlog_${element_id});
 }
  
-setup_debug_${element_id}();
-
 function sendlog_${element_id}(){
 
     var xqaLog = {authkey: '${xqa_key}',
@@ -97,6 +95,8 @@ function sendlog_${element_id}(){
     });
     return false;
 };
+
+setup_debug_${element_id}();
  
 function getlog_${element_id}(){
 
