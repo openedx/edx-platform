@@ -94,10 +94,11 @@ class SelfAssessmentModule(XModule):
         self.score = 0
         self.top_score = 1
         self.attempts = 0
-        self.correctness = "incorrect"
+        self.correctness = []
         self.done = False
         self.max_attempts = self.metadata.get('attempts', None)
-        self.hint=""
+        self.hint=[]
+        self.temp_answer=""
 
         #Try setting maxattempts, use default if not available in metadata
         if self.max_attempts is not None:
@@ -123,13 +124,23 @@ class SelfAssessmentModule(XModule):
         if instance_state is not None and 'done' in instance_state:
             self.done = instance_state['done']
 
+        if instance_state is not None and 'temp_answer' in instance_state:
+            self.temp_answer = instance_state['temp_answer']
+
         if instance_state is not None and 'hint' in instance_state:
-            self.hint = instance_state['hint']
+            if(type(instance_state['hint']) in [type(u''),type('')]):
+                self.hint.append(instance_state['hint'])
+            elif(type(instance_state['hint'])==type([])):
+                self.hint = instance_state['hint']
 
         if instance_state is not None and 'correct_map' in instance_state:
             if 'self_assess' in instance_state['correct_map']:
                 self.score = instance_state['correct_map']['self_assess']['npoints']
-                self.correctness = instance_state['correct_map']['self_assess']['correctness']
+                map_correctness=instance_state['correct_map']['self_assess']['correctness']
+                if(type(map_correctness) in [type(u''),type('')]):
+                    self.correctness.append(map_correctness)
+                elif(type(map_correctness)==type([])):
+                    self.correctness = map_correctness
 
         #Parse definition file
         dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
@@ -237,7 +248,9 @@ class SelfAssessmentModule(XModule):
         """
         #Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
-            self.answer.append(get.keys()[0])
+            #Dump to temp to keep answer in sync with correctness and hint
+            self.temp_answer=get.keys()[0]
+            log.debug(self.temp_answer)
             return {'success': True, 'rubric': self.rubric}
         else:
             return{'success': False, 'message': 'Too many attempts.'}
@@ -249,12 +262,17 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False.
         '''
 
-        #Extract correctness from ajax and assign points
-        self.hint=get[get.keys()[1]]
-        self.correctness = get[get.keys()[0]].lower()
-        points = 0
-        if self.correctness == "correct":
-            points = 1
+        #Temp answer check is to keep hints, correctness, and answer in sync
+        points=0
+        log.debug(self.temp_answer)
+        if self.temp_answer is not "":
+            #Extract correctness and hint from ajax and assign points
+            self.hint.append(get[get.keys()[1]])
+            curr_correctness = get[get.keys()[0]].lower()
+            if curr_correctness == "correct":
+                points = 1
+            self.correctness.append(curr_correctness)
+            self.answer.append(self.temp_answer)
 
         #Student is done, and increment attempts
         self.done = True
@@ -291,6 +309,7 @@ class SelfAssessmentModule(XModule):
 
         state = {'seed': 1,
                  'student_answers': self.answer,
+                 'temp_answer': self.temp_answer,
                  'hint' : self.hint,
                  'correct_map': {'self_assess': {'correctness': self.correctness,
                                                  'npoints': points,
