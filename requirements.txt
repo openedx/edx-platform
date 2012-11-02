@@ -52,3 +52,4 @@ pil
 nltk
 dogstatsd-python
 MySQL-python
+sphinx
