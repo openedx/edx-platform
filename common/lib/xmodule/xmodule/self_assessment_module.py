@@ -137,6 +137,8 @@ class SelfAssessmentModule(XModule):
                        '<section class="sa-wrapper"><select name="assessment" id="assessment">'
                        '<option value="incorrect">Incorrect</option><option value="correct">'
                        'Correct</option></select><br/>'
+                       'What hint about this problem would you give to someone?'
+                       '<textarea name="hint" id="hint" cols="50" rows="5"/><br/>'
                        '<input type="button" value="Save" id="save" name="save"/>'
                        '<p id="save_message"></p><input type="hidden" '
                        'id="ajax_url" name="ajax_url" url="{0}">'
@@ -225,6 +227,8 @@ class SelfAssessmentModule(XModule):
         '''
 
         #Extract correctness from ajax and assign points
+        log.debug(get.keys())
+        log.debug(get)
         self.correctness = get.keys()[0].lower()
         points = 0
         if self.correctness == "correct":
