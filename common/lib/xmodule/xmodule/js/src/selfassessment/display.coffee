@@ -9,6 +9,7 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
       $('section.sa-wrapper p#rubric').append("Your answer: #{answer}")
       $('section.sa-wrapper p#rubric').append(response.rubric)
     else
+      $('section.sa-wrapper input#show').remove()
       $('section.sa-wrapper p#rubric').append(response.message)
 ));
 

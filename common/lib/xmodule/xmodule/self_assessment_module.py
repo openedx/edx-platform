@@ -27,7 +27,8 @@ from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 log = logging.getLogger("mitx.courseware")
 
 #Set the default number of max attempts.  Should be 1 for production
-max_attempts = 100
+#Set higher for debugging/testing
+max_attempts = 1
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -274,6 +275,7 @@ class SelfAssessmentModule(XModule):
 
         state = {'seed': 1,
                  'student_answers': self.answer,
+                 'hint' : self.hint,
                  'correct_map': {'self_assess': {'correctness': self.correctness,
                                                  'npoints': points,
                                                  'msg': "",
