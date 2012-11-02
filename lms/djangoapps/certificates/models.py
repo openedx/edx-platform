@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
+from datetime import datetime
 
 '''
 Certificates are created for a student and an offering of a course.
@@ -59,8 +59,10 @@ class GeneratedCertificate(models.Model):
     distinction = models.BooleanField(default=False)
     status = models.CharField(max_length=32, default='unavailable')
     name = models.CharField(blank=True, max_length=255)
-    created_date = models.DateTimeField(auto_now_add=True)
-    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(
+            auto_now_add=True, default=datetime.now)
+    modified_date = models.DateTimeField(
+            auto_now=True, default=datetime.now)
 
     class Meta:
         unique_together = (('user', 'course_id'),)
