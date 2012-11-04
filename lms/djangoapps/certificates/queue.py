@@ -114,8 +114,8 @@ class XQueueCertInterface(object):
 
                 contents = {
                      'action': 'regen',
-                     'remove_verify_uuid': cert.verify_uuid,
-                     'remove_download_uuid': cert.download_uuid,
+                     'delete_verify_uuid': cert.verify_uuid,
+                     'delete_download_uuid': cert.download_uuid,
                      'username': cert.user.username,
                      'course_id': cert.course_id,
                      'name': profile.name,
@@ -160,9 +160,9 @@ class XQueueCertInterface(object):
             cert.status = status.deleting
 
             contents = {
-                 'action': 'remove',
-                 'remove_verify_uuid': cert.verify_uuid,
-                 'remove_download_uuid': cert.download_uuid,
+                 'action': 'delete',
+                 'delete_verify_uuid': cert.verify_uuid,
+                 'delete_download_uuid': cert.download_uuid,
                  'username': cert.user.username,
             }
 
