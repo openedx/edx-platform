@@ -63,6 +63,7 @@ class GeneratedCertificate(models.Model):
             auto_now_add=True, default=datetime.now)
     modified_date = models.DateTimeField(
             auto_now=True, default=datetime.now)
+    error_reason = models.CharField(max_length=512, blank=True, default='')
 
     class Meta:
         unique_together = (('user', 'course_id'),)
