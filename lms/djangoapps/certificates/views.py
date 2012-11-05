@@ -43,6 +43,20 @@ def update_certificate(request):
 
         if 'error' in xqueue_body:
             cert.status = status.error
+            if 'error_reason' in xqueue_body:
+
+                # Hopefully we will record a meaningful error
+                # here if something bad happened during the
+                # certificate generation process
+                #
+                # example:
+                #  (aamorm BerkeleyX/CS169.1x/2012_Fall)
+                #  <class 'simples3.bucket.S3Error'>:
+                #  HTTP error (reason=error(32, 'Broken pipe'), filename=None) :
+                #  certificate_agent.py:175
+
+
+                cert.error_reason = xqueue_body['error_reason']
         else:
             if cert.status in [status.generating, status.regenerating]:
                 cert.download_uuid = xqueue_body['download_uuid']
