@@ -18,8 +18,23 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../..'))  # mitx folder
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'capa'))
+sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'capa'))  # capa module
+sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'xmodule'))  # xmodule
+sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'lms', 'djangoapps'))  # lms djangoapps
+sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'cms', 'djangoapps'))  # cms djangoapps
+sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'djangoapps'))  # common djangoapps
+
+
+
+# django specific
 # import ipdb; ipdb.set_trace()
+# Set up the Django settings/environment
+# STATIC_URL = '/static/'
+# sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'lms', 'envs'))  # lms djangoapps
+# from django.core.management import setup_environ
+# import lms.envs.dev
+# import ipdb; ipdb.set_trace()
+# setup_environ(lms.envs.dev)
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -246,3 +261,83 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+# from http://djangosnippets.org/snippets/2533/
+# autogenerate models definitions
+# THIS_DIR = os.path.dirname(__file__)
+# PROJECT_DIR = os.path.join(THIS_DIR, 'relative/path/to/your/project/')
+# sys.path.append(PROJECT_DIR)
+
+import inspect
+import lms.envs.dev
+from django.core.management import setup_environ
+from django.utils.html import strip_tags
+from django.utils.encoding import force_unicode
+
+setup_environ(lms.envs.dev)
+
+
+def process_docstring(app, what, name, obj, options, lines):
+    # This causes import errors if left outside the function
+    from django.db import models
+    from django import forms
+    from django.forms.models import BaseInlineFormSet
+
+    # Only look at objects that inherit from Django's base MODEL class
+    if inspect.isclass(obj) and issubclass(obj, models.Model):
+        # Grab the field list from the meta class
+        fields = obj._meta._fields()
+
+        for field in fields:
+            # Decode and strip any html out of the field's help text
+            help_text = strip_tags(force_unicode(field.help_text))
+
+            # Decode and capitalize the verbose name, for use if there isn't
+            # any help text
+            verbose_name = force_unicode(field.verbose_name).capitalize()
+
+            if help_text:
+                # Add the model field to the end of the docstring as a param
+                # using the help text as the description
+                lines.append(u':param %s: %s' % (field.attname, help_text))
+            else:
+                # Add the model field to the end of the docstring as a param
+                # using the verbose name as the description
+                lines.append(u':param %s: %s' % (field.attname, verbose_name))
+
+            # Add the field's type to the docstring
+            lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
+        # Only look at objects that inherit from Django's base FORM class
+    # elif (inspect.isclass(obj) and issubclass(obj, forms.ModelForm) or issubclass(obj, forms.ModelForm) or issubclass(obj, BaseInlineFormSet)):
+    #     pass
+        # # Grab the field list from the meta class
+        # import ipdb; ipdb.set_trace()
+        # fields = obj._meta._fields()
+        # import ipdb; ipdb.set_trace()
+        # for field in fields:
+        #     import ipdb; ipdb.set_trace()
+        #     # Decode and strip any html out of the field's help text
+        #     help_text = strip_tags(force_unicode(field.help_text))
+
+        #     # Decode and capitalize the verbose name, for use if there isn't
+        #     # any help text
+        #     verbose_name = force_unicode(field.verbose_name).capitalize()
+
+        #     if help_text:
+        #         # Add the model field to the end of the docstring as a param
+        #         # using the help text as the description
+        #         lines.append(u':param %s: %s' % (field.attname, help_text))
+        #     else:
+        #         # Add the model field to the end of the docstring as a param
+        #         # using the verbose name as the description
+        #         lines.append(u':param %s: %s' % (field.attname, verbose_name))
+
+        #     # Add the field's type to the docstring
+        #     lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
+    # Return the extended docstring
+    return lines
+
+
+def setup(app):
+    # Register the docstring processor with sphinx
+    app.connect('autodoc-process-docstring', process_docstring)
