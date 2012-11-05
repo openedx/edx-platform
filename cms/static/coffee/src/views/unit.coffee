@@ -169,11 +169,20 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 
   initialize: =>
     @model.on('change:metadata', @render)
+    @model.on('change:state', @setEnabled)
+    @setEnabled()
     @saveName
     @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
   render: =>
     @$('.unit-display-name-input').val(@model.get('metadata').display_name)
+
+  setEnabled: =>
+    disabled = @model.get('state') == 'public'
+    if disabled
+      @$('.unit-display-name-input').attr('disabled', true)
+    else
+      @$('.unit-display-name-input').removeAttr('disabled')
 
   saveName: =>
     # Treat the metadata dictionary as immutable
@@ -196,7 +205,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     if @timer
       clearTimeout @timer
     @timer = setTimeout( =>
-      @model.save(metadata: metadata)
+      @model.save(metadata: metadata, children: null)
       @timer = null
       @$spinner.delay(500).fadeOut(150)
     , 500)
