@@ -1867,11 +1867,13 @@ class OpenEndedResponse(LoncapaResponse):
         else:
             self.initial_display = ''
 
-        grader_type = oeparam.find('initial_display')
+        grader_type = oeparam.find('grader_type')
         if grader_type is not None:
             self.grader_type = grader_type.text
         else:
             self.grader_type='ml'
+
+        self.answer="None available."
 
     def get_score(self, student_answers):
         try:
@@ -1912,6 +1914,7 @@ class OpenEndedResponse(LoncapaResponse):
         # Submit request. When successful, 'msg' is the prior length of the queue
         contents.update({'student_response': submission})
         contents.update({'grader_type' : self.grader_type})
+        log.debug(contents)
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
 
