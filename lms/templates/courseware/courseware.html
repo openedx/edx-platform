@@ -25,7 +25,9 @@
   <%static:js group='discussion'/>
 
   <%include file="../discussion/_js_body_dependencies.html" />
-  
+  % if staff_access:
+  	<%include file="xqa_interface.html"/>
+  % endif
 
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
