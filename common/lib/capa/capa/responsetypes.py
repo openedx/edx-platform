@@ -1852,25 +1852,26 @@ class OpenEndedResponse(LoncapaResponse):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
-            self.answer (an answer to display to the student in the LMS)
             self.payload
+            self.grader_type  - type of grader to use.  One of 'peer','ml','turk'
+
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
         self.payload = {'grader_payload': grader_payload}
 
-        answer_display = oeparam.find('answer_display')
-        if answer_display is not None:
-            self.answer = answer_display.text
-        else:
-            self.answer = 'No answer provided.'
-
         initial_display = oeparam.find('initial_display')
         if initial_display is not None:
             self.initial_display = initial_display.text
         else:
             self.initial_display = ''
+
+        grader_type = oeparam.find('initial_display')
+        if grader_type is not None:
+            self.grader_type = grader_type.text
+        else:
+            self.grader_type='ml'
 
     def get_score(self, student_answers):
         try:
@@ -1910,6 +1911,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         contents.update({'student_response': submission})
+        contents.update({'grader_type'} : self.grader_type)
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
 
