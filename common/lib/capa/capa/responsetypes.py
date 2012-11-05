@@ -1911,7 +1911,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         contents.update({'student_response': submission})
-        contents.update({'grader_type'} : self.grader_type)
+        contents.update({'grader_type' : self.grader_type})
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
 
