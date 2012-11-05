@@ -11,7 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   mitx_modules.rst
+   overview.rst
+   common-lib.rst
+   djangoapps.rst
+
 
 Indices and tables
 ==================
