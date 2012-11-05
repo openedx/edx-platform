@@ -108,44 +108,21 @@ class SelfAssessmentModule(XModule):
         #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
         # TODO: use templates -- system.render_template will pull them from the right place (lms/templates dir)
 
-        prompt_form = ('<section class="sa-wrapper"><textarea name="answer" '
-                        'id="answer" cols="50" rows="5"/><br/>'
-                        '<input type="button" value="Check" id ="show" name="show"/>'
-                        '<p id="rubric"></p><input type="hidden" '
-                        'id="ajax_url" name="ajax_url" url="{0}"></section><br/><br/>').format(system.ajax_url)
-
-        rubric_form = ('Please assess your performance given the above rubric: <br/>'
-                       '<section class="sa-wrapper"><select name="assessment" id="assessment">'
-                       '<option value="incorrect">Incorrect</option><option value="correct">'
-                       'Correct</option></select><br/>'
-                       'What hint about this problem would you give to someone?'
-                       '<textarea name="hint" id="hint" cols="50" rows="5"/><br/>'
-                       '<input type="button" value="Save" id="save" name="save"/>'
-                       '<p id="save_message"></p><input type="hidden" '
-                       'id="ajax_url" name="ajax_url" url="{0}">'
-                       '</section><br/><br/>').format(system.ajax_url)
-
-        rubric_header=('<br/><br/><b>Rubric</b>')
 
         # TODO:
-        #context = {rubric, ..., answer, etc}
-        # self.html = self.system.render_template('selfassessment.html', context)
+        previous_answer=''
+        if len(self.student_answers)>0:
+            previous_answer=self.student_answers[len(self.student_answers)-1]
 
-        #Combine prompt, rubric, and the forms
-        if type(self.student_answers)==type([]):
-            if len(self.student_answers)>0:
-                answer_html="<br/>Previous answer:  {0}<br/>".format(self.student_answers[len(self.student_answers)-1])
-                self.prompt = ''.join([self.prompt, answer_html, prompt_form])
-            else:
-                self.prompt = ''.join([self.prompt, prompt_form])
-        else:
-            self.prompt = ''.join([self.prompt, prompt_form])
-
-        self.rubric = ''.join([rubric_header, self.rubric, rubric_form])
-
-        #Display the prompt to the student to begin with
-        self.html = self.prompt
-
+        self.context = {
+            'prompt' : self.prompt,
+            'rubric' : self.rubric,
+            'previous_answer_given' : len(self.student_answers)>0,
+            'previous_answer' : previous_answer,
+            'ajax_url' : system.ajax_url,
+            'section_name' : 'sa-wrapper',
+        }
+        self.html = self.system.render_template('self_assessment_prompt.html', context)
 
     def get_score(self):
         return {'score': self.score}

@@ -1,0 +1,14 @@
+<section class="${ section_name }">
+    ${ prompt }
+    % if previous_answer_given
+    : <br/>Previous answer:  ${ previous_answer }<br/>
+    % endif
+
+    <textarea name="answer" id="answer" cols="50" rows="5"/>
+    <br/>
+    <input type="button" value="Check" id ="show" name="show"/>
+    <p id="rubric">
+    </p>
+    <input type="hidden" id="ajax_url" name="ajax_url" url="${ ajax_url }">
+</section>
+<br/><br/>

@@ -1,0 +1,16 @@
+<section class="${section_name}">
+    <br/><br/><b>Rubric</b>
+    Please assess your performance given the above rubric: <br/>
+    <select name="assessment" id="assessment">
+        <option value="incorrect">Incorrect</option>
+        <option value="correct">Correct</option>
+    </select>
+    <br/>
+    What hint about this problem would you give to someone?
+    <textarea name="hint" id="hint" cols="50" rows="5"/>
+    <br/>
+    <input type="button" value="Save" id="save" name="save"/>
+    <p id="save_message"></p>
+    <input type="hidden" id="ajax_url" name="ajax_url" url="${ self_assessment['ajax_url']}">
+</section>
+<br/><br/>
