@@ -122,7 +122,7 @@ class XQueueCertInterface(object):
                     }
 
                 key = cert.key
-                self.__send_to_xqueue(contents, key)
+                self._send_to_xqueue(contents, key)
                 cert.save()
 
         return cert_status
@@ -167,7 +167,7 @@ class XQueueCertInterface(object):
             }
 
             key = cert.key
-            self.__send_to_xqueue(contents, key)
+            self._send_to_xqueue(contents, key)
             cert.save()
         return cert_status
 
@@ -220,18 +220,18 @@ class XQueueCertInterface(object):
                     'name': profile.name,
                 }
 
-                self.__send_to_xqueue(contents, key)
+                self._send_to_xqueue(contents, key)
                 cert.save()
 
         return cert_status
 
-    def __send_to_xqueue(self, contents, key):
+    def _send_to_xqueue(self, contents, key):
 
         # TODO - need to read queue name from settings
 
         xheader = make_xheader(
             'http://{0}/update_certificate?{1}'.format(
-                key, settings.SITE_NAME), key, 'test-pull')
+                settings.SITE_NAME, key), key, 'test-pull')
 
         (error, msg) = self.xqueue_interface.send_to_queue(
                 header=xheader, body=json.dumps(contents))
