@@ -44,19 +44,19 @@ def update_certificate(request):
         if 'error' in xqueue_body:
             cert.status = status.error
         else:
-            if cert.state in [status.generating, status.regenerating]:
+            if cert.status in [status.generating, status.regenerating]:
                 cert.download_uuid = xqueue_body['download_uuid']
                 cert.verify_uuid = xqueue_body['verify_uuid']
                 cert.download_url = xqueue_body['url']
                 cert.status = status.downloadable
-            elif cert.state in [status.deleting]:
+            elif cert.status in [status.deleting]:
                 cert.status = status.deleted
             else:
                 logger.critical('Invalid state for cert update: {0}'.format(
-                    cert.state))
+                    cert.status))
                 return HttpResponse(json.dumps({
                             'return_code': 1,
-                            'content': 'invalid cert state'}),
+                            'content': 'invalid cert status'}),
                              mimetype='application/json')
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),
