@@ -200,6 +200,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
         'margin-top': '-10px'
     });
     inputField.after(@$spinner);
+    @$spinner.fadeIn(10)
 
     # save the name after a slight delay
     if @timer
