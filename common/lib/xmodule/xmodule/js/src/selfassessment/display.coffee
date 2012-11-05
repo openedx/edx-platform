@@ -2,7 +2,7 @@ $(document).on('click', 'section.sa-wrapper input#show', ( ->
   post_url=$('section.sa-wrapper input#ajax_url').attr('url')
   final_url="#{post_url}/sa_show"
   answer=$('section.sa-wrapper textarea#answer').val()
-  $.post final_url, answer, (response) ->
+  $.post final_url, {'student_answer' : answer }, (response) ->
     if response.success
       $('section.sa-wrapper input#show').remove()
       $('section.sa-wrapper textarea#answer').remove()
