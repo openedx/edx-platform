@@ -1814,6 +1814,207 @@ class ImageResponse(LoncapaResponse):
         return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
+
+class OpenEndedResponse(LoncapaResponse):
+    """
+    Grade student open ended responses using an external queueing server, called 'xqueue'
+
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by OpenEndedResponse:
+        system.xqueue = { 'interface': XqueueInterface object,
+                          'callback_url': Per-StudentModule callback URL
+                                          where results are posted (string),
+                          'default_queuename': Default queuename to submit request (string)
+                        }
+
+    External requests are only submitted for student submission grading
+        (i.e. and not for getting reference answers)
+    """
+
+    response_tag = 'openendedresponse'
+    allowed_inputfields = ['openendedinput']
+    max_inputfields = 1
+
+    def setup_response(self):
+        '''
+        Configure OpenEndedResponse from XML.
+        '''
+        xml = self.xml
+        # TODO: XML can override external resource (grader/queue) URL
+        self.url = xml.get('url', None)
+        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
+
+        # VS[compat]:
+        #   Check if XML uses the ExternalResponse format or the generic OpenEndedResponse format
+        oeparam = self.xml.find('openendedparam')
+        self._parse_openendedresponse_xml(oeparam)
+
+    def _parse_openendedresponse_xml(self,oeparam):
+        '''
+        Parse OpenEndedResponse XML:
+            self.initial_display
+            self.answer (an answer to display to the student in the LMS)
+            self.payload
+        '''
+        # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
+        grader_payload = oeparam.find('grader_payload')
+        grader_payload = grader_payload.text if grader_payload is not None else ''
+        self.payload = {'grader_payload': grader_payload}
+
+        answer_display = oeparam.find('answer_display')
+        if answer_display is not None:
+            self.answer = answer_display.text
+        else:
+            self.answer = 'No answer provided.'
+
+        initial_display = oeparam.find('initial_display')
+        if initial_display is not None:
+            self.initial_display = initial_display.text
+        else:
+            self.initial_display = ''
+
+    def get_score(self, student_answers):
+        try:
+            # Note that submission can be a file
+            submission = student_answers[self.answer_id]
+        except Exception as err:
+            log.error('Error in OpenEndedResponse %s: cannot get student answer for %s;'
+                      ' student_answers=%s' %
+                      (err, self.answer_id, convert_files_to_filenames(student_answers)))
+            raise Exception(err)
+
+        # Prepare xqueue request
+        #------------------------------------------------------------
+
+        qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
+        anonymous_student_id = self.system.anonymous_student_id
+
+        # Generate header
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 self.answer_id)
+        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
+            lms_key=queuekey,
+            queue_name=self.queue_name)
+
+        self.context.update({'submission': submission})
+
+        contents = self.payload.copy()
+
+        # Metadata related to the student submission revealed to the external grader
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                        }
+        contents.update({'student_info': json.dumps(student_info)})
+
+        # Submit request. When successful, 'msg' is the prior length of the queue
+        contents.update({'student_response': submission})
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+            body=json.dumps(contents))
+
+        # State associated with the queueing request
+        queuestate = {'key': queuekey,
+                      'time': qtime,}
+
+        cmap = CorrectMap()
+        if error:
+            cmap.set(self.answer_id, queuestate=None,
+                msg='Unable to deliver your submission to grader. (Reason: %s.)'
+                    ' Please try again later.' % msg)
+        else:
+            # Queueing mechanism flags:
+            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
+            #      the problem has been queued
+            #   2) Frontend: correctness='incomplete' eventually trickles down
+            #      through inputtypes.textbox and .filesubmission to inform the
+            #      browser to poll the LMS
+            cmap.set(self.answer_id, queuestate=queuestate, correctness='incomplete', msg=msg)
+
+        return cmap
+
+    def update_score(self, score_msg, oldcmap, queuekey):
+
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
+        if not valid_score_msg:
+            oldcmap.set(self.answer_id,
+                msg='Invalid grader reply. Please contact the course staff.')
+            return oldcmap
+
+        correctness = 'correct' if correct else 'incorrect'
+
+        # TODO: Find out how this is used elsewhere, if any
+        self.context['correct'] = correctness
+
+        # Replace 'oldcmap' with new grading results if queuekey matches.  If queuekey
+        # does not match, we keep waiting for the score_msg whose key actually matches
+        if oldcmap.is_right_queuekey(self.answer_id, queuekey):
+            # Sanity check on returned points
+            if points < 0:
+                points = 0
+            elif points > self.maxpoints[self.answer_id]:
+                points = self.maxpoints[self.answer_id]
+                # Queuestate is consumed
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
+                msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
+        else:
+            log.debug('OpenEndedResponse: queuekey %s does not match for answer_id=%s.' %
+                      (queuekey, self.answer_id))
+
+        return oldcmap
+
+    def get_answers(self):
+        anshtml = '<span class="openended-answer"><pre><code>%s</code></pre></span>' % self.answer
+        return {self.answer_id: anshtml}
+
+    def get_initial_display(self):
+        return {self.answer_id: self.initial_display}
+
+    def _parse_score_msg(self, score_msg):
+        """
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': Numeric value (floating point is okay) to assign to answer
+             'msg': grader_msg }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           Points to be assigned (numeric, can be float)
+            msg:             Message from grader to display to student (string)
+        """
+        fail = (False, False, 0, '')
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_msg = %s" % score_msg)
+            return fail
+        if not isinstance(score_result, dict):
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_result = %s" % score_result)
+            return fail
+        for tag in ['correct', 'score', 'msg']:
+            if tag not in score_result:
+                log.error("External grader message is missing one or more required"
+                          " tags: 'correct', 'score', 'msg'")
+                return fail
+
+        # Next, we need to check that the contents of the external grader message
+        #   is safe for the LMS.
+        # 1) Make sure that the message is valid XML (proper opening/closing tags)
+        # 2) TODO: Is the message actually HTML?
+        msg = score_result['msg']
+        try:
+            etree.fromstring(msg)
+        except etree.XMLSyntaxError as err:
+            log.error("Unable to parse external grader message as valid"
+                      " XML: score_msg['msg']=%s" % msg)
+            return fail
+
+        return (True, score_result['correct'], score_result['score'], msg)
+
+#-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
@@ -1830,4 +2031,5 @@ __all__ = [CodeResponse,
            ChoiceResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
-           JavascriptResponse]
+           JavascriptResponse,
+           OpenEndedResponse]
