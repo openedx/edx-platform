@@ -33,6 +33,10 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
+#Set maximum available number of points.  Should be set to 1 for now due to correctness handling,
+# which only allows for correct/incorrect.
+MAX_SCORE=1
+
 class SelfAssessmentModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]
     }
@@ -89,7 +93,7 @@ class SelfAssessmentModule(XModule):
         # Used for progress / grading.  Currently get credit just for completion (doesn't matter if you self-assessed
         # correct/incorrect).
         self.score = instance_state.get('score', 0)
-        self.top_score = instance_state.get('top_score', 1)
+        self.top_score = instance_state.get('top_score', MAX_SCORE)
 
         # TODO: do we need this?  True once everything is done
         self.done = instance_state.get('done', False)
@@ -176,7 +180,7 @@ class SelfAssessmentModule(XModule):
             # Dump to temp to keep answer in sync with correctness and hint
 
             # TODO: expecting something like get['answer']
-            self.temp_answer = get.keys()[0]
+            self.temp_answer = get['student_answer']
             log.debug(self.temp_answer)
             return {
                 'success': True,
@@ -200,8 +204,8 @@ class SelfAssessmentModule(XModule):
         log.debug(self.temp_answer)
         if self.temp_answer is not "":
             #Extract correctness and hint from ajax and assign points
-            self.hints.append(get[get.keys()[1]])
-            curr_correctness = get[get.keys()[0]].lower()
+            self.hints.append(get['hint'])
+            curr_correctness = get['assessment'].lower()
             if curr_correctness == "correct":
                 points = 1
             self.correctness.append(curr_correctness)
@@ -213,21 +217,16 @@ class SelfAssessmentModule(XModule):
 
         # TODO: simplify tracking info to just log the relevant stuff
         event_info = dict()
-        event_info['state'] = {'seed': 1,
+        event_info['state'] = {
                                'student_answers': self.student_answers,
                                'hint' : self.hints,
-                               'correct_map': {'self_assess': {'correctness': self.correctness,
-                                                               'npoints': points,
-                                                               'msg': "",
-                                                               'hint': "",
-                                                               'hintmode': "",
-                                                               'queuestate': "",
-                               }},
-                               'done': self.done}
+                               'correctness': self.correctness,
+                               'score': points,
+                               'done': self.done
+        }
 
         # TODO: figure out how to identify self assessment.  May not want to confuse with problems.
         event_info['selfassessment_id'] = self.location.url()
-        event_info['answers'] = self.student_answers
 
         self.system.track_function('save_problem_succeed', event_info)
 
@@ -248,19 +247,16 @@ class SelfAssessmentModule(XModule):
                 if self.correctness[len(self.correctness)-1]== "correct":
                     points = 1
 
-        state = {'seed': 1,
+        state = {
                  'student_answers': self.student_answers,
                  'temp_answer': self.temp_answer,
                  'hint' : self.hints,
-                 'correct_map': {'self_assess': {'correctness': self.correctness,
-                                                 'npoints': points,
-                                                 'msg': "",
-                                                 'hint': "",
-                                                 'hintmode': "",
-                                                 'queuestate': "",
-                 }},
-                 'done': self.done}
-        state['attempts'] = self.attempts
+                 'correctness': self.correctness,
+                 'score': points,
+                 'top_score' : MAX_SCORE,
+                 'done': self.done,
+                 'attempts' : self.attempts
+        }
         return json.dumps(state)
 
 
