@@ -104,12 +104,7 @@ class SelfAssessmentModule(XModule):
         self.prompt = definition['prompt']
         self.submit_message = definition['submitmessage']
 
-        #Forms to append to prompt and rubric that capture student responses.
-        #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
-        # TODO: use templates -- system.render_template will pull them from the right place (lms/templates dir)
-
-
-        # TODO:
+        #set context variables and render template
         previous_answer=''
         if len(self.student_answers)>0:
             previous_answer=self.student_answers[len(self.student_answers)-1]
@@ -122,7 +117,7 @@ class SelfAssessmentModule(XModule):
             'ajax_url' : system.ajax_url,
             'section_name' : 'sa-wrapper',
         }
-        self.html = self.system.render_template('self_assessment_prompt.html', context)
+        self.html = self.system.render_template('self_assessment_prompt.html', self.context)
 
     def get_score(self):
         return {'score': self.score}
@@ -183,9 +178,15 @@ class SelfAssessmentModule(XModule):
             # TODO: expecting something like get['answer']
             self.temp_answer = get.keys()[0]
             log.debug(self.temp_answer)
-            return {'success': True, 'rubric': self.rubric}
+            return {
+                'success': True,
+                'rubric': self.system.render_template('self_assessment_rubric.html', self.context)
+            }
         else:
-            return{'success': False, 'message': 'Too many attempts.'}
+            return{
+                'success': False,
+                'message': 'Too many attempts.'
+            }
 
     def save_problem(self, get):
         '''

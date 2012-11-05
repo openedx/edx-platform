@@ -1,5 +1,6 @@
 <section class="${section_name}">
     <br/><br/><b>Rubric</b>
+    ${ rubric }
     Please assess your performance given the above rubric: <br/>
     <select name="assessment" id="assessment">
         <option value="incorrect">Incorrect</option>
@@ -11,6 +12,6 @@
     <br/>
     <input type="button" value="Save" id="save" name="save"/>
     <p id="save_message"></p>
-    <input type="hidden" id="ajax_url" name="ajax_url" url="${ self_assessment['ajax_url']}">
+    <input type="hidden" id="ajax_url" name="ajax_url" url="${ ajax_url}">
 </section>
 <br/><br/>
