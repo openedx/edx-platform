@@ -30,15 +30,17 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 def only_one(lst, default="", process=lambda x: x):
     """
     If lst is empty, returns default
-    If lst has a single element, applies process to that element and returns it
-    Otherwise, raises an exeception
+
+    If lst has a single element, applies process to that element and returns it.
+
+    Otherwise, raises an exception.
     """
     if len(lst) == 0:
         return default
     elif len(lst) == 1:
         return process(lst[0])
     else:
-        raise Exception('Malformed XML')
+        raise Exception('Malformed XML: expected at most one element in list.')
 
 
 def parse_timedelta(time_str):
@@ -292,11 +294,11 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+        if self.max_attempts is None or self.attempts < self.max_attempts-1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
-            check_button = "Final Check" 
+            check_button = "Final Check"
 
         reset_button = True
         save_button = True
@@ -527,11 +529,11 @@ class CapaModule(XModule):
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
-            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
+                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -678,10 +680,10 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super(CapaDescriptor, self).__init__(*args, **kwargs)
-        
+
         weight_string = self.metadata.get('weight', None)
         if weight_string:
             self.weight = float(weight_string)
