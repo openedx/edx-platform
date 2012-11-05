@@ -14,12 +14,14 @@ from path import path
 import json
 from progress import Progress
 
-from .x_module import XModule
 from pkg_resources import resource_string
-from .xml_module import XmlDescriptor, name_to_pathname
+
+from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
-from .stringify import stringify_children
 from .html_checker import check_html
+from .stringify import stringify_children
+from .x_module import XModule
+from .xml_module import XmlDescriptor, name_to_pathname
 from xmodule.modulestore import Location
 
 from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
@@ -28,35 +30,11 @@ log = logging.getLogger("mitx.courseware")
 
 #Set the default number of max attempts.  Should be 1 for production
 #Set higher for debugging/testing
-#maxattempts specified in xml definition overrides this
-max_attempts = 1
-
-def only_one(lst, default="", process=lambda x: x):
-    """
-    If lst is empty, returns default
-    If lst has a single element, applies process to that element and returns it
-    Otherwise, raises an exeception
-    """
-    if len(lst) == 0:
-        return default
-    elif len(lst) == 1:
-        return process(lst[0])
-    else:
-        raise Exception('Malformed XML')
-
-
-class ComplexEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, complex):
-            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
-        return json.JSONEncoder.default(self, obj)
-
+# attempts specified in xml definition overrides this.
+MAX_ATTEMPTS = 1
 
 class SelfAssessmentModule(XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/selfassessment/display.coffee')
-    ]
+    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]
     }
     js_module_name = "SelfAssessment"
 
@@ -70,96 +48,67 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
 
         """
-        Definition file should have 4 blocks -- problem, rubric, submitmessage, and maxattempts
+        Definition file should have 3 blocks -- prompt, rubric, submitmessage, and one optional attribute, attempts,
+        which should be an integer that defaults to 1.  If it's >1, the student will be able to re-submit after they see
+        the rubric.  Note: all the submissions are stored.
+
         Sample file:
 
-        <selfassessment>
-            <problem>
-                Insert problem text here.
-            </problem>
+        <selfassessment attempts="1">
+            <prompt>
+                Insert prompt text here.  (arbitrary html)
+            </prompt>
             <rubric>
-                Insert grading rubric here.
+                Insert grading rubric here.  (arbitrary html)
             </rubric>
             <submitmessage>
-                Thanks for submitting!
+                Thanks for submitting!  (arbitrary html)
             </submitmessage>
-            <maxattempts>
-            1
-            </maxattempts>
         </selfassessment>
         """
 
-        #Initialize variables
-        self.answer = []
-        self.score = 0
-        self.top_score = 1
-        self.attempts = 0
-        self.correctness = []
-        self.done = False
-        self.max_attempts = self.metadata.get('attempts', None)
-        self.hint=[]
-        self.temp_answer=""
-
-        #Try setting maxattempts, use default if not available in metadata
-        if self.max_attempts is not None:
-            self.max_attempts = int(self.max_attempts)
-        else:
-            self.max_attempts = max_attempts
-
-        #Load instance state
+        # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
-            log.debug(instance_state)
+        else:
+            instance_state = {}
 
-        #Pull variables from instance state if available
-        if instance_state is not None and 'attempts' in instance_state:
-            self.attempts = instance_state['attempts']
+        log.debug('Instance state of self-assessment module {0}: {1}'.format(location.url(), instance_state))
 
-        if instance_state is not None and 'student_answers' in instance_state:
-            if(type(instance_state['student_answers']) in [type(u''),type('')]):
-                self.answer.append(instance_state['student_answers'])
-            elif(type(instance_state['student_answers'])==type([])):
-                self.answer = instance_state['student_answers']
+        # Pull out state, or initialize variables
 
-        if instance_state is not None and 'done' in instance_state:
-            self.done = instance_state['done']
+        # lists of student answers, correctness responses ('incorrect'/'correct'), and suggested hints
+        self.student_answers = instance_state.get('student_answers', [])
+        self.correctness = instance_state.get('correctness', [])
+        self.hints = instance_state.get('hints', [])
 
-        if instance_state is not None and 'temp_answer' in instance_state:
-            self.temp_answer = instance_state['temp_answer']
+        # Used to keep track of a submitted answer for which we don't have a self-assessment and hint yet:
+        # this means that the answers, correctness, hints always stay in sync, and have the same number of elements.
+        self.temp_answer = instance_state.get('temp_answer', '')
 
-        if instance_state is not None and 'hint' in instance_state:
-            if(type(instance_state['hint']) in [type(u''),type('')]):
-                self.hint.append(instance_state['hint'])
-            elif(type(instance_state['hint'])==type([])):
-                self.hint = instance_state['hint']
+        # Used for progress / grading.  Currently get credit just for completion (doesn't matter if you self-assessed
+        # correct/incorrect).
+        self.score = instance_state.get('score', 0)
+        self.top_score = instance_state.get('top_score', 1)
 
-        if instance_state is not None and 'correct_map' in instance_state:
-            if 'self_assess' in instance_state['correct_map']:
-                self.score = instance_state['correct_map']['self_assess']['npoints']
-                map_correctness=instance_state['correct_map']['self_assess']['correctness']
-                if(type(map_correctness) in [type(u''),type('')]):
-                    self.correctness.append(map_correctness)
-                elif(type(map_correctness)==type([])):
-                    self.correctness = map_correctness
+        # TODO: do we need this?  True once everything is done
+        self.done = instance_state.get('done', False)
 
-        #Parse definition file
-        dom2 = etree.fromstring("<selfassessment>" + self.definition['data'] + "</selfassessment>")
+        self.attempts = instance_state.get('attempts', 0)
 
-        #Try setting max_attempts from definition xml
-        max_attempt_parsed=dom2.xpath('maxattempts')[0].text
-        try:
-            self.max_attempts=int(max_attempt_parsed)
-        except:
-            pass
+        #Try setting maxattempts, use default if not available in metadata
+        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
 
-        #Extract problem, submission message and rubric from definition file
-        self.rubric = "<br/>" + ''.join([etree.tostring(child) for child in only_one(dom2.xpath('rubric'))])
-        self.problem = ''.join([etree.tostring(child) for child in only_one(dom2.xpath('problem'))])
-        self.submit_message = etree.tostring(dom2.xpath('submitmessage')[0])
+        #Extract prompt, submission message and rubric from definition file
+        self.rubric = definition['rubric']
+        self.prompt = definition['prompt']
+        self.submit_message = definition['submitmessage']
 
-        #Forms to append to problem and rubric that capture student responses.
+        #Forms to append to prompt and rubric that capture student responses.
         #Do not change ids and names, as javascript (selfassessment/display.coffee) depends on them
-        problem_form = ('<section class="sa-wrapper"><textarea name="answer" '
+        # TODO: use templates -- system.render_template will pull them from the right place (lms/templates dir)
+
+        prompt_form = ('<section class="sa-wrapper"><textarea name="answer" '
                         'id="answer" cols="50" rows="5"/><br/>'
                         '<input type="button" value="Check" id ="show" name="show"/>'
                         '<p id="rubric"></p><input type="hidden" '
@@ -178,20 +127,24 @@ class SelfAssessmentModule(XModule):
 
         rubric_header=('<br/><br/><b>Rubric</b>')
 
-        #Combine problem, rubric, and the forms
-        if type(self.answer)==type([]):
-            if len(self.answer)>0:
-                answer_html="<br/>Previous answer:  {0}<br/>".format(self.answer[len(self.answer)-1])
-                self.problem = ''.join([self.problem, answer_html, problem_form])
+        # TODO:
+        #context = {rubric, ..., answer, etc}
+        # self.html = self.system.render_template('selfassessment.html', context)
+
+        #Combine prompt, rubric, and the forms
+        if type(self.student_answers)==type([]):
+            if len(self.student_answers)>0:
+                answer_html="<br/>Previous answer:  {0}<br/>".format(self.student_answers[len(self.student_answers)-1])
+                self.prompt = ''.join([self.prompt, answer_html, prompt_form])
             else:
-                self.problem = ''.join([self.problem, problem_form])
+                self.prompt = ''.join([self.prompt, prompt_form])
         else:
-            self.problem = ''.join([self.problem, problem_form])
+            self.prompt = ''.join([self.prompt, prompt_form])
 
-        self.rubric = ''.join([rubric_header,self.rubric, rubric_form])
+        self.rubric = ''.join([rubric_header, self.rubric, rubric_form])
 
-        #Display the problem to the student to begin with
-        self.html = self.problem
+        #Display the prompt to the student to begin with
+        self.html = self.prompt
 
 
     def get_score(self):
@@ -244,12 +197,14 @@ class SelfAssessmentModule(XModule):
 
     def show_rubric(self, get):
         """
-        After the problem is submitted, show the rubric
+        After the prompt is submitted, show the rubric
         """
         #Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
-            #Dump to temp to keep answer in sync with correctness and hint
-            self.temp_answer=get.keys()[0]
+            # Dump to temp to keep answer in sync with correctness and hint
+
+            # TODO: expecting something like get['answer']
+            self.temp_answer = get.keys()[0]
             log.debug(self.temp_answer)
             return {'success': True, 'rubric': self.rubric}
         else:
@@ -263,25 +218,26 @@ class SelfAssessmentModule(XModule):
         '''
 
         #Temp answer check is to keep hints, correctness, and answer in sync
-        points=0
+        points = 0
         log.debug(self.temp_answer)
         if self.temp_answer is not "":
             #Extract correctness and hint from ajax and assign points
-            self.hint.append(get[get.keys()[1]])
+            self.hints.append(get[get.keys()[1]])
             curr_correctness = get[get.keys()[0]].lower()
             if curr_correctness == "correct":
                 points = 1
             self.correctness.append(curr_correctness)
-            self.answer.append(self.temp_answer)
+            self.student_answers.append(self.temp_answer)
 
         #Student is done, and increment attempts
         self.done = True
         self.attempts = self.attempts + 1
 
+        # TODO: simplify tracking info to just log the relevant stuff
         event_info = dict()
         event_info['state'] = {'seed': 1,
-                               'student_answers': self.answer,
-                               'hint' : self.hint,
+                               'student_answers': self.student_answers,
+                               'hint' : self.hints,
                                'correct_map': {'self_assess': {'correctness': self.correctness,
                                                                'npoints': points,
                                                                'msg': "",
@@ -291,8 +247,9 @@ class SelfAssessmentModule(XModule):
                                }},
                                'done': self.done}
 
-        event_info['problem_id'] = self.location.url()
-        event_info['answers'] = self.answer
+        # TODO: figure out how to identify self assessment.  May not want to confuse with problems.
+        event_info['selfassessment_id'] = self.location.url()
+        event_info['answers'] = self.student_answers
 
         self.system.track_function('save_problem_succeed', event_info)
 
@@ -306,15 +263,17 @@ class SelfAssessmentModule(XModule):
         points = 1
         #This is a pointless if structure, but left in place in case points change from
         #being completion based to correctness based
+
+        # TODO: clean up
         if type(self.correctness)==type([]):
             if(len(self.correctness)>0):
                 if self.correctness[len(self.correctness)-1]== "correct":
                     points = 1
 
         state = {'seed': 1,
-                 'student_answers': self.answer,
+                 'student_answers': self.student_answers,
                  'temp_answer': self.temp_answer,
-                 'hint' : self.hint,
+                 'hint' : self.hints,
                  'correct_map': {'self_assess': {'correctness': self.correctness,
                                                  'npoints': points,
                                                  'msg': "",
@@ -342,123 +301,42 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
 
-    # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
-    # are being edited in the cms
     @classmethod
-    def backcompat_paths(cls, path):
-        if path.endswith('.html.xml'):
-            path = path[:-9] + '.html'  # backcompat--look for html instead of xml
-        if path.endswith('.html.html'):
-            path = path[:-5]            # some people like to include .html in filenames..
-        candidates = []
-        while os.sep in path:
-            candidates.append(path)
-            _, _, path = path.partition(os.sep)
+    def definition_from_xml(cls, xml_object, system):
+        """
+        Pull out the rubric, prompt, and submitmessage into a dictionary.
 
-        # also look for .html versions instead of .xml
-        nc = []
-        for candidate in candidates:
-            if candidate.endswith('.xml'):
-                nc.append(candidate[:-4] + '.html')
-        return candidates + nc
+        Returns:
+        {
+        'rubric' : 'some-html',
+        'prompt' : 'some-html',
+        'submitmessage' : 'some-html'
+        }
+        """
+        expected_children = ['rubric', 'prompt', 'submitmessage']
+        for child in expected_children:
+            if len(xml_object.xpath(child)) != 1:
+                raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
 
-    # NOTE: html descriptors are special.  We do not want to parse and
-    # export them ourselves, because that can break things (e.g. lxml
-    # adds body tags when it exports, but they should just be html
-    # snippets that will be included in the middle of pages.
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return stringify_children(xml_object.xpath(k)[0])
 
-    @classmethod
-    def load_definition(cls, xml_object, system, location):
-        '''Load a descriptor from the specified xml_object:
+        return {'rubric' : parse('rubric'),
+                'prompt' : parse('prompt'),
+                'submitmessage' : parse('submitmessage'),}
 
-        If there is a filename attribute, load it as a string, and
-        log a warning if it is not parseable by etree.HTMLParser.
-
-        If there is not a filename attribute, the definition is the body
-        of the xml_object, without the root tag (do not want <html> in the
-        middle of a page)
-        '''
-        filename = xml_object.get('filename')
-        if filename is None:
-            definition_xml = copy.deepcopy(xml_object)
-            cls.clean_metadata_from_xml(definition_xml)
-            return {'data': stringify_children(definition_xml)}
-        else:
-            # html is special.  cls.filename_extension is 'xml', but
-            # if 'filename' is in the definition, that means to load
-            # from .html
-            # 'filename' in html pointers is a relative path
-            # (not same as 'html/blah.html' when the pointer is in a directory itself)
-            pointer_path = "{category}/{url_path}".format(category='html',
-                url_path=name_to_pathname(location.name))
-            base = path(pointer_path).dirname()
-            #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
-            filepath = "{base}/{name}.html".format(base=base, name=filename)
-            #log.debug("looking for html file for {0} at {1}".format(location, filepath))
-
-
-
-            # VS[compat]
-            # TODO (cpennington): If the file doesn't exist at the right path,
-            # give the class a chance to fix it up. The file will be written out
-            # again in the correct format.  This should go away once the CMS is
-            # online and has imported all current (fall 2012) courses from xml
-            if not system.resources_fs.exists(filepath):
-                candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
-                for candidate in candidates:
-                    if system.resources_fs.exists(candidate):
-                        filepath = candidate
-                        break
-
-            try:
-                with system.resources_fs.open(filepath) as file:
-                    html = file.read()
-                    # Log a warning if we can't parse the file, but don't error
-                    if not check_html(html):
-                        msg = "Couldn't parse html in {0}.".format(filepath)
-                        log.warning(msg)
-                        system.error_tracker("Warning: " + msg)
-
-                    definition = {'data': html}
-
-                    # TODO (ichuang): remove this after migration
-                    # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [filepath, filename]
-
-                    return definition
-
-            except (ResourceNotFoundError) as err:
-                msg = 'Unable to load file contents at path {0}: {1} '.format(
-                    filepath, err)
-                # add more info and re-raise
-                raise Exception(msg), None, sys.exc_info()[2]
-
-    # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):
-        '''If the contents are valid xml, write them to filename.xml.  Otherwise,
-        write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
-        string to filename.html.
-        '''
-        try:
-            return etree.fromstring(self.definition['data'])
-        except etree.XMLSyntaxError:
-            pass
+        '''Return an xml element representing this definition.'''
+        elt = etree.Element('selfassessment')
 
-        # Not proper format.  Write html to file, return an empty tag
-        pathname = name_to_pathname(self.url_name)
-        pathdir = path(pathname).dirname()
-        filepath = u'{category}/{pathname}.html'.format(category=self.category,
-            pathname=pathname)
+        def add_child(k):
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_node = etree.fromstring(child_str)
+            elt.append(child_node)
 
-        resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data'])
+        for child in ['rubric', 'prompt', 'submitmessage']:
+            add_child(child)
 
-        # write out the relative name
-        relname = path(pathname).basename()
-
-        elt = etree.Element('html')
-        elt.set("filename", relname)
         return elt
