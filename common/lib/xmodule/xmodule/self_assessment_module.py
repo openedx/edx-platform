@@ -302,10 +302,14 @@ class SelfAssessmentModule(XModule):
         """
         Get the current correctness, points, and done status
         """
-        #Assign points based on correctness
-        points = 0
-        if self.correctness == "correct":
-            points = 1
+        #Assign points based on completion
+        points = 1
+        #This is a pointless if structure, but left in place in case points change from
+        #being completion based to correctness based
+        if type(self.correctness)==type([]):
+            if(len(self.correctness)>0):
+                if self.correctness[len(self.correctness)-1]== "correct":
+                    points = 1
 
         state = {'seed': 1,
                  'student_answers': self.answer,
