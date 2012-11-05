@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from models import StudentModuleCache
-from module_render import get_module, get_instance_module
+from module_render import get_module, get_or_create_student_module
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
@@ -355,7 +355,13 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         problem = module_creator(problem_descriptor)
         if problem is None:
             return (None, None)
-        instance_module = get_instance_module(course_id, user, problem, student_module_cache)
+        instance_module = get_or_create_student_module(
+            course_id,
+            user,
+            problem.descriptor,
+            student_module_cache,
+            problem
+        )
 
     # If this problem is ungraded/ungradable, bail
     if not instance_module or instance_module.max_grade is None:

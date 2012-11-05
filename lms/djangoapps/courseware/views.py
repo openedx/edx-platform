@@ -20,7 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
-from module_render import toc_for_course, get_module, get_instance_module
+from module_render import toc_for_course, get_module, get_or_create_student_module
 
 from django_comment_client.utils import get_discussion_title
 
@@ -214,7 +214,13 @@ def index(request, course_id, chapter=None, section=None,
 
         chapter_descriptor = course.get_child_by_url_name(chapter)
         if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
+            instance_module = get_or_create_student_module(
+                course_id,
+                request.user,
+                course_module.descriptor,
+                student_module_cache,
+                course_module
+            )
             save_child_position(course_module, chapter, instance_module)
         else:
             raise Http404
@@ -242,7 +248,13 @@ def index(request, course_id, chapter=None, section=None,
                 raise Http404
 
             # Save where we are in the chapter
-            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+            instance_module = get_or_create_student_module(
+                course_id,
+                request.user,
+                chapter_module.descriptor,
+                student_module_cache,
+                chapter_module,
+            )
             save_child_position(chapter_module, section, instance_module)
 
 

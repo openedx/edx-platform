@@ -163,14 +163,17 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     shared_module = None
     if user.is_authenticated():
         if descriptor.stores_state:
-            instance_module = student_module_cache.lookup(
-                course_id, descriptor.category, descriptor.location.url())
+            instance_module = get_or_create_student_module(
+                course_id,
+                user,
+                descriptor,
+                student_module_cache
+            )
 
         shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
-            shared_module = student_module_cache.lookup(course_id,
-                                                        descriptor.category,
-                                                        shared_state_key)
+            shared_module = get_or_create_shared_student_module(
+                course_id, user, descriptor, student_module_cache)
 
     instance_state = instance_module.state if instance_module is not None else None
     shared_state = shared_module.state if shared_module is not None else None
@@ -268,31 +271,49 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         if has_access(user, module, 'staff'):
             module.get_html = add_histogram(module.get_html, module, user)
 
+    if instance_module is not None and instance_state is None:
+        instance_module.state = module.get_instance_state()
+        instance_module.save()
+
+    if shared_state_key is not None and shared_module is not None and shared_state is None:
+        shared_module.state = module.get_shared_state()
+        shared_module.save()
+
+
     return module
 
 # TODO (vshnayder): Rename this?  It's very confusing.
-def get_instance_module(course_id, user, module, student_module_cache):
+def get_or_create_student_module(course_id, user, descriptor, student_module_cache, module=None):
     """
     Returns the StudentModule specific to this module for this student,
         or None if this is an anonymous user
+
+
+    course_id: The course_id of the course that this module is being loaded from
+    user: The current user
+    descriptor: The descriptor of the module to load the state for
+    student_module_cache: A StudentModuleCache to load the StudentModule from. If the StudentModule
+        is new, it will be inserted into this cache
+    module: The module to use to initialize the instance state and max_grade. If None,
+        both of those fields will be initialized to None
     """
     if user.is_authenticated():
-        if not module.descriptor.stores_state:
+        if not descriptor.stores_state:
             log.exception("Attempted to get the instance_module for a module "
-                          + str(module.id) + " which does not store state.")
+                          + str(descriptor.location.url()) + " which does not store state.")
             return None
 
         instance_module = student_module_cache.lookup(
-            course_id, module.category, module.location.url())
+            course_id, descriptor.category, descriptor.location.url())
 
         if not instance_module:
             instance_module = StudentModule(
                 course_id=course_id,
                 student=user,
-                module_type=module.category,
-                module_state_key=module.id,
-                state=module.get_instance_state(),
-                max_grade=module.max_score())
+                module_type=descriptor.category,
+                module_state_key=descriptor.location.url(),
+                state=module.get_instance_state() if module else None,
+                max_grade=module.max_score() if module else None)
             instance_module.save()
             student_module_cache.append(instance_module)
 
@@ -300,19 +321,25 @@ def get_instance_module(course_id, user, module, student_module_cache):
     else:
         return None
 
-def get_shared_instance_module(course_id, user, module, student_module_cache):
+def get_or_create_shared_student_module(course_id, user, descriptor, student_module_cache, module=None):
     """
     Return shared_module is a StudentModule specific to all modules with the same
         'shared_state_key' attribute, or None if the module does not elect to
         share state
+
+    course_id: The course_id of the course that this module is being loaded from
+    user: The current user
+    descriptor: The descriptor of the module to load the state for
+    student_module_cache: A StudentModuleCache to load the StudentModule from. If the StudentModule
+        is new, it will be inserted into this cache
+    module: The module to use to initialize the instance state and max_grade. If None,
+        both of those fields will be initialized to None
     """
     if user.is_authenticated():
-        # To get the shared_state_key, we need to descriptor
-        descriptor = modulestore().get_instance(course_id, module.location)
-
-        shared_state_key = getattr(module, 'shared_state_key', None)
+        shared_state_key = getattr(descriptor, 'shared_state_key', None)
         if shared_state_key is not None:
-            shared_module = student_module_cache.lookup(module.category,
+            shared_module = student_module_cache.lookup(course_id,
+                                                        descriptor.category,
                                                         shared_state_key)
             if not shared_module:
                 shared_module = StudentModule(
@@ -320,7 +347,7 @@ def get_shared_instance_module(course_id, user, module, student_module_cache):
                     student=user,
                     module_type=descriptor.category,
                     module_state_key=shared_state_key,
-                    state=module.get_shared_state())
+                    state=module.get_shared_state() if module else None)
                 shared_module.save()
                 student_module_cache.append(shared_module)
         else:
@@ -356,7 +383,13 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
 
-    instance_module = get_instance_module(course_id, user, instance, student_module_cache)
+    instance_module = get_or_create_student_module(
+        course_id,
+        user,
+        instance.descriptor,
+        student_module_cache,
+        instance
+    )
 
     if instance_module is None:
         log.debug("Couldn't find instance of module '%s' for user '%s'", id, user)
@@ -443,7 +476,13 @@ def modx_dispatch(request, dispatch, location, course_id):
         log.debug("No module {0} for user {1}--access denied?".format(location, user))
         raise Http404
 
-    instance_module = get_instance_module(course_id, request.user, instance, student_module_cache)
+    instance_module = get_or_create_student_module(
+        course_id,
+        request.user,
+        instance.descriptor,
+        student_module_cache,
+        instance
+    )
     shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
 
     # Don't track state for anonymous users (who don't have student modules)
