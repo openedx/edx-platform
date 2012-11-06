@@ -219,7 +219,7 @@ class SelfAssessmentModule(XModule):
         event_info = dict()
         event_info['state'] = {
                                'student_answers': self.student_answers,
-                               'hint' : self.hints,
+                               'hints' : self.hints,
                                'correctness': self.correctness,
                                'score': points,
                                'done': self.done
@@ -250,7 +250,7 @@ class SelfAssessmentModule(XModule):
         state = {
                  'student_answers': self.student_answers,
                  'temp_answer': self.temp_answer,
-                 'hint' : self.hints,
+                 'hints' : self.hints,
                  'correctness': self.correctness,
                  'score': points,
                  'top_score' : MAX_SCORE,
