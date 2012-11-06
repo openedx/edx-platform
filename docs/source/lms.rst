@@ -53,10 +53,53 @@ Circuit
     :members:
     :show-inheritance:
 
+Models
+------
+
+.. automodule:: circuit.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: circuit.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: circuit.tests
+    :members:
+    :show-inheritance:
+
+
 Course_wiki
 ===========
 
 .. automodule:: course_wiki
+    :members:
+    :show-inheritance:
+
+Course Nav
+----------
+
+.. .. automodule:: course_wiki.course_nav
+..     :members:
+..     :show-inheritance:
+
+Views
+-----
+
+.. automodule:: course_wiki.views
+    :members:
+    :show-inheritance:
+
+Editors
+-------
+
+.. automodule:: course_wiki.editors
     :members:
     :show-inheritance:
 
@@ -67,6 +110,56 @@ Courseware
     :members:
     :show-inheritance:
 
+Access
+------
+
+.. automodule:: courseware.access
+    :members:
+    :show-inheritance:
+
+Admin
+-----
+
+.. automodule:: courseware.admin
+    :members:
+    :show-inheritance:
+
+Courses
+-------
+
+.. automodule:: courseware.courses
+    :members:
+    :show-inheritance:
+
+Grades
+------
+
+.. automodule:: courseware.grades
+    :members:
+    :show-inheritance:
+
+Models
+------
+
+.. automodule:: courseware.models
+    :members:
+    :show-inheritance:
+
+Progress
+--------
+
+.. automodule:: courseware.progress
+    :members:
+    :show-inheritance:
+
+Tabs
+----
+
+.. automodule:: courseware.tabs
+    :members:
+    :show-inheritance:
+
+
 Dashboard
 =========
 
@@ -74,10 +167,45 @@ Dashboard
     :members:
     :show-inheritance:
 
+Models
+------
+
+.. automodule:: dashboard.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: dashboard.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: dashboard.tests
+    :members:
+    :show-inheritance:
+
 Django comment client
 =====================
 
 .. automodule:: django_comment_client
+    :members:
+    :show-inheritance:
+
+Models
+------
+
+.. automodule:: django_comment_client.models
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: django_comment_client.tests
     :members:
     :show-inheritance:
 
@@ -95,6 +223,20 @@ Instructor
     :members:
     :show-inheritance:
 
+Views
+-----
+
+.. automodule:: instructor.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. .. automodule:: instructor.tests
+..     :members:
+..     :show-inheritance:
+
 Lisenses
 ========
 
@@ -102,10 +244,38 @@ Lisenses
     :members:
     :show-inheritance:
 
+Models
+------
+
+.. automodule:: licenses.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: licenses.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: licenses.tests
+    :members:
+    :show-inheritance:
+
 LMS migration
 =============
 
 .. automodule:: lms_migration
+    :members:
+    :show-inheritance:
+
+Migration
+---------
+
+.. automodule:: lms_migration.migrate
     :members:
     :show-inheritance:
 
@@ -123,12 +293,55 @@ Psychometrics
     :members:
     :show-inheritance:
 
+Models
+------
+
+.. automodule:: psychometrics.models
+    :members:
+    :show-inheritance:
+
+Admin
+-----
+
+.. automodule:: psychometrics.admin
+    :members:
+    :show-inheritance:
+
+Psychoanalyze
+-------------
+
+.. automodule:: psychometrics.psychoanalyze
+    :members:
+    :show-inheritance:
+
 Simple wiki
 ===========
 
 .. automodule:: simplewiki
     :members:
     :show-inheritance:
+
+Models
+------
+
+.. automodule:: simplewiki.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: simplewiki.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: simplewiki.tests
+    :members:
+    :show-inheritance:
+
 
 Static template view
 ====================
@@ -137,9 +350,52 @@ Static template view
     :members:
     :show-inheritance:
 
+Models
+------
+
+.. automodule:: static_template_view.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: static_template_view.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: static_template_view.tests
+    :members:
+    :show-inheritance:
+
+
 Static book
 ===========
 
 .. automodule:: staticbook
+    :members:
+    :show-inheritance:
+
+Models
+------
+
+.. automodule:: staticbook.models
+    :members:
+    :show-inheritance:
+
+Views
+-----
+
+.. automodule:: staticbook.views
+    :members:
+    :show-inheritance:
+
+Tests
+-----
+
+.. automodule:: staticbook.tests
     :members:
     :show-inheritance:

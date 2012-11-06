@@ -24,17 +24,11 @@ sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'lms', 'djangoapps')) 
 sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'cms', 'djangoapps'))  # cms djangoapps
 sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'djangoapps'))  # common djangoapps
 
+#  django configuration  - careful here
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
 
 
-# django specific
-# import ipdb; ipdb.set_trace()
-# Set up the Django settings/environment
-# STATIC_URL = '/static/'
-# sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'lms', 'envs'))  # lms djangoapps
-# from django.core.management import setup_environ
-# import lms.envs.dev
-# import ipdb; ipdb.set_trace()
-# setup_environ(lms.envs.dev)
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -268,20 +262,17 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 # PROJECT_DIR = os.path.join(THIS_DIR, 'relative/path/to/your/project/')
 # sys.path.append(PROJECT_DIR)
 
+
 import inspect
-import lms.envs.dev
-from django.core.management import setup_environ
 from django.utils.html import strip_tags
 from django.utils.encoding import force_unicode
-
-setup_environ(lms.envs.dev)
 
 
 def process_docstring(app, what, name, obj, options, lines):
     # This causes import errors if left outside the function
     from django.db import models
-    from django import forms
-    from django.forms.models import BaseInlineFormSet
+    # from django import forms
+    # from django.forms.models import BaseInlineFormSet
 
     # Only look at objects that inherit from Django's base MODEL class
     if inspect.isclass(obj) and issubclass(obj, models.Model):
