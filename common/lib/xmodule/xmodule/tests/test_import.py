@@ -311,3 +311,10 @@ class ImportTestCase(unittest.TestCase):
         system = self.get_system(False)
 
         self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)
+
+    def test_selfassessment_import_export(self):
+        '''
+        Check to see if definition_from_xml and definition_to_xml in self_assessment_module.py function.
+        '''
+
+
