@@ -29,16 +29,10 @@ SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 INSTALLED_APPS += ('django_nose',)
 NOSE_ARGS = []
 
-# Turning off coverage speeds up tests dramatically... until we have better config,
-# leave it here for manual fiddling.
-_coverage = True
-if _coverage:
-    NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html',
-                 # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
-                 '--cover-inclusive', '--cover-html-dir',
-                 os.environ.get('NOSE_COVER_HTML_DIR', 'cover_html')]
-    for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
-        NOSE_ARGS += ['--cover-package', app]
+NOSE_ARGS = [
+    '--with-xunit',
+    # '-v', '--pdb',     # When really stuck, uncomment to start debugger on error
+]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Local Directories
