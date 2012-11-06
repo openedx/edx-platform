@@ -172,7 +172,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
-MAX_FILEUPLOADS_PER_INPUT = 10
+MAX_FILEUPLOADS_PER_INPUT = 20
 
 # FIXME:
 # We should have separate S3 staged URLs in case we need to make changes to
