@@ -1,0 +1,18 @@
+--- 
+cursor_positions: 
+  - :path: lms/djangoapps/django_comment_client/forum/views.py
+    :cursor_offset: 1425
+    :timestamp: 2012-11-05 17:39:58 -05:00
+  - :path: lms/static/sass/README.txt
+    :cursor_offset: 102
+    :timestamp: 2012-11-05 17:39:58 -05:00
+  - :path: lms/lib/comment_client/thread.py
+    :cursor_offset: 1903
+    :timestamp: 2012-11-05 19:14:39 -05:00
+  - :path: lms/static/sass/_discussion.scss
+    :cursor_offset: 3568
+    :timestamp: 2012-11-05 19:28:49 -05:00
+  - :path: lms/static/sass/application.css
+    :cursor_offset: 228300
+    :timestamp: 2012-11-05 19:33:57 -05:00
+files_to_retain: 0
