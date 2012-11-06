@@ -1,54 +1,89 @@
 *******************************************
-Capa module
+CMS module
 *******************************************
 
-.. module:: capa
+.. module:: cms
 
-Calc
+Auth
 ====
 
-.. automodule:: capa.calc
+.. automodule:: auth
     :members:
     :show-inheritance:
 
-Capa_problem
-============
+Authz
+-----
 
-.. automodule:: capa.capa_problem
+.. automodule:: auth.authz
     :members:
     :show-inheritance:
 
-Checker
-=======
+Content store
+=============
 
-.. automodule:: capa.checker
+.. .. automodule:: contentstore
+..     :members:
+..     :show-inheritance:
+
+.. Utils
+.. -----
+
+.. .. automodule:: contentstore.untils
+..     :members:
+..     :show-inheritance:
+
+.. Views
+.. -----
+
+.. .. automodule:: contentstore.views
+..     :members:
+..     :show-inheritance:
+
+.. Management
+.. ----------
+
+.. .. automodule:: contentstore.management
+..     :members:
+..     :show-inheritance:
+
+.. Tests
+.. -----
+
+.. .. automodule:: contentstore.tests
+..     :members:
+..     :show-inheritance:
+
+Github sync
+===========
+
+.. automodule:: github_sync
     :members:
     :show-inheritance:
 
-Correctmap
-==========
+Exceptions
+----------
 
-.. automodule:: capa.correctmap
+.. automodule:: github_sync.exceptions
     :members:
     :show-inheritance:
 
-Customrender
-============
+Views
+-----
 
-.. automodule:: capa.customrender
+.. automodule:: github_sync.views
     :members:
     :show-inheritance:
 
-Inputtypes
-==========
+Management
+----------
 
-.. automodule:: capa.inputtypes
+.. automodule:: github_sync.management
     :members:
     :show-inheritance:
 
-Resposetypes
-============
+Tests
+-----
 
-.. automodule:: capa.responsetypes
-    :members:
-    :show-inheritance:
+.. .. automodule:: github_sync.tests
+..     :members:
+..     :show-inheritance:

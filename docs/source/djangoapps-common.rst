@@ -1,54 +1,54 @@
 *******************************************
-Capa module
+Common
 *******************************************
 
-.. module:: capa
+.. module:: common.djangoapps
 
-Calc
-====
-
-.. automodule:: capa.calc
-    :members:
-    :show-inheritance:
-
-Capa_problem
-============
-
-.. automodule:: capa.capa_problem
-    :members:
-    :show-inheritance:
-
-Checker
+Student
 =======
 
-.. automodule:: capa.checker
+.. automodule:: student
     :members:
     :show-inheritance:
 
-Correctmap
-==========
+Models
+------
 
-.. automodule:: capa.correctmap
+.. automodule:: student.models
     :members:
     :show-inheritance:
 
-Customrender
-============
+Views
+-----
 
-.. automodule:: capa.customrender
+.. automodule:: student.views
     :members:
     :show-inheritance:
 
-Inputtypes
-==========
+Admin
+-----
 
-.. automodule:: capa.inputtypes
+.. automodule:: student.admin
     :members:
     :show-inheritance:
 
-Resposetypes
-============
+Tests
+-----
 
-.. automodule:: capa.responsetypes
+.. automodule:: student.tests
+    :members:
+    :show-inheritance:
+
+Management
+----------
+
+.. automodule:: student.management
+    :members:
+    :show-inheritance:
+
+Migrations
+----------
+
+.. automodule:: student.migrations
     :members:
     :show-inheritance:
