@@ -312,9 +312,14 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)
 
-    def test_selfassessment_import_export(self):
+    def test_selfassessment_import(self):
         '''
         Check to see if definition_from_xml and definition_to_xml in self_assessment_module.py function.
         '''
 
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['self_assessment'])
 
+        sa_id = "edX/sa_test/2012_Fall"
+        location = Location(["i4x", "edX", "sa_test", "selfassessment", "SampleQuestion"])
+        sa_sample = modulestore.get_instance(sa_id, location)
+        self.assertEqual(sa_sample.metadata['attempts'], '10')
