@@ -81,7 +81,7 @@ class LoncapaResponse(object):
                          by __init__
 
       - check_hint_condition : check to see if the student's answers satisfy a particular
-                         condition for a hint to be displayed
+                               condition for a hint to be displayed
 
       - render_html          : render this Response as HTML (must return XHTML-compliant string)
       - __unicode__          : unicode representation of this Response
@@ -149,6 +149,7 @@ class LoncapaResponse(object):
             # for convenience
             self.answer_id = self.answer_ids[0]
 
+        # map input_id -> maxpoints
         self.maxpoints = dict()
         for inputfield in self.inputfields:
             # By default, each answerfield is worth 1 point
@@ -280,17 +281,14 @@ class LoncapaResponse(object):
         (correctness, npoints, msg) for each answer_id.
 
         Arguments:
-         - student_answers : dict of (answer_id,answer) where answer = student input (string)
-
-         - old_cmap        : previous CorrectMap (may be empty); useful for analyzing or
-                             recording history of responses
+         - student_answers : dict of (answer_id, answer) where answer = student input (string)
         '''
         pass
 
     @abc.abstractmethod
     def get_answers(self):
         '''
-        Return a dict of (answer_id,answer_text) for each answer for this question.
+        Return a dict of (answer_id, answer_text) for each answer for this question.
         '''
         pass
 
@@ -867,7 +865,8 @@ def sympy_check2():
   </customresponse>"""}]
 
     response_tag = 'customresponse'
-    allowed_inputfields = ['textline', 'textbox', 'crystallography', 'chemicalequationinput']
+
+    allowed_inputfields = ['textline', 'textbox', 'crystallography', 'chemicalequationinput', 'vsepr_input']
 
     def setup_response(self):
         xml = self.xml
@@ -1716,7 +1715,7 @@ class ImageResponse(LoncapaResponse):
     """
     Handle student response for image input: the input is a click on an image,
     which produces an [x,y] coordinate pair.  The click is correct if it falls
-    within a region specified.  This region is nominally a rectangle.
+    within a region specified.  This region is a union of rectangles.
 
     Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.  That
     doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
@@ -1726,6 +1725,7 @@ class ImageResponse(LoncapaResponse):
     snippets = [{'snippet': '''<imageresponse>
       <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
       <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
+      <imageinput src="image2.jpg" width="210" height="130" rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
     </imageresponse>'''}]
 
     response_tag = 'imageresponse'
@@ -1742,19 +1742,9 @@ class ImageResponse(LoncapaResponse):
         for aid in self.answer_ids:	 # loop through IDs of <imageinput> fields in our stanza
             given = student_answers[aid]	 # this should be a string of the form '[x,y]'
 
+            correct_map.set(aid, 'incorrect')
             if not given: # No answer to parse. Mark as incorrect and move on
-                correct_map.set(aid, 'incorrect')
                 continue
-
-            # parse expected answer
-            # TODO: Compile regexp on file load
-            m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
-                         expectedset[aid].strip().replace(' ', ''))
-            if not m:
-                msg = 'Error in problem specification! cannot parse rectangle in %s' % (
-                    etree.tostring(self.ielements[aid], pretty_print=True))
-                raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
-            (llx, lly, urx, ury) = [int(x) for x in m.groups()]
 
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
@@ -1763,11 +1753,24 @@ class ImageResponse(LoncapaResponse):
                                 'error grading %s (input=%s)' % (aid, given))
             (gx, gy) = [int(x) for x in m.groups()]
 
-            # answer is correct if (x,y) is within the specified rectangle
-            if (llx <= gx <= urx) and (lly <= gy <= ury):
-                correct_map.set(aid, 'correct')
-            else:
-                correct_map.set(aid, 'incorrect')
+            # Check whether given point lies in any of the solution rectangles
+            solution_rectangles = expectedset[aid].split(';')
+            for solution_rectangle in solution_rectangles:
+                # parse expected answer
+                # TODO: Compile regexp on file load
+                m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                             solution_rectangle.strip().replace(' ', ''))
+                if not m:
+                    msg = 'Error in problem specification! cannot parse rectangle in %s' % (
+                        etree.tostring(self.ielements[aid], pretty_print=True))
+                    raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+                (llx, lly, urx, ury) = [int(x) for x in m.groups()]
+
+                # answer is correct if (x,y) is within the specified rectangle
+                if (llx <= gx <= urx) and (lly <= gy <= ury):
+                    correct_map.set(aid, 'correct')
+                    break
+
         return correct_map
 
     def get_answers(self):
