@@ -258,10 +258,6 @@ intersphinx_mapping = {'http://docs.python.org/': None}
 
 # from http://djangosnippets.org/snippets/2533/
 # autogenerate models definitions
-# THIS_DIR = os.path.dirname(__file__)
-# PROJECT_DIR = os.path.join(THIS_DIR, 'relative/path/to/your/project/')
-# sys.path.append(PROJECT_DIR)
-
 
 import inspect
 from django.utils.html import strip_tags
