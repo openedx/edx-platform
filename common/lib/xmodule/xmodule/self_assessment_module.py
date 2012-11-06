@@ -1,8 +1,7 @@
 """
 Add Self Assessment module so students can write essay, submit, then see a rubric and rate themselves.
-Incredibly hacky solution to persist state and properly display information
-
-TODO: Add some tests
+Persists student supplied hints, answers, and correctness judgment (currently only correct/incorrect).
+Parses xml definition file--see below for exact format.
 """
 
 import copy
@@ -103,6 +102,7 @@ class SelfAssessmentModule(XModule):
         # TODO: do we need this?  True once everything is done
         self.done = instance_state.get('done', False)
 
+        #Get number of attempts student has used from instance state
         self.attempts = instance_state.get('attempts', 0)
 
         #Try setting maxattempts, use default if not available in metadata
@@ -114,11 +114,13 @@ class SelfAssessmentModule(XModule):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
-        #set context variables and render template
+        #Determine if student has answered the question before.  This is used to display
+        #a "previous answer" message to the student if they have.
         previous_answer=''
         if len(self.student_answers)>0:
             previous_answer=self.student_answers[len(self.student_answers)-1]
 
+        #set context variables and render template
         self.context = {
             'prompt' : self.prompt,
             'rubric' : self.rubric,
@@ -184,16 +186,16 @@ class SelfAssessmentModule(XModule):
         """
         #Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
-            # Dump to temp to keep answer in sync with correctness and hint
-
-            # TODO: expecting something like get['answer']
+            # Dump to temp_answer to keep answer in sync with correctness and hint
             self.temp_answer = get['student_answer']
-            log.debug(self.temp_answer)
+
+            #Return success and return rubric html to ajax call
             return {
                 'success': True,
                 'rubric': self.system.render_template('self_assessment_rubric.html', self.context)
             }
         else:
+            #If too many attempts, prevent student from saving answer and seeing rubric.
             return{
                 'success': False,
                 'message': 'Too many attempts.'
@@ -207,21 +209,19 @@ class SelfAssessmentModule(XModule):
         '''
 
         #Temp answer check is to keep hints, correctness, and answer in sync
-        points = 0
-        log.debug(self.temp_answer)
         if self.temp_answer is not "":
-            #Extract correctness and hint from ajax and assign points
+            #Extract correctness and hint from ajax, and add temp answer to student answers
             self.hints.append(get['hint'])
-            curr_correctness = get['assessment'].lower()
-            if curr_correctness == "correct":
-                points = 1
-            self.correctness.append(curr_correctness)
+            self.correctness.append(get['assessment'].lower())
             self.student_answers.append(self.temp_answer)
 
         #Student is done, and increment attempts
         self.done = True
         self.attempts = self.attempts + 1
 
+        #Create and store event info dict
+        #Currently points are assigned for completion, so set to 1 instead of depending on correctness.
+        points=1
         event_info = dict()
         event_info['state'] = {
                                'student_answers': self.student_answers,
@@ -236,6 +236,7 @@ class SelfAssessmentModule(XModule):
 
         self.system.track_function('save_problem_succeed', event_info)
 
+        #Return the submitmessage specified in xml defintion on success
         return {'success': True, 'message': self.submit_message}
 
     def get_instance_state(self):
@@ -283,6 +284,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         'rubric' : 'some-html',
         'prompt' : 'some-html',
         'submitmessage' : 'some-html'
+        'hintprompt' : 'some-html'
         }
         """
         expected_children = ['rubric', 'prompt', 'submitmessage', 'hintprompt']
