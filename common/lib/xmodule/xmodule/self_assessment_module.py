@@ -52,8 +52,9 @@ class SelfAssessmentModule(XModule):
             instance_state, shared_state, **kwargs)
 
         """
-        Definition file should have 3 blocks -- prompt, rubric, submitmessage, and one optional attribute, attempts,
-        which should be an integer that defaults to 1.  If it's >1, the student will be able to re-submit after they see
+        Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
+        and one optional attribute, attempts, which should be an integer that defaults to 1.
+        If it's >1, the student will be able to re-submit after they see
         the rubric.  Note: all the submissions are stored.
 
         Sample file:
@@ -65,6 +66,9 @@ class SelfAssessmentModule(XModule):
             <rubric>
                 Insert grading rubric here.  (arbitrary html)
             </rubric>
+            <hintprompt>
+                Please enter a hint below: (arbitrary html)
+            </hintprompt>
             <submitmessage>
                 Thanks for submitting!  (arbitrary html)
             </submitmessage>
@@ -103,10 +107,11 @@ class SelfAssessmentModule(XModule):
         #Try setting maxattempts, use default if not available in metadata
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
 
-        #Extract prompt, submission message and rubric from definition file
+        #Extract prompt, submission message, hint prompt, and rubric from definition file
         self.rubric = definition['rubric']
         self.prompt = definition['prompt']
         self.submit_message = definition['submitmessage']
+        self.hint_prompt = definition['hintprompt']
 
         #set context variables and render template
         previous_answer=''
@@ -116,6 +121,7 @@ class SelfAssessmentModule(XModule):
         self.context = {
             'prompt' : self.prompt,
             'rubric' : self.rubric,
+            'hint_prompt' : self.hint_prompt,
             'previous_answer_given' : len(self.student_answers)>0,
             'previous_answer' : previous_answer,
             'ajax_url' : system.ajax_url,
@@ -287,7 +293,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         'submitmessage' : 'some-html'
         }
         """
-        expected_children = ['rubric', 'prompt', 'submitmessage']
+        expected_children = ['rubric', 'prompt', 'submitmessage', 'hintprompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
@@ -298,7 +304,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
         return {'rubric' : parse('rubric'),
                 'prompt' : parse('prompt'),
-                'submitmessage' : parse('submitmessage'),}
+                'submitmessage' : parse('submitmessage'),
+                'hintprompt' : parse('hintprompt'),
+                }
 
 
     def definition_to_xml(self, resource_fs):
@@ -310,7 +318,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['rubric', 'prompt', 'submitmessage']:
+        for child in ['rubric', 'prompt', 'submitmessage', 'hintprompt']:
             add_child(child)
 
         return elt
