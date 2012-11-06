@@ -29,6 +29,7 @@ from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from statsd import statsd
 
 log = logging.getLogger("mitx.courseware")
 
@@ -342,7 +343,7 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     '''
     # Test xqueue package, which we expect to be:
     #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
-    #               'xqueue_body'  : 'Message from grader}
+    #               'xqueue_body'  : 'Message from grader'}
     get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
         if not get.has_key(key):
@@ -377,7 +378,8 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # We go through the "AJAX" path
     #   So far, the only dispatch from xqueue will be 'score_update'
     try:
-        ajax_return = instance.handle_ajax(dispatch, get)  # Can ignore the "ajax" return in 'xqueue_callback'
+        # Can ignore the return value--not used for xqueue_callback
+        instance.handle_ajax(dispatch, get)
     except:
         log.exception("error processing ajax call")
         raise
@@ -389,6 +391,15 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
         instance_module.save()
 
+        #Bin score into range and increment stats
+        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
+        org, course_num, run=course_id.split("/")
+        statsd.increment("lms.courseware.question_answered",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run),
+                              "score_bucket:{0}".format(score_bucket),
+                              "type:xqueue"])
     return HttpResponse("")
 
 
@@ -473,6 +484,17 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.max_grade != old_instance_max_grade):
             instance_module.save()
 
+            #Bin score into range and increment stats
+            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
+            org, course_num, run=course_id.split("/")
+            statsd.increment("lms.courseware.question_answered",
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run),
+                                  "score_bucket:{0}".format(score_bucket),
+                                  "type:ajax"])
+
+
     if shared_module is not None:
         shared_module.state = instance.get_shared_state()
         if shared_module.state != old_shared_state:
@@ -517,5 +539,18 @@ def preview_chemcalc(request):
 
     return HttpResponse(json.dumps(result))
 
+
+def get_score_bucket(grade,max_grade):
+    """
+    Function to split arbitrary score ranges into 3 buckets.
+    Used with statsd tracking.
+    """
+    score_bucket="incorrect"
+    if(grade>0 and grade<max_grade):
+        score_bucket="partial"
+    elif(grade==max_grade):
+        score_bucket="correct"
+
+    return score_bucket
 
 

@@ -250,8 +250,11 @@ Values are dictionaries of the form {"metadata-key" : "metadata-value"}.
 Supported fields at the course level:
 
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
+* "advertised_start" -- specify what you want displayed as the start date of the course in the course listing and course about pages. This can be useful if you want to let people in early before the formal start. Format-by-example: "2012-09-05T12:00".
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
+* "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
+* "discussion_blackouts" -- An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: [["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]
 * TODO: there are others
 
 ### Grading policy file contents
@@ -308,7 +311,7 @@ __Inherited:__
 * `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
-*	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+*	`rerandomize` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
                                                             'onreset' (randomize question when reset button is pressed by the student)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)

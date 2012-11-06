@@ -50,3 +50,5 @@ pygraphviz
 -r repo-requirements.txt
 pil
 nltk
+dogstatsd-python
+MySQL-python

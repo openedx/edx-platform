@@ -36,7 +36,7 @@ metadata:
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \subsection{Example "multiple choice" problem}
         
-        What color is a bannana?
+        What color is a banana?
         
         \edXabox{ type="multichoice" expect="Yellow" options="Red","Green","Yellow","Blue" }
         
@@ -129,7 +129,7 @@ data: |
           <h4>Example "multiple choice" problem</h4>
         </p>
         <p>
-    What color is a bannana? </p>
+    What color is a banana? </p>
         <p>
           <choiceresponse>
             <checkboxgroup>
