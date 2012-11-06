@@ -1,6 +1,8 @@
 """
 Add Self Assessment module so students can write essay, submit, then see a rubric and rate themselves.
 Incredibly hacky solution to persist state and properly display information
+
+TODO: Add some tests
 """
 
 import copy
@@ -84,7 +86,6 @@ class SelfAssessmentModule(XModule):
         log.debug('Instance state of self-assessment module {0}: {1}'.format(location.url(), instance_state))
 
         # Pull out state, or initialize variables
-
         # lists of student answers, correctness responses ('incorrect'/'correct'), and suggested hints
         self.student_answers = instance_state.get('student_answers', [])
         self.correctness = instance_state.get('correctness', [])
@@ -221,7 +222,6 @@ class SelfAssessmentModule(XModule):
         self.done = True
         self.attempts = self.attempts + 1
 
-        # TODO: simplify tracking info to just log the relevant stuff
         event_info = dict()
         event_info['state'] = {
                                'student_answers': self.student_answers,
@@ -242,16 +242,8 @@ class SelfAssessmentModule(XModule):
         """
         Get the current correctness, points, and done status
         """
-        #Assign points based on completion
+        #Assign points based on completion.  May want to change to correctness-based down the road.
         points = 1
-        #This is a pointless if structure, but left in place in case points change from
-        #being completion based to correctness based
-
-        # TODO: clean up
-        if type(self.correctness)==type([]):
-            if(len(self.correctness)>0):
-                if self.correctness[len(self.correctness)-1]== "correct":
-                    points = 1
 
         state = {
                  'student_answers': self.student_answers,
