@@ -115,4 +115,5 @@ class RoundTripTestCase(unittest.TestCase):
         self.check_export_roundtrip(DATA_DIR, "full")
 
     def test_selfassessment_roundtrip(self):
+        #Test selfassessment xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR,"self_assessment")
