@@ -250,3 +250,24 @@ task :autodeploy_properties do
         file.puts("UPSTREAM_REVISION=#{COMMIT}")
     end
 end
+
+desc "Invoke sphinx 'make build' to generate docs."
+task :builddocs do
+    Dir.chdir('docs') do
+        sh('make html')
+    end
+end
+
+desc "Show doc in browser (mac only for now) TODO add linux support"
+task :showdocs do
+    Dir.chdir('docs/build/html') do
+        sh('open index.html')
+    end
+end
+
+desc "Build docs and show them in browser"
+task :doc => :builddocs do
+    Dir.chdir('docs/build/html') do
+        sh('open index.html')
+    end
+end
