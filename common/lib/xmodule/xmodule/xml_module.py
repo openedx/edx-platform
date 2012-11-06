@@ -25,7 +25,7 @@ def name_to_pathname(name):
 def is_pointer_tag(xml_obj):
     """
     Check if xml_obj is a pointer tag: <blah url_name="something" />.
-    No children, one attribute named url_name.
+    No children, one attribute named url_name, no text.
 
     Special case for course roots: the pointer is
       <course url_name="something" org="myorg" course="course">
@@ -40,7 +40,10 @@ def is_pointer_tag(xml_obj):
         expected_attr = set(['url_name', 'course', 'org'])
 
     actual_attr = set(xml_obj.attrib.keys())
-    return len(xml_obj) == 0 and actual_attr == expected_attr
+
+    has_text = xml_obj.text is not None and len(xml_obj.text.strip()) > 0
+
+    return len(xml_obj) == 0 and actual_attr == expected_attr and not has_text
 
 def get_metadata_from_xml(xml_object, remove=True):
     meta = xml_object.find('meta')
