@@ -15,12 +15,14 @@ log = logging.getLogger(__name__)
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
+
 def name_to_pathname(name):
     """
     Convert a location name for use in a path: replace ':' with '/'.
     This allows users of the xml format to organize content into directories
     """
     return name.replace(':', '/')
+
 
 def is_pointer_tag(xml_obj):
     """
@@ -42,6 +44,7 @@ def is_pointer_tag(xml_obj):
     actual_attr = set(xml_obj.attrib.keys())
     return len(xml_obj) == 0 and actual_attr == expected_attr
 
+
 def get_metadata_from_xml(xml_object, remove=True):
     meta = xml_object.find('meta')
     if meta is None:
@@ -53,6 +56,7 @@ def get_metadata_from_xml(xml_object, remove=True):
     return dmdata
 
 _AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
+
 
 class AttrMap(_AttrMapBase):
     """
@@ -89,7 +93,7 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',	# for xqaa server access
+        'xqa_key',	 # for xqaa server access
         # VS[compat] Remove once unused.
         'name', 'slug')
 
@@ -109,20 +113,18 @@ class XmlDescriptor(XModuleDescriptor):
         'hide_progress_tab': bool_map,
     }
 
-
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
     # A set of metadata key conversions that we want to make
     metadata_translations = {
-        'slug' : 'url_name',
-        'name' : 'display_name',
+        'slug': 'url_name',
+        'name': 'display_name',
         }
 
     @classmethod
     def _translate(cls, key):
         'VS[compat]'
         return cls.metadata_translations.get(key, key)
-
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -172,7 +174,6 @@ class XmlDescriptor(XModuleDescriptor):
                 filepath, location.url(), str(err))
             raise Exception, msg, sys.exc_info()[2]
 
-
     @classmethod
     def load_definition(cls, xml_object, system, location):
         '''Load a descriptor definition from the specified xml_object.
@@ -211,7 +212,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         # TODO (ichuang): remove this after migration
         # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-        definition['filename'] = [ filepath, filename ]
+        definition['filename'] = [filepath, filename]
 
         return definition
 
@@ -236,7 +237,6 @@ class XmlDescriptor(XModuleDescriptor):
                 attr_map = cls.xml_attribute_map.get(attr, AttrMap())
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
-
 
     @classmethod
     def apply_policy(cls, metadata, policy):
@@ -272,9 +272,9 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
-            definition_xml = xml_object	# this is just a pointer, not the real definition content
+            definition_xml = xml_object	 # this is just a pointer, not the real definition content
 
-        definition = cls.load_definition(definition_xml, system, location)	# note this removes metadata
+        definition = cls.load_definition(definition_xml, system, location)	 # note this removes metadata
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
         if is_pointer_tag(xml_object):
@@ -284,13 +284,13 @@ class XmlDescriptor(XModuleDescriptor):
         metadata = cls.load_metadata(definition_xml)
 
         # move definition metadata into dict
-        dmdata = definition.get('definition_metadata','')
+        dmdata = definition.get('definition_metadata', '')
         if dmdata:
             metadata['definition_metadata_raw'] = dmdata
             try:
                 metadata.update(json.loads(dmdata))
             except Exception as err:
-                log.debug('Error %s in loading metadata %s' % (err,dmdata))
+                log.debug('Error %s in loading metadata %s' % (err, dmdata))
                 metadata['definition_metadata_err'] = str(err)
 
         # Set/override any metadata specified by policy
@@ -319,7 +319,6 @@ class XmlDescriptor(XModuleDescriptor):
         specifically for customtag...
         """
         return True
-
 
     def export_to_xml(self, resource_fs):
         """

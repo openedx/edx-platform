@@ -3,6 +3,7 @@
 #
 # Used by responsetypes and capa_problem
 
+
 class CorrectMap(object):
     """
     Stores map between answer_id and response evaluation result for each question
@@ -152,6 +153,3 @@ class CorrectMap(object):
         if not isinstance(other_cmap, CorrectMap):
             raise Exception('CorrectMap.update called with invalid argument %s' % other_cmap)
         self.cmap.update(other_cmap.get_dict())
-
-
-

@@ -8,5 +8,3 @@ for i in range(5):
 TEST_DIR = TEST_DIR / 'test'
 
 DATA_DIR = TEST_DIR / 'data'
-
-

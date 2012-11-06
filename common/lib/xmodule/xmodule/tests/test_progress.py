@@ -7,6 +7,7 @@ from xmodule import x_module
 
 from . import i4xs
 
+
 class ProgressTest(unittest.TestCase):
     ''' Test that basic Progress objects work.  A Progress represents a
     fraction between 0 and 1.

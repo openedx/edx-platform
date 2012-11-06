@@ -18,7 +18,7 @@ class Command(BaseCommand):
         student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
 
         for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
-                       "update_comment", "create_sub_comment", "unvote" , "create_thread",
+                       "update_comment", "create_sub_comment", "unvote", "create_thread",
                        "follow_commentable", "unfollow_commentable", "create_comment", ]:
             student_role.add_permission(per)
 

@@ -183,9 +183,9 @@ class LoncapaResponse(object):
         tree = etree.Element('span')
 
         # problem author can make this span display:inline
-        if self.xml.get('inline',''):
-            tree.set('class','inline')
-            
+        if self.xml.get('inline', ''):
+            tree.set('class', 'inline')
+
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -431,7 +431,6 @@ class JavascriptResponse(LoncapaResponse):
 
         return subprocess.check_output(subprocess_args, env=self.get_node_env())
 
-
     def generate_problem_state(self):
 
         generator_file = os.path.dirname(os.path.normpath(__file__)) + '/javascript_problem_generator.js'
@@ -471,7 +470,7 @@ class JavascriptResponse(LoncapaResponse):
                                                     escapedict)
             inputfield.set("problem_state", encoded_problem_state)
 
-            inputfield.set("display_file",  self.display_filename)
+            inputfield.set("display_file", self.display_filename)
             inputfield.set("display_class", self.display_class)
 
     def get_score(self, student_answers):
@@ -498,8 +497,8 @@ class JavascriptResponse(LoncapaResponse):
                                   json.dumps(self.params)]).split('\n')
 
         all_correct = json.loads(outputs[0].strip())
-        evaluation  = outputs[1].strip()
-        solution    = outputs[2].strip()
+        evaluation = outputs[1].strip()
+        solution = outputs[2].strip()
         return (all_correct, evaluation, solution)
 
     def get_answers(self):
@@ -509,9 +508,7 @@ class JavascriptResponse(LoncapaResponse):
         return {self.answer_id: self.solution}
 
 
-
 #-----------------------------------------------------------------------------
-
 class ChoiceResponse(LoncapaResponse):
     """
     This response type is used when the student chooses from a discrete set of
@@ -1143,7 +1140,7 @@ class CodeResponse(LoncapaResponse):
         else:
             self._parse_coderesponse_xml(codeparam)
 
-    def _parse_coderesponse_xml(self,codeparam):
+    def _parse_coderesponse_xml(self, codeparam):
         '''
         Parse the new CodeResponse XML format. When successful, sets:
             self.initial_display
@@ -1214,7 +1211,7 @@ class CodeResponse(LoncapaResponse):
         # Finally, make the ExternalResponse input XML format conform to the generic
         # exteral grader interface
         #   The XML tagging of grader_payload is pyxserver-specific
-        grader_payload  = '<pyxserver>'
+        grader_payload = '<pyxserver>'
         grader_payload += '<tests>' + tests + '</tests>\n'
         grader_payload += '<processor>' + code + '</processor>'
         grader_payload += '</pyxserver>'
@@ -1275,7 +1272,7 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
-                      'time': qtime,}
+                      'time': qtime, }
 
         cmap = CorrectMap()
         if error:
@@ -1747,7 +1744,7 @@ class ImageResponse(LoncapaResponse):
             given = student_answers[aid]	 # this should be a string of the form '[x,y]'
 
             correct_map.set(aid, 'incorrect')
-            if not given: # No answer to parse. Mark as incorrect and move on
+            if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
 
             # parse given answer

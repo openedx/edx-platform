@@ -27,14 +27,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('licenses', ['UserLicense'])
 
-
     def backwards(self, orm):
         # Deleting model 'CourseSoftware'
         db.delete_table('licenses_coursesoftware')
 
         # Deleting model 'UserLicense'
         db.delete_table('licenses_userlicense')
-
 
     models = {
         'auth.group': {

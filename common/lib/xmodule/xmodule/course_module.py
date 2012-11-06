@@ -2,7 +2,7 @@ from fs.errors import ResourceNotFoundError
 import logging
 import json
 from lxml import etree
-from path import path # NOTE (THK): Only used for detecting presence of syllabus
+from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 import time
 from cStringIO import StringIO
@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
+
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -105,7 +106,6 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
-
     def set_grading_policy(self, course_policy):
         if course_policy is None:
             course_policy = {}
@@ -163,8 +163,6 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
         self._grading_policy = grading_policy
 
-
-
     @classmethod
     def read_grading_policy(cls, paths, system):
         """Load a grading policy from the specified paths, in order, if it exists."""
@@ -186,14 +184,13 @@ class CourseDescriptor(SequenceDescriptor):
 
         return policy_str
 
-    
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         course_file = StringIO(xml_data)
-        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+        xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
@@ -206,7 +203,7 @@ class CourseDescriptor(SequenceDescriptor):
             paths = [policy_dir + '/grading_policy.json'] + paths
 
         policy = json.loads(cls.read_grading_policy(paths, system))
-        
+
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
         instance.definition['data']['grading_policy'] = policy
@@ -215,7 +212,6 @@ class CourseDescriptor(SequenceDescriptor):
         instance.set_grading_policy(policy)
 
         return instance
-    
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -313,17 +309,16 @@ class CourseDescriptor(SequenceDescriptor):
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
+                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
                     section_format = s.metadata.get('format', "")
-                    graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
+                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
                     all_descriptors.append(s)
 
-        return { 'graded_sections' : graded_sections,
-                 'all_descriptors' : all_descriptors,}
-
+        return {'graded_sections': graded_sections,
+                 'all_descriptors': all_descriptors, }
 
     @staticmethod
     def make_id(org, course, url_name):
@@ -348,7 +343,6 @@ class CourseDescriptor(SequenceDescriptor):
         if loc.category != "course":
             raise ValueError("{0} is not a course location".format(loc))
         return "/".join([loc.org, loc.course, loc.name])
-
 
     @property
     def id(self):
@@ -398,7 +392,7 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-        
+
         return True
 
     @property
@@ -419,5 +413,3 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
-
-

@@ -312,8 +312,6 @@ class XMLModuleStore(ModuleStoreBase):
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
 
-
-
     def __unicode__(self):
         '''
         String representation - for debugging
@@ -340,8 +338,6 @@ class XMLModuleStore(ModuleStoreBase):
             log.warning(msg + " " + str(err))
         return {}
 
-
-
     def load_course(self, course_dir, tracker):
         """
         Load a course into this module store
@@ -358,7 +354,7 @@ class XMLModuleStore(ModuleStoreBase):
             # been imported into the cms from xml
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
-            course_data = etree.parse(course_file,parser=edx_xml_parser).getroot()
+            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
 
@@ -403,7 +399,6 @@ class XMLModuleStore(ModuleStoreBase):
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
 
-
             course_id = CourseDescriptor.make_id(org, course, url_name)
             system = ImportSystem(
                 self,
@@ -425,7 +420,6 @@ class XMLModuleStore(ModuleStoreBase):
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
-
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -470,7 +464,6 @@ class XMLModuleStore(ModuleStoreBase):
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
 
-
     def get_courses(self, depth=0):
         """
         Returns a list of course descriptors.  If there were errors on loading,
@@ -483,7 +476,7 @@ class XMLModuleStore(ModuleStoreBase):
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
         course_dir where course loading failed.
         """
-        return dict( (k, self.errored_courses[k].errors) for k in self.errored_courses)
+        return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
     def update_item(self, location, data):
         """
@@ -495,7 +488,6 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
@@ -505,7 +497,6 @@ class XMLModuleStore(ModuleStoreBase):
         children: A list of child item identifiers
         """
         raise NotImplementedError("XMLModuleStores are read-only")
-
 
     def update_metadata(self, location, metadata):
         """

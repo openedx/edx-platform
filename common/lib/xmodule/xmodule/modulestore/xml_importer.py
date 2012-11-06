@@ -9,8 +9,9 @@ from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
+
 def import_static_content(modules, data_dir, static_content_store):
-    
+
     remap_dict = {}
 
     course_data_dir = None
@@ -27,7 +28,6 @@ def import_static_content(modules, data_dir, static_content_store):
     if course_data_dir is None or course_loc is None:
         return remap_dict
 
-   
     # now import all static assets
     static_dir = '{0}/static/'.format(course_data_dir)
 
@@ -61,11 +61,12 @@ def import_static_content(modules, data_dir, static_content_store):
                 remap_dict[fullname_with_subpath] = content_loc.name
 
             except:
-                raise    
+                raise
 
     return remap_dict
 
-def import_from_xml(store, data_dir, course_dirs=None, 
+
+def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True, static_content_store=None):
     """
@@ -76,7 +77,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     all course dirs
 
     """
-    
+
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
@@ -116,7 +117,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     pass    # part of the techincal debt is that module_data might not be a string (e.g. ABTest)
 
                 store.update_item(module.location, module_data)
-
 
             if 'children' in module.definition:
                 store.update_children(module.location, module.definition['children'])

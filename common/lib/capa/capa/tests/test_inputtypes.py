@@ -21,6 +21,7 @@ lookup_tag = inputtypes.registry.get_class_for_tag
 def quote_attr(s):
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
 
+
 class OptionInputTest(unittest.TestCase):
     '''
     Make sure option inputs work
@@ -45,6 +46,7 @@ class OptionInputTest(unittest.TestCase):
                     'id': 'sky_input'}
 
         self.assertEqual(context, expected)
+
 
 class ChoiceGroupTest(unittest.TestCase):
     '''
@@ -76,7 +78,7 @@ class ChoiceGroupTest(unittest.TestCase):
                     'input_type': expected_input_type,
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
-                                ('foil3', 'This is foil Three.'),],
+                                ('foil3', 'This is foil Three.'), ],
                     'name_array_suffix': expected_suffix,   # what is this for??
                     }
 
@@ -90,7 +92,6 @@ class ChoiceGroupTest(unittest.TestCase):
 
     def test_checkboxgroup(self):
         self.check_group('checkboxgroup', 'checkbox', '[]')
-
 
 
 class JavascriptInputTest(unittest.TestCase):
@@ -113,7 +114,7 @@ class JavascriptInputTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': '3',}
+        state = {'value': '3', }
         the_input = lookup_tag('javascriptinput')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -124,7 +125,7 @@ class JavascriptInputTest(unittest.TestCase):
                     'display_class': display_class,
                     'problem_state': problem_state,
                     'value': '3',
-                    'evaluation': '',}
+                    'evaluation': '', }
 
         self.assertEqual(context, expected)
 
@@ -140,7 +141,7 @@ class TextLineTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee',}
+        state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -156,7 +157,6 @@ class TextLineTest(unittest.TestCase):
                     'preprocessor': None}
         self.assertEqual(context, expected)
 
-
     def test_math_rendering(self):
         size = "42"
         preprocessorClass = "preParty"
@@ -168,7 +168,7 @@ class TextLineTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee',}
+        state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -201,7 +201,6 @@ class FileSubmissionTest(unittest.TestCase):
         />""".format(af=allowed_files,
                      rf=required_files,)
 
-
         element = etree.fromstring(xml_str)
 
         escapedict = {'"': '&quot;'}
@@ -209,7 +208,7 @@ class FileSubmissionTest(unittest.TestCase):
 
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
-                 'feedback' : {'message': '3'}, }
+                 'feedback': {'message': '3'}, }
         input_class = lookup_tag('filesubmission')
         the_input = input_class(test_system, element, state)
 
@@ -253,7 +252,7 @@ class CodeInputTest(unittest.TestCase):
 
         state = {'value': 'print "good evening"',
                  'status': 'incomplete',
-                 'feedback' : {'message': '3'}, }
+                 'feedback': {'message': '3'}, }
 
         the_input = lookup_tag('codeinput')(test_system, element, state)
 
@@ -287,7 +286,6 @@ class SchematicTest(unittest.TestCase):
         analyses = 'fast, slow, and pink'
         initial_value = 'two large batteries'
         submit_analyses = 'maybe'
-
 
         xml_str = """<schematic id="prob_1_2"
         height="{h}"
@@ -375,7 +373,6 @@ class ImageInputTest(unittest.TestCase):
         self.check('[12 13 14]', 0, 0)
 
 
-
 class CrystallographyTest(unittest.TestCase):
     '''
     Check that crystallography inputs work
@@ -456,7 +453,6 @@ class VseprTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
 
-
 class ChemicalEquationTest(unittest.TestCase):
     '''
     Check that chemical equation inputs work.
@@ -468,7 +464,7 @@ class ChemicalEquationTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'H2OYeah',}
+        state = {'value': 'H2OYeah', }
         the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -480,4 +476,3 @@ class ChemicalEquationTest(unittest.TestCase):
                     'previewer': '/static/js/capa/chemical_equation_preview.js',
                     }
         self.assertEqual(context, expected)
-

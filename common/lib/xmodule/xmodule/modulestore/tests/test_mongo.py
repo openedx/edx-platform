@@ -102,4 +102,3 @@ class TestMongoModuleStore(object):
     def test_path_to_location(self):
         '''Make sure that path_to_location works'''
         check_path_to_location(self.store)
-

@@ -4,6 +4,7 @@ import logging
 
 from courseware.courses import get_course_by_id
 
+
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
@@ -12,10 +13,10 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name + " for " + (self.course_id if self.course_id else "all courses")
 
-    def inherit_permissions(self, role): # TODO the name of this method is a little bit confusing,
+    def inherit_permissions(self, role):  # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
         if role.course_id and role.course_id != self.course_id:
-            logging.warning("%s cannot inheret permissions from %s due to course_id inconsistency" % 
+            logging.warning("%s cannot inheret permissions from %s due to course_id inconsistency" %
                             (self, role))
         for per in role.permissions.all():
             self.add_permission(per)
@@ -29,7 +30,7 @@ class Role(models.Model):
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):
            return False
-        
+
         return self.permissions.filter(name=permission).exists()
 
 

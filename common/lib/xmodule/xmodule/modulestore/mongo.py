@@ -111,7 +111,6 @@ class MongoModuleStore(ModuleStoreBase):
         if user is not None and password is not None:
             self.collection.database.authenticate(user, password)
 
-
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
 

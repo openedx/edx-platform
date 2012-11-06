@@ -33,7 +33,6 @@ graded status as'status'
 # general css and layout strategy for capa, document it, then implement it.
 
 
-
 import json
 import logging
 from lxml import etree
@@ -49,6 +48,7 @@ log = logging.getLogger('mitx.' + __name__)
 #########################################################################
 
 registry = TagRegistry()
+
 
 class InputTypeBase(object):
     """
@@ -110,7 +110,6 @@ class InputTypeBase(object):
             # Something went wrong: add xml to message, but keep the traceback
             msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
             raise Exception, msg, sys.exc_info()[2]
-
 
     def setup(self):
         """
@@ -182,7 +181,7 @@ class OptionInput(InputTypeBase):
             'status': self.status,
             'msg': self.msg,
             'options': self.osetdict,
-            'inline': self.xml.get('inline',''),
+            'inline': self.xml.get('inline', ''),
             }
         return context
 
@@ -244,6 +243,7 @@ class ChoiceGroup(InputTypeBase):
                    'name_array_suffix': self.suffix}
         return context
 
+
 def extract_choices(element):
     '''
     Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
@@ -303,11 +303,10 @@ class JavascriptInput(InputTypeBase):
         self.display_class = self.xml.get('display_class')
         self.display_file = self.xml.get('display_file')
 
-
     def _get_render_context(self):
         escapedict = {'"': '&quot;'}
         value = saxutils.escape(self.value, escapedict)
-        msg   = saxutils.escape(self.msg, escapedict)
+        msg = saxutils.escape(self.msg, escapedict)
 
         context = {'id': self.id,
                'params': self.params,
@@ -348,12 +347,10 @@ class TextLine(InputTypeBase):
         self.preprocessor = None
         if self.do_math:
             # Preprocessor to insert between raw input and Mathjax
-            self.preprocessor = {'class_name': self.xml.get('preprocessorClassName',''),
-                            'script_src': self.xml.get('preprocessorSrc','')}
+            self.preprocessor = {'class_name': self.xml.get('preprocessorClassName', ''),
+                            'script_src': self.xml.get('preprocessorSrc', '')}
             if '' in self.preprocessor.values():
                 self.preprocessor = None
-
-
 
     def _get_render_context(self):
         # Escape answers with quotes, so they don't crash the system!
@@ -376,6 +373,7 @@ registry.register(TextLine)
 
 #-----------------------------------------------------------------------------
 
+
 class FileSubmission(InputTypeBase):
     """
     Upload some files (e.g. for programming assignments)
@@ -390,8 +388,8 @@ class FileSubmission(InputTypeBase):
 
     def setup(self):
         escapedict = {'"': '&quot;'}
-        self.allowed_files  = json.dumps(self.xml.get('allowed_files', '').split())
-        self.allowed_files  = saxutils.escape(self.allowed_files, escapedict)
+        self.allowed_files = json.dumps(self.xml.get('allowed_files', '').split())
+        self.allowed_files = saxutils.escape(self.allowed_files, escapedict)
         self.required_files = json.dumps(self.xml.get('required_files', '').split())
         self.required_files = saxutils.escape(self.required_files, escapedict)
 
@@ -411,7 +409,7 @@ class FileSubmission(InputTypeBase):
                    'value': self.value,
                    'queue_len': self.queue_len,
                    'allowed_files': self.allowed_files,
-                   'required_files': self.required_files,}
+                   'required_files': self.required_files, }
         return context
 
 registry.register(FileSubmission)
@@ -430,7 +428,6 @@ class CodeInput(InputTypeBase):
             'textbox',        # Another (older) name--at some point we may want to make it use a
                               # non-codemirror editor.
             ]
-
 
     def setup(self):
         self.rows = self.xml.get('rows') or '30'
@@ -490,7 +487,6 @@ class Schematic(InputTypeBase):
         self.initial_value = self.xml.get('initial_value')
         self.submit_analyses = self.xml.get('submit_analyses')
 
-
     def _get_render_context(self):
 
         context = {'id': self.id,
@@ -501,12 +497,13 @@ class Schematic(InputTypeBase):
                    'height': self.height,
                    'parts': self.parts,
                    'analyses': self.analyses,
-                   'submit_analyses': self.submit_analyses,}
+                   'submit_analyses': self.submit_analyses, }
         return context
 
 registry.register(Schematic)
 
 #-----------------------------------------------------------------------------
+
 
 class ImageInput(InputTypeBase):
     """
@@ -536,7 +533,6 @@ class ImageInput(InputTypeBase):
         else:
             (self.gx, self.gy) = (0, 0)
 
-
     def _get_render_context(self):
 
         context = {'id': self.id,
@@ -555,6 +551,7 @@ registry.register(ImageInput)
 
 #-----------------------------------------------------------------------------
 
+
 class Crystallography(InputTypeBase):
     """
     An input for crystallography -- user selects 3 points on the axes, and we get a plane.
@@ -564,7 +561,6 @@ class Crystallography(InputTypeBase):
 
     template = "crystallography.html"
     tags = ['crystallography']
-
 
     def setup(self):
         self.height = self.xml.get('height')
@@ -593,6 +589,7 @@ class Crystallography(InputTypeBase):
 registry.register(Crystallography)
 
 # -------------------------------------------------------------------------
+
 
 class VseprInput(InputTypeBase):
     """

@@ -14,11 +14,11 @@ class CodeMirrorWidget(forms.Widget):
     def __init__(self, attrs=None):
         # The 'rows' and 'cols' attributes are required for HTML correctness.
         default_attrs = {'class': 'markItUp',
-                         'rows': '10', 'cols': '40',}
+                         'rows': '10', 'cols': '40', }
         if attrs:
             default_attrs.update(attrs)
         super(CodeMirrorWidget, self).__init__(default_attrs)
-    
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
 
@@ -34,10 +34,10 @@ class CodeMirrorWidget(forms.Widget):
 
 class CodeMirror(BaseEditor):
     editor_id = 'codemirror'
-    
+
     def get_admin_widget(self, instance=None):
         return MarkItUpAdminWidget()
-    
+
     def get_widget(self, instance=None):
         return CodeMirrorWidget()
 
@@ -61,4 +61,3 @@ class CodeMirror(BaseEditor):
               "js/wiki/CodeMirror.init.js",
               "js/wiki/cheatsheet.js",
               )
-

@@ -4,6 +4,7 @@ from thread import Thread
 import models
 import settings
 
+
 class Comment(models.Model):
 
     accessible_fields = [
@@ -41,8 +42,10 @@ class Comment(models.Model):
         else:
             return super(Comment, cls).url(action, params)
 
+
 def _url_for_thread_comments(thread_id):
     return "{prefix}/threads/{thread_id}/comments".format(prefix=settings.PREFIX, thread_id=thread_id)
+
 
 def _url_for_comment(comment_id):
     return "{prefix}/comments/{comment_id}".format(prefix=settings.PREFIX, comment_id=comment_id)

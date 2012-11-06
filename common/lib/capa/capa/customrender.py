@@ -21,6 +21,7 @@ log = logging.getLogger('mitx.' + __name__)
 
 registry = TagRegistry()
 
+
 #-----------------------------------------------------------------------------
 class MathRenderer(object):
     tags = ['math']
@@ -49,7 +50,6 @@ class MathRenderer(object):
             mathstr = mathstr.replace(r'\displaystyle', '')
         self.mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
 
-
     def get_html(self):
         """
         Return the contents of this tag, rendered to html, as an etree element.
@@ -77,6 +77,7 @@ registry.register(MathRenderer)
 
 #-----------------------------------------------------------------------------
 
+
 class SolutionRenderer(object):
     '''
     A solution is just a <span>...</span> which is given an ID, that is used for displaying an
@@ -97,4 +98,3 @@ class SolutionRenderer(object):
         return etree.XML(html)
 
 registry.register(SolutionRenderer)
-

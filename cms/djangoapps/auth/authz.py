@@ -15,6 +15,7 @@ but this implementation should be data compatible with the LMS implementation
 INSTRUCTOR_ROLE_NAME = 'instructor'
 STAFF_ROLE_NAME = 'staff'
 
+
 # we're just making a Django group for each location/role combo
 # to do this we're just creating a Group name which is a formatted string
 # of those two variables
@@ -25,10 +26,11 @@ def get_course_groupname_for_role(location, role):
     # more information
     groupname = '{0}_{1}'.format(role, loc.course)
 
-    if len(Group.objects.filter(name = groupname)) == 0:
-        groupname = '{0}_{1}'.format(role,loc.course_id)
+    if len(Group.objects.filter(name=groupname)) == 0:
+        groupname = '{0}_{1}'.format(role, loc.course_id)
 
     return groupname
+
 
 def get_users_in_course_group_by_role(location, role):
     groupname = get_course_groupname_for_role(location, role)
@@ -39,6 +41,8 @@ def get_users_in_course_group_by_role(location, role):
 '''
 Create all permission groups for a new course and subscribe the caller into those roles
 '''
+
+
 def create_all_course_groups(creator, location):
     create_new_course_group(creator, location, INSTRUCTOR_ROLE_NAME)
     create_new_course_group(creator, location, STAFF_ROLE_NAME)
@@ -46,7 +50,7 @@ def create_all_course_groups(creator, location):
 
 def create_new_course_group(creator, location, role):
     groupname = get_course_groupname_for_role(location, role)
-    (group, created) =Group.objects.get_or_create(name=groupname)
+    (group, created) = Group.objects.get_or_create(name=groupname)
     if created:
         group.save()
 
@@ -100,8 +104,6 @@ def remove_user_from_course_group(caller, user, location, role):
 def is_user_in_course_group_role(user, location, role):
     if user.is_active and user.is_authenticated:
         # all "is_staff" flagged accounts belong to all groups
-        return user.is_staff or user.groups.filter(name=get_course_groupname_for_role(location,role)).count() > 0
+        return user.is_staff or user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
 
     return False
-
-    

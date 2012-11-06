@@ -54,7 +54,6 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', invalid.sub('_', value))
 
-
     @staticmethod
     def clean(value):
         """
@@ -132,7 +131,6 @@ class Location(_LocationBase):
         Components may be set to None, which may be interpreted in some contexts
         to mean wildcard selection.
         """
-
 
         if (org is None and course is None and category is None and
             name is None and revision is None):
@@ -226,7 +224,6 @@ class Location(_LocationBase):
 
     def __repr__(self):
         return "Location%s" % repr(tuple(self))
-
 
     @property
     def course_id(self):

@@ -63,7 +63,6 @@ class ImportTestCase(unittest.TestCase):
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
@@ -74,7 +73,6 @@ class ImportTestCase(unittest.TestCase):
         descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
-
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -195,7 +193,6 @@ class ImportTestCase(unittest.TestCase):
 
         check_for_key('graceperiod', course)
 
-
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same
         org and course names, policy applies to the right one."""
@@ -227,7 +224,6 @@ class ImportTestCase(unittest.TestCase):
         # appropriate attribute maps -- 'graded' should be True, not 'true'
         self.assertEqual(toy.metadata['graded'], True)
 
-
     def test_definition_loading(self):
         """When two courses share the same org and course name and
         both have a module with the same url_name, the definitions shouldn't clash.
@@ -243,10 +239,9 @@ class ImportTestCase(unittest.TestCase):
 
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
-        two_toy_video =  modulestore.get_instance(two_toy_id, location)
+        two_toy_video = modulestore.get_instance(two_toy_id, location)
         self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
         self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
-
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
@@ -297,7 +292,7 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertEqual(len(sections), 4)
 
-        for i in (2,3):
+        for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
             print "video {0} url_name: {1}".format(i, video.url_name)

@@ -234,17 +234,17 @@ class XModule(HTMLSnippet):
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
-    
+
     def get_children_locations(self):
         '''
         Returns the locations of each of child modules.
-        
+
         Overriding this changes the behavior of get_children and
         anything that uses get_children, such as get_display_items.
-        
+
         This method will not instantiate the modules of the children
         unless absolutely necessary, so it is cheaper to call than get_children
-        
+
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
@@ -320,7 +320,7 @@ class XModule(HTMLSnippet):
             get is a dictionary-like object '''
         return ""
 
-    # cdodge: added to support dynamic substitutions of 
+    # cdodge: added to support dynamic substitutions of
     # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
     def rewrite_content_links(self, link):
         # see if we start with our format, e.g. 'xasset:<filename>'
@@ -333,7 +333,6 @@ class XModule(HTMLSnippet):
             link = StaticContent.get_url_path_from_location(content_loc)
 
         return link
-
 
 
 def policy_key(location):
@@ -413,7 +412,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
     system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft']
-    
+
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('definition', 'metadata', 'location',
@@ -571,18 +570,16 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             self,
             metadata=self.metadata
         )
-    
-    
+
     def has_dynamic_children(self):
         """
         Returns True if this descriptor has dynamic children for a given
         student when the module is created.
-        
+
         Returns False if the children of this descriptor are the same
-        children that the module will return for any student. 
+        children that the module will return for any student.
         """
         return False
-        
 
     # ================================= JSON PARSING ===========================
     @staticmethod

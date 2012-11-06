@@ -37,7 +37,7 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 
         def find_course(name):
             """Assumes the course is present"""
-            return [c for c in courses if c.location.course==name][0]
+            return [c for c in courses if c.location.course == name][0]
 
         self.full = find_course("full")
         self.toy = find_course("toy")
@@ -59,7 +59,6 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         self.login(self.instructor, self.password)
         self.enroll(self.toy)
 
-
     def test_download_grades_csv(self):
         print "running test_download_grades_csv"
         course = self.toy
@@ -69,13 +68,13 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
                                           })
         msg += "instructor dashboard download csv grades: response = '%s'\n" % response
 
-        self.assertEqual(response['Content-Type'],'text/csv',msg)
+        self.assertEqual(response['Content-Type'], 'text/csv', msg)
 
-        cdisp = response['Content-Disposition'].replace('TT_2012','2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
+        cdisp = response['Content-Disposition'].replace('TT_2012', '2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
         msg += "cdisp = '%s'\n" % cdisp
-        self.assertEqual(cdisp,'attachment; filename=grades_edX/toy/2012_Fall.csv',msg)
+        self.assertEqual(cdisp, 'attachment; filename=grades_edX/toy/2012_Fall.csv', msg)
 
-        body = response.content.replace('\r','')
+        body = response.content.replace('\r', '')
         msg += "body = '%s'\n" % body
 
         expected_body = '''"ID","Username","Full Name","edX email","External email","HW 01","HW 02","HW 03","HW 04","HW 05","HW 06","HW 07","HW 08","HW 09","HW 10","HW 11","HW 12","HW Avg","Lab 01","Lab 02","Lab 03","Lab 04","Lab 05","Lab 06","Lab 07","Lab 08","Lab 09","Lab 10","Lab 11","Lab 12","Lab Avg","Midterm","Final"

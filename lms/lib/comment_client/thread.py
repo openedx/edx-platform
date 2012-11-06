@@ -3,6 +3,7 @@ from utils import *
 import models
 import settings
 
+
 class Thread(models.Model):
 
     accessible_fields = [
@@ -66,7 +67,7 @@ class Thread(models.Model):
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
 
-        request_params = { 
+        request_params = {
                             'recursive': kwargs.get('recursive'),
                             'user_id': kwargs.get('user_id'),
                             'mark_as_read': kwargs.get('mark_as_read', True),

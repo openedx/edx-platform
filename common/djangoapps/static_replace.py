@@ -7,6 +7,7 @@ from django.conf import settings
 
 log = logging.getLogger(__name__)
 
+
 def try_staticfiles_lookup(path):
     """
     Try to lookup a path in staticfiles_storage.  If it fails, return

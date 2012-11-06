@@ -59,11 +59,11 @@ def instructor_dashboard(request, course_id):
 
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
-    idash_mode = request.POST.get('idash_mode','')
+    idash_mode = request.POST.get('idash_mode', '')
     if idash_mode:
         request.session['idash_mode'] = idash_mode
     else:
-        idash_mode = request.session.get('idash_mode','Grades')
+        idash_mode = request.session.get('idash_mode', 'Grades')
 
     def escape(s):
         """escape HTML special characters in string"""
@@ -124,7 +124,7 @@ def instructor_dashboard(request, course_id):
                 course_errors = modulestore().get_item_errors(course.location)
                 msg += '<ul>'
                 for cmsg, cerr in course_errors:
-                    msg += "<li>%s: <pre>%s</pre>" % (cmsg,escape(cerr))
+                    msg += "<li>%s: <pre>%s</pre>" % (cmsg, escape(cerr))
                 msg += '</ul>'
             except Exception as err:
                 msg += '<br/><p>Error: %s</p>' % escape(err)
@@ -212,7 +212,7 @@ def instructor_dashboard(request, course_id):
         msg += nmsg
         track.views.server_track(request, 'psychometrics %s' % problem, {}, page='idashboard')
 
-    if idash_mode=='Psychometrics':
+    if idash_mode == 'Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
     #----------------------------------------
@@ -227,7 +227,7 @@ def instructor_dashboard(request, course_id):
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
-               'djangopid' : os.getpid(),
+               'djangopid': os.getpid(),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
@@ -267,10 +267,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     data = []
 
     for student in enrolled_students:
-        datarow = [ student.id, student.username, student.profile.name, student.email ]
+        datarow = [student.id, student.username, student.profile.name, student.email]
         try:
             datarow.append(student.externalauthmap.external_email)
-        except:	# ExternalAuthMap.DoesNotExist
+        except:	 # ExternalAuthMap.DoesNotExist
             datarow.append('')
 
         if get_grades:
@@ -412,5 +412,5 @@ def compute_course_stats(course):
             walk(c)
 
     walk(course)
-    stats = dict(counts)	# number of each kind of module
+    stats = dict(counts)	 # number of each kind of module
     return stats

@@ -6,6 +6,7 @@ from django.conf import settings
 
 _CONTENTSTORE = None
 
+
 def load_function(path):
     """
     Load a function by name.

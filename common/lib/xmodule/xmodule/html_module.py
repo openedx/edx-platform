@@ -27,7 +27,7 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
-    
+
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
         _html = self.html
@@ -43,7 +43,6 @@ class HtmlModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         self.html = self.definition['data']
-
 
 
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
@@ -112,8 +111,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             filepath = "{base}/{name}.html".format(base=base, name=filename)
             #log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
-
-
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
             # give the class a chance to fix it up. The file will be written out
@@ -140,7 +137,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [ filepath, filename ]
+                    definition['filename'] = [filepath, filename]
 
                     return definition
 

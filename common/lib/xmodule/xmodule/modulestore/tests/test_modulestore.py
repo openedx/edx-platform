@@ -3,6 +3,7 @@ from nose.tools import assert_equals, assert_raises, assert_not_equals, with_set
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 
+
 def check_path_to_location(modulestore):
     '''Make sure that path_to_location works: should be passed a modulestore
     with the toy and simple courses loaded.'''
@@ -31,4 +32,3 @@ def check_path_to_location(modulestore):
         )
     for location in no_path:
         assert_raises(NoPathToItem, path_to_location, modulestore, course_id, location)
-

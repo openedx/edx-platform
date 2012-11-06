@@ -12,6 +12,7 @@ from django.core.management.base import BaseCommand
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.errortracker import make_error_tracker
 
+
 def traverse_tree(course):
     '''Load every descriptor in course.  Return bool success value.'''
     queue = [course]
@@ -82,7 +83,6 @@ def import_with_checks(course_dir, verbose=True):
         print "=" * 40
         print '\n'
 
-
     #print course
     validators = (
         traverse_tree,
@@ -94,7 +94,6 @@ def import_with_checks(course_dir, verbose=True):
     for validate in validators:
         print 'Running {0}'.format(validate.__name__)
         all_ok = validate(course) and all_ok
-
 
     if all_ok:
         print 'Course passes all checks!'
@@ -134,7 +133,6 @@ def clean_xml(course_dir, export_dir, force):
         print "Did NOT export"
 
 
-
 class Command(BaseCommand):
     help = """Imports specified course.xml, validate it, then exports in
     a canonical format.
@@ -144,6 +142,7 @@ Usage: clean_xml PATH-TO-COURSE-DIR PATH-TO-OUTPUT-DIR [force]
 If 'force' is specified as the last argument, exports even if there
 were import errors.
 """
+
     def handle(self, *args, **options):
         n = len(args)
         if n < 2 or n > 3:

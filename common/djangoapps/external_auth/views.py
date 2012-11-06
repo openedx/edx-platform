@@ -215,7 +215,7 @@ def ssl_dn_extract_info(dn):
     else:
         return None
     return (user, email, fullname)
-    
+
 
 def ssl_get_cert_from_request(request):
     """
@@ -532,7 +532,7 @@ def provider_login(request):
             # missing fields is up to the Consumer. The proper change
             # should only return the username, however this will likely
             # break the CS50 client. Temporarily we will be returning
-            # username filling in for fullname in addition to username 
+            # username filling in for fullname in addition to username
             # as sreg nickname.
             results = {
                 'nickname': user.username,

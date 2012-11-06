@@ -31,6 +31,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.timeparse import stringify_time
 
+
 def parse_json(response):
     """Parse response, which is assumed to be json"""
     return json.loads(response.content)
@@ -65,6 +66,7 @@ def mongo_store_config(data_dir):
     }
 }
 
+
 def xml_store_config(data_dir):
     return {
     'default': {
@@ -83,6 +85,7 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
 REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
+
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
@@ -218,7 +221,6 @@ class PageLoader(ActivateLoginTestCase):
         data = parse_json(resp)
         self.assertTrue(data['success'])
 
-
     def check_for_get_code(self, code, url):
         """
         Check that we got the expected code.  Hacks around our broken 404
@@ -228,7 +230,6 @@ class PageLoader(ActivateLoginTestCase):
         self.assertEqual(resp.status_code, code,
                          "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
-
 
     def check_pages_load(self, course_name, data_dir, modstore):
         """Make all locations in course load"""
@@ -292,7 +293,7 @@ class TestNavigation(PageLoader):
 
         def find_course(course_id):
             """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
+            return [c for c in courses if c.id == course_id][0]
 
         self.full = find_course("edX/full/6.002_Spring_2012")
         self.toy = find_course("edX/toy/2012_Fall")
@@ -329,7 +330,7 @@ class TestNavigation(PageLoader):
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
                                              kwargs={'course_id': self.toy.id,
-                                                     'chapter':'secret:magic', 'section':'toyvideo'}))
+                                                     'chapter': 'secret:magic', 'section': 'toyvideo'}))
 
         # And now hitting the courseware tab should redirect to 'secret:magic'
         resp = self.client.get(reverse('courseware', kwargs={'course_id': self.toy.id}))
@@ -350,7 +351,7 @@ class TestViewAuth(PageLoader):
 
         def find_course(course_id):
             """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
+            return [c for c in courses if c.id == course_id][0]
 
         self.full = find_course("edX/full/6.002_Spring_2012")
         self.toy = find_course("edX/toy/2012_Fall")
@@ -413,7 +414,6 @@ class TestViewAuth(PageLoader):
             print 'checking for 404 on {0}'.format(url)
             self.check_for_get_code(404, url)
 
-
         # now also make the instructor staff
         u = user(self.instructor)
         u.is_staff = True
@@ -423,7 +423,6 @@ class TestViewAuth(PageLoader):
         for url in instructor_urls(self.toy) + instructor_urls(self.full):
             print 'checking for 200 on {0}'.format(url)
             self.check_for_get_code(200, url)
-
 
     def run_wrapped(self, test):
         """
@@ -440,7 +439,6 @@ class TestViewAuth(PageLoader):
         finally:
             settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
 
-
     def test_dark_launch(self):
         """Make sure that before course start, students can't access course
         pages, but instructors can"""
@@ -450,12 +448,11 @@ class TestViewAuth(PageLoader):
         """Check that enrollment periods work"""
         self.run_wrapped(self._do_test_enrollment_period)
 
-
     def _do_test_dark_launch(self):
         """Actually do the test, relying on settings to be right."""
 
         # Make courses start in the future
-        tomorrow = time.time() + 24*3600
+        tomorrow = time.time() + 24 * 3600
         self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
         self.full.metadata['start'] = stringify_time(time.gmtime(tomorrow))
 
@@ -493,7 +490,7 @@ class TestViewAuth(PageLoader):
 
         def instructor_urls(course):
             """list of urls that only instructors/staff should be able to see"""
-            urls = reverse_urls(['instructor_dashboard','gradebook','grade_summary'],
+            urls = reverse_urls(['instructor_dashboard', 'gradebook', 'grade_summary'],
                                 course)
             return urls
 
@@ -530,7 +527,6 @@ class TestViewAuth(PageLoader):
             # The courseware url should redirect, not 200
             url = reverse_urls(['courseware'], course)[0]
             self.check_for_get_code(302, url)
-
 
         # First, try with an enrolled student
         print '=== Testing student access....'
@@ -657,49 +653,49 @@ class TestCourseGrader(PageLoader):
 
         def find_course(course_id):
             """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
+            return [c for c in courses if c.id == course_id][0]
 
         self.graded_course = find_course("edX/graded/2012_Fall")
-        
+
         # create a test student
         self.student = 'view@test.com'
         self.password = 'foo'
         self.create_account('u1', self.student, self.password)
         self.activate_user(self.student)
         self.enroll(self.graded_course)
-        
+
         self.student_user = user(self.student)
-        
+
         self.factory = RequestFactory()
-    
+
     def get_grade_summary(self):
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
-        
-        fake_request = self.factory.get(reverse('progress',
-                                       kwargs={'course_id': self.graded_course.id}))
-        
-        return grades.grade(self.student_user, fake_request, 
-                            self.graded_course, student_module_cache)
-    
-    def get_homework_scores(self):
-        return self.get_grade_summary()['totaled_scores']['Homework']
-    
-    def get_progress_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            self.graded_course.id, self.student_user, self.graded_course)
-        
+
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
 
-        progress_summary = grades.progress_summary(self.student_user, fake_request, 
+        return grades.grade(self.student_user, fake_request,
+                            self.graded_course, student_module_cache)
+
+    def get_homework_scores(self):
+        return self.get_grade_summary()['totaled_scores']['Homework']
+
+    def get_progress_summary(self):
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            self.graded_course.id, self.student_user, self.graded_course)
+
+        fake_request = self.factory.get(reverse('progress',
+                                       kwargs={'course_id': self.graded_course.id}))
+
+        progress_summary = grades.progress_summary(self.student_user, fake_request,
                                                    self.graded_course, student_module_cache)
         return progress_summary
-        
+
     def check_grade_percent(self, percent):
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
-    
+
     def submit_question_answer(self, problem_url_name, responses):
         """
         The field names of a problem are hard to determine. This method only works
@@ -709,97 +705,96 @@ class TestCourseGrader(PageLoader):
         input_i4x-edX-graded-problem-H1P3_2_2
         """
         problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
-        
-        modx_url = reverse('modx_dispatch', 
+
+        modx_url = reverse('modx_dispatch',
                             kwargs={
-                                'course_id' : self.graded_course.id,
-                                'location' : problem_location,
-                                'dispatch' : 'problem_check', }
+                                'course_id': self.graded_course.id,
+                                'location': problem_location,
+                                'dispatch': 'problem_check', }
                           )
-        
+
         resp = self.client.post(modx_url, {
             'input_i4x-edX-graded-problem-{0}_2_1'.format(problem_url_name): responses[0],
             'input_i4x-edX-graded-problem-{0}_2_2'.format(problem_url_name): responses[1],
             })
-        print "modx_url" , modx_url, "responses" , responses
-        print "resp" , resp
-        
+        print "modx_url", modx_url, "responses", responses
+        print "resp", resp
+
         return resp
-    
+
     def problem_location(self, problem_url_name):
         return "i4x://edX/graded/problem/{0}".format(problem_url_name)
-    
+
     def reset_question_answer(self, problem_url_name):
         problem_location = self.problem_location(problem_url_name)
-        
-        modx_url = reverse('modx_dispatch', 
+
+        modx_url = reverse('modx_dispatch',
                             kwargs={
-                                'course_id' : self.graded_course.id,
-                                'location' : problem_location,
-                                'dispatch' : 'problem_reset', }
+                                'course_id': self.graded_course.id,
+                                'location': problem_location,
+                                'dispatch': 'problem_reset', }
                           )
-        
+
         resp = self.client.post(modx_url)
-        return resp    
-     
+        return resp
+
     def test_get_graded(self):
         #### Check that the grader shows we have 0% in the course
         self.check_grade_percent(0)
-        
+
         #### Submit the answers to a few problems as ajax calls
         def earned_hw_scores():
             """Global scores, each Score is a Problem Set"""
             return [s.earned for s in self.get_homework_scores()]
-        
+
         def score_for_hw(hw_url_name):
             hw_section = [section for section
                           in self.get_progress_summary()[0]['sections']
                           if section.get('url_name') == hw_url_name][0]
             return [s.earned for s in hw_section['scores']]
-        
+
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
         self.check_grade_percent(0.06)
-        self.assertEqual(earned_hw_scores(), [1.0, 0, 0]) # Order matters
+        self.assertEqual(earned_hw_scores(), [1.0, 0, 0])  # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
-        
+
         # Get both parts of the first problem correct
         self.reset_question_answer('H1P1')
         self.submit_question_answer('H1P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.13)
         self.assertEqual(earned_hw_scores(), [2.0, 0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 0.0])
-        
+
         # This problem is shown in an ABTest
         self.submit_question_answer('H1P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
         self.assertEqual(earned_hw_scores(), [4.0, 0.0, 0])
-        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])        
-        
+        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
+
         # This problem is hidden in an ABTest. Getting it correct doesn't change total grade
         self.submit_question_answer('H1P3', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
-        
+
         # On the second homework, we only answer half of the questions.
         # Then it will be dropped when homework three becomes the higher percent
         # This problem is also weighted to be 4 points (instead of default of 2)
-        # If the problem was unweighted the percent would have been 0.38 so we 
+        # If the problem was unweighted the percent would have been 0.38 so we
         # know it works.
         self.submit_question_answer('H2P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.42)
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])        
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])
+
         # Third homework
         self.submit_question_answer('H3P1', ['Correct', 'Correct'])
-        self.check_grade_percent(0.42) # Score didn't change
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])        
-        
+        self.check_grade_percent(0.42)  # Score didn't change
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
+
         self.submit_question_answer('H3P2', ['Correct', 'Correct'])
-        self.check_grade_percent(0.5) # Now homework2 dropped. Score changes
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])                
-        
+        self.check_grade_percent(0.5)  # Now homework2 dropped. Score changes
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
+
         # Now we answer the final question (worth half of the grade)
         self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
-        self.check_grade_percent(1.0) # Hooray! We got 100%
-
+        self.check_grade_percent(1.0)  # Hooray! We got 100%

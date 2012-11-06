@@ -61,7 +61,6 @@ class CustomTagDescriptor(RawDescriptor):
                                    .format(name=template_name)) as template:
             return Template(template.read()).render(**params)
 
-
     def __init__(self, system, definition, **kwargs):
         '''Render and save the template for this descriptor instance'''
         super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
@@ -73,4 +72,3 @@ class CustomTagDescriptor(RawDescriptor):
         to export them in a file with yet another layer of indirection.
         """
         return False
-

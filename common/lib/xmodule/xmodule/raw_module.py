@@ -6,6 +6,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
 class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It

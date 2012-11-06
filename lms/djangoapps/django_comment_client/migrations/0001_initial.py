@@ -38,7 +38,6 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('django_comment_client_permission_roles', ['permission_id', 'role_id'])
 
-
     def backwards(self, orm):
         # Deleting model 'Role'
         db.delete_table('django_comment_client_role')
@@ -51,7 +50,6 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field roles on 'Permission'
         db.delete_table('django_comment_client_permission_roles')
-
 
     models = {
         'auth.group': {

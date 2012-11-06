@@ -181,6 +181,7 @@ TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
+
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class EditTestCase(ContentStoreTestCase):
     """Check that editing functionality works on example courses"""

@@ -6,6 +6,7 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from lxml import etree
 
+
 @login_required
 def index(request, course_id, book_index, page=None):
     course = get_course_with_access(request.user, course_id, 'load')
@@ -22,9 +23,10 @@ def index(request, course_id, book_index, page=None):
                               {'book_index': book_index, 'page': int(page),
                                'course': course, 'book_url': textbook.book_url,
                                'table_of_contents': table_of_contents,
-                               'start_page' : textbook.start_page,
-                               'end_page' : textbook.end_page,
+                               'start_page': textbook.start_page,
+                               'end_page': textbook.end_page,
                                'staff_access': staff_access})
+
 
 def index_shifted(request, course_id, page):
     return index(request, course_id=course_id, page=int(page) + 24)

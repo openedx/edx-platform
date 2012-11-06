@@ -55,6 +55,7 @@ def update_template_dictionary(dictionary, request=None, course=None, article=No
     else:
         dictionary['staff_access'] = False
 
+
 def view(request, article_path, course_id=None):
     course = get_opt_course_with_access(request.user, course_id, 'load')
 

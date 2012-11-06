@@ -143,6 +143,7 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
 #-----------------------------------------------------------------------------
 # helper function to convert all <p> to <span class='inline-error'>
 
+
 def make_error_message(msg):
     # msg = msg.replace('<p>','<p><span class="inline-error">').replace('</p>','</span></p>')
     msg = '<div class="capa_alert">%s</div>' % msg
@@ -152,6 +153,7 @@ def make_error_message(msg):
 # Check function interface, which takes pmathml input
 #
 # This is one of the main entry points to call.
+
 
 def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None):
     '''
@@ -167,8 +169,8 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     DEBUG = debug
 
     if xml is not None:
-        DEBUG = xml.get('debug',False)	# override debug flag using attribute in symbolicmath xml
-        if DEBUG in ['0','False']:
+        DEBUG = xml.get('debug', False)	 # override debug flag using attribute in symbolicmath xml
+        if DEBUG in ['0', 'False']:
             DEBUG = False
 
     # options

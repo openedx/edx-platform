@@ -4,6 +4,7 @@ import unittest
 from xmodule import graders
 from xmodule.graders import Score, aggregate_scores
 
+
 class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
@@ -217,4 +218,3 @@ class GraderTest(unittest.TestCase):
 
         #TODO: How do we test failure cases? The parser only logs an error when
         #it can't parse something. Maybe it should throw exceptions?
-

@@ -64,6 +64,7 @@ def course_image_url(course):
     path = course.metadata['data_dir'] + "/images/course_image.jpg"
     return try_staticfiles_lookup(path)
 
+
 def find_file(fs, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.
@@ -79,6 +80,7 @@ def find_file(fs, dirs, filename):
         if fs.exists(filepath):
             return filepath
     raise ResourceNotFoundError("Could not find {0}".format(filename))
+
 
 def get_course_about_section(course, section_key):
     """
@@ -165,7 +167,7 @@ def get_course_info_section(course, section_key):
                 info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
 
                 # Replace '/course/' urls
-                course_root = reverse('course_root', args=[course.id])[:-1] # Remove trailing slash
+                course_root = reverse('course_root', args=[course.id])[:-1]  # Remove trailing slash
                 info_html = replace_urls(info_html, course_root, '/course/')
                 return info_html
         except ResourceNotFoundError:

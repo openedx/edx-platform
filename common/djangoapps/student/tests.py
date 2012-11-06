@@ -17,6 +17,7 @@ COURSE_2 = 'edx/full/6.002_Spring_2012'
 
 log = logging.getLogger(__name__)
 
+
 class ReplicationTest(TestCase):
 
     multi_db = True
@@ -25,13 +26,13 @@ class ReplicationTest(TestCase):
         """Test basic user replication."""
         raise SkipTest()
         portal_user = User.objects.create_user('rusty', 'rusty@edx.org', 'fakepass')
-        portal_user.first_name='Rusty'
-        portal_user.last_name='Skids'
-        portal_user.is_staff=True
-        portal_user.is_active=True
-        portal_user.is_superuser=True
-        portal_user.last_login=datetime(2012, 1, 1)
-        portal_user.date_joined=datetime(2011, 1, 1)
+        portal_user.first_name = 'Rusty'
+        portal_user.last_name = 'Skids'
+        portal_user.is_staff = True
+        portal_user.is_active = True
+        portal_user.is_superuser = True
+        portal_user.last_login = datetime(2012, 1, 1)
+        portal_user.date_joined = datetime(2011, 1, 1)
         # This is an Askbot field and will break if askbot is not included
 
         if hasattr(portal_user, 'seen_response_count'):
@@ -55,7 +56,7 @@ class ReplicationTest(TestCase):
         # This hasattr lameness is here because we don't want this test to be
         # triggered when we're being run by CMS tests (Askbot doesn't exist
         # there, so the test will fail).
-        # 
+        #
         # seen_response_count isn't a field we care about, so it shouldn't have
         # been copied over.
         if hasattr(portal_user, 'seen_response_count'):
@@ -74,10 +75,9 @@ class ReplicationTest(TestCase):
 
         # During this entire time, the user data should never have made it over
         # to COURSE_2
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
-
 
     def test_enrollment_for_existing_user_info(self):
         """Test the effect of Enrolling in a class if you've already got user
@@ -108,19 +108,19 @@ class ReplicationTest(TestCase):
         # Grab all the copies we expect
         course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
         self.assertEquals(portal_user, course_user)
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
 
         course_enrollment = CourseEnrollment.objects.using(COURSE_1).get(id=portal_enrollment.id)
         self.assertEquals(portal_enrollment, course_enrollment)
-        self.assertRaises(CourseEnrollment.DoesNotExist, 
+        self.assertRaises(CourseEnrollment.DoesNotExist,
                           CourseEnrollment.objects.using(COURSE_2).get,
                           id=portal_enrollment.id)
 
         course_user_profile = UserProfile.objects.using(COURSE_1).get(id=portal_user_profile.id)
         self.assertEquals(portal_user_profile, course_user_profile)
-        self.assertRaises(UserProfile.DoesNotExist, 
+        self.assertRaises(UserProfile.DoesNotExist,
                           UserProfile.objects.using(COURSE_2).get,
                           id=portal_user_profile.id)
 
@@ -141,8 +141,6 @@ class ReplicationTest(TestCase):
             course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
             self.assertEqual(portal_user.email, 'jim@edx.org')
             self.assertEqual(course_user.email, 'jim@edx.org')
-
-
 
     def test_enrollment_for_user_info_after_enrollment(self):
         """Test the effect of modifying User data after you've enrolled."""
@@ -174,30 +172,23 @@ class ReplicationTest(TestCase):
         portal_user.save()
         portal_user_profile.gender = 'm'
         portal_user_profile.save()
-      
-        # Grab all the copies we expect, and make sure it doesn't end up in 
+
+        # Grab all the copies we expect, and make sure it doesn't end up in
         # places we don't expect.
         course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
         self.assertEquals(portal_user, course_user)
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
 
         course_enrollment = CourseEnrollment.objects.using(COURSE_1).get(id=portal_enrollment.id)
         self.assertEquals(portal_enrollment, course_enrollment)
-        self.assertRaises(CourseEnrollment.DoesNotExist, 
+        self.assertRaises(CourseEnrollment.DoesNotExist,
                           CourseEnrollment.objects.using(COURSE_2).get,
                           id=portal_enrollment.id)
 
         course_user_profile = UserProfile.objects.using(COURSE_1).get(id=portal_user_profile.id)
         self.assertEquals(portal_user_profile, course_user_profile)
-        self.assertRaises(UserProfile.DoesNotExist, 
+        self.assertRaises(UserProfile.DoesNotExist,
                           UserProfile.objects.using(COURSE_2).get,
                           id=portal_user_profile.id)
-
-
-
-
-
-
-

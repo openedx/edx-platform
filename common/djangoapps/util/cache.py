@@ -58,4 +58,3 @@ def cache_if_anonymous(view_func):
             return view_func(request, *args, **kwargs)
 
     return _decorated
-

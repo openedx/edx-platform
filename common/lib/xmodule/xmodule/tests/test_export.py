@@ -27,6 +27,7 @@ def strip_metadata(descriptor, key):
     for d in descriptor.get_children():
         strip_metadata(d, key)
 
+
 def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
@@ -35,7 +36,6 @@ def strip_filenames(descriptor):
     descriptor.definition.pop('filename', None)
     for d in descriptor.get_children():
         strip_filenames(d)
-
 
 
 class RoundTripTestCase(unittest.TestCase):
@@ -100,7 +100,6 @@ class RoundTripTestCase(unittest.TestCase):
                 continue
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
-
 
     def setUp(self):
         self.maxDiff = None

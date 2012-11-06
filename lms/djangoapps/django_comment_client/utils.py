@@ -28,19 +28,24 @@ import pystache_custom as pystache
 _FULLMODULES = None
 _DISCUSSIONINFO = defaultdict(dict)
 
+
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
+
 def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
+
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
+
 
 def get_role_ids(course_id):
     roles = Role.objects.filter(course_id=course_id)
@@ -50,11 +55,13 @@ def get_role_ids(course_id):
       roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
     return roles_with_ids
 
+
 def get_full_modules():
     global _FULLMODULES
     if not _FULLMODULES:
         _FULLMODULES = modulestore().modules
     return _FULLMODULES
+
 
 def get_discussion_id_map(course):
     """
@@ -65,12 +72,14 @@ def get_discussion_id_map(course):
         initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
 
+
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
     if not _DISCUSSIONINFO[course.id]:
         initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
+
 
 def get_discussion_category_map(course):
 
@@ -79,6 +88,7 @@ def get_discussion_category_map(course):
         initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
 
+
 def filter_unstarted_categories(category_map):
 
     now = time.gmtime()
@@ -86,12 +96,12 @@ def filter_unstarted_categories(category_map):
     result_map = {}
 
     unfiltered_queue = [category_map]
-    filtered_queue   = [result_map]
+    filtered_queue = [result_map]
 
     while len(unfiltered_queue) > 0:
 
         unfiltered_map = unfiltered_queue.pop()
-        filtered_map   = filtered_queue.pop()
+        filtered_map = filtered_queue.pop()
 
         filtered_map["children"] = []
         filtered_map["entries"] = {}
@@ -116,6 +126,7 @@ def filter_unstarted_categories(category_map):
 
     return result_map
 
+
 def sort_map_entries(category_map):
     things = []
     for title, entry in category_map["entries"].items():
@@ -124,6 +135,7 @@ def sort_map_entries(category_map):
         things.append((title, category))
         sort_map_entries(category_map["subcategories"][title])
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+
 
 def initialize_discussion_info(course):
 
@@ -189,7 +201,7 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
-    default_topics = {'General': {'id' :course.location.html_id()}}
+    default_topics = {'General': {'id': course.location.html_id()}}
     discussion_topics = course.metadata.get('discussion_topics', default_topics)
     for topic, entry in discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
@@ -200,11 +212,13 @@ def initialize_discussion_info(course):
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
 
+
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf-8')
+
 
 class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
@@ -216,13 +230,16 @@ class JsonError(HttpResponse):
         super(JsonError, self).__init__(content,
                                         mimetype='application/json; charset=utf-8', status=status)
 
+
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
+
 class ViewNameMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         request.view_name = view_func.__name__
+
 
 class QueryCountDebugMiddleware(object):
     """
@@ -249,6 +266,7 @@ class QueryCountDebugMiddleware(object):
             logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
 
+
 def get_ability(course_id, content, user):
     return {
             'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
@@ -258,6 +276,7 @@ def get_ability(course_id, content, user):
             'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
             'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
+
 
 #TODO: RENAME
 def get_annotated_content_info(course_id, content, user, user_info):
@@ -275,18 +294,21 @@ def get_annotated_content_info(course_id, content, user, user_info):
         'ability': get_ability(course_id, content, user),
     }
 
+
 #TODO: RENAME
 def get_annotated_content_infos(course_id, thread, user, user_info):
     """
     Get metadata for a thread and its children
     """
     infos = {}
+
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
         for child in content.get('children', []):
             annotate(child)
     annotate(thread)
     return infos
+
 
 def get_metadata_for_threads(course_id, threads, user, user_info):
     def infogetter(thread):
@@ -295,13 +317,16 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     metadata = reduce(merge_dict, map(infogetter, threads), {})
     return metadata
 
+
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 def url_for_tags(course_id, tags):
     return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
 
+
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
+
 
 def permalink(content):
     if content['type'] == 'thread':
@@ -310,6 +335,7 @@ def permalink(content):
     else:
         return reverse('django_comment_client.forum.views.single_thread',
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
+
 
 def extend_content(content):
     roles = {}
@@ -326,9 +352,10 @@ def extend_content(content):
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
-        'updated': content['created_at']!=content['updated_at'],
+        'updated': content['created_at'] != content['updated_at'],
     }
     return merge_dict(content, content_info)
+
 
 def get_courseware_context(content, course):
     id_map = get_discussion_id_map(course)
@@ -338,12 +365,13 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
         (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
-        url = reverse('courseware_position', kwargs={"course_id":course_id,
-                                                     "chapter":chapter,
-                                                     "section":section,
-                                                     "position":position})
+        url = reverse('courseware_position', kwargs={"course_id": course_id,
+                                                     "chapter": chapter,
+                                                     "section": section,
+                                                     "position": position})
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
+
 
 def safe_content(content):
     fields = [

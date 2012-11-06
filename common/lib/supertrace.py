@@ -3,7 +3,8 @@ A handy util to print a django-debug-screen-like stack trace with
 values of local variables.
 """
 
-import sys, traceback
+import sys
+import traceback
 from django.utils.encoding import smart_unicode
 
 
@@ -48,5 +49,3 @@ def supertrace(max_len=160):
                 print s
             except:
                 print "<ERROR WHILE PRINTING VALUE>"
-
-

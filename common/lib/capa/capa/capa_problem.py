@@ -229,7 +229,6 @@ class LoncapaProblem(object):
         '''
         return any(self.correct_map.is_queued(answer_id) for answer_id in self.correct_map)
 
-
     def get_recentmost_queuetime(self):
         '''
         Returns a DateTime object that represents the timestamp of the most recent
@@ -246,7 +245,6 @@ class LoncapaProblem(object):
                       for qt_str in queuetime_strs]
 
         return max(queuetimes)
-
 
     def grade_answers(self, answers):
         '''
@@ -448,7 +446,7 @@ class LoncapaProblem(object):
                 exec code in context, context
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
-                msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
+                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
             finally:
                 sys.path = original_path
@@ -497,7 +495,7 @@ class LoncapaProblem(object):
                    'id': problemtree.get('id'),
                    'feedback': {'message': msg,
                                 'hint': hint,
-                                'hintmode': hintmode,}}
+                                'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             the_input = input_type_cls(self.system, problemtree, state)

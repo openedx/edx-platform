@@ -8,7 +8,7 @@ Portal servers that hold the canoncial user information and that user
 information is replicated to slave Course server pools. Each Course has a set of
 servers that serves only its content and has users that are relevant only to it.
 
-We replicate the following tables into the Course DBs where the user is 
+We replicate the following tables into the Course DBs where the user is
 enrolled. Only the Portal servers should ever write to these models.
 * UserProfile
 * CourseEnrollment
@@ -63,11 +63,11 @@ log = logging.getLogger(__name__)
 
 
 class UserProfile(models.Model):
-    """This is where we store all the user demographic fields. We have a 
+    """This is where we store all the user demographic fields. We have a
     separate table for this rather than extending the built-in Django auth_user.
 
     Notes:
-        * Some fields are legacy ones from the first run of 6.002, from which 
+        * Some fields are legacy ones from the first run of 6.002, from which
           we imported many users.
         * Fields like name and address are intentionally open ended, to account
           for international variations. An unfortunate side-effect is that we
@@ -306,10 +306,10 @@ def replicate_user_save(sender, **kwargs):
 
 # @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
-    """This is called when a Student enrolls in a course. It has to do the 
+    """This is called when a Student enrolls in a course. It has to do the
     following:
 
-    1. Make sure the User is copied into the Course DB. It may already exist 
+    1. Make sure the User is copied into the Course DB. It may already exist
        (someone deleting and re-adding a course). This has to happen first or
        the foreign key constraint breaks.
     2. Replicate the CourseEnrollment.
@@ -353,9 +353,9 @@ USER_FIELDS_TO_COPY = ["id", "username", "first_name", "last_name", "email",
 
 def replicate_user(portal_user, course_db_name):
     """Replicate a User to the correct Course DB. This is more complicated than
-    it should be because Askbot extends the auth_user table and adds its own 
+    it should be because Askbot extends the auth_user table and adds its own
     fields. So we need to only push changes to the standard fields and leave
-    the rest alone so that Askbot changes at the Course DB level don't get 
+    the rest alone so that Askbot changes at the Course DB level don't get
     overridden.
     """
     try:
@@ -400,7 +400,7 @@ def is_valid_course_id(course_id):
     """Right now, the only database that's not a course database is 'default'.
     I had nicer checking in here originally -- it would scan the courses that
     were in the system and only let you choose that. But it was annoying to run
-    tests with, since we don't have course data for some for our course test 
+    tests with, since we don't have course data for some for our course test
     databases. Hence the lazy version.
     """
     return course_id != 'default'

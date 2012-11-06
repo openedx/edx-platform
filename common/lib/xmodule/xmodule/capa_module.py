@@ -260,11 +260,11 @@ class CapaModule(XModule):
 
                 #   Next, generate a fresh LoncapaProblem
                 self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None, # Tabula rasa
+                               state=None,  # Tabula rasa
                                seed=self.seed, system=self.system)
 
                 # Prepend a scary warning to the student
-                warning  = '<div class="capa_reset">'\
+                warning = '<div class="capa_reset">'\
                            '<h2>Warning: The problem has been reset to its initial state!</h2>'\
                            'The problem\'s state was corrupted by an invalid submission. ' \
                            'The submission consisted of:'\
@@ -279,7 +279,7 @@ class CapaModule(XModule):
                 html = warning
                 try:
                     html += self.lcp.get_html()
-                except Exception, err: # Couldn't do it. Give up
+                except Exception, err:  # Couldn't do it. Give up
                     log.exception(err)
                     raise
 
@@ -292,11 +292,11 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+        if self.max_attempts is None or self.attempts < self.max_attempts - 1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
-            check_button = "Final Check" 
+            check_button = "Final Check"
 
         reset_button = True
         save_button = True
@@ -456,7 +456,7 @@ class CapaModule(XModule):
         else:
             answers = self.lcp.get_question_answers()
 
-	    # answers (eg <solution>) may have embedded images
+        # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
@@ -530,11 +530,11 @@ class CapaModule(XModule):
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
-            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
-            if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
+            if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
+                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -564,11 +564,11 @@ class CapaModule(XModule):
         #       'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-	event_info['attempts'] = self.attempts
+    event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
-	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
-		self.system.psychometrics_handler(self.get_instance_state())
+    if hasattr(self.system, 'psychometrics_handler'):    # update PsychometricsData using callback
+        self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -675,10 +675,10 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super(CapaDescriptor, self).__init__(*args, **kwargs)
-        
+
         weight_string = self.metadata.get('weight', None)
         if weight_string:
             self.weight = float(weight_string)

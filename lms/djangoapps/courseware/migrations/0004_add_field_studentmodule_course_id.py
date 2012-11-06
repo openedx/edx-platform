@@ -24,7 +24,6 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'StudentModule', fields ['course_id', 'module_state_key', 'student']
         db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
 
-
     def backwards(self, orm):
         # Removing unique constraint on 'StudentModule', fields ['studnet_id', 'module_state_key', 'course_id']
         db.delete_unique('courseware_studentmodule', ['student_id', 'module_id', 'course_id'])
@@ -37,7 +36,6 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'StudentModule', fields ['module_id', 'module_type', 'student']
         db.create_unique('courseware_studentmodule', ['student_id', 'module_id', 'module_type'])
-
 
     models = {
         'auth.group': {
