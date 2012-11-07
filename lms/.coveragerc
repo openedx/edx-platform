@@ -1,0 +1,9 @@
+# .coveragerc for cms
+[report]
+ignore_errors = True
+
+[html]
+directory = reports/lms/cover
+
+[xml]
+output = reports/lms/coverage.xml

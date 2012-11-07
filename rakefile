@@ -84,26 +84,33 @@ end
 
 $failed_tests = 0
 
-def run_under_coverage(cmd)
+def run_under_coverage(cmd, root)
     cmd0, cmd_rest = cmd.split(" ", 2)
-    cmd = "coverage run `which #{cmd0}` #{cmd_rest}"
+    # We use "python -m coverage" so that the proper python will run the importable coverage
+    # rather than the coverage that OS path finds.
+    cmd = "python -m coverage run --rcfile=#{root}/.coveragerc `which #{cmd0}` #{cmd_rest}"
     return cmd
+end
+
+def coverage_reports(root)
+    sh("coverage xml --rcfile=#{root}/.coveragerc")
+    sh("coverage html --rcfile=#{root}/.coveragerc")
 end
 
 def run_tests(system, report_dir, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-    ENV['NOSE_COVER_HTML_DIR'] = File.join(report_dir, "cover")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
     cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', *dirs.each)
-    sh(run_under_coverage(cmd)) do |ok, res|
+    sh(run_under_coverage(cmd, system)) do |ok, res|
         if !ok and stop_on_failure
             abort "Test failed!"
         end
         $failed_tests += 1 unless ok
     end
+    coverage_reports(system)
 end
 
-TEST_TASKS = []
+TEST_TASK_SYMBOLS = []
 
 [:lms, :cms].each do |system|
     report_dir = File.join(REPORT_DIR, system.to_s)
@@ -120,7 +127,7 @@ TEST_TASKS = []
         run_tests(system, report_dir, args.stop_on_failure)
     end
 
-    TEST_TASKS << "test_#{system}"
+    TEST_TASK_SYMBOLS << system
 
     desc <<-desc
         Start the #{system} locally with the specified environment (defaults to dev).
@@ -150,7 +157,7 @@ TEST_TASKS = []
     end
 end
 
-Dir["common/lib/*"].each do |lib|
+Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     task_name = "test_#{lib}"
 
     report_dir = File.join(REPORT_DIR, task_name.gsub('/', '_'))
@@ -160,21 +167,23 @@ Dir["common/lib/*"].each do |lib|
     task task_name => report_dir do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib} --logging-clear-handlers --with-xunit"
-        sh(run_under_coverage(cmd))
+        sh(run_under_coverage(cmd, lib)) do |ok, res|
+            $failed_tests += 1 unless ok
+        end
+        coverage_reports(lib)
     end
-    TEST_TASKS << task_name
+    TEST_TASK_SYMBOLS << lib
 
     desc "Run tests for common lib #{lib} (without coverage)"
     task "fasttest_#{lib}" do 
         sh("nosetests #{lib}")
     end
 
-
 end
 
 task :test do
-    TEST_TASKS.each do |task|
-        Rake::Task[task].invoke(false)
+    TEST_TASK_SYMBOLS.each do |sym|
+        Rake::Task["test_#{sym}"].invoke(false)
     end
 
     if $failed_tests > 0

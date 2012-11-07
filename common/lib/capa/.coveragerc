@@ -1,0 +1,9 @@
+# .coveragerc for common/lib/capa
+[report]
+ignore_errors = True
+
+[html]
+directory = reports/common/lib/capa/cover
+
+[xml]
+output = reports/common/lib/capa/coverage.xml
