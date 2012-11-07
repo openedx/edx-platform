@@ -206,7 +206,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
     if @timer
       clearTimeout @timer
     @timer = setTimeout( =>
-      @model.save(metadata: metadata, children: null)
+      @model.save(metadata: metadata)
       @timer = null
       @$spinner.delay(500).fadeOut(150)
     , 500)
