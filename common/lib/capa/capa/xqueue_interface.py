@@ -49,6 +49,7 @@ def parse_xreply(xreply):
 
     return_code = xreply['return_code']
     content = xreply['content']
+
     return (return_code, content)
 
 

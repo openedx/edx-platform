@@ -1843,8 +1843,6 @@ class OpenEndedResponse(LoncapaResponse):
         self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
-        # VS[compat]:
-        #   Check if XML uses the ExternalResponse format or the generic OpenEndedResponse format
         oeparam = self.xml.find('openendedparam')
         self._parse_openendedresponse_xml(oeparam)
 
@@ -1914,7 +1912,7 @@ class OpenEndedResponse(LoncapaResponse):
         # Submit request. When successful, 'msg' is the prior length of the queue
         contents.update({'student_response': submission})
         contents.update({'grader_type' : self.grader_type})
-        log.debug(contents)
+
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
 
@@ -1939,7 +1937,6 @@ class OpenEndedResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
