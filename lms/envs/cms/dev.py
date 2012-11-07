@@ -33,3 +33,13 @@ CONTENTSTORE = {
         'db': 'xcontent',
     }
 }
+
+INSTALLED_APPS += (
+    # Mongo perf stats
+    'debug_toolbar_mongo',
+    )
+
+
+DEBUG_TOOLBAR_PANELS += (
+   'debug_toolbar_mongo.panel.MongoDebugPanel',
+   )

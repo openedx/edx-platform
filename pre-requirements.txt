@@ -1,1 +1,2 @@
 numpy
+distribute>=0.6.28
