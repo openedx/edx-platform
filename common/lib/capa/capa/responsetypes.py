@@ -1867,8 +1867,8 @@ class OpenEndedResponse(LoncapaResponse):
             grader_payload=json.dumps(grader_payload)
         except Exception as err:
             log.error("Grader payload is not a json object!")
-        self.payload = {'grader_payload': grader_payload}
 
+        self.payload = {'grader_payload': grader_payload}
 
         #Parse initial display
         initial_display = oeparam.find('initial_display')
@@ -1882,16 +1882,15 @@ class OpenEndedResponse(LoncapaResponse):
         if answer_display is not None:
             self.answer= answer_display.text
         else:
-            self.answer = "No answer available."
+            self.answer = "No answer given."
 
     def get_score(self, student_answers):
+
         try:
-            # Note that submission can be a file
             submission = student_answers[self.answer_id]
         except Exception as err:
             log.error('Error in OpenEndedResponse %s: cannot get student answer for %s;'
-                      ' student_answers=%s' %
-                      (err, self.answer_id, convert_files_to_filenames(student_answers)))
+                      ' student_answers=%s', err, self.answer_id)
             raise Exception(err)
 
         # Prepare xqueue request
@@ -1906,6 +1905,7 @@ class OpenEndedResponse(LoncapaResponse):
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.answer_id)
+
         xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
             lms_key=queuekey,
             queue_name=self.queue_name)
@@ -1918,11 +1918,11 @@ class OpenEndedResponse(LoncapaResponse):
         student_info = {'anonymous_student_id': anonymous_student_id,
                         'submission_time': qtime,
                         }
-        contents.update({'student_info': json.dumps(student_info)})
+
+        #Update contents with student response and student info
+        contents.update({'student_info': json.dumps(student_info), 'student_response': submission})
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        contents.update({'student_response': submission})
-
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
 
@@ -1988,7 +1988,9 @@ class OpenEndedResponse(LoncapaResponse):
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
              'score': Numeric value (floating point is okay) to assign to answer
-             'msg': grader_msg }
+             'msg': grader_msg
+             'feedback' : feedback from grader
+             }
 
         Returns (valid_score_msg, correct, score, msg):
             valid_score_msg: Flag indicating valid score_msg format (Boolean)
@@ -2012,22 +2014,24 @@ class OpenEndedResponse(LoncapaResponse):
                 log.error("External grader message is missing one or more required"
                           " tags: 'correct', 'score', 'msg', 'feedback")
                 return fail
-        #Extract feedback from score_result
-        feedback = score_result['feedback']
 
         # Next, we need to check that the contents of the external grader message
         #   is safe for the LMS.
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
         msg = score_result['msg']
+        feedback = score_result['feedback']
 
         try:
             etree.fromstring(msg)
+            etree.fromstring(feedback)
         except etree.XMLSyntaxError as err:
             log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s" % msg)
+                      " Msg: score_msg['msg']=%r "
+                      "\n Feedback : score_result['feedback'] = %r", msg, feedback)
             return fail
 
+        #Currently ignore msg and only return feedback (which takes the place of msg)
         return (True, score_result['correct'], score_result['score'], feedback)
 
 #-----------------------------------------------------------------------------
