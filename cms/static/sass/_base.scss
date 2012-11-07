@@ -338,3 +338,29 @@ body.show-wip {
         @extend .spinner-icon;
     }
 }
+
+.tooltip {
+    display: block;
+    position: absolute;
+    z-index: 9999999;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, .9);
+    border-radius: 3px;
+    pointer-events: none;
+    font-size: 11px;
+    color: #fff;
+    text-align: center;
+
+    &:before {
+        content: '▾';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        width: 20px;
+        height: 10px;
+        margin-left: -10px;        
+        font-size: 16px;
+        line-height: 0;
+        color: rgba(0, 0, 0, .9);
+    }
+}

@@ -13,6 +13,115 @@
       })
     });
   </script>
+
+  <script src="/static/js/speed-editor.js"></script>
+
+  <script type="text/template" id="component-actions">
+    <div class="component-actions">
+      <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
+      <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>  
+    </div>
+    <a href="#" class="drag-handle"></a>
+  </script>
+
+  <script type="text/template" id="problem-editor">
+    <div class="problem-editor editor">
+      <div class="row">
+        <div class="editor-bar">
+          <ul class="format-buttons">
+            <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span class="problem-editor-icon multiple-choice"></span></a></li>
+            <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span class="problem-editor-icon checks"></span></a></li>
+            <li><a href="#" class="string-button" data-tooltip="String Response"><span class="problem-editor-icon string"></span></a></li>
+            <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span class="problem-editor-icon number"></span></a></li>
+            <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span class="problem-editor-icon dropdown"></span></a></li>
+          </ul>
+          <ul class="editor-tabs">
+            <li><a href="#" class="simple-tab current">Simple</a></li>
+            <li><a href="#" class="xml-tab">XML</a></li>
+          </ul>
+        </div>
+        <textarea class="edit-box"></textarea>
+        <textarea class="xml-box"></textarea>
+      </div>
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>    
+  </script>
+
+  <script type="text/template" id="problem-preview">
+    <section class="xmodule_display xmodule_CapaModule" data-type="Problem">
+      <section id="problem_i4x-Giannattasio-313-problem-9e62f3fb1fa14ba6a671b3de73c02eab" class="problems-wrapper" data-problem-id="i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab" data-url="/preview/modx/0/i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab">
+
+        <section class="problem"></section>
+
+        <section class="action">
+          <input type="hidden" name="problem_id" value="Option Response">
+          <input class="check Check" type="button" value="Check">
+          <input class="show" type="button" value="Show Answer">
+        </section>
+      </section>
+    </section>
+  </script>
+
+  <script type="text/template" id="video-editor">
+    <div class="video-editor editor">
+      <div class="row">
+        <label>YouTube ID(s):</label>
+        <input type="text" value="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" class="video-id-field">
+        <a href="#" class="browse-button">Browse…</a>
+      </div>
+      <div class="row">
+        <label>Transcript:</label>
+        <input type="text" class="transcript-field">
+        <a href="#" class="browse-button">Browse…</a>
+      </div>
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>    
+  </script>
+
+  <script type="text/template" id="video-preview">
+    <div class="video-preview">
+      <section class="xmodule_display xmodule_VideoModule" data-type="Video">
+        <div id="video_i4x-Giannattasio-313-video-39532ac1a90742bbbd70148122a8fcfa" class="video video-load-complete" data-streams="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" data-caption-data-dir="0458bf5495cf4072adde09918f6a9941" data-show-captions="true">
+          <div class="tc-wrapper">
+            <article class="video-wrapper">
+              <section class="video-player">
+                <iframe frameborder="0" allowfullscreen="" id="i4x-Giannattasio-313-video-39532ac1a90742bbbd70148122a8fcfa" title="YouTube video player" height="390" width="640" src="http://www.youtube.com/embed/OEoXaMPEzfM?controls=0&amp;wmode=transparent&amp;rel=0&amp;showinfo=0&amp;enablejsapi=1&amp;modestbranding=1&amp;origin=http%3A%2F%2Flocalhost%3A8001"></iframe>
+              </section>
+
+              <section class="video-controls"><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="width: 2.586206896551724%; "></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 2.586206896551724%; "></a></div>
+        <div>
+          <ul class="vcr">
+            <li><a class="video_control play" href="#">Play</a></li>
+            <li>
+              <div class="vidtime">0:02 / 1:56</div>
+            </li>
+          </ul>
+          <div class="secondary-controls"><div class="speeds">
+          <a href="#">
+            <h3>Speed</h3>
+            <p class="active">1.0x</p>
+          </a>
+          <ol class="video_speeds"><li data-speed="1.50"><a href="#">1.50x</a></li><li data-speed="1.25"><a href="#">1.25x</a></li><li data-speed="1.0" class="active"><a href="#">1.0x</a></li><li data-speed="0.75"><a href="#">0.75x</a></li></ol>
+        </div><div class="volume">
+          <a href="#"></a>
+          <div class="volume-slider-container">
+            <div class="volume-slider ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="height: 100%; "></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="bottom: 100%; "></a></div>
+          </div>
+        </div>
+            <a href="#" class="add-fullscreen" oldtitle="Fill browser">Fill Browser</a>
+          <a href="#" class="quality_control" title="HD">HD</a><a href="#" class="hide-subtitles" oldtitle="Turn off captions">Captions</a></div>
+        </div></section>
+            </article><ol class="subtitles" style="max-height: 342px; "></ol>
+          </div>
+        </div>
+
+        </section>
+      </div>
+  </script>
 </%block>
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
@@ -32,12 +141,9 @@
             % for id in components:
             <li class="component" data-id="${id}"/>
             % endfor
-            <li class="new-component-item">
-              <a href="#" class="new-component-button">
-                <span class="plus-icon"></span>New Component
-              </a>
+            <li class="new-component-item adding">              
               <div class="new-component">
-                <h5>Select Component Type</h5>
+                <h5>Add New Component</h5>
                 <ul class="new-component-type">
                   % for type in sorted(component_templates.keys()):
                   <li>
@@ -48,22 +154,7 @@
                   </li>
                   % endfor
                 </ul>
-                <a href="#" class="cancel-button">Cancel</a>
-              </div>
-              % for type, templates in sorted(component_templates.items()):
-              <div class="new-component-templates new-component-${type}">
-                <ul class="new-component-template">
-                  % for name, location in templates:
-                  <li>
-                    <a href="#" data-location="${location}">
-                      <span class="name">${name}</span>
-                    </a>
-                  </li>
-                  % endfor
-                </ul>
-                <a href="#" class="cancel-button">Cancel</a>
-              </div>
-              % endfor
+              </div>              
             </li>
           </ol>
         </article>

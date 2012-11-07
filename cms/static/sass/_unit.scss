@@ -73,7 +73,11 @@
       }
 
       &.editing {
-        border-color: #6696d7;
+        border-color: #3c3c3c;
+        box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+        position: relative;
+        z-index: 99999;
+        @include transition(all);
 
         .drag-handle,
         .component-actions {
@@ -135,30 +139,16 @@
       }
 
       &.new-component-item {
-        padding: 0;
-        border: 1px solid #8891a1;
+        border: none;
         border-radius: 3px;
-        @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-        background-color: #d1dae3;
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
-        @include transition(background-color .15s, border-color .15s);
-
-        &.adding {
-          background-color: $blue;
-          border-color: #437fbf;
-        }
-
-        .new-component-button {
-          display: block;
-          padding: 20px;
-          text-align: center;
-          color: #6d788b;
-        }
+        background: $lightGrey;
+        @include clearfix;
 
         h5 {
-          margin-bottom: 8px;
-          color: #fff;
+          margin-bottom: 22px;
+          color: $blue;
           font-weight: 700;
+          text-align: center;
         }
 
         .rendered-component {
@@ -168,25 +158,32 @@
         }
 
         .new-component-type, .new-component-template {
+          text-align: center;
           @include clearfix;
+
+          li {
+            display: inline;
+          }
 
           a {
             position: relative;
-            float: left;
+            display: inline-block;
             width: 100px;
             height: 100px;
             margin-right: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
+            border: 1px solid #437fbf;
+            background-color: $blue;
             font-size: 13px;
             line-height: 14px;
             color: #fff;
             text-align: center;
-            @include box-shadow(0 1px 1px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .4) inset);
+            @include box-shadow(0 1px 1px rgba(0, 0, 0, .25), 0 1px 0 rgba(255, 255, 255, .4) inset);
             @include transition(background-color .15s);
 
             &:hover {
-              background-color: rgba(255, 255, 255, .2);
+              @include box-shadow(0 1px 1px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .4) inset, 0 0 20px rgba(255, 255, 255, .3) inset);
             }
 
             .name {
@@ -208,9 +205,6 @@
 
         .new-component,
         .new-component-templates {
-          display: none;
-          position: absolute;
-          width: 100%;
           padding: 20px;
           @include clearfix;
 
@@ -219,12 +213,121 @@
             border-color: #30649c;
           }
         }
+
+        .new-component-templates {
+          display: none;
+        }
       }
     }
   }
 
   .xmodule_display {
     padding: 10px 20px;
+  }
+
+  .editor {
+    background: $blue;
+    padding: 20px;
+    border-radius: 3px 3px 0 0;
+
+    label {
+      display: inline-block;
+      width: 130px;
+      color: #fff;
+    }
+
+    input {
+      border-color: #3c3c3c;
+    }
+
+    .row {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .video-id-field,
+    .transcript-field {
+      width: 300px;
+    }
+
+    .browse-button {
+      @include blue-button;
+      border-color: #3c3c3c;
+      font-size: 12px;
+    }
+
+    .save-button {
+      @include orange-button;
+      margin: 10px 8px 0 0;
+      border-color: #3c3c3c;
+    }
+
+    .cancel-button {
+      @include white-button;
+      border-color: #3c3c3c;
+    }
+
+    .editor-bar {
+      position: relative;
+      @include linear-gradient(top, #d4dee8, #c9d5e2);
+      padding: 5px;
+      border: 1px solid #3c3c3c;
+      border-radius: 3px 3px 0 0;
+      border-bottom-color: #a5aaaf;
+      @include clearfix;
+
+      a {
+        display: block;
+        float: left;
+        padding: 3px 10px 7px;
+        margin-left: 7px;
+        border-radius: 2px;
+
+        &:hover {
+          background: rgba(255, 255, 255, .5);
+        }
+      }
+
+      .editor-tabs {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        li {
+          float: left;
+        }
+
+        a {
+          height: 24px;
+          padding: 7px 20px 3px;
+          border: 1px solid #a5aaaf;          
+          border-radius: 3px 3px 0 0;
+          @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
+          background-color: #e5ecf3;
+          font-size: 13px;
+          color: #3c3c3c;
+          box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+
+          &.current {
+            background: #fff;
+            border-bottom-color: #fff;
+          }
+        }
+      }
+    }
+
+    .CodeMirror {
+      font-size: 13px;
+      border: 1px solid #3c3c3c;
+      border-top: none;
+      background: #fff;
+      color: #3c3c3c;
+    }
   }
 
   .component-editor {

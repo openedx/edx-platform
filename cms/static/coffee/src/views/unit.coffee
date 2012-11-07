@@ -1,6 +1,7 @@
 class CMS.Views.UnitEdit extends Backbone.View
   events:
-    'click .new-component .new-component-type a': 'showComponentTemplates'
+    # 'click .new-component .new-component-type a': 'showComponentTemplates'
+    'click .new-component .new-component-type a': 'addNewComponent'
     'click .new-component .cancel-button': 'closeNewComponent'
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'
@@ -78,6 +79,42 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$newComponentItem.removeClass('adding')
     @$newComponentItem.find('.rendered-component').remove()
     @$newComponentItem.css('height', @$newComponentButton.outerHeight())
+
+  addNewComponent: (event) =>
+    event.preventDefault()
+
+    @$componentItem = $('<li>').addClass('editing')
+    $modalCover.show()
+    $modalCover.bind('click', @closeEditor)
+    type = $(event.currentTarget).data('type')
+
+    switch type
+      when 'video'
+        @$editor = $($('#video-editor').html())
+        $preview = $($('#video-preview').html())
+      when 'problem'
+        @$editor = $($('#problem-editor').html())
+        $preview = $($('#problem-preview').html())
+        initProblemEditors(@$editor, $preview)
+
+    @$editor.find('.save-button').bind('click', =>
+      @$componentItem.removeClass('editing')
+      @closeEditor()
+    )
+
+    $componentActions = $($('#component-actions').html());
+
+    @$componentItem.append(@$editor)
+    @$componentItem.append($preview)
+    @$componentItem.append($componentActions);
+    @$newComponentItem.before(@$componentItem)
+
+  closeEditor: (event) =>
+    console.log('close')
+    $modalCover.hide()
+    $modalCover.unbind('click', @closeEditor)
+    @$editor.remove()
+    @$componentItem.removeClass('editing')
 
   saveNewComponent: (event) =>
     event.preventDefault()
