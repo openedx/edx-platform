@@ -786,7 +786,7 @@ def test_center_login(request):
     error_url = request.POST.get("errorURL")
 
     if client_candidate_id == "edX003671291147":
-        authenticate(username="pearson", password="12345")
+        authenticate(username="pearsontest", password="12345")
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         raise Http404

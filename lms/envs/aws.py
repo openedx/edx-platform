@@ -79,3 +79,6 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
 
+
+# Temporary hack for testing Pearson
+MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
