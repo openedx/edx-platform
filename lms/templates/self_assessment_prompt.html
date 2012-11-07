@@ -1,13 +1,14 @@
-<section class="${ section_name }">
-    ${ prompt }
-    % if previous_answer_given:
-        <br/>Previous answer:  ${ previous_answer }<br/>
-    % endif
-    <textarea name="answer" id="answer" cols="50" rows="5"/>
-    <br/>
-    <input type="button" value="Check" id ="show" name="show"/>
-    <p id="rubric">
-    </p>
-    <input type="hidden" id="ajax_url" name="ajax_url" url="${ ajax_url }">
+<section id="self_assessment_${id}" class="self-assessment" data-ajax-url="${ajax_url}" data-id="${id}">
+    <div class="error"></div>
+    <div class="prompt">
+    ${prompt}
+    </div>
+
+    <div>
+    <textarea name="answer" class="answer" cols="80" rows="20">${previous_answer|h}</textarea>
+    </div>
+
+    <div class="rubric-wrapper"></div>
+
+    <input type="button" value="Submit" class="submit-button" name="show"/>
 </section>
-<br/><br/>
