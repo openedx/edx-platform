@@ -1850,28 +1850,29 @@ class OpenEndedResponse(LoncapaResponse):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
-            self.payload
-            self.grader_type  - type of grader to use.  One of 'peer','ml','turk'
-
+            self.payload - dict containing keys --
+            'grader' : path to grader settings file, 'problem_id' : id of the problem
+            
+            self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
         self.payload = {'grader_payload': grader_payload}
 
+        #Parse initial display
         initial_display = oeparam.find('initial_display')
         if initial_display is not None:
             self.initial_display = initial_display.text
         else:
             self.initial_display = ''
 
-        grader_type = oeparam.find('grader_type')
-        if grader_type is not None:
-            self.grader_type = grader_type.text
+        #Parse answer display
+        answer_display = oeparam.find('answer_display')
+        if answer_display is not None:
+            self.answer= answer_display.text
         else:
-            self.grader_type='ml'
-
-        self.answer="None available."
+            self.answer = "No answer available."
 
     def get_score(self, student_answers):
         try:
