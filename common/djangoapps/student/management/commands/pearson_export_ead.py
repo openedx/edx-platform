@@ -49,7 +49,7 @@ class Command(BaseCommand):
                     ClientAuthorizationID=generate_id(),
                     ClientCandidateID=tcu.client_candidate_id,
                     ExamAuthorizationCount="1",
-                    ExamSeriesCode="MIT 6.002-001",
+                    ExamSeriesCode="6002x001",
                     EligibilityApptDateFirst="2012/12/15",
                     EligibilityApptDateLast="2012/12/30",
                     LastUpdate=datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
