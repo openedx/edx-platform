@@ -25,7 +25,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 from django.core.cache import cache
 
-from django_future.csrf import ensure_csrf_cookie
+from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment)
@@ -774,3 +774,22 @@ def accept_name_change(request):
         raise Http404
 
     return accept_name_change_by_id(int(request.POST['id']))
+
+@csrf_exempt
+def test_center_login(request):
+    if not MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
+        raise Http404
+
+    client_candidate_id = request.POST.get("clientCandidateID")
+    # registration_id = request.POST.get("registrationID")
+    exit_url = request.POST.get("exitURL")
+    error_url = request.POST.get("errorURL")
+
+    if client_candidate_id == "edX003671291147":
+        authenticate(username="pearson", password="12345")
+        return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
+    else:
+        raise Http404
+
+
+
