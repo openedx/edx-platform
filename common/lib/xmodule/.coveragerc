@@ -1,9 +1,12 @@
 # .coveragerc for common/lib/xmodule
+[run]
+data_file = common/lib/xmodule/.coverage
+
 [report]
 ignore_errors = True
 
 [html]
-directory = reports/common/xmodule/capa/cover
+directory = reports/common/lib/xmodule/cover
 
 [xml]
 output = reports/common/lib/xmodule/coverage.xml
