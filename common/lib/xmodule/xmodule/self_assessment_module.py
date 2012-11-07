@@ -22,25 +22,22 @@ from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from .stringify import stringify_children
 from .x_module import XModule
-from .xml_module import XmlDescriptor, name_to_pathname
+from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
-
-from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
-#Set the default number of max attempts.  Should be 1 for production
-#Set higher for debugging/testing
+# Set the default number of max attempts.  Should be 1 for production
+# Set higher for debugging/testing
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-#Set maximum available number of points.  Should be set to 1 for now due to correctness handling,
+# Set maximum available number of points.  Should be set to 1 for now due to correctness handling,
 # which only allows for correct/incorrect.
-MAX_SCORE=1
+MAX_SCORE = 1
 
 class SelfAssessmentModule(XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]
-    }
+    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
     js_module_name = "SelfAssessment"
 
     def get_html(self):
@@ -85,17 +82,21 @@ class SelfAssessmentModule(XModule):
         log.debug('Instance state of self-assessment module {0}: {1}'.format(location.url(), instance_state))
 
         # Pull out state, or initialize variables
-        # lists of student answers, correctness responses ('incorrect'/'correct'), and suggested hints
+
+        # lists of student answers, correctness responses
+        # ('incorrect'/'correct'), and suggested hints
         self.student_answers = instance_state.get('student_answers', [])
         self.correctness = instance_state.get('correctness', [])
         self.hints = instance_state.get('hints', [])
 
-        # Used to keep track of a submitted answer for which we don't have a self-assessment and hint yet:
-        # this means that the answers, correctness, hints always stay in sync, and have the same number of elements.
+        # Used to keep track of a submitted answer for which we don't have a
+        # self-assessment and hint yet: this means that the answers,
+        # correctness, hints always stay in sync, and have the same number of
+        # elements.
         self.temp_answer = instance_state.get('temp_answer', '')
 
-        # Used for progress / grading.  Currently get credit just for completion (doesn't matter if you self-assessed
-        # correct/incorrect).
+        # Used for progress / grading.  Currently get credit just for
+        # completion (doesn't matter if you self-assessed correct/incorrect).
         self.score = instance_state.get('score', 0)
         self.top_score = instance_state.get('top_score', MAX_SCORE)
 
@@ -116,21 +117,15 @@ class SelfAssessmentModule(XModule):
 
         #Determine if student has answered the question before.  This is used to display
         #a "previous answer" message to the student if they have.
-        previous_answer=''
-        if len(self.student_answers)>0:
-            previous_answer=self.student_answers[len(self.student_answers)-1]
+        previous_answer = self.student_answers[-1] if self.student_answers else ''
 
         #set context variables and render template
-        self.context = {
+        context = {
             'prompt' : self.prompt,
-            'rubric' : self.rubric,
-            'hint_prompt' : self.hint_prompt,
-            'previous_answer_given' : len(self.student_answers)>0,
             'previous_answer' : previous_answer,
             'ajax_url' : system.ajax_url,
-            'section_name' : 'sa-wrapper',
         }
-        self.html = self.system.render_template('self_assessment_prompt.html', self.context)
+        self.html = self.system.render_template('self_assessment_prompt.html', context)
 
     def get_score(self):
         return {'score': self.score}
@@ -153,7 +148,7 @@ class SelfAssessmentModule(XModule):
 
 
     def handle_ajax(self, dispatch, get):
-        '''
+        """
         This is called by courseware.module_render, to handle an AJAX call.
         "get" is request.POST.
 
@@ -161,11 +156,11 @@ class SelfAssessmentModule(XModule):
         { 'progress_changed' : True/False,
         'progress' : 'none'/'in_progress'/'done',
         <other request-specific values here > }
-        '''
+        """
 
         handlers = {
-            'sa_show': self.show_rubric,
-            'sa_save': self.save_problem,
+            'show': self.show_rubric,
+            'save': self.save_problem,
         }
 
         if dispatch not in handlers:
@@ -182,21 +177,24 @@ class SelfAssessmentModule(XModule):
 
     def show_rubric(self, get):
         """
-        After the prompt is submitted, show the rubric
+        After the answer is submitted, show the rubric.
         """
-        #Check to see if attempts are less than max
+        # Check to see if attempts are less than max
         if(self.attempts < self.max_attempts):
             # Dump to temp_answer to keep answer in sync with correctness and hint
             self.temp_answer = get['student_answer']
 
-            #Return success and return rubric html to ajax call
+            # Return success and return rubric html to ajax call
+            rubric_context = {'rubric' : self.rubric,
+                              'hint_prompt' : self.hint_prompt,}
+            
             return {
                 'success': True,
-                'rubric': self.system.render_template('self_assessment_rubric.html', self.context)
+                'rubric': self.system.render_template('self_assessment_rubric.html', rubric_context)
             }
         else:
-            #If too many attempts, prevent student from saving answer and seeing rubric.
-            return{
+            # If too many attempts, prevent student from saving answer and seeing rubric.
+            return {
                 'success': False,
                 'message': 'Too many attempts.'
             }
@@ -221,7 +219,7 @@ class SelfAssessmentModule(XModule):
 
         #Create and store event info dict
         #Currently points are assigned for completion, so set to 1 instead of depending on correctness.
-        points=1
+        points = 1
         event_info = dict()
         event_info['state'] = {
                                'student_answers': self.student_answers,

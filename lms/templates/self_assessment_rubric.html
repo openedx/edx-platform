@@ -1,17 +1,18 @@
-<section class="${section_name}">
-    <br/><br/><b>Rubric</b>
-    ${ rubric }
-    Please assess your performance given the above rubric: <br/>
-    <select name="assessment" id="assessment">
+<div class="assessment">
+    <div class="rubric">
+    <h3>Self-assess your answer with this rubric:</h3>
+    ${rubric}
+    </div>
+
+    <select name="assessment" class="assessment">
         <option value="incorrect">Incorrect</option>
         <option value="correct">Correct</option>
     </select>
-    <br/>
-    ${ hint_prompt }
-    <textarea name="hint" id="hint" cols="50" rows="5"/>
-    <br/>
-    <input type="button" value="Save" id="save" name="save"/>
-    <p id="save_message"></p>
-    <input type="hidden" id="ajax_url" name="ajax_url" url="${ ajax_url}">
-</section>
-<br/><br/>
+
+    <div class="hint-prompt">
+    ${hint_prompt}
+    </div>
+    <textarea name="hint" class="hint" cols="50" rows="5"/>
+
+    <div class="save_message"></div>
+</div>
