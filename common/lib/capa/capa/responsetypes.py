@@ -1937,6 +1937,7 @@ class OpenEndedResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
+        log.debug(score_msg)
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
@@ -1996,17 +1997,20 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['correct', 'score', 'msg']:
+        for tag in ['correct', 'score', 'msg', 'feedback']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
-                          " tags: 'correct', 'score', 'msg'")
+                          " tags: 'correct', 'score', 'msg', 'feedback")
                 return fail
+        #Extract feedback from score_result
+        feedback = score_result['feedback']
 
         # Next, we need to check that the contents of the external grader message
         #   is safe for the LMS.
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
         msg = score_result['msg']
+
         try:
             etree.fromstring(msg)
         except etree.XMLSyntaxError as err:
@@ -2014,7 +2018,7 @@ class OpenEndedResponse(LoncapaResponse):
                       " XML: score_msg['msg']=%s" % msg)
             return fail
 
-        return (True, score_result['correct'], score_result['score'], msg)
+        return (True, score_result['correct'], score_result['score'], feedback)
 
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses

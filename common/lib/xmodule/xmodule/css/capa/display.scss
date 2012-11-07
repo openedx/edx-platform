@@ -685,6 +685,21 @@ section.problem {
             color: #B00;
           }
         }
+
+        .markup-text{
+          margin: 5px;
+          padding: 20px 0px 15px 50px;
+          border-top: 1px solid #DDD;
+          border-left: 20px solid #FAFAFA;
+
+          .badspelling {
+            color: #BB0000;
+          }
+
+          .badgrammar {
+            color: #BDA046;
+          }
+        }
       }
     }
   }
