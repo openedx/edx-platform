@@ -53,7 +53,7 @@ response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 solution_tags = ['solution']
 
 # these get captured as student responses
-response_properties = ["codeparam", "responseparam", "answer"]
+response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -72,7 +72,7 @@ global_context = {'random': random,
                   'miller': chem.miller}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam"]
 
 log = logging.getLogger('mitx.' + __name__)
 
