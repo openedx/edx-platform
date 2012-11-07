@@ -11,12 +11,12 @@ export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
 
-pip install -r pre-requirements.txt
-yes w | pip install -r requirements.txt
-[ ! -d askbot ] || pip install -r askbot/askbot_requirements.txt
+pip install -q -r pre-requirements.txt
+yes w | pip install -q -r requirements.txt
+[ ! -d askbot ] || pip install -q -r askbot/askbot_requirements.txt
 
 # Install the latest entry points from xmodule
-pip install --upgrade -e common/lib/xmodule
+pip install -q --upgrade -e common/lib/xmodule
 
 rake clobber
 TESTS_FAILED=0
