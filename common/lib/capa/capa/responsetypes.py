@@ -1843,6 +1843,7 @@ class OpenEndedResponse(LoncapaResponse):
         self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
 
+        #Look for tag named openendedparam that encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
         self._parse_openendedresponse_xml(oeparam)
 
@@ -1858,7 +1859,16 @@ class OpenEndedResponse(LoncapaResponse):
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
+
+        #Update grader payload with student id.  If grader payload not json, error.
+        try:
+            grader_payload=json.loads(grader_payload)
+            grader_payload.update({'student_id' : self.system.anonymous_student_id})
+            grader_payload=json.dumps(grader_payload)
+        except Exception as err:
+            log.error("Grader payload is not a json object!")
         self.payload = {'grader_payload': grader_payload}
+
 
         #Parse initial display
         initial_display = oeparam.find('initial_display')
