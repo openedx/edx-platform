@@ -1,0 +1,40 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Tabs</%block>
+<%block name="bodyclass">static-pages</%block>
+
+<%block name="jsextra">
+  <script type='text/javascript'>
+    new CMS.Views.TabsEdit({
+      el: $('.main-wrapper'),
+      model: new CMS.Models.Module({
+        id: '${context_course.location}'
+      })
+    });
+  </script>
+</%block>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <h1>Static Tabs</h1>
+    <div class="main-column">
+ 	   <article class="unit-body window">
+		    <div class="tab-list">
+			    <ol class='components'>
+            % for id in components:
+            <li class="component" data-id="${id}"/>
+            % endfor
+                     
+            <li class="new-component-item">
+              <a href="#" class="new-component-button new-tab">
+                <span class="plus-icon"></span>New Tab
+              </a>
+			    	</li>
+			    </ol>      
+		    </div>
+		</article>
+    </div>
+  </div>
+</div>
+</%block>
