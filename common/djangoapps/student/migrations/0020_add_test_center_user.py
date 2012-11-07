@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'TestCenterUser'
         db.create_table('student_testcenteruser', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'], unique=True)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
             ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
             ('user_updated_at', self.gf('django.db.models.fields.DateTimeField')(db_index=True)),
@@ -157,6 +158,7 @@ class Migration(SchemaMigration):
             'state': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '20', 'blank': 'True'}),
             'suffix': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['auth.User']", 'unique': 'True'}),
             'user_updated_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'})
         },
         'student.userprofile': {
