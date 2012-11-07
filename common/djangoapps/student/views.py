@@ -19,7 +19,7 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
@@ -777,7 +777,7 @@ def accept_name_change(request):
 
 @csrf_exempt
 def test_center_login(request):
-    if not MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
+    if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
         raise Http404
 
     client_candidate_id = request.POST.get("clientCandidateID")
@@ -786,10 +786,12 @@ def test_center_login(request):
     error_url = request.POST.get("errorURL")
 
     if client_candidate_id == "edX003671291147":
-        authenticate(username="pearsontest", password="12345")
+        user = authenticate(username=settings.PEARSON_TEST_USER,
+                            password=settings.PEARSON_TEST_PASSWORD)
+        login(request, user)
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
-        raise Http404
+        return HttpResponseForbidden()
 
 
 
