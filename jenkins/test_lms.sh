@@ -15,9 +15,6 @@ pip install -q -r pre-requirements.txt
 yes w | pip install -q -r requirements.txt
 [ ! -d askbot ] || pip install -q -r askbot/askbot_requirements.txt
 
-# Install the latest entry points from xmodule
-pip install -q --upgrade -e common/lib/xmodule
-
 rake clobber
 TESTS_FAILED=0
 rake test_lms[false] || TESTS_FAILED=1
