@@ -8,7 +8,7 @@ Portal servers that hold the canoncial user information and that user
 information is replicated to slave Course server pools. Each Course has a set of
 servers that serves only its content and has users that are relevant only to it.
 
-We replicate the following tables into the Course DBs where the user is 
+We replicate the following tables into the Course DBs where the user is
 enrolled. Only the Portal servers should ever write to these models.
 * UserProfile
 * CourseEnrollment
@@ -41,33 +41,22 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
-from django_countries import CountryField
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from functools import partial
-
 import comment_client as cc
-from django_comment_client.models import Role, Permission
+from django_comment_client.models import Role
 
-import logging
-
-from xmodule.modulestore.django import modulestore
-
-#from cache_toolbox import cache_model, cache_relation
 
 log = logging.getLogger(__name__)
 
 
 class UserProfile(models.Model):
-    """This is where we store all the user demographic fields. We have a 
+    """This is where we store all the user demographic fields. We have a
     separate table for this rather than extending the built-in Django auth_user.
 
     Notes:
-        * Some fields are legacy ones from the first run of 6.002, from which 
+        * Some fields are legacy ones from the first run of 6.002, from which
           we imported many users.
         * Fields like name and address are intentionally open ended, to account
           for international variations. An unfortunate side-effect is that we
@@ -150,7 +139,7 @@ class TestCenterUser(models.Model):
     a limit of 255 while last_name only gets 50.
     """
     # Our own record keeping...
-    # user = models.ForeignKey(User, unique=True)
+    user = models.ForeignKey(User, unique=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     # user_updated_at happens only when the user makes a change to their data,
@@ -198,7 +187,7 @@ class TestCenterUser(models.Model):
     
     @property
     def email(self):
-        return "" # should return user.email, but stub for now
+        return self.user.email
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
