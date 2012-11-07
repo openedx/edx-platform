@@ -7,11 +7,14 @@ class Command(BaseCommand):
     help = 'Seed default permisssions and roles'
 
     def handle(self, *args, **options):
-        if len(args) != 1:
-            raise CommandError("The number of arguments does not match. ")
+        if len(args) == 0:
+            raise CommandError("Please provide a course id")
+        if len(args) > 1:
+            raise CommandError("Too many arguments")
         course_id = args[0]
         administrator_role = Role.objects.get_or_create(name="Administrator", course_id=course_id)[0]
         moderator_role = Role.objects.get_or_create(name="Moderator", course_id=course_id)[0]
+        community_ta_role = Role.objects.get_or_create(name="Community TA", course_id=course_id)[0]
         student_role = Role.objects.get_or_create(name="Student", course_id=course_id)[0]
 
         for per in ["vote", "update_thread", "follow_thread", "unfollow_thread",
@@ -27,5 +30,8 @@ class Command(BaseCommand):
             administrator_role.add_permission(per)
 
         moderator_role.inherit_permissions(student_role)
+
+        # For now, Community TA == Moderator, except for the styling.
+        community_ta_role.inherit_permissions(moderator_role)
 
         administrator_role.inherit_permissions(moderator_role)

@@ -1,16 +1,18 @@
 import logging
 import pkg_resources
-import sys
+import yaml
+import os
 
-from fs.errors import ResourceNotFoundError
 from functools import partial
 from lxml import etree
-from lxml.etree import XMLSyntaxError
 from pprint import pprint
+from collections import namedtuple
+from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
+
+from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -71,7 +73,11 @@ class Plugin(object):
 
     @classmethod
     def load_classes(cls):
-        return [class_.load()
+        """
+        Returns a list of containing the identifiers and their corresponding classes for all
+        of the available instances of this plugin
+        """
+        return [(class_.name, class_.load())
                 for class_
                 in pkg_resources.iter_entry_points(cls.entry_point)]
 
@@ -211,6 +217,7 @@ class XModule(HTMLSnippet):
         '''
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
+
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
 
@@ -219,13 +226,28 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            child_locations = self.definition.get('children', [])
+            child_locations = self.get_children_locations()
             children = [self.system.get_module(loc) for loc in child_locations]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
+    
+    def get_children_locations(self):
+        '''
+        Returns the locations of each of child modules.
+        
+        Overriding this changes the behavior of get_children and
+        anything that uses get_children, such as get_display_items.
+        
+        This method will not instantiate the modules of the children
+        unless absolutely necessary, so it is cheaper to call than get_children
+        
+        These children will be the same children returned by the
+        descriptor unless descriptor.has_dynamic_children() is true.
+        '''
+        return self.definition.get('children', [])
 
     def get_display_items(self):
         '''
@@ -297,6 +319,20 @@ class XModule(HTMLSnippet):
             get is a dictionary-like object '''
         return ""
 
+    # cdodge: added to support dynamic substitutions of 
+    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
+    def rewrite_content_links(self, link):
+        # see if we start with our format, e.g. 'xasset:<filename>'
+        if link.startswith(XASSET_SRCREF_PREFIX):
+            # yes, then parse out the name
+            name = link[len(XASSET_SRCREF_PREFIX):]
+            loc = Location(self.location)
+            # resolve the reference to our internal 'filepath' which
+            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
+
+        return link
+
+
 
 def policy_key(location):
     """
@@ -306,7 +342,39 @@ def policy_key(location):
     return '{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
-class XModuleDescriptor(Plugin, HTMLSnippet):
+Template = namedtuple("Template", "metadata data children")
+
+
+class ResourceTemplates(object):
+    @classmethod
+    def templates(cls):
+        """
+        Returns a list of Template objects that describe possible templates that can be used
+        to create a module of this type.
+        If no templates are provided, there will be no way to create a module of
+        this type
+
+        Expects a class attribute template_dir_name that defines the directory
+        inside the 'templates' resource directory to pull templates from
+        """
+        templates = []
+        dirname = os.path.join('templates', cls.template_dir_name)
+        if not resource_isdir(__name__, dirname):
+            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                dir=dirname,
+                cls_name=cls.__name__,
+            ))
+            return []
+
+        for template_file in resource_listdir(__name__, dirname):
+            template_content = resource_string(__name__, os.path.join(dirname, template_file))
+            template = yaml.load(template_content)
+            templates.append(Template(**template))
+
+        return templates
+
+
+class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
@@ -321,9 +389,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
     module_class = XModule
 
     # Attributes for inpsection of the descriptor
-    stores_state = False # Indicates whether the xmodule state should be
+    stores_state = False  # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
-    has_score = False # This indicates whether the xmodule is a problem-type.
+    has_score = False  # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
 
@@ -337,10 +405,17 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         'data_dir'
     )
 
+    # cdodge: this is a list of metadata names which are 'system' metadata
+    # and should not be edited by an end-user
+    system_metadata_fields = [ 'data_dir' ]
+    
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('definition', 'metadata', 'location',
                            'shared_state_key', '_inherited_metadata')
+
+    # Name of resource directory to load templates from
+    template_dir_name = "default"
 
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
@@ -421,9 +496,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         """
         Return the metadata that is not inherited, but was defined on this module.
         """
-        return dict((k,v) for k,v in self.metadata.items()
+        return dict((k, v) for k, v in self.metadata.items()
                     if k not in self._inherited_metadata)
-
 
     @staticmethod
     def compute_inherited_metadata(node):
@@ -465,7 +539,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
 
         return self._child_instances
 
-
     def get_child_by_url_name(self, url_name):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
@@ -489,6 +562,18 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
             self,
             metadata=self.metadata
         )
+    
+    
+    def has_dynamic_children(self):
+        """
+        Returns True if this descriptor has dynamic children for a given
+        student when the module is created.
+        
+        Returns False if the children of this descriptor are the same
+        children that the module will return for any student. 
+        """
+        return False
+        
 
     # ================================= JSON PARSING ===========================
     @staticmethod
@@ -537,36 +622,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        try:
-            class_ = XModuleDescriptor.load_class(
-                etree.fromstring(xml_data).tag,
-                default_class
-                )
-            # leave next line, commented out - useful for low-level debugging
-            # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-            #        etree.fromstring(xml_data).tag,class_))
+        class_ = XModuleDescriptor.load_class(
+            etree.fromstring(xml_data).tag,
+            default_class
+            )
+        # leave next line, commented out - useful for low-level debugging
+        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
+        #        etree.fromstring(xml_data).tag,class_))
 
-            descriptor = class_.from_xml(xml_data, system, org, course)
-        except Exception as err:
-            # Didn't load properly.  Fall back on loading as an error
-            # descriptor.  This should never error due to formatting.
-
-            # Put import here to avoid circular import errors
-            from xmodule.error_module import ErrorDescriptor
-            msg = "Error loading from xml."
-            log.warning(msg + " " + str(err)[:200])
-
-            # Normally, we don't want lots of exception traces in our logs from common
-            # content problems.  But if you're debugging the xml loading code itself,
-            # uncomment the next line.
-            # log.exception(msg)
-
-            system.error_tracker(msg)
-            err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
-            descriptor = ErrorDescriptor.from_xml(xml_data, system, org, course,
-                                                  err_msg)
-
-        return descriptor
+        return class_.from_xml(xml_data, system, org, course)
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
@@ -649,7 +713,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet):
                     self.location.url(), self.metadata[key], e)
                 log.warning(msg)
         return None
-
 
 
 class DescriptorSystem(object):

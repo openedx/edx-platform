@@ -1,0 +1,55 @@
+<section id="textbox_${id}" class="textbox">
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+       % if hidden:
+      	    style="display:none;"
+       % endif
+  >${value|h}</textarea>
+
+  <div class="grader-status">
+    % if status == 'unsubmitted':
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+    % elif status == 'correct':
+      <span class="correct" id="status_${id}">Correct</span>
+    % elif status == 'incorrect':
+      <span class="incorrect" id="status_${id}">Incorrect</span>
+    % elif status == 'queued':
+      <span class="processing" id="status_${id}">Queued</span>
+      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+    % endif
+
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+
+    <p class="debug">${status}</p>
+  </div>
+
+  <span id="answer_${id}"></span>
+
+  <div class="external-grader-message">
+    ${msg|n}
+  </div>
+
+  <script>
+    // Note: We need to make the area follow the CodeMirror for this to work.
+    $(function(){
+      var cm = CodeMirror.fromTextArea(document.getElementById("input_${id}"), {
+        % if linenumbers == 'true':
+        lineNumbers: true,
+        % endif
+        mode: "${mode}",
+        matchBrackets: true,
+        lineWrapping: true,
+        indentUnit: "${tabsize}",
+        tabSize: "${tabsize}",
+        indentWithTabs: false,
+        extraKeys: {
+            "Tab": function(cm) {
+                cm.replaceSelection("${' '*tabsize}", "end");
+            }
+        },
+        smartIndent: false
+      });
+    });
+  </script>
+</section>

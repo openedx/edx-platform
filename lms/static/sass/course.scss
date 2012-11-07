@@ -12,6 +12,7 @@
 // Course base / layout styles
 @import 'course/layout/courseware_header';
 @import 'course/layout/footer';
+@import 'course/base/mixins';
 @import 'course/base/base';
 @import 'course/base/extends';
 @import 'module/module-styles.scss';
@@ -41,6 +42,7 @@
 @import "course/textbook";
 @import "course/profile";
 @import "course/gradebook";
+@import "course/tabs";
 
 // instructor
 @import "course/instructor/instructor";

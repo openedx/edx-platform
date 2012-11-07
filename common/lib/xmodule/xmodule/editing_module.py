@@ -1,9 +1,9 @@
 from pkg_resources import resource_string
-from lxml import etree
 from xmodule.mako_module import MakoModuleDescriptor
 import logging
 
 log = logging.getLogger(__name__)
+
 
 class EditingDescriptor(MakoModuleDescriptor):
     """
@@ -14,16 +14,31 @@ class EditingDescriptor(MakoModuleDescriptor):
     """
     mako_template = "widgets/raw-edit.html"
 
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit.coffee')]}
-    js_module_name = "RawDescriptor"
-
+    # cdodge: a little refactoring here, since we're basically doing the same thing
+    # here as with our parent class, let's call into it to get the basic fields
+    # set and then add our additional fields. Trying to keep it DRY.
     def get_context(self):
-        return {
-            'module': self,
-            'data': self.definition.get('data', ''),
-    # TODO (vshnayder): allow children and metadata to be edited.
-    #'children' : self.definition.get('children, ''),
+        _context = MakoModuleDescriptor.get_context(self)
+        # Add our specific template information (the raw data body)
+        _context.update({'data': self.definition.get('data', '')})
+        return _context
 
-    # TODO: show both own metadata and inherited?
-    #'metadata' : self.own_metadata,
-        }
+
+class XMLEditingDescriptor(EditingDescriptor):
+    """
+    Module that provides a raw editing view of its data as XML. It does not perform
+    any validation of its definition
+    """
+
+    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/xml.coffee')]}
+    js_module_name = "XMLEditingDescriptor"
+
+
+class JSONEditingDescriptor(EditingDescriptor):
+    """
+    Module that provides a raw editing view of its data as XML. It does not perform
+    any validation of its definition
+    """
+
+    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/json.coffee')]}
+    js_module_name = "JSONEditingDescriptor"

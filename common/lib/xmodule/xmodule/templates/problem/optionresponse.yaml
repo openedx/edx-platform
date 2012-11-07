@@ -1,0 +1,19 @@
+---
+metadata:
+    display_name: Option Response
+data: |
+    <problem>
+      <text>
+        <h2>Example: Option Response Problem</h2>
+        <p>
+          An option response problem presents option boxes for students to select from.  Correctness of input is evaluated based
+          on which option is defined as correct in the optioninput statement.  
+        </p>
+        <p>Select the correct options:</p>
+        <optionresponse direction="vertical" randomize="yes">
+        <p><text class="inline">The location of the sky is: </text><optioninput inline="1" options="('Up','Down')" correct="Up"></optioninput></p>
+        <p><text>The location of the earth is: </text><optioninput options="('Up','Down')" correct="Down"></optioninput></p>
+        </optionresponse>
+      </text>
+    </problem>
+children: []

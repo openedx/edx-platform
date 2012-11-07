@@ -52,6 +52,14 @@ div.course-wrapper {
         margin-bottom: 15px;
         padding: 0 0 15px;
 
+        .collapsible {
+          header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            font-size: 16px;
+          }
+        }
+
         header {
           @extend h1.top-header;
           @include border-radius(0 4px 0 0);
@@ -87,7 +95,7 @@ div.course-wrapper {
         ul {
           list-style: disc outside none;
           padding-left: 1em;
-          
+
           &.discussion-errors {
             list-style: none;
             padding-left: 2em;
@@ -96,6 +104,10 @@ div.course-wrapper {
           &.admin-actions {
             list-style: none;
           }
+        }
+
+        nav.sequence-nav ul li.prev {
+          left: 4px;
         }
 
         nav.sequence-bottom {

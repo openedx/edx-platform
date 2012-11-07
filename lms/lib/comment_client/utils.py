@@ -28,9 +28,9 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
     data_or_params['api_key'] = settings.API_KEY
     try:
         if method in ['post', 'put', 'patch']:
-            response = requests.request(method, url, data=data_or_params)
+            response = requests.request(method, url, data=data_or_params, timeout=5)
         else:
-            response = requests.request(method, url, params=data_or_params)
+            response = requests.request(method, url, params=data_or_params, timeout=5)
     except Exception as err:
         log.exception("Trying to call {method} on {url} with params {params}".format(
             method=method, url=url, params=data_or_params))

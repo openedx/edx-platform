@@ -1,5 +1,6 @@
 import json
 import random
+import logging
 from lxml import etree
 
 from xmodule.x_module import XModule
@@ -8,6 +9,9 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
 
 DEFAULT = "_DEFAULT_GROUP"
+
+
+log = logging.getLogger(__name__)
 
 
 def group_from_value(groups, v):
@@ -47,17 +51,22 @@ class ABTestModule(XModule):
 
     def get_shared_state(self):
         return json.dumps({'group': self.group})
-
+    
+    def get_children_locations(self):
+        return self.definition['data']['group_content'][self.group]
+        
     def displayable_items(self):
-        child_locations = self.definition['data']['group_content'][self.group]
-        children = [self.system.get_module(loc) for loc in child_locations]
-        return [c for c in children if c is not None]
+        # Most modules return "self" as the displayable_item. We never display ourself
+        # (which is why we don't implement get_html). We only display our children.
+        return self.get_children()
 
 
 # TODO (cpennington): Use Groups should be a first class object, rather than being
 # managed by ABTests
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
+
+#    template_dir_name = "abtest"
 
     def __init__(self, system, definition=None, **kwargs):
         """
@@ -122,10 +131,13 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 name = group.get('name')
                 definition['data']['group_portions'][name] = float(group.get('portion', 0))
 
-            child_content_urls = [
-                system.process_xml(etree.tostring(child)).location.url()
-                for child in group
-            ]
+            child_content_urls = []
+            for child in group:
+                try:
+                    child_content_urls.append(system.process_xml(etree.tostring(child)).location.url())
+                except:
+                    log.exception("Unable to load child when parsing ABTest. Continuing...")
+                    continue
 
             definition['data']['group_content'][name] = child_content_urls
             definition['children'].extend(child_content_urls)
@@ -158,3 +170,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
 
         return xml_object
+    
+    
+    def has_dynamic_children(self):
+        return True

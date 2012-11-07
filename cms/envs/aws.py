@@ -19,6 +19,8 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 with open(ENV_ROOT / "cms.env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
 LOG_DIR = ENV_TOKENS['LOG_DIR']

@@ -119,13 +119,18 @@ section.course-index {
             margin-bottom: 0;
             line-height: 1.3;
 
-            span.subtitle {
+            &.subtitle {
               color: #666;
               font-size: 13px;
               font-weight: normal;
               display: block;
+              margin: 0;
+
+              &:empty {
+                display: none;
+              }
             }
-          }          
+          }
 
           &:hover {
             background: rgba(0, 0, 0, .1);

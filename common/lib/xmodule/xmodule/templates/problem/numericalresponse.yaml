@@ -1,0 +1,28 @@
+---
+metadata:
+    display_name: Numerical Response
+data: |
+ <problem>
+      <text>
+ <h2>Example: Numerical Response Problem</h2>
+ 
+ <p>
+   A numerical response problem accepts a line of text input from the
+   student, and evaluates the input for correctness based on its
+   numerical value.  
+ </p>
+ 
+ <p>
+   The answer is correct if it is within a specified numerical tolerance
+   of the expected answer.
+ </p>
+ 
+ <p>Enter the numerical value of Pi:
+   <numericalresponse answer="3.14159">
+            <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+            <textline />
+   </numericalresponse>
+ </p>
+      </text>
+ </problem>
+children: []

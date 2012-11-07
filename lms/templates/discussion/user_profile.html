@@ -21,7 +21,7 @@
   <div class="course-wrapper">
     <section aria-label="User Profile" class="user-profile">
       <nav>
-        
+
         <article class="sidebar-module discussion-sidebar">
           <%include file="_user_profile.html" />
         </article>
@@ -29,8 +29,8 @@
       </nav>
     </section>
 
-    <section class="course-content">
-      ${content.decode('utf-8')}
+    <section class="course-content container discussion-user-threads" data-user-id="${django_user.id | escapejs}" data-course-id="${course.id | escapejs}" data-threads="${threads}" data-user-info="${user_info}">
+        <h2>Active Threads</h2>
     </section>
   </div>
 </section>
@@ -39,3 +39,4 @@
   var $$profiled_user_id = "${django_user.id | escapejs}";
   var $$course_id = "${course.id | escapejs}";
 </script>
+<%include file="_underscore_templates.html" />

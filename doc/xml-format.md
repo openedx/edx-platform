@@ -143,6 +143,7 @@ That's basically all there is to the organizational structure.  Read the next se
 * `chapter` -- top level organization unit of a course.   The courseware display code currently expects the top level `course` element to contain only chapters, though there is no philosophical reason why this is required, so we may change it to properly display non-chapters at the top level.
 * `course` -- top level tag.  Contains everything else.
 * `customtag` -- render an html template, filling in some parameters, and return the resulting html.  See below for details.
+* `discussion` -- Inline discussion forum
 * `html` -- a reference to an html file.
 * `error`  -- don't put these in by hand :)   The internal representation of content that has an error, such as malformed xml or some broken invariant.  You may see this in the xml once the CMS is in use...
 * `problem` -- a problem.  See elsewhere in edx4edx for documentation on the format.
@@ -171,6 +172,33 @@ When we see `<customtag impl="special" animal="unicorn" hat="blue"/>`, we will:
 
 Since `customtag` is already a pointer, there is generally no need to put it into a separate file--just use it in place: <customtag url_name="my_custom_tag" impl="blah" attr1="..."/>
 
+### `discussion`
+
+The discussion tag embeds an inline discussion module. The XML format is:
+```
+<discussion for="Course overview" id="6002x_Fall_2012_Overview" discussion_category="Week 1 / Overview" />
+``` 
+The meaning of each attribute is as follows:
+* `for`: A string that describes the discussion. Purely for descriptive purposes (to the student).
+* `id`: The identifier that the discussion forum service uses to refer to this inline discussion module. Since the `id` must be unique and lives in a common namespace with all other courses, the preferred convention is to use `<course_name>_<course_run>_<descriptor>` as in the above example. The `id` should be "machine-friendly", e.g. use alphanumeric characters, underscores. Do **not** use a period (e.g. `6.002x_Fall_2012_Overview`).
+* `discussion_category`: The inline module will be indexed in the main "Discussion" tab of the course. The inline discussions are organized into a directory-like hierarchy. Note that the forward slash indicates depth, as in conventional filesytems. In the above example, this discussion module will show up in the following "directory":
+```
+Week 1 / Overview / Course overview
+```
+
+Further discussion on `discussion_category`:
+Note that the `for` tag has been appended to the end of the `discussion_category`. This can often lead into deeply nested subforums, which may not be intended. In the above example, if we were to use instead:
+
+```
+<discussion for="Course overview" id="6002x_Fall_2012_Overview" discussion_category="Week 1" />
+``` 
+
+this discussion module would show up in the main forums as:
+```
+Week 1 / Course overview
+```
+
+which is more succinct.
 
 ### `html`
 
@@ -218,6 +246,16 @@ __IMPORTANT__: A student's state for a particular content element is tied to the
 Values are dictionaries of the form {"metadata-key" : "metadata-value"}.
 * The order in which things appear does not matter, though it may be helpful to organize the file in the same order as things appear in the content.
 * NOTE: json is picky about commas.  If you have trailing commas before closing braces, it will complain and refuse to parse the file.  This can be irritating at first.
+
+Supported fields at the course level:
+
+* "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
+* "advertised_start" -- specify what you want displayed as the start date of the course in the course listing and course about pages. This can be useful if you want to let people in early before the formal start. Format-by-example: "2012-09-05T12:00".
+* "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
+* "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
+* "tabs" -- have custom tabs in the courseware.  See below for details on config.
+* "discussion_blackouts" -- An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: [["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]
+* TODO: there are others
 
 ### Grading policy file contents
 
@@ -273,7 +311,8 @@ __Inherited:__
 * `start` -- when this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 *	`showanswer` - When to show answer. For 'attempted', will show answer after first attempt. Values: never, attempted, answered, closed. Default: closed. Optional.
 *	`graded` - Whether this section will count towards the students grade. "true" or "false". Defaults to "false".
-*	`rerandomise` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+*	`rerandomize` - Randomize question on each attempt. Values: 'always' (students see a different version of the problem after each attempt to solve it)
+                                                            'onreset' (randomize question when reset button is pressed by the student)
                                                             'never' (all students see the same version of the problem)
                                                             'per_student' (individual students see the same version of the problem each time the look at it, but that version is different from what other students see)
                                                             Default: 'always'. Optional.
@@ -340,7 +379,43 @@ If you look at some older xml, you may see some tags or metadata attributes that
 
 # Static links
 
-if your content links (e.g. in an html file)  to `"static/blah/ponies.jpg"`, we will look for this in `YOUR_COURSE_DIR/blah/ponies.jpg`.  Note that this is not looking in a `static/` subfolder in your course dir.  This may (should?) change at some point.   Links that include `/course` will be rewritten to the root of your course in the courseware (e.g. `courses/{org}/{course}/{url_name}/` in the current url structure).  This is useful for linking to the course wiki, for example.
+If your content links (e.g. in an html file)  to `"static/blah/ponies.jpg"`, we will look for this...
+
+* If your course dir has a `static/` subdirectory, we will look in `YOUR_COURSE_DIR/static/blah/ponies.jpg`.   This is the prefered organization, as it does not expose anything except what's in `static/` to the world.
+*  If your course dir does not have a `static/` subdirectory, we will look in `YOUR_COURSE_DIR/blah/ponies.jpg`.  This is the old organization, and requires that the web server allow access to everything in the couse dir.  To switch to the new organization, move all your static content into a new `static/` dir  (e.g. if you currently have things in `images/`, `css/`, and `special/`, create a dir called `static/`, and move `images/, css/, and special/` there).
+
+Links that include `/course` will be rewritten to the root of your course in the courseware (e.g. `courses/{org}/{course}/{url_name}/` in the current url structure).  This is useful for linking to the course wiki, for example.
+
+# Tabs
+
+If you want to customize the courseware tabs displayed for your course, specify a "tabs" list in the course-level policy.  e.g.:
+
+    "tabs" : [
+        {"type": "courseware"},       # no name--always "Courseware" for consistency between courses
+        {"type": "course_info", "name": "Course Info"},
+        {"type": "external_link", "name": "My Discussion", "link": "http://www.mydiscussion.org/blah"},
+        {"type": "progress", "name": "Progress"},
+        {"type": "wiki", "name": "Wonderwiki"},
+        {"type": "static_tab", "url_slug": "news", "name": "Exciting news"},
+        {"type": "textbooks"}        # generates one tab per textbook, taking names from the textbook titles
+    ]
+
+
+* If you specify any tabs, you must specify all tabs.  They will appear in the order given.
+* The first two tabs must have types `"courseware"` and `"course_info"`, in that order.  Otherwise, we'll refuse to load the course.
+* for static tabs, the url_slug will be the url that points to the tab.  It can not be one of the existing courseware url types (even if those aren't used in your course).  The static content will come from `tabs/{course_url_name}/{url_slug}.html`, or `tabs/{url_slug}.html` if that doesn't exist.
+
+* An Instructor tab will be automatically added at the end for course staff users.
+
+## Supported tab types:
+
+* "courseware".  No other parameters.
+* "course_info".  Parameter "name".
+* "wiki". Parameter "name".
+* "discussion".  Parameter "name".
+* "external_link".  Parameters "name", "link".
+* "textbooks".  No parameters--generates tab names from book titles.
+* "progress".  Parameter "name".
 
 # Tips for content developers
 

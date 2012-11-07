@@ -6,16 +6,15 @@ import settings
 class Thread(models.Model):
 
     accessible_fields = [
-        'id', 'title', 'body', 'anonymous',
-        'course_id', 'closed', 'tags', 'votes',
-        'commentable_id', 'username', 'user_id',
-        'created_at', 'updated_at', 'comments_count',
-        'at_position_list', 'children', 'type',
-        'highlighted_title', 'highlighted_body',
+        'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
+        'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
+        'at_position_list', 'children', 'type', 'highlighted_title',
+        'highlighted_body', 'endorsed', 'read'
     ]
 
     updatable_fields = [
-        'title', 'body', 'anonymous', 'course_id', 
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'closed', 'tags', 'user_id', 'commentable_id',
     ]
 
@@ -32,7 +31,7 @@ class Thread(models.Model):
                           'course_id': query_params['course_id'],
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
-        if query_params.get('text') or query_params.get('tags'):
+        if query_params.get('text') or query_params.get('tags') or query_params.get('commentable_ids'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
@@ -40,7 +39,7 @@ class Thread(models.Model):
                 del params['commentable_id']
         response = perform_request('get', url, params, *args, **kwargs)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
-        
+
     @classmethod
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):
@@ -61,7 +60,21 @@ class Thread(models.Model):
         else:
             return super(Thread, cls).url(action, params)
 
+    # TODO: This is currently overriding Model._retrieve only to add parameters
+    # for the request. Model._retrieve should be modified to handle this such
+    # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-        response = perform_request('get', url, {'recursive': kwargs.get('recursive')})
+
+        request_params = { 
+                            'recursive': kwargs.get('recursive'),
+                            'user_id': kwargs.get('user_id'),
+                            'mark_as_read': kwargs.get('mark_as_read', True),
+                         }
+
+        # user_id may be none, in which case it shouldn't be part of the
+        # request.
+        request_params = strip_none(request_params)
+
+        response = perform_request('get', url, request_params)
         self.update_attributes(**response)

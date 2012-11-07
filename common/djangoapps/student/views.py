@@ -39,6 +39,8 @@ from collections import namedtuple
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
+from statsd import statsd
+
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
@@ -52,6 +54,10 @@ def csrf_token(context):
             ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
 
 
+# NOTE: This view is not linked to directly--it is called from
+# branding/views.py:index(), which is cached for anonymous users.
+# This means that it should always return the same thing for anon
+# users. (in particular, no switching based on query params allowed)
 def index(request, extra_context={}, user=None):
     '''
     Render the edX main page.
@@ -200,7 +206,13 @@ def change_enrollment(request):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
-
+                    
+        org, course_num, run=course_id.split("/")        
+        statsd.increment("common.student.enrollment",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run)])
+        
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
 
@@ -208,6 +220,13 @@ def change_enrollment(request):
         try:
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
+            
+            org, course_num, run=course_id.split("/")        
+            statsd.increment("common.student.unenrollment",
+                            tags=["org:{0}".format(org),
+                                  "course:{0}".format(course_num),
+                                  "run:{0}".format(run)])
+                              
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
             return {'success': False, 'error': 'You are not enrolled for this course.'}
@@ -256,12 +275,19 @@ def login_user(request, error=""):
         log.info("Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
-
+        
+        statsd.increment("common.student.successful_login")
+        
         return HttpResponse(json.dumps({'success': True}))
-
-    log.warning("Login failed - Account not active for user {0}".format(username))
+    
+    log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
+    
+    reactivation_email_for_user(user)
+    not_activated_msg = "This account has not been activated. We have " + \
+                        "sent another activation message. Please check your " + \
+                        "e-mail for the activation instructions."
     return HttpResponse(json.dumps({'success': False,
-                                    'value': 'This account has not been activated. Please check your e-mail for the activation instructions.'}))
+                                    'value': not_activated_msg}))
 
 
 @ensure_csrf_cookie
@@ -457,7 +483,9 @@ def create_account(request, post_override=None):
             log.debug('bypassing activation email')
             login_user.is_active = True
             login_user.save()
-
+            
+    statsd.increment("common.student.account_created")
+    
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
@@ -513,6 +541,17 @@ def password_reset(request):
     ''' Attempts to send a password reset e-mail. '''
     if request.method != "POST":
         raise Http404
+    
+    # By default, Django doesn't allow Users with is_active = False to reset their passwords,
+    # but this bites people who signed up a long time ago, never activated, and forgot their 
+    # password. So for their sake, we'll auto-activate a user for whome password_reset is called.
+    try:
+        user = User.objects.get(email=request.POST['email'])
+        user.is_active = True
+        user.save()
+    except:
+        log.exception("Tried to auto-activate user to enable password reset, but failed.")
+    
     form = PasswordResetForm(request.POST)
     if form.is_valid():
         form.save(use_https = request.is_secure(),
@@ -525,7 +564,6 @@ def password_reset(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid e-mail'}))
 
-
 @ensure_csrf_cookie
 def reactivation_email(request):
     ''' Send an e-mail to reactivate a deactivated account, or to
@@ -536,25 +574,22 @@ def reactivation_email(request):
     except User.DoesNotExist:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
+    return reactivation_email_for_user(user)
 
-    if user.is_active:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': 'User is already active'}))
-
+def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
-    reg.register(user)
 
-    d = {'name': UserProfile.get(user=user).name,
-       'key': r.activation_key}
+    d = {'name': user.profile.name,
+         'key': reg.activation_key}
 
-    subject = render_to_string('reactivation_email_subject.txt', d)
+    subject = render_to_string('emails/activation_email_subject.txt', d)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('reactivation_email.txt', d)
+    message = render_to_string('emails/activation_email.txt', d)
 
     res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return HttpResponse(json.dumps({'success': True}))
-
+    
 
 @ensure_csrf_cookie
 def change_email_request(request):
@@ -638,9 +673,12 @@ def confirm_email_change(request, key):
     meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
     up.set_meta(meta)
     up.save()
+    # Send it to the old email...
+    user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     user.email = pec.new_email
     user.save()
     pec.delete()
+    # And send it to the new email...
     user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return render_to_response("email_change_successful.html", d)
@@ -661,9 +699,12 @@ def change_name_request(request):
     pnc.rationale = request.POST['rationale']
     if len(pnc.new_name) < 2:
         return HttpResponse(json.dumps({'success': False, 'error': 'Name required'}))
-    if len(pnc.rationale) < 2:
-        return HttpResponse(json.dumps({'success': False, 'error': 'Rationale required'}))
     pnc.save()
+
+    # The following automatically accepts name change requests. Remove this to
+    # go back to the old system where it gets queued up for admin approval.
+    accept_name_change_by_id(pnc.id)
+
     return HttpResponse(json.dumps({'success': True}))
 
 
@@ -698,14 +739,9 @@ def reject_name_change(request):
     return HttpResponse(json.dumps({'success': True}))
 
 
-@ensure_csrf_cookie
-def accept_name_change(request):
-    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change '''
-    if not request.user.is_staff:
-        raise Http404
-
+def accept_name_change_by_id(id):
     try:
-        pnc = PendingNameChange.objects.get(id=int(request.POST['id']))
+        pnc = PendingNameChange.objects.get(id=id)
     except PendingNameChange.DoesNotExist:
         return HttpResponse(json.dumps({'success': False, 'error': 'Invalid ID'}))
 
@@ -724,3 +760,17 @@ def accept_name_change(request):
     pnc.delete()
 
     return HttpResponse(json.dumps({'success': True}))
+
+
+@ensure_csrf_cookie
+def accept_name_change(request):
+    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change 
+    
+    We used this during the prototype but now we simply record name changes instead
+    of manually approving them. Still keeping this around in case we want to go
+    back to this approval method.
+    '''
+    if not request.user.is_staff:
+        raise Http404
+
+    return accept_name_change_by_id(int(request.POST['id']))

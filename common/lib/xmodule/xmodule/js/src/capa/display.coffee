@@ -11,7 +11,9 @@ class @Problem
     $(selector, @el)
 
   bind: =>
-    MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+    @el.find('.problem > div').each (index, element) =>
+      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
     window.update_schematics()
 
     problem_prefix = @element_id.replace(/problem_/,'')
@@ -22,7 +24,14 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
-    @$('input.math').keyup(@refreshMath).each(@refreshMath)
+
+    # Collapsibles
+    Collapsible.setCollapsibles(@el)
+
+    # Dynamath
+    @$('input.math').keyup(@refreshMath)
+    @$('input.math').each (index, element) =>
+      MathJax.Hub.Queue [@refreshMath, null, element]
 
   renderProgressState: () =>
     @$(".problem-progress").html(@el.data('progress_detail'))
@@ -60,7 +69,7 @@ class @Problem
       @new_queued_items = $(response.html).find(".xqueue")
       if @new_queued_items.length isnt @num_queued_items
         @el.html(response.html)
-        @executeProblemScripts () =>
+        JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
       
@@ -74,18 +83,19 @@ class @Problem
   render: (content) ->
     if content
       @el.html(content)
-      @executeProblemScripts () =>
+      JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
         @bind()
         @queueing()
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
-        @executeProblemScripts () =>
+        JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
           @queueing()
           @renderProgressState()
+
 
 
   # TODO add hooks for problem types here by inspecting response.html and doing
@@ -101,50 +111,6 @@ class @Problem
         if setupMethod?
           @inputtypeDisplays[id] = setupMethod(inputtype)
 
-  executeProblemScripts: (callback=null) ->
-
-    placeholders = @el.find(".script_placeholder")
-
-    if placeholders.length == 0
-      callback()
-      return
-
-    completed      = (false for i in [1..placeholders.length])
-    callbackCalled = false
-
-    # This is required for IE8 support.
-    completionHandlerGeneratorIE = (index) =>
-      return () ->
-        if (this.readyState == 'complete' || this.readyState == 'loaded')
-          #completionHandlerGenerator.call(self, index)()
-          completionHandlerGenerator(index)()
-
-    completionHandlerGenerator = (index) =>
-      return () =>
-        allComplete = true
-        completed[index] = true
-        for flag in completed
-          if not flag
-            allComplete = false
-            break
-        if allComplete and not callbackCalled
-          callbackCalled = true
-          callback() if callback?
-
-    placeholders.each (index, placeholder) ->
-      s = document.createElement('script')
-      s.setAttribute('src', $(placeholder).attr("data-src"))
-      s.setAttribute('type', "text/javascript")
-
-      s.onload             = completionHandlerGenerator(index)
-
-      # s.onload does not fire in IE8; this does.
-      s.onreadystatechange = completionHandlerGeneratorIE(index)
-
-      # Need to use the DOM elements directly or the scripts won't execute
-      # properly.
-      $('head')[0].appendChild(s)
-      $(placeholder).remove()
 
   ###
   # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -258,7 +224,9 @@ class @Problem
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
           else
-            @$("#answer_#{key}, #solution_#{key}").html(value)
+            answer = @$("#answer_#{key}, #solution_#{key}")
+            answer.html(value)
+            Collapsible.setCollapsibles(answer)
 
         # TODO remove the above once everything is extracted into its own
         # inputtype functions.
@@ -270,7 +238,9 @@ class @Problem
               showMethod = @inputtypeShowAnswerMethods[cls]
               showMethod(inputtype, display, answers) if showMethod?
 
-        MathJax.Hub.Queue ["Typeset", MathJax.Hub]
+        @el.find('.problem > div').each (index, element) =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
         @updateProgress response
@@ -304,12 +274,21 @@ class @Problem
 
   refreshMath: (event, element) =>
     element = event.target unless element
-    target = "display_#{element.id.replace(/^input_/, '')}"
+    elid = element.id.replace(/^input_/,'')
+    target = "display_" + elid
+
+    # MathJax preprocessor is loaded by 'setupInputTypes'
+    preprocessor_tag = "inputtype_" + elid
+    mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
     if jax = MathJax.Hub.getAllJax(target)[0]
-      MathJax.Hub.Queue ['Text', jax, $(element).val()],
-        [@updateMathML, jax, element]
+      eqn = $(element).val()
+      if mathjax_preprocessor
+        eqn = mathjax_preprocessor(eqn)
+      MathJax.Hub.Queue(['Text', jax, eqn], [@updateMathML, jax, element])
 
+    return # Explicit return for CoffeeScript
+    
   updateMathML: (jax, element) =>
     try
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
@@ -325,6 +304,22 @@ class @Problem
     @answers = @inputs.serialize()
 
   inputtypeSetupMethods:
+
+    'text-input-dynamath': (element) =>
+      ###
+      Return: function (eqn) -> eqn that preprocesses the user formula input before
+                it is fed into MathJax. Return 'false' if no preprocessor specified
+      ###
+      data = $(element).find('.text-input-dynamath_data')
+
+      preprocessorClassName = data.data('preprocessor')
+      preprocessorClass = window[preprocessorClassName]
+      if not preprocessorClass?
+        return false
+      else
+        preprocessor = new preprocessorClass()
+        return preprocessor.fn
+
     javascriptinput: (element) =>
 
       data = $(element).find(".javascriptinput_data")
@@ -349,10 +344,13 @@ class @Problem
   inputtypeShowAnswerMethods:
     choicegroup: (element, display, answers) =>
       element = $(element)
-      for key, value of answers
-        element.find('input').attr('disabled', 'disabled')
-        for choice in value
-          element.find("label[for='input_#{key}_#{choice}']").addClass 'choicegroup_correct'
+
+      element.find('input').attr('disabled', 'disabled')
+
+      input_id = element.attr('id').replace(/inputtype_/,'')
+      answer = answers[input_id]
+      for choice in answer
+        element.find("label[for='input_#{input_id}_#{choice}']").addClass 'choicegroup_correct'
 
     javascriptinput: (element, display, answers) =>
       answer_id = $(element).attr('id').split("_")[1...].join("_")

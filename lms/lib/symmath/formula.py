@@ -105,6 +105,7 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
                   'e': sympy.E,			# for exp
                   'i': sympy.I,			# lowercase i is also sqrt(-1)
                   'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
+                  'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
                   #'X':sympy.sympify('Matrix([[0,1],[1,0]])'),
                   #'Y':sympy.sympify('Matrix([[0,-I],[I,0]])'),
                   #'Z':sympy.sympify('Matrix([[1,0],[0,-1]])'),
@@ -273,11 +274,16 @@ class formula(object):
             if not self.is_mathml():
                 return my_sympify(self.expr)
             if self.is_presentation_mathml():
+                cmml = None
                 try:
                     cmml = self.cmathml
                     xml = etree.fromstring(str(cmml))
                 except Exception, err:
-                    raise Exception, 'Err %s while converting cmathml to xml; cmml=%s' % (err, cmml)
+                    if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
+                        msg = "Illegal math expression"
+                    else:
+                        msg = 'Err %s while converting cmathml to xml; cmml=%s' % (err, cmml)
+                    raise Exception, msg
                 xml = self.fix_greek_in_mathml(xml)
                 self.the_sympy = self.make_sympy(xml[0])
             else:
@@ -320,6 +326,24 @@ class formula(object):
                   'power': sympy.Pow,
                   'sin': sympy.sin,
                   'cos': sympy.cos,
+                  'tan': sympy.tan,
+                  'cot': sympy.cot,
+                  'sinh': sympy.sinh,
+                  'cosh': sympy.cosh,
+                  'coth': sympy.coth,
+                  'tanh': sympy.tanh,
+                  'asin': sympy.asin,
+                  'acos': sympy.acos,
+                  'atan': sympy.atan,
+                  'atan2': sympy.atan2,
+                  'acot': sympy.acot,
+                  'asinh': sympy.asinh,
+                  'acosh': sympy.acosh,
+                  'atanh': sympy.atanh,
+                  'acoth': sympy.acoth,
+                  'exp': sympy.exp,
+                  'log': sympy.log,
+                  'ln': sympy.ln,
                    }
 
         # simple sumbols
@@ -385,8 +409,7 @@ class formula(object):
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:
-                    if usym == 'i': print "options=", self.options
-                    if usym == 'i' and 'imaginary' in self.options:	 # i = sqrt(-1)
+                    if usym == 'i' and self.options is not None and 'imaginary' in self.options:	 # i = sqrt(-1)
                         sym = sympy.I
                     else:
                         sym = sympy.Symbol(str(usym))

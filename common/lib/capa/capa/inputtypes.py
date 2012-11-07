@@ -2,540 +2,737 @@
 # File:   courseware/capa/inputtypes.py
 #
 
-'''
+"""
 Module containing the problem elements which render into input objects
 
 - textline
-- textbox     (change this to textarea?)
-- schemmatic
-- choicegroup
-- radiogroup
-- checkboxgroup
+- textbox (aka codeinput)
+- schematic
+- choicegroup (aka radiogroup, checkboxgroup)
 - javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
 
-These are matched by *.html files templates/*.html which are mako templates with the actual html.
+These are matched by *.html files templates/*.html which are mako templates with the
+actual html.
 
-Each input type takes the xml tree as 'element', the previous answer as 'value', and the graded status as 'status'
+Each input type takes the xml tree as 'element', the previous answer as 'value', and the
+graded status as'status'
+"""
 
-'''
+# TODO: make hints do something
 
-# TODO: rename "state" to "status" for all below
-# status is currently the answer for the problem ID for the input element,
-# but it will turn into a dict containing both the answer and any associated message for the problem ID for the input element.
+# TODO: make all inputtypes actually render msg
 
+# TODO: remove unused fields (e.g. 'hidden' in a few places)
+
+# TODO: add validators so that content folks get better error messages.
+
+
+# Possible todo: make inline the default for textlines and other "one-line" inputs.  It probably
+# makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
+# general css and layout strategy for capa, document it, then implement it.
+
+from collections import namedtuple
+import json
 import logging
+from lxml import etree
 import re
 import shlex  # for splitting quoted strings
-import json
+import sys
 
-from lxml import etree
-import xml.sax.saxutils as saxutils
+from registry import TagRegistry
 
 log = logging.getLogger('mitx.' + __name__)
 
+#########################################################################
 
-def get_input_xml_tags():
-    ''' Eventually, this will be for all registered input types '''
-    return SimpleInput.get_xml_tags()
+registry = TagRegistry()
+
+class Attribute(object):
+    """
+    Allows specifying required and optional attributes for input types.
+    """
+
+    # want to allow default to be None, but also allow required objects
+    _sentinel = object()
+
+    def __init__(self, name, default=_sentinel, transform=None, validate=None, render=True):
+        """
+        Define an attribute
+
+        name (str): then name of the attribute--should be alphanumeric (valid for an XML attribute)
+
+        default (any type): If not specified, this attribute is required.  If specified, use this as the default value
+                        if the attribute is not specified.  Note that this value will not be transformed or validated.
+
+        transform (function str -> any type): If not None, will be called to transform the parsed value into an internal
+                        representation.
+
+        validate (function str-or-return-type-of-tranform -> unit or exception): If not None, called to validate the
+                       (possibly transformed) value of the attribute.  Should raise ValueError with a helpful message if
+                       the value is invalid.
+
+        render (bool): if False, don't include this attribute in the template context.
+        """
+        self.name = name
+        self.default = default
+        self.validate = validate
+        self.transform = transform
+        self.render = render
+
+    def parse_from_xml(self, element):
+        """
+        Given an etree xml element that should have this attribute, do the obvious thing:
+          - look for it.  raise ValueError if not found and required.
+          - transform and validate.  pass through any exceptions from transform or validate.
+        """
+        val = element.get(self.name)
+        if self.default == self._sentinel and val is None:
+            raise ValueError('Missing required attribute {0}.'.format(self.name))
+
+        if val is None:
+            # not required, so return default
+            return self.default
+
+        if self.transform is not None:
+            val = self.transform(val)
+
+        if self.validate is not None:
+            self.validate(val)
+
+        return val
 
 
-class SimpleInput():#  XModule
-    '''
-    Type for simple inputs -- plain HTML with a form element
-    '''
+class InputTypeBase(object):
+    """
+    Abstract base class for input types.
+    """
 
-    xml_tags = {}  # # Maps tags to functions
+    template = None
 
-    def __init__(self, system, xml, item_id=None, track_url=None, state=None, use='capa_input'):
-        '''
-        Instantiate a SimpleInput class.  Arguments:
+    def __init__(self, system, xml, state):
+        """
+        Instantiate an InputType class.  Arguments:
 
-        - system    : ModuleSystem instance which provides OS, rendering, and user context
+        - system    : ModuleSystem instance which provides OS, rendering, and user context.
+                      Specifically, must have a render_template function.
         - xml       : Element tree of this Input element
-        - item_id   : id for this input element (assigned by capa_problem.LoncapProblem) - string
-        - track_url : URL used for tracking - string
         - state     : a dictionary with optional keys:
-                      * Value
-                      * ID
-                      * Status (answered, unanswered, unsubmitted)
-                      * Feedback (dictionary containing keys for hints, errors, or other
-                        feedback from previous attempt)
-        - use        :
-        '''
+                      * 'value'  -- the current value of this input
+                                    (what the student entered last time)
+                      * 'id' -- the id of this input, typically
+                                "{problem-location}_{response-num}_{input-num}"
+                      * 'status' (answered, unanswered, unsubmitted)
+                      * 'feedback' (dictionary containing keys for hints, errors, or other
+                         feedback from previous attempt.  Specifically 'message', 'hint',
+                         'hintmode'.  If 'hintmode' is 'always', the hint is always displayed.)
+        """
 
         self.xml = xml
         self.tag = xml.tag
         self.system = system
-        if not state: state = {}
 
-        ## ID should only come from one place.
-        ## If it comes from multiple, we use state first, XML second, and parameter
-        ## third. Since we don't make this guarantee, we can swap this around in
-        ## the future if there's a more logical order.
-        if item_id: self.id = item_id
-        if xml.get('id'): self.id = xml.get('id')
-        if 'id' in state: self.id = state['id']
+        ## NOTE: ID should only come from one place.  If it comes from multiple,
+        ## we use state first, XML second (in case the xml changed, but we have
+        ## existing state with an old id). Since we don't make this guarantee,
+        ## we can swap this around in the future if there's a more logical
+        ## order.
 
-        self.value = ''
-        if 'value' in state:
-            self.value = state['value']
+        self.id = state.get('id', xml.get('id'))
+        if self.id is None:
+            raise ValueError("input id state is None. xml is {0}".format(etree.tostring(xml)))
 
-        self.msg = ''
-        feedback = state.get('feedback')
-        if feedback is not None:
-            self.msg = feedback.get('message', '')
-            self.hint = feedback.get('hint', '')
-            self.hintmode = feedback.get('hintmode', None)
+        self.value = state.get('value', '')
 
-            # put hint above msg if to be displayed
-            if self.hintmode == 'always':
-                self.msg = self.hint + ('<br/.>' if self.msg else '') + self.msg
+        feedback = state.get('feedback', {})
+        self.msg = feedback.get('message', '')
+        self.hint = feedback.get('hint', '')
+        self.hintmode = feedback.get('hintmode', None)
 
-        self.status = 'unanswered'
-        if 'status' in state:
-            self.status = state['status']
+        # put hint above msg if it should be displayed
+        if self.hintmode == 'always':
+            self.msg = self.hint + ('<br/>' if self.msg else '') + self.msg
+
+        self.status = state.get('status', 'unanswered')
+
+        try:
+            # Pre-parse and propcess all the declared requirements.
+            self.process_requirements()
+
+            # Call subclass "constructor" -- means they don't have to worry about calling
+            # super().__init__, and are isolated from changes to the input constructor interface.
+            self.setup()
+        except Exception as err:
+            # Something went wrong: add xml to message, but keep the traceback
+            msg = "Error in xml '{x}': {err} ".format(x=etree.tostring(xml), err=str(err))
+            raise Exception, msg, sys.exc_info()[2]
+
 
     @classmethod
-    def get_xml_tags(c):
-        return c.xml_tags.keys()
+    def get_attributes(cls):
+        """
+        Should return a list of Attribute objects (see docstring there for details). Subclasses should override.  e.g.
 
-    @classmethod
-    def get_uses(c):
-        return ['capa_input', 'capa_transform']
+        return [Attribute('unicorn', True), Attribute('num_dragons', 12, transform=int), ...]
+        """
+        return []
+
+
+    def process_requirements(self):
+        """
+        Subclasses can declare lists of required and optional attributes.  This
+        function parses the input xml and pulls out those attributes.  This
+        isolates most simple input types from needing to deal with xml parsing at all.
+
+        Processes attributes, putting the results in the self.loaded_attributes dictionary.  Also creates a set
+        self.to_render, containing the names of attributes that should be included in the context by default.
+        """
+        # Use local dicts and sets so that if there are exceptions, we don't end up in a partially-initialized state.
+        loaded = {}
+        to_render = set()
+        for a in self.get_attributes():
+            loaded[a.name] = a.parse_from_xml(self.xml)
+            if a.render:
+                to_render.add(a.name)
+
+        self.loaded_attributes = loaded
+        self.to_render = to_render
+
+    def setup(self):
+        """
+        InputTypes should override this to do any needed initialization.  It is called after the
+        constructor, so all base attributes will be set.
+
+        If this method raises an exception, it will be wrapped with a message that includes the
+        problem xml.
+        """
+        pass
+
+
+    def _get_render_context(self):
+        """
+        Should return a dictionary of keys needed to render the template for the input type.
+
+        (Separate from get_html to faciliate testing of logic separately from the rendering)
+
+        The default implementation gets the following rendering context: basic things like value, id, status, and msg,
+        as well as everything in self.loaded_attributes, and everything returned by self._extra_context().
+
+        This means that input types that only parse attributes and pass them to the template get everything they need,
+        and don't need to override this method.
+        """
+        context = {
+            'id': self.id,
+            'value': self.value,
+            'status': self.status,
+            'msg': self.msg,
+            }
+        context.update((a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
+        context.update(self._extra_context())
+        return context
+
+    def _extra_context(self):
+        """
+        Subclasses can override this to return extra context that should be passed to their templates for rendering.
+
+        This is useful when the input type requires computing new template variables from the parsed attributes.
+        """
+        return {}
 
     def get_html(self):
-        return self.xml_tags[self.tag](self.xml, self.value, self.status, self.system.render_template, self.msg)
+        """
+        Return the html for this input, as an etree element.
+        """
+        if self.template is None:
+            raise NotImplementedError("no rendering template specified for class {0}"
+                                      .format(self.__class__))
 
+        context = self._get_render_context()
 
-def register_render_function(fn, names=None, cls=SimpleInput):
-    if names is None:
-        SimpleInput.xml_tags[fn.__name__] = fn
-    else:
-        raise NotImplementedError
+        html = self.system.render_template(self.template, context)
+        return etree.XML(html)
 
-    def wrapped():
-        return fn
-    return wrapped
 
 #-----------------------------------------------------------------------------
 
 
-@register_render_function
-def optioninput(element, value, status, render_template, msg=''):
-    '''
-    Select option input type.
+class OptionInput(InputTypeBase):
+    """
+    Input type for selecting and Select option input type.
 
     Example:
 
     <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
-    '''
-    eid = element.get('id')
-    options = element.get('options')
-    if not options:
-        raise Exception("[courseware.capa.inputtypes.optioninput] Missing options specification in " + etree.tostring(element))
-    oset = shlex.shlex(options[1:-1])
-    oset.quotes = "'"
-    oset.whitespace = ","
-    oset = [x[1:-1] for x  in list(oset)]
 
-    # osetdict = dict([('option_%s_%s' % (eid,x),oset[x]) for x in range(len(oset)) ])	# make dict with IDs
-    osetdict = [(oset[x], oset[x]) for x in range(len(oset))]	 # make ordered list with (key,value) same
     # TODO: allow ordering to be randomized
+    """
 
-    context = {'id': eid,
-             'value': value,
-             'state': status,
-             'msg': msg,
-             'options': osetdict,
-             'inline': element.get('inline',''),
-             }
+    template = "optioninput.html"
+    tags = ['optioninput']
 
-    html = render_template("optioninput.html", context)
-    return etree.XML(html)
+    @staticmethod
+    def parse_options(options):
+        """
+        Given options string, convert it into an ordered list of (option_id, option_description) tuples, where
+        id==description for now.  TODO: make it possible to specify different id and descriptions.
+        """
+        # parse the set of possible options
+        lexer = shlex.shlex(options[1:-1])
+        lexer.quotes = "'"
+        # Allow options to be separated by whitespace as well as commas
+        lexer.whitespace = ", "
+
+        # remove quotes
+        tokens = [x[1:-1] for x in list(lexer)]
+
+        # make list of (option_id, option_description), with description=id
+        return [(t, t) for t in tokens]
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [Attribute('options', transform=cls.parse_options),
+                Attribute('inline', '')]
+
+registry.register(OptionInput)
+
+#-----------------------------------------------------------------------------
+
+
+# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
+# desired semantics.
+
+class ChoiceGroup(InputTypeBase):
+    """
+    Radio button or checkbox inputs: multiple choice or true/false
+
+    TODO: allow order of choices to be randomized, following lon-capa spec.  Use
+    "location" attribute, ie random, top, bottom.
+
+    Example:
+
+    <choicegroup>
+      <choice correct="false" name="foil1">
+        <text>This is foil One.</text>
+      </choice>
+      <choice correct="false" name="foil2">
+        <text>This is foil Two.</text>
+      </choice>
+      <choice correct="true" name="foil3">
+        <text>This is foil Three.</text>
+      </choice>
+    </choicegroup>
+    """
+    template = "choicegroup.html"
+    tags = ['choicegroup', 'radiogroup', 'checkboxgroup']
+
+    def setup(self):
+        # suffix is '' or [] to change the way the input is handled in --as a scalar or vector
+        # value.  (VS: would be nice to make this less hackish).
+        if self.tag == 'choicegroup':
+            self.suffix = ''
+            self.html_input_type = "radio"
+        elif self.tag == 'radiogroup':
+            self.html_input_type = "radio"
+            self.suffix = '[]'
+        elif self.tag == 'checkboxgroup':
+            self.html_input_type = "checkbox"
+            self.suffix = '[]'
+        else:
+            raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
+
+        self.choices = self.extract_choices(self.xml)
+
+    def _extra_context(self):
+        return {'input_type': self.html_input_type,
+                'choices': self.choices,
+                'name_array_suffix': self.suffix}
+
+    @staticmethod
+    def extract_choices(element):
+        '''
+        Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
+        CheckboxGroup.
+
+        returns list of (choice_name, choice_text) tuples
+
+        TODO: allow order of choices to be randomized, following lon-capa spec.  Use
+        "location" attribute, ie random, top, bottom.
+        '''
+
+        choices = []
+
+        for choice in element:
+            if choice.tag != 'choice':
+                raise Exception(
+                    "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
+                    % choice.tag)
+            choice_text = ''.join([etree.tostring(x) for x in choice])
+            if choice.text is not None:
+                # TODO: fix order?
+                choice_text += choice.text
+
+            choices.append((choice.get("name"), choice_text))
+
+        return choices
+
+
+registry.register(ChoiceGroup)
+
 
 #-----------------------------------------------------------------------------
 
 
-# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
-# desired semantics.
-@register_render_function
-def choicegroup(element, value, status, render_template, msg=''):
-    '''
-    Radio button inputs: multiple choice or true/false
-
-    TODO: allow order of choices to be randomized, following lon-capa spec.  Use "location" attribute,
-    ie random, top, bottom.
-    '''
-    eid = element.get('id')
-    if element.get('type') == "MultipleChoice":
-        type = "radio"
-    elif element.get('type') == "TrueFalse":
-        type = "checkbox"
-    else:
-        type = "radio"
-    choices = []
-    for choice in element:
-        if not choice.tag == 'choice':
-            raise Exception("[courseware.capa.inputtypes.choicegroup] Error only <choice> tags should be immediate children of a <choicegroup>, found %s instead" % choice.tag)
-        ctext = ""
-        ctext += ''.join([etree.tostring(x) for x in choice])	 # TODO: what if choice[0] has math tags in it?
-        if choice.text is not None:
-            ctext += choice.text		# TODO: fix order?
-        choices.append((choice.get("name"), ctext))
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': type, 'choices': choices, 'name_array_suffix': ''}
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
-
-
-#-----------------------------------------------------------------------------
-def extract_choices(element):
-    '''
-    Extracts choices for a few input types, such as radiogroup and
-    checkboxgroup.
-
-    TODO: allow order of choices to be randomized, following lon-capa spec.  Use "location" attribute,
-    ie random, top, bottom.
-    '''
-
-    choices = []
-
-    for choice in element:
-        if not choice.tag == 'choice':
-            raise Exception("[courseware.capa.inputtypes.extract_choices] \
-                             Expected a <choice> tag; got %s instead"
-                             % choice.tag)
-        choice_text = ''.join([etree.tostring(x) for x in choice])
-
-        choices.append((choice.get("name"), choice_text))
-
-    return choices
-
-
-# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
-# desired semantics.
-@register_render_function
-def radiogroup(element, value, status, render_template, msg=''):
-    '''
-    Radio button inputs: (multiple choice)
-    '''
-
-    eid = element.get('id')
-
-    choices = extract_choices(element)
-
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'radio', 'choices': choices, 'name_array_suffix': '[]'}
-
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
-
-
-# TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
-# desired semantics.
-@register_render_function
-def checkboxgroup(element, value, status, render_template, msg=''):
-    '''
-    Checkbox inputs: (select one or more choices)
-    '''
-
-    eid = element.get('id')
-
-    choices = extract_choices(element)
-
-    context = {'id': eid, 'value': value, 'state': status, 'input_type': 'checkbox', 'choices': choices, 'name_array_suffix': '[]'}
-
-    html = render_template("choicegroup.html", context)
-    return etree.XML(html)
-
-@register_render_function
-def javascriptinput(element, value, status, render_template, msg='null'):
-    '''
+class JavascriptInput(InputTypeBase):
+    """
     Hidden field for javascript to communicate via; also loads the required
     scripts for rendering the problem and passes data to the problem.
-    '''
-    eid = element.get('id')
-    params = element.get('params')
-    problem_state = element.get('problem_state')
-    display_class = element.get('display_class')
-    display_file = element.get('display_file')
-    
-    # Need to provide a value that JSON can parse if there is no
-    # student-supplied value yet.
-    if value == "":
-        value = 'null'
-    
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)
-    msg   = saxutils.escape(msg, escapedict)
-    context = {'id': eid, 'params': params, 'display_file': display_file, 
-               'display_class': display_class, 'problem_state': problem_state, 
-               'value': value, 'evaluation': msg,
-               }
-    html = render_template("javascriptinput.html", context)
-    return etree.XML(html)
+
+    TODO (arjun?): document this in detail.  Initial notes:
+    - display_class is a subclass of XProblemClassDisplay (see
+        xmodule/xmodule/js/src/capa/display.coffee),
+    - display_file is the js script to be in /static/js/ where display_class is defined.
+    """
+
+    template = "javascriptinput.html"
+    tags = ['javascriptinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Register the attributes.
+        """
+        return [Attribute('params', None),
+                Attribute('problem_state', None),
+                Attribute('display_class', None),
+                Attribute('display_file', None),]
 
 
+    def setup(self):
+        # Need to provide a value that JSON can parse if there is no
+        # student-supplied value yet.
+        if self.value == "":
+            self.value = 'null'
 
-@register_render_function
-def textline(element, value, status, render_template, msg=""):
-    '''
-    Simple text line input, with optional size specification.
-    '''
-    if element.get('math') or element.get('dojs'):		# 'dojs' flag is temporary, for backwards compatibility with 8.02x
-        return SimpleInput.xml_tags['textline_dynamath'](element, value, status, render_template, msg)
-    eid = element.get('id')
-    if eid is None:
-        msg = 'textline has no id: it probably appears outside of a known response type'
-        msg += "\nSee problem XML source line %s" % getattr(element, 'sourceline', '<unavailable>')
-        raise Exception(msg)
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
-    escapedict = {'"': '&quot;'}
-    value = saxutils.escape(value, escapedict)	 # otherwise, answers with quotes in them crashes the system!
-    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg, 'hidden': hidden,
-               'inline': element.get('inline',''),
-               }
-    html = render_template("textinput.html", context)
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        if True:  # TODO needs to be self.system.DEBUG - but can't access system
-            log.debug('[inputtypes.textline] failed to parse XML for:\n%s' % html)
-            raise
-    return xhtml
-
-#-----------------------------------------------------------------------------
-
-
-@register_render_function
-def textline_dynamath(element, value, status, render_template, msg=''):
-    '''
-    Text line input with dynamic math display (equation rendered on client in real time during input).
-    '''
-    # TODO: Make a wrapper for <formulainput>
-    # TODO: Make an AJAX loop to confirm equation is okay in real-time as user types
-    '''
-    textline is used for simple one-line inputs, like formularesponse and symbolicresponse.
-    uses a <span id=display_eid>`{::}`</span>
-    and a hidden textarea with id=input_eid_fromjs for the mathjax rendering and return.
-    '''
-    eid = element.get('id')
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
-    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size,
-               'msg': msg, 'hidden': hidden,
-               }
-    html = render_template("textinput_dynamath.html", context)
-    return etree.XML(html)
+registry.register(JavascriptInput)
 
 
 #-----------------------------------------------------------------------------
-@register_render_function
-def filesubmission(element, value, status, render_template, msg=''):
-    '''
-    Upload a single file (e.g. for programming assignments)
-    '''
-    eid = element.get('id')
-    escapedict = {'"': '&quot;'}
-    allowed_files  = json.dumps(element.get('allowed_files', '').split())
-    allowed_files  = saxutils.escape(allowed_files, escapedict)
-    required_files = json.dumps(element.get('required_files', '').split())
-    required_files = saxutils.escape(required_files, escapedict)
 
-    # Check if problem has been queued
-    queue_len = 0
-    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
-        status = 'queued'
-        queue_len = msg
-        msg = 'Submitted to grader.'
+class TextLine(InputTypeBase):
+    """
+    A text line input.  Can do math preview if "math"="1" is specified.
 
-    context = { 'id': eid, 'state': status, 'msg': msg, 'value': value,
-            'queue_len': queue_len, 'allowed_files': allowed_files,
-            'required_files': required_files
-              }
-    html = render_template("filesubmission.html", context)
-    return etree.XML(html)
+    If the hidden attribute is specified, the textline is hidden and the input id is stored in a div with name equal
+    to the value of the hidden attribute.  This is used e.g. for embedding simulations turned into questions.
+    """
+
+    template = "textline.html"
+    tags = ['textline']
+
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Register the attributes.
+        """
+        return [
+            Attribute('size', None),
+
+
+            Attribute('hidden', False),
+            Attribute('inline', False),
+
+            # Attributes below used in setup(), not rendered directly.
+            Attribute('math', None, render=False),
+            # TODO: 'dojs' flag is temporary, for backwards compatibility with 8.02x
+            Attribute('dojs', None, render=False),
+            Attribute('preprocessorClassName', None, render=False),
+            Attribute('preprocessorSrc', None, render=False),
+            ]
+
+
+    def setup(self):
+        self.do_math = bool(self.loaded_attributes['math'] or
+                            self.loaded_attributes['dojs'])
+
+        # TODO: do math checking using ajax instead of using js, so
+        # that we only have one math parser.
+        self.preprocessor = None
+        if self.do_math:
+            # Preprocessor to insert between raw input and Mathjax
+            self.preprocessor = {'class_name': self.loaded_attributes['preprocessorClassName'],
+                                 'script_src': self.loaded_attributes['preprocessorSrc']}
+            if None in self.preprocessor.values():
+                self.preprocessor = None
+
+
+    def _extra_context(self):
+        return {'do_math': self.do_math,
+                'preprocessor': self.preprocessor,}
+
+registry.register(TextLine)
+
+#-----------------------------------------------------------------------------
+
+class FileSubmission(InputTypeBase):
+    """
+    Upload some files (e.g. for programming assignments)
+    """
+
+    template = "filesubmission.html"
+    tags = ['filesubmission']
+
+    # pulled out for testing
+    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
+                     " graded, this message will be replaced with the grader's feedback.")
+
+    @staticmethod
+    def parse_files(files):
+        """
+        Given a string like 'a.py b.py c.out', split on whitespace and return as a json list.
+        """
+        return json.dumps(files.split())
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert the list of allowed files to a convenient format.
+        """
+        return [Attribute('allowed_files', '[]', transform=cls.parse_files),
+                Attribute('required_files', '[]', transform=cls.parse_files),]
+
+    def setup(self):
+        """
+        Do some magic to handle queueing status (render as "queued" instead of "incomplete"),
+        pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
+        """
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = FileSubmission.submitted_msg
+
+    def _extra_context(self):
+        return {'queue_len': self.queue_len,}
+        return context
+
+registry.register(FileSubmission)
 
 
 #-----------------------------------------------------------------------------
-## TODO: Make a wrapper for <codeinput>
-@register_render_function
-def textbox(element, value, status, render_template, msg=''):
-    '''
-    The textbox is used for code input.  The message is the return HTML string from
-    evaluating the code, eg error messages, and output from the code tests.
 
-    '''
-    eid = element.get('id')
-    count = int(eid.split('_')[-2]) - 1  # HACK
-    size = element.get('size')
-    rows = element.get('rows') or '30'
-    cols = element.get('cols') or '80'
-    hidden = element.get('hidden', '')	 # if specified, then textline is hidden and id is stored in div of name given by hidden
+class CodeInput(InputTypeBase):
+    """
+    A text area input for code--uses codemirror, does syntax highlighting, special tab handling,
+    etc.
+    """
 
-    if not value: value = element.text	 # if no student input yet, then use the default input given by the problem
+    template = "codeinput.html"
+    tags = ['codeinput',
+            'textbox',        # Another (older) name--at some point we may want to make it use a
+                              # non-codemirror editor.
+            ]
 
-    # Check if problem has been queued
-    queue_len = 0
-    if status == 'incomplete': # Flag indicating that the problem has been queued, 'msg' is length of queue
-        status = 'queued'
-        queue_len = msg
-        msg = 'Submitted to grader.'
+    # pulled out for testing
+    submitted_msg = ("Submitted.  As soon as your submission is"
+                     " graded, this message will be replaced with the grader's feedback.")
 
-    # For CodeMirror
-    mode = element.get('mode','python')
-    linenumbers = element.get('linenumbers','true')
-    tabsize = element.get('tabsize','4')
-    tabsize = int(tabsize)
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [Attribute('rows', '30'),
+                Attribute('cols', '80'),
+                Attribute('hidden', ''),
 
-    context = {'id': eid, 'value': value, 'state': status, 'count': count, 'size': size, 'msg': msg,
-               'mode': mode, 'linenumbers': linenumbers,
-               'rows': rows, 'cols': cols,
-               'hidden': hidden, 'tabsize': tabsize,
-               'queue_len': queue_len,
-               }
-    html = render_template("textbox.html", context)
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        newmsg = 'error %s in rendering message' % (str(err).replace('<', '&lt;'))
-        newmsg += '<br/>Original message: %s' % msg.replace('<', '&lt;')
-        context['msg'] = newmsg
-        html = render_template("textbox.html", context)
-        xhtml = etree.XML(html)
-    return xhtml
+                # For CodeMirror
+                Attribute('mode', 'python'),
+                Attribute('linenumbers', 'true'),
+                # Template expects tabsize to be an int it can do math with
+                Attribute('tabsize', 4, transform=int),
+                ]
 
+    def setup(self):
+        """
+        Implement special logic: handle queueing state, and default input.
+        """
+        # if no student input yet, then use the default input given by the problem
+        if not self.value:
+            self.value = self.xml.text
 
-#-----------------------------------------------------------------------------
-@register_render_function
-def schematic(element, value, status, render_template, msg=''):
-    eid = element.get('id')
-    height = element.get('height')
-    width = element.get('width')
-    parts = element.get('parts')
-    analyses = element.get('analyses')
-    initial_value = element.get('initial_value')
-    submit_analyses = element.get('submit_analyses')
-    context = {
-        'id': eid,
-        'value': value,
-        'initial_value': initial_value,
-        'state': status,
-        'width': width,
-        'height': height,
-        'parts': parts,
-        'analyses': analyses,
-        'submit_analyses': submit_analyses,
-        }
-    html = render_template("schematicinput.html", context)
-    return etree.XML(html)
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = self.submitted_msg
+
+    def _extra_context(self):
+        """Defined queue_len, add it """
+        return {'queue_len': self.queue_len,}
+
+registry.register(CodeInput)
 
 
 #-----------------------------------------------------------------------------
-### TODO: Move out of inputtypes
-@register_render_function
-def math(element, value, status, render_template, msg=''):
-    '''
-    This is not really an input type.  It is a convention from Lon-CAPA, used for
-    displaying a math equation.
+class Schematic(InputTypeBase):
+    """
+    """
 
-    Examples:
+    template = "schematicinput.html"
+    tags = ['schematic']
 
-    <m display="jsmath">$\displaystyle U(r)=4 U_0 </m>
-    <m>$r_0$</m>
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [
+            Attribute('height', None),
+            Attribute('width', None),
+            Attribute('parts', None),
+            Attribute('analyses', None),
+            Attribute('initial_value', None),
+            Attribute('submit_analyses', None),]
 
-    We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
+        return context
 
-    TODO: use shorter tags (but this will require converting problem XML files!)
-    '''
-    mathstr = re.sub('\$(.*)\$', '[mathjaxinline]\\1[/mathjaxinline]', element.text)
-    mtag = 'mathjax'
-    if not '\\displaystyle' in mathstr: mtag += 'inline'
-    else: mathstr = mathstr.replace('\\displaystyle', '')
-    mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
+registry.register(Schematic)
 
-    #if '\\displaystyle' in mathstr:
-    #    isinline = False
-    #    mathstr = mathstr.replace('\\displaystyle','')
-    #else:
-    #    isinline = True
-    # html = render_template("mathstring.html",{'mathstr':mathstr,'isinline':isinline,'tail':element.tail})
+#-----------------------------------------------------------------------------
 
-    html = '<html><html>%s</html><html>%s</html></html>' % (mathstr, saxutils.escape(element.tail))
-    try:
-        xhtml = etree.XML(html)
-    except Exception as err:
-        if False:  # TODO needs to be self.system.DEBUG - but can't access system
-            msg = '<html><div class="inline-error"><p>Error %s</p>' % str(err).replace('<', '&lt;')
-            msg += '<p>Failed to construct math expression from <pre>%s</pre></p>' % html.replace('<', '&lt;')
-            msg += "</div></html>"
-            log.error(msg)
-            return etree.XML(msg)
+class ImageInput(InputTypeBase):
+    """
+    Clickable image as an input field.  Element should specify the image source, height,
+    and width, e.g.
+
+    <imageinput src="/static/Figures/Skier-conservation-of-energy.jpg" width="388" height="560" />
+
+    TODO: showanswer for imageimput does not work yet - need javascript to put rectangle
+    over acceptable area of image.
+    """
+
+    template = "imageinput.html"
+    tags = ['imageinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: src, height, and width are all required.
+        """
+        return [Attribute('src'),
+                Attribute('height'),
+                Attribute('width'),]
+
+
+    def setup(self):
+        """
+        if value is of the form [x,y] then parse it and send along coordinates of previous answer
+        """
+        m = re.match('\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
+        if m:
+            # Note: we subtract 15 to compensate for the size of the dot on the screen.
+            # (is a 30x30 image--lms/static/green-pointer.png).
+            (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
         else:
-            raise
-    # xhtml.tail = element.tail	# don't forget to include the tail!
-    return xhtml
+            (self.gx, self.gy) = (0, 0)
+
+
+    def _extra_context(self):
+
+        return {'gx': self.gx,
+                'gy': self.gy}
+
+registry.register(ImageInput)
 
 #-----------------------------------------------------------------------------
 
+class Crystallography(InputTypeBase):
+    """
+    An input for crystallography -- user selects 3 points on the axes, and we get a plane.
 
-@register_render_function
-def solution(element, value, status, render_template, msg=''):
-    '''
-    This is not really an input type.  It is just a <span>...</span> which is given an ID,
-    that is used for displaying an extended answer (a problem "solution") after "show answers"
-    is pressed.  Note that the solution content is NOT sent with the HTML. It is obtained
-    by a JSON call.
-    '''
-    eid = element.get('id')
-    size = element.get('size')
-    context = {'id': eid,
-               'value': value,
-               'state': status,
-               'size': size,
-               'msg': msg,
-               }
-    html = render_template("solutionspan.html", context)
-    return etree.XML(html)
+    TODO: what's the actual value format?
+    """
 
-#-----------------------------------------------------------------------------
+    template = "crystallography.html"
+    tags = ['crystallography']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: height, width are required.
+        """
+        return [Attribute('size', None),
+                Attribute('height'),
+                Attribute('width'),
+
+                # can probably be removed (textline should prob be always-hidden)
+                Attribute('hidden', ''),
+                ]
+
+registry.register(Crystallography)
+
+# -------------------------------------------------------------------------
+
+class VseprInput(InputTypeBase):
+    """
+    Input for molecular geometry--show possible structures, let student
+    pick structure and label positions with atoms or electron pairs.
+    """
+
+    template = 'vsepr_input.html'
+    tags = ['vsepr_input']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: height, width are required.
+        """
+        return [Attribute('height'),
+                Attribute('width'),
+                Attribute('molecules'),
+                Attribute('geometries'),
+                ]
+
+registry.register(VseprInput)
+
+#--------------------------------------------------------------------------------
 
 
-@register_render_function
-def imageinput(element, value, status, render_template, msg=''):
-    '''
-    Clickable image as an input field.  Element should specify the image source, height, and width, eg
-    <imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg"  width="388" height="560" />
+class ChemicalEquationInput(InputTypeBase):
+    """
+    An input type for entering chemical equations.  Supports live preview.
 
-    TODO: showanswer for imageimput does not work yet - need javascript to put rectangle over acceptable area of image.
+    Example:
 
-    '''
-    eid = element.get('id')
-    src = element.get('src')
-    height = element.get('height')
-    width = element.get('width')
+    <chemicalequationinput size="50"/>
 
-    # if value is of the form [x,y] then parse it and send along coordinates of previous answer
-    m = re.match('\[([0-9]+),([0-9]+)]', value.strip().replace(' ', ''))
-    if m:
-        (gx, gy) = [int(x) - 15 for x in m.groups()]
-    else:
-        (gx, gy) = (0, 0)
+    options: size -- width of the textbox.
+    """
 
-    context = {
-        'id': eid,
-        'value': value,
-        'height': height,
-        'width': width,
-        'src': src,
-        'gx': gx,
-        'gy': gy,
-        'state': status,	 # to change
-        'msg': msg,			# to change
-        }
-    html = render_template("imageinput.html", context)
-    return etree.XML(html)
+    template = "chemicalequationinput.html"
+    tags = ['chemicalequationinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('size', '20'),]
+
+    def _extra_context(self):
+        """
+        TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
+        """
+        return {'previewer': '/static/js/capa/chemical_equation_preview.js',}
+
+registry.register(ChemicalEquationInput)

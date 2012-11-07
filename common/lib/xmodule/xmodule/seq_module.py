@@ -21,7 +21,8 @@ class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
     js = {'coffee': [resource_string(__name__,
-                                     'js/src/sequence/display.coffee')]}
+                                     'js/src/sequence/display.coffee')],
+          'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')]}
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
@@ -94,7 +95,8 @@ class SequenceModule(XModule):
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
-                  'tag': self.location.category}
+                  'tag': self.location.category
+                  }
 
         self.content = self.system.render_template('seq_module.html', params)
         self.rendered = True
@@ -115,12 +117,18 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     stores_state = True # For remembering where in the sequence the student is
 
+    template_dir_name = 'sequence'
+
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'children': [
-            system.process_xml(etree.tostring(child_module)).location.url()
-            for child_module in xml_object
-        ]}
+        children = []
+        for child in xml_object:
+            try:
+                children.append(system.process_xml(etree.tostring(child)).location.url())
+            except:
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                continue
+        return {'children': children}
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')

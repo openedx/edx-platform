@@ -16,7 +16,7 @@ beautifulsoup
 beautifulsoup4
 feedparser
 requests
-sympy
+http://sympy.googlecode.com/files/sympy-0.7.1.tar.gz
 newrelic
 glob2
 pymongo
@@ -48,3 +48,9 @@ sorl-thumbnail
 networkx
 pygraphviz
 -r repo-requirements.txt
+pil
+nltk
+dogstatsd-python
+# Taking out MySQL-python for now because it requires mysql to be installed, so breaks updates on content folks' envs.
+# MySQL-python
+sphinx

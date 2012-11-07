@@ -1,3 +1,4 @@
+import cgi
 import datetime
 import dateutil
 import dateutil.parser
@@ -9,6 +10,7 @@ import sys
 
 from datetime import timedelta
 from lxml import etree
+from lxml.html import rewrite_links
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
@@ -74,9 +76,13 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee')],
+    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                    ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
                  resource_string(__name__, 'js/src/capa/schematic.js')]}
+
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
@@ -114,6 +120,8 @@ class CapaModule(XModule):
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
 
+        self.force_save_button = self.metadata.get('force_save_button', 'false')
+
         if self.show_answer == "":
             self.show_answer = "closed"
 
@@ -124,24 +132,23 @@ class CapaModule(XModule):
 
         self.name = only_one(dom2.xpath('/problem/@name'))
 
-        weight_string = only_one(dom2.xpath('/problem/@weight'))
-        if weight_string:
-            self.weight = float(weight_string)
-        else:
-            self.weight = None
-
         if self.rerandomize == 'never':
-            seed = 1
+            self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            seed = system.id
+            # TODO: This line is badly broken:
+            # (1) We're passing student ID to xmodule.
+            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+            #     - analytics really needs small number of bins.
+            self.seed = system.id
         else:
-            seed = None
+            self.seed = None
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
             self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=seed, system=self.system)
+                                      instance_state, seed=self.seed, system=self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -160,7 +167,7 @@ class CapaModule(XModule):
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    instance_state, seed=seed, system=self.system)
+                    instance_state, seed=self.seed, system=self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
@@ -178,6 +185,8 @@ class CapaModule(XModule):
             return "per_student"
         elif rerandomize == "never":
             return "never"
+        elif rerandomize == "onreset":
+            return "onreset"
         else:
             raise Exception("Invalid rerandomize attribute " + rerandomize)
 
@@ -226,9 +235,10 @@ class CapaModule(XModule):
         try:
             html = self.lcp.get_html()
         except Exception, err:
+            log.exception(err)
+
             # TODO (vshnayder): another switch on DEBUG.
             if self.system.DEBUG:
-                log.exception(err)
                 msg = (
                     '[courseware.capa.capa_module] <font size="+1" color="red">'
                     'Failed to generate HTML for problem %s</font>' %
@@ -237,11 +247,51 @@ class CapaModule(XModule):
                 msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
                 html = msg
             else:
-                raise
+                # We're in non-debug mode, and possibly even in production. We want
+                #   to avoid bricking of problem as much as possible
+
+                # Presumably, student submission has corrupted LoncapaProblem HTML.
+                #   First, pull down all student answers
+                student_answers = self.lcp.student_answers
+                answer_ids = student_answers.keys()
+
+                # Some inputtypes, such as dynamath, have additional "hidden" state that
+                #   is not exposed to the student. Keep those hidden
+                # TODO: Use regex, e.g. 'dynamath' is suffix at end of answer_id
+                hidden_state_keywords = ['dynamath']
+                for answer_id in answer_ids:
+                    for hidden_state_keyword in hidden_state_keywords:
+                        if answer_id.find(hidden_state_keyword) >= 0:
+                            student_answers.pop(answer_id)
+
+                #   Next, generate a fresh LoncapaProblem
+                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
+                               state=None, # Tabula rasa
+                               seed=self.seed, system=self.system)
+
+                # Prepend a scary warning to the student
+                warning  = '<div class="capa_reset">'\
+                           '<h2>Warning: The problem has been reset to its initial state!</h2>'\
+                           'The problem\'s state was corrupted by an invalid submission. ' \
+                           'The submission consisted of:'\
+                           '<ul>'
+                for student_answer in student_answers.values():
+                    if student_answer != '':
+                        warning += '<li>' + cgi.escape(student_answer) + '</li>'
+                warning += '</ul>'\
+                           'If this error persists, please contact the course staff.'\
+                           '</div>'
+
+                html = warning
+                try:
+                    html += self.lcp.get_html()
+                except Exception, err: # Couldn't do it. Give up
+                    log.exception(err)
+                    raise
 
         content = {'name': self.display_name,
                    'html': html,
-                   'weight': self.weight,
+                   'weight': self.descriptor.weight,
                    }
 
         # We using strings as truthy values, because the terminology of the
@@ -271,16 +321,17 @@ class CapaModule(XModule):
             save_button = False
 
         # Only show the reset button if pressing it will show different values
-        if self.rerandomize != 'always':
+        if self.rerandomize not in ["always", "onreset"]:
             reset_button = False
 
         # User hasn't submitted an answer yet -- we don't want resets
         if not self.lcp.done:
             reset_button = False
 
-        # We don't need a "save" button if infinite number of attempts and
-        # non-randomized
-        if self.max_attempts is None and self.rerandomize != "always":
+        # We may not need a "save" button if infinite number of attempts and
+        # non-randomized. The problem author can force it. It's a bit weird for
+        # randomization to control this; should perhaps be cleaned up.
+        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
@@ -295,6 +346,15 @@ class CapaModule(XModule):
                    }
 
         html = self.system.render_template('problem.html', context)
+        # cdodge: OK, we have to do two rounds of url reference subsitutions
+        # one which uses the 'asset library' that is served by the contentstore and the
+        # more global /static/ filesystem based static content.
+        # NOTE: rewrite_content_links is defined in XModule
+        # This is a bit unfortunate and I'm sure we'll try to considate this into
+        # a one step process.
+        html = rewrite_links(html, self.rewrite_content_links)
+
+        # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html, self.metadata['data_dir'])
 
     def handle_ajax(self, dispatch, get):
@@ -481,15 +541,9 @@ class CapaModule(XModule):
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
-            # TODO (vshnayder): why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
-            # TODO: why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -570,15 +624,17 @@ class CapaModule(XModule):
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Problem is closed"
+            return {'success': False,
+                    'error': "Problem is closed"}
 
         if not self.lcp.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
-            return "Refresh the page and make an attempt before resetting."
+            return {'success': False,
+                    'error': "Refresh the page and make an attempt before resetting."}
 
         self.lcp.do_reset()
-        if self.rerandomize == "always":
+        if self.rerandomize in ["always", "onreset"]:
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
             self.lcp.seed = None
@@ -603,6 +659,7 @@ class CapaDescriptor(RawDescriptor):
 
     stores_state = True
     has_score = True
+    template_dir_name = 'problem'
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
@@ -618,3 +675,12 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+        
+    def __init__(self, *args, **kwargs):
+        super(CapaDescriptor, self).__init__(*args, **kwargs)
+        
+        weight_string = self.metadata.get('weight', None)
+        if weight_string:
+            self.weight = float(weight_string)
+        else:
+            self.weight = None

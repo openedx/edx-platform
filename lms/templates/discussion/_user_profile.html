@@ -5,7 +5,7 @@
 
 <div class="user-profile">
   <%
-    role_names = sorted(map(attrgetter('name'), django_user.roles.all()))
+    role_names = sorted(set(map(attrgetter('name'), django_user.roles.all())))
   %>
   <div class="sidebar-username">${django_user.username | h}</div>
   <div class="sidebar-user-roles">
@@ -15,7 +15,7 @@
   <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
   % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
     % if "Moderator" in role_names:
-      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">Revoke Moderator provileges</a>
+      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">Revoke Moderator rights</a>
     % else:
       <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-promote-moderator-button">Promote to Moderator</a>
     % endif

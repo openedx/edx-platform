@@ -1,0 +1,28 @@
+<div class="discussion-post local">
+    <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow"></a></div>
+    <header>
+        <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span></a>
+        <h3>{{title}}</h3>
+        <p class="posted-details">
+            {{#user}}
+            <a href="{{user_url}}" class="username">{{username}}</a>
+            {{/user}}
+            {{^user}}
+            anonymous
+            {{/user}}
+
+            <span class="timeago" title="{{created_at}}">{{created_at}}</span>
+
+            <span class="post-status-closed top-post-status" style="display: none">
+                &bull; This thread is closed.
+            </span>
+        </p>
+    </header>
+    <div class="post-body">{{abbreviatedBody}}</div>
+
+    <ul class="moderator-actions post-extended-content">
+        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
+        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
+        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
+    </ul>
+</div>

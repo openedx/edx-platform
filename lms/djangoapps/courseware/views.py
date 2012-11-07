@@ -22,7 +22,8 @@ from django.views.decorators.cache import cache_control
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
-from models import StudentModuleCache
+import courseware.tabs as tabs
+from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
 from student.models import UserProfile
 
@@ -216,6 +217,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
         chapter_descriptor = course.get_child_by_url_name(chapter)
@@ -343,6 +345,30 @@ def course_info(request, course_id):
     return render_to_response('courseware/info.html', {'course': course,
                                             'staff_access': staff_access,})
 
+@ensure_csrf_cookie
+def static_tab(request, course_id, tab_slug):
+    """
+    Display the courses tab with the given name.
+
+    Assumes the course_id is in a valid format.
+    """
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    tab = tabs.get_static_tab_by_slug(course, tab_slug)
+    if tab is None:
+        raise Http404
+
+    contents = tabs.get_static_tab_contents(course, tab)
+    if contents is None:
+        raise Http404
+
+    staff_access = has_access(request.user, course, 'staff')
+    return render_to_response('courseware/static_tab.html',
+                              {'course': course,
+                               'tab': tab,
+                               'tab_contents': contents,
+                               'staff_access': staff_access,})
+
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
 @ensure_csrf_cookie
 def syllabus(request, course_id):
@@ -356,6 +382,7 @@ def syllabus(request, course_id):
 
     return render_to_response('courseware/syllabus.html', {'course': course,
                                             'staff_access': staff_access,})
+
 
 def registered_for_course(course, user):
     '''Return CourseEnrollment if user is registered for course, else False'''
@@ -386,6 +413,16 @@ def course_about(request, course_id):
                                'course_target': course_target,
                                'show_courseware_link' : show_courseware_link})
 
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def static_university_profile(request, org_id):
+    """
+    Return the profile for the particular org_id that does not have any courses.
+    """
+    template_file = "university_profile/{0}.html".format(org_id).lower()
+    context = dict(courses=[], org_id=org_id)
+    return render_to_response(template_file, context)
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -455,16 +492,14 @@ def progress(request, course_id, student_id=None):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         course_id, student, course)
-    course_module = get_module(student, request, course.location,
-                               student_module_cache, course_id)
 
-    # The course_module should be accessible, but check anyway just in case something went wrong:
-    if course_module is None:
-        raise Http404("Course does not exist")
-
-    courseware_summary = grades.progress_summary(student, course_module,
-                                                 course.grader, student_module_cache)
+    courseware_summary = grades.progress_summary(student, request, course,
+                                                 student_module_cache)
     grade_summary = grades.grade(student, request, course, student_module_cache)
+
+    if courseware_summary is None:
+        #This means the student didn't have access to the course (which the instructor requested)
+        raise Http404
 
     context = {'course': course,
                'courseware_summary': courseware_summary,
@@ -474,4 +509,3 @@ def progress(request, course_id, student_id=None):
     context.update()
 
     return render_to_response('courseware/progress.html', context)
-

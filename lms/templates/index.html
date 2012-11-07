@@ -65,11 +65,19 @@
               </div>
             </a>
           </li>
-          <li class="partner last">
+          <li class="partner">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
               <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
                 <span>BerkeleyX</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner last">
+            <a href="${reverse('university_profile', args=['UTx'])}">
+              <img src="${static.url('images/university/ut/ut-rollover_160x90.png')}" />
+              <div class="name">
+                <span>UTx</span>
               </div>
             </a>
           </li>
@@ -145,30 +153,21 @@
   </div>
 </section>
 
+
+<%block name="js_extra">
+   <script type="text/javascript"">
+      $(window).load(function() {
+         if(getParameterByName('next')) {
+              $('#login').trigger("click");
+         }
+      })
+   </script>
+</%block>
+
 % if show_signup_immediately is not UNDEFINED:
+  ## NOTE: This won't work in production, because anonymous views are cached, so it will
+  ## show either with or without this extra js for 3 minutes at a time.
 <script type="text/javascript">
-function dosignup(){
-    comp = document.getElementById('signup_action');
-try { //in firefox
-    comp.click();
-    return;
-} catch(ex) {}
-try { // in old chrome
-    if(document.createEvent) {
-        var e = document.createEvent('MouseEvents');
-        e.initEvent( 'click', true, true );
-        comp.dispatchEvent(e);
-        return;
-    }
-} catch(ex) {}
-try { // in IE, safari
-    if(document.createEventObject) {
-         var evObj = document.createEventObject();
-         comp.fireEvent("onclick", evObj);
-         return;
-    }
-} catch(ex) {}
-}
-$(window).load(dosignup);
+  $(window).load(function() {$('#signup_action').trigger("click");});
 </script>
 % endif
