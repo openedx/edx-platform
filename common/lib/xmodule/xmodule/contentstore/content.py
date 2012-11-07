@@ -62,6 +62,13 @@ class StaticContent(object):
     @staticmethod
     def get_id_from_path(path):
         return get_id_from_location(get_location_from_path(path))
+
+    @staticmethod
+    def convert_legacy_static_url(path, course_namespace):
+        loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
+        return StaticContent.get_url_path_from_location(loc)
+
+
     
 
 class ContentStore(object):

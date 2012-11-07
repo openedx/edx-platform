@@ -28,6 +28,7 @@ from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
 log = logging.getLogger("mitx.courseware")
@@ -114,7 +115,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_module(user, request, location, student_module_cache, course_id, position=None):
+def get_module(user, request, location, student_module_cache, course_id, position=None, not_found_ok = False):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -136,6 +137,10 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     """
     try:
         return _get_module(user, request, location, student_module_cache, course_id, position)
+    except ItemNotFoundError:
+        if not not_found_ok:
+            log.exception("Error in get_module")
+        return None
     except:
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
@@ -258,7 +263,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     module.get_html = replace_static_urls(
         wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
-        module.metadata['data_dir'])
+        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course

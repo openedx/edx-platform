@@ -1,5 +1,6 @@
 import pymongo
 import sys
+import logging
 
 from bson.son import SON
 from fs.osfs import OSFS

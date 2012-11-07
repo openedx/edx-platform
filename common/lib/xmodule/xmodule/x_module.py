@@ -320,21 +320,6 @@ class XModule(HTMLSnippet):
             get is a dictionary-like object '''
         return ""
 
-    # cdodge: added to support dynamic substitutions of 
-    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
-    def rewrite_content_links(self, link):
-        # see if we start with our format, e.g. 'xasset:<filename>'
-        if link.startswith(XASSET_SRCREF_PREFIX):
-            # yes, then parse out the name
-            name = link[len(XASSET_SRCREF_PREFIX):]
-            loc = Location(self.location)
-            # resolve the reference to our internal 'filepath' which
-            content_loc = StaticContent.compute_location(loc.org, loc.course, name)
-            link = StaticContent.get_url_path_from_location(content_loc)
-
-        return link
-
-
 
 def policy_key(location):
     """

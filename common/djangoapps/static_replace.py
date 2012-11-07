@@ -5,6 +5,10 @@ from staticfiles.storage import staticfiles_storage
 from staticfiles import finders
 from django.conf import settings
 
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.contentstore.content import StaticContent
+
 log = logging.getLogger(__name__)
 
 def try_staticfiles_lookup(path):
@@ -22,7 +26,7 @@ def try_staticfiles_lookup(path):
     return url
 
 
-def replace(static_url, prefix=None):
+def replace(static_url, prefix=None, course_namespace=None):
     if prefix is None:
         prefix = ''
     else:
@@ -41,13 +45,23 @@ def replace(static_url, prefix=None):
         return static_url.group(0)
     else:
         # don't error if file can't be found
-        url = try_staticfiles_lookup(prefix + static_url.group('rest'))
-        return "".join([quote, url, quote])
+        # cdodge: to support the change over to Mongo backed content stores, lets
+        # use the utility functions in StaticContent.py
+        if static_url.group('prefix') == '/static/' and not isinstance(modulestore(), XMLModuleStore):
+            if course_namespace is None:
+                raise BaseException('You must pass in course_namespace when remapping static content urls with MongoDB stores')
+            url = StaticContent.convert_legacy_static_url(static_url.group('rest'), course_namespace)
+        else:
+            url = try_staticfiles_lookup(prefix + static_url.group('rest'))
+
+        new_link = "".join([quote, url, quote])
+        return new_link
 
 
-def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/'):
+
+def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
     def replace_url(static_url):
-        return replace(static_url, staticfiles_prefix)
+        return replace(static_url, staticfiles_prefix, course_namespace = course_namespace)
 
     return re.sub(r"""
         (?x)                 # flags=re.VERBOSE

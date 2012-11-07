@@ -96,7 +96,9 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] Remove once unused.
         'name', 'slug')
 
-    metadata_to_strip = ('data_dir',
+    metadata_to_strip = ('data_dir', 
+            # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
+            'tabs', 'grading_policy',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename')
 
@@ -358,7 +360,8 @@ class XmlDescriptor(XModuleDescriptor):
         for attr in sorted(self.own_metadata):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip:
-                xml_object.set(attr, val_for_xml(attr))
+                val = val_for_xml(attr)
+                xml_object.set(attr, val)
 
         if self.export_to_file():
             # Write the definition to a file

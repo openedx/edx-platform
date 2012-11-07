@@ -17,8 +17,17 @@ from django.core.urlresolvers import reverse
 
 from fs.errors import ResourceNotFoundError
 
+from lxml.html import rewrite_links
+
+from module_render import get_module
 from courseware.access import has_access
 from static_replace import replace_urls
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.x_module import XModule
+
+
 
 log = logging.getLogger(__name__)
 
@@ -248,27 +257,16 @@ def get_static_tab_by_slug(course, tab_slug):
 
     return None
 
+def get_static_tab_contents(request, cache, course, tab):
 
-def get_static_tab_contents(course, tab):
-    """
-    Given a course and a static tab config dict, load the tab contents,
-    returning None if not found.
+    loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
+    tab_module = get_module(request.user, request, loc, cache, course.id)
 
-    Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.
-    """
-    slug = tab['url_slug']
-    paths = ['tabs/{0}/{1}.html'.format(course.url_name, slug),
-             'tabs/{0}.html'.format(slug)]
-    fs = course.system.resources_fs
-    for p in paths:
-        if fs.exists(p):
-            try:
-                with fs.open(p) as tabfile:
-                    # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
-                    text = tabfile.read().decode('utf-8')
-                    contents = replace_urls(text, course.metadata['data_dir'])
-                    return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
-            except (ResourceNotFoundError) as err:
-                log.exception("Couldn't load tab contents from '{0}': {1}".format(p, err))
-                return None
-    return None
+    logging.debug('course_module = {0}'.format(tab_module))
+
+    html = ''
+
+    if tab_module is not None:
+        html = tab_module.get_html()
+
+    return html

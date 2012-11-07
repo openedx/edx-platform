@@ -2,21 +2,44 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 from functools import wraps
 import logging
+import inspect
+
+from lxml.html import rewrite_links
 
 from path import path
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
+from module_render import get_module
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.content import StaticContent
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.x_module import XModule
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
+from courseware.models import StudentModuleCache
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
+
+def get_request_for_thread():
+    """Walk up the stack, return the nearest first argument named "request"."""
+    frame = None
+    try:
+        for f in inspect.stack()[1:]:
+            frame = f[0]
+            code = frame.f_code
+            if code.co_varnames[:1] == ("request",):
+                return frame.f_locals["request"]
+            elif code.co_varnames[:2] == ("self", "request",):
+                return frame.f_locals["request"]
+    finally:
+        del frame
 
 
 def get_course_by_id(course_id):
@@ -61,8 +84,13 @@ def get_opt_course_with_access(user, course_id, action):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    path = course.metadata['data_dir'] + "/images/course_image.jpg"
-    return try_staticfiles_lookup(path)
+    if isinstance(modulestore(), XMLModuleStore):
+        path = course.metadata['data_dir'] + "/images/course_image.jpg"
+        return try_staticfiles_lookup(path)
+    else:
+        loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
+        path = StaticContent.get_url_path_from_location(loc)
+        return path
 
 def find_file(fs, dirs, filename):
     """
@@ -116,14 +144,20 @@ def get_course_about_section(course, section_key):
                        'effort', 'end_date', 'prerequisites', 'ocw_links']:
 
         try:
-            fs = course.system.resources_fs
-            # first look for a run-specific version
-            dirs = [path("about") / course.url_name, path("about")]
-            filepath = find_file(fs, dirs, section_key + ".html")
-            with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'])
-        except ResourceNotFoundError:
+
+            request = get_request_for_thread()
+
+            loc = course.location._replace(category='about', name=section_key)
+            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True)
+
+            html = ''
+
+            if course_module is not None:
+                html = course_module.get_html()
+
+            return html
+
+        except ItemNotFoundError:
             log.warning("Missing about section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
             return None
@@ -137,7 +171,8 @@ def get_course_about_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section(course, section_key):
+
+def get_course_info_section(request, cache, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -149,31 +184,17 @@ def get_course_info_section(course, section_key):
     - guest_updates
     """
 
-    # Many of these are stored as html files instead of some semantic
-    # markup. This can change without effecting this interface when we find a
-    # good format for defining so many snippets of text/html.
 
-    if section_key in ['handouts', 'guest_handouts', 'updates', 'guest_updates']:
-        try:
-            fs = course.system.resources_fs
-            # first look for a run-specific version
-            dirs = [path("info") / course.url_name, path("info")]
-            filepath = find_file(fs, dirs, section_key + ".html")
+    loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
+    course_module = get_module(request.user, request, loc, cache, course.id)
 
-            with fs.open(filepath) as htmlFile:
-                # Replace '/static/' urls
-                info_html = replace_urls(htmlFile.read().decode('utf-8'), course.metadata['data_dir'])
+    html = ''
 
-                # Replace '/course/' urls
-                course_root = reverse('course_root', args=[course.id])[:-1] # Remove trailing slash
-                info_html = replace_urls(info_html, course_root, '/course/')
-                return info_html
-        except ResourceNotFoundError:
-            log.exception("Missing info section {key} in course {url}".format(
-                key=section_key, url=course.location.url()))
-            return "! Info section missing !"
+    if course_module is not None:
+        html = course_module.get_html()
 
-    raise KeyError("Invalid about key " + str(section_key))
+    return html
+
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.

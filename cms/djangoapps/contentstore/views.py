@@ -287,6 +287,7 @@ def edit_unit(request, location):
     # TODO (cpennington): If we share units between courses,
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
+
     containing_subsection_locs = modulestore().get_parent_locations(location)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
 
@@ -997,7 +998,8 @@ def import_course(request, org, course, name):
 
         data_root = path(settings.GITHUB_REPO_ROOT)
 
-        course_dir = data_root / "{0}-{1}-{2}".format(org, course, name)
+        course_subdir = "{0}-{1}-{2}".format(org, course, name)
+        course_dir = data_root / course_subdir
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
@@ -1032,18 +1034,8 @@ def import_course(request, org, course, name):
             for fname in os.listdir(r):
                 shutil.move(r/fname, course_dir)
 
-        with open(course_dir / 'course.xml', 'r') as course_file:
-            course_data = etree.parse(course_file, parser=edx_xml_parser)
-            course_data_root = course_data.getroot()
-            course_data_root.set('org', org)
-            course_data_root.set('course', course)
-            course_data_root.set('url_name', name)
-
-        with open(course_dir / 'course.xml', 'w') as course_file:
-            course_data.write(course_file)
-
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_dir], load_error_modules=False, static_content_store=contentstore())
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

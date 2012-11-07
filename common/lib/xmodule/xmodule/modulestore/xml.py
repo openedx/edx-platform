@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import glob
 
 from collections import defaultdict
 from cStringIO import StringIO
@@ -16,6 +17,8 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+
+from xmodule.html_module import HtmlDescriptor
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
@@ -331,7 +334,6 @@ class XMLModuleStore(ModuleStoreBase):
         if not os.path.exists(policy_path):
             return {}
         try:
-            log.debug("Loading policy from {0}".format(policy_path))
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
@@ -386,6 +388,7 @@ class XMLModuleStore(ModuleStoreBase):
             if url_name:
                 policy_dir = self.data_dir / course_dir / 'policies' / url_name
                 policy_path = policy_dir / 'policy.json'
+
                 policy = self.load_policy(policy_path, tracker)
 
                 # VS[compat]: remove once courses use the policy dirs.
@@ -402,7 +405,6 @@ class XMLModuleStore(ModuleStoreBase):
                 else:
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
-
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
             system = ImportSystem(
@@ -423,9 +425,40 @@ class XMLModuleStore(ModuleStoreBase):
             # after we have the course descriptor.
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
 
+            # now import all pieces of course_info which is expected to be stored
+            # in <content_dir>/info or <content_dir>/info/<url_name>
+            self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
+
+            # now import all static tabs which are expected to be stored in
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>           
+            self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
+
+            self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
+
+            self.load_extra_content(system, course_descriptor, 'about', self.data_dir / course_dir / 'about', course_dir, url_name)
+
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
+    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
+        if url_name:
+            path =  base_dir / url_name
+
+        if not os.path.exists(path):
+            path = base_dir
+
+        for filepath in glob.glob(path/ '*'):
+            with open(filepath) as f:
+                try:
+                    html = f.read().decode('utf-8')
+                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                    slug = os.path.splitext(os.path.basename(filepath))[0]
+                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                    module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    module.metadata['data_dir'] = course_dir
+                    self.modules[course_descriptor.id][module.location] = module   
+                except Exception, e:
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))          
 
     def get_instance(self, course_id, location, depth=0):
         """
