@@ -135,8 +135,8 @@
                 <h2 class="university">${get_course_about_section(course, 'university')}</h2>
                 <h3>${course.number} ${course.title}</h3>
               </hgroup>
-              <section class="course-status">
-                <p>Class Starts - <span>${course.start_date_text}</span></p>
+              <section class="course-status course-status-completed">
+                <p><!-- Class Starts - <span>${course.start_date_text}</span> --> Course Completed - <span>Nov 6, 2012</span></p>
               </section>
               % if course.id in show_courseware_links_for:
                 <p class="enter-course">View Courseware</p>
@@ -144,6 +144,38 @@
             </section>
           </a>
         </article>
+
+        <div class="message message-status course-status-processing is-shown">
+          <p class="message-copy">Final course details are being wrapped up at this time. Your final standing will be available shortly.</p>
+        </div>
+
+        <div class="message message-status course-status-certrendering is-shown">
+          <p class="message-copy">You have received a grade of <span class="grade-value">B</span> in this course.</p>
+
+          <ul class="actions">
+            <li class="action"><span class="btn disabled" href="">Your Certificate is Generating</span></li>
+            <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+          </ul>
+        </div>
+
+        <div class="message message-status course-status-certavailable is-shown">
+          <p class="message-copy">You have received a grade of <span class="grade-value">B</span> in this course.</p>
+
+          <ul class="actions">
+            <li class="action"><a class="btn" href="" title="This link will open/download a PDF document">Download Your PDF Certificate</a></li>
+            <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+          </ul>
+        </div>
+
+        <div class="message message-status course-status-certnotavailable is-shown">
+          <p class="message-copy">You did not complete the necessary requirements for completion of this course.</p>
+
+          <ul class="actions">
+            <li class="action"><a class="btn" href="">Contact Faculty</a></li>
+            <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+          </ul>
+        </div>
+
         <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
 
       % endfor
