@@ -90,35 +90,211 @@
           <nav class="settings-page-menu">
             <ul>
               <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
+              <li><a href="#" data-section="staff">Staff</a></li>
               <li><a href="#" data-section="grading">Grading</a></li>
+              <li><a href="#" data-section="handouts">Handouts &amp; Guides</a></li>
               <li><a href="#" data-section="problems">Problems</a></li>
             </ul>
           </nav>
         </div>
         <div class="settings-page-section main-column">
+
           <section class="is-shown settings-details">
             <h2>Course Details</h2>
-            <div class="row">
-              <label>Course Name:</label>
-              <input type="text" class="course-name-input long">
-            </div>
-            <div class="row">
-              <label>Organization:</label>
-              <input type="text" class="course-organization-input long">
-            </div>
-            <div class="row">
-              <label>Course Number:</label>
-              <input type="text" class="course-number-input short">
-            </div>
-            <div class="row">
-              <label>Start Date:</label>
-              <input type="text" class="start-date-input date">
-            </div>
-            <div class="row">
-              <label>Enrollment End Date:</label>
-              <input type="text" class="start-date-input date">
-            </div>
+
+            <section class="settings-details-basic">
+              <header>
+                <h3>Basic Information</h3>
+                <span class="detail">The nuts and bolts of your class</span>
+              </header>
+
+              <div class="row">
+                <label>Course Name:</label>
+                <input type="text" class="long course-name-input">
+              </div>
+              <div class="row">
+                <label>Organization:</label>
+                <input type="text" class="long course-organization-input">
+              </div>
+              <div class="row">
+                <label>Course Number:</label>
+                <input type="text" class="short course-number-input">
+                <span class="tip">e.g. 101x</span>
+              </div>
+              <div class="row">
+                <label>Course Description:</label>
+                <textarea class="long tall course-description-input"></textarea>
+              </div>           
+            </section>
+
+            <section class="settings-details-dates">
+              <header>
+                <h3>Dates &amp; Times</h3>
+                <span class="detail">The nuts and bolts of your class</span>
+              </header>
+
+              <div class="row">
+                <label>Classes Start Date:</label>
+                <input type="text" class="date course-start-date-input">
+                <span class="tip">First day the class begins</span>
+              </div>
+
+              <div class="row">
+                <label>Classes End Date:</label>
+                <input type="text" class="date course-end-date-input">
+                <span class="tip">Last day of class activty</span>
+              </div> 
+
+              <div class="row">
+                <label>Milestone :</label>
+
+                <div class="field">
+                  <ol class="input-list course-milestone-list">
+                    <li class="course-milestone-list-element">
+                      <div class="course-milestone-date">
+                        <input type="text" class="course-milestone-date-input date">
+                        <span class="label-micro">Milestone Date</span>
+                      </div>
+
+                      <div class="course-milestone-name">
+                        <input type="text" class="course-milestone-name-input short">
+                        <span class="label-micro">Milestone Name</span>
+                      </div>
+
+                      <a href="#" class="delete-icon remove-milestone-data"></a>
+                    </li>
+                  </ol>
+
+                  <a href="#" class="new-item new-course-milestone-item add-milestone-data">
+                    <span class="plus-icon-small"></span>New Class Milestone
+                  </a>
+                </div>
+              </div>            
+            </section>
+
+            <section class="settings-details-marketing">
+              <header>
+                <h3>Introducing Your Course</h3>
+                <span class="detail">How your course will be shown to students considering taking it</span>
+              </header>
+
+              <div class="row">
+                <label>Course Overview:</label>
+                <textarea class="long tall course-overview"></textarea>
+              </div> 
+
+              <div class="row">
+                <label>Course Statement:</label>
+                <textarea class="long course-shortdescription"></textarea>
+                <span class="tip">Used to introduce your class to perspective students</span>
+              </div> 
+
+              <div class="row">
+                <label>Introduction Video:</label>
+                <input type="file" class="course-video">
+              </div>  
+            </section>
+
+            <section class="settings-details-requirements">
+              <header>
+                <h3>Requirements</h3>
+                <span class="detail">Expectations of the students taking this course</span>
+              </header>
+
+              <div class="row">
+                <label>Prerequisites</label>
+                <textarea class="long tall course-prerequisites"></textarea>
+              </div> 
+
+              <div class="row optional">
+                <label>Prerequisites Links</label>
+
+                <div class="field">
+                  <input type="text" class="long course-prerequisites-links">
+
+                  <a href="#" class="new-item new-course-prerequisites-links-item add-links-data">
+                    <span class="plus-icon-small"></span>New Link
+                  </a>
+                </div>
+              </div> 
+
+              <div class="row">
+                <label>Requirements:</label>
+                <textarea class="long tall course-requirements"></textarea>
+              </div>
+
+              <div class="row">
+                <label>Hours of Effort per Week:</label>
+                <input type="text" class="course-effort short">
+              </div> 
+
+              <div class="row">
+                <label>Textbooks:</label>
+
+                <div class="field">
+                  <ol class="input-list course-textbook-list">
+                    <li class="course-textbook-list-element">
+                      <div class="course-textbook-name">
+                        <input type="text" class="long course-textbook-name-input">
+                        <span class="label-micro">Textbook Name</span>
+                      </div>
+
+                      <div class="course-textbook-url">
+                        <input type="text" class="long course-textbook-url-input">
+                        <span class="label-micro">Textbook URL</span>
+                      </div>
+
+                      <a href="#" class="delete-icon remove-textbook-data"></a>
+                    </li>
+                  </ol>
+
+                  <a href="#" class="new-item new-course-textbook-item add-textbook-data">
+                    <span class="plus-icon-small"></span>New Textbook
+                  </a>
+                </div>
+              </div>   
+            </section>
+
+            <section class="settings-details-more">
+              <header>
+                <h3>More Information</h3>
+                <span class="detail">Other helpful information about the course</span>
+              </header>
+
+              <div class="row">
+                <label>Frequently Asked Questions:</label>
+
+                <div class="field">
+                  <ol class="input-list course-faq-list">
+                    <li class="course-faq-list-element">
+                      <div class="course-faq-question">
+                        <input type="text" class="long course-faq-question-input">
+                        <span class="label-micro">Question</span>
+                      </div>
+
+                      <div class="course-faq-answer">
+                        <textarea class="long tall course-faq-answer-input"></textarea>
+                        <span class="label-micro">Answer</span>
+                      </div>
+
+                      <a href="#" class="delete-icon remove-faq-data"></a>
+                    </li>
+                  </ol>
+
+                  <a href="#" class="new-item new-course-faq-item add-faq-data">
+                    <span class="plus-icon-small"></span>New Question &amp; Answer
+                  </a>
+                </div>
+              </div>
+            </section>
+            
           </section>
+
+          <section class="settings-staff">
+            <h2>Course Staff</h2>
+
+          </section>
+
           <section class="settings-grading">
             <h2>Grading</h2>
             <section>
@@ -200,6 +376,17 @@
               </div>
             </section>
           </section>
+
+          <section class="settings-handouts">
+            <h2>Handouts &amp; Guides</h2>
+
+            <div class="row">
+              <label>Syllabus: </label>
+              <input type="file" class="course-handouts-syllabus">
+              <span class="tip">PDF formatted file</span>
+            </div>
+          </section>
+
           <section class="settings-problems">
             <h2>Problems</h2>
             <div class="row">

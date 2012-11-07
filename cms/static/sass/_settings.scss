@@ -37,11 +37,15 @@
       }
     }
 
-    input {
+    input, textarea {
       font-size: 15px;
 
       &.long {
         width: 400px;
+      }
+
+      &.tall {
+        height: 200px;
       }
 
       &.short {
@@ -54,6 +58,14 @@
     }
 
     .settings-page-section {
+      > .alert {
+        display: none;
+
+        &.is-shown {
+          display: block;
+        }
+      }
+
       > section {
         display: none;
         margin-bottom: 40px;
