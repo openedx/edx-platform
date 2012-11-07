@@ -66,7 +66,7 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential']
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 
 def _modulestore(location):
@@ -869,6 +869,27 @@ def static_pages(request, org, course, coursename):
 def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
+
+def edit_tabs(request, org, course, coursename):
+    location = ['i4x', org, course, 'course', coursename]    
+    course_item = modulestore().get_item(location)
+    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    static_tabs = modulestore('direct').get_items(static_tabs_loc)
+
+    # import pudb; pudb.set_trace()
+
+    components = [
+        static_tab.location.url()
+        for static_tab
+        in static_tabs
+    ]
+
+    return render_to_response('edit-tabs.html', {
+        'active_tab': 'pages',
+        'context_course':course_item, 
+        'components': components
+        })
 
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
