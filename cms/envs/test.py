@@ -14,6 +14,7 @@ from path import path
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
+NOSE_ARGS = ['--with-xunit']
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')

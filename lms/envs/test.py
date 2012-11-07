@@ -27,7 +27,6 @@ SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
-NOSE_ARGS = []
 
 NOSE_ARGS = [
     '--with-xunit',
