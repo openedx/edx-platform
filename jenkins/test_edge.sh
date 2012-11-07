@@ -1,5 +1,8 @@
 #! /bin/bash
 
+set -e
+set -x
+
 # Reset the submodule, in case it changed
 git submodule foreach 'git reset --hard HEAD'
 
