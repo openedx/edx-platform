@@ -1852,7 +1852,7 @@ class OpenEndedResponse(LoncapaResponse):
             self.initial_display
             self.payload - dict containing keys --
             'grader' : path to grader settings file, 'problem_id' : id of the problem
-            
+
             self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
@@ -1912,7 +1912,6 @@ class OpenEndedResponse(LoncapaResponse):
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         contents.update({'student_response': submission})
-        contents.update({'grader_type' : self.grader_type})
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
