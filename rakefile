@@ -92,11 +92,6 @@ def run_under_coverage(cmd, root)
     return cmd
 end
 
-def coverage_reports(root)
-    sh("coverage xml --rcfile=#{root}/.coveragerc")
-    sh("coverage html --rcfile=#{root}/.coveragerc")
-end
-
 def run_tests(system, report_dir, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
@@ -107,10 +102,9 @@ def run_tests(system, report_dir, stop_on_failure=true)
         end
         $failed_tests += 1 unless ok
     end
-    coverage_reports(system)
 end
 
-TEST_TASK_SYMBOLS = []
+TEST_TASK_DIRS = []
 
 [:lms, :cms].each do |system|
     report_dir = File.join(REPORT_DIR, system.to_s)
@@ -127,7 +121,7 @@ TEST_TASK_SYMBOLS = []
         run_tests(system, report_dir, args.stop_on_failure)
     end
 
-    TEST_TASK_SYMBOLS << system
+    TEST_TASK_DIRS << system
 
     desc <<-desc
         Start the #{system} locally with the specified environment (defaults to dev).
@@ -170,9 +164,8 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
         sh(run_under_coverage(cmd, lib)) do |ok, res|
             $failed_tests += 1 unless ok
         end
-        coverage_reports(lib)
     end
-    TEST_TASK_SYMBOLS << lib
+    TEST_TASK_DIRS << lib
 
     desc "Run tests for common lib #{lib} (without coverage)"
     task "fasttest_#{lib}" do 
@@ -182,12 +175,25 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
 end
 
 task :test do
-    TEST_TASK_SYMBOLS.each do |sym|
-        Rake::Task["test_#{sym}"].invoke(false)
+    TEST_TASK_DIRS.each do |dir|
+        Rake::Task["test_#{dir}"].invoke(false)
     end
 
     if $failed_tests > 0
         abort "Tests failed!"
+    end
+end
+
+task :html do
+    TEST_TASK_DIRS.each do |dir|
+        sh("coverage html --rcfile=#{dir}/.coveragerc")
+    end
+end
+
+task :xml do
+    TEST_TASK_DIRS.each do |dir|
+        # Why doesn't the rcfile control the xml output file properly??
+        sh("coverage xml -o reports/#{dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
     end
 end
 

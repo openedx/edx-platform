@@ -1,4 +1,7 @@
-# .coveragerc for cms
+# .coveragerc for lms
+[run]
+data_file = lms/.coverage
+
 [report]
 ignore_errors = True
 
