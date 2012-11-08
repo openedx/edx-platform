@@ -34,8 +34,11 @@ urlpatterns = ('',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
-    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', name='static_pages'),
-    url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
+    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', 
+        name='static_pages'),
+    url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', 
+        name='edit_static'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$', 'contentstore.views.course_info', name='course_info'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$', 'contentstore.views.asset_index', name='asset_index'),
 
     # temporary landing page for a course

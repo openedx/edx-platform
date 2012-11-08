@@ -883,6 +883,36 @@ def server_error(request):
 
 @login_required
 @ensure_csrf_cookie
+def course_info(request, org, course, name):
+    """
+    Display an editable asset library
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    # safe but slower would be to chk that course_info exists and, if not, add it
+    location = ['i4x', org, course, 'course_info', "updates"]
+    # TODO chagne to get_items when we store each update as a separate entry, then no need to force creation
+    try:
+        course_updates = modulestore().get_item(location)
+    except ItemNotFoundError:
+        template = Location(['i4x', org, "templates", 'course_info', "Empty"])
+        _modulestore(template).clone_item(template, location)
+    
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
+        'context_course': course_module,
+        'updates' : course_updates
+    })
+
+@login_required
+@ensure_csrf_cookie
 def asset_index(request, org, course, name):
     """
     Display an editable asset library
@@ -980,7 +1010,7 @@ def create_new_course(request):
     modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
 
     create_all_course_groups(request.user, new_course.location)
-
+    
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 @ensure_csrf_cookie
