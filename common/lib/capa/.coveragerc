@@ -1,6 +1,6 @@
 # .coveragerc for common/lib/capa
 [run]
-data_file = common/lib/capa/.coverage
+data_file = reports/common/lib/capa/.coverage
 
 [report]
 ignore_errors = True
