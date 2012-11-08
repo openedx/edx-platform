@@ -57,18 +57,6 @@ class Command(BaseCommand):
                 writer.writerow(record)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     def reset_sample_data(self):
         def make_sample(**kwargs):
             data = dict((model_field, kwargs.get(model_field, ""))
