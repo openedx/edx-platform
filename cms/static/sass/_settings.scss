@@ -64,16 +64,16 @@
       }
 
       &:focus {
+        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
         border-color: $blue;
         outline: 0;
       }
     }
 
     .field {
-      background: #b6eab1;
       display: inline-block;
       vertical-align: top;
-      min-width: 400px;
+      max-width: 400px;
 
       input {
         display: block;
@@ -87,12 +87,7 @@
           @include clearfix();
 
           div {
-            float: left;
-            margin-right: 20px;
 
-            &:last-child {
-              margin-right: 0;
-            }
           }
 
           .delete-icon {
@@ -102,12 +97,27 @@
           }
         }
 
-        &.element-stacked {
+        .element-stacked {
 
+          div {
+            margin-bottom: 20px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
 
-        &.element-multi {
+        .element-multi {
 
+          div {
+            float: left;
+            margin-right: 20px;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
         }
       }
 
@@ -137,19 +147,29 @@
         }
 
         .row {
-          margin-bottom: 20px;
-          padding: 0;
-          border-bottom: none;
+          margin-bottom: 15px;
+          padding-bottom: 15px;
+          border-bottom: 1px solid $lightGrey;
 
           &:last-child {
             margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
           }
 
           .tip {
             color: $mediumGrey;
+            font-size: 13px;
+          }
+
+          .tip-inline {
             display: inline-block;
             margin-left: 10px;
-            font-size: 13px;
+          }
+
+          .tip-stacked {
+            display: block;
+            margin: 10px 0 0 200px;
           }
         }
 
@@ -158,10 +178,7 @@
         }
 
         > section {
-          padding-bottom: 60px;
-          margin-bottom: 40px;
-          border-radius: 3px;
-          border-bottom: 1px solid $lightGrey;
+          margin-bottom: 100px;
           @include clearfix;
 
           header {
