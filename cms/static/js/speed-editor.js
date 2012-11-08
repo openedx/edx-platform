@@ -156,25 +156,22 @@ function updateXML() {
   // replace videos
   xml = xml.replace(/\{\{video\s(.*)\}\}/g, '<video youtube="1.0:$1" />\n\n');
 
-  // replace string input
-  xml = xml.replace(/\_\_\_\[(.+)\]/g, '<stringresponse answer="$1" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n');
-
-  // replace numerical input
-  xml = xml.replace(/\#\#\#\[(.+)\]/g, function(match, p) {
-    var solution = extractNumericalSolution(p);
-    var string = '<numericalresponse answer="' + solution + '">\n';
-
-    var params = extractNumericalSettings(p);
-
-    if(params) {
-      for(var i = 0; i < params.length; i++) {
-        var splitProp = params[i].split(/:\s*/);
-        string += '  <responseparam type="' + splitProp[0] + '" default="' + splitProp[1] + '" />\n';
+  // replace string and numerical
+  xml = xml.replace(/\=\s*(.*)/g, function(match, p) {
+    var string;
+    var params = /(.*)\+\-\s*(.*)/.exec(p);
+    if(parseFloat(p)) {      
+      if(params) {
+        string = '<numericalresponse answer="' + params[1] + '">\n';
+        string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+      } else {
+        string = '<numericalresponse answer="' + p + '">\n';
       }
+      string += '  <textline />\n';
+      string += '</numericalresponse>\n\n';
+    } else {
+      string = '<stringresponse answer="' + p + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
     }
-                        
-    string += '  <textline />\n';
-    string += '</numericalresponse>\n\n';
     return string;
   });
 
@@ -256,6 +253,12 @@ function updatePreview() {
     return groupString;
   });
 
+  html = html.replace(/\=\s*(.*)/g, function(match, p) {
+    var value = p.replace(/\+\-.*/g, '');
+    var string = '<input type="text" name="" id="" value="' + value + '" size="20">\n';
+    return string;
+  });
+
   // wrap the paragraphs
   html = html.replace(/(^(?!\<\/*ul|\s*\<li|\<h1|\s*\<label|\s*$).*$)/gm, '<p>$1</p>\n');
 
@@ -272,16 +275,7 @@ function updatePreview() {
 
   // replace radios
   html = html.replace(/\(\s*\)/g, '<input type="radio" name="multiple-choice-id">');
-  html = html.replace(/\(x\)/gi, '<input type="radio" checked name="multiple-choice-id">');
-
-  // replace string input
-  html = html.replace(/\_\_\_\[(.+)\]/g, function(match, p) {
-    var string = '<input type="text" name="" id="" value="' + p + '" size="20">\n';
-    return string;
-  });
-
-  // replace numerical input
-  html = html.replace(/\#\#\#\[(.+)\]/g, '<input type="text"><small>$1</small>');
+  html = html.replace(/\(x\)/gi, '<input type="radio" checked name="multiple-choice-id">');  
 
   // replace selects
   html = html.replace(/\[\[(.+)\]\]/g, function(match, p) {
@@ -387,10 +381,10 @@ function makeMultipleChoice() {
 function makeStringInput() {
   var selection = simpleEditor.getSelection();
   if(selection.length > 0) {
-    var revisedSelection = '___[' + selection + ']';
+    var revisedSelection = '= ' + selection + '';
   simpleEditor.replaceSelection(revisedSelection);
   } else {
-    var template = '___[answer]\n';
+    var template = '= answer\n';
     simpleEditor.replaceSelection(template);
     setFocus();
   }
@@ -399,10 +393,10 @@ function makeStringInput() {
 function makeNumberInput() {
   var selection = simpleEditor.getSelection();
   if(selection.length > 0) {
-    var revisedSelection = '###[' + selection + ']';
+    var revisedSelection = '= ' + selection + '';
     simpleEditor.replaceSelection(revisedSelection);
   } else {
-    var template = '###[answer +-tolerance]\n';
+    var template = '= answer +- x%\n';
     simpleEditor.replaceSelection(template);
     setFocus();
   }
