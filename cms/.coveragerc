@@ -1,6 +1,7 @@
 # .coveragerc for cms
 [run]
 data_file = reports/cms/.coverage
+source = cms
 
 [report]
 ignore_errors = True
