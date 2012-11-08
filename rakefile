@@ -364,6 +364,18 @@ namespace :cms do
   end
 end
 
+namespace :cms do
+  desc "Import course data within the given DATA_DIR variable"
+  task :xlint do
+    if ENV['DATA_DIR']
+      sh(django_admin(:cms, :dev, :xlint, ENV['DATA_DIR']))
+    else
+      raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
+        "Example: \`rake cms:import DATA_DIR=../data\`"
+    end
+  end
+end
+
 desc "Build a properties file used to trigger autodeploy builds"
 task :autodeploy_properties do
     File.open("autodeploy.properties", "w") do |file|

@@ -88,7 +88,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
 
 def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace = None):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None, validate_only=False):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -109,6 +109,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
         course_dirs=course_dirs,
         load_error_modules=load_error_modules
     )
+
+    if validate_only:
+        validate_module_structure(module_store)
+        return module_store, []
 
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
     # to enumerate the entire collection of course modules. It will be left as a TBD to implement that
@@ -192,7 +196,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 store.update_item(module.location, module_data)
 
-
             if 'children' in module.definition:
                 store.update_children(module.location, module.definition['children'])
 
@@ -200,6 +203,38 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(module.own_metadata))
 
-
-
     return module_store, course_items
+
+
+def validate_category_hierarcy(module_store, course_id, parent_category, expected_child_category):
+    err_cnt = 0
+
+    parents = []
+    # get all modules of parent_category
+    for module in module_store.modules[course_id].itervalues():
+        if module.location.category == parent_category:
+            parents.append(module)
+
+    for parent in parents:
+        for child_loc in [Location(child) for child in parent.definition.get('children', [])]:
+            if child_loc.category != expected_child_category:
+                err_cnt += 1
+                print 'ERROR: child {0} of parent {1} was expected to be category of {2} but was {3}'.format(
+                    child_loc, parent.location, expected_child_category, child_loc.category)
+
+    return err_cnt
+
+def validate_module_structure(module_store):
+    err_cnt = 0
+    warn_cnt = 0
+    for course_id in module_store.modules.keys():
+        # constrain that courses only have 'chapter' children
+        err_cnt += validate_category_hierarcy(module_store, course_id, "course", "chapter")
+        # constrain that chapters only have 'sequentials'
+        err_cnt += validate_category_hierarcy(module_store, course_id, "chapter", "sequential")
+        # constrain that sequentials only have 'verticals'
+        err_cnt += validate_category_hierarcy(module_store, course_id, "sequential", "vertical")
+
+    print "SUMMARY: {0} Errors   {1} Warnings".format(err_cnt, warn_cnt)
+       
+
