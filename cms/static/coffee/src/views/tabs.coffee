@@ -15,7 +15,7 @@ class CMS.Views.TabsEdit extends Backbone.View
 
     @$('.components').sortable(
       handle: '.drag-handle'
-      update: (event, ui) => alert 'got it!'
+      update: (event, ui) => alert 'not yet implemented!'
       helper: 'clone'
       opacity: '0.5'
       placeholder: 'component-placeholder'
