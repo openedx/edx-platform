@@ -209,10 +209,10 @@ namespace :coverage do
             sh("coverage xml -o reports/#{dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
         end
     end
-end
 
-TEST_TASK_DIRS.each do |dir|
-    CLOBBER.include("#{dir}/.coverage")
+    TEST_TASK_DIRS.each do |dir|
+        CLOBBER.include("#{dir}/.coverage")
+    end
 end
 
 task :runserver => :lms
