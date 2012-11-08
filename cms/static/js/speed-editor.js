@@ -72,8 +72,6 @@ function toggleProblemSettings(e) {
 function toggleCheatsheet(e) {
   e.preventDefault();
 
-  console.log('bam');
-
   if(!$currentEditor.find('.simple-editor-cheatsheet')[0]) {
     $cheatsheet = $($('#simple-editor-cheatsheet').html());
     $currentEditor.append($cheatsheet);  
