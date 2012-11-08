@@ -266,6 +266,33 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('tabs')
 
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
+
+    def add_tab_reference(self, tab_module):
+        '''
+        Since in CMS we can add static tabs via data, the current data model expects that
+        the list of tabs be encapsulated in the course.
+        VS[compat] we can rework this to avoid pointers to static tab modules once we fully deprecate filesystem support
+        '''
+        existing_tabs = self.tabs or []
+        existing_tabs.append({'type':'static_tab', 'name' : tab_module.metadata.get('display_name'), 'url_slug' : tab_module.location.name})
+        self.tabs = existing_tabs
+
+
+    def update_tab_reference(self, tab_module):
+        '''
+        Since in CMS we can add static tabs via data, the current data model expects that
+        the list of tabs be encapsulated in the course.
+        VS[compat] we can rework this to avoid pointers to static tab modules once we fully deprecate filesystem support
+        '''
+        existing_tabs = self.tabs
+        for tab in existing_tabs:
+            if tab.get('url_slug') == tab_module.location.name:
+                tab['name'] = tab_module.metadata.get('display_name')
+        self.tabs = existing_tabs
+
     @property
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
