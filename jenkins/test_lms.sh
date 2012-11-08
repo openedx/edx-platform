@@ -21,7 +21,7 @@ rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_lms || true
-rake xml html
+rake coverage:xml coverage:html
 
 [ $TESTS_FAILED == '0' ]
 rake autodeploy_properties
