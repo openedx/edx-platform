@@ -42,6 +42,8 @@ import shutil
 import sys
 import tarfile
 import time
+from contentstore.course_info_model import get_course_updates,\
+    update_course_updates, delete_course_update
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -336,7 +338,7 @@ def edit_unit(request, location):
 def preview_component(request, location):
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     if not has_access(request.user, location):
-        raise Http404  # TODO (vshnayder): better error
+        raise HttpResponseForbidden()
 
     component = modulestore().get_item(location)
 
@@ -869,6 +871,9 @@ def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
 
+def settings(request, org, course, coursename):
+    return render_to_response('settings.html', {})
+
 def edit_tabs(request, org, course, coursename):
     location = ['i4x', org, course, 'course', coursename]    
     course_item = modulestore().get_item(location)
@@ -895,6 +900,61 @@ def not_found(request):
 def server_error(request):
     return render_to_response('error.html', {'error': '500'})
 
+
+@login_required
+@ensure_csrf_cookie
+def course_info(request, org, course, name, provided_id=None):
+    """
+    Send models and views as well as html for editing the course info to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
+        'context_course': course_module,
+        'url_base' : "/" + org + "/" + course + "/",
+        'course_updates' : json.dumps(get_course_updates(location))
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_info_updates(request, org, course, provided_id=None):
+    """
+    restful CRUD operations on course_info updates.
+
+    org, course: Attributes of the Location for the item to edit
+    provided_id should be none if it's new (create) and a composite of the update db id + index otherwise.
+    """
+    # ??? No way to check for access permission afaik
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
+    elif real_method == 'POST':
+        # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+    elif real_method == 'PUT':
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
 
 @login_required
 @ensure_csrf_cookie

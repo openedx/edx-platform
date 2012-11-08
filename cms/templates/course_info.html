@@ -1,0 +1,33 @@
+<%inherit file="base.html" />
+<!-- TODO decode course # from context_course into title -->
+<%block name="title">Course Info</%block>
+
+<%block name="jsextra">
+  <script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    editor = new CMS.Views.CourseInfoEdit({
+    	el: $('.course-updates'),
+    	model : new CMS.Models.Module({id : '${course_updates.location.url()}'})
+    });
+    $(".new-update-button").bind('click', editor.onNew);
+    });
+  </script>
+</%block>
+
+<%block name="content">
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <h1>Course Info</h1>
+      <div class="main-column">
+		<div class="window">
+            <h2>Updates</h2>
+			<a href="#" class="new-update-button">New Update</a>
+			<div class="course-updates"></div>
+			<!-- probably replace w/ a vertical where each element of the vertical is a separate update w/ a date and html field -->
+        </div>
+	  </div>
+	  <div class="sidebar window">
+	  </div>
+	</div>
+  </div>
+</%block>
