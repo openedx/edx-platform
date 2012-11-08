@@ -184,16 +184,20 @@ task :test do
     end
 end
 
-task :html do
-    TEST_TASK_DIRS.each do |dir|
-        sh("coverage html --rcfile=#{dir}/.coveragerc")
+namespace :coverage do
+    desc "Build the html coverage reports"
+    task :html do
+        TEST_TASK_DIRS.each do |dir|
+            sh("coverage html --rcfile=#{dir}/.coveragerc")
+        end
     end
-end
 
-task :xml do
-    TEST_TASK_DIRS.each do |dir|
-        # Why doesn't the rcfile control the xml output file properly??
-        sh("coverage xml -o reports/#{dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+    desc "Build the xml coverage reports"
+    task :xml do
+        TEST_TASK_DIRS.each do |dir|
+            # Why doesn't the rcfile control the xml output file properly??
+            sh("coverage xml -o reports/#{dir}/coverage.xml --rcfile=#{dir}/.coveragerc")
+        end
     end
 end
 
