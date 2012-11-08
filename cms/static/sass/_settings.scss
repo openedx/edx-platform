@@ -23,6 +23,7 @@
 
     label {
       display: inline-block;
+      vertical-align: top;
       width: 200px;
       font-size: 15px;
       font-weight: 400;
@@ -35,6 +36,12 @@
       &.ranges {
         margin-bottom: 20px;
       }
+    }
+
+    .label-micro {
+      display: block;
+      margin-top: 5px;
+      font-size: 13px;
     }
 
     input, textarea {
@@ -54,6 +61,61 @@
 
       &.date {
         width: 140px;
+      }
+
+      &:focus {
+        border-color: $blue;
+        outline: 0;
+      }
+    }
+
+    .field {
+      background: #b6eab1;
+      display: inline-block;
+      vertical-align: top;
+      min-width: 400px;
+
+      input {
+        display: block;
+      }
+
+      .input-list {
+
+        .element {
+          position: relative;
+          width: 100%;
+          @include clearfix();
+
+          div {
+            float: left;
+            margin-right: 20px;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+
+          .delete-icon {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+          }
+        }
+
+        &.element-stacked {
+
+        }
+
+        &.element-multi {
+
+        }
+      }
+
+      .new-item {
+        margin-top: 20px;
+        padding-bottom: 10px;
+        @include grey-button;
+        @include box-sizing(border-box);
       }
     }
 
@@ -82,6 +144,13 @@
           &:last-child {
             margin-bottom: 0;
           }
+
+          .tip {
+            color: $mediumGrey;
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 13px;
+          }
         }
 
         &:last-child {
@@ -89,11 +158,33 @@
         }
 
         > section {
-          padding-bottom: 40px;
+          padding-bottom: 60px;
           margin-bottom: 40px;
           border-radius: 3px;
-          border-bottom: 1px solid $mediumGrey;
+          border-bottom: 1px solid $lightGrey;
           @include clearfix;
+
+          header {
+            @include clearfix;
+            border-bottom: 1px solid $mediumGrey;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+
+            h3 {
+              color: $darkGrey;
+              float: left;
+
+              margin: 0 40px 0 0;
+              text-transform: uppercase;
+            }
+
+            .detail {
+              float: right;
+              marign-top: 3px;
+              color: $mediumGrey;
+              font-size: 13px;
+            }
+          }
 
           &:last-child {
             padding-bottom: 0;
