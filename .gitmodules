@@ -1,0 +1,3 @@
+[submodule "common/test/phantom-jasmine"]
+	path = common/test/phantom-jasmine
+	url = https://github.com/jcarver989/phantom-jasmine.git
