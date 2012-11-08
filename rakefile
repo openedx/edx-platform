@@ -211,6 +211,10 @@ namespace :coverage do
     end
 end
 
+TEST_TASK_DIRS.each do |dir|
+    CLOBBER.include("#{dir}/.coverage")
+end
+
 task :runserver => :lms
 
 desc "Run django-admin <action> against the specified system and environment"
