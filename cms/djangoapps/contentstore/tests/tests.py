@@ -190,11 +190,15 @@ class ContentStoreTest(TestCase):
         password = 'foo'
 
         # Create the use so we can log them in.
+        self.user = User.objects.create_user(uname, email, password)
+
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
-        self.user = User.objects.create_user(uname, email, password)
         self.user.is_active = True
+        # Staff has access to view all courses
+        self.user.is_staff = True
         self.user.save()
+
 
         # Flush and initialize the module store
         # It needs a course template because it creates a new course
@@ -245,12 +249,20 @@ class ContentStoreTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization and course number.')
 
-    def test_index(self):
-        """Test viewing the existing courses"""
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
+    def test_course_index_view_with_no_courses(self):
+        """Test viewing the index page with no courses"""
+        # Create a course so there is something to view
+        resp = self.client.get(reverse('index'))
 
+        # Right now there may be a bug in cms/templates/widgets/header.html
+        # because there is an unexpected ending ul tag in the header.
+        # When this is fixed, make a better matcher below.  JZ 11/08/2012
+        self.assertContains(resp, 
+            '<a href="#" class="new-course-button"><span class="plus-icon"></span> New Course</a>',
+            html=False)
+
+    def test_course_index_view_with_course(self):
+        """Test viewing the index page with an existing course"""
         # Create a course so there is something to view
         resp = self.client.post(reverse('create_new_course'), self.post_data)
         resp = self.client.get(reverse('index'))
@@ -259,6 +271,24 @@ class ContentStoreTest(TestCase):
         # because there is an unexpected ending ul tag in the header.
         # When this is fixed, change html=True below.  JZ 11/08/2012
         self.assertContains(resp, '<span class="class-name">Robot Super Course</span>', html=False)
+
+    def test_course_overview_view_with_course(self):
+        """Test viewing the course overview page with an existing course"""
+        # Create a course so there is something to view
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+
+        data = {
+            'org': 'MITx',
+            'course': '999',
+            'name': Location.clean('Robot Super Course'),}
+
+        resp = self.client.get(reverse('course_index', kwargs=data))
+        # Right now there may be a bug in cms/templates/widgets/header.html
+        # because there is an unexpected ending ul tag in the header.
+        # When this is fixed, change html=True below.  JZ 11/08/2012
+        self.assertContains(resp, 
+            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            html=False)
 
     def check_edit_unit(self, test_course_name):
         """Check that editing functionality works on example courses"""
