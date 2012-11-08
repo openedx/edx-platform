@@ -1,6 +1,8 @@
 var $body;
 var $preview;
 var $tooltip;
+var $cheatsheet;
+var $currentEditor;
 var simpleEditor;
 var xmlEditor;
 var currentEditor;
@@ -8,7 +10,18 @@ var controlDown;
 var commandDown;
 
 
+(function() {
+  $body = $('body');
+  $body.on('click', '.editor-bar a', onEditorButton);
+  $body.on('click', '.editor-tabs .tab', setEditorTab);
+  $body.on('click', '.cheatsheet-toggle', toggleCheatsheet);
+  $body.on('click', '.problem-settings-button', toggleProblemSettings);
+  $(document).bind('keyup', onKeyboard);
+})();
+
+
 function initProblemEditors($editor, $prev) {
+  $currentEditor = $editor;
   simpleEditor = CodeMirror.fromTextArea($editor.find('.edit-box')[0], {
     lineWrapping: true,
     extraKeys: {
@@ -40,10 +53,35 @@ function initProblemEditors($editor, $prev) {
 
   $(simpleEditor.getWrapperElement()).bind('click', setFocus);
   $preview = $prev.find('.problem');
+}
 
-  $body.on('click', '.editor-bar a', onEditorButton);
-  $body.on('click', '.editor-tabs a', setEditorTab);
-  $(document).bind('keyup', onKeyboard);
+function toggleProblemSettings(e) {
+  e.preventDefault();
+
+  $(this).toggleClass('is-open');
+
+  if($(this).hasClass('is-open')) {
+    $(this).find('.button-label').html('Hide Advanced Settings');
+    $('.problem-settings').slideDown(150);
+  } else {
+    $(this).find('.button-label').html('Show Advanced Settings');
+    $('.problem-settings').slideUp(150);
+  }
+}
+
+function toggleCheatsheet(e) {
+  e.preventDefault();
+
+  console.log('bam');
+
+  if(!$currentEditor.find('.simple-editor-cheatsheet')[0]) {
+    $cheatsheet = $($('#simple-editor-cheatsheet').html());
+    $currentEditor.append($cheatsheet);  
+  }
+
+  setTimeout(function() {
+    $cheatsheet.toggleClass('shown');
+  }, 10);
 }
 
 function setEditorTab(e) {

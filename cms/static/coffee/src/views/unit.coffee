@@ -84,8 +84,6 @@ class CMS.Views.UnitEdit extends Backbone.View
     event.preventDefault()
 
     @$componentItem = $('<li>').addClass('editing')
-    $modalCover.show()
-    $modalCover.bind('click', @closeEditor)
     type = $(event.currentTarget).data('type')
 
     switch type
@@ -97,23 +95,27 @@ class CMS.Views.UnitEdit extends Backbone.View
         $preview = $($('#problem-preview').html())
         initProblemEditors(@$editor, $preview)
 
-    @$editor.find('.save-button').bind('click', =>
+    @$editor.find('.save-button, .cancel-button').bind('click', =>
       @$componentItem.removeClass('editing')
       @closeEditor()
     )
 
-    $componentActions = $($('#component-actions').html());
+    $componentActions = $($('#component-actions').html())
 
     @$componentItem.append(@$editor)
     @$componentItem.append($preview)
-    @$componentItem.append($componentActions);
+    @$componentItem.append($componentActions)
+    @$componentItem.hide()
     @$newComponentItem.before(@$componentItem)
+    @$componentItem.slideDown(200)
+    $modalCover.fadeIn(200)
+    $modalCover.bind('click', @closeEditor)
 
   closeEditor: (event) =>
-    console.log('close')
-    $modalCover.hide()
+    @$editor.slideUp(150)
+    $modalCover.fadeOut(150)
     $modalCover.unbind('click', @closeEditor)
-    @$editor.remove()
+    @$editor.slideUp(150)
     @$componentItem.removeClass('editing')
 
   saveNewComponent: (event) =>
