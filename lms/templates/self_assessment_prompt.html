@@ -8,7 +8,11 @@
     <textarea name="answer" class="answer" cols="80" rows="20">${previous_answer|h}</textarea>
     </div>
 
-    <div class="rubric-wrapper"></div>
+    <div class="rubric-wrapper">${initial_rubric}</div>
 
+    <div class="hint-wrapper">${initial_hint}</div>
+
+    <div class="message-wrapper">${initial_message}</div>
+    
     <input type="button" value="Submit" class="submit-button" name="show"/>
 </section>
