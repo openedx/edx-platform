@@ -20,7 +20,8 @@ TESTS_FAILED=0
 rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
-rake phantomjs_jasmine_cms || true
+rake phantomjs_jasmine_lms || true
+rake xml html
 
 [ $TESTS_FAILED == '0' ]
 rake autodeploy_properties
