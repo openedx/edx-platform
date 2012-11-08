@@ -775,6 +775,8 @@ def accept_name_change(request):
 
     return accept_name_change_by_id(int(request.POST['id']))
 
+# TODO: This is a giant kludge to give Pearson something to test against ASAP.
+#       Will need to get replaced by something that actually ties into TestCenterUser
 @csrf_exempt
 def test_center_login(request):
     if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
