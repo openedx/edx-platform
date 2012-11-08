@@ -19,13 +19,13 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 from django.core.cache import cache
 
-from django_future.csrf import ensure_csrf_cookie
+from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment)
@@ -774,3 +774,26 @@ def accept_name_change(request):
         raise Http404
 
     return accept_name_change_by_id(int(request.POST['id']))
+
+# TODO: This is a giant kludge to give Pearson something to test against ASAP.
+#       Will need to get replaced by something that actually ties into TestCenterUser
+@csrf_exempt
+def test_center_login(request):
+    if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
+        raise Http404
+
+    client_candidate_id = request.POST.get("clientCandidateID")
+    # registration_id = request.POST.get("registrationID")
+    exit_url = request.POST.get("exitURL")
+    error_url = request.POST.get("errorURL")
+
+    if client_candidate_id == "edX003671291147":
+        user = authenticate(username=settings.PEARSON_TEST_USER,
+                            password=settings.PEARSON_TEST_PASSWORD)
+        login(request, user)
+        return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
+    else:
+        return HttpResponseForbidden()
+
+
+
