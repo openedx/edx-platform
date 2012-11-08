@@ -242,7 +242,7 @@ if settings.QUICKEDIT:
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
 
-if settings.DEBUG:
+if settings.ENABLE_JASMINE:
     ## Jasmine and admin
     urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),
                     url(r'^admin/', include(admin.site.urls)),
