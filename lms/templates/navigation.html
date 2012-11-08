@@ -91,6 +91,47 @@ site_status_msg = get_site_status_msg(course_id)
 <div class="ie-banner"><strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> or <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
 % endif
 
+% if course: 
+<div class="message message-status course-status course-status-certavailable is-shown">
+  <div class="inner-wrapper">
+    <p class="message-copy">You have received a grade of <span class="grade-value">B</span> in this course.</p>
+
+  <ul class="actions">
+    <li class="action"><a class="btn" href="" title="This link will open/download a PDF document">Download Your PDF Certificate</a></li>
+    <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+  </ul>    
+  </div>
+</div>
+
+<div class="message message-status course-status course-status-certnotavailable is-shown">
+  <div class="inner-wrapper">
+    <p class="message-copy">You did not complete the necessary requirements for completion of this course.</p>
+
+    <ul class="actions">
+      <li class="action"><a class="btn" href="">Contact Faculty</a></li>
+      <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="message message-status course-status course-status-certnotavailable is-shown">
+  <div class="inner-wrapper">
+    <p class="message-copy">You have received a grade of <span class="grade-value">B</span> in this course.</p>
+
+    <ul class="actions">
+      <li class="action"><span class="btn disabled" href="">Your Certificate is Generating</span></li>
+      <li class="action"><a class="cta" href="">Complete our course feedback survey</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="message message-status course-status course-status-certnotavailable is-shown">
+  <div class="inner-wrapper">
+    <p class="message-copy">Final course details are being wrapped up at this time. Your final standing will be available shortly.</p>
+  </div>
+</div>
+% endif
+
 %if not user.is_authenticated():
   <%include file="login_modal.html" />
   <%include file="signup_modal.html" />
