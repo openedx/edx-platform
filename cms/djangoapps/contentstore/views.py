@@ -55,7 +55,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState
 
 from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -622,17 +622,6 @@ def save_item(request):
         # commit to datastore
         store.update_metadata(item_location, existing_item.metadata)
 
-        # cdodge: special case logic for updating static_tabs
-        # unfortunately tabs are enumerated in the course policy data structure, so if we change the display name of
-        # the tab, we need to update the course policy (which has a nice .tabs property on it)
-        item_loc = Location(item_location)
-        if item_loc.category == 'static_tab':
-            # VS[compat] Rework when we can stop having to support tabs lists in the policy
-            tag_module = store.get_item(item_location)
-            course = get_course_for_item(item_location)
-            course.update_tab_reference(tag_module)
-            modulestore('direct').update_metadata(course.location, course.metadata)
-
     return HttpResponse()
 
 
@@ -709,13 +698,6 @@ def clone_item(request):
 
     if new_item.location.category not in DETACHED_CATEGORIES:
         _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
-    elif new_item.location.category == 'static_tab':
-        # static tabs - in our data model - are described in the course policy
-        # VS[compat]: Rework when we can stop having to support tabs lists in the policy
-        if parent.location.category != 'course':
-            raise BaseException('adding a new static_tab must be on a course object')
-        parent.add_tab_reference(new_item)
-        _modulestore(parent.location).update_metadata(parent.location.url(), parent.metadata)
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
