@@ -581,8 +581,11 @@ def save_item(request):
     if request.POST.get('data') is not None:
         data = request.POST['data']
         store.update_item(item_location, data)
-        
-    if request.POST.get('children') is not None:
+       
+    # cdodge: note calling request.POST.get('children') will return None if children is an empty array
+    # so it lead to a bug whereby the last component to be deleted in the UI was not actually
+    # deleting the children object from the children collection
+    if 'children' in request.POST and request.POST['children'] is not None:
         children = request.POST['children']
         store.update_children(item_location, children)
 

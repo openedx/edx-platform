@@ -16,4 +16,6 @@ Changes
 
 Upcoming
 --------
-* Created changelog
+* Fix: Deleting last component in a unit does not work
+* Fix: Unit name is editable when a unit is public
+* Fix: Visual feedback inconsistent when saving a unit name change
