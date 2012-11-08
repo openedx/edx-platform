@@ -132,7 +132,81 @@ img {
 }
 
 .site-status {
+  display: block;
+}
+
+.course-status {
+  display: none;
+  padding: 20px 10px;
+  background: #fffcf0;
+  border-bottom: 1px solid #999;
+  @include linear-gradient(#f2dfbe, #fffcf0);
+  @include box-shadow(0 -2px 0 #fff inset);
+
+  .inner-wrapper {
+    margin: auto;
+    max-width: 1180px;
+    @include clearfix();
+
+    .message-copy {
+      display: inline-block;
+      margin-right: 20px;
+
+      .grade-value {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+    }
+
+    .actions {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .action {
+        display: inline-block;
+        margin-right: 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        .btn {
+          padding: 6px 12px;
+          @include box-sizing(border-box);
+          @include button(shiny, $blue);
+          @include border-radius(3px);
+          font: normal 0.8rem/1.2rem $sans-serif;
+          letter-spacing: 1px;
+          text-align: center;
+
+          &.disabled {
+            @include button(shiny, #eee);
+            cursor: default !important;
+
+            &:hover {
+              background: #eee;
+              background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+              background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+              background-image: -ms-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+              background-image: -o-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+              background-image: linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+            }
+          }
+        }
+
+        .cta {
+          font-size: 0.8rem;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  &.is-shown {
     display: block;
+  }
 }
 
 .toast-notification {
