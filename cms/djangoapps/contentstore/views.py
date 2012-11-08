@@ -55,7 +55,7 @@ from cache_toolbox.core import set_cached_content, get_cached_content, del_cache
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
 
 from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -66,7 +66,10 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential']
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
 def _modulestore(location):
@@ -619,6 +622,17 @@ def save_item(request):
         # commit to datastore
         store.update_metadata(item_location, existing_item.metadata)
 
+        # cdodge: special case logic for updating static_tabs
+        # unfortunately tabs are enumerated in the course policy data structure, so if we change the display name of
+        # the tab, we need to update the course policy (which has a nice .tabs property on it)
+        item_loc = Location(item_location)
+        if item_loc.category == 'static_tab':
+            # VS[compat] Rework when we can stop having to support tabs lists in the policy
+            tag_module = store.get_item(item_location)
+            course = get_course_for_item(item_location)
+            course.update_tab_reference(tag_module)
+            modulestore('direct').update_metadata(course.location, course.metadata)
+
     return HttpResponse()
 
 
@@ -692,7 +706,16 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
-    _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if new_item.location.category not in DETACHED_CATEGORIES:
+        _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+    elif new_item.location.category == 'static_tab':
+        # static tabs - in our data model - are described in the course policy
+        # VS[compat]: Rework when we can stop having to support tabs lists in the policy
+        if parent.location.category != 'course':
+            raise BaseException('adding a new static_tab must be on a course object')
+        parent.add_tab_reference(new_item)
+        _modulestore(parent.location).update_metadata(parent.location.url(), parent.metadata)
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -873,6 +896,25 @@ def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
 
+def edit_tabs(request, org, course, coursename):
+    location = ['i4x', org, course, 'course', coursename]    
+    course_item = modulestore().get_item(location)
+    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    static_tabs = modulestore('direct').get_items(static_tabs_loc)
+
+    components = [
+        static_tab.location.url()
+        for static_tab
+        in static_tabs
+    ]
+
+    return render_to_response('edit-tabs.html', {
+        'active_tab': 'pages',
+        'context_course':course_item, 
+        'components': components
+        })
+
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 
@@ -880,6 +922,36 @@ def not_found(request):
 def server_error(request):
     return render_to_response('error.html', {'error': '500'})
 
+
+@login_required
+@ensure_csrf_cookie
+def course_info(request, org, course, name):
+    """
+    Display an editable asset library
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    # safe but slower would be to chk that course_info exists and, if not, add it
+    location = ['i4x', org, course, 'course_info', "updates"]
+    # TODO chagne to get_items when we store each update as a separate entry, then no need to force creation
+    try:
+        course_updates = modulestore().get_item(location)
+    except ItemNotFoundError:
+        template = Location(['i4x', org, "templates", 'course_info', "Empty"])
+        _modulestore(template).clone_item(template, location)
+    
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
+        'context_course': course_module,
+        'updates' : course_updates
+    })
 
 @login_required
 @ensure_csrf_cookie
@@ -977,10 +1049,21 @@ def create_new_course(request):
     # set a default start date to now
     new_course.metadata['start'] = stringify_time(time.gmtime())
 
+    # set up the default tabs
+    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    # at least a list populated with the minimal times
+    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    new_course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
+        {"type": "discussion", "name": "Discussion"},
+        {"type": "wiki", "name": "Wiki"},
+        {"type": "progress", "name": "Progress"}]
+
     modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
 
     create_all_course_groups(request.user, new_course.location)
-
+    
     return HttpResponse(json.dumps({'id': new_course.location.url()}))
 
 @ensure_csrf_cookie
