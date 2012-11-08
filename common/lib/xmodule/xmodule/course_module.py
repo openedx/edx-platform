@@ -266,6 +266,10 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('tabs')
 
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
+
     @property
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
