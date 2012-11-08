@@ -208,3 +208,61 @@ class EditTestCase(ContentStoreTestCase):
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
+@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+class CourseCreationTest(ContentStoreTestCase):
+    """Test new course creation code"""
+
+    def setUp(self):
+        uname = 'testuser'
+        email = 'edit@test.com'
+        password = 'foo'
+
+        # Create the use so we can log them in.
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        u = User.objects.create_user(uname, email, password)
+        u.is_active = True
+        u.save()
+
+        # Flush and initialize the module store
+        # It needs a course template because it creates a new course
+        # by cloning from the template.
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
+        template_item = {'_id': {'tag': 'i4x', 'org': 'edx', 'course': 'templates',
+                         'category': 'course', 'name': 'Empty', 'revision': None}}
+        xmodule.modulestore.django.modulestore().collection.insert(template_item)
+
+        self.client = Client()
+        self.client.login(username=uname, password=password)
+
+        self.post_data = {
+            'template': 'i4x://edx/templates/course/Empty',
+            'org': 'MITx',
+            'number': '999',
+            'display_name': 'Robot Super Course',
+        }
+
+    def test_create_course(self):
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+    def test_create_course_duplicate_course(self):
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        data = parse_json(resp)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
+
+    def test_create_course_duplicate_number(self):
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        self.post_data['display_name'] = 'Robot Super Course Two'
+
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization and course number.')
