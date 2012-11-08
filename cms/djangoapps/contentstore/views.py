@@ -903,8 +903,6 @@ def edit_tabs(request, org, course, coursename):
 
     static_tabs = modulestore('direct').get_items(static_tabs_loc)
 
-    logging.debug('tabs in policy = %s', course_item.tabs)
-
     components = [
         static_tab.location.url()
         for static_tab
