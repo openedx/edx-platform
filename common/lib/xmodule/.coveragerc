@@ -1,0 +1,12 @@
+# .coveragerc for common/lib/xmodule
+[run]
+data_file = reports/common/lib/xmodule/.coverage
+
+[report]
+ignore_errors = True
+
+[html]
+directory = reports/common/lib/xmodule/cover
+
+[xml]
+output = reports/common/lib/xmodule/coverage.xml
