@@ -1,6 +1,7 @@
 # .coveragerc for common/lib/xmodule
 [run]
 data_file = reports/common/lib/xmodule/.coverage
+source = common/lib/xmodule
 
 [report]
 ignore_errors = True

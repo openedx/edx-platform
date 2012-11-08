@@ -1,6 +1,7 @@
 # .coveragerc for lms
 [run]
 data_file = reports/lms/.coverage
+source = lms
 
 [report]
 ignore_errors = True
