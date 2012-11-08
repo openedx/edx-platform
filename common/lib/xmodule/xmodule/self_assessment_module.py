@@ -1,6 +1,7 @@
 """
-Add Self Assessment module so students can write essay, submit, then see a rubric and rate themselves.
-Persists student supplied hints, answers, and correctness judgment (currently only correct/incorrect).
+A Self Assessment module that allows students to write open-ended responses,
+submit, then see a rubric and rate themselves.  Persists student supplied
+hints, answers, and correctness judgment (currently only correct/incorrect).
 Parses xml definition file--see below for exact format.
 """
 
@@ -37,6 +38,26 @@ MAX_ATTEMPTS = 1
 MAX_SCORE = 1
 
 class SelfAssessmentModule(XModule):
+    """
+    States:
+
+    initial (prompt, textbox shown)
+         |
+    assessing (read-only textbox, rubric + assessment input shown)
+         |
+    request_hint (read-only textbox, read-only rubric and assessment, hint input box shown)
+         |
+    done (submitted msg, green checkmark, everything else read-only.  If attempts < max, shows
+         a reset button that goes back to initial state.  Saves previous
+         submissions too.)
+    """
+
+    # states
+    INITIAL = 'initial'
+    ASSESSING = 'assessing'
+    REQUEST_HINT = 'request_hint'
+    DONE = 'done'
+
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
     js_module_name = "SelfAssessment"
 
@@ -93,15 +114,12 @@ class SelfAssessmentModule(XModule):
         # self-assessment and hint yet: this means that the answers,
         # correctness, hints always stay in sync, and have the same number of
         # elements.
-        self.temp_answer = instance_state.get('temp_answer', '')
+        self.state = instance_state.get('state', 'initial')
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self.score = instance_state.get('score', 0)
         self.top_score = instance_state.get('top_score', MAX_SCORE)
-
-        # TODO: do we need this?  True once everything is done
-        self.done = instance_state.get('done', False)
 
         #Get number of attempts student has used from instance state
         self.attempts = instance_state.get('attempts', 0)
@@ -124,6 +142,9 @@ class SelfAssessmentModule(XModule):
             'prompt' : self.prompt,
             'previous_answer' : previous_answer,
             'ajax_url' : system.ajax_url,
+            'initial_rubric' : self.get_rubric_html(),
+            'initial_hint' : self.get_hint_html(),
+            'initial_message' : self.get_message_html(),
         }
         self.html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -175,6 +196,55 @@ class SelfAssessmentModule(XModule):
         })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def get_rubric_html(self):
+        """
+        Return the appropriate version of the rubric, based on the state.
+        """
+        if self.state == self.INITIAL:
+            return ''
+
+        # we'll render it
+        context = {'rubric' : self.rubric}
+
+        if self.state == self.ASSESSING:
+            context['read_only'] = False
+        elif self.state in (self.REQUEST_HINT, self.DONE):
+            context['read_only'] = True
+        else:
+            raise ValueError("Illegal state '%r'" % self.state)
+
+        return self.system.render_template('self_assessment_rubric.html', context)
+
+    def get_hint_html(self):
+        """
+        Return the appropriate version of the hint view, based on state.
+        """
+        if self.state in (self.INITIAL, self.ASSESSING):
+            return ''
+
+        # else we'll render it
+        context = {'hint_prompt': self.hint_prompt,
+                   'hint': self.hint}
+
+        if self.state == self.REQUEST_HINT:
+            context['read_only'] = False
+        elif self.state == self.DONE:
+            context['read_only'] = True
+        else:
+            raise ValueError("Illegal state '%r'" % self.state)
+
+        return self.system.render_template('self_assessment_hint.html', context)
+
+    def get_message_html(self):
+        """
+        Return the appropriate version of the message view, based on state.
+        """
+        if self.state != self.DONE:
+            return ""
+
+        return """<div class="save_message">{0}</div>""".format(self.message)
+
+
     def show_rubric(self, get):
         """
         After the answer is submitted, show the rubric.
@@ -184,13 +254,9 @@ class SelfAssessmentModule(XModule):
             # Dump to temp_answer to keep answer in sync with correctness and hint
             self.temp_answer = get['student_answer']
 
-            # Return success and return rubric html to ajax call
-            rubric_context = {'rubric' : self.rubric,
-                              'hint_prompt' : self.hint_prompt,}
-            
             return {
                 'success': True,
-                'rubric': self.system.render_template('self_assessment_rubric.html', rubric_context)
+                'rubric': self.get_rubric_html()
             }
         else:
             # If too many attempts, prevent student from saving answer and seeing rubric.
@@ -213,8 +279,7 @@ class SelfAssessmentModule(XModule):
             self.correctness.append(get['assessment'].lower())
             self.student_answers.append(self.temp_answer)
 
-        #Student is done, and increment attempts
-        self.done = True
+        # increment attempts
         self.attempts = self.attempts + 1
 
         #Create and store event info dict
@@ -239,7 +304,7 @@ class SelfAssessmentModule(XModule):
 
     def get_instance_state(self):
         """
-        Get the current correctness, points, and done status
+        Get the current correctness, points, and state
         """
         #Assign points based on completion.  May want to change to correctness-based down the road.
         points = 1
@@ -251,7 +316,6 @@ class SelfAssessmentModule(XModule):
                  'correctness': self.correctness,
                  'score': points,
                  'top_score' : MAX_SCORE,
-                 'done': self.done,
                  'attempts' : self.attempts
         }
         return json.dumps(state)

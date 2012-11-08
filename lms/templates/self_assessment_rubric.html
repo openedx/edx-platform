@@ -4,15 +4,11 @@
     ${rubric}
     </div>
 
+    % if not read_only:
     <select name="assessment" class="assessment">
         <option value="incorrect">Incorrect</option>
         <option value="correct">Correct</option>
     </select>
+    % endif
 
-    <div class="hint-prompt">
-    ${hint_prompt}
-    </div>
-    <textarea name="hint" class="hint" cols="50" rows="5"/>
-
-    <div class="save_message"></div>
 </div>
