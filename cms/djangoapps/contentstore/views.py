@@ -1,22 +1,15 @@
-import traceback 
 from util.json_request import expect_json
-import exceptions
 import json
 import logging
-import mimetypes
 import os
-import StringIO
 import sys
 import time
 import tarfile
 import shutil
-import tempfile
 from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
-from lxml import etree
 from path import path
-from shutil import rmtree
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -28,8 +21,6 @@ from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django import forms
-from django.shortcuts import redirect
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -43,23 +34,21 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
-from xmodule.timeparse import parse_time, stringify_time
 from functools import partial
-from itertools import groupby
-from operator import attrgetter
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 
-from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
-from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
 
-from xmodule.templates import all_templates
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml import edx_xml_parser
+from contentstore.course_info_model import get_course_updates,\
+    update_course_updates, delete_course_update
+from cache_toolbox.core import del_cached_content
+from xmodule.timeparse import stringify_time
 
 log = logging.getLogger(__name__)
 
@@ -346,7 +335,7 @@ def edit_unit(request, location):
 def preview_component(request, location):
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     if not has_access(request.user, location):
-        raise Http404  # TODO (vshnayder): better error
+        raise HttpResponseForbidden()
 
     component = modulestore().get_item(location)
 
@@ -905,6 +894,61 @@ def not_found(request):
 def server_error(request):
     return render_to_response('error.html', {'error': '500'})
 
+
+@login_required
+@ensure_csrf_cookie
+def course_info(request, org, course, name, provided_id=None):
+    """
+    Send models and views as well as html for editing the course info to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
+        'context_course': course_module,
+        'url_base' : "/" + org + "/" + course + "/",
+        'course_updates' : json.dumps(get_course_updates(location))
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_info_updates(request, org, course, provided_id=None):
+    """
+    restful CRUD operations on course_info updates.
+
+    org, course: Attributes of the Location for the item to edit
+    provided_id should be none if it's new (create) and a composite of the update db id + index otherwise.
+    """
+    # ??? No way to check for access permission afaik
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
+    elif real_method == 'POST':
+        # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+    elif real_method == 'PUT':
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
 
 @login_required
 @ensure_csrf_cookie
