@@ -35,7 +35,7 @@ end
 
 def django_admin(system, env, command, *args)
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "python `which #{django_admin}` #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
 task :default => [:test, :pep8, :pylint]
