@@ -182,56 +182,31 @@ TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data'
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class EditTestCase(ContentStoreTestCase):
-    """Check that editing functionality works on example courses"""
-
-    def setUp(self):
-        email = 'edit@test.com'
-        password = 'foo'
-        self.create_account('edittest', email, password)
-        self.activate_user(email)
-        self.login(email, password)
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def check_edit_unit(self, test_course_name):
-        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
-
-        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
-            print "Checking ", descriptor.location.url()
-            print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
-            self.assertEqual(resp.status_code, 200)
-
-    def test_edit_unit_toy(self):
-        self.check_edit_unit('toy')
-
-    def test_edit_unit_full(self):
-        self.check_edit_unit('full')
-
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class CourseCreationTest(ContentStoreTestCase):
-    """Test new course creation code"""
+class ContentStoreTest(TestCase):
 
     def setUp(self):
         uname = 'testuser'
-        email = 'edit@test.com'
+        email = 'test+courses@edx.org'
         password = 'foo'
 
         # Create the use so we can log them in.
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
-        u = User.objects.create_user(uname, email, password)
-        u.is_active = True
-        u.save()
+        self.user = User.objects.create_user(uname, email, password)
+        self.user.is_active = True
+        self.user.save()
 
         # Flush and initialize the module store
         # It needs a course template because it creates a new course
         # by cloning from the template.
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
-        template_item = {'_id': {'tag': 'i4x', 'org': 'edx', 'course': 'templates',
-                         'category': 'course', 'name': 'Empty', 'revision': None}}
+        template_item = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
+                         "category" : "course", "name" : "Empty", "revision" : None }, 
+                         "definition" : { "children" : [ ], "data" : { "textbooks" : [ ], 
+                         "wiki_slug" : None } }, "metadata" : { "start" : "2020-10-10T10:00", 
+                         "display_name" : "Empty" } }
+
         xmodule.modulestore.django.modulestore().collection.insert(template_item)
 
         self.client = Client()
@@ -245,12 +220,14 @@ class CourseCreationTest(ContentStoreTestCase):
         }
 
     def test_create_course(self):
+        """Test new course creation - happy path"""
         resp = self.client.post(reverse('create_new_course'), self.post_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
 
     def test_create_course_duplicate_course(self):
+        """Test new course creation - error path"""
         resp = self.client.post(reverse('create_new_course'), self.post_data)
         resp = self.client.post(reverse('create_new_course'), self.post_data)
         data = parse_json(resp)
@@ -258,6 +235,7 @@ class CourseCreationTest(ContentStoreTestCase):
         self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
 
     def test_create_course_duplicate_number(self):
+        """Test new course creation - error path"""
         resp = self.client.post(reverse('create_new_course'), self.post_data)
         self.post_data['display_name'] = 'Robot Super Course Two'
 
@@ -266,3 +244,34 @@ class CourseCreationTest(ContentStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization and course number.')
+
+    def test_index(self):
+        """Test viewing the existing courses"""
+        # Staff has access to view all courses
+        self.user.is_staff = True
+        self.user.save()
+
+        # Create a course so there is something to view
+        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.get(reverse('index'))
+
+        # Right now there may be a bug in cms/templates/widgets/header.html
+        # because there is an unexpected ending ul tag in the header.
+        # When this is fixed, change html=True below.  JZ 11/08/2012
+        self.assertContains(resp, '<span class="class-name">Robot Super Course</span>', html=False)
+
+    def check_edit_unit(self, test_course_name):
+        """Check that editing functionality works on example courses"""
+        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
+
+        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
+            print "Checking ", descriptor.location.url()
+            print descriptor.__class__, descriptor.location
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+    def test_edit_unit_toy(self):
+        self.check_edit_unit('toy')
+
+    def test_edit_unit_full(self):
+        self.check_edit_unit('full')
