@@ -1,0 +1,48 @@
+#bigicon_providers, #smallicon_providers {
+    display: block;
+    padding: 0px;
+    width:600px;
+    margin:0px 0px 5px 0px;
+}
+
+.provider_logo {
+    display: inline-block;
+    padding: 4px;
+    border: 1px solid #DDD;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.provider_logo.big {
+    height: 40px;
+    width: 90px;
+}
+
+.provider_logo.small {
+    height: 32px;
+    width: 32px;
+}
+
+.provider_logo.selected {
+    outline: 2px solid #FFF8C6;
+}
+
+.provider_logo .provider_url {
+    display: none;
+}
+
+.signin_form input[type="text"], .signin_form input[type="password"], .signin_form input[type="submit"] {
+    height: 28px;
+    line-height: 22px;
+    font-size: 140%;
+    border: 1px solid #999;
+}
+
+.signin_form .icon_input  {
+    padding-left: 20px;
+}
+
+.or_label {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

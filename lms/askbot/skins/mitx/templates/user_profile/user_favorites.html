@@ -1,0 +1,9 @@
+{% extends "user_profile/user.html" %}
+<!-- user_favorites.html -->
+{% block profilesection %}
+   <h1 class="section-title"> {% trans %}followed questions{% endtrans %}</h1>
+{% endblock %}
+{% block usercontent %}
+{% include "user_profile/users_questions.html" %}
+{% endblock %}
+<!-- end user_favorites.html -->

@@ -1,0 +1,63 @@
+{% import "macros.html" as macros %}
+{{ settings.SIDEBAR_QUESTION_HEADER }}
+<h1>Course Question</h1>
+<!-- <div class="box vote-buttons"> -->
+  <!-- <div class="follow-buttons"> -->
+  <!--   {% if favorited %} -->
+  <!--   <a class="button followed" alt="{% trans %}click to unfollow this question{% endtrans %}"> -->
+  <!--     <div>Unfollow</div> -->
+  <!--   </a> -->
+  <!--   {% else %} -->
+
+  <!--   <a class="button followed" -->
+  <!--     alt="{% trans %}click to follow this question{% endtrans %}"> -->
+  <!--     {%trans %}Follow{%endtrans%} -->
+  <!--   </a> -->
+  <!--   {% endif %} -->
+  <!-- </div> -->
+
+<!--   <div id="favorite-number" class="favorite-number{% if favorited %} my-favorite-number{% endif %}"> -->
+<!--     {% set follower_count = thread.favourite_count %} -->
+<!--     {% if follower_count > 0 %} -->
+<!--     {% trans count=follower_count %}{{count}} follower{% pluralize %}{{count}} followers{% endtrans %} -->
+<!--     {% endif %} -->
+<!--   </div> -->
+<!-- </div> -->
+
+{% if settings.SIDEBAR_QUESTION_SHOW_META %}
+<div class="box statsWidget question-stats">
+  <ul>
+    <li>
+    {% trans %}question asked{% endtrans %} <strong title="{{ question.added_at }}">{{question.added_at|diff_date}}</strong>
+    </li>
+    <li>
+    {% trans %}question was seen{% endtrans %} <strong>{{ thread.view_count|intcomma }} {% trans %}times{% endtrans %}</strong>
+    </li>
+    <li>
+    {% trans %}last updated{% endtrans %} <strong title="{{ thread.last_activity_at }}">{{thread.last_activity_at|diff_date}}</strong>
+    </li>
+    <!-- <li> -->
+    <!-- Followed <strong>{% set follower_count = thread.favourite_count %} -->
+    <!-- {% trans count=follower_count %}{{count}}{% endtrans %} -->
+    <!-- </strong> -->
+    <!-- </li> -->
+  </ul>
+</div>
+{% endif %}
+
+{% if similar_threads.data and settings.SIDEBAR_QUESTION_SHOW_RELATED %}
+{#% cache 1800 "related_questions" related_questions question.id language_code %#}
+<!-- <div class="box"> -->
+<!--   <h2>{% trans %}Related questions{% endtrans %}</h2> -->
+<!--   <div class="questions-related"> -->
+<!--     {% for thread_dict in similar_threads.data() %} -->
+<!--     <p> -->
+<!--     <a href="{{ thread_dict.url }}">{{ thread_dict.title|escape }}</a> -->
+<!--     </p> -->
+<!--     {% endfor %} -->
+<!--   </div> -->
+<!-- </div> -->
+{#% endcache %#}
+{% endif %}
+
+{{ settings.SIDEBAR_QUESTION_FOOTER }}

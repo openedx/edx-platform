@@ -1,0 +1,38 @@
+{% extends "two_column_body.html" %}
+<!-- reopen.html -->
+{% block title %}{% spaceless %}{% trans %}Reopen question{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1>{% trans %}Reopen question{% endtrans %}</h1>
+<p>{% trans %}Title{% endtrans %}: 
+    <a href="{{ question.get_absolute_url() }}">
+        <span class="big">{{ question.get_question_title()|escape }}</span>
+    </a>
+</p>
+<p>{% trans %}This question has been closed by 
+    <a href="{{closed_by_profile_url}}">{{closed_by_username}}</a>
+{% endtrans %}
+</p>
+<p>
+    {% trans %}Close reason:{% endtrans %} "<strong>{{question.thread.get_close_reason_display()}}</strong>".
+</p>
+<p>
+    {% trans %}When:{% endtrans %} {{question.thread.closed_at|diff_date}}
+</p>
+<p>
+    {% trans %}Reopen this question?{% endtrans %}
+</p>
+<form id="fmclose" action="{% url reopen question.id %}" method="post" >{% csrf_token %}
+    <div id="" style="padding:20px 0 20px 0">
+        <input type="submit" value="{% trans %}Reopen this question{% endtrans %}" class="submit" />&nbsp;
+        <input id="btBack" type="button" value="{% trans %}Cancel{% endtrans %}"  class="submit"  />
+    </div>
+</form>
+{% endblock %}
+{% block endjs %}
+    <script type="text/javascript">
+        $().ready(function(){
+            $('#btBack').bind('click', function(){ history.back(); });
+        });
+    </script>
+{% endblock %}
+<!-- end reopen.html -->

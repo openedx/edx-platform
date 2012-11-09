@@ -25,6 +25,7 @@ COURSE_SETTINGS =  {'edx4edx': {'number' : 'edX.01',
 
 STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
+    ASKBOT_ROOT / "askbot" / "skins",
     ("edx4edx", EDX4EDX_ROOT / "html"),
     ("circuits", DATA_DIR / "images"),
     ("handouts", DATA_DIR / "handouts"),

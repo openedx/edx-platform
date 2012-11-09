@@ -40,3 +40,7 @@ def course_db_for(course_id):
                     'NAME' : path_for_db(db_name)
                 }
             }
+
+def askbot_url_for(course_id):
+    return "courses/{0}/discussions/".format(course_id)
+

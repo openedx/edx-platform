@@ -1,0 +1,21 @@
+<!-- template secondary_header.html -->
+<div class="secondary-nav">
+  <nav id="secondaryHeader"> <!--default id-->
+
+    <div class="question-filter">
+      <a  href="{% url questions %}">Questions</a>
+      <ul>
+        {% include "widgets/scope_nav.html" %}
+      </ul>
+    </div>
+
+    <div class="search-box" id="scopeWrapper">
+      {% include "widgets/search_bar.html" %} {# include search form widget #}
+    </div>
+
+    <!--<div class="ask-button">
+    {% include "widgets/ask_button.html" %}
+    </div>-->
+
+  </nav>
+</div>

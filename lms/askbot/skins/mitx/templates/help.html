@@ -1,0 +1,33 @@
+{% extends "two_column_body.html" %}
+{% block title %}{% trans %}Help{% endtrans %}{% endblock %}
+{% block content %}
+<h1 class='section-title'>{% trans %}Help{% endtrans %}</h1>
+<p>
+    {% if request.user.is_authenticated() %}
+        {% trans username = request.user.username %}Welcome {{username}},{% endtrans %}
+    {% else %}
+        {% trans %}Welcome,{% endtrans %}
+    {% endif %}
+</p>
+<p>
+    {% trans %}Thank you for using {{app_name}}, here is how it works.{% endtrans %}
+</p>
+<p>
+    {% trans %}This site is for asking and answering questions, not for open-ended discussions.{% endtrans %}
+    {% trans %}We encourage everyone to use “question” space for asking and “answer” for answering.{% endtrans %}
+</p>
+<p>
+    {% trans %}Despite that, each question and answer can be commented – 
+    the comments are good for the limited discussions.{% endtrans %}
+</p>
+<p>
+    {% trans %}Voting in {{app_name}} helps to select best answers and thank most helpful users.{% endtrans %}
+</p>
+    {% trans %}Please vote when you find helpful information,
+    it really helps the {{app_name}} community.{% endtrans %}
+     
+    {% trans %}Besides, you can @mention users anywhere in the text to point their attention,
+    follow users and conversations and report inappropriate content by flagging it.{% endtrans %}
+</p>
+<p>{% trans %}Enjoy.{% endtrans %}</p>
+{% endblock %}

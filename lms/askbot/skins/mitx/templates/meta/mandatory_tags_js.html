@@ -1,0 +1,25 @@
+<script type="text/javascript">
+    $(document).ready(function(){
+        var fake_tag = new Tag();
+        $('ul.tags .tag').each(function(idx, elem){
+            var tag_input = $('input#id_tags');
+            var callback = function(){
+                var new_tag = fake_tag.decodeTagName($(elem).html());
+                if (/\*$/.test(new_tag)){//strip the asterisk
+                    new_tag = new_tag.substring(0, new_tag.length - 1);
+                }
+                if ($.trim(tag_input.val()) !== ''){
+                    var entered_tags = tag_input.val().split(/\s+/);
+                } else {
+                    var entered_tags = [];
+                }
+                if ($.inArray(new_tag, entered_tags) === -1){
+                    entered_tags.push(new_tag);
+                    tag_input.val(entered_tags.join(' '));
+                    tag_input.focus();
+                }
+            };
+            setupButtonEventHandlers($(elem), callback);
+        });
+    });
+</script>

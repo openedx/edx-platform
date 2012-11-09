@@ -1,0 +1,47 @@
+{% import "macros.html" as macros %}
+<div id="tagSelector" class="box tag-selector">
+    <h2>{% trans %}Interesting tags{% endtrans %}</h2>
+    {{ 
+        macros.tag_list_widget(
+            interesting_tag_names,
+            deletable = True,
+            css_class = 'interesting marked-tags',
+            search_state = search_state
+        )
+    }}
+    {# todo - add this via js
+        "remove '%(tag_name)s' from the list of interesting tags"|
+        format(tag_name = tag_name)
+    #}
+    <div class="inputs">
+        <input id="interestingTagInput" autocomplete="off" type="text"/>&nbsp;
+        <input id="interestingTagAdd" type="submit" value="{% trans %}add{% endtrans %}"/>
+    </div>
+    <h2>{% trans %}Ignored tags{% endtrans %}</h2>
+    {{
+        macros.tag_list_widget(
+            ignored_tag_names,
+            deletable = True,
+            css_class = 'ignored marked-tags',
+            search_state = search_state
+        )
+    }}
+    {# todo: add this via javascript 
+        "remove '%(tag_name)s' from the list of ignored tags"|
+        format(tag_name = tag_name)
+    #}
+    <div class="inputs">
+        <input id="ignoredTagInput" autocomplete="off" type="text"/>&nbsp;
+        <input id="ignoredTagAdd" type="submit" value="{% trans %}add{% endtrans%}"/>
+    </div>
+    <h2>{% trans %}Display tag filter{% endtrans%}</h2>
+    <div id="displayTagFilterControl">
+        {{
+            macros.radio_select(
+                name = "display_tag_filter_strategy",
+                value = request.user.display_tag_filter_strategy,
+                choices = tag_filter_strategy_choices
+            )
+        }}
+    </div>
+</div>

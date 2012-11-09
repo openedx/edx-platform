@@ -1,0 +1,27 @@
+{% extends "user_profile/user.html" %}
+<!-- user_email_subscriptions.html -->
+{% block profilesection %}
+    {% trans %}subscriptions{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+    <h2>{% trans %}Email subscription settings{% endtrans %}</h2>
+    <p class="message">{% trans %}email subscription settings info{% endtrans %}</p>
+    <div>
+    {% if action_status %}
+        <p class="action-status"><span>{{action_status}}</span></p>
+    {% endif %}
+    <form method="post" action="">{% csrf_token %}
+        <table class='form-as-table ab-subscr-form'>
+        {{email_feeds_form.as_table()}}
+        </table>
+        <table class='form-as-table ab-tag-filter-form'>
+        {{tag_filter_selection_form}}
+        </table>
+        <div class="submit-row text-align-right">
+            <input type="submit" class="submit" name="save" value="{% trans %}Update{% endtrans %}"/>&nbsp;
+            <input type="submit" class="submit" name="stop_email" value="{% trans %}Stop sending email{% endtrans %}"/>
+        </div>
+    </form>
+    </div>
+{% endblock %}
+<!-- end user_email_subscriptions.html -->

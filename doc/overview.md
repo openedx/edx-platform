@@ -27,7 +27,7 @@ You should be familiar with the following.  If you're not, go read some docs...
 
   - CMS -- Course Management System.  The instructor-facing parts of the system.  Allows instructors to see and modify their course, add lectures, problems, reorder things, etc.
 
-  - Forums -- this is a ruby on rails service that runs on Heroku.  Contributed by berkeley folks.  The LMS has a wrapper lib that talks to it.
+  - Askbot -- the discussion forums.  We have a custom fork of this project.  We're also hoping to replace it with something better later.  (e.g. need support for multiple classes, etc)
 
   - Data.  In the data/ dir.  There is currently a single `course.xml` file that describes an entire course.  Speaking of which...
 
