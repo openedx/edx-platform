@@ -22,7 +22,7 @@ def load_polices(policy_list):
     args: An option dictionary containing named arguments to pass to the policy plugin
     """
     return [
-        Policy.load_class(policy['class'])(policy.get('condition', {}) **policy.get('args', {}))
+        Policy.load_class(policy['class'])(condition=policy.get('condition', {}), **policy.get('args', {}))
         for policy in policy_list
     ]
 
@@ -68,6 +68,8 @@ class Run():
         return hasher.hexdigest()
 
 
+# N.B. it would be nice to make policy a frozen dictionary, and children a frozen list
+# to force usages to behave entirely like values
 Usage = namedtuple('Usage', 'id source policy children')
 
 
@@ -93,8 +95,8 @@ class CascadeKeys(Policy):
     down the tree, prioritizing policies already set on descendents
     over those being cascaded
     """
-    def __init__(self, condition, keys):
-        super(CascadeKeys, self).__init__(condition)
+    def __init__(self, keys, *args, **kwargs):
+        super(CascadeKeys, self).__init__(*args, **kwargs)
 
         self.keys = keys
 
@@ -112,3 +114,48 @@ class CascadeKeys(Policy):
         ]
 
         return tree._update(children=children)
+
+class Reschedule(Policy):
+    """
+    This policy adds a specified timedelta to all start_dates
+    """
+
+    def __init__(self, delta, *args, **kwargs):
+        super(CascadeKeys, self).__init__(*args, **kwargs)
+
+        self.delta = delta
+
+    def apply(self, tree):
+        children = [
+            self.apply(child) for child in tree.children
+        ]
+
+        policy = dict(tree.policy)
+        if 'start_date' in policy:
+            policy['start_date'] = policy['start_date'] + delta
+
+        return tree._update(policy=policy, children=children)
+
+class AppendModule(QueryPolicy):
+    """
+    This module will append a policy after each module matching the query.
+    Any keys in policy_to_copy will be copied from the usage node that
+    matches the query.
+    """
+
+    def __init__(self, query, source, policy_to_copy=None, *args, **kwargs):
+        super(AppendModule, self).__init__(query, *args, **kwargs)
+        self.policy_to_copy = policy_to_copy if policy_to_copy is not None else []
+        self.source = source
+
+    def update(usage):
+        """
+        Return a list of usages to replace the returned usage with
+        """
+        to_insert = Usage.create_usage(self.source)
+        policy = dict(to_insert.policy)
+        for key in self.policy_to_copy:
+            if key in usage:
+                policy[key] = usage[key]
+
+        return [usage, to_insert._update(policy=policy)]
