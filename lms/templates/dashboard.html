@@ -148,30 +148,30 @@
 
 
         % if course.has_ended:
-              <%
-              passing_grade = False
-              cert_button = False
-              survey_button = False
-              if cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
-                  status_css_class = 'course-status-certrendering'
-                  cert_button = True
-                  survey_button = True
-                  passing_grade = True
-              elif cert_status['status'] == CertificateStatuses.downloadable:
-                  status_css_class = 'course-status-certavailable'
-                  cert_button = True
-                  survey_button = True
-                  passing_grade = True
-              elif cert_status['status'] == CertificateStatuses.notpassing:
-                  status_css_class = 'course-status-certnotavailable'
-                  survey_button = True
-              else cert_status['status']:
-                  # This is primarily the 'unavailable' state, but also 'error', 'deleted', etc.
-                  status_css_class = 'course-status-processing'
+            <%
+            passing_grade = False
+            cert_button = False
+            survey_button = False
+            if cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
+                status_css_class = 'course-status-certrendering'
+                cert_button = True
+                survey_button = True
+                passing_grade = True
+            elif cert_status['status'] == CertificateStatuses.downloadable:
+                status_css_class = 'course-status-certavailable'
+                cert_button = True
+                survey_button = True
+                passing_grade = True
+            elif cert_status['status'] == CertificateStatuses.notpassing:
+                status_css_class = 'course-status-certnotavailable'
+                survey_button = True
+            else:
+                # This is primarily the 'unavailable' state, but also 'error', 'deleted', etc.
+                status_css_class = 'course-status-processing'
 
-              if survey_button and not course.end_of_course_survey_url:
-                  survey_button = False
-              %>
+            if survey_button and not course.end_of_course_survey_url:
+                survey_button = False
+            %>
             <div class="message message-status ${status_css_class} is-shown">
 
             % if cert_status == CertificateStatuses.unavailable:
