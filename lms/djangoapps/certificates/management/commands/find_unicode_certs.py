@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.core.management.base import BaseCommand
-from certificates.models import GeneratedCertificate
+from certificates.models import certificate_status_for_student
 from certificates.queue import XQueueCertInterface
 from django.contrib.auth.models import User
 from student.models import UserProfile
-import sys
+
 
 class Command(BaseCommand):
 
@@ -15,6 +15,9 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+
+        # TODO this is only temporary for CS169 certs
+
         course_id = 'BerkeleyX/CS169.1x/2012_Fall'
 
         enrolled_students = User.objects.filter(
@@ -33,4 +36,3 @@ class Command(BaseCommand):
                     if ret == 'generating':
                         print 'generating for {0}'.format(student)
                     break
-
