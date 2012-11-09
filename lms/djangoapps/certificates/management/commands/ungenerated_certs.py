@@ -10,13 +10,6 @@ class Command(BaseCommand):
     help = """
     Find all students that have need certificates
     and put certificate requests on the queue
-    """
-
-    def handle(self, *args, **options):
-
-    help = """
-    Find all students that have need certificates
-    and put certificate requests on the queue
 
     This is only for BerkeleyX/CS169.1x/2012_Fall
     """
@@ -24,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         course_id = 'BerkeleyX/CS169.1x/2012_Fall'
-        enrolled_students = User.objects.filter(id=444894,
+        enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_id).prefetch_related(
                         "groups").order_by('username')
         xq = XQueueCertInterface()
