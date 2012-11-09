@@ -19,7 +19,8 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
-# Enable Berkeley forums
+# Disable askbot, enable Berkeley forums
+MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that

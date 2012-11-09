@@ -1,0 +1,12 @@
+{% trans %}Thank you for registering at our Q&A forum!{% endtrans %}
+
+{% trans %}Your account details are:{% endtrans %}
+
+{% trans %}Username:{% endtrans %} {{ username }}
+{% trans %}Password:{% endtrans %} {{ password }}
+
+{% trans %}Please sign in here:{% endtrans %}
+{{signup_url}}
+
+{% trans %}Sincerely,
+Forum Administrator{% endtrans %}

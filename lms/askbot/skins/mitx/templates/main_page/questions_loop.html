@@ -1,0 +1,14 @@
+{% import "macros.html" as macros %}
+{# cache 0 "questions" questions search_tags scope sort query context.page language_code #}
+{% for thread in threads.object_list %}
+    {{ macros.question_summary(thread, thread._question_post(), search_state=search_state) }}
+{% endfor %}
+{% if threads.object_list|length == 0 %}
+    {% include "main_page/nothing_found.html" %}
+{% else %}
+    <div class="evenMore post-own-question">
+        {% trans %}Did not find what you were looking for?{% endtrans %} 
+        <a href="{% url ask %}">{% trans %}Please, post your question!{% endtrans %}</a>
+    </div>
+{% endif %}
+

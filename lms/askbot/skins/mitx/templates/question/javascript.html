@@ -1,0 +1,91 @@
+{% if not thread.closed %}
+    <script type='text/javascript' src='{{"/js/editor.js"|media}}'></script>
+    <script type='text/javascript'>
+        {% if settings.ENABLE_MATHJAX or settings.MARKUP_CODE_FRIENDLY %}
+        var codeFriendlyMarkdown = true;
+        {% else %}
+        var codeFriendlyMarkdown = false;
+        {% endif %}
+        var maxCommentLength = {{settings.MAX_COMMENT_LENGTH}};
+        askbot['urls']['postComments'] = '{% url post_comments %}';
+        askbot['urls']['editComment'] = '{% url edit_comment %}';
+        askbot['urls']['deleteComment'] = '{% url delete_comment %}';
+        askbot['urls']['getComment'] = '{% url get_comment %}';
+        askbot['urls']['question_url_template'] = scriptUrl + '{{ 'question/'|transurl }}{{ "{{QuestionID}}/{{questionSlug}}" }}';{# yes it needs to be that whacky #}
+        askbot['urls']['vote_url_template'] = scriptUrl + '{{ 'questions/'|transurl }}{{ "{{QuestionID}}/" }}{{ 'vote/'|transurl }}';
+        askbot['urls']['user_signin'] = '{{ settings.LOGIN_URL }}';
+        askbot['urls']['swap_question_with_answer'] = '{% url swap_question_with_answer %}';
+        askbot['urls']['upvote_comment'] = '{% url upvote_comment %}';
+        askbot['urls']['delete_post'] = '{% url delete_post %}';
+        askbot['messages']['addComment'] = '{% trans %}add comment{% endtrans %}';
+        {% if settings.SAVE_COMMENT_ON_ENTER %}
+            askbot['settings']['saveCommentOnEnter'] = true;
+        {% else %}
+            askbot['settings']['saveCommentOnEnter'] = false;
+        {% endif %}
+    </script>
+    <script type='text/javascript' src='{{"/js/wmd/showdown.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/wmd/wmd.js"|media}}'></script>
+{% endif %}
+<script type='text/javascript' src='{{"/js/jquery.validate.min.js"|media}}'></script>
+<script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+<script type="text/javascript">
+    // define reputation needs for comments
+    var repNeededForComments = 50;
+    $().ready(function(){
+
+        $("#nav_questions").attr('className',"on");
+        var answer_sort_tab = "{{ tab_id }}";
+        $("#" + answer_sort_tab).attr('className',"on");
+        Vote.init({{ question.id }}, '{{ thread.title|slugify }}', '{{ question.author.id }}','{{ request.user.id }}');
+        {% if not thread.closed and request.user.is_authenticated %}initEditor();{% endif %}
+        lanai.highlightSyntax();
+        $('#btLogin').bind('click', function(){window.location.href='{{ settings.LOGIN_URL }}'; } )
+        if (window.location.hash === 'fmanswer'){
+            $('#fmanswer textarea').focus();
+        }
+        {% if settings.ENABLE_SHARING_GOOGLE %}$.getScript("http://apis.google.com/js/plusone.js"){% endif %}
+
+        {% if request.user == question.author %}
+            $("#fmanswer_button").click(function() {
+                $("#fmanswer").show();
+                $("#fmanswer_button").hide();
+            });
+        {%endif%}
+    });
+
+    $(window).bind('hashchange', animate_hashes);
+
+    function animate_hashes(){
+      var id_value = window.location.hash;
+      <!-- if (id_value != ""){ -->
+      <!--   var previous_color = $(id_value).css('background-color'); -->
+      <!--   $(id_value).css('backgroundColor', '#FFF8C6'); -->
+      <!--   $(id_value).animate({backgroundColor: '#ff7f2a'}, 1000).animate({backgroundColor: '#FFF8C6'}, 1000, function(){ -->
+      <!--       $(id_value).css('backgroundColor', previous_color); -->
+      <!--   }); -->
+      <!-- } -->
+    }
+
+    function initEditor(){
+        $('#editor').TextAreaResizer();
+        //highlight code synctax when editor has new text
+        $("#editor").typeWatch({highlight: false, wait: 3000,
+                         captureLength: 5, callback: lanai.highlightSyntax});
+        var display = true;
+        var txt = "{% trans %}hide preview{% endtrans %}";
+        $('#pre-collapse').text(txt);
+        $('#pre-collapse').bind('click', function(){
+            txt = display ? "{% trans %}show preview{% endtrans %}" : "{% trans %}hide preview{% endtrans %}";
+            display = !display;
+            $('#previewer').toggle();
+            $('#pre-collapse').text(txt);
+        });
+        setupFormValidation(
+            $("#fmanswer"),
+            CPValidator.getAnswerFormRules(),
+            CPValidator.getAnswerFormMessages()
+        );
+    }
+</script>
+{% include "meta/editor_data.html" %}

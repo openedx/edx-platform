@@ -1,0 +1,13 @@
+<script type="text/javascript">
+    {# data necessary for the post editor, goes into endjs block #}
+    askbot['settings']['maxTagLength'] = {{settings.MAX_TAG_LENGTH}};
+                            'each tag must be shorter than %(max_chars)d characters',
+    askbot['messages']['maxTagLength'] = '{% trans max_chars = settings.MAX_TAG_LENGTH %}each tag must be shorter that {{max_chars}} character{% pluralize %}each tag must be shorter than {{max_chars}} characters{% endtrans %}';
+    askbot['settings']['maxTagsPerPost'] = {{settings.MAX_TAGS_PER_POST}};
+    askbot['messages']['maxTagsPerPost'] = '{% trans tag_count = settings.MAX_TAGS_PER_POST %}please use {{tag_count}} tag{% pluralize %}please use {{tag_count}} tags or less{% endtrans %}';
+    askbot['messages']['tagLimits'] = '{% trans tag_count=settings.MAX_TAGS_PER_POST, max_chars=settings.MAX_TAG_LENGTH %}please use up to {{tag_count}} tags, less than {{max_chars}} characters each{% endtrans %}'; 
+    askbot['urls']['upload'] = '{% url "upload" %}';
+    askbot['settings']['minTitleLength'] = {{settings.MIN_TITLE_LENGTH}}
+    askbot['settings']['minQuestionBodyLength'] = {{settings.MIN_QUESTION_BODY_LENGTH}}
+    askbot['settings']['minAnswerBodyLength'] = {{settings.MIN_ANSWER_BODY_LENGTH}}
+</script>

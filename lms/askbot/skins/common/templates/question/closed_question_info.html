@@ -1,0 +1,5 @@
+<div class="question-status">
+    <h3>{% trans close_reason=thread.get_close_reason_display() %}The question has been closed for the following reason <b>"{{ close_reason }}"</b> <i>by{% endtrans %}
+        <a href="{{ thread.closed_by.get_profile_url() }}">{{ thread.closed_by.username }}</a> </i><br>
+        {% trans closed_at=thread.closed_at %}close date {{closed_at}}{% endtrans %}</h3>
+</div>

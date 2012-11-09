@@ -1,0 +1,19 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+{% block title %}{% trans %}Subscribe for tags{% endtrans %}{% endblock %}
+{% block content %}
+<h1>{% trans %}Subscribe for tags{% endtrans %}</h1>
+<p>{% trans %}Please, subscribe for the following tags:{% endtrans %}</p>
+<ul class="tags" style="margin-left: 4px">
+    {% for tag in tags %}
+        {{ macros.tag_widget(tag, html_tag = 'li', is_link = False) }}
+    {% endfor %}
+</ul>
+<div style="clear:both;padding-top: 5px">
+    <form method="post" action="{% url subscribe_for_tags %}">{% csrf_token %}
+        <input type="hidden" name="tags" value="{{tags|join(' ')|escape}}" />
+        <input type="submit" name="ok" value="{% trans %}Subscribe{% endtrans %}" />
+        <input type="submit" name="nope" value="{% trans %}Cancel{% endtrans %}" />
+    </form>
+</div>
+{% endblock %}

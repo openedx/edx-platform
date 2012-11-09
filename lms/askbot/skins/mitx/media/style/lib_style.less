@@ -1,0 +1,65 @@
+/* General Predifined classes, read more in lesscss.org */
+
+/* Variables for Colors*/
+
+@header-color:#16160f;
+@link:#1b79bd;
+@question-link:#464646;
+@button-label:#4a757f;
+@section-title:#7ea9b3;
+@info-text:#707070;
+@info-text-dark:#525252;
+
+/* Variables for fonts*/
+
+@body-font:Arial; /* "Trebuchet MS", sans-serif;*/
+@sort-font:Georgia, serif;
+@main-font:'Yanone Kaffeesatz', sans-serif;
+@secondary-font:Arial;
+
+/* Receive exactly positions for background Sprite  */
+
+.sprites(@hor,@vert,@back:url(../images/sprites.png)){
+    background:@hor @vert @back no-repeat;
+}
+
+/* CSS3 Elements */
+
+.box-shadow (@hor: 0px, @vert: 0px, @blur: 5px, @shadow: #929292){
+    -webkit-box-shadow: @arguments ;
+    -moz-box-shadow: @arguments;
+    box-shadow: @arguments;
+}
+
+.text-shadow(@hor: 0px, @vert: 0px, @blur: 5px, @shadow: #929292){
+    text-shadow: @arguments;
+    -moz-text-shadow: @arguments;
+    -webkit-text-shadow: @arguments;
+}
+
+.rounded-corners(@radio: 5px){
+    border-radius: @radio;
+    -ms-border-radius: @radio;
+    -moz-border-radius: @radio;
+    -webkit-border-radius: @radio;
+    -khtml-border-radius: @radio;
+}
+
+.rounded-corners-top(@radio:5px){
+    border-top-right-radius:@radio;
+    border-top-left-radius:@radio;
+    -moz-border-radius-topright:@radio;
+    -moz-border-radius-topleft:@radio;
+    -webkit-border-top-left-radius:@radio;
+    -webkit-border-top-right-radius:@radio;
+}
+
+.rounded-corners-right(@radio:5px){
+    border-top-right-radius:@radio;
+    border-bottom-right-radius:@radio;
+    -moz-border-radius-topright:@radio;
+    -moz-border-radius-bottomright:@radio;
+    -webkit-border-bottom-right-radius:@radio;
+    -webkit-border-top-right-radius:@radio;
+}
+
