@@ -75,12 +75,12 @@ class Usage(namedtuple('Usage', 'id source policy children')):
 
     @classmethod
     def create_usage(cls, source):
-        xmodule = xmodule.get_xmodule
+        xmodule = xmodule.get_module(source)
         return Usage(
             uuid(),
             xmodule.id,
             xmodule.policy,
-            [Usage.create_usage(child) for child in xmodule.children]
+            [Usage.create_usage(child.id) for child in xmodule.children]
         )
 
 
