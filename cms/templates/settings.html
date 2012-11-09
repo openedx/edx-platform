@@ -94,6 +94,7 @@
               <li><a href="#" data-section="grading">Grading</a></li>
               <li><a href="#" data-section="handouts">Handouts</a></li>
               <li><a href="#" data-section="problems">Problems</a></li>
+              <li><a href="#" data-section="discussions">Discussions</a></li>
             </ul>
           </nav>
         </div>
@@ -152,7 +153,7 @@
                   <ol class="input-list course-milestone-list">
                     <li class="element element-multi element-group course-milestone-list-element">
                       <div class="course-milestone-date">
-                        <input type="text" class="course-milestone-date-input date">
+                        <input type="text" class="course-milestone-date-input date hasDatepicker" placeholder="MM/DD/YYYY">
                         <span class="label-micro">Milestone Date</span>
                       </div>
 
@@ -210,7 +211,16 @@
                 <label>Prerequisites Links</label>
 
                 <div class="field">
-                  <input type="text" class="long course-prerequisites-links">
+
+                  <ol class="input-list course-prerequisites-list">
+                    <li class="element element-group course-prerequisites-list-element">
+                      <div class="course-milestone-date">
+                        <input type="text" class="long course-prerequisites-links">
+                      </div>
+
+                      <a href="#" class="remove-item remove-prerequisite-data"><span class="delete-icon"></span> Delete Link</a>
+                    </li>
+                  </ol>
 
                   <a href="#" class="new-item new-course-prerequisites-links-item add-links-data">
                     <span class="plus-icon"></span>New Link
@@ -293,6 +303,38 @@
           <section class="settings-staff">
             <h2>Course Staff</h2>
 
+            <section class="settings-staff-faculty">
+              <header>
+                <h3>Faculty</h3>
+              </header>
+
+              <ol class="input-list">
+                <li class="element element-group course-staff-faculty-element">
+                  <div class="row">
+                    <label>Faculty First Name:</label>
+                    <input type="text" class="long course-faculty-firstname-input">
+                  </div>
+                  <div class="row">
+                    <label>Faculty Last Name:</label>
+                    <input type="text" class="long course-faculty-lastname-input">
+                  </div>
+                  <div class="row">
+                    <label>Faculty Photo:</label>
+                    <input type="file" class="long course-faculty-photo-input">
+                    <span class="tip tip-stacked">This photo will appear on your course's info page</span>
+                  </div>
+                  <div class="row">
+                    <label>Faculty Bio:</label>
+                    <textarea class="long tall course-faculty-bio-input"></textarea>
+                    <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                  </div>  
+                </li>
+              </ol>
+
+              <a href="#" class="new-item new-course-faculty-item add-faculty-data">
+                <span class="plus-icon"></span>New Faculty Member
+              </a>
+            </section>
           </section>
 
           <section class="settings-grading">
@@ -392,6 +434,11 @@
             <div class="row">
               <input type="checkbox" id="randomize-problems"><label for="randomize-problems" class="check-label">Randomize Problems</label>            
             </div>
+          </section>
+
+          <section class="settings-discussions">
+            <h2>Discussions</h2>
+            
           </section>
         </div>
       </article>

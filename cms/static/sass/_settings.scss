@@ -70,6 +70,15 @@
       }
     }
 
+    ::-webkit-input-placeholder {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+    :-moz-placeholder {  
+      color: $mediumGrey;  
+      font-size: 13px;
+    }
+
     .field {
       display: inline-block;
       vertical-align: top;
@@ -93,7 +102,7 @@
           .remove-item {
             display: block;
             border-top: 1px solid $lightGrey;
-            margin-top: 5px;
+            margin-top: 10px;
             padding-top: 10px;
             font-size: 13px;
           }
@@ -101,7 +110,7 @@
 
         .element-group {
           width: 400px;
-          padding: 15px 20px;          
+          padding: 15px;          
           background: tint($lightGrey, 50%);
           @include border-radius(3px);
           @include box-sizing(border-box);
@@ -241,6 +250,30 @@
           border-radius: 5px 0 0 5px;
         }
       }
+    }
+
+    .settings-details {
+
+    }
+
+    .settings-staff {
+
+    }
+
+    .settings-grading {
+
+    }
+
+    .settings-handouts {
+
+    }
+
+    .settings-problems {
+
+    }
+
+    .settings-discussions {
+      
     }
   }
 
