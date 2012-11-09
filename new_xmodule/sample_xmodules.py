@@ -1,7 +1,7 @@
 import xmodule
 from xmodule import progress
 
-class StudentDefinition(ResourceTemplate):
+class CourseItem(ResourceTemplate):
 
     definition = BaseDefinition
 
@@ -105,7 +105,7 @@ class SequenceDefinition(BaseDefinition):
     def empty_view(self):
         return None
 
-class SequenceStudentDefinition(StudentDefinition):
+class SequenceCourseItem(CourseItem):
 
     definition = SequenceDefinition
 
@@ -147,7 +147,7 @@ class SequenceStudentDefinition(StudentDefinition):
         })
 
 
-class ChemistryEquationStudentDefinition(StudentDefinition):
+class ChemistryEquationCourseItem(CourseItem):
 
     @xmodule.register_view('student')
     def student_view(self):
