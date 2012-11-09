@@ -227,6 +227,28 @@ def validate_category_hierarcy(module_store, course_id, parent_category, expecte
 def validate_module_structure(module_store):
     err_cnt = 0
     warn_cnt = 0
+
+    print module_store.errored_courses
+
+    # first count all errors and warnings as part of the XMLModuleStore import
+    for err_log in module_store._location_errors.itervalues():
+        for err_log_entry in err_log.errors:
+            msg = err_log_entry[0]
+            if msg.startswith('ERROR:'):
+                err_cnt+=1
+            else:
+                warn_cnt+=1
+
+    # then count outright all courses that failed to load at all
+    for err_log in module_store.errored_courses.itervalues():
+        for err_log_entry in err_log.errors:
+            msg = err_log_entry[0]
+            print msg
+            if msg.startswith('ERROR:'):
+                err_cnt+=1
+            else:
+                warn_cnt+=1
+
     for course_id in module_store.modules.keys():
         # constrain that courses only have 'chapter' children
         err_cnt += validate_category_hierarcy(module_store, course_id, "course", "chapter")
@@ -235,6 +257,14 @@ def validate_module_structure(module_store):
         # constrain that sequentials only have 'verticals'
         err_cnt += validate_category_hierarcy(module_store, course_id, "sequential", "vertical")
 
-    print "SUMMARY: {0} Errors   {1} Warnings".format(err_cnt, warn_cnt)
+    print "\n\n------------------------------------------\nVALIDATION SUMMARY: {0} Errors   {1} Warnings\n".format(err_cnt, warn_cnt)
+
+    if err_cnt > 0:
+        print "This course is not suitable for importing. Please fix courseware according to specifications before importing."
+    elif warn_cnt > 0:
+        print "This course can be imported, but some errors may occur during the run of the course. It is recommend that you fix your courseware before importing"
+    else:
+        print "This course can be imported successfully."
+
        
 

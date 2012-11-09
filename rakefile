@@ -367,7 +367,9 @@ end
 namespace :cms do
   desc "Import course data within the given DATA_DIR variable"
   task :xlint do
-    if ENV['DATA_DIR']
+    if ENV['DATA_DIR'] and ENV['COURSE_DIR']
+      sh(django_admin(:cms, :dev, :xlint, ENV['DATA_DIR'], ENV['COURSE_DIR']))
+    elsif ENV['DATA_DIR']
       sh(django_admin(:cms, :dev, :xlint, ENV['DATA_DIR']))
     else
       raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
