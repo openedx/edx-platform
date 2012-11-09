@@ -252,7 +252,9 @@ Supported fields at the course level:
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
 * "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
+* "end_of_course_survey_url" -- a url for an end of course survey -- shown after course is over, next to certificate download links.
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
+* "show_calculator" (value "Yes" if desired)
 * TODO: there are others
 
 ### Grading policy file contents
