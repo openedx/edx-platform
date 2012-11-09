@@ -5,8 +5,13 @@ class StudentDefinition(ResourceTemplate):
 
     definition = BaseDefinition
 
-    def __init__(self, definition, state, preferences):
+    class Policies:
+        title = StringField(default=attrgetter('id.name'))
+        visible = BooleanField(default=True)
+
+    def __init__(self, definition, policy, state, preferences):
         self.definition = definition
+        self.policy = policy.with_defaults(self.definition.default_policy)
         self.state = state
         self.preferences = preferences
 
@@ -28,9 +33,9 @@ class StudentDefinition(ResourceTemplate):
 
 
 class BaseDefinition(ResourceTemplate):
-    def __init__(self, content, policy, child_pointers):
+    def __init__(self, content, default_policy, child_pointers):
         self.content = content
-        self.policy = policy
+        self.default_policy = default_policy
         self.child_pointers = child_pointers
 
     @lazy_property
@@ -42,7 +47,7 @@ class BaseDefinition(ResourceTemplate):
         return self.render_template(
             'combined',
             content=self.render(self, 'edit_content'),
-            policy=self.render(self, 'edit_policy'),
+            default_policy=self.render(self, 'edit_policy'),
             children=self.render(self, 'edit_children'),
         )
 
@@ -57,7 +62,7 @@ class BaseDefinition(ResourceTemplate):
     def edit_policy(self):
         return self.render_template(
             'mapping',
-            mapping=self.policy
+            mapping=self.default_policy
         )
 
     @xmodule.register_view('edit_content')
@@ -82,9 +87,9 @@ class BaseDefinition(ResourceTemplate):
         the named key to the value
         """
         if data['value'] is None:
-            del self.policy[data['value']]
+            del self.default_policy[data['value']]
         else:
-            self.policy[data['name']] = self.policy[data['value']]
+            self.default_policy[data['name']] = self.default_policy[data['value']]
 
 class SequenceDefinition(BaseDefinition):
 
@@ -93,7 +98,7 @@ class SequenceDefinition(BaseDefinition):
         return self.render_template(
             'combined',
             children=self.render(self, 'edit_children'),
-            policy=self.render(self, 'edit_policy'),
+            default_policy=self.render(self, 'edit_policy'),
         )
 
     @xmodule.register_view('edit_content')
