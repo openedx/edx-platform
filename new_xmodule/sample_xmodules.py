@@ -77,6 +77,20 @@ def XModuleEditor():
         else:
             self.policy[data['name']] = self.policy[data['value']]
 
+def SequenceEditor(XModuleEditor, ResourceTemplate):
+
+    @xmodule.register_view('edit')
+    def edit(self):
+        return self.render_template(
+            'combined',
+            children=self.render(self, 'edit_children'),
+            policy=self.render(self, 'edit_policy'),
+        )
+
+    @xmodule.register_view('edit_content')
+    def empty_view(self):
+        return None
+
 def SequenceModule(XModule, ResourceTemplate):
 
     @property
