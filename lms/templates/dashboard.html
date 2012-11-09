@@ -137,7 +137,15 @@
                 <h3>${course.number} ${course.title}</h3>
               </hgroup>
               <section class="course-status course-status-completed">
-                <p><!-- Class Starts - <span>${course.start_date_text}</span> --> Course Completed - <span>Nov 6, 2012</span></p>
+              <p>
+              % if course.has_ended():
+              Course Completed - <span>${course.end_date_text}</span>
+              % elif course.has_started():
+              Course Started - <span>${course.start_date_text}</span>
+              % else:   # hasn't started yet
+              Course Starts - <span>${course.start_date_text}</span>
+              % endif
+              </p>
               </section>
               % if course.id in show_courseware_links_for:
                 <p class="enter-course">View Courseware</p>
