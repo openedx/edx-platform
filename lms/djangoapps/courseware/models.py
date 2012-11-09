@@ -108,7 +108,6 @@ class StudentModuleCache(object):
         else:
             self.cache = []
 
-
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
@@ -137,7 +136,6 @@ class StudentModuleCache(object):
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors
-
 
         descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 

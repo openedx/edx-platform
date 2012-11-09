@@ -66,7 +66,10 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential']
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
 def _modulestore(location):
@@ -692,7 +695,9 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
-    _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if new_item.location.category not in DETACHED_CATEGORIES:
+        _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -873,6 +878,25 @@ def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
 
+def edit_tabs(request, org, course, coursename):
+    location = ['i4x', org, course, 'course', coursename]    
+    course_item = modulestore().get_item(location)
+    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    static_tabs = modulestore('direct').get_items(static_tabs_loc)
+
+    components = [
+        static_tab.location.url()
+        for static_tab
+        in static_tabs
+    ]
+
+    return render_to_response('edit-tabs.html', {
+        'active_tab': 'pages',
+        'context_course':course_item, 
+        'components': components
+        })
+
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
 
@@ -976,6 +1000,17 @@ def create_new_course(request):
 
     # set a default start date to now
     new_course.metadata['start'] = stringify_time(time.gmtime())
+
+    # set up the default tabs
+    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    # at least a list populated with the minimal times
+    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    new_course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
+        {"type": "discussion", "name": "Discussion"},
+        {"type": "wiki", "name": "Wiki"},
+        {"type": "progress", "name": "Progress"}]
 
     modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
 

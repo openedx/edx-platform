@@ -170,3 +170,25 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
+
+
+class AboutDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "about"
+
+class StaticTabDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "statictab"
+
+class CourseInfoDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "courseinfo"

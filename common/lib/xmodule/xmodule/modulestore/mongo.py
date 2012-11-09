@@ -276,9 +276,48 @@ class MongoModuleStore(ModuleStoreBase):
             source_item = self.collection.find_one(location_to_query(source))
             source_item['_id'] = Location(location).dict()
             self.collection.insert(source_item)
-            return self._load_items([source_item])[0]
+            item = self._load_items([source_item])[0]
+
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # if we add one then we need to also add it to the policy information (i.e. metadata)
+            # we should remove this once we can break this reference from the course to static tabs
+            if location.category == 'static_tab':
+                course = self.get_course_for_item(item.location)
+                existing_tabs = course.tabs or []
+                existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
+                course.tabs = existing_tabs
+                self.update_metadata(course.location, course.metadata)
+
+            return item
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
+
+
+    def get_course_for_item(self, location):
+        '''
+        VS[compat]
+        cdodge: for a given Xmodule, return the course that it belongs to
+        NOTE: This makes a lot of assumptions about the format of the course location
+        Also we have to assert that this module maps to only one course item - it'll throw an
+        assert if not
+        This is only used to support static_tabs as we need to be course module aware
+        '''
+
+        # @hack! We need to find the course location however, we don't
+        # know the 'name' parameter in this context, so we have
+        # to assume there's only one item in this query even though we are not specifying a name
+        course_search_location = ['i4x', location.org, location.course, 'course', None]
+        courses = self.get_items(course_search_location)
+
+        # make sure we found exactly one match on this above course search
+        found_cnt = len(courses)
+        if found_cnt == 0:
+            raise BaseException('Could not find course at {0}'.format(course_search_location))
+
+        if found_cnt > 1:
+            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+
+        return courses[0]
 
     def _update_single_item(self, location, update):
         """
@@ -327,6 +366,19 @@ class MongoModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         metadata: A nested dictionary of module metadata
         """
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        loc = Location(location)
+        if loc.category == 'static_tab':
+            course = self.get_course_for_item(loc)
+            existing_tabs = course.tabs or []
+            for tab in existing_tabs:
+                if tab.get('url_slug') == loc.name:
+                    tab['name'] = metadata.get('display_name')
+                    break
+            course.tabs = existing_tabs
+            self.update_metadata(course.location, course.metadata)
 
         self._update_single_item(location, {'metadata': metadata})
 
@@ -336,6 +388,16 @@ class MongoModuleStore(ModuleStoreBase):
 
         location: Something that can be passed to Location
         """
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if location.category == 'static_tab':
+            item = self.get_item(location)
+            course = self.get_course_for_item(item.location)
+            existing_tabs = course.tabs or []
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
+            self.update_metadata(course.location, course.metadata)
+
         self.collection.remove({'_id': Location(location).dict()})
 
     def get_parent_locations(self, location):

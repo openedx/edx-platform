@@ -52,5 +52,6 @@ pil
 nltk
 django-debug-toolbar-mongo
 dogstatsd-python
-MySQL-python
+# Taking out MySQL-python for now because it requires mysql to be installed, so breaks updates on content folks' envs.
+# MySQL-python
 sphinx
