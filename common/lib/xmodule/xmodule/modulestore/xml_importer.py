@@ -16,7 +16,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
     remap_dict = {}
    
     # now import all static assets
-    static_dir = course_data_path / 'static'
+    static_dir = course_data_path / 'static/'
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:
