@@ -199,7 +199,6 @@ class ContentStoreTest(TestCase):
         self.user.is_staff = True
         self.user.save()
 
-
         # Flush and initialize the module store
         # It needs the templates because it creates new records
         # by cloning from the template.
@@ -238,6 +237,17 @@ class ContentStoreTest(TestCase):
             'display_name': 'Section One',
             }
 
+    def tearDown(self):
+        # Make sure you flush out the test modulestore after the end
+        # of the last test otherwise cms/djangoapps/contentstore/__init__.py
+        # update_templates() is complaining that there are duplicate
+        # templates.
+        # If your test module gets in some weird state, do this manually
+        # from the bash shell to drop it.
+        # $ mongo test_xmodule --eval "db.dropDatabase()"
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
+
     def test_create_course(self):
         """Test new course creation - happy path"""
         resp = self.client.post(reverse('create_new_course'), self.course_data)
@@ -269,24 +279,20 @@ class ContentStoreTest(TestCase):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
-
-        # Right now there may be a bug in cms/templates/widgets/header.html
-        # because there is an unexpected ending ul tag in the header.
-        # When this is fixed, make a better matcher below.  JZ 11/08/2012
         self.assertContains(resp, 
-            '<a href="#" class="new-course-button"><span class="plus-icon"></span> New Course</a>',
-            html=False)
+            '<h1>My Courses</h1>',
+            status_code=200,
+            html=True)
 
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
         # Create a course so there is something to view
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         resp = self.client.get(reverse('index'))
-
-        # Right now there may be a bug in cms/templates/widgets/header.html
-        # because there is an unexpected ending ul tag in the header.
-        # When this is fixed, change html=True below.  JZ 11/08/2012
-        self.assertContains(resp, '<span class="class-name">Robot Super Course</span>', html=False)
+        self.assertContains(resp,
+            '<span class="class-name">Robot Super Course</span>',
+            status_code=200,
+            html=True)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
@@ -300,12 +306,10 @@ class ContentStoreTest(TestCase):
                 }
 
         resp = self.client.get(reverse('course_index', kwargs=data))
-        # Right now there may be a bug in cms/templates/widgets/header.html
-        # because there is an unexpected ending ul tag in the header.
-        # When this is fixed, change html=True below.  JZ 11/08/2012
         self.assertContains(resp, 
             '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
-            html=False)
+            status_code=200,
+            html=True)
 
     def test_clone_item(self):
         """Test cloning an item. E.g. creating a new section"""
@@ -326,6 +330,9 @@ class ContentStoreTest(TestCase):
             print descriptor.__class__, descriptor.location
             resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
+
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
 
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
