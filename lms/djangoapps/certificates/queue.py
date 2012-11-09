@@ -253,7 +253,7 @@ class XQueueCertInterface(object):
 
         xheader = make_xheader(
             'http://{0}/update_certificate?{1}'.format(
-                settings.SITE_NAME, key), key, 'test-pull')
+                settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
                 header=xheader, body=json.dumps(contents))
