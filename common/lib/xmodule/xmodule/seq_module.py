@@ -57,6 +57,11 @@ class SequenceModule(XModule):
         (assumes that each submodule uses the same "units" for progress.)
         '''
         # TODO: Cache progress or children array?
+        # TODO: Also need to do the right thing here when combining children
+        # with different kinds of progress:  problem modules have fraction of
+        # problems that have been completed (correctly?).  Video modules (may
+        # someday) have fraction of video that has been watched.  Need to figure
+        # out how to combine these.
         children = self.get_children()
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses)

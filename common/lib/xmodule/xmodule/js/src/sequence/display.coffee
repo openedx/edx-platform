@@ -40,45 +40,15 @@ class @Sequence
 
     return "none"
 
-  updateOverallScore: (details) =>
-    # Given a list of "a/b" strings, compute the sum(a)/sum(b), and the corresponding percentage
-    gotten = 0
-    possible = 0
-    for d in details
-      if d? and d.indexOf('/') > 0
-        a = d.split('/')
-        got = parseInt(a[0])
-        pos = parseInt(a[1])
-        gotten += got
-        possible += pos
-
-    if possible > 0
-      s = (gotten / possible * 100).toFixed(1) + "%"
-    else
-      s = "0%"
-
-    s += " (" + gotten + '/' + possible + ")"
-      
-    @el.find('.overall-progress').html(s)
-      
-
   updateProgress: =>
     new_progress_status = "NA"
-    scores_list = @el.find('.progress-score-list')
-    scores_list.empty()
-    details = []
     _this = this
     $('.problems-wrapper').each (index) ->
       progress_status = $(this).data('progress_status')
       new_progress_status = _this.mergeProgressStatus progress_status, new_progress_status
 
-      progress_detail = $(this).data('progress_detail')
-      scores_list.append("<li>" + progress_detail + "</li>")
-      details.push(progress_detail)
-
     @progressTable[@position] = new_progress_status
     @setProgress(new_progress_status, @link_for(@position))
-    @updateOverallScore(details)
 
   setProgress: (progress, element) ->
       # If progress is "NA", don't add any css class
@@ -124,8 +94,6 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
-      # update score lists
-      @updateProgress()
 
   goto: (event) =>
     event.preventDefault()
@@ -137,7 +105,7 @@ class @Sequence
     if (1 <= new_position) and (new_position <= @num_contents)
       Logger.log "seq_goto", old: @position, new: new_position, id: @id
     
-      # On Sequence chage, destroy any existing polling thread 
+      # On Sequence change, destroy any existing polling thread 
       #   for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)

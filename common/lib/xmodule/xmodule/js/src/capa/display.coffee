@@ -34,7 +34,18 @@ class @Problem
       MathJax.Hub.Queue [@refreshMath, null, element]
 
   renderProgressState: () =>
-    @$(".problem-progress").html(@el.data('progress_detail'))
+    detail = @el.data('progress_detail')
+    status = @el.data('progress_status')
+    progress = "(" + detail + " points)"
+    if status == "none" and detail? and detail.indexOf('/') > 0
+        a = detail.split('/')
+        possible = parseInt(a[1])
+        if possible == 1
+            progress =  "(" + possible + " point possible)"
+        else 
+            progress =  "(" + possible + " points possible)" 
+ 
+    @$(".problem-progress").html(progress)
     
 
   updateProgress: (response) =>
@@ -42,7 +53,7 @@ class @Problem
         @el.data('progress_status', response.progress_status)
         @el.data('progress_detail', response.progress_detail)
         @el.trigger('progressChanged')
-        @renderProgressState()
+    @renderProgressState()
 
 
   queueing: =>

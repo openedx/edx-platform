@@ -1,7 +1,16 @@
-<ol class="vert-mod">
+<div class="vert-wrapper">
+  <div class="vert-progress">
+    <div class="vert-progress-summary">
+      Overall: <span class="vert-progress-status"></span>
+    </div>
+    <div class="vert-progress-score">
+    </div>
+  </div>
+  <ol class="vert-mod">
 % for idx, item in enumerate(items):
-  <li id="vert-${idx}">
-    ${item}
-  </li>
+    <li id="vert-${idx}">
+      ${item}
+    <li>
 % endfor
-</ol>
+  </ol>
+</div>
