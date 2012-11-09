@@ -201,53 +201,69 @@ class ContentStoreTest(TestCase):
 
 
         # Flush and initialize the module store
-        # It needs a course template because it creates a new course
+        # It needs the templates because it creates new records
         # by cloning from the template.
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
-        template_item = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
-                         "category" : "course", "name" : "Empty", "revision" : None }, 
-                         "definition" : { "children" : [ ], "data" : { "textbooks" : [ ], 
-                         "wiki_slug" : None } }, "metadata" : { "start" : "2020-10-10T10:00", 
-                         "display_name" : "Empty" } }
-
-        xmodule.modulestore.django.modulestore().collection.insert(template_item)
+        course_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
+                            "category" : "course", "name" : "Empty", "revision" : None }, 
+                            "definition" : { "children" : [ ], "data" : { "textbooks" : [ ], 
+                            "wiki_slug" : None } },
+                            "metadata" : { "start" : "2020-10-10T10:00", "display_name" : "Empty" } }
+        section_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
+                            "category" : "section", "name" : "Empty", "revision" : None }, 
+                            "definition" : { "children" : [ ], "data" : "" }, 
+                            "metadata" : { "display_name" : "Empty" } }
+        chapter_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
+                            "category" : "chapter", "name" : "Empty", "revision" : None },
+                            "definition" : { "children" : [ ], "data" : "" }, 
+                            "metadata" : { "display_name" : "Empty" } }
+        xmodule.modulestore.django.modulestore().collection.insert(course_template)
+        xmodule.modulestore.django.modulestore().collection.insert(section_template)
+        xmodule.modulestore.django.modulestore().collection.insert(chapter_template)
 
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        self.post_data = {
+        self.course_data = {
             'template': 'i4x://edx/templates/course/Empty',
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
-        }
+            }
+
+        self.section_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/chapter/Empty',
+            'display_name': 'Section One',
+            }
 
     def test_create_course(self):
         """Test new course creation - happy path"""
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
         data = parse_json(resp)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
-        self.post_data['display_name'] = 'Robot Super Course Two'
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.course_data['display_name'] = 'Robot Super Course Two'
 
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
         data = parse_json(resp)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization and course number.')
+        self.assertEqual(data['ErrMsg'], 
+            'There is already a course defined with the same organization and course number.')
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
@@ -264,7 +280,7 @@ class ContentStoreTest(TestCase):
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
         # Create a course so there is something to view
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
         resp = self.client.get(reverse('index'))
 
         # Right now there may be a bug in cms/templates/widgets/header.html
@@ -275,12 +291,13 @@ class ContentStoreTest(TestCase):
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
         # Create a course so there is something to view
-        resp = self.client.post(reverse('create_new_course'), self.post_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
 
         data = {
-            'org': 'MITx',
-            'course': '999',
-            'name': Location.clean('Robot Super Course'),}
+                'org': 'MITx',
+                'course': '999',
+                'name': Location.clean('Robot Super Course'),
+                }
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         # Right now there may be a bug in cms/templates/widgets/header.html
@@ -289,6 +306,16 @@ class ContentStoreTest(TestCase):
         self.assertContains(resp, 
             '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
             html=False)
+
+    def test_clone_item(self):
+        """Test cloning an item. E.g. creating a new section"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.post(reverse('clone_item'), self.section_data)
+
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertRegexpMatches(data['id'], 
+            '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
 
     def check_edit_unit(self, test_course_name):
         """Check that editing functionality works on example courses"""
