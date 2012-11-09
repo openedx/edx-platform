@@ -1,0 +1,34 @@
+{% import "macros.html" as macros %}
+
+<h1>Course Discussion</h1>
+
+{% if request.user.is_authenticated() %}
+<div class="box view-profile">
+  <a href="{% url ask %}"><span>Ask a question</span></a>
+  <a href="{{ user.get_absolute_url() }}">View profile (<span>{{user.username}}</span>)</a>
+</div>
+{% endif %}
+
+<div class="search-box box" id="scopeWrapper">
+  <h2>Search questions</h2>
+  {% include "widgets/search_bar.html" %} {# include search form widget #}
+</div>
+
+
+{{ settings.SIDEBAR_MAIN_HEADER }}
+
+{% if contributors and settings.SIDEBAR_MAIN_SHOW_AVATARS %}
+   {# include "widgets/contributors.html" #}
+{% endif %}
+
+{% if request.user.is_authenticated() and settings.SIDEBAR_MAIN_SHOW_TAG_SELECTOR %} 
+   {% include "widgets/tag_selector.html" %}
+{% endif %}
+
+{% if tags and settings.SIDEBAR_MAIN_SHOW_TAGS %}
+   {% include "widgets/related_tags.html" %}
+{% endif %}
+
+
+
+{{ settings.SIDEBAR_MAIN_FOOTER }}

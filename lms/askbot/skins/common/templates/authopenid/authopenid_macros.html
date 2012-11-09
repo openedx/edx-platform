@@ -1,0 +1,58 @@
+{% macro login_provider_input(login_provider) %}
+    <input
+      name="{{login_provider.name}}"
+      type="image"
+      class="{{login_provider.type}}"
+      src="{{login_provider.icon_media_path|media}}"
+      alt="{{login_provider.tooltip_text}}"
+      title="{{login_provider.tooltip_text}}"
+    />
+{% endmacro %}
+
+{% macro provider_buttons(
+                    login_form = None,
+                    major_login_providers = None,
+                    minor_login_providers = None,
+                    hide_local_login = False,
+                    settings = None,
+                    logged_in = False
+                )
+%}
+    <div id="login-icons">
+        <ul class="login-icons large">
+            {% for login_provider in major_login_providers %}
+                {% if login_provider.name == 'local' and hide_local_login == True %}
+                    {# do nothing here, left if statement this way for simplicity #}
+                {% else %}
+                    {% if logged_in == True and login_provider.type == 'password' and login_provider.password_changeable == False %}
+                    {% else %}
+                    <li>
+                        {{ login_provider_input(login_provider) }}
+                    </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <ul class="login-icons small">
+            {% for login_provider in minor_login_providers %}
+                {% if logged_in == True and login_provider.type == 'password' and login_provider.password_changeable == False %}
+                {% else %}
+                <li>
+                    {{ login_provider_input(login_provider) }}
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <fieldset 
+        id="openid-fs" 
+        {% if not login_form.openid_login_token.errors %}
+            style="display:none;"
+        {% endif %}
+    >
+        <h2 id="openid-heading">{% trans %}Please enter your <span>user name</span>, then sign in{% endtrans %}</h2>
+        <p class="hint">{% trans %}(or select another login method above){% endtrans %}</p>
+        <input type="text" name="openid_login_token" />
+        <input class="submit-b" type="submit" name="openid_login_with_extra_token" value="{% trans %}Sign in{% endtrans %}"/>
+    </fieldset> 
+{% endmacro %}

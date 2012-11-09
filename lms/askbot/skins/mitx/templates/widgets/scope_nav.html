@@ -1,0 +1,25 @@
+{% if active_tab != "ask" %}
+    {% if not search_state %}  {#  get empty SearchState() if there's none #}
+        {% set search_state=search_state|get_empty_search_state %}
+    {% endif %}
+    <li>
+      <a class="scope-selector {% if scope == 'all' %}on{% endif %}"
+          href="{{ search_state.change_scope('all').full_url() }}" title="{% trans %}see all questions{% endtrans %}">{% trans %}All{% endtrans %}</a>
+    </li>
+
+    <li>
+      <a class="scope-selector {% if scope == 'unanswered' %}on{% endif %}"
+          href="{{ search_state.change_scope('unanswered').change_sort('answers-asc').full_url() }}" title="{% trans %}see unanswered questions{% endtrans %}">{% trans %}Unanswered{% endtrans %}</a>
+    </li>
+
+    {% if request.user.is_authenticated() %} 
+
+    <li>
+      <a class="scope-selector {% if scope == 'favorite' %}on{% endif %}"
+        href="{{ search_state.change_scope('favorite').full_url() }}" title="{% trans %}see your followed questions{% endtrans %}">{% trans %}Followed{% endtrans %}</a>
+    </li>
+
+    {% endif %}
+{% else %}
+    <div class="scope-selector ask-message">{% trans %}Go back to&nbsp{% endtrans %}</div>
+{% endif %}

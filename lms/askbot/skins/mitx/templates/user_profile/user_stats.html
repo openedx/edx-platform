@@ -1,0 +1,155 @@
+{% extends "user_profile/user.html" %}
+{% import "macros.html" as macros %}
+<!-- user_stats.html -->
+{% block profilesection %}
+{% trans %}overview{% endtrans %}
+{% endblock %}
+
+{% block sidebar%}
+{% include "user_profile/user_info.html" %}
+{% endblock%}
+
+{% block usercontent %}
+
+<section class="questions">
+<div class="question-list-header">
+  <h1>{% trans counter=question_count %}{{counter}} Question{% pluralize %}{{counter}} Questions{% endtrans %} asked by {% trans username=view_user.username %}{{username}}{% endtrans %}</h1>
+</div>
+{% include "user_profile/users_questions.html" %}
+</section>
+
+<ul class="sub-info">
+
+  <li class="votes-badges">
+    <h2>{% trans cnt=total_votes %}{{cnt}} Vote{% pluralize %}{{cnt}} Votes {% endtrans %}</h2>
+
+    <ul class="vote-buttons">
+      <li class="up">
+        <span title="{% trans %}user has voted up this many times{% endtrans %}" class="vote-count">{{up_votes}}</span>
+      </li>
+
+      <li class="down">
+        <span title="{% trans %}user voted down this many times{% endtrans %}" class="vote-count">{{down_votes}}</span>
+      </li>
+    </ul>
+
+    <h2>{% trans counter=total_badges %}{{counter}} Badge{% pluralize %}{{counter}} Badges{% endtrans %}</h2>
+    <ul class="badges">
+      {% for badge, badge_user_awards in badges %}
+      <li>
+
+        <a href="{{badge.get_absolute_url()}}" title="{% trans description=badge.description %}{{description}}{% endtrans %}" class="medal" >
+          &nbsp;{% trans name=badge.name %}{{name}}{% endtrans %}
+        </a>
+
+        <span class="tag-number">
+          <span class="badge-context-toggle">{{ badge_user_awards|length|intcomma }}</span>
+        </span>
+
+        <ul id="badge-context-{{ badge.id }}" class="badge-context-list" style="display:none">
+          {% for award in badge_user_awards %}
+          {% if award.content_object_is_post %}
+
+          <li>
+            <a title="{{ award.content_object.get_snippet()|collapse }}" href="{{ award.content_object.get_absolute_url() }}">
+              {% if award.content_type.post_type == 'answer' %}{% trans %}Answer to:{% endtrans %}{% endif %} {{ award.content_object.thread.title }}</a>
+          </li>
+
+          {% endif %}
+          {% endfor %}
+        </ul>
+        {% if loop.index is divisibleby 3 %}
+
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <br>
+    <p>View all <a href="/discussion/badges">MITx badges ➜</a></p>
+  </li>
+
+  <li class="answer-list">
+
+    <h2>{{ top_answer_count }} {% trans counter=top_answer_count %}Answer{% pluralize %}Answers{% endtrans %}</h2>
+
+    <ul class="user-stats-table">
+      {% for top_answer in top_answers %}
+
+      <li class="answer-summary">
+        <a title="{{ top_answer.summary|collapse|escape }}"
+          href="{% url question top_answer.thread._question_post().id %}{{ top_answer.thread.title|slugify }}#{{ top_answer.id }}">
+          <span class="answer-votes {% if top_answer.accepted() %}answered-accepted{% endif %}"
+            title="{% trans answer_score=top_answer.score %}the answer has been voted for {{ answer_score }} times{% endtrans %} {% if top_answer.accepted() %}{% trans %}this answer has been selected as correct{% endtrans %}{%endif%}">
+            {{ top_answer.score }}
+          </span>
+        </a>
+
+        <div class="answer-link">
+          {% spaceless %}
+          <a href="{% url question top_answer.thread._question_post().id %}{{ top_answer.thread.title|slugify }}#{{top_answer.id}}">{{ top_answer.thread.title|escape }}</a>
+          {% endspaceless %}
+          {% if top_answer.comment_count > 0 %}
+          <span>
+            {% trans comment_count=top_answer.comment_count %}({{ comment_count }} comment){% pluralize %}the answer has been commented {{ comment_count }} times{% endtrans %}
+          </span>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </li>
+
+
+  <li class="tags-list">
+    <h2>{% trans counter=user_tags|length %}{{counter}} Tag{% pluralize %}{{counter}} Tags{% endtrans %}</h2>
+
+    <ul id="ab-user-tags" class="tags">
+      {% for tag in user_tags %}
+      <li>
+        {{ macros.tag_widget(
+        tag.name,
+        html_tag = 'div',
+        search_state = search_state,
+        extra_content =
+        '<span class="tag-number">&#215; ' ~
+          tag.user_tag_usage_count|intcomma ~
+          '</span>'
+        )
+        }}
+      </li>
+      {#
+      {% if loop.index is divisibleby 10 %}
+    </td>
+    <td width="180"  valign="top">
+      {% endif %}
+      #}
+      {% endfor %}
+    </ul>
+  </li>
+
+</ul>
+{% endblock %}
+
+{% block endjs %}
+{{ super() }}
+<script type="text/javascript">
+  $(document).ready(function(){
+      $('.badge-context-toggle').each(function(idx, elem){
+        var context_list = $(elem).parent().next('ul');
+        if (context_list.children().length > 0){
+        $(elem).addClass('active');
+        var toggle_display = function(){
+        if (context_list.css('display') == 'none'){
+        $('.badge-context-list').hide();{# hide all context lists #}
+        context_list.show();
+        } else {
+        context_list.hide();
+        }
+        };
+        $(elem).click(toggle_display);
+        }
+        });
+      });
+</script>
+{% endblock %}
+<!-- end user_stats.html -->

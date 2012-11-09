@@ -1,0 +1,47 @@
+<div class="question-header  {% if question.author.is_administrator() %}official{%endif%} ">
+
+  <div class="vote-buttons">
+    {# ==== BEGIN: question/question_vote_buttons.html ==== #}
+    {% include "question/question_vote_buttons.html" %}
+    {# ==== END: question/question_vote_buttons.html ==== #}
+    {# ==== BEGIN: question/share_buttons.html ==== #}
+    <!-- {% include "question/share_buttons.html" %} -->
+    {# ==== END: question/share_buttons.html ==== #}
+  </div>
+
+  <div class="question-container">
+
+    <h1><a href="{{ question.get_absolute_url() }}">{{ thread.get_title(question)|escape }}</a></h1>
+
+    <div class="meta-bar">
+
+      <div class="tag-list">
+        {% include "question/question_tags.html" %}
+      </div>
+
+      <div class="question-actions">
+        {% include "question/question_controls.html" %}
+      </div>
+
+    </div>
+
+    <div class="question-content" {% if question.deleted %}class="deleted"{%endif%}>
+
+      <div class="question-body">
+        {{ question.html }}
+        {# ==== START: question/question_comments.html ==== #}
+        {% include "question/question_comments.html" %}
+        {# ==== END: question/question_comments.html ==== #}
+      </div>
+
+      {# ==== START: "question/question_author_info.html" #}
+      <div class="post-update-container">
+        {% if question.author.is_administrator() %}<div class="official-stamp">Staff question</div>{%endif%}
+        {% include "question/question_author_info.html" %}</div>
+      {# ==== END: "question/question_author_info.html" #}
+
+    </div>
+
+  </div>
+
+</div>

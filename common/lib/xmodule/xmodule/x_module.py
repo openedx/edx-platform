@@ -388,7 +388,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     entry_point = "xmodule.v1"
     module_class = XModule
 
-    # Attributes for inspection of the descriptor
+    # Attributes for inpsection of the descriptor
     stores_state = False  # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
     has_score = False  # This indicates whether the xmodule is a problem-type.

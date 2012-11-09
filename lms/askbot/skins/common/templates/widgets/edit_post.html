@@ -1,0 +1,63 @@
+{% if edit_title %}
+    <div class="form-item">
+      <label for="id_title" >
+        <!-- <strong>{{ post_form.title.label_tag() }}:</strong> -->
+      </label>
+
+      <span class="form-error"> {{ post_form.title.errors }}</span><br/>
+      {{ post_form.title }}
+        <div class="title-desc">
+            {{ post_form.title.help_text }}
+        </div>
+    </div>
+{% endif %}
+
+<div id="wmd-button-bar" class="wmd-panel"></div>
+<div class="form-item">
+    {{ post_form.text }}{# this element is resizable and will be wrapped by js #}
+    <label for="editor" class="form-error">{{ post_form.text.errors }}</label>
+</div>
+{# need label element for resizable input, b/c form validation won't find span #}
+{% if post_type == 'question' %}
+    <div class="form-item">
+        {% if mandatory_tags  %}
+            <label for="id_tags">
+                <strong>{% trans %}tags{% endtrans %},</strong>
+                {% trans %}one of these is required{% endtrans %}
+            </label>
+            {{
+                tag_list_widget(
+                    mandatory_tags,
+                    make_links = False,
+                    css_class = 'clearfix'
+                )
+            }}
+        {% else %}
+            <label for="id_tags">
+                <strong>{% trans %}tags{% endtrans %}:</strong>
+                {% trans %}(required){% endtrans %}
+            </label>
+        {% endif %}
+        <span class="form-error">{{ post_form.tags.errors }}</span><br/>
+        {{ post_form.tags }}
+        <div class="title-desc">
+            {{ post_form.tags.help_text }}
+        </div>
+    </div>
+{% endif %}
+{% if 'summary' in post_form['fields'] %}
+    <div class="form-item">
+        <strong>{{ post_form.summary.label_tag() }}</strong> <br/>
+        {{ post_form.summary }}
+        <div class="title-desc">
+            {{ post_form.summary.help_text }}
+        </div>
+        <div class="form-error" >{{ post_form.summary.errors }}</div>
+    </div>
+{% endif %}
+<div class="preview-toggle">
+    <a id="pre-collapse" title="{% trans %}Toggle the real time Markdown editor preview{% endtrans %}" >
+        {% trans %}hide preview{% endtrans %}
+    </a>
+</div>
+<div id="previewer" class="wmd-preview"></div>

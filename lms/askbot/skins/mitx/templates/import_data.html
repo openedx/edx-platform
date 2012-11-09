@@ -1,0 +1,31 @@
+{% extends "two_column_body.html" %}
+{% block title %}{% trans %}Import StackExchange data{% endtrans %}{% endblock %}
+{% block content %}
+    <h1>{% trans %}Import StackExchange data{% endtrans %}</h1>
+    {% if need_configuration %}
+        <p><em>Note:</em> to import stackexchange data, first add 
+            <code>'askbot.importers.stackexchange',</code>
+            to the <code>INSTALLED_APPS</code> setting in your <code>settings.py</code>
+            file, then run <code>python manage.py syncdb</code>, and restart the application.
+            After that, pleale return to here and try again.
+        </p>
+    {% else %}
+        <p class="message">{% trans %}<em>Warning:</em> if your database is not empty, please back it up
+        before attempting this operation.{% endtrans %}
+        </p>
+        <p>{% trans %}Upload your stackexchange dump .zip file, then wait until
+        the data import completes. This process may take several minutes.
+        Please note that feedback will be printed in plain text.
+        {% endtrans %}
+        </p>
+        <form id="load-dump-form" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <table>
+            {{dump_upload_form.as_table()}}
+            </table>
+            <input type="submit" value="{% trans %}Import data{% endtrans %}" />
+        </form>
+        <p>{% trans %}In the case you experience any difficulties in using this import tool,
+        please try importing your data via command line: <code>python manage.py load_stackexchange path/to/your-data.zip</code>{% endtrans %}
+        </p>
+    {% endif %}
+{% endblock %}

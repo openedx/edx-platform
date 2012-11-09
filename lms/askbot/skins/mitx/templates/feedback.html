@@ -1,0 +1,68 @@
+{% extends "two_column_body.html" %}
+<!-- template feedback.html -->
+{% block title %}{% spaceless %}{% trans %}Feedback{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+<h1 class="section-title">{% trans %}Give us your feedback!{% endtrans %}</h1>
+{% if form.errors %}
+<span class="error">
+  {{form.errors.__all__}}
+</span>
+{%endif%}
+<form method="post" action="{% url feedback %}" accept-charset="utf-8">{% csrf_token %}
+    {% if user.is_authenticated() %}
+        <p class="message">
+        {% trans user_name=user.username %}
+        <span class='big strong'>Dear {{user_name}}</span>, we look forward to hearing your feedback. 
+        Please type and send us your message below.
+        {% endtrans %}
+        <p>
+    {% else %}
+        <p class="message">
+        {% trans %}
+        <span class='big strong'>Dear visitor</span>, we look forward to hearing your feedback.
+        Please type and send us your message below.
+        {% endtrans %}
+        </p>
+        <div class="form-row"><label>{{form.name.label}}</label><br/>{{form.name}}</div>
+        <div class="form-row">
+            <label>{{form.email.label}} 
+                {% if form.errors.email %}
+                    <span class='error'>{% trans %}(to hear from us please enter a valid email or check the box below){% endtrans %}</span>
+                {% endif %}
+            </label><br/>{{form.email}}
+        </div>
+        <div class="form-row">
+        <label>{{form.no_email.label}}
+        {% if form.errors.no_email %}
+        <span class="error">{% trans %}(this field is required){% endtrans %}</span>
+        {% endif %}
+        {{form.no_email}}
+        </label>
+        </div>
+    {% endif %}
+    <div class="form-row">
+        <label>{{form.message.label}}
+        {% if form.errors.message %}
+        <span class="error">{% trans %}(this field is required){% endtrans %}</span>
+        </label>
+        {% endif %}
+        <br/>
+        {{form.message}}
+    </div>
+    {% if form.recaptcha %}
+    <div class="form-row">
+        {% if form.errors.recaptcha%}
+        <span class="error">{% trans %}(Please solve the captcha){% endtrans %}</span>
+        </label>
+        {% endif %}
+      {{form.recaptcha}}
+    </div>
+    {% endif %}
+    {{form.next}}
+    <div class="submit-row">
+        <input type="submit" class="submit" value="{% trans %}Send Feedback{% endtrans %}"/>&nbsp;
+        <input type="submit" class="submit cancel" name="cancel" value="{% trans %}Cancel{% endtrans %}"/>
+    </div>
+</form>
+{% endblock %}
+<!-- end template feedback.html -->

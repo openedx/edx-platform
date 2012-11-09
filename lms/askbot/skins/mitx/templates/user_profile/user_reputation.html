@@ -1,0 +1,41 @@
+{% extends "user_profile/user.html" %}
+<!-- user_reputation.html -->
+{% block profilesection %}
+    {% trans %}karma{% endtrans %}
+{% endblock %}
+{% block usercontent %}
+        <div class="karma-summary">
+            <div id="diagram" class="karma-diagram"></div>
+            <div class="karma-details">
+                {% if view_user.id == user.id %}
+                <h2>{% trans %}Your karma change log.{% endtrans %}</h2>
+                {% else %}
+                <h2>{% trans user_name=view_user.username %}{{user_name}}'s karma change log{% endtrans %}</h2>
+                {% endif %}
+                {% for rep in reputation %}
+                <p>
+                    <span class="karma-gained">{{ rep.positive }}</span>
+                    <span class="karma-lost">{{ rep.negative }}</span>
+                    {{ rep.get_explanation_snippet() }}
+                    <span class="small">({{rep.reputed_at|diff_date}})</span>
+                    <div class="clean"></div>                  
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+{% endblock %}
+{% block userjs %}
+       <script type='text/javascript' src='{{"/js/excanvas.min.js"|media}}'></script>
+       <script type='text/javascript' src='{{"/js/jquery.flot.min.js"|media}}'></script>
+       <script type="text/javascript">
+            $().ready(function(){
+                var d = {{ reps }};
+                var placeholder = $("#diagram");
+                var plot = $.plot(placeholder, [d], {
+                    xaxis: { mode: "time" },
+                    points: { show: true },
+                    lines: { show: true }
+                });
+            });
+        </script>
+{% endblock %}<!-- end user_reputation.html -->
