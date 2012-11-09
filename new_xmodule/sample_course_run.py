@@ -70,7 +70,18 @@ class Run():
 
 # N.B. it would be nice to make policy a frozen dictionary, and children a frozen list
 # to force usages to behave entirely like values
-Usage = namedtuple('Usage', 'id source policy children')
+class Usage(namedtuple('Usage', 'id source policy children')):
+    __slots__ = ()
+
+    @classmethod
+    def create_usage(cls, source):
+        xmodule = xmodule.get_xmodule
+        return Usage(
+            uuid(),
+            xmodule.id,
+            xmodule.policy,
+            [Usage.create_usage(child) for child in xmodule.children]
+        )
 
 
 class Policy():
