@@ -20,12 +20,15 @@ def SequenceModule(XModule, ResourceTemplateModule):
     def student_view(self):
         return self.render_template(
             'main',
+            # Render w/ no arguments executes the same view for the children
+            # that is currently rendering for the parent
             children=[child.render() for child in self.children]
         )
 
     @xmodule.register_handler('update_position')
     def update_position(self, data):
         new_position = self.children[data['position']].id
+        # Updates to the state dictionary are transparently saved to the db
         self.state['position'] = new_position
         self.state['visited'] = self.visited.union(new_position)
         self.update_progress()
