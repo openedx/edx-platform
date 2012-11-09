@@ -37,6 +37,7 @@ State diagram:
 
 """
 
+
 class CertificateStatuses(object):
     unavailable = 'unavailable'
     generating = 'generating'
@@ -83,20 +84,23 @@ def certificate_status_for_student(student, course_id):
 
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
+    notpassing   - The student was graded but is not passing
 
     If the status is "downloadable", the dictionary also contains
     "download_url".
 
-    If the student has been graded, the dictionary also contains their grade for the course.
+    If the student has been graded, the dictionary also contains their
+    grade for the course.
     '''
 
     try:
         generated_certificate = GeneratedCertificate.objects.get(
                 user=student, course_id=course_id)
-        d = {'status': generated_certificate.status,
-             'grade' : generated_certificate.grade,}
+        d = {'status': generated_certificate.status}
+        if generated_certificate.grade:
+            d['grade'] = generated_certificate.grade
         if generated_certificate.status == CertificateStatuses.downloadable:
-            d['download_url'] =  generated_certificate.download_url
+            d['download_url'] = generated_certificate.download_url
 
         return d
     except GeneratedCertificate.DoesNotExist:
