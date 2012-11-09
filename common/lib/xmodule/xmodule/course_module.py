@@ -133,7 +133,7 @@ class CourseDescriptor(SequenceDescriptor):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
         """
-        if self.end_date is None:
+        if self.end is None:
             return False
 
         return time.gmtime() > self.end
