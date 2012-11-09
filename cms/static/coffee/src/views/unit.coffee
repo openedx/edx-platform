@@ -98,6 +98,9 @@ class CMS.Views.UnitEdit extends Backbone.View
         @$editor = $($('#html-editor').html())
         $preview = $('<div class="html-preview">')
         initHTMLEditor(@$editor, $preview)
+      when 'discussion'
+        @$editor = $($('#discussion-editor').html())
+        $preview = $($('#discussion-preview').html())        
 
     @$editor.find('.save-button, .cancel-button').bind('click', =>
       @$componentItem.removeClass('editing')
@@ -108,6 +111,7 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$componentItem.append(@$editor)
     @$componentItem.append($preview)
+
     @$componentItem.append($componentActions)
     @$componentItem.hide()
     @$newComponentItem.before(@$componentItem)

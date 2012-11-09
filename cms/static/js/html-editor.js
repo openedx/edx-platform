@@ -5,7 +5,6 @@ var htmlEditor;
 
 function initHTMLEditor($editor, $prev) {
   $htmlEditor = $editor;
-  console.log($editor.find('.edit-box'));
   htmlEditor = CodeMirror.fromTextArea($editor.find('.edit-box')[0], {
     lineWrapping: true,
     mode: 'xml',
@@ -15,9 +14,13 @@ function initHTMLEditor($editor, $prev) {
 
   currentEditor = htmlEditor;
 
-  $(htmlEditor.getWrapperElement()).css('background', '#fff');
-
-  $(htmlEditor.getWrapperElement()).bind('click', setFocus);
+  $(htmlEditor.getWrapperElement()).css({
+    'background': '#fff'
+  });
+  $(htmlEditor.getWrapperElement()).bind('click', function() {
+    $(htmlEditor).focus();
+  });
+  $(htmlEditor).focus();
   $htmlPreview = $prev;
 }
 

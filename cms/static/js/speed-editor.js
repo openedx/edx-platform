@@ -155,7 +155,7 @@ function updateXML() {
   xml = xml.replace(/\{\{video\s(.*)\}\}/g, '<video youtube="1.0:$1" />\n\n');
 
   // replace string and numerical
-  xml = xml.replace(/\=\s*(.*)/g, function(match, p) {
+  xml = xml.replace(/(?:\n|^)\=\s*(.*)/g, function(match, p) {
     var string;
     var params = /(.*)\+\-\s*(.*)/.exec(p);
     if(parseFloat(p)) {      
@@ -251,7 +251,7 @@ function updatePreview() {
     return groupString;
   });
 
-  html = html.replace(/\=\s*(.*)/g, function(match, p) {
+  html = html.replace(/(?:\n|^)\=\s*(.*)/g, function(match, p) {
     var value = p.replace(/\+\-.*/g, '');
     var string = '<input type="text" name="" id="" value="' + value + '" size="20">\n';
     return string;
