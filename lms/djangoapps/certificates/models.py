@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 
-'''
+"""
 Certificates are created for a student and an offering of a course.
 
 When a certificate is generated, a unique ID is generated so that
@@ -35,8 +35,7 @@ State diagram:
             v                v             v
       [downloadable]   [downloadable]  [deleted]
 
-'''
-
+"""
 
 class CertificateStatuses(object):
     unavailable = 'unavailable'
@@ -88,6 +87,7 @@ def certificate_status_for_student(student, course_id):
     If the status is "downloadable", the dictionary also contains
     "download_url".
 
+    If the student has been graded, the dictionary also contains their grade for the course.
     '''
 
     try:
@@ -97,6 +97,7 @@ def certificate_status_for_student(student, course_id):
             return {
                       'status': CertificateStatuses.downloadable,
                       'download_url': generated_certificate.download_url,
+                      'grade': generated_certificate.grade,
                    }
         else:
             return {'status': generated_certificate.status}

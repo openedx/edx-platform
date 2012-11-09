@@ -299,6 +299,16 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('hide_progress_tab') == True
 
     @property
+    def end_of_course_survey_url(self):
+        """
+        Pull from policy.  Once we have our own survey module set up, can change this to point to an automatically
+        created survey for each class.
+
+        Returns None if no url specified.
+        """
+        return self.metadata.get('end_of_course_survey_url')
+
+    @property
     def title(self):
         return self.display_name
 
