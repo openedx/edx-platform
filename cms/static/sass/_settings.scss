@@ -90,10 +90,24 @@
 
           }
 
-          .delete-icon {
-            position: absolute;
-            right: 10px;
-            top: 10px;
+          .remove-item {
+            display: block;
+            border-top: 1px solid $lightGrey;
+            margin-top: 5px;
+            padding-top: 10px;
+            font-size: 13px;
+          }
+        }
+
+        .element-group {
+          width: 400px;
+          padding: 15px 20px;          
+          background: tint($lightGrey, 50%);
+          @include border-radius(3px);
+          @include box-sizing(border-box);
+
+          input.long, textarea {
+            width: 100%;
           }
         }
 
@@ -117,6 +131,11 @@
             &:last-child {
               margin-right: 0;
             }
+          }
+
+          .remove-item {
+            float: left;
+            width: 100%;
           }
         }
       }
