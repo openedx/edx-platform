@@ -9,10 +9,16 @@ def SequenceModule(XModule, ResourceTemplateModule):
 
     @property
     def visited(self):
+        """
+        Return the set of ids that this user has visited in the past
+        """
         return set(self.state['visited'])
 
     @property
     def possible(self):
+        """
+        Return the set of ids in this sequence that a student could have visited
+        """
         return set(child.id for child in self.children)
 
     @xmodule.register_view('student')
