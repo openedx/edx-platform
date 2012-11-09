@@ -1,7 +1,7 @@
 """
 A Self Assessment module that allows students to write open-ended responses,
 submit, then see a rubric and rate themselves.  Persists student supplied
-hints, answers, and correctness judgment (currently only correct/incorrect).
+hints, answers, and assessment judgment (currently only correct/incorrect).
 Parses xml definition file--see below for exact format.
 """
 
@@ -33,7 +33,7 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-# Set maximum available number of points.  Should be set to 1 for now due to correctness handling,
+# Set maximum available number of points.  Should be set to 1 for now due to assessment handling,
 # which only allows for correct/incorrect.
 MAX_SCORE = 1
 
@@ -73,7 +73,7 @@ class SelfAssessmentModule(XModule):
         """
         Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
         and one optional attribute, attempts, which should be an integer that defaults to 1.
-        If it's >1, the student will be able to re-submit after they see
+        If it's > 1, the student will be able to re-submit after they see
         the rubric.  Note: all the submissions are stored.
 
         Sample file:
@@ -100,41 +100,28 @@ class SelfAssessmentModule(XModule):
         else:
             instance_state = {}
 
-        log.debug('Instance state of self-assessment module {0}: {1}'.format(location.url(), instance_state))
-
-        # Pull out state, or initialize variables
-
-        # lists of student answers, correctness responses
-        # ('incorrect'/'correct'), and suggested hints
         self.student_answers = instance_state.get('student_answers', [])
-        self.correctness = instance_state.get('correctness', [])
+
+        # assessment responses are 'incorrect'/'correct'
+        self.assessment = instance_state.get('assessment', [])
         self.hints = instance_state.get('hints', [])
 
-        # Used to keep track of a submitted answer for which we don't have a
-        # self-assessment and hint yet: this means that the answers,
-        # correctness, hints always stay in sync, and have the same number of
-        # elements.
         self.state = instance_state.get('state', 'initial')
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self.score = instance_state.get('score', 0)
-        self.top_score = instance_state.get('top_score', MAX_SCORE)
+        self.max_score = instance_state.get('max_score', MAX_SCORE)
 
-        #Get number of attempts student has used from instance state
         self.attempts = instance_state.get('attempts', 0)
 
-        #Try setting maxattempts, use default if not available in metadata
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
 
-        #Extract prompt, submission message, hint prompt, and rubric from definition file
         self.rubric = definition['rubric']
         self.prompt = definition['prompt']
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
-        #Determine if student has answered the question before.  This is used to display
-        #a "previous answer" message to the student if they have.
         previous_answer = self.student_answers[-1] if self.student_answers else ''
 
         #set context variables and render template
@@ -149,19 +136,24 @@ class SelfAssessmentModule(XModule):
         self.html = self.system.render_template('self_assessment_prompt.html', context)
 
     def get_score(self):
+        """
+        Returns dict with 'score' key
+        """
         return {'score': self.score}
 
     def max_score(self):
-        return self.top_score
+        """
+        Return max_score
+        """
+        return self.max_score
 
     def get_progress(self):
-        ''' For now, just return score / max_score
         '''
-        score = self.score
-        total = self.top_score
-        if total > 0:
+        For now, just return score / max_score
+        '''
+        if self.max_score > 0:
             try:
-                return Progress(score, total)
+                return Progress(self.score, self.max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
@@ -180,8 +172,10 @@ class SelfAssessmentModule(XModule):
         """
 
         handlers = {
-            'show': self.show_rubric,
-            'save': self.save_problem,
+            'save_answer': self.save_answer,
+            'save_assessment': self.save_assessment,
+            'save_hint': self.save_hint,
+            'reset': self.reset,
         }
 
         if dispatch not in handlers:
@@ -195,6 +189,15 @@ class SelfAssessmentModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
         })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def out_of_sync_error(self, get):
+        """
+        return dict out-of-sync error message, and also log.
+        """
+        log.warning("Assessment module state out sync. state: %r, get: %r",
+                    self.state, get)
+        return {'success': False,
+                'error': 'The problem state got out-of-sync'}
 
     def get_rubric_html(self):
         """
@@ -245,77 +248,116 @@ class SelfAssessmentModule(XModule):
         return """<div class="save_message">{0}</div>""".format(self.message)
 
 
-    def show_rubric(self, get):
+    def save_answer(self, get):
         """
         After the answer is submitted, show the rubric.
         """
         # Check to see if attempts are less than max
-        if(self.attempts < self.max_attempts):
-            # Dump to temp_answer to keep answer in sync with correctness and hint
-            self.temp_answer = get['student_answer']
-
-            return {
-                'success': True,
-                'rubric': self.get_rubric_html()
-            }
-        else:
-            # If too many attempts, prevent student from saving answer and seeing rubric.
+        if self.attempts < self.max_attempts:
+            # If too many attempts, prevent student from saving answer and
+            # seeing rubric.  In normal use, students shouldn't see this because
+            # they won't see the reset button once they're out of attempts.
             return {
                 'success': False,
                 'message': 'Too many attempts.'
             }
 
-    def save_problem(self, get):
-        '''
-        Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
+        if self.state != self.INITIAL:
+            return self.out_of_sync_error(get)
 
-        #Temp answer check is to keep hints, correctness, and answer in sync
-        if self.temp_answer is not "":
-            #Extract correctness and hint from ajax, and add temp answer to student answers
-            self.hints.append(get['hint'])
-            self.correctness.append(get['assessment'].lower())
-            self.student_answers.append(self.temp_answer)
+        self.student_answers.append = get['student_answer']
+        self.state = self.ASSESSING
 
+        return {
+            'success': True,
+            'rubric': self.get_rubric_html()
+            }
+
+    def save_assessment(self, get):
+        """
+        Save the assessment.
+
+        Returns a dict { 'success' : bool, 'hint_html': hint_html 'error' : error-msg},
+        with 'error' only present if 'success' is False, and 'hint_html' only if success is true
+        """
+
+        if (self.state != self.ASSESSMENT or
+            len(self.student_answers) !=  len(self.assessment) + 1):
+            return self.out_of_sync_error(get)
+
+        self.assessment.append(get['assessment'].lower())
+        self.state = self.REQUEST_HINT
+
+        # TODO: return different hint based on assessment value...
+        return {'success': True, 'hint_html': self.get_hint_html()}
+
+    def save_hint(self, get):
+        '''
+        Save the hint.
+        Returns a dict { 'success' : bool,
+                         'message_html': message_html,
+                         'error' : error-msg},
+        with the error key only present if success is False and message_html
+        only if True.
+        '''
+        if self.state != self.REQUEST_HINT or len(self.assessment) !=  len(self.hints) + 1:
+            return self.out_of_sync_error(get)
+
+        self.hints.append(get['hint'].lower())
+        self.state = self.DONE
+
+        # Points are assigned for completion, so always set to 1
+        points = 1
         # increment attempts
         self.attempts = self.attempts + 1
 
-        #Create and store event info dict
-        #Currently points are assigned for completion, so set to 1 instead of depending on correctness.
-        points = 1
-        event_info = dict()
-        event_info['state'] = {
-                               'student_answers': self.student_answers,
-                               'hints' : self.hints,
-                               'correctness': self.correctness,
-                               'score': points,
-                               'done': self.done
-        }
+        # To the tracking logs!
+        event_info = {
+            'selfassessment_id' : self.location.url(),
+            'state': {
+                'student_answers': self.student_answers,
+                'assessment': self.assessment,
+                'hints' : self.hints,
+                'score': points,
+                'done': self.done,}}
+        self.system.track_function('save_hint', event_info)
 
-        # TODO: figure out how to identify self assessment.  May not want to confuse with problems.
-        event_info['selfassessment_id'] = self.location.url()
+        return {'success': True,
+                'message_html': self.get_message_html()}
 
-        self.system.track_function('save_problem_succeed', event_info)
 
-        #Return the submitmessage specified in xml defintion on success
-        return {'success': True, 'message': self.submit_message}
+    def reset(self, get):
+        """
+        If resetting is allowed, reset the state.
+
+        Returns {'success': bool, 'error': msg}
+        (error only present if not success)
+        """
+        if self.state != DONE:
+            return self.out_of_sync_error(get)
+        if self.attempts < self.max_attempts:
+            return {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+        self.state = self.INITIAL
+        return {'success': True}
+
 
     def get_instance_state(self):
         """
-        Get the current correctness, points, and state
+        Get the current assessment, points, and state
         """
-        #Assign points based on completion.  May want to change to correctness-based down the road.
+        #Assign points based on completion.  May want to change to assessment-based down the road.
         points = 1
 
         state = {
                  'student_answers': self.student_answers,
                  'temp_answer': self.temp_answer,
                  'hints' : self.hints,
-                 'correctness': self.correctness,
+                 'assessment': self.assessment,
                  'score': points,
-                 'top_score' : MAX_SCORE,
+                 'max_score' : MAX_SCORE,
                  'attempts' : self.attempts
         }
         return json.dumps(state)
