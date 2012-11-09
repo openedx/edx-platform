@@ -1,0 +1,42 @@
+{% import "macros.html" as macros %}
+{% if questions_count > 0 %}
+        <h1 id="questionCount" class="search-result-summary">
+            {% trans cnt=questions_count, q_num=questions_count|intcomma %}{{q_num}} question{% pluralize %}{{q_num}} questions{% endtrans %}
+        {% if author_name %}
+            {% trans %}with {{author_name}}'s contributions{% endtrans %}
+        {% endif %}
+        </h1>
+        {% if search_tags %}
+        <div id="listSearchTags">
+          <span class="left">{% trans %}Tagged{% endtrans %}</span>
+          {{ macros.tag_list_widget(
+          search_tags,
+          id = 'searchTags',
+          deletable = True,
+          make_links = False,
+          search_state = search_state
+          )
+          }}
+        </div>
+        {% endif %}
+        {% if author_name or search_tags or query %}
+            <div class="search-tips"><strong>{% trans %}Search tips:{% endtrans %}</strong>
+            {% if reset_method_count > 1 %}
+                {% if author_name %}
+                    <a href="{{ search_state.remove_author().full_url() }}">{% trans %}reset author{% endtrans %}</a>
+                {% endif %}
+                {% if search_tags %}{% if author_name and query %}, {% elif author_name %}{% trans %} or {% endtrans %}{% endif %}
+                    <a href="{{ search_state.remove_tags().full_url() }}">{% trans %}reset tags{% endtrans %}</a>
+                {% endif %}
+                {% if query %}{% trans %} or {% endtrans %}
+                    <a href="{% url questions %}">{% trans %}start over{% endtrans %}</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url questions %}">{% trans %}start over{% endtrans %}</a>
+            {% endif %}
+            {% trans %} - to expand, or dig in by adding more tags and revising the query.{% endtrans %}
+            </div>
+        {% else %}
+            <div class="search-tips"><strong>{% trans %}Search tip:{% endtrans %}</strong> {% trans %}add tags and a query to focus your search{% endtrans %}</div>
+        {% endif %}
+{% endif %}

@@ -1,0 +1,245 @@
+{% extends "two_column_body.html" %}
+{% import "authopenid/authopenid_macros.html" as login_macros %}
+<!-- signin.html -->
+{% block title %}{% spaceless %}{% trans %}User login{% endtrans %}{% endspaceless %}{% endblock %}
+{% block forestyle %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{"/jquery-openid/openid.css"|media}}"/>
+{% endblock %}
+{% block content %}
+{% if have_buttons or view_subtype == 'email_sent' %}
+    <h1 class="section-title">{{page_title}}</h1>
+{% endif %}
+    {% if answer %}
+        <div class="message">
+        {% trans title=answer.question.title|escape, summary=answer.summary|escape %}
+        Your answer to {{title}} {{summary}} will be posted once you log in
+        {% endtrans %}
+        </div>
+    {% endif %}
+    {% if question %}
+        <div class="message">
+        {% trans title=question.title|escape, summary=question.summary|escape %}Your question 
+        {{title}} {{summary}} will be posted once you log in
+        {% endtrans %}
+        </div>
+    {% endif %}
+    <p id='login-intro'>
+    {% if view_subtype == 'default' and have_buttons %}
+        {% trans %}Take a pick of your favorite service below to sign in using secure OpenID or similar technology. Your external service password always stays confidential and you don't have to rememeber or create another one.{% endtrans %}
+    {% elif view_subtype == 'add_openid' and have_buttons %}
+        {% if existing_login_methods %}
+            {% trans %}It's a good idea to make sure that your existing login methods still work, or add a new one. Please click any of the icons below to check/change or add new login methods.{% endtrans %}
+        {% else %}
+            {% trans %}Please add a more permanent login method by clicking one of the icons below, to avoid logging in via email each time.{% endtrans %}
+        {% endif %}
+    {% elif view_subtype == 'change_openid' and have_buttons %}
+        {% if existing_login_methods %}
+            {% trans %}Click on one of the icons below to add a new login method or re-validate an existing one.{% endtrans %}
+        {% else %}
+            {% trans %}You don't have a method to log in right now, please add one or more by clicking any of the icons below.{% endtrans %}
+        {% endif %}
+    {% elif view_subtype == 'email_sent' %}
+        {% trans %}Please check your email and visit the enclosed link to re-connect to your account{% endtrans %}
+    {% endif %}
+    </p>
+    {% if openid_error_message %}
+        <p class="warning">{{ openid_error_message }}</p>
+    {% endif %}
+    {% if view_subtype != 'email_sent' and view_subtype != 'bad_key' %}
+    <form id="signin-form" method="post" action="{{ settings.LOGIN_URL }}">{% csrf_token %}
+        {# in this branch - the real signin view we display the login icons
+            here we hide the local login button only if admin
+            wants to always show the password login form - then
+            the button is useless.
+        #}
+        {{ login_form.login_provider_name }}
+        {{ login_form.next }}
+        {{ 
+            login_macros.provider_buttons(
+                login_form = login_form,
+                major_login_providers = major_login_providers,
+                minor_login_providers = minor_login_providers,
+                hide_local_login = settings.SIGNIN_ALWAYS_SHOW_LOCAL_LOGIN,
+                settings = settings,
+                logged_in = user.is_authenticated()
+            )
+        }}
+          {% if use_password_login == True %}
+        <fieldset 
+            id="password-fs"
+            {% if user.is_anonymous() %}
+                {% if not login_form.username.errors and not login_form.password_login_failed %}
+                    {% if not settings.SIGNIN_ALWAYS_SHOW_LOCAL_LOGIN %}
+                        style="display:none;"
+                    {%endif%}
+              {% endif %}
+            {% else %}
+                {% if not login_form.new_password.errors and not login_form.new_password_retyped.errors %}
+                    {% if not settings.SIGNIN_ALWAYS_SHOW_LOCAL_LOGIN %}
+                        style="display:none;"
+                    {% endif%}
+                {% endif %}
+            {% endif %}
+        >
+            {{login_form.password_action}}
+            {% if user.is_anonymous() %}
+                <h2 id="password-heading">
+                    {% trans %}Please enter your <span>user name and password</span>, then sign in{% endtrans %}
+                </h2>
+                {% if have_buttons %}
+                    <p class="hint">{% trans %}(or select another login method above){% endtrans %}</p>
+                {% endif %}
+                {% if login_form.password_login_failed %}
+                    <p class="error">{% trans %}Login failed, please try again{% endtrans %}</p>
+                {% endif %}
+                <table class="login">
+                    <tr>
+                        <td><label for="id_username">{% trans %}Login or email{% endtrans %}</label></td>
+                        <td>{{login_form.username}}</td>
+                    </tr>
+                    <tr>
+                        <td><label for="id_password">{% trans %}Password{% endtrans %}</label></td>
+                        <td>{{login_form.password}}</td>
+                    </tr>
+                </table>
+                <p id="local_login_buttons">
+                    <input class="submit-b" name="login_with_password" type="submit" value="{% trans %}Login{% endtrans %}" />
+                    {% if settings.USE_LDAP_FOR_PASSWORD_LOGIN == False %}
+                    <a class="create-password-account" style="vertical-align:middle" href="{% url user_signup_with_password %}?login_provider=local">{% trans %}Create a password-protected account{% endtrans %}</a>
+                    {% endif %}
+                </p>
+            {% elif settings.USE_LDAP_FOR_PASSWORD_LOGIN == False %}
+                <h2 id="password-heading">
+                    {% trans %}To change your password - please enter the new one twice, then submit{% endtrans %}
+                </h2>
+                <table class="login">
+                    <tr>
+                        <td><label for="id_new_password">{% trans %}New password{% endtrans %}</label></td>
+                        <td>
+                            {{login_form.new_password}}
+                        </td>
+                        <td>
+                            <span class="error">{{login_form.new_password.errors[0]}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="id_new_password_retyped">{% trans %}Please, retype{% endtrans %}</label></td>
+                        <td>
+                            {{login_form.new_password_retyped}}
+                        </td>
+                        <td>
+                            <span class="error">{{login_form.new_password_retyped.errors[0]}}</span>
+                        </td>
+                    </tr>
+                </table>
+                <p id="local_login_buttons">
+                    <input class="submit-b" name="change_password" type="submit" value="{% trans %}Change password{% endtrans %}" />
+                </p>
+            {% endif %}
+        </fieldset>
+        {% endif %}
+    </form>
+    {% if user.is_authenticated() and existing_login_methods and settings.ALLOW_ADD_REMOVE_LOGIN_METHODS %}
+    <div 
+        id='existing-login-methods'
+        {% if login_form.password_change_failed %}
+            style="display:none";
+        {% endif %}
+    >
+        <h2 id='ab-show-login-methods'>
+            {% trans %}Here are your current login methods{% endtrans %}
+        </h2>
+        <table id='ab-existing-login-methods'>
+            <tr>
+                <th>{% trans %}provider{% endtrans %}</th>
+                <th>{% trans %}last used{% endtrans %}</th>
+                <th>{% trans %}delete, if you like{% endtrans %}</th>
+            </tr>
+            {% for login_method in existing_login_methods %}
+            <tr class="ab-provider-row">
+                <td class="ab-provider-name">
+                    {{login_method.provider_name}}
+                </td>
+                <td>
+                    {% if login_method.last_used_timestamp %}
+                        {{login_method.last_used_timestamp|diff_date}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if login_method.is_deletable %}
+                        <button>{% trans %}delete{% endtrans %}</button>
+                    {% else %}
+                        {% trans %}cannot be deleted{% endtrans %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if view_subtype != 'email_sent' or view_subtype == 'bad_key' %}
+        {% if user.is_anonymous() and settings.ALLOW_ACCOUNT_RECOVERY_BY_EMAIL %}
+        <form id="account-recovery-form" action="{% url user_account_recover %}" method="post">{% csrf_token %}
+            {% if view_subtype != 'bad_key' %}
+                <h2 id='account-recovery-heading'>{% trans %}Still have trouble signing in?{% endtrans %}</h2>
+            {% endif %}
+            <p class="hint">
+                <span class="text">
+                {% if view_subtype == 'bad_key' %}
+                    {% trans %}Please, enter your email address below and obtain a new key{% endtrans %}
+                {% else %}
+                    {% trans %}Please, enter your email address below to recover your account{% endtrans %}
+                {% endif %}
+                </span>
+                <span style="display:none" class="link"> - <a href="#">{% trans %}recover your account via email{% endtrans %}</a></span>
+            </p>
+            <fieldset id='email-input-fs'>
+                {% if account_recovery_form.email.errors %}
+                <p class="error">{{account_recovery_form.email.errors[0]}}</p>
+                {% endif %}
+                {{ account_recovery_form.email }}
+                <input
+                    class="submit-b"
+                    type="submit"
+                    {% if view_subtype == 'bad_key' %}
+                    value="{% trans %}Send a new recovery key{% endtrans %}"
+                    {% else %}
+                    value="{% trans %}Recover your account via email{% endtrans %}"
+                    {% endif %}
+                />
+            </fieldset>
+        </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+    {% if have_buttons %}
+        <div class="box">
+            <h2>{% trans %}Why use OpenID?{% endtrans %}</h2>
+            <ul>
+                <li>
+                    {% trans %}with openid it is easier{% endtrans %}
+                </li>
+                <li>
+                    {% trans %}reuse openid{% endtrans %}
+                </li>
+                <li>
+                    {% trans %}openid is widely adopted{% endtrans %}
+                </li>
+                <li>
+                    {% trans %}openid is supported open standard{% endtrans %}
+                </li>
+            </ul>
+            <p class="info-box-follow-up-links">
+                <a href="http://openid.net/what/" target="_blank">{% trans %}Find out more{% endtrans %} »</a><br/>
+                <a href="http://openid.net/get/" target="_blank">{% trans %}Get OpenID{% endtrans %} »</a>
+            </p>
+        </div>
+    {% endif %}
+{% endblock%}
+{%block endjs%}
+{%include "authopenid/providers_javascript.html" %}
+{%endblock%}
+<!-- end signin.html -->

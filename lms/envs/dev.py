@@ -39,7 +39,8 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things. Askbot will not work without a
+    # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -158,6 +159,16 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
+############################ FILE UPLOADS (ASKBOT) #############################
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = ENV_ROOT / "uploads"
+MEDIA_URL = "/static/uploads/"
+STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+FILE_UPLOAD_TEMP_DIR = ENV_ROOT / "uploads"
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
 
 ########################### PIPELINE #################################
 

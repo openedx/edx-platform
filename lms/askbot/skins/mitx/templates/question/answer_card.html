@@ -1,0 +1,41 @@
+<div class="answer-block {% if answer.author.is_administrator() %}official{%endif%}" >
+
+  <a name="{{ answer.id }}"></a>
+  {% if answer.old_answer_id %}
+  {# Make old URL anchors/hashes work #}
+  <a class="old_answer_id_anchor" name="{{ answer.old_answer_id }}"></a>
+  {% endif %}
+
+  <div class="vote-buttons">
+    {# ==== START: question/answer_vote_buttons.html ==== #}
+    {% include "question/answer_vote_buttons.html" %}
+    {# ==== END: question/answer_vote_buttons.html ==== #}
+  </div>
+
+  <div id="answer-container-{{ answer.id }}" class="answer-container {{ macros.answer_classes(answer, question) }}">
+
+    <div class="answer-content">
+
+      <div class="answer-body">
+        {{ answer.html }}
+        {# ==== START: question/question_comments.html ==== #}
+        {% include "question/answer_comments.html" %}
+        {# ==== END: question/question_comments.html ==== #}
+      </div>
+
+      {# ==== START: "question/question_author_info.html" #}
+      <div class="post-update-container">
+
+        {% if answer.author.is_administrator() %}<div class="official-stamp">Staff answer</div>{%endif%}
+        {% include "question/answer_author_info.html" %}
+        <div class="answer-actions answer-controls">
+        {% include "question/answer_controls.html" %}
+        </div>
+      </div>
+      {# ==== END: "question/question_author_info.html" #}
+
+    </div>
+
+  </div>
+
+</div>

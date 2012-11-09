@@ -1,0 +1,38 @@
+/* General Predifined classes, read more in lesscss.org */
+
+/* Variables for Colors*/
+
+@header-color:#16160f;
+
+@link:#1b79bd;
+@question-link:#464646;
+@button-label:#4a757f;
+
+/* Receive exactly positions for background Sprite  */
+
+.sprites(@hor,@vert,@back:url(../images/sprites.png)){
+    background:@hor @vert @back;
+}
+
+
+/* CSS3 Elements */
+
+.box-shadow (@hor: 0px, @vert: 0px, @blur: 5px, @shadow: #929292){
+    -webkit-box-shadow: @arguments;
+    -moz-box-shadow: @arguments;
+    box-shadow: @arguments;
+}
+
+.text-shadow(@hor: 0px, @vert: 0px, @blur: 5px, @shadow: #929292){
+    text-shadow: @arguments;
+    -moz-text-shadow: @arguments;
+    -webkit-text-shadow: @arguments;
+}
+
+.rounded-corners(@radio: 5px){
+    border-radius: @radio;
+    -ms-border-radius: @radio;
+    -moz-border-radius: @radio;
+    -webkit-border-radius: @radio;
+    -khtml-border-radius: @radio;
+}

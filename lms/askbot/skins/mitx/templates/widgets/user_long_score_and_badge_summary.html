@@ -1,0 +1,21 @@
+<a class="user-micro-info" 
+       href="{{user.get_absolute_url()}}?sort=reputation"
+>{% trans %}karma:{% endtrans %} {{user.reputation}}</a>
+{%- if user.gold or user.silver or user.bronze %}
+<a class="user-micro-info"
+   href="{{user.get_absolute_url()}}#badges"
+><span title="{{user.get_badge_summary}}">{% trans %}badges:{% endtrans %}
+    {% if user.gold %}
+    <span class='badge1'>&#9679;</span>
+    <span class="badgecount">{{user.gold}}</span>
+    {% endif %}
+    {% if user.silver %}
+    <span class='badge2'>&#9679;</span>
+    <span class="badgecount">{{user.silver}}</span>
+    {% endif %}
+    {% if user.bronze %}
+    <span class='badge3'>&#9679;</span>
+    <span class="badgecount">{{user.bronze}}</span>
+    {%- endif -%}
+</span></a>
+{%- endif -%}

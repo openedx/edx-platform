@@ -1,0 +1,59 @@
+<form id="fmanswer" class="answer-form" {% if user == question.author %}style="display:none"{% endif %} action="{% url answer question.id %}" method="post" >{% csrf_token %}
+
+    {% if request.user.is_anonymous() and settings.ALLOW_POSTING_BEFORE_LOGGING_IN == False %}
+        {% if not thread.closed %}
+            <a
+                    class="submit"
+                    href="{{settings.LOGIN_URL}}?next={% url question question.id %}"
+                    >{% trans %}Login/Signup to Answer{% endtrans %}</a>
+        {% endif %}
+    {% else %}
+        {% if not thread.closed %}
+            <div>
+                    <h2>
+                        {% if answers %}
+                            {% trans %}Your answer{% endtrans %}
+                        {% else %}
+                            {% trans %}Be the first one to answer this question!{% endtrans %}
+                        {% endif %}
+                    </h2>
+            </div>
+
+            {% if request.user.is_anonymous() %}
+                <div class="message">{% trans %}you can answer anonymously and then login{% endtrans %}</div>
+            {% else %}
+                <p class="message">
+                    {% if request.user==question.author  %}
+                        {% trans %}answer your own question only to give an answer{% endtrans %}
+                    {% else %}
+                        {% trans %}please only give an answer, no discussions{% endtrans %}
+                    {% endif %}
+                </p>
+            {% endif %}
+
+            {# ==== START: question/subscribe_by_email_prompt.html ==== #}
+            {# include "question/subscribe_by_email_prompt.html" #}
+            {# ==== END: question/subscribe_by_email_prompt.html ==== #}
+
+            {{ macros.edit_post(answer) }}
+
+            <div class="submit-answer">
+              <input type="submit"
+              {% if user.is_anonymous() %}
+              value="{% trans %}Login/Signup to Post Your Answer{% endtrans %}"
+              {% else %}
+              {% if user == question.author %}
+              value="{% trans %}Answer Your Own Question{% endtrans %}"
+              {% else %}
+              value="{% trans %}Answer the question{% endtrans %}"
+              {% endif %}
+              {% endif %}
+              class="submit after-editor" style="float:left"/>
+              {% if settings.WIKI_ON %}
+              {{ macros.checkbox_in_div(answer.wiki) }}
+              {% endif %}
+            </div>
+
+        {% endif %}
+    {% endif %}
+</form>

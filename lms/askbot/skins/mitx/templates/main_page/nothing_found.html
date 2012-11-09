@@ -1,0 +1,30 @@
+{# todo: add tips to widen selection #}
+{% if search_state.scope == "unanswered" %}
+    <p class="evenMore tabula-rasa">
+      {% trans %}There are no unanswered questions here{% endtrans %}
+    </p>
+{% endif %}
+{% if search_state.scope == "favorite" %}
+    <p class="evenMore tabula-rasa">
+      {% trans %}No questions here. {% endtrans %}
+      {% trans %}Please follow some questions or follow some users.{% endtrans %}
+    </p>
+{% endif %}
+
+{% if search_state.query or search_state.tags or search_state.author %}
+    {% if reset_method_count > 1 %}
+        {% if search_state.author %}
+            <a class="evenMore tabula-rasa" href="{{ search_state.remove_author().full_url() }}">{% trans %}You can expand your search by {% endtrans %}{% trans %}resetting author{% endtrans %}</a>
+        {% endif %}
+        {% if search_state.tags %}{% if search_state.author and search_state.query %}, {% elif search_state.author %}{% trans %} or {% endtrans %}{% endif %}
+            <a class="evenMore tabula-rasa" href="{{ search_state.remove_tags().full_url() }}">{% trans %}You can expand your search by {% endtrans %}{% trans %}resetting tags{% endtrans %}</a>
+        {% endif %}
+        {% if search_state.query %}
+            <a class="evenMore tabula-rasa" href="{% url questions %}">{% trans %}You can expand your search by {% endtrans %}{% trans %}starting over{% endtrans %}</a>
+        {% endif %}
+        {% else %}
+            <a class="evenMore tabula-rasa" href="{% url questions %}">{% trans %}You can expand your search by {% endtrans %}{% trans %}starting over{% endtrans %}</a>
+        {% endif %}
+
+{% endif %}
+  <a class="evenMore tabula-rasa" href="{% url ask %}">{% trans %}Ask a question{% endtrans %}</a>

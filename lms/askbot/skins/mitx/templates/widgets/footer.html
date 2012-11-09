@@ -1,0 +1,38 @@
+<!-- template footer.html -->
+<footer>
+  <nav>
+    <section class="top">
+      <section class="primary">
+        <a href="{% url root %}" class="logo"></a>
+        <a href="{% url courses %}">Find Courses</a>
+        <a href="{% url about_edx %}">About</a>
+        <a href="http://edxonline.tumblr.com/">Blog</a>
+        <a href="{% url jobs %}">Jobs</a>
+        <a href="{% url contact %}">Contact</a>
+      </section>
+
+      <section class="social">
+        <a href="http://youtube.com/user/edxonline"><img src='{{"images/social/youtube-sharing.png"|media}}' /></a>
+        <a href="https://plus.google.com/108235383044095082735"><img src="{{('images/social/google-plus-sharing.png'|media)}}" /></a>
+        <a href="http://www.facebook.com/EdxOnline"><img src="{{'images/social/facebook-sharing.png'|media}}" /></a>
+        <a href="https://twitter.com/edXOnline"><img src="{{'images/social/twitter-sharing.png'|media}}" /></a>
+      </section>
+    </section>
+
+    <section class="bottom">
+      <section class="copyright">
+        <p style="float:left;">&copy; 2012 edX, some rights reserved.</p>
+      </section>
+
+      <section class="secondary">
+        <a href="{% url tos %}">Terms of Service</a>
+        <a href="{% url privacy_edx %}">Privacy Policy</a>
+        <a href="{% url honor %}">Honor Code</a>
+        <a href="{% url help_edx %}">Help</a>
+      </section>
+    </section>
+
+  </nav>
+</footer>
+
+<!-- end template footer.html -->

@@ -1,0 +1,96 @@
+{% extends "two_column_body.html" %}
+{% import "macros.html" as macros %}
+<!-- question_edit.html -->
+{% block title %}{% spaceless %}{% trans %}Edit question{% endtrans %}{% endspaceless %}{% endblock %}
+{% block content %}
+
+
+  <div class="question-list-header">
+    <h1 class="section-title">{% trans %}Edit question{% endtrans %} <a class="light-button" href="{{ question.get_absolute_url() }}">{% trans %}back to question{% endtrans %}</a></h1>
+  </div>
+
+<form id="fmedit" class="question-form" action="{% url edit_question question.id %}" method="post" >{% csrf_token %}
+
+
+    {{
+        macros.edit_post(
+                    form,
+                    post_type='question',
+                    edit_title=True,
+                    mandatory_tags = mandatory_tags
+                )
+    }}
+    <div class="question-options">
+      {% if settings.WIKI_ON and question.wiki == False %}
+      {{ macros.checkbox_in_div(form.wiki) }}
+      {% endif %}
+      {% if form.can_stay_anonymous() %}
+      {{ macros.checkbox_in_div(form.reveal_identity) }}
+      {% endif %}
+    </div>
+
+    <div class="after-editor form-item">
+        <input type="submit" value="{% trans %}Save edit{% endtrans %}" class="submit" />&nbsp;
+        <input type="button" value="{% trans %}Cancel{% endtrans %}" class="submit" onclick="history.back(-1);" />
+
+    </div>
+</form>
+{% endblock %}
+
+{% block sidebar %}
+{% include "widgets/question_edit_tips.html" %}
+{% endblock %}
+
+{% block endjs %}
+    {% include "meta/editor_data.html" %}
+    <script type='text/javascript' src='{{"/js/editor.js"|media }}'></script>
+    {% if mandatory_tags %}
+        {% include "meta/mandatory_tags_js.html" %}
+    {% endif %}
+    <script type='text/javascript' src='{{"/js/jquery.validate.min.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/post.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/wmd/showdown.js"|media}}'></script>
+    <script type='text/javascript' src='{{"/js/wmd/wmd.js"|media}}'></script>
+    <script type="text/javascript">
+    {% if settings.ENABLE_MATHJAX or settings.MARKUP_CODE_FRIENDLY %}
+        var codeFriendlyMarkdown = true;
+    {% else %}
+        var codeFriendlyMarkdown = false;
+    {% endif %}
+    //todo move javascript out
+    $().ready(function(){
+        $("#nav_questions").attr('className',"on");
+        $('#editor').TextAreaResizer();
+
+        //highlight code synctax when editor has new text
+        $("#editor").typeWatch({highlight: false, wait: 3000,
+                         captureLength: 5, callback: lanai.highlightSyntax});
+
+        //toggle preview of editor
+        var display = true;
+        var txt = "{% trans %}hide preview{% endtrans %}";
+        $('#pre-collapse').text(txt);
+        $('#pre-collapse').bind('click', function(){
+            txt = display ? "{% trans %}show preview{% endtrans %}" : "{% trans %}hide preview{% endtrans %}";
+            display = !display;
+            $('#previewer').toggle();
+            $('#pre-collapse').text(txt);
+        });
+
+        {{ macros.tag_autocomplete_js(id = '#id_tags') }}
+
+        setupFormValidation(
+                    $("#fmedit"),
+                    CPValidator.getQuestionFormRules(),
+                    CPValidator.getQuestionFormMessages()
+        );
+
+        $('#id_revision').unbind().change(function(){
+            $("#select_revision").click();
+        });
+        lanai.highlightSyntax();
+
+    });
+    </script>
+{% endblock %}
+<!-- end question_edit.html -->

@@ -1,0 +1,14 @@
+{% trans %}Greetings from the Q&A forum{% endtrans %},
+
+{% trans %}To make use of the Forum, please follow the link below:{% endtrans %}
+
+{{validation_link}}
+
+{% trans %}Following the link above will help us verify your email address.{% endtrans %}
+
+{% trans %}If you beleive that this message was sent in mistake - 
+no further action is needed. Just ingore this email, we apologize
+for any inconvenience{% endtrans %}
+
+{% trans %}Sincerely,
+Forum Administrator{% endtrans %}

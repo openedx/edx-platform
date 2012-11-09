@@ -1,0 +1,17 @@
+{% if request.user.is_authenticated() %}
+    <a href="{{ request.user.get_absolute_url() }}">{{ request.user.username }}</a> 
+    <span class="user-info">
+    {{ macros.inbox_link(request.user) }}
+    {{ macros.moderation_items_link(request.user, moderation_items) }}
+    ({{ macros.user_long_score_and_badge_summary(user) }})
+    </span>
+    {% if settings.USE_ASKBOT_LOGIN_SYSTEM %}
+         <a href="{{ settings.LOGOUT_URL }}?next={{ settings.LOGOUT_REDIRECT_URL }}">{% trans %}logout{% endtrans %}</a>
+    {% endif %}
+{% elif settings.USE_ASKBOT_LOGIN_SYSTEM %}
+    <a href="{{ settings.LOGIN_URL }}?next={{request.path|clean_login_url}}">{% trans %}login{% endtrans %}</a>
+{% endif %}
+{% if request.user.is_authenticated() and request.user.is_administrator() %}
+    <a href="{% url site_settings %}">{% trans %}settings{% endtrans %}</a>
+{% endif %}
+    <a href="{% url "help" %}" title="{% trans %}help{% endtrans %}">{% trans %}help{% endtrans %}</a>
