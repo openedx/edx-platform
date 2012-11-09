@@ -1,11 +1,32 @@
 import xmodule
 from xmodule import progress
 
+def XModule():
+    def __init__(self, content, policy, state, child_pointers, preferences):
+        self.content = content
+        self.policy = policy
+        self.state = state
+        self.child_pointers = child_pointers
+        self.preferences = preferences
+
+    @lazy_property
+    def children(self):
+        return [xmodule.get_module(child_ptr) for child_ptr in self.child_pointers]
+
+    def render(self, child, context=None):
+        if context is None:
+            context = self.render_context
+
+        # Make children use the appropriate render context
+        child.render_context = context
+        return child.find_view(context)()
+
+    def find_view(self, context):
+        # self._views is populated with metaclass magic that is TBD
+        return self._views[context]
+
 
 def SequenceModule(XModule, ResourceTemplateModule):
-
-    def __init__(self, definition, policy, state, preferences):
-        self.state = state
 
     @property
     def visited(self):
@@ -28,7 +49,7 @@ def SequenceModule(XModule, ResourceTemplateModule):
             'main',
             # Render w/ no arguments executes the same view for the children
             # that is currently rendering for the parent
-            children=[child.render() for child in self.children]
+            children=[self.render(child) for child in self.children]
         )
 
     @xmodule.register_handler('update_position')
