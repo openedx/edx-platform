@@ -45,6 +45,7 @@ class CertificateStatuses(object):
     deleting = 'deleting'
     deleted = 'deleted'
     downloadable = 'downloadable'
+    notpassing = 'notpassing'
     error = 'error'
 
 
