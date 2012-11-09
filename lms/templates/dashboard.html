@@ -182,21 +182,21 @@
             %>
             <div class="message message-status ${status_css_class} is-shown">
 
-            % if cert_status == CertificateStatuses.unavailable:
+            % if cert_status['status'] == CertificateStatuses.unavailable:
               <p class="message-copy">Final course details are being wrapped up at this time.
               Your final standing will be available shortly.</p>
             % elif passing_grade:
               <p class="message-copy">You have received a grade of
                         <span class="grade-value">${cert_status['grade']}</span>
               in this course.</p>
-            % elif cert_status == CertificateStatuses.notpassing:
+            % elif cert_status['status'] == CertificateStatuses.notpassing:
               <p class="message-copy">You did not complete the necessary requirements for
               completion of this course. Your grade was <span class="grade-value">${cert_status['grade']}</span>
               </p>
             % endif
             % if cert_button or survey_button:
               <ul class="actions">
-                % if cert_button and cert_status['status'] == CertificateStatuses.generating:
+                % if cert_button and cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
                   <li class="action"><span class="btn disabled" href="">Your Certificate is Generating</span></li>
                 % elif cert_button and cert_status['status'] == CertificateStatuses.downloadable:
                   <li class="action">
