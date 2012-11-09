@@ -82,7 +82,12 @@ class XQueueCertInterface(object):
         the certificate status to 'regenerating'.
 
         Certificate must be in the 'error' or 'downloadable' state
-        and the student must have a passing grade.
+
+        If the student has a passing grade a certificate
+        request will be put on the queue
+
+        If the student is not passing his state will change
+        to status.notpassing
 
         otherwise it will return the current state
 
@@ -98,16 +103,16 @@ class XQueueCertInterface(object):
             course = courses.get_course_by_id(course_id)
             grade = grades.grade(student, self.request, course)
 
-            if grade['grade'] is not None:
+            profile = UserProfile.objects.get(user=student)
+            try:
+                cert = GeneratedCertificate.objects.get(
+                    user=student, course_id=course_id)
+            except GeneratedCertificate.DoesNotExist:
+                logger.critical("Attempting to regenerate a certificate"
+                               "for a user that doesn't have one")
+                raise
 
-                profile = UserProfile.objects.get(user=student)
-                try:
-                    cert = GeneratedCertificate.objects.get(
-                        user=student, course_id=course_id)
-                except GeneratedCertificate.DoesNotExist:
-                    logger.warning("Attempting to regenerate a certificate"
-                                   "for a user that doesn't have one")
-                    raise
+            if grade['grade'] is not None:
 
                 cert.status = status.regenerating
                 cert.name = profile.name
@@ -123,6 +128,11 @@ class XQueueCertInterface(object):
 
                 key = cert.key
                 self._send_to_xqueue(contents, key)
+                cert.save()
+
+            else:
+                cert.status = status.notpassing
+                cert.name = profile.name
                 cert.save()
 
         return cert_status
@@ -182,14 +192,20 @@ class XQueueCertInterface(object):
         Will change the certificate status to 'deleting'.
 
         Certificate must be in the 'unavailable', 'error',
-        or 'deleted' state and the student must have
-        a passing grade.
+        or 'deleted' state.
 
-        otherwise it will return the current state
+        If a student has a passing grade a request will made
+        for a new cert
+
+        If a student does not have a passing grade the status
+        will change to status.notpassing
+
+        Returns the student's status
 
         """
 
-        VALID_STATUSES = [status.unavailable, status.deleted, status.error]
+        VALID_STATUSES = [status.unavailable, status.deleted, status.error,
+                status.notpassing]
 
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
@@ -198,14 +214,14 @@ class XQueueCertInterface(object):
             # grade the student
             course = courses.get_course_by_id(course_id)
             grade = grades.grade(student, self.request, course)
+            profile = UserProfile.objects.get(user=student)
+            cert, created = GeneratedCertificate.objects.get_or_create(
+                   user=student, course_id=course_id)
 
             if grade['grade'] is not None:
                 cert_status = status.generating
-                cert, created = GeneratedCertificate.objects.get_or_create(
-                       user=student, course_id=course_id)
-                profile = UserProfile.objects.get(user=student)
-
                 key = make_hashkey(random.random())
+
                 cert.status = cert_status
                 cert.grade = grade['percent']
                 cert.user = student
@@ -222,12 +238,18 @@ class XQueueCertInterface(object):
 
                 self._send_to_xqueue(contents, key)
                 cert.save()
+            else:
+                cert_status = status.notpassing
+
+                cert.status = cert_status
+                cert.user = student
+                cert.course_id = course_id
+                cert.name = profile.name
+                cert.save()
 
         return cert_status
 
     def _send_to_xqueue(self, contents, key):
-
-        # TODO - need to read queue name from settings
 
         xheader = make_xheader(
             'http://{0}/update_certificate?{1}'.format(
