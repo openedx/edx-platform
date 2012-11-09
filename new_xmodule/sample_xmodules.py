@@ -26,7 +26,58 @@ def XModule():
         return self._views[context]
 
 
-def SequenceModule(XModule, ResourceTemplateModule):
+def XModuleEditor():
+
+    @xmodule.register_view('edit')
+    def edit(self):
+        return self.render_template(
+            'combined',
+            content=self.render(self, 'edit_content'),
+            policy=self.render(self, 'edit_policy'),
+            children=self.render(self, 'edit_children'),
+        )
+
+    @xmodule.register_view('edit_children')
+    def edit_children(self):
+        return self.render_template(
+            'drag_and_drop',
+            children=self.children
+        )
+
+    @xmodule.register_view('edit_policy')
+    def edit_policy(self):
+        return self.render_template(
+            'mapping',
+            mapping=self.policy
+        )
+
+    @xmodule.register_view('edit_content')
+    def edit_content(self):
+        return self.render_template(
+            'mapping',
+            mapping=self.content
+        )
+
+    @xmodule.register_handler('update_children')
+    def update_children(self, data):
+        """
+        Expects a new list of child xmodule ids
+        """
+        self.children = data['children']
+
+    @xmodule.register_handler('set_policy')
+    def set_policy(self, data):
+        """
+        Expects keys 'name' and 'value'.
+        If value is None, then delete the key, otherwise set
+        the named key to the value
+        """
+        if data['value'] is None:
+            del self.policy[data['value']]
+        else:
+            self.policy[data['name']] = self.policy[data['value']]
+
+def SequenceModule(XModule, ResourceTemplate):
 
     @property
     def visited(self):
