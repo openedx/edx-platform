@@ -239,9 +239,10 @@ class ContentStoreTest(TestCase):
 
     def tearDown(self):
         # Make sure you flush out the test modulestore after the end
-        # of the last test otherwise cms/djangoapps/contentstore/__init__.py
-        # update_templates() is complaining that there are duplicate
-        # templates.
+        # of the last test because otherwise on the next run
+        # cms/djangoapps/contentstore/__init__.py
+        # update_templates() will try to update the templates
+        # via upsert and it seems to be messing things up.
         # If your test module gets in some weird state, do this manually
         # from the bash shell to drop it.
         # $ mongo test_xmodule --eval "db.dropDatabase()"
@@ -322,7 +323,6 @@ class ContentStoreTest(TestCase):
             '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
 
     def check_edit_unit(self, test_course_name):
-        """Check that editing functionality works on example courses"""
         import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
 
         for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
@@ -331,11 +331,9 @@ class ContentStoreTest(TestCase):
             resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
