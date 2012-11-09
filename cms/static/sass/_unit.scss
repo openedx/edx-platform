@@ -374,6 +374,10 @@
     }
   }
 
+  .html-preview {
+    padding: 20px 30px;
+  }
+
   .component-editor {
     @include edit-box;
     display: none;

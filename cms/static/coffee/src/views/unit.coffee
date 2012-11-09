@@ -94,6 +94,10 @@ class CMS.Views.UnitEdit extends Backbone.View
         @$editor = $($('#problem-editor').html())
         $preview = $($('#problem-preview').html())
         initProblemEditors(@$editor, $preview)
+      when 'html'
+        @$editor = $($('#html-editor').html())
+        $preview = $('<div class="html-preview">')
+        initHTMLEditor(@$editor, $preview)
 
     @$editor.find('.save-button, .cancel-button').bind('click', =>
       @$componentItem.removeClass('editing')
