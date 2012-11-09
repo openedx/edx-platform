@@ -1,3 +1,17 @@
+# Possible names for things:
+#
+# XModuleDescriptor
+# Courselet
+# Blueprint
+# CoursePiece
+# Plan
+#
+# XModule
+# Personalized
+# Lesson
+
+
+
 import xmodule
 from xmodule import progress
 
