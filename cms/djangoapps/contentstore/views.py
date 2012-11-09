@@ -503,7 +503,8 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     )
     module.get_html = replace_static_urls(
         module.get_html,
-        module.metadata.get('data_dir', module.location.course)
+        module.metadata.get('data_dir', module.location.course),
+        course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None])
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
