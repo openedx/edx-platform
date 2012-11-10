@@ -149,7 +149,7 @@ def dashboard(request):
     # TODO: workaround to not have to zip courses and certificates in the template
     # since before there is a migration to certificates
     if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
-        cert_statuses = {(course.id, certificate_status_for_student(request.user, course.id)) for course in courses}
+        cert_statuses = { course.id: certificate_status_for_student(request.user, course.id) for course in courses}
     else:
         cert_statuses = {}
 
