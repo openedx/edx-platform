@@ -146,7 +146,10 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = [certificate_status_for_student(request.user, course.id) for course in courses]
+    if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
+        cert_statuses = [certificate_status_for_student(request.user, course.id) for course in courses]
+    else:
+        cert_statuses = []
 
     context = {'courses': courses,
                'message': message,
