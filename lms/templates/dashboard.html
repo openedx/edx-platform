@@ -115,7 +115,7 @@
     </header>
 
     % if len(courses) > 0:
-      % for course, cert_status in zip(courses, cert_statuses):
+      % for course in courses:
 
         <article class="my-course">
           <%
@@ -154,8 +154,10 @@
           </a>
         </article>
 
-
-        % if course.has_ended:
+        <%
+        cert_status = cert_statuses.get(course.id)
+        %>
+        % if course.has_ended and cert_status:
             <%
             passing_grade = False
             cert_button = False
@@ -350,4 +352,3 @@
     </div>
   </div>
 </section>
-
