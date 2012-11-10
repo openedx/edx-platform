@@ -252,7 +252,7 @@ class XQueueCertInterface(object):
     def _send_to_xqueue(self, contents, key):
 
         xheader = make_xheader(
-            'http://{0}/update_certificate?{1}'.format(
+            'https://{0}/update_certificate?{1}'.format(
                 settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
