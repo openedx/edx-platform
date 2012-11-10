@@ -192,8 +192,7 @@
                         <span class="grade-value">${cert_status['grade']}</span>
               in this course.</p>
             % elif cert_status['status'] == CertificateStatuses.notpassing:
-              <p class="message-copy">You did not complete the necessary requirements for
-              completion of this course. Your grade was <span class="grade-value">${cert_status['grade']}</span>
+              <p class="message-copy">You did not complete the necessary requirements for completion of this course. 
               </p>
             % endif
             % if cert_button or survey_button:
