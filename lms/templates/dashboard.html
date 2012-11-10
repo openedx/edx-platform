@@ -157,7 +157,7 @@
         <%
         cert_status = cert_statuses.get(course.id)
         %>
-        % if course.has_ended and cert_status:
+        % if course.has_ended() and cert_status:
             <%
             passing_grade = False
             cert_button = False
