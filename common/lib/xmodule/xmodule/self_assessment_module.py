@@ -61,10 +61,6 @@ class SelfAssessmentModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
     js_module_name = "SelfAssessment"
 
-    def get_html(self):
-        # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(self.html, self.rewrite_content_links)
-
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
@@ -100,9 +96,8 @@ class SelfAssessmentModule(XModule):
         else:
             instance_state = {}
 
+        # Note: assessment responses are 'incorrect'/'correct'
         self.student_answers = instance_state.get('student_answers', [])
-
-        # assessment responses are 'incorrect'/'correct'
         self.assessment = instance_state.get('assessment', [])
         self.hints = instance_state.get('hints', [])
 
@@ -111,7 +106,7 @@ class SelfAssessmentModule(XModule):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self.score = instance_state.get('score', 0)
-        self.max_score = instance_state.get('max_score', MAX_SCORE)
+        self._max_score = instance_state.get('max_score', MAX_SCORE)
 
         self.attempts = instance_state.get('attempts', 0)
 
@@ -122,18 +117,23 @@ class SelfAssessmentModule(XModule):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
+    def get_html(self):
+        #set context variables and render template
         previous_answer = self.student_answers[-1] if self.student_answers else ''
 
-        #set context variables and render template
         context = {
-            'prompt' : self.prompt,
-            'previous_answer' : previous_answer,
-            'ajax_url' : system.ajax_url,
-            'initial_rubric' : self.get_rubric_html(),
-            'initial_hint' : self.get_hint_html(),
-            'initial_message' : self.get_message_html(),
+            'prompt': self.prompt,
+            'previous_answer': previous_answer,
+            'ajax_url': self.system.ajax_url,
+            'initial_rubric': self.get_rubric_html(),
+            'initial_hint': self.get_hint_html(),
+            'initial_message': self.get_message_html(),
+            'state': self.state,
         }
-        self.html = self.system.render_template('self_assessment_prompt.html', context)
+        html = self.system.render_template('self_assessment_prompt.html', context)
+
+        # cdodge: perform link substitutions for any references to course static content (e.g. images)
+        return rewrite_links(html, self.rewrite_content_links)
 
     def get_score(self):
         """
@@ -145,15 +145,15 @@ class SelfAssessmentModule(XModule):
         """
         Return max_score
         """
-        return self.max_score
+        return self._max_score
 
     def get_progress(self):
         '''
         For now, just return score / max_score
         '''
-        if self.max_score > 0:
+        if self._max_score > 0:
             try:
-                return Progress(self.score, self.max_score)
+                return Progress(self.score, self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
@@ -167,7 +167,7 @@ class SelfAssessmentModule(XModule):
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
-        'progress' : 'none'/'in_progress'/'done',
+        'progress': 'none'/'in_progress'/'done',
         <other request-specific values here > }
         """
 
@@ -207,7 +207,7 @@ class SelfAssessmentModule(XModule):
             return ''
 
         # we'll render it
-        context = {'rubric' : self.rubric}
+        context = {'rubric': self.rubric}
 
         if self.state == self.ASSESSING:
             context['read_only'] = False
@@ -226,8 +226,9 @@ class SelfAssessmentModule(XModule):
             return ''
 
         # else we'll render it
+        hint = self.hints[-1] if len(self.hints) > 0 else ''
         context = {'hint_prompt': self.hint_prompt,
-                   'hint': self.hint}
+                   'hint': hint}
 
         if self.state == self.REQUEST_HINT:
             context['read_only'] = False
@@ -245,7 +246,7 @@ class SelfAssessmentModule(XModule):
         if self.state != self.DONE:
             return ""
 
-        return """<div class="save_message">{0}</div>""".format(self.message)
+        return """<div class="save_message">{0}</div>""".format(self.submit_message)
 
 
     def save_answer(self, get):
@@ -253,7 +254,7 @@ class SelfAssessmentModule(XModule):
         After the answer is submitted, show the rubric.
         """
         # Check to see if attempts are less than max
-        if self.attempts < self.max_attempts:
+        if self.attempts > self.max_attempts:
             # If too many attempts, prevent student from saving answer and
             # seeing rubric.  In normal use, students shouldn't see this because
             # they won't see the reset button once they're out of attempts.
@@ -265,23 +266,23 @@ class SelfAssessmentModule(XModule):
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
 
-        self.student_answers.append = get['student_answer']
+        self.student_answers.append(get['student_answer'])
         self.state = self.ASSESSING
 
         return {
             'success': True,
-            'rubric': self.get_rubric_html()
+            'rubric_html': self.get_rubric_html()
             }
 
     def save_assessment(self, get):
         """
         Save the assessment.
 
-        Returns a dict { 'success' : bool, 'hint_html': hint_html 'error' : error-msg},
+        Returns a dict { 'success': bool, 'hint_html': hint_html 'error': error-msg},
         with 'error' only present if 'success' is False, and 'hint_html' only if success is true
         """
 
-        if (self.state != self.ASSESSMENT or
+        if (self.state != self.ASSESSING or
             len(self.student_answers) !=  len(self.assessment) + 1):
             return self.out_of_sync_error(get)
 
@@ -294,9 +295,9 @@ class SelfAssessmentModule(XModule):
     def save_hint(self, get):
         '''
         Save the hint.
-        Returns a dict { 'success' : bool,
+        Returns a dict { 'success': bool,
                          'message_html': message_html,
-                         'error' : error-msg},
+                         'error': error-msg},
         with the error key only present if success is False and message_html
         only if True.
         '''
@@ -313,13 +314,14 @@ class SelfAssessmentModule(XModule):
 
         # To the tracking logs!
         event_info = {
-            'selfassessment_id' : self.location.url(),
+            'selfassessment_id': self.location.url(),
             'state': {
                 'student_answers': self.student_answers,
                 'assessment': self.assessment,
-                'hints' : self.hints,
+                'hints': self.hints,
                 'score': points,
-                'done': self.done,}}
+                }
+            }
         self.system.track_function('save_hint', event_info)
 
         return {'success': True,
@@ -335,7 +337,7 @@ class SelfAssessmentModule(XModule):
         """
         if self.state != DONE:
             return self.out_of_sync_error(get)
-        if self.attempts < self.max_attempts:
+        if self.attempts > self.max_attempts:
             return {
                 'success': False,
                 'error': 'Too many attempts.'
@@ -353,12 +355,12 @@ class SelfAssessmentModule(XModule):
 
         state = {
                  'student_answers': self.student_answers,
-                 'temp_answer': self.temp_answer,
-                 'hints' : self.hints,
                  'assessment': self.assessment,
+                 'hints': self.hints,
+                 'state': self.state,
                  'score': points,
-                 'max_score' : MAX_SCORE,
-                 'attempts' : self.attempts
+                 'max_score': self._max_score,
+                 'attempts': self.attempts
         }
         return json.dumps(state)
 
@@ -385,10 +387,10 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
         Returns:
         {
-        'rubric' : 'some-html',
-        'prompt' : 'some-html',
-        'submitmessage' : 'some-html'
-        'hintprompt' : 'some-html'
+        'rubric': 'some-html',
+        'prompt': 'some-html',
+        'submitmessage': 'some-html'
+        'hintprompt': 'some-html'
         }
         """
         expected_children = ['rubric', 'prompt', 'submitmessage', 'hintprompt']
@@ -400,10 +402,10 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
 
-        return {'rubric' : parse('rubric'),
-                'prompt' : parse('prompt'),
-                'submitmessage' : parse('submitmessage'),
-                'hintprompt' : parse('hintprompt'),
+        return {'rubric': parse('rubric'),
+                'prompt': parse('prompt'),
+                'submitmessage': parse('submitmessage'),
+                'hintprompt': parse('hintprompt'),
                 }
 
 
