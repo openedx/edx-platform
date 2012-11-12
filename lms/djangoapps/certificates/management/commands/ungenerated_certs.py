@@ -1,22 +1,30 @@
-from django.utils.simplejson import dumps
-from django.core.management.base import BaseCommand, CommandError
-from certificates.models import GeneratedCertificate
+from django.core.management.base import BaseCommand
+from certificates.models import certificate_status_for_student
+from certificates.queue import XQueueCertInterface
+from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
 
     help = """
-    This command finds all GeneratedCertificate objects that do not have a
-    certificate generated. These come into being when a user requests a
-    certificate, or when grade_all_students is called (for pre-generating
-    certificates).
+    Find all students that have need certificates
+    and put certificate requests on the queue
 
-    It returns a json formatted list of users and their user ids
+    This is only for BerkeleyX/CS169.1x/2012_Fall
     """
 
     def handle(self, *args, **options):
-        users = GeneratedCertificate.objects.filter(
-                download_url=None)
-        user_output = [{'user_id':user.user_id, 'name':user.name}
-                for user in users]
-        self.stdout.write(dumps(user_output) + "\n")
+
+        # TODO This is only temporary for CS169 certs
+
+        course_id = 'BerkeleyX/CS169.1x/2012_Fall'
+        enrolled_students = User.objects.filter(
+                courseenrollment__course_id=course_id).prefetch_related(
+                        "groups").order_by('username')
+        xq = XQueueCertInterface()
+        for student in enrolled_students:
+            if certificate_status_for_student(
+                     student, course_id)['status'] == 'unavailable':
+                ret = xq.add_cert(student, course_id)
+                if ret == 'generating':
+                    print 'generating for {0}'.format(student)

@@ -2,6 +2,7 @@
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
+  from certificates.models import CertificateStatuses
 %>
 <%inherit file="main.html" />
 
@@ -135,8 +136,16 @@
                 <h2 class="university">${get_course_about_section(course, 'university')}</h2>
                 <h3>${course.number} ${course.title}</h3>
               </hgroup>
-              <section class="course-status">
-                <p>Class Starts - <span>${course.start_date_text}</span></p>
+              <section class="course-status course-status-completed">
+              <p>
+              % if course.has_ended():
+              Course Completed - <span>${course.end_date_text}</span>
+              % elif course.has_started():
+              Course Started - <span>${course.start_date_text}</span>
+              % else:   # hasn't started yet
+              Course Starts - <span>${course.start_date_text}</span>
+              % endif
+              </p>
               </section>
               % if course.id in show_courseware_links_for:
                 <p class="enter-course">View Courseware</p>
@@ -144,6 +153,68 @@
             </section>
           </a>
         </article>
+
+        <%
+        cert_status = cert_statuses.get(course.id)
+        %>
+        % if course.has_ended() and cert_status:
+            <%
+            passing_grade = False
+            cert_button = False
+            survey_button = False
+            if cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
+                status_css_class = 'course-status-certrendering'
+                cert_button = True
+                survey_button = True
+                passing_grade = True
+            elif cert_status['status'] == CertificateStatuses.downloadable:
+                status_css_class = 'course-status-certavailable'
+                cert_button = True
+                survey_button = True
+                passing_grade = True
+            elif cert_status['status'] == CertificateStatuses.notpassing:
+                status_css_class = 'course-status-certnotavailable'
+                survey_button = True
+            else:
+                # This is primarily the 'unavailable' state, but also 'error', 'deleted', etc.
+                status_css_class = 'course-status-processing'
+
+            if survey_button and not course.end_of_course_survey_url:
+                survey_button = False
+            %>
+            <div class="message message-status ${status_css_class} is-shown">
+
+            % if cert_status['status'] == CertificateStatuses.unavailable:
+              <p class="message-copy">Final course details are being wrapped up at this time.
+              Your final standing will be available shortly.</p>
+            % elif passing_grade:
+              <p class="message-copy">You have received a grade of
+                        <span class="grade-value">${cert_status['grade']}</span>
+              in this course.</p>
+            % elif cert_status['status'] == CertificateStatuses.notpassing:
+              <p class="message-copy">You did not complete the necessary requirements for completion of this course. 
+              </p>
+            % endif
+            % if cert_button or survey_button:
+              <ul class="actions">
+                % if cert_button and cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
+                  <li class="action"><span class="btn disabled" href="">Your Certificate is Generating</span></li>
+                % elif cert_button and cert_status['status'] == CertificateStatuses.downloadable:
+                  <li class="action">
+                  <a class="btn" href="${cert_status['download_url']}"
+                     title="This link will open/download a PDF document">
+                     Download Your PDF Certificate</a></li>
+                % endif
+                % if survey_button:
+                  <li class="action"><a class="cta" href="${course.end_of_course_survey_url}">
+                         Complete our course feedback survey</a></li>
+                % endif
+              </ul>
+            % endif
+            </div>
+
+        % endif
+
         <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
 
       % endfor
@@ -280,4 +351,3 @@
     </div>
   </div>
 </section>
-
