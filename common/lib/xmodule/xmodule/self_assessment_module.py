@@ -33,8 +33,8 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-# Set maximum available number of points.  Should be set to 1 for now due to assessment handling,
-# which only allows for correct/incorrect.
+# Set maximum available number of points.
+# Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
 class SelfAssessmentModule(XModule):
@@ -68,13 +68,19 @@ class SelfAssessmentModule(XModule):
 
         """
         Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
-        and one optional attribute, attempts, which should be an integer that defaults to 1.
+        and two optional attributes:
+        attempts, which should be an integer that defaults to 1.
         If it's > 1, the student will be able to re-submit after they see
-        the rubric.  Note: all the submissions are stored.
+        the rubric.
+        max_score, which should be an integer that defaults to 1.
+        It defines the maximum number of points a student can get.  Assumed to be integer scale
+        from 0 to max_score, with an interval of 1.
+
+        Note: all the submissions are stored.
 
         Sample file:
 
-        <selfassessment attempts="1">
+        <selfassessment attempts="1" max_score="1">
             <prompt>
                 Insert prompt text here.  (arbitrary html)
             </prompt>
@@ -96,17 +102,17 @@ class SelfAssessmentModule(XModule):
         else:
             instance_state = {}
 
-        # Note: assessment responses are 'incorrect'/'correct'
+        # Note: score responses are on scale from 0 to max_score
         self.student_answers = instance_state.get('student_answers', [])
-        self.assessment = instance_state.get('assessment', [])
+        self.scores = instance_state.get('scores', [])
         self.hints = instance_state.get('hints', [])
 
         self.state = instance_state.get('state', 'initial')
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self.score = instance_state.get('score', 0)
-        self._max_score = instance_state.get('max_score', MAX_SCORE)
+
+        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
         self.attempts = instance_state.get('attempts', 0)
 
@@ -117,11 +123,17 @@ class SelfAssessmentModule(XModule):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
+    def _allow_reset(self):
+        """Can the module be reset?"""
+        return self.state == self.DONE and self.attempts < self.max_attempts
+
     def get_html(self):
         #set context variables and render template
-        previous_answer = self.student_answers[-1] if self.student_answers else ''
+        if self.state != self.INITIAL and self.student_answers:
+            previous_answer = self.student_answers[-1]
+        else:
+            previous_answer = ''
 
-        allow_reset = self.state == self.DONE and self.attempts < self.max_attempts
         context = {
             'prompt': self.prompt,
             'previous_answer': previous_answer,
@@ -130,7 +142,7 @@ class SelfAssessmentModule(XModule):
             'initial_hint': self.get_hint_html(),
             'initial_message': self.get_message_html(),
             'state': self.state,
-            'allow_reset': allow_reset,
+            'allow_reset': self._allow_reset(),
         }
         html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -141,7 +153,7 @@ class SelfAssessmentModule(XModule):
         """
         Returns dict with 'score' key
         """
-        return {'score': self.score}
+        return {'score': self.get_last_score()}
 
     def max_score(self):
         """
@@ -149,13 +161,22 @@ class SelfAssessmentModule(XModule):
         """
         return self._max_score
 
+    def get_last_score(self):
+        """
+        Returns the last score in the list
+        """
+        last_score=0
+        if(len(self.scores)>0):
+            last_score=self.scores[len(self.scores)-1]
+        return last_score
+
     def get_progress(self):
         '''
-        For now, just return score / max_score
+        For now, just return last score / max_score
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.score, self._max_score)
+                return Progress(self.get_last_score(), self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
@@ -192,12 +213,12 @@ class SelfAssessmentModule(XModule):
         })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def out_of_sync_error(self, get):
+    def out_of_sync_error(self, get, msg=''):
         """
         return dict out-of-sync error message, and also log.
         """
-        log.warning("Assessment module state out sync. state: %r, get: %r",
-                    self.state, get)
+        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
+                    self.state, get, msg)
         return {'success': False,
                 'error': 'The problem state got out-of-sync'}
 
@@ -209,7 +230,9 @@ class SelfAssessmentModule(XModule):
             return ''
 
         # we'll render it
-        context = {'rubric': self.rubric}
+        context = {'rubric': self.rubric,
+                   'max_score' : self._max_score,
+                   }
 
         if self.state == self.ASSESSING:
             context['read_only'] = False
@@ -227,8 +250,12 @@ class SelfAssessmentModule(XModule):
         if self.state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        # else we'll render it
-        hint = self.hints[-1] if len(self.hints) > 0 else ''
+        if self.state == self.DONE and len(self.hints) > 0:
+            # display the previous hint
+            hint = self.hints[-1]
+        else:
+            hint = ''
+
         context = {'hint_prompt': self.hint_prompt,
                    'hint': hint}
 
@@ -262,7 +289,7 @@ class SelfAssessmentModule(XModule):
             # they won't see the reset button once they're out of attempts.
             return {
                 'success': False,
-                'message': 'Too many attempts.'
+                'error': 'Too many attempts.'
             }
 
         if self.state != self.INITIAL:
@@ -278,21 +305,45 @@ class SelfAssessmentModule(XModule):
 
     def save_assessment(self, get):
         """
-        Save the assessment.
+        Save the assessment.  If the student said they're right, don't ask for a
+        hint, and go straight to the done state.  Otherwise, do ask for a hint.
 
-        Returns a dict { 'success': bool, 'hint_html': hint_html 'error': error-msg},
-        with 'error' only present if 'success' is False, and 'hint_html' only if success is true
+        Returns a dict { 'success': bool, 'state': state,
+
+        'hint_html': hint_html OR 'message_html': html and 'allow_reset',
+
+           'error': error-msg},
+
+        with 'error' only present if 'success' is False, and 'hint_html' or
+        'message_html' only if success is true
         """
 
-        if (self.state != self.ASSESSING or
-            len(self.student_answers) !=  len(self.assessment) + 1):
-            return self.out_of_sync_error(get)
+        n_answers = len(self.student_answers)
+        n_scores = len(self.scores)
+        if (self.state != self.ASSESSING or n_answers !=  n_scores + 1):
+            msg = "%d answers, %d scores" % (n_answers, n_scores)
+            return self.out_of_sync_error(get, msg)
 
-        self.assessment.append(get['assessment'].lower())
-        self.state = self.REQUEST_HINT
+        try:
+            score = int(get['assessment'])
+        except:
+            return {'success': False, 'error': "Non-integer score value"}
 
-        # TODO: return different hint based on assessment value...
-        return {'success': True, 'hint_html': self.get_hint_html()}
+        self.scores.append(score)
+
+        d = {'success': True,}
+
+        if score == self.max_score():
+            self.state = self.DONE
+            d['message_html'] = self.get_message_html()
+            d['allow_reset'] = self._allow_reset()
+        else:
+            self.state = self.REQUEST_HINT
+            d['hint_html'] = self.get_hint_html()
+
+        d['state'] = self.state
+        return d
+
 
     def save_hint(self, get):
         '''
@@ -304,14 +355,14 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.REQUEST_HINT or len(self.assessment) !=  len(self.hints) + 1:
+        if self.state != self.REQUEST_HINT:
+            # Note: because we only ask for hints on wrong answers, may not have
+            # the same number of hints and answers.
             return self.out_of_sync_error(get)
 
         self.hints.append(get['hint'].lower())
         self.state = self.DONE
 
-        # Points are assigned for completion, so always set to 1
-        points = 1
         # increment attempts
         self.attempts = self.attempts + 1
 
@@ -320,16 +371,15 @@ class SelfAssessmentModule(XModule):
             'selfassessment_id': self.location.url(),
             'state': {
                 'student_answers': self.student_answers,
-                'assessment': self.assessment,
+                'score': self.scores,
                 'hints': self.hints,
-                'score': points,
                 }
             }
         self.system.track_function('save_hint', event_info)
 
         return {'success': True,
                 'message_html': self.get_message_html(),
-                'allow_reset': self.attempts < self.max_attempts}
+                'allow_reset': self._allow_reset()}
 
 
     def reset(self, get):
@@ -353,17 +403,14 @@ class SelfAssessmentModule(XModule):
 
     def get_instance_state(self):
         """
-        Get the current assessment, points, and state
+        Get the current score and state
         """
-        #Assign points based on completion.  May want to change to assessment-based down the road.
-        points = 1
 
         state = {
                  'student_answers': self.student_answers,
-                 'assessment': self.assessment,
                  'hints': self.hints,
                  'state': self.state,
-                 'score': points,
+                 'scores': self.scores,
                  'max_score': self._max_score,
                  'attempts': self.attempts
         }
