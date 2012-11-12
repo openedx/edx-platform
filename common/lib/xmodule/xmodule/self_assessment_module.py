@@ -33,8 +33,8 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-# Set maximum available number of points.  Should be set to 1 for now due to assessment handling,
-# which only allows for correct/incorrect.
+# Set maximum available number of points.
+# Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
 class SelfAssessmentModule(XModule):
@@ -68,13 +68,19 @@ class SelfAssessmentModule(XModule):
 
         """
         Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
-        and one optional attribute, attempts, which should be an integer that defaults to 1.
+        and two optional attributes:
+        attempts, which should be an integer that defaults to 1.
         If it's > 1, the student will be able to re-submit after they see
-        the rubric.  Note: all the submissions are stored.
+        the rubric.
+        max_score, which should be an integer that defaults to 1.
+        It defines the maximum number of points a student can get.  Assumed to be integer scale
+        from 0 to max_score, with an interval of 1.
+
+        Note: all the submissions are stored.
 
         Sample file:
 
-        <selfassessment attempts="1">
+        <selfassessment attempts="1" max_score="1">
             <prompt>
                 Insert prompt text here.  (arbitrary html)
             </prompt>
@@ -96,16 +102,16 @@ class SelfAssessmentModule(XModule):
         else:
             instance_state = {}
 
-        # Note: assessment responses are 'incorrect'/'correct'
+        # Note: score responses are on scale from 0 to max_score
         self.student_answers = instance_state.get('student_answers', [])
-        self.assessment = instance_state.get('assessment', [])
+        self.scores = instance_state.get('scores', [])
         self.hints = instance_state.get('hints', [])
 
         self.state = instance_state.get('state', 'initial')
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self.score = instance_state.get('score', 0)
+
         self._max_score = instance_state.get('max_score', MAX_SCORE)
 
         self.attempts = instance_state.get('attempts', 0)
@@ -131,6 +137,7 @@ class SelfAssessmentModule(XModule):
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': allow_reset,
+            'max_score' : self._max_score,
         }
         html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -141,7 +148,7 @@ class SelfAssessmentModule(XModule):
         """
         Returns dict with 'score' key
         """
-        return {'score': self.score}
+        return {'score': self.get_last_score()}
 
     def max_score(self):
         """
@@ -149,13 +156,22 @@ class SelfAssessmentModule(XModule):
         """
         return self._max_score
 
+    def get_last_score(self):
+        """
+        Returns the last score in the list
+        """
+        last_score=0
+        if(len(self.scores)>0):
+            last_score=self.scores[len(self.scores)-1]
+        return last_score
+
     def get_progress(self):
         '''
-        For now, just return score / max_score
+        For now, just return last score / max_score
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.score, self._max_score)
+                return Progress(self.get_last_score(), self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
@@ -285,10 +301,14 @@ class SelfAssessmentModule(XModule):
         """
 
         if (self.state != self.ASSESSING or
-            len(self.student_answers) !=  len(self.assessment) + 1):
+            len(self.student_answers) !=  len(self.scores) + 1):
             return self.out_of_sync_error(get)
 
-        self.assessment.append(get['assessment'].lower())
+        try:
+            self.scores.append(int(get['assessment']))
+        except:
+            return {'success': False, 'error': "Non-integer score value"}
+
         self.state = self.REQUEST_HINT
 
         # TODO: return different hint based on assessment value...
@@ -304,14 +324,12 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.REQUEST_HINT or len(self.assessment) !=  len(self.hints) + 1:
+        if self.state != self.REQUEST_HINT or len(self.scores) !=  len(self.hints) + 1:
             return self.out_of_sync_error(get)
 
         self.hints.append(get['hint'].lower())
         self.state = self.DONE
 
-        # Points are assigned for completion, so always set to 1
-        points = 1
         # increment attempts
         self.attempts = self.attempts + 1
 
@@ -320,9 +338,8 @@ class SelfAssessmentModule(XModule):
             'selfassessment_id': self.location.url(),
             'state': {
                 'student_answers': self.student_answers,
-                'assessment': self.assessment,
+                'score': self.scores,
                 'hints': self.hints,
-                'score': points,
                 }
             }
         self.system.track_function('save_hint', event_info)
@@ -353,17 +370,14 @@ class SelfAssessmentModule(XModule):
 
     def get_instance_state(self):
         """
-        Get the current assessment, points, and state
+        Get the current score and state
         """
-        #Assign points based on completion.  May want to change to assessment-based down the road.
-        points = 1
 
         state = {
                  'student_answers': self.student_answers,
-                 'assessment': self.assessment,
                  'hints': self.hints,
                  'state': self.state,
-                 'score': points,
+                 'scores': self.scores,
                  'max_score': self._max_score,
                  'attempts': self.attempts
         }
