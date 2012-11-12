@@ -1,5 +1,5 @@
 <section id="self_assessment_${id}" class="self-assessment" data-ajax-url="${ajax_url}"
-         data-id="${id}" data-state="${state}">
+         data-id="${id}" data-state="${state}" data-allow_reset="${allow_reset}">
     <div class="error"></div>
     <div class="prompt">
     ${prompt}
@@ -16,4 +16,5 @@
     <div class="message-wrapper">${initial_message}</div>
     
     <input type="button" value="Submit" class="submit-button" name="show"/>
+    <input type="button" value="Reset" class="reset-button" name="reset"/>
 </section>

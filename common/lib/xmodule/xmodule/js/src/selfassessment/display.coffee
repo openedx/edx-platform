@@ -4,6 +4,7 @@ class @SelfAssessment
     @id = @el.data('id')
     @ajax_url = @el.data('ajax-url')
     @state = @el.data('state')
+    allow_reset = @el.data('allow_reset')
     # valid states: 'initial', 'assessing', 'request_hint', 'done'
 
     # Where to put the rubric once we load it
@@ -14,17 +15,24 @@ class @SelfAssessment
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
     @check_button = @$('.submit-button')
+    @reset_button = @$('.reset-button')
+    @reset_button.click @reset
 
     @find_assessment_elements()
     @find_hint_elements()
 
-    @bind()
+    if allow_reset
+      @reset_button.show()
+    else
+      @reset_button.hide()
+
+    @rebind()
 
   # locally scoped jquery.
   $: (selector) ->
     $(selector, @el)
 
-  bind: () =>
+  rebind: () =>
     # rebind to the appropriate function for the current state
     @check_button.unbind('click')
     if @state == 'initial'
@@ -51,7 +59,7 @@ class @SelfAssessment
           @rubric_wrapper.html(response.rubric_html)
           @state = 'assessing'
           @find_assessment_elements()
-          @bind()
+          @rebind()
         else
           @errors_area.html(response.message)
     else
@@ -66,7 +74,7 @@ class @SelfAssessment
           @hint_wrapper.html(response.hint_html)
           @state = 'request_hint'
           @find_hint_elements()
-          @bind()
+          @rebind()
         else
           @errors_area.html(response.message)
     else
@@ -82,9 +90,27 @@ class @SelfAssessment
         if response.success
           @message_wrapper.html(response.message_html)
           @state = 'done'
-          @bind()
+          @rebind()
+          if response.allow_reset
+            @reset_button.show()
         else
           @errors_area.html(response.message)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
       
+
+  reset: (event) =>
+    event.preventDefault()
+    if @state == 'done'
+      $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
+        if response.success
+          @rubric_wrapper.html('')
+          @hint_wrapper.html('')
+          @message_wrapper.html('')
+          @state = 'initial'
+          @rebind()
+          @reset_button.hide()
+        else
+          @errors_area.html(response.message)
+    else
+      @errors_area.html('Problem state got out of sync.  Try reloading the page.')

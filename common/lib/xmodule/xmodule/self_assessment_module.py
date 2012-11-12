@@ -121,6 +121,7 @@ class SelfAssessmentModule(XModule):
         #set context variables and render template
         previous_answer = self.student_answers[-1] if self.student_answers else ''
 
+        allow_reset = self.state == self.DONE and self.attempts < self.max_attempts
         context = {
             'prompt': self.prompt,
             'previous_answer': previous_answer,
@@ -129,6 +130,7 @@ class SelfAssessmentModule(XModule):
             'initial_hint': self.get_hint_html(),
             'initial_message': self.get_message_html(),
             'state': self.state,
+            'allow_reset': allow_reset,
         }
         html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -297,7 +299,8 @@ class SelfAssessmentModule(XModule):
         Save the hint.
         Returns a dict { 'success': bool,
                          'message_html': message_html,
-                         'error': error-msg},
+                         'error': error-msg,
+                         'allow_reset': bool},
         with the error key only present if success is False and message_html
         only if True.
         '''
@@ -325,7 +328,8 @@ class SelfAssessmentModule(XModule):
         self.system.track_function('save_hint', event_info)
 
         return {'success': True,
-                'message_html': self.get_message_html()}
+                'message_html': self.get_message_html(),
+                'allow_reset': self.attempts < self.max_attempts}
 
 
     def reset(self, get):
@@ -335,8 +339,9 @@ class SelfAssessmentModule(XModule):
         Returns {'success': bool, 'error': msg}
         (error only present if not success)
         """
-        if self.state != DONE:
+        if self.state != self.DONE:
             return self.out_of_sync_error(get)
+
         if self.attempts > self.max_attempts:
             return {
                 'success': False,
