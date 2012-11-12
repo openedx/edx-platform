@@ -21,7 +21,6 @@ class @SelfAssessment
     @find_assessment_elements()
     @find_hint_elements()
 
-
     @rebind()
 
   # locally scoped jquery.
@@ -33,16 +32,22 @@ class @SelfAssessment
     @submit_button.unbind('click')
     @submit_button.show()
     @reset_button.hide()
+    @hint_area.attr('disabled', false)
     if @state == 'initial'
+      @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
     else if @state == 'assessing'
+      @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
     else if @state == 'request_hint'
+      @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit hint')
       @submit_button.click @save_hint
     else if @state == 'done'
+      @answer_area.attr("disabled", true)
+      @hint_area.attr('disabled', true)
       @submit_button.hide()
       if @allow_reset
         @reset_button.show()
@@ -62,7 +67,6 @@ class @SelfAssessment
       data = {'student_answer' : @answer_area.val()}
       $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
         if response.success
-          @answer_area.attr("disabled",true)
           @rubric_wrapper.html(response.rubric_html)
           @state = 'assessing'
           @find_assessment_elements()
@@ -110,6 +114,7 @@ class @SelfAssessment
     if @state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
+          @answer_area.html('')
           @rubric_wrapper.html('')
           @hint_wrapper.html('')
           @message_wrapper.html('')
