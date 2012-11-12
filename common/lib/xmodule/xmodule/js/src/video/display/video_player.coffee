@@ -9,6 +9,7 @@ class @VideoPlayer extends Subview
   bind: ->
     $(@control).bind('play', @play)
       .bind('pause', @pause)
+    $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
     $(@caption).bind('seek', @onSeek)
     $(@speedControl).bind('speedChange', @onSpeedChange)
     $(@progressSlider).bind('seek', @onSeek)
@@ -25,6 +26,7 @@ class @VideoPlayer extends Subview
 
   render: ->
     @control = new VideoControl el: @$('.video-controls')
+    @qualityControl = new VideoQualityControl el: @$('.secondary-controls')
     @caption = new VideoCaption
         el: @el
         youtubeId: @video.youtubeId('1.0')
@@ -41,10 +43,12 @@ class @VideoPlayer extends Subview
         rel: 0
         showinfo: 0
         enablejsapi: 1
+        modestbranding: 1
       videoId: @video.youtubeId()
       events:
         onReady: @onReady
         onStateChange: @onStateChange
+        onPlaybackQualityChange: @onPlaybackQualityChange
     @caption.hideCaptions(@['video'].hide_captions)
 
   addToolTip: ->
@@ -53,7 +57,7 @@ class @VideoPlayer extends Subview
         my: 'top right'
         at: 'top center'
 
-  onReady: =>
+  onReady: (event) =>
     unless onTouchBasedDevice()
       $('.video-load-complete:first').data('video').player.play()
 
@@ -67,6 +71,13 @@ class @VideoPlayer extends Subview
         @onPause()
       when YT.PlayerState.ENDED
         @onEnded()
+
+  onPlaybackQualityChange: (event, value) =>
+    quality = @player.getPlaybackQuality()
+    @qualityControl.onQualityChange(quality)
+
+  handlePlaybackQualityChange: (event, value) =>
+    @player.setPlaybackQuality(value)
 
   onUnstarted: =>
     @control.pause()

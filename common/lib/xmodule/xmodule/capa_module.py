@@ -540,15 +540,9 @@ class CapaModule(XModule):
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
-            # TODO (vshnayder): why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
-            # TODO: why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
