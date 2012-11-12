@@ -6,8 +6,9 @@
 
     % if not read_only:
     <select name="assessment" class="assessment">
-        <option value="incorrect">Incorrect</option>
-        <option value="correct">Correct</option>
+        %for i in xrange(0,max_score+1):
+            <option value="${i}">${i}</option>
+        %endfor
     </select>
     % endif
 
