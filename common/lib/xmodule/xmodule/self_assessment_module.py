@@ -125,7 +125,10 @@ class SelfAssessmentModule(XModule):
 
     def get_html(self):
         #set context variables and render template
-        previous_answer = self.student_answers[-1] if self.student_answers else ''
+        if self.state != self.INITIAL and self.student_answers:
+            previous_answer = self.student_answers[-1]
+        else:
+            previous_answer = ''
 
         allow_reset = self.state == self.DONE and self.attempts < self.max_attempts
         context = {
@@ -207,12 +210,12 @@ class SelfAssessmentModule(XModule):
         })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def out_of_sync_error(self, get):
+    def out_of_sync_error(self, get, msg=''):
         """
         return dict out-of-sync error message, and also log.
         """
-        log.warning("Assessment module state out sync. state: %r, get: %r",
-                    self.state, get)
+        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
+                    self.state, get, msg)
         return {'success': False,
                 'error': 'The problem state got out-of-sync'}
 
@@ -244,8 +247,12 @@ class SelfAssessmentModule(XModule):
         if self.state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        # else we'll render it
-        hint = self.hints[-1] if len(self.hints) > 0 else ''
+        if self.state == self.REQUEST_HINT and len(self.hints) > 0:
+            # display the previous hint
+            hint = self.hints[-1]
+        else:
+            hint = ''
+            
         context = {'hint_prompt': self.hint_prompt,
                    'hint': hint}
 
@@ -301,9 +308,11 @@ class SelfAssessmentModule(XModule):
         with 'error' only present if 'success' is False, and 'hint_html' only if success is true
         """
 
-        if (self.state != self.ASSESSING or
-            len(self.student_answers) !=  len(self.scores) + 1):
-            return self.out_of_sync_error(get)
+        n_answers = len(self.student_answers)
+        n_scores = len(self.scores)
+        if (self.state != self.ASSESSING or n_answers !=  n_scores + 1):
+            msg = "%d answers, %d scores" % (n_answers, n_scores)
+            return self.out_of_sync_error(get, msg)
 
         try:
             self.scores.append(int(get['assessment']))
