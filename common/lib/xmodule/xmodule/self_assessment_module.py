@@ -112,7 +112,7 @@ class SelfAssessmentModule(XModule):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
 
-        self._max_score = instance_state.get('max_score', MAX_SCORE)
+        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
         self.attempts = instance_state.get('attempts', 0)
 
@@ -137,7 +137,6 @@ class SelfAssessmentModule(XModule):
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': allow_reset,
-            'max_score' : self._max_score,
         }
         html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -225,7 +224,9 @@ class SelfAssessmentModule(XModule):
             return ''
 
         # we'll render it
-        context = {'rubric': self.rubric}
+        context = {'rubric': self.rubric,
+                   'max_score' : self._max_score,
+                   }
 
         if self.state == self.ASSESSING:
             context['read_only'] = False
