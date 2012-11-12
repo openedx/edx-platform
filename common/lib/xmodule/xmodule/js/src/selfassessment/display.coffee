@@ -72,7 +72,7 @@ class @SelfAssessment
           @find_assessment_elements()
           @rebind()
         else
-          @errors_area.html(response.message)
+          @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
@@ -82,12 +82,18 @@ class @SelfAssessment
       data = {'assessment' : @assessment.find(':selected').text()}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
-          @hint_wrapper.html(response.hint_html)
-          @state = 'request_hint'
-          @find_hint_elements()
+          @state = response.state
+
+          if @state == 'request_hint'
+            @hint_wrapper.html(response.hint_html)
+            @find_hint_elements()
+          else if @state == 'done'
+            @message_wrapper.html(response.message_html)
+            @allow_reset = response.allow_reset
+
           @rebind()
         else
-          @errors_area.html(response.message)
+          @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
     
@@ -104,7 +110,7 @@ class @SelfAssessment
           @allow_reset = response.allow_reset
           @rebind()
         else
-          @errors_area.html(response.message)
+          @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
       
@@ -122,6 +128,6 @@ class @SelfAssessment
           @rebind()
           @reset_button.hide()
         else
-          @errors_area.html(response.message)
+          @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')

@@ -123,6 +123,10 @@ class SelfAssessmentModule(XModule):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
+    def _allow_reset(self):
+        """Can the module be reset?"""
+        return self.state == self.DONE and self.attempts < self.max_attempts
+
     def get_html(self):
         #set context variables and render template
         if self.state != self.INITIAL and self.student_answers:
@@ -130,7 +134,6 @@ class SelfAssessmentModule(XModule):
         else:
             previous_answer = ''
 
-        allow_reset = self.state == self.DONE and self.attempts < self.max_attempts
         context = {
             'prompt': self.prompt,
             'previous_answer': previous_answer,
@@ -139,7 +142,7 @@ class SelfAssessmentModule(XModule):
             'initial_hint': self.get_hint_html(),
             'initial_message': self.get_message_html(),
             'state': self.state,
-            'allow_reset': allow_reset,
+            'allow_reset': self._allow_reset(),
         }
         html = self.system.render_template('self_assessment_prompt.html', context)
 
@@ -247,12 +250,12 @@ class SelfAssessmentModule(XModule):
         if self.state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        if self.state == self.REQUEST_HINT and len(self.hints) > 0:
+        if self.state == self.DONE and len(self.hints) > 0:
             # display the previous hint
             hint = self.hints[-1]
         else:
             hint = ''
-            
+
         context = {'hint_prompt': self.hint_prompt,
                    'hint': hint}
 
@@ -286,7 +289,7 @@ class SelfAssessmentModule(XModule):
             # they won't see the reset button once they're out of attempts.
             return {
                 'success': False,
-                'message': 'Too many attempts.'
+                'error': 'Too many attempts.'
             }
 
         if self.state != self.INITIAL:
@@ -302,10 +305,17 @@ class SelfAssessmentModule(XModule):
 
     def save_assessment(self, get):
         """
-        Save the assessment.
+        Save the assessment.  If the student said they're right, don't ask for a
+        hint, and go straight to the done state.  Otherwise, do ask for a hint.
 
-        Returns a dict { 'success': bool, 'hint_html': hint_html 'error': error-msg},
-        with 'error' only present if 'success' is False, and 'hint_html' only if success is true
+        Returns a dict { 'success': bool, 'state': state,
+
+        'hint_html': hint_html OR 'message_html': html and 'allow_reset',
+
+           'error': error-msg},
+
+        with 'error' only present if 'success' is False, and 'hint_html' or
+        'message_html' only if success is true
         """
 
         n_answers = len(self.student_answers)
@@ -315,14 +325,25 @@ class SelfAssessmentModule(XModule):
             return self.out_of_sync_error(get, msg)
 
         try:
-            self.scores.append(int(get['assessment']))
+            score = int(get['assessment'])
         except:
             return {'success': False, 'error': "Non-integer score value"}
 
-        self.state = self.REQUEST_HINT
+        self.scores.append(score)
 
-        # TODO: return different hint based on assessment value...
-        return {'success': True, 'hint_html': self.get_hint_html()}
+        d = {'success': True,}
+
+        if score == self.max_score():
+            self.state = self.DONE
+            d['message_html'] = self.get_message_html()
+            d['allow_reset'] = self._allow_reset()
+        else:
+            self.state = self.REQUEST_HINT
+            d['hint_html'] = self.get_hint_html()
+
+        d['state'] = self.state
+        return d
+
 
     def save_hint(self, get):
         '''
@@ -334,7 +355,9 @@ class SelfAssessmentModule(XModule):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.REQUEST_HINT or len(self.scores) !=  len(self.hints) + 1:
+        if self.state != self.REQUEST_HINT:
+            # Note: because we only ask for hints on wrong answers, may not have
+            # the same number of hints and answers.
             return self.out_of_sync_error(get)
 
         self.hints.append(get['hint'].lower())
@@ -356,7 +379,7 @@ class SelfAssessmentModule(XModule):
 
         return {'success': True,
                 'message_html': self.get_message_html(),
-                'allow_reset': self.attempts < self.max_attempts}
+                'allow_reset': self._allow_reset()}
 
 
     def reset(self, get):
