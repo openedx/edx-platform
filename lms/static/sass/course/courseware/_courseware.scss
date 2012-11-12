@@ -242,9 +242,16 @@ div.course-wrapper {
 }
 
 
-.self-assessment {
-    textarea {
+section.self-assessment {
+    textarea.answer {
         height: 200px;
+        padding: 5px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    textarea.hint {
+        height: 100px;
         padding: 5px;
         margin-top: 5px;
         margin-bottom: 5px;
@@ -254,5 +261,6 @@ div.course-wrapper {
         margin-top: 5px;
         margin-bottom: 5px;
     }
+
 }
 
