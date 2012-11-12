@@ -4,7 +4,7 @@ class @SelfAssessment
     @id = @el.data('id')
     @ajax_url = @el.data('ajax-url')
     @state = @el.data('state')
-    allow_reset = @el.data('allow_reset')
+    @allow_reset = @el.data('allow_reset')
     # valid states: 'initial', 'assessing', 'request_hint', 'done'
 
     # Where to put the rubric once we load it
@@ -14,17 +14,13 @@ class @SelfAssessment
     @rubric_wrapper = @$('.rubric-wrapper')
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
-    @check_button = @$('.submit-button')
+    @submit_button = @$('.submit-button')
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
 
     @find_assessment_elements()
     @find_hint_elements()
 
-    if allow_reset
-      @reset_button.show()
-    else
-      @reset_button.hide()
 
     @rebind()
 
@@ -34,15 +30,25 @@ class @SelfAssessment
 
   rebind: () =>
     # rebind to the appropriate function for the current state
-    @check_button.unbind('click')
+    @submit_button.unbind('click')
+    @submit_button.show()
+    @reset_button.hide()
     if @state == 'initial'
-      @check_button.click @save_answer
+      @submit_button.prop('value', 'Submit')
+      @submit_button.click @save_answer
     else if @state == 'assessing'
-      @check_button.click @save_assessment
+      @submit_button.prop('value', 'Submit assessment')
+      @submit_button.click @save_assessment
     else if @state == 'request_hint'
-      @check_button.click @save_hint
+      @submit_button.prop('value', 'Submit hint')
+      @submit_button.click @save_hint
     else if @state == 'done'
-      @check_button.hide()
+      @submit_button.hide()
+      if @allow_reset
+        @reset_button.show()
+      else
+        @reset_button.hide()
+
 
   find_assessment_elements: ->
     @assessment = @$('select.assessment')
@@ -90,9 +96,8 @@ class @SelfAssessment
         if response.success
           @message_wrapper.html(response.message_html)
           @state = 'done'
+          @allow_reset = response.allow_reset
           @rebind()
-          if response.allow_reset
-            @reset_button.show()
         else
           @errors_area.html(response.message)
     else
