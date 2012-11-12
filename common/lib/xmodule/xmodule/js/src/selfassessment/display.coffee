@@ -59,6 +59,7 @@ class @SelfAssessment
   save_answer: (event) =>
     event.preventDefault()
     if @state == 'initial'
+      @answer_area.attr("disabled",true)
       data = {'student_answer' : @answer_area.val()}
       $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
         if response.success
