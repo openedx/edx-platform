@@ -202,24 +202,13 @@ class ContentStoreTest(TestCase):
         # Flush and initialize the module store
         # It needs the templates because it creates new records
         # by cloning from the template.
+        # Note that if your test module gets in some weird state
+        # (though it shouldn't), do this manually
+        # from the bash shell to drop it:
+        # $ mongo test_xmodule --eval "db.dropDatabase()"
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
-        course_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
-                            "category" : "course", "name" : "Empty", "revision" : None }, 
-                            "definition" : { "children" : [ ], "data" : { "textbooks" : [ ], 
-                            "wiki_slug" : None } },
-                            "metadata" : { "start" : "2020-10-10T10:00", "display_name" : "Empty" } }
-        section_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
-                            "category" : "section", "name" : "Empty", "revision" : None }, 
-                            "definition" : { "children" : [ ], "data" : "" }, 
-                            "metadata" : { "display_name" : "Empty" } }
-        chapter_template = { "_id" : { "tag" : "i4x", "org" : "edx", "course" : "templates",
-                            "category" : "chapter", "name" : "Empty", "revision" : None },
-                            "definition" : { "children" : [ ], "data" : "" }, 
-                            "metadata" : { "display_name" : "Empty" } }
-        xmodule.modulestore.django.modulestore().collection.insert(course_template)
-        xmodule.modulestore.django.modulestore().collection.insert(section_template)
-        xmodule.modulestore.django.modulestore().collection.insert(chapter_template)
+        xmodule.templates.update_templates()
 
         self.client = Client()
         self.client.login(username=uname, password=password)
@@ -242,10 +231,7 @@ class ContentStoreTest(TestCase):
         # of the last test because otherwise on the next run
         # cms/djangoapps/contentstore/__init__.py
         # update_templates() will try to update the templates
-        # via upsert and it seems to be messing things up.
-        # If your test module gets in some weird state, do this manually
-        # from the bash shell to drop it.
-        # $ mongo test_xmodule --eval "db.dropDatabase()"
+        # via upsert and it sometimes seems to be messing things up.
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
 
