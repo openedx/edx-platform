@@ -98,7 +98,7 @@
               &.email-icon {
                 @include background-image(url('../images/portal-icons/email-icon.png'));
               }
-              
+
               &.name-icon {
                 @include background-image(url('../images/portal-icons/course-info-icon.png'));
               }
@@ -200,7 +200,7 @@
         margin-bottom: 15px;
 
         img {
-          width: 100%;
+          width: 109px;
           border: 1px solid $light-gray;
         }
       }
@@ -422,7 +422,7 @@
 
           p {
             color: #222;
-          
+
             span {
               font-weight: bold;
             }
@@ -489,7 +489,7 @@
       font-family: "Open Sans", Verdana, Geneva, sans-serif;
       background: #fffcf0;
       border: 1px solid #ccc;
-      
+
       .message-copy {
         margin: 0;
 
