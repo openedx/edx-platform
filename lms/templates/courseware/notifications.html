@@ -5,7 +5,7 @@ def url_for_thread(discussion_id, thread_id):
   return reverse('django_comment_client.forum.views.single_thread', args=[course.id, discussion_id, thread_id])
 %>
 
-<% 
+<%
 def url_for_comment(discussion_id, thread_id, comment_id):
   return url_for_thread(discussion_id, thread_id) + "#" + comment_id
 %>
@@ -15,7 +15,7 @@ def url_for_discussion(discussion_id):
   return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course.id, discussion_id])
 %>
 
-<% 
+<%
 def discussion_title(discussion_id):
   return get_discussion_title(discussion_id=discussion_id)
 %>
@@ -59,18 +59,18 @@ def url_for_user(user_id): #TODO
 <%def name="render_notification(notification)">
   <div class="notification">
     % if notification['notification_type'] == 'post_reply':
-      ${render_user_link(notification)} posted a ${render_comment_link(notification)} 
+      ${render_user_link(notification)} posted a ${render_comment_link(notification)}
       to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
     % elif notification['notification_type'] == 'post_topic':
       ${render_user_link(notification)} posted a new thread ${render_thread_link(notification)}
       in discussion ${render_discussion_link(notification)}
     % elif notification['notification_type'] == 'at_user':
-      ${render_user(info)} mentioned you in 
+      ${render_user(info)} mentioned you in
       % if notification['info']['content_type'] == 'thread':
         the thread ${render_thread_link(notification)}
         in discussion ${render_discussion_link(notification)}
       % else:
-        ${render_comment_link(notification)} 
+        ${render_comment_link(notification)}
         to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
       % endif
     % endif
