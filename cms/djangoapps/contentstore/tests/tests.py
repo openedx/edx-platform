@@ -182,17 +182,131 @@ TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data'
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class EditTestCase(ContentStoreTestCase):
-    """Check that editing functionality works on example courses"""
+class ContentStoreTest(TestCase):
 
     def setUp(self):
-        email = 'edit@test.com'
+        uname = 'testuser'
+        email = 'test+courses@edx.org'
         password = 'foo'
-        self.create_account('edittest', email, password)
-        self.activate_user(email)
-        self.login(email, password)
+
+        # Create the use so we can log them in.
+        self.user = User.objects.create_user(uname, email, password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        self.user.is_active = True
+        # Staff has access to view all courses
+        self.user.is_staff = True
+        self.user.save()
+
+        # Flush and initialize the module store
+        # It needs the templates because it creates new records
+        # by cloning from the template.
+        # Note that if your test module gets in some weird state
+        # (though it shouldn't), do this manually
+        # from the bash shell to drop it:
+        # $ mongo test_xmodule --eval "db.dropDatabase()"
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
+        xmodule.templates.update_templates()
+
+        self.client = Client()
+        self.client.login(username=uname, password=password)
+
+        self.course_data = {
+            'template': 'i4x://edx/templates/course/Empty',
+            'org': 'MITx',
+            'number': '999',
+            'display_name': 'Robot Super Course',
+            }
+
+        self.section_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/chapter/Empty',
+            'display_name': 'Section One',
+            }
+
+    def tearDown(self):
+        # Make sure you flush out the test modulestore after the end
+        # of the last test because otherwise on the next run
+        # cms/djangoapps/contentstore/__init__.py
+        # update_templates() will try to update the templates
+        # via upsert and it sometimes seems to be messing things up.
+        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django.modulestore().collection.drop()
+
+    def test_create_course(self):
+        """Test new course creation - happy path"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+    def test_create_course_duplicate_course(self):
+        """Test new course creation - error path"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
+
+    def test_create_course_duplicate_number(self):
+        """Test new course creation - error path"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.course_data['display_name'] = 'Robot Super Course Two'
+
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 
+            'There is already a course defined with the same organization and course number.')
+
+    def test_course_index_view_with_no_courses(self):
+        """Test viewing the index page with no courses"""
+        # Create a course so there is something to view
+        resp = self.client.get(reverse('index'))
+        self.assertContains(resp, 
+            '<h1>My Courses</h1>',
+            status_code=200,
+            html=True)
+
+    def test_course_index_view_with_course(self):
+        """Test viewing the index page with an existing course"""
+        # Create a course so there is something to view
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.get(reverse('index'))
+        self.assertContains(resp,
+            '<span class="class-name">Robot Super Course</span>',
+            status_code=200,
+            html=True)
+
+    def test_course_overview_view_with_course(self):
+        """Test viewing the course overview page with an existing course"""
+        # Create a course so there is something to view
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+
+        data = {
+                'org': 'MITx',
+                'course': '999',
+                'name': Location.clean('Robot Super Course'),
+                }
+
+        resp = self.client.get(reverse('course_index', kwargs=data))
+        self.assertContains(resp, 
+            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            status_code=200,
+            html=True)
+
+    def test_clone_item(self):
+        """Test cloning an item. E.g. creating a new section"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.post(reverse('clone_item'), self.section_data)
+
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertRegexpMatches(data['id'], 
+            '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
@@ -208,3 +322,4 @@ class EditTestCase(ContentStoreTestCase):
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
