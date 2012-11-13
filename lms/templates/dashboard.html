@@ -21,7 +21,6 @@
 
 
     $('.news-carousel .page').each(function() {
-      console.log($(this).outerHeight());
       carouselPageHeight = Math.max($(this).outerHeight(), carouselPageHeight);
     });
     $('.news-carousel .pages').css('height', carouselPageHeight);
@@ -33,13 +32,12 @@
       setCarouselPage(null, carouselIndex);
     }
 
-    function setCarouselPage(e, index) {
-      console.log('set');
+    function setCarouselPage(event, index) {
       var $pageToShow;
       var transitionSpeed;
       $('.news-carousel .page-dots').find('.current').removeClass('current');
 
-      if(e) {
+      if(event) {
         clearInterval(carouselTimer);
         carouselTimer = setInterval(nextCarouselPage, carouselDelay);
         carouselIndex = $(this).closest('li').index();
