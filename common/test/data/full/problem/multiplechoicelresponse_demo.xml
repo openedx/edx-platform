@@ -1,0 +1,17 @@
+<problem display_name="S3E3: Deflection of a Proton">
+<startouttext/>
+<p>Suppose you were to pass a hydroge ion (H+) through an electric field and measure the deflection of the ion. How would its deflection compare to the deflection of an electron passed through the same electric field? </p>
+<endouttext/>
+
+
+<multiplechoiceresponse direction="vertical" randomize="yes">
+<choicegroup type="MultipleChoice">
+    <choice location="random" correct="false" name="1"><text>The ion would deflect identically as both species have the same charge.</text></choice>
+    <choice location="random" correct="false" name="2"><text>The ion would deflect by an amount identical in magnitude but opposite in direction because the charges are of opposite sign but equal in magnitude.</text></choice>
+    <choice location="random" correct="false" name="3"><text>The deflection will be in the same direction but smaller in magnitude due to the larger mass of the ion.</text></choice>
+    <choice location="random" correct="true" name="4"><text>The deflection will be smaller in magnitude due to the increased mass of the ion, as well as in the opposite direction due to the opposite sign of the charge.</text></choice>
+   
+</choicegroup>
+</multiplechoiceresponse>
+
+</problem> 
