@@ -1863,7 +1863,8 @@ class OpenEndedResponse(LoncapaResponse):
         #Update grader payload with student id.  If grader payload not json, error.
         try:
             grader_payload=json.loads(grader_payload)
-            grader_payload.update({'student_id' : self.system.anonymous_student_id})
+            location=self.system.ajax_url.split("://")[1]
+            grader_payload.update({'location' : location})
             grader_payload=json.dumps(grader_payload)
         except Exception as err:
             log.error("Grader payload is not a json object!")
