@@ -47,7 +47,7 @@ def django_for_jasmine(system, django_reload)
     end
 
     django_pid = fork do
-        exec(*django_admin(system, 'jasmine', 'runserver', "12345", reload_arg).split(' '))
+        exec(*django_admin(system, 'jasmine', 'runserver', '-v', '0', "12345", reload_arg).split(' '))
     end
     jasmine_url = 'http://localhost:12345/_jasmine/'
     up = false
