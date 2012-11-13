@@ -36,7 +36,7 @@ CourseTab = namedtuple('CourseTab', 'name link is_active')
 #    wrong.  (e.g. "is there a 'name' field?).  Validators can assume
 #    that the type field is valid.
 #
-#  - a function that takes a config, a user, and a course, and active_page and
+#  - a function that takes a config, a user, and a course, an active_page and
 #    return a list of CourseTabs.  (e.g. "return a CourseTab with specified
 #    name, link to courseware, and is_active=True/False").  The function can
 #    assume that it is only called with configs of the appropriate type that

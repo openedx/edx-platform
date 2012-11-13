@@ -27,7 +27,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 

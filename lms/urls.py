@@ -161,7 +161,7 @@ if settings.COURSEWARE_ENABLED:
         # input types system so that previews can be context-specific.
         # Unfortunately, we don't have time to think through the right way to do
         # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemican-equation rendering service.
+        # generic chemical-equation rendering service.
         url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
             name='preview_chemcalc'),
 

@@ -10,7 +10,7 @@ from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 from pkg_resources import resource_string
 
-log = logging.getLogger("mitx.common.lib.seq_module")
+log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
