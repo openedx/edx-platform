@@ -96,9 +96,12 @@ class VideoModule(XModule):
         return self.youtube
 
     def get_html(self):
-        caption_asset_path = ''
         if isinstance(modulestore(), MongoModuleStore) :
             caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location)
+        else:
+            # VS[compat]
+            # cdodge: filesystem static content support.
+            caption_asset_path = "/static/{0}/subs".format(self.metadata['data_dir'])
 
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
