@@ -1,5 +1,193 @@
 [
-
+    {
+        "title": "EdX offers free higher education online",
+        "url": "http://www.youtube.com/watch?v=yr5Ep7RN4Bs",
+        "author": "via YouTube",
+        "image": "cnn_logo_178x138.jpg",
+        "deck": null,
+        "publication": "CNN",
+        "publish_date": "October, 2012"
+    },
+    {
+        "title": "Students weigh in on value of massive open online classes",
+        "url": "http://dailycollegian.com/2012/09/27/students-weigh-in-on-value-of-massive-open-online-classes/",
+        "author": "Sam Hayes",
+        "image": "dailycollegian_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Daily Collegian",
+        "publish_date": "September 27, 2012"
+    },
+    {
+        "title": "The Crisis in Higher Education",
+        "url": "http://www.technologyreview.com/featured-story/429376/the-crisis-in-higher-education ",
+        "author": "Nicholas Carr",
+        "image": "techreview_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Technology Review",
+        "publish_date": "September 27, 2012"
+    },
+    {
+        "title": "10gen Offering Free MongoDB Training through EdX Platform",
+        "url": "http://campustechnology.com/articles/2012/09/27/10gen-offering-free-mongodb-training-through-edx-platform.aspx",
+        "author": "Dian Schaffhauser",
+        "image": "campustech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Campus Technology",
+        "publish_date": "September 27, 2012"
+    },
+    {
+        "title": "edX Students To Use Free Elsevier Online Textbook",
+        "url": "http://campustechnology.com/articles/2012/09/27/edx-students-to-use-free-elsevier-online-textbook.aspx",
+        "author": "Tim Sohn",
+        "image": "campustech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Campus Technology",
+        "publish_date": "September 27, 2012"
+    },
+    {
+        "title": "Students weigh in on value of massive open online classes",
+        "url": "http://dailycollegian.com/2012/09/27/students-weigh-in-on-value-of-massive-open-online-classes/",
+        "author": "Sam Hayes",
+        "image": "dailycollegian_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Daily Collegian",
+        "publish_date": "September 27, 2012"
+    },
+    {
+        "title": "Elsevier partners with edX offering interactive study via the web",
+        "url": "http://www.knowledgespeak.com/newsArchieveviewdtl.asp?pickUpBatch=2046",
+        "author": null,
+        "image": "cnn_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Knowledge Speak",
+        "publish_date": "September 26, 2012"
+    },
+    {
+        "title": "Coming back, looking forward",
+        "url": "http://news.harvard.edu/gazette/story/2012/09/governing_board_reunion/",
+        "author": "Alvin Powell",
+        "image": "harvardgazette_logo_178x138.jpeg",
+        "deck": "Governing boards reunion mixes nostalgia, innovation",
+        "publication": "Harvard Gazette",
+        "publish_date": "September 26, 2012"
+    },
+    {
+        "title": "MongoDB developers team with EdX open learning collaboration",
+        "url": "http://arstechnica.com/information-technology/2012/09/mongodb-developers-team-with-edx-open-learning-collaboration/",
+        "author": "Sean Gallagher",
+        "image": "name_logo_178x138.jpg",
+        "deck": " To offer free MongoDB developer and DBA training, help open-source EdX platform.",
+        "publication": "Ars Technica",
+        "publish_date": "September 26, 2012"
+    },
+    {
+        "title": "Marketing to the MOOC Masses",
+        "url": "http://www.insidehighered.com/news/2012/09/26/elsevier-partners-edx-provide-free-versions-textbooks-mooc-students",
+        "author": "Steve Kolowich",
+        "image": "insidehighered_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Inside Higher Ed",
+        "publish_date": "September 26, 2012"
+    },
+    {
+        "title": "Five buzzwords youre likely to hear in education this school year",
+        "url": "http://schoolsofthought.blogs.cnn.com/2012/09/26/five-buzzwords-youre-likely-to-hear-in-education-this-school-year/",
+        "author": "Donna Krache",
+        "image": "cnn_logo_178x138.jpg",
+        "deck": null,
+        "publication": "CNN",
+        "publish_date": "September 26, 2012"
+    },
+    {
+        "title": "10gen will provide online MongoDB training",
+        "url": "http://www.h-online.com/open/news/item/10gen-will-provide-online-MongoDB-training-1716936.html",
+        "author": null,
+        "image": "thehopen_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The H Open",
+        "publish_date": "September 25, 2012"
+    },
+    {
+        "title": "Opinion: MIT should create an education degree",
+        "url": "http://tech.mit.edu/V132/N40/normandin.html",
+        "author": "Ryan Normandin",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": "For MIT to lead the way in education, it should use its graduates",
+        "publication": "The Tech",
+        "publish_date": "September 25, 2012"
+    },
+    {
+        "title": "Want free MongoDB classes? edX and 10gen are happy to oblige",
+        "url": "http://gigaom.com/2012/09/25/want-free-mongodb-classes-edx-and-10gen-are-happy-to-oblige/",
+        "author": "Ki Mae Heussner",
+        "image": "gigaom_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "GIGAOM",
+        "publish_date": "September 25, 2012"
+    },
+    {
+        "title": "MOOCs Shift From Curiousity to Employability",
+        "url": "http://www.huffingtonpost.com/tom-vander-ark/moocs-shift-from-curiousi_b_1912059.html",
+        "author": "Tom Vander Ark",
+        "image": "huffpost_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "HUFF POST",
+        "publish_date": "September 25, 2012"
+    },
+    {
+        "title": "A president next door",
+        "url": "http://news.harvard.edu/gazette/story/2012/09/a-president-next-door/",
+        "author": "Katie Koch",
+        "image": "harvardgazette_logo_178x138.jpeg",
+        "deck": "Faust lauds Reif at his inauguration as MITs leader ",
+        "publication": "Harvard Gazette",
+        "publish_date": "September 21, 2012"
+    },
+    {
+        "title": "Is Everybody Right When it Comes to the Future of Education?",
+        "url": "http://bostinno.com/2012/09/23/is-everybody-right-when-it-comes-to-the-future-of-education/",
+        "author": "Lauren Landry",
+        "image": "bostinno_logo_178x138.jpg",
+        "deck": null,
+        "publication": "BostInno",
+        "publish_date": "September 23, 2012"
+    },
+    {
+        "title": "Keyboard College: How Technology is Revolutionizing Higher Education",
+        "url": "http://americanradioworks.publicradio.org/features/tomorrows-college/keyboard-college/",
+        "author": "Stephen Smith",
+        "image": "name_logo_178x138.jpg",
+        "deck": null,
+        "publication": "American RadioWorks",
+        "publish_date": "September, 2012"
+    },
+    {
+        "title": "Google Releases Open-Source Online-Education Software",
+        "url": "http://chronicle.com/blogs/wiredcampus/google-releases-open-source-online-education-software/39882",
+        "author": "Azevedo",
+        "image": "chroniclehighered_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The Chronicle of Higher Education",
+        "publish_date": "September 13, 2012"
+    },
+    {
+        "title": "President Fausts Beginning-of-2012-2013 Message",
+        "url": "http://harvardmagazine.com/2012/09/harvards-faust-beginning-of-year-message",
+        "author": null,
+        "image": "harvardmagazine_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Harvard Magazine",
+        "publish_date": "September 13, 2012"
+    },
+    {
+        "title": "The MOOC Survivors",
+        "url": "http://www.insidehighered.com/news/2012/09/12/edx-explores-demographics-most-persistent-mooc-students",
+        "author": "Steve Kolowich",
+        "image": "insidehighered_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Inside Higher Education",
+        "publish_date": "September 12, 2012"
+    },
     {
       "title": "College may never be the same",
       "url": "http://www.usatoday.com/news/nation/story/2012/09/12/college-may-never-be-the-same/57752972/1",
@@ -8,6 +196,24 @@
       "deck": "",
       "publication": "USA Today",
       "publish_date": "September 12, 2012"
+    },
+    {
+        "title": "Harvard & MIT Free Online Classes",
+        "url": "http://thewritingcorpofficial.wordpress.com/2012/09/11/harvard-mit-free-online-classes/",
+        "author": null,
+        "image": "name_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Writing Corp",
+        "publish_date": "September 11, 2012"
+    },
+    {
+        "title": "The first 71 days of office",
+        "url": "http://tech.mit.edu/V132/N36/reif.html",
+        "author": "Bruno B.F. Faviero",
+        "image": "name_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+        "publish_date": "September 11, 2012"
     },
     {
       "title": "Is MIT Giving Away the Farm?",
@@ -28,15 +234,41 @@
       "publish_date": "September 2012"
     },
     {
-      "title": "Q&A: Anant Agarwal, edX’s president and first professor",
-      "url": "http://www.bostonmagazine.com/articles/2012/08/edx-online-classes-schools-ou t-forever/",
-      "author": " Molly Petrilla ",
-      "image": "smartplanet_logo_178x138.jpg",
-      "deck": "",
-      "publication": "Smart Planet",
-      "publish_date": "September 3, 2012"
+        "title": "Pearson partners with online learning provider",
+        "url": "http://www.educationinvestor.co.uk/%28A%28sJl5vujFzQEkAAAAMWZkZTlhNjktODE0Mi00NjliLThlN2MtZTNhNDYxZDU4NGU3x4PawVukQHrQR1HU1YmDjMvTJNs1%29S%28rfj4z455jgfjljudyovhsyzb%29%29/ShowArticle.aspx?ID=2949",
+        "author": null,
+        "image": "eduinvest_logo_178x138.jpg",
+        "deck": null,
+        "publication": "EducationInvestor",
+        "publish_date": "September 10, 2012"
     },
-
+    {
+        "title": "Pearson to provide test centers for edX courses",
+        "url": "http://edtechtimes.com/2012/09/10/pearson-to-provide-test-centers-for-edx-courses/",
+        "author": null,
+        "image": "edtech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The EdTech Times",
+        "publish_date": "September 10, 2012"
+    },
+    {
+        "title": "Online education - the future of learning",
+        "url": "http://www.campdenfb.com/article/sponsored-feature-online-education-future-learning",
+        "author": null,
+        "image": "campdenfb_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Campden FB",
+        "publish_date": "September 9, 2012"
+    },
+    {
+        "title": "Step Forward For New Higher Education Model",
+        "url": "http://www.forbes.com/sites/susanadams/2012/09/07/step-forward-for-new-higher-education-model/",
+        "author": "Susan Adams",
+        "image": "forbes_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Forbes",
+        "publish_date": "September 7, 2012"
+    },
     {
       "title": "EdX To Offer Proctored Final Exam For One Course",
       "url": "http://www.thecrimson.com/article/2012/9/7/edx-offer-proctored-exams/",
@@ -109,7 +341,6 @@
       "publication": "ITBriefing.net",
       "publish_date": "September 6, 2012"
     },
-
     {
       "title": "Student Loans: Debt for Life",
       "url": "http://www.businessweek.com/articles/2012-09-06/student-loans-debt-for-life#p3",
@@ -147,15 +378,6 @@
       "publish_date": "September 4, 2012"
     },
     {
-      "title": "Ivy walls lower with free online classes from Coursera and edX ",
-      "url": "http://www.csmonitor.com/Innovation/Pioneers/2012/0903/Ivy-walls-lower-with-free-online-classes-from-Coursera-and-edX",
-      "author": "Chris Gaylord",
-      "image": "csmonitor_logo_178x138.jpg",
-      "deck": "",
-      "publication": "Christian Science Monitor",
-      "publish_date": "September 3, 2012"
-    },
-    {
       "title": "Summer recap. RLADs, new edX partner, Institute files amicus brief",
       "url": "http://tech.mit.edu/V132/N34/summer.html",
       "author": "",
@@ -163,6 +385,24 @@
       "deck": "",
       "publication": "The Tech",
       "publish_date": "September 4, 2012"
+    },
+    {
+      "title": "Q&A: Anant Agarwal, edX’s president and first professor",
+      "url": "http://www.bostonmagazine.com/articles/2012/08/edx-online-classes-schools-ou t-forever/",
+      "author": " Molly Petrilla ",
+      "image": "smartplanet_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Smart Planet",
+      "publish_date": "September 3, 2012"
+    },
+    {
+      "title": "Ivy walls lower with free online classes from Coursera and edX ",
+      "url": "http://www.csmonitor.com/Innovation/Pioneers/2012/0903/Ivy-walls-lower-with-free-online-classes-from-Coursera-and-edX",
+      "author": "Chris Gaylord",
+      "image": "csmonitor_logo_178x138.jpg",
+      "deck": "",
+      "publication": "Christian Science Monitor",
+      "publish_date": "September 3, 2012"
     },
     {
       "title": "Into the Future With MOOC's",
@@ -181,6 +421,15 @@
       "deck": "",
       "publication": "NPR/Radio Boston",
       "publish_date": "August 20, 2012"
+    },
+    {
+        "title": "LSU urged to adapt to changes in higher ed",
+        "url": "http://theadvocate.com/csp/mediapool/sites/Advocate/assets/templates/FullStoryPrint.csp?cid=3462091&preview=y",
+        "author": "Koran Addo",
+        "image": "theadvocate_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Advocate",
+        "publish_date": "August 3, 2012"
     },
     {
       "title": "Berkeley Joins edX",
@@ -423,7 +672,7 @@
         "image": "mit_logo_178x138.jpeg",
         "deck": "Joint partnership builds on MITx and Harvard distance learning; aims to benefit campus-based education and beyond.",
         "publication": "MIT News",
-        "publish_date": "May 02, 2012"
+        "publish_date": "May 2, 2012"
     },
     {
         "title": "MIT and Harvard launch a 'revolution in education'",
@@ -432,6 +681,6 @@
         "image": "mit_logo_178x138.jpeg",
         "deck": "Online edX courses will open both universities' classrooms to the world while enhancing on-campus learning.",
         "publication": "MIT News",
-        "publish_date": "May 02, 2012"
+        "publish_date": "May 2, 2012"
     }
 ]
