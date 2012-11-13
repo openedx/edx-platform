@@ -97,6 +97,14 @@ def _textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
+
+def _staff_grading(tab, user, course, active_page):
+    if has_access(user, course, 'staff'):
+        link = reverse('staff_grading', args=[course.id])
+        return [CourseTab('Staff grading', link, active_page == "staff_grading")]
+    return []
+
+
 #### Validators
 
 
@@ -132,6 +140,7 @@ VALID_TAB_TYPES = {
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
+    'staff_grading': TabImpl(null_validator, _staff_grading),
     }
 
 
