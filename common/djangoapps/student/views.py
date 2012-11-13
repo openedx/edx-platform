@@ -69,20 +69,6 @@ def index(request, extra_context={}, user=None):
     extra_context is used to allow immediate display of certain modal windows, eg signup,
     as used by external_auth.
     '''
-    feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
-        if hasattr(settings, 'RSS_URL'):
-            feed_data = urllib.urlopen(settings.RSS_URL).read()
-        else:
-            feed_data = render_to_string("feed.rss", None)
-        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
-
-    feed = feedparser.parse(feed_data)
-    entries = feed['entries'][0:3]
-    for entry in entries:
-        soup = BeautifulSoup(entry.description)
-        entry.image = soup.img['src'] if soup.img else None
-        entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
@@ -90,7 +76,11 @@ def index(request, extra_context={}, user=None):
         domain = request.META.get('HTTP_HOST')
     universities = get_courses_by_university(None,
                                              domain=domain)
-    context = {'universities': universities, 'entries': entries}
+
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
+
+    context = {'universities': universities, 'news': top_news}
     context.update(extra_context)
     return render_to_response('index.html', context)
 
@@ -230,12 +220,16 @@ def dashboard(request):
 
     cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
 
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
+
     context = {'courses': courses,
                'message': message,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
+               'news': top_news,
                }
 
     return render_to_response('dashboard.html', context)
@@ -883,3 +877,24 @@ def test_center_login(request):
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         return HttpResponseForbidden()
+
+
+def _get_news(top=None):
+    "Return the n top news items on settings.RSS_URL"
+
+    feed_data = cache.get("students_index_rss_feed_data")
+    if feed_data == None:
+        if hasattr(settings, 'RSS_URL'):
+            feed_data = urllib.urlopen(settings.RSS_URL).read()
+        else:
+            feed_data = render_to_string("feed.rss", None)
+        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
+
+    feed = feedparser.parse(feed_data)
+    entries = feed['entries'][0:top]  # all entries if top is None
+    for entry in entries:
+        soup = BeautifulSoup(entry.description)
+        entry.image = soup.img['src'] if soup.img else None
+        entry.summary = soup.getText()
+
+    return entries

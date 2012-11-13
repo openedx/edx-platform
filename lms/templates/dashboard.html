@@ -150,6 +150,7 @@
       </ul>
     </section>
 
+    %if news:
     <article class="news-carousel">
       <header>
         <h4>edX News</h4>
@@ -162,38 +163,25 @@
         </nav>
       </header>
       <div class="pages">
+        % for entry in news:
         <section class="page">
+          %if entry.image:
           <div class="news-image">
-            <a href="#"><img src="/static/content-berkeley-cs169x/images/course_image.jpg" /></a>
+            <a href="${entry.link}"><img src="${entry.image}" /></a>
           </div>
-          <h5><a href="#">BerkeleyX to offer Computer Graphics course</a></h5>
+          %endif
+          <h5><a href="${entry.link}">${entry.title}</a></h5>
           <div class="excerpt">
-            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
-            <p><a href="#">Learn More ›</a></p>
+            %if entry.summary:
+            <p>${entry.summary}</p>
+            %endif
+            <p><a href="${entry.link}">Learn More ›</a></p>
           </div>
         </section>
-        <section class="page">
-          <div class="news-image">
-            <a href="#"><img src="/static/content-mit-6002x/images/course_image.jpg" /></a>
-          </div>
-          <h5><a href="#">MIT has a new class</a></h5>
-          <div class="excerpt">
-            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
-            <p><a href="#">Learn More ›</a></p>
-          </div>
-        </section>
-        <section class="page">
-          <div class="news-image">
-            <a href="#"><img src="/static/6.00x/images/course_image.jpg" /></a>
-          </div>
-          <h5><a href="#">Look at this class, too!</a></h5>
-          <div class="excerpt">
-            <p>BerkeleyX will be offering CS184.1x: Foundations of Computer Graphics starting on November 5, 2012.</p>
-            <p><a href="#">Learn More ›</a></p>
-          </div>
-        </section>
+        %endfor
       </div>
     </article>
+    %endif
   </section>
 
   <section class="my-courses">
@@ -268,7 +256,7 @@
                   <p class="message-copy">You did not complete the necessary requirements for
                      completion of this course.</p>
             % endif
-              
+
             % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
               <ul class="actions">
                 % if cert_status['show_disabled_download_button']:
@@ -280,7 +268,7 @@
                      title="This link will open/download a PDF document">
                      Download Your PDF Certificate</a></li>
                 % endif
-                     
+
                 % if cert_status['show_survey_button']:
                   <li class="action"><a class="cta" href="${cert_status['survey_url']}">
                          Complete our course feedback survey</a></li>
