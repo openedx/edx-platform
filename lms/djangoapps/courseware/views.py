@@ -1,9 +1,5 @@
-import csv
-import json
 import logging
 import urllib
-import itertools
-import StringIO
 
 from functools import partial
 
@@ -12,7 +8,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -25,15 +21,11 @@ from courseware.courses import (get_course_with_access, get_courses_by_universit
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
-from student.models import UserProfile
-
-from multicourse import multicourse_settings
 
 from django_comment_client.utils import get_discussion_title
 
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
