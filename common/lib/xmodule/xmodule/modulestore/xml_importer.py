@@ -11,12 +11,12 @@ from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
-def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace):
+def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace, subpath = 'static'):
     
     remap_dict = {}
-   
+
     # now import all static assets
-    static_dir = course_data_path / 'static/'
+    static_dir = course_data_path / subpath
 
     for dirname, dirnames, filenames in os.walk(static_dir):
         for filename in filenames:
@@ -24,6 +24,8 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
             try:
                 content_path = os.path.join(dirname, filename)
                 fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
+                if fullname_with_subpath.startswith('/'):
+                    fullname_with_subpath = fullname_with_subpath[1:]
                 content_loc = StaticContent.compute_location(target_location_namespace.org, target_location_namespace.course, fullname_with_subpath)
                 mime_type = mimetypes.guess_type(filename)[0]
 
@@ -125,8 +127,11 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 course_location = module.location
 
         if static_content_store is not None:
+            _namespace_rename = target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location
+            
+            # first pass to find everything in /static/
             import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
-                target_location_namespace if target_location_namespace is not None else  course_location)
+                _namespace_rename, subpath='static')
 
         for module in module_store.modules[course_id].itervalues():
 

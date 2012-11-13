@@ -32,6 +32,7 @@ class @VideoPlayer extends Subview
         youtubeId: @video.youtubeId('1.0')
         currentSpeed: @currentSpeed()
         captionDataDir: @video.caption_data_dir
+        captionAssetPath: @video.caption_asset_path
     unless onTouchBasedDevice()
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
