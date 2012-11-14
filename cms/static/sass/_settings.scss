@@ -5,12 +5,13 @@
     display: table;
     width: 100%;
 
+    // layout
     .sidebar {
       display: table-cell;
       float: none;
       width: 20%;
       padding: 30px 0 30px 20px;
-      border-radius: 3px 0 0 3px;
+      @include border-radius(3px 0 0 3px);
       background: $lightGrey;      
     }
 
@@ -21,139 +22,16 @@
       padding: 30px 40px 30px 60px;
     }
 
-    label {
-      display: inline-block;
-      vertical-align: top;
-      width: 200px;
-      font-size: 15px;
-      font-weight: 400;
-
-      &.check-label {
-        display: inline;
-        margin-left: 10px;
-      }
-
-      &.ranges {
-        margin-bottom: 20px;
-      }
-    }
-
-    .label-micro {
-      display: block;
-      margin-top: 5px;
-      font-size: 13px;
-    }
-
-    input, textarea {
-      font-size: 15px;
-
-      &.long {
-        width: 400px;
-      }
-
-      &.tall {
-        height: 200px;
-      }
-
-      &.short {
-        width: 100px;
-      }
-
-      &.date {
-        width: 140px;
-      }
-
-      &:focus {
-        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
-        border-color: $blue;
-        outline: 0;
-      }
-    }
-
-    ::-webkit-input-placeholder {
-      color: $mediumGrey;
-      font-size: 13px;
-    }
-    :-moz-placeholder {  
-      color: $mediumGrey;  
-      font-size: 13px;
-    }
-
-    .field {
-      display: inline-block;
-      vertical-align: top;
-      max-width: 400px;
-
-      input {
+    .settings-page-menu {
+      a {
         display: block;
-      }
+        padding-left: 20px;
+        line-height: 52px;
 
-      .input-list {
-
-        .element {
-          position: relative;
-          width: 100%;
-          @include clearfix();
-
-          div {
-
-          }
-
-          .remove-item {
-            display: block;
-            border-top: 1px solid $lightGrey;
-            margin-top: 10px;
-            padding-top: 10px;
-            font-size: 13px;
-          }
+        &.is-shown {
+          background: #fff;
+          @include border-radius(5px 0 0 5px);
         }
-
-        .element-group {
-          width: 400px;
-          padding: 15px;          
-          background: tint($lightGrey, 50%);
-          @include border-radius(3px);
-          @include box-sizing(border-box);
-
-          input.long, textarea {
-            width: 100%;
-          }
-        }
-
-        .element-stacked {
-
-          div {
-            margin-bottom: 20px;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-          }
-        }
-
-        .element-multi {
-
-          div {
-            float: left;
-            margin-right: 20px;
-
-            &:last-child {
-              margin-right: 0;
-            }
-          }
-
-          .remove-item {
-            float: left;
-            width: 100%;
-          }
-        }
-      }
-
-      .new-item {
-        margin-top: 20px;
-        padding-bottom: 10px;
-        @include grey-button;
-        @include box-sizing(border-box);
       }
     }
 
@@ -174,35 +52,15 @@
           display: block;
         }
 
-        .row {
-          margin-bottom: 15px;
-          padding-bottom: 15px;
-          border-bottom: 1px solid $lightGrey;
-
-          &:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-          }
-
-          .tip {
-            color: $mediumGrey;
-            font-size: 13px;
-          }
-
-          .tip-inline {
-            display: inline-block;
-            margin-left: 10px;
-          }
-
-          .tip-stacked {
-            display: block;
-            margin: 10px 0 0 200px;
-          }
-        }
-
         &:last-child {
           border-bottom: none;
+        }
+
+        > .title {
+          margin-bottom: 30px;
+          font-size: 28px;
+          font-weight: 300;
+          color: $blue;
         }
 
         > section {
@@ -239,25 +97,276 @@
       }
     }
 
-    .settings-page-menu {
-      a {
-        display: block;
-        padding-left: 20px;
-        line-height: 52px;
+    // form basics
+    label, .label {
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 400;
 
-        &.is-shown {
-          background: #fff;
-          border-radius: 5px 0 0 5px;
+      &.check-label {
+        display: inline;
+        margin-left: 10px;
+      }
+
+      &.ranges {
+        margin-bottom: 20px;
+      }
+    }
+
+    input, textarea {
+      @include transition(all 1s ease-in-out);
+      @include box-sizing(border-box);
+      font-size: 15px;
+
+      &.long {
+        width: 100%;
+      }
+
+      &.tall {
+        height: 200px;
+      }
+
+      &.short {
+        width: 25%;
+      }
+
+      &.date {
+
+      }
+
+      &:focus {
+        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
+        border-color: $blue;
+        outline: 0;
+      }
+    }
+
+    ::-webkit-input-placeholder {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+    :-moz-placeholder {  
+      color: $mediumGrey;  
+      font-size: 13px;
+    }
+
+    .tip {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+
+
+    // form layouts
+    .row {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid $lightGrey;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      // structural labels, not semantic labels per se
+      > label, .label {
+        display: inline-block;
+        vertical-align: top;
+        width: 200px;
+      }
+
+      // tips
+      .tip-inline {
+        display: inline-block;
+        margin-left: 10px;
+      }
+
+      .tip-stacked {
+        display: block;
+        margin-top: 10px;
+      }
+
+      // structural field, not semantic fields per se
+      .field {
+        display: inline-block;
+        width: 400px;
+
+        > input, > textarea, .input {
+          display: inline-block;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .group {
+            input, textarea {
+              margin-bottom: 5px;
+            }
+
+            .label, label {
+              font-size: 13px;
+            }
+          }
+
+          // multi-field
+          &.multi {
+            display: block;
+            background: tint($lightGrey, 50%);
+            padding: 15px;
+            @include border-radius(4px);
+            @include box-sizing(border-box);
+
+            .group {
+              margin-bottom: 10px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              input, .input, textarea {
+
+              }
+            }
+          }
+
+          // multi stacked
+          &.multi-stacked {
+            
+            .group {
+              input, .input, textarea {
+                width: 100%;
+              }
+            }
+          }
+
+          // multi-field inline
+          &.multi-inline {
+            @include clearfix;
+
+            .group {
+              float: left;
+              margin-right: 20px;
+              width: 170px;
+
+              &:nth-child(2) {
+                margin-right: 0;
+              }
+
+              .input, input, textarea {
+                width: 100%;
+              }
+            }
+
+            .remove-item {
+              float: right;
+            }       
+          }
+        }
+
+        // input-list
+        .input-list {
+
+          .input {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dotted $lightGrey;
+
+            &:last-child {
+              border: 0;
+            }
+          }
+        }
+
+        // enumerated inputs
+        &.enum {
         }
       }
     }
 
+    // editing controls - adding
+    .new-item, .replace-item {
+      clear: both;
+      display: block;
+      margin-top: 10px;
+      padding-bottom: 10px;
+      @include grey-button;
+      @include box-sizing(border-box);
+    }
+
+
+    // editing controls - removing
+    .remove-item {
+      clear: both;
+      display: block;
+      opacity: 0.75;
+      font-size: 13px;
+      text-align: right;
+      @include transition(opacity 0.25s ease-in-out);
+
+
+      &:hover {
+        color: $blue;
+        opacity: 0.99;
+      }
+    }
+
+    // editing controls - preview
+    .input-existing {
+      display: block !important;
+
+      .current {
+        width: 100%;
+        margin: 10px 0;
+        padding: 15px;
+        @include box-sizing(border-box);
+        @include border-radius(5px);
+        background: tint($blue, 80%);
+      }
+    }
+
+
+    // specific sections
     .settings-details {
 
     }
 
-    .settings-staff {
+    .settings-faculty {
 
+      .settings-faculty-members {
+
+        > header {
+          display: none;
+        }
+
+        .field .multi {
+          display: block;
+          margin-bottom: 40px;
+          padding: 20px;
+          background: tint($lightGrey, 50%);
+          @include border-radius(4px);
+          @include box-sizing(border-box);
+        }
+
+        .course-faculty-list-item {
+
+          .row {
+
+            &:nth-child(4) {
+              padding-bottom: 0;
+              border-bottom: none;
+            }
+          }
+        }
+
+        #course-faculty-bio-input {
+          margin-bottom: 0;
+        }
+
+        .new-course-faculty-item {
+        }
+      }
     }
 
     .settings-grading {
@@ -275,194 +384,200 @@
     .settings-discussions {
       
     }
-  }
 
-  h2 {
-    margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: 300;
-    color: $blue;
-  }
+    // states
+    label.is-focused {
+      color: $blue;
+      @include transition(color 1s ease-in-out);
+    }
 
-  h3 {
-    margin-bottom: 30px;
-    font-size: 15px;
-    font-weight: 700;
-    color: $blue;
-  }
-
-  .grade-controls {
-    @include clearfix;
-  }
-
-  .new-grade-button {
-    position: relative;
-    float: left;
-    display: block;
-    width: 29px;
-    height: 29px;
-    margin: 4px 10px 0 0;
-    border-radius: 20px;
-    border: 1px solid $darkGrey;
-    @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-    background-color: #d1dae3;
-    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-    color: #6d788b;
-
-    .plus-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-left: -6px;
-      margin-top: -6px;
+    // misc
+    .divide {
+      display: none;
     }
   }
 
-  .grade-slider {
-    float: left;
-    width: 560px;
-    height: 60px;
 
-    .grade-bar {
-      position: relative;
-      width: 100%;
-      height: 40px;
-      background: $lightGrey;
 
-      .increments {
-        position: relative;
+  // h3 {
+  //   margin-bottom: 30px;
+  //   font-size: 15px;
+  //   font-weight: 700;
+  //   color: $blue;
+  // }
 
-        li {
-          position: absolute;
-          top: 42px;
-          width: 30px;
-          margin-left: -15px;
-          font-size: 9px;
-          text-align: center;
+  // .grade-controls {
+  //   @include clearfix;
+  // }
 
-          &.increment-0 {
-            left: 0;
-          }
+  // .new-grade-button {
+  //   position: relative;
+  //   float: left;
+  //   display: block;
+  //   width: 29px;
+  //   height: 29px;
+  //   margin: 4px 10px 0 0;
+  //   border-radius: 20px;
+  //   border: 1px solid $darkGrey;
+  //   @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+  //   background-color: #d1dae3;
+  //   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  //   color: #6d788b;
 
-          &.increment-10 {
-            left: 10%;
-          }
+  //   .plus-icon {
+  //     position: absolute;
+  //     top: 50%;
+  //     left: 50%;
+  //     margin-left: -6px;
+  //     margin-top: -6px;
+  //   }
+  // }
 
-          &.increment-20 {
-            left: 20%;
-          }
+  // .grade-slider {
+  //   float: left;
+  //   width: 560px;
+  //   height: 60px;
 
-          &.increment-30 {
-            left: 30%;
-          }
+  //   .grade-bar {
+  //     position: relative;
+  //     width: 100%;
+  //     height: 40px;
+  //     background: $lightGrey;
 
-          &.increment-40 {
-            left: 40%;
-          }
+  //     .increments {
+  //       position: relative;
 
-          &.increment-50 {
-            left: 50%;
-          }
+  //       li {
+  //         position: absolute;
+  //         top: 42px;
+  //         width: 30px;
+  //         margin-left: -15px;
+  //         font-size: 9px;
+  //         text-align: center;
 
-          &.increment-60 {
-            left: 60%;
-          }
+  //         &.increment-0 {
+  //           left: 0;
+  //         }
 
-          &.increment-70 {
-            left: 70%;
-          }
+  //         &.increment-10 {
+  //           left: 10%;
+  //         }
 
-          &.increment-80 {
-            left: 80%;
-          }
+  //         &.increment-20 {
+  //           left: 20%;
+  //         }
 
-          &.increment-90 {
-            left: 90%;
-          }
+  //         &.increment-30 {
+  //           left: 30%;
+  //         }
 
-          &.increment-100 {
-            left: 100%;
-          }
-        }
-      }
+  //         &.increment-40 {
+  //           left: 40%;
+  //         }
 
-      .grades {
-        position: relative;
+  //         &.increment-50 {
+  //           left: 50%;
+  //         }
 
-        li {
-          position: absolute;
-          top: 0;
-          height: 40px;     
-          text-align: right;
+  //         &.increment-60 {
+  //           left: 60%;
+  //         }
 
-          &:hover,
-          &.is-dragging {
-            .remove-button {
-              display: block;
-            }
-          }
+  //         &.increment-70 {
+  //           left: 70%;
+  //         }
 
-          .remove-button {
-            display: none;
-            position: absolute;
-            top: -17px;
-            right: 1px;
-            height: 17px;
-            font-size: 10px;
-          }
+  //         &.increment-80 {
+  //           left: 80%;
+  //         }
 
-          &:nth-child(1) {
-            background: #4fe696;
-          }
+  //         &.increment-90 {
+  //           left: 90%;
+  //         }
 
-          &:nth-child(2) {
-            background: #ffdf7e;
-          }
+  //         &.increment-100 {
+  //           left: 100%;
+  //         }
+  //       }
+  //     }
 
-          &:nth-child(3) {
-            background: #ffb657;
-          }
+  //     .grades {
+  //       position: relative;
 
-          &:nth-child(4) {
-            background: #fb336c;
-          }
+  //       li {
+  //         position: absolute;
+  //         top: 0;
+  //         height: 40px;     
+  //         text-align: right;
 
-          &:nth-child(5) {
-            background: #ef54a1;
-          }
+  //         &:hover,
+  //         &.is-dragging {
+  //           .remove-button {
+  //             display: block;
+  //           }
+  //         }
 
-          .letter-grade {
-            display: block;
-            margin: 7px 5px 0 0;
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 14px;
-          }
+  //         .remove-button {
+  //           display: none;
+  //           position: absolute;
+  //           top: -17px;
+  //           right: 1px;
+  //           height: 17px;
+  //           font-size: 10px;
+  //         }
 
-          .range {
-            display: block;
-            margin-right: 5px;
-            font-size: 9px;
-            line-height: 12px;
-          }
+  //         &:nth-child(1) {
+  //           background: #4fe696;
+  //         }
 
-          .drag-bar {
-            position: absolute;
-            top: 0;
-            right: -1px;
-            height: 40px;
-            width: 2px;
-            background-color: #fff;
-            cursor: ew-resize;
-            @include transition(none);
+  //         &:nth-child(2) {
+  //           background: #ffdf7e;
+  //         }
 
-            &:hover {
-              width: 4px;
-              right: -2px;
-            }
-          }
-        }
-      }
-    }
-  }
+  //         &:nth-child(3) {
+  //           background: #ffb657;
+  //         }
+
+  //         &:nth-child(4) {
+  //           background: #fb336c;
+  //         }
+
+  //         &:nth-child(5) {
+  //           background: #ef54a1;
+  //         }
+
+  //         .letter-grade {
+  //           display: block;
+  //           margin: 7px 5px 0 0;
+  //           font-size: 14px;
+  //           font-weight: 700;
+  //           line-height: 14px;
+  //         }
+
+  //         .range {
+  //           display: block;
+  //           margin-right: 5px;
+  //           font-size: 9px;
+  //           line-height: 12px;
+  //         }
+
+  //         .drag-bar {
+  //           position: absolute;
+  //           top: 0;
+  //           right: -1px;
+  //           height: 40px;
+  //           width: 2px;
+  //           background-color: #fff;
+  //           cursor: ew-resize;
+  //           @include transition(none);
+
+  //           &:hover {
+  //             width: 4px;
+  //             right: -2px;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }

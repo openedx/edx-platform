@@ -15,6 +15,12 @@
     var gradeThresholds;
     var GRADES = ['A', 'B', 'C', 'D', 'E'];
 
+    $(" :input, textarea").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
+    });
+
     (function() {
       $body = $('body');
       $gradeBar = $('.grade-bar');
@@ -82,6 +88,7 @@
 </%block>
 
 <%block name="content">
+  <!-- -->
   <div class="main-wrapper">
     <div class="inner-wrapper">      
       <h1>Settings</h1>
@@ -90,9 +97,8 @@
           <nav class="settings-page-menu">
             <ul>
               <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
-              <li><a href="#" data-section="staff">Staff</a></li>
+              <li><a href="#" data-section="faculty">Faculty</a></li>
               <li><a href="#" data-section="grading">Grading</a></li>
-              <li><a href="#" data-section="handouts">Handouts</a></li>
               <li><a href="#" data-section="problems">Problems</a></li>
               <li><a href="#" data-section="discussions">Discussions</a></li>
             </ul>
@@ -100,101 +106,178 @@
         </div>
         <div class="settings-page-section main-column">
 
-          <section class="is-shown settings-details">
-            <h2>Course Details</h2>
+          <section class="settings-details is-shown">
+            <h2 class="title">Course Details</h2>
 
             <section class="settings-details-basic">
               <header>
                 <h3>Basic Information</h3>
-                <span class="detail">The nuts and bolts of your class</span>
+                <span class="detail">The nuts and bolts of your course</span>
               </header>
 
               <div class="row">
-                <label>Course Name:</label>
-                <input type="text" class="long course-name-input">
-              </div>
-              <div class="row">
-                <label>Organization:</label>
-                <input type="text" class="long course-organization-input">
-              </div>
-              <div class="row">
-                <label>Course Number:</label>
-                <input type="text" class="short course-number-input">
-                <span class="tip tip-inline">e.g. 101x</span>
-              </div>
-              <div class="row">
-                <label>Course Description:</label>
-                <textarea class="long tall course-description-input"></textarea>
-              </div>           
-            </section>
-
-            <section class="settings-details-dates">
-              <header>
-                <h3>Dates &amp; Times</h3>
-                <span class="detail">The nuts and bolts of your class</span>
-              </header>
-
-              <div class="row">
-                <label>Classes Start Date:</label>
-                <input type="text" class="date course-start-date-input">
-                <span class="tip tip-inline">First day the class begins</span>
-              </div>
-
-              <div class="row">
-                <label>Classes End Date:</label>
-                <input type="text" class="date course-end-date-input">
-                <span class="tip tip-inline">Last day of class activty</span>
-              </div> 
-
-              <div class="row">
-                <label>Milestone :</label>
-
+                <label for="course-name-input">Course Name:</label>
                 <div class="field">
-                  <ol class="input-list course-milestone-list">
-                    <li class="element element-multi element-group course-milestone-list-element">
-                      <div class="course-milestone-date">
-                        <input type="text" class="course-milestone-date-input date hasDatepicker" placeholder="MM/DD/YYYY">
-                        <span class="label-micro">Milestone Date</span>
+                  <input type="text" class="long" id="course-name-input">
+                </div>
+              </div>
+
+              <div class="row">
+                <label for="course-organization-input">Organization:</label>
+                <div class="field">
+                  <input type="text" class="long" id="course-organization-input">
+                </div>
+              </div>
+
+              <div class="row">
+                <label for="course-number-input">Course Number:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="course-number-input">
+                    <span class="tip tip-inline">e.g. 101x</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- settings-details-basic -->
+
+            <hr class="divide" />
+
+            <section class="settings-details-schedule">
+              <header>
+                <h3>Course Schedule</h3>
+                <span class="detail">Important steps and segments of your your course</span>
+              </header>
+
+              <div class="row">
+                <label for="course-start-date-input">Course Start Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="date" id="course-start-date-input">
+                    <span class="tip tip-inline">First day the class begins</span>          
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <label for="course-end-date-input">Course End Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="date" id="course-end-date-input">
+                    <span class="tip tip-inline">Last day the class begins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <h4 class="label">Milestones:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-milestone-list">
+                    <li class="input input-existing multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-1-date-input">Milestone Date</label>
+                        <input type="text" id="course-milestone-1-date-input" class="course-milestone-date-input date hasDatepicker" placeholder="MM/DD/YYYY">
                       </div>
 
-                      <div class="course-milestone-name">
-                        <input type="text" class="course-milestone-name-input">
-                        <span class="label-micro">Milestone Name</span>
+                      <div class="group">
+                        <label for="course-milestone-1-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-1-name-input">
                       </div>
 
                       <a href="#" class="remove-item remove-milestone-data"><span class="delete-icon"></span> Delete Milestone</a>
                     </li>
-                  </ol>
+
+                    <li class="input multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-2-date-input">Milestone Date</label>
+                        <input type="text" class="course-milestone-date-input date hasDatepicker" id="course-milestone-2-date-input" placeholder="MM/DD/YYYY">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-milestone-2-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-2-name-input">
+                      </div>
+                    </li>
+                  </ul>
 
                   <a href="#" class="new-item new-course-milestone-item add-milestone-data">
-                    <span class="plus-icon"></span>New Class Milestone
+                    <span class="plus-icon"></span>New Course Milestone
                   </a>
                 </div>
-              </div>            
-            </section>
+              </div>
 
-            <section class="settings-details-marketing">
+              <div class="row">
+                <label for="course-syllabus-input">Course Syllabus</label>
+                <div class="field">
+                  <div class="input input-existing">
+                    <div class=" current current-course-syllabus">
+                    </div>
+
+                    <a href="#" class="replace-item replace-course-syllabus add-syllabus-data" id="course-syllabus">
+                      <span class="upload-icon"></span>Replace Syllabus
+                    </a>
+                    <span class="tip tip-inline">PDF formatting preferred</span>          
+                  </div>
+
+                  <div class="input">
+                    <a href="#" class="new-item new-course-syllabus add-syllabus-data" id="course-syllabus-input">
+                      <span class="upload-icon"></span>Upload Syllabus
+                    </a>
+                    <span class="tip tip-inline">PDF formatting preferred</span>          
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-details-schedule -->
+
+            <hr class="divide" />
+
+            <section class="setting-details-marketing">
               <header>
                 <h3>Introducing Your Course</h3>
                 <span class="detail">Information for perspective students</span>
               </header>
 
               <div class="row">
-                <label>Course Overview:</label>
-                <textarea class="long tall course-overview"></textarea>
-              </div> 
+                <label for="course-overview">Course Overview:</label>
+                <div class="field">
+                  <textarea class="long tall" input="course-overview"></textarea>
+                  <span class="tip tip-stacked">Detailed summary of concepts and lessons covered</span>
+                </div>      
+              </div>
 
               <div class="row">
-                <label>Course Statement:</label>
-                <textarea class="long course-shortdescription"></textarea>
-                <span class="tip tip-stacked">Used to introduce your class to perspective students</span>
-              </div> 
+                <label for="course-shortdescription">Course Statement:</label>
+                <div class="field">
+                  <textarea class="long" id="course-shortdescription"></textarea>
+                  <span class="tip tip-stacked">1-2 sentences used to introduce your class to perspective students</span>
+                </div>
+              </div>
 
               <div class="row">
-                <label>Introduction Video:</label>
-                <input type="file" class="course-video">
-              </div>  
-            </section>
+                <label for="course-introduction-video">Introduction Video:</label>
+                <div class="field">
+                  <div class="input input-existing">
+                    <div class=" current current-course-introduction-video">
+
+                    </div>
+
+                    <a href="#" class="replace-item replace-course-introduction-video add-video-data" id="course-introduction-video">
+                      <span class="upload-icon"></span>Replace Video
+                    </a>
+                    <span class="tip tip-inline">Video restrictions go here</span>          
+                  </div>
+
+                  <div class="input">
+                    <a href="#" class="new-item new-course-introduction-video add-video-data" id="course-introduction-video">
+                      <span class="upload-icon"></span>Upload Video
+                    </a>
+                    <span class="tip tip-inline">Video restrictions go here</span>          
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-details-marketing -->
+
+            <hr class="divide" />
 
             <section class="settings-details-requirements">
               <header>
@@ -203,67 +286,100 @@
               </header>
 
               <div class="row">
-                <label>Prerequisites</label>
-                <textarea class="long tall course-prerequisites"></textarea>
-              </div> 
-
-              <div class="row optional">
-                <label>Prerequisites Links</label>
-
+                <label for="course-requirements">Requirements:</label>
                 <div class="field">
-
-                  <ol class="input-list course-prerequisites-list">
-                    <li class="element element-group course-prerequisites-list-element">
-                      <div class="course-milestone-date">
-                        <input type="text" class="long course-prerequisites-links">
-                      </div>
-
-                      <a href="#" class="remove-item remove-prerequisite-data"><span class="delete-icon"></span> Delete Link</a>
-                    </li>
-                  </ol>
-
-                  <a href="#" class="new-item new-course-prerequisites-links-item add-links-data">
-                    <span class="plus-icon"></span>New Link
-                  </a>
+                  <textarea class="long tall" id="course-requirements"></textarea>  
+                  <span class="tip tip-stacked">Supplies, software, and set-up that students will need</span>      
                 </div>
-              </div> 
-
-              <div class="row">
-                <label>Requirements:</label>
-                <textarea class="long tall course-requirements"></textarea>
               </div>
 
               <div class="row">
-                <label>Hours of Effort per Week:</label>
-                <input type="text" class="course-effort short">
-              </div> 
+                <label for="course-effort">Hours of Effort per Week:</label>
+                <div class="field">
+                  <input type="text" class="short" id="course-effort">
+                  <span class="tip tip-inline">Time students should spend on all course work</span>
+                </div>
+              </div>
 
               <div class="row">
-                <label>Textbooks:</label>
+                <h4 class="label">Textbooks:</h4>
 
-                <div class="field">
-                  <ol class="input-list course-textbook-list">
-                    <li class="element element-stacked element-group course-textbook-list-element">
-                      <div class="course-textbook-name">
-                        <input type="text" class="long course-textbook-name-input">
-                        <span class="label-micro">Textbook Name</span>
+                <div class="field enum">
+                  <ul class="input-list course-textbooks-list">
+                    <li class="input input-existing multi multi-stacked course-textbooks-list-item">
+                      <div class="group">
+                        <label for="course-textbooks-1-name-input">Textbook Name</label>
+                        <input type="text" class="course-textbooks-name-input" id="course-textbooks-1-name-input" placeholder="">
                       </div>
 
-                      <div class="course-textbook-url">
-                        <input type="text" class="long course-textbook-url-input">
-                        <span class="label-micro">Textbook URL</span>
+                      <div class="group optional">
+                        <label for="course-textbooks-1-link-input">Textbook Link</label>
+                        <input type="text" class="course-textbooks-link-input" id="course-textbooks-1-link-input">
                       </div>
 
-                      <a href="#" class="remove-item remove-textbook-data"><span class="delete-icon"></span> Delete Textbook</a>
+                      <a href="#" class="remove-item remove-textbooks-data"><span class="delete-icon"></span> Delete Textbook</a>
                     </li>
-                  </ol>
+                    
+                    <li class="input multi multi-stacked course-textbooks-list-item">
+                      <div class="group">
+                        <label for="course-textbooks-2-name-input">Textbook Name</label>
+                        <input type="text" class="course-textbooks-name-input" id="course-textbooks-2-name-input">
+                      </div>
 
-                  <a href="#" class="new-item new-course-textbook-item add-textbook-data">
+                      <div class="group optional">
+                        <label for="course-textbooks-2-link-input">Textbook Link</label>
+                        <input type="text" class="course-textbooks-link-input" id="course-textbooks-2-link-input">
+                      </div>
+
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-textbooks-item add-textbooks-data">
                     <span class="plus-icon"></span>New Textbook
                   </a>
                 </div>
-              </div>   
+              </div>
+
+              <div class="row">
+                <h4 class="label">Prerequisites:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-prerequisites-list">
+                    <li class="input input-existing multi multi-stacked course-prerequisites-list-item">
+                      <div class="group">
+                        <label for="course-prerequisites-1-name-input">Prerequisite</label>
+                        <input type="text" class="course-prerequisites-name-input" id="course-prerequisites-1-name-input">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-prerequisites-1-link-input">Prerequisite Link</label>
+                        <input type="text" class="course-prerequisites-link-input" id="course-prerequisites-1-link-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-prerequisite-data"><span class="delete-icon"></span> Delete Prerequisite</a>
+                    </li>
+                    
+                    <li class="input multi multi-stacked course-prerequisites-list-item">
+                      <div class="group">
+                        <label for="course-prerequisites-2-name-input">Prerequisite</label>
+                        <input type="text" class="course-prerequisites-name-input" id="course-prerequisites-2-name-input">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-prerequisites-2-link-input">Prerequisite Link</label>
+                        <input type="text" class="course-prerequisites-link-input" id="course-prerequisites-2-link-input">
+                      </div>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-prerequisite-item add-prerequisite-data">
+                    <span class="plus-icon"></span>New Prerequisite
+                  </a>
+                </div>
+              </div>
             </section>
+
+            <hr class="divide" />
 
             <section class="settings-details-more">
               <header>
@@ -272,24 +388,38 @@
               </header>
 
               <div class="row">
-                <label><abbr title="Frequently Asked Questions">FAQs</abbr></label>
+                <h4 class="label">FAQs:</h4>
 
-                <div class="field">
-                  <ol class="input-list course-faq-list">
-                    <li class="element element-stacked element-group course-faq-list-element">
-                      <div class="course-faq-question">
-                        <input type="text" class="long course-faq-question-input">
-                        <span class="label-micro">Question</span>
+                <div class="field enum">
+                  <ul class="input-list course-faq-list">
+                    <li class="input multi multi-stacked course-faq-list-item">
+                      <div class="group">
+                        <label for="course-faq-1-question-input">Question</label>
+                        <input type="text" class="long course-faq-question-input" id="course-faq-1-question-input">
                       </div>
 
-                      <div class="course-faq-answer">
-                        <textarea class="long tall course-faq-answer-input"></textarea>
-                        <span class="label-micro">Answer</span>
+                      <div class="group optional">
+                        <label for="course-faq-1-answer-input">Answer</label>
+                        <textarea class="long tall course-faq-answer-input" id="course-faq-1-answer-input"></textarea>
                       </div>
 
                       <a href="#" class="remove-item remove-faq-data"><span class="delete-icon"></span> Delete Question &amp; Answer</a>
                     </li>
-                  </ol>
+                    
+                    <li class="input multi multi-stacked course-faq-list-item">
+                      <div class="group">
+                        <label for="course-faq-2-question-input">Question</label>
+                        <input type="text" class="long course-faq-question-input" id="course-faq-2-question-input">
+                      </div>
+
+                      <div class="group optional">
+                        <label for="course-faq-2-answer-input">Answer</label>
+                        <textarea class="long tall course-faq-answer-input" id="course-faq-2-answer-input"></textarea>
+                      </div>
+
+                      <a href="#" class="remove-item remove-faq-data"><span class="delete-icon"></span> Delete Question &amp; Answer</a>
+                    </li>
+                  </ul>
 
                   <a href="#" class="new-item new-course-faq-item add-faq-data">
                     <span class="plus-icon"></span>New Question &amp; Answer
@@ -297,149 +427,138 @@
                 </div>
               </div>
             </section>
-            
-          </section>
+          </section><!-- .settings-details -->
 
-          <section class="settings-staff">
-            <h2>Course Staff</h2>
+          <section class="settings-faculty">
+            <h2 class="title">Faculty</h2>
 
-            <section class="settings-staff-faculty">
+            <section class="settings-faculty-members">
               <header>
-                <h3>Faculty</h3>
+                <h3>Faculty Members</h3>
+                <span class="detail">Individuals instructing and help with this course</span>
               </header>
 
-              <ol class="input-list">
-                <li class="element element-group course-staff-faculty-element">
-                  <div class="row">
-                    <label>Faculty First Name:</label>
-                    <input type="text" class="long course-faculty-firstname-input">
-                  </div>
-                  <div class="row">
-                    <label>Faculty Last Name:</label>
-                    <input type="text" class="long course-faculty-lastname-input">
-                  </div>
-                  <div class="row">
-                    <label>Faculty Photo:</label>
-                    <input type="file" class="long course-faculty-photo-input">
-                    <span class="tip tip-stacked">This photo will appear on your course's info page</span>
-                  </div>
-                  <div class="row">
-                    <label>Faculty Bio:</label>
-                    <textarea class="long tall course-faculty-bio-input"></textarea>
-                    <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
-                  </div>  
-                </li>
-              </ol>
+              <div class="field enum">
+                <ul class="input-list course-faculty-list">
+                  <li class="input input-existing multi course-faculty-list-item">
+                    <div class="row">
+                      <label for="course-faculty-firstname-input">Faculty First Name:</label>
+                      <div class="field">
+                        <input type="text" class="long" id="course-faculty-firstname-input">
+                      </div>
+                    </div>
 
-              <a href="#" class="new-item new-course-faculty-item add-faculty-data">
-                <span class="plus-icon"></span>New Faculty Member
-              </a>
+                    <div class="row">
+                      <label for="course-faculty-lastname-input">Faculty Last Name:</label>
+                      <div class="field">
+                        <input type="text" class="long" id="course-faculty-lastname-input">
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label for="course-faculty-photo-input">Faculty Photo</label>
+                      <div class="field">
+                        <div class="input">
+                          <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                            <span class="upload-icon"></span>Upload Faculty Photo
+                          </a>
+                          <span class="tip tip-inline">Max size: 30KB</span>          
+                        </div>
+
+                        <div class="input input-existing">
+                          <div class=" current current-course-syllabus">
+
+                          </div>
+
+                          <a href="#" class="replace-item replace-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                            <span class="upload-icon"></span>Upload Faculty Photo
+                          </a>
+                          <span class="tip tip-inline">Max size: 30KB</span>          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label for="course-faculty-bio-input">Faculty Bio:</label>
+                      <div class="field">
+                        <textarea class="long tall" id="course-faculty-bio-input"></textarea>
+                        <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                      </div>      
+                    </div>
+
+                    <a href="#" class="remove-item remove-faculty-data"><span class="delete-icon"></span> Delete Faculty Member</a>
+                  </li>
+
+                  <li class="input multi course-faculty-list-item">
+                    <div class="row">
+                      <label for="course-faculty-firstname-input">Faculty First Name:</label>
+                      <div class="field">
+                        <input type="text" class="long" id="course-faculty-firstname-input">
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label for="course-faculty-lastname-input">Faculty Last Name:</label>
+                      <div class="field">
+                        <input type="text" class="long" id="course-faculty-lastname-input">
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label for="course-faculty-photo-input">Faculty Photo</label>
+                      <div class="field">
+                        <div class="input">
+                          <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                            <span class="upload-icon"></span>Upload Faculty Photo
+                          </a>
+                          <span class="tip tip-inline">Max size: 30KB</span>          
+                        </div>
+
+                        <div class="input input-existing">
+                          <div class=" current current-course-faculty-photo">
+
+                          </div>
+
+                          <a href="#" class="replace-item replace-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                            <span class="upload-icon"></span>Upload Faculty Photo
+                          </a>
+                          <span class="tip tip-inline">Max size: 30KB</span>          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <label for="course-faculty-bio-input">Faculty Bio:</label>
+                      <div class="field">
+                        <textarea class="long tall" id="course-faculty-bio-input"></textarea>
+                        <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                      </div>      
+                    </div>
+                  </li>
+                </ul>
+
+                <a href="#" class="new-item new-course-faculty-item add-faculty-data">
+                  <span class="plus-icon"></span>New Faculty Member
+                </a>
+              </div>
             </section>
-          </section>
+
+          </section><!-- .settings-staff -->
 
           <section class="settings-grading">
-            <h2>Grading</h2>
-            <section>
-              <label class="ranges">Grade Ranges:</label>
-              <div class="grade-controls">
-                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
-                <div class="grade-slider">
-                  <div class="grade-bar">
-                    <ol class="increments">
-                      <li class="increment-0">0</li>
-                      <li class="increment-10">10</li>
-                      <li class="increment-20">20</li>
-                      <li class="increment-30">30</li>
-                      <li class="increment-40">40</li>
-                      <li class="increment-50">50</li>
-                      <li class="increment-60">60</li>
-                      <li class="increment-70">70</li>
-                      <li class="increment-80">80</li>
-                      <li class="increment-90">90</li>
-                      <li class="increment-100">100</li>
-                    </ol>
-                    <ol class="grades">
-                      <li class="bar-a" style="width: 100%;">
-                        <span class="letter-grade" contenteditable>A</span>
-                        <span class="range">81-100</span>
-                        <a href="#" class="remove-button">remove</a>
-                      </li>
-                      <li class="bar-b" style="width: 80%;">
-                        <span class="letter-grade" contenteditable>B</span>
-                        <span class="range">71-80</span>
-                        <a href="#" class="drag-bar"></a>
-                        <a href="#" class="remove-button">remove</a>
-                      </li>
-                      <li class="bar-c" style="width: 70%;">
-                        <span class="letter-grade" contenteditable>C</span>
-                        <span class="range">0-70</span>
-                        <a href="#" class="drag-bar"></a>
-                        <a href="#" class="remove-button">remove</a>
-                      </li>
-                    </ol>
-                  </div>
-                </div>
-              </div>
-            </section>
-            <section>
-              <div class="row">
-                <label>Grace Period:</label>
-                <input type="text" class="grace-period">
-              </div>
-            </section>
-            <section>
-              <h3>Homework</h3>
-              <div class="row">
-                <label>Minimum Count:</label>
-                <input type="text" class="minimum-count-input short">
-              </div>
-              <div class="row">
-                <label>Drop Count:</label>
-                <input type="text" class="drop-count-input short">
-              </div>
-              <div class="row">
-                <label>Weight:</label>
-                <input type="text" class="weight-input short">
-              </div>
-            </section>
-            <section>
-              <h3>Lab</h3>
-              <div class="row">
-                <label>Minimum Count:</label>
-                <input type="text" class="minimum-count-input short">
-              </div>
-              <div class="row">
-                <label>Drop Count:</label>
-                <input type="text" class="drop-count-input short">
-              </div>
-              <div class="row">
-                <label>Weight:</label>
-                <input type="text" class="weight-input short">
-              </div>
-            </section>
-          </section>
+            <h2 class="title">Grading</h2>
 
-          <section class="settings-handouts">
-            <h2>Handouts &amp; Guides</h2>
-
-            <div class="row">
-              <label>Syllabus: </label>
-              <input type="file" class="course-handouts-syllabus">
-              <span class="tip">PDF formatted file</span>
-            </div>
-          </section>
+          </section><!-- .settings-grading -->
 
           <section class="settings-problems">
-            <h2>Problems</h2>
-            <div class="row">
-              <input type="checkbox" id="randomize-problems"><label for="randomize-problems" class="check-label">Randomize Problems</label>            
-            </div>
-          </section>
+            <h2 class="title">Problems</h2>
+
+          </section><!-- .settings-problems -->
 
           <section class="settings-discussions">
-            <h2>Discussions</h2>
+            <h2 class="title">Discussions</h2>
             
-          </section>
+          </section><!-- .settings-discussions -->
         </div>
       </article>
     </div>
