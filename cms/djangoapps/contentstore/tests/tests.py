@@ -323,3 +323,16 @@ class ContentStoreTest(TestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def test_factory(self):
+
+        from factories import *
+
+        course = CourseFactory.create()
+        print '\n'
+        print course
+        print '\n'
+        section = ItemFactory.create()
+
+        print '\n'
+        print section
+        print '\n'

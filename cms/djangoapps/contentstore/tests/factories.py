@@ -55,3 +55,50 @@ class CourseFactory(XModuleCourseFactory):
     org = 'MITx'
     number = '999'
     display_name = 'Robot Super Course'
+
+class XModuleItemFactory(Factory):
+    """
+    Factory for XModule items.
+    """
+
+    ABSTRACT_FACTORY = True
+
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+
+        DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
+        
+        parent_location = Location(kwargs.get('parent_location'))
+        template = Location(kwargs.get('template'))
+        display_name = kwargs.get('display_name')
+
+        store = modulestore('direct')
+
+        parent = store.get_item(parent_location)
+        dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+
+        new_item = store.clone_item(template, dest_location)
+
+        # TODO: This needs to be deleted when we have proper storage for static content
+        new_item.metadata['data_dir'] = parent.metadata['data_dir']
+
+        # replace the display name with an optional parameter passed in from the caller
+        if display_name is not None:
+            new_item.metadata['display_name'] = display_name
+
+        store.update_metadata(new_item.location.url(), new_item.own_metadata)
+
+        if new_item.location.category not in DETACHED_CATEGORIES:
+            store.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+        return new_item
+
+class Item:
+    pass
+
+class ItemFactory(XModuleItemFactory):
+    FACTORY_FOR = Item
+
+    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
+    template = 'i4x://edx/templates/chapter/Empty'
+    display_name = 'Section One'
