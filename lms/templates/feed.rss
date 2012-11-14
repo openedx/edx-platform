@@ -22,7 +22,7 @@
     <updated>2012-10-14T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/ut-joins-edx')}"/>
     <title>The University of Texas System joins edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/uts-seal_109x84.jpg')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/uts-seal_109x84.jpg')}&quot; /&gt;
          &lt;p&gt;Nine universities and six health institutions&lt;/p&gt;</content>
   </entry>
   <!-- <entry> -->
@@ -40,7 +40,7 @@
     <updated>2012-09-06T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/edX-announces-proctored-exam-testing')}"/>
     <title>EdX to offer learners option of taking proctored final exam</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/diploma-109x84.jpg')}&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/diploma-109x84.jpg')}&quot; /&gt;</content>
   </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/3</id>
@@ -48,7 +48,7 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/uc-berkeley-joins-edx')}"/>
     <title>UC Berkeley joins edX</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/edx-109x84.png')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/edx-109x84.png')}&quot; /&gt;
       &lt;p&gt;edX broadens course offerings&lt;/p&gt;</content>
   </entry>
   <entry>
@@ -57,7 +57,7 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589840852/opening-doors-for-exceptional-students-6-002x-in"/>
     <title>Opening Doors For Exceptional Students: 6.002x in Mongolia</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_opening_doors_mongolia.jpg')}&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/tumblr_tumbnail_opening_doors_mongolia.jpg')}&quot; /&gt;</content>
   </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/1</id>
@@ -65,6 +65,6 @@
     <updated>2012-07-16T14:08:12-07:00</updated>
     <link type="text/html" rel="alternate" href="http://edxonline.tumblr.com/post/27589835076/beyond-the-circuits-a-students-experience-with-6-002x"/>
     <title>Brazilian teen blogs about his 6.002x experience</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/tumblr_tumbnail_brazilian_teen.jpg')}&quot; /&gt;</content>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/tumblr_tumbnail_brazilian_teen.jpg')}&quot; /&gt;</content>
   </entry>
 </feed>
