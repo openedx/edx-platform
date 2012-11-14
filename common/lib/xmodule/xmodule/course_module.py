@@ -243,7 +243,7 @@ class CourseDescriptor(SequenceDescriptor):
         Returns True if the current time is after the specified course end date.
         Returns False if there is no end date specified.
         """
-        if self.end_date is None:
+        if self.end is None:
             return False
 
         return time.gmtime() > self.end
@@ -364,6 +364,10 @@ class CourseDescriptor(SequenceDescriptor):
         displayed_start = self._try_parse_time('advertised_start') or self.start
         return time.strftime("%b %d, %Y", displayed_start)
 
+    @property
+    def end_date_text(self):
+        return time.strftime("%b %d, %Y", self.end)
+
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have
@@ -411,6 +415,16 @@ class CourseDescriptor(SequenceDescriptor):
         until we get grade integration set up."""
         # Explicit comparison to True because we always want to return a bool.
         return self.metadata.get('hide_progress_tab') == True
+
+    @property
+    def end_of_course_survey_url(self):
+        """
+        Pull from policy.  Once we have our own survey module set up, can change this to point to an automatically
+        created survey for each class.
+
+        Returns None if no url specified.
+        """
+        return self.metadata.get('end_of_course_survey_url')
 
     @property
     def title(self):

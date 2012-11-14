@@ -29,6 +29,9 @@ from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment)
+
+from certificates.models import CertificateStatuses, certificate_status_for_student
+
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
@@ -143,11 +146,20 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
+    # TODO: workaround to not have to zip courses and certificates in the template
+    # since before there is a migration to certificates
+    if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
+        cert_statuses = { course.id: certificate_status_for_student(request.user, course.id) for course in courses}
+    else:
+        cert_statuses = {}
+
     context = {'courses': courses,
                'message': message,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
-               'show_courseware_links_for' : show_courseware_links_for}
+               'show_courseware_links_for' : show_courseware_links_for,
+               'cert_statuses': cert_statuses,
+               }
 
     return render_to_response('dashboard.html', context)
 
@@ -206,13 +218,13 @@ def change_enrollment(request):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
-                    
-        org, course_num, run=course_id.split("/")        
+
+        org, course_num, run=course_id.split("/")
         statsd.increment("common.student.enrollment",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
                               "run:{0}".format(run)])
-        
+
         enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
         return {'success': True}
 
@@ -220,13 +232,13 @@ def change_enrollment(request):
         try:
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
-            
-            org, course_num, run=course_id.split("/")        
+
+            org, course_num, run=course_id.split("/")
             statsd.increment("common.student.unenrollment",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
                                   "run:{0}".format(run)])
-                              
+
             return {'success': True}
         except CourseEnrollment.DoesNotExist:
             return {'success': False, 'error': 'You are not enrolled for this course.'}
@@ -275,13 +287,13 @@ def login_user(request, error=""):
         log.info("Login success - {0} ({1})".format(username, email))
 
         try_change_enrollment(request)
-        
+
         statsd.increment("common.student.successful_login")
-        
+
         return HttpResponse(json.dumps({'success': True}))
-    
+
     log.warning("Login failed - Account not active for user {0}, resending activation".format(username))
-    
+
     reactivation_email_for_user(user)
     not_activated_msg = "This account has not been activated. We have " + \
                         "sent another activation message. Please check your " + \
@@ -483,9 +495,9 @@ def create_account(request, post_override=None):
             log.debug('bypassing activation email')
             login_user.is_active = True
             login_user.save()
-            
+
     statsd.increment("common.student.account_created")
-    
+
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
@@ -541,9 +553,9 @@ def password_reset(request):
     ''' Attempts to send a password reset e-mail. '''
     if request.method != "POST":
         raise Http404
-    
+
     # By default, Django doesn't allow Users with is_active = False to reset their passwords,
-    # but this bites people who signed up a long time ago, never activated, and forgot their 
+    # but this bites people who signed up a long time ago, never activated, and forgot their
     # password. So for their sake, we'll auto-activate a user for whome password_reset is called.
     try:
         user = User.objects.get(email=request.POST['email'])
@@ -551,7 +563,7 @@ def password_reset(request):
         user.save()
     except:
         log.exception("Tried to auto-activate user to enable password reset, but failed.")
-    
+
     form = PasswordResetForm(request.POST)
     if form.is_valid():
         form.save(use_https = request.is_secure(),
@@ -589,7 +601,7 @@ def reactivation_email_for_user(user):
     res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
 
     return HttpResponse(json.dumps({'success': True}))
-    
+
 
 @ensure_csrf_cookie
 def change_email_request(request):
@@ -764,8 +776,8 @@ def accept_name_change_by_id(id):
 
 @ensure_csrf_cookie
 def accept_name_change(request):
-    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change 
-    
+    ''' JSON: Name change process. Course staff clicks 'accept' on a given name change
+
     We used this during the prototype but now we simply record name changes instead
     of manually approving them. Still keeping this around in case we want to go
     back to this approval method.
@@ -794,6 +806,3 @@ def test_center_login(request):
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         return HttpResponseForbidden()
-
-
-

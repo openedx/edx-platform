@@ -10,6 +10,9 @@ if settings.DEBUG:
     admin.autodiscover()
 
 urlpatterns = ('',
+    # certificate view
+
+    url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
