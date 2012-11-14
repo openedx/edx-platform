@@ -1864,7 +1864,11 @@ class OpenEndedResponse(LoncapaResponse):
         try:
             grader_payload=json.loads(grader_payload)
             location=self.system.ajax_url.split("://")[1]
-            grader_payload.update({'location' : location})
+            org,course,type,name=location.split("/")
+            grader_payload.update({
+                'location' : location,
+                'course_id' : "{0}/{1}".format(org,course)
+            })
             grader_payload=json.dumps(grader_payload)
         except Exception as err:
             log.error("Grader payload is not a json object!")
