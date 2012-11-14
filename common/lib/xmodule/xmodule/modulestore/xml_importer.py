@@ -111,7 +111,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     )
 
     if validate_only:
-        validate_module_structure(module_store)
+        perform_xlint(data_dir, course_dirs, module_store)
         return module_store, []
 
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
@@ -224,11 +224,34 @@ def validate_category_hierarcy(module_store, course_id, parent_category, expecte
 
     return err_cnt
 
-def validate_module_structure(module_store):
+def validate_data_source_path_existence(path, is_err = True, extra_msg = None):
+    _cnt = 0
+    if not os.path.exists(path):
+        print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if 
+            extra_msg is not None else ''))
+        _cnt = 1
+    return _cnt
+
+def validate_data_source_paths(data_dir, course_dir):
+    # check that there is a '/static/' directory
+    course_path = data_dir / course_dir
+    err_cnt = 0
+    warn_cnt = 0
+    err_cnt += validate_data_source_path_existence(course_path / 'static')
+    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err = False, 
+        extra_msg = 'Video captions (if they are used) will not work unless they are static/subs.')
+    return err_cnt, warn_cnt
+
+
+def perform_xlint(data_dir, course_dirs,module_store):
     err_cnt = 0
     warn_cnt = 0
 
-    print module_store.errored_courses
+    # check all data source path information
+    for course_dir in course_dirs:
+        _err_cnt, _warn_cnt = validate_data_source_paths(path(data_dir), course_dir)
+        err_cnt += _err_cnt
+        warn_cnt += _warn_cnt
 
     # first count all errors and warnings as part of the XMLModuleStore import
     for err_log in module_store._location_errors.itervalues():
