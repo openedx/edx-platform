@@ -79,7 +79,7 @@ def get_logger_config(log_dir,
                 'level': 'INFO'
             },
             'tracking': {
-                'handlers': ['tracking'],
+                'handlers': ['tracking', 'http'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
@@ -121,6 +121,12 @@ def get_logger_config(log_dir,
                 'maxBytes': 1024 * 1024 * 2,
                 'backupCount': 5,
             },
+            'http' : {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.HTTPHandler',
+                'host':'127.0.0.1:14141', 
+                'url':'/logger',
+            }
         })
     else:
         logger_config['handlers'].update({
