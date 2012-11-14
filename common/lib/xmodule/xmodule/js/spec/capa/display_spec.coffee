@@ -8,6 +8,7 @@ describe 'Problem', ->
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
 
+    jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
     loadFixtures 'problem.html'
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
