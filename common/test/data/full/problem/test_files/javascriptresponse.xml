@@ -1,0 +1,13 @@
+<problem>
+
+<javascriptresponse>
+  <generator src="test_problem_generator.js"/>
+  <grader src="test_problem_grader.js"/>
+  <display class="TestProblemDisplay" src="test_problem_display.js"/>
+  <responseparam name="value" value="4"/>
+  <javascriptinput>
+  </javascriptinput>
+</javascriptresponse>
+
+</problem>
+
