@@ -25,6 +25,7 @@ class StaffGradingBackend
         rubric: 'A rubric!' + @mock_cnt
 
     else if cmd == 'save_grade'
+      console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
         success: true
         submission: 'another submission! ' + @mock_cnt
@@ -60,6 +61,7 @@ class StaffGrading
   constructor: (backend) ->
     @backend = backend
 
+    # all the jquery selectors
     @error_container = $('.error-container')
     @message_container = $('.message-container')
     @submission_container = $('.submission-container')
@@ -67,75 +69,98 @@ class StaffGrading
     @submission_wrapper = $('.submission-wrapper')
     @rubric_wrapper = $('.rubric-wrapper')
     @button = $('.submit-button')
-    @button.click @clicked
+    
+    # model state
     @state = state_no_data
+    @submission = ''
+    @rubric = ''
+    @error_msg = ''
+    @message = ''
 
-    @submission_wrapper.hide()
-    @rubric_wrapper.hide()
+    @feedback = null
+    @score = null
 
+    # action handlers
+    @button.click @clicked
+
+    # render intial state
+    @render_view()
+
+    # send initial request automatically
     @get_next_submission()
 
 
   set_button_text: (text) ->
     @button.prop('value', text)
 
-
   ajax_callback: (response) =>
-      if response.success
-        if response.submission
-          @data_loaded(response.submission, response.rubric)
-        else
-          @no_more()
+    # always clear out errors and messages on transition.
+    @error_msg = ''
+    @message = ''
+    
+    if response.success
+      if response.submission
+        @data_loaded(response.submission, response.rubric)
       else
-        @error(response.error)
-  
+        @no_more()
+    else
+      @error(response.error)
+
+    @render_view()
+       
   get_next_submission: () ->
     @backend.post('get_next', {}, @ajax_callback)
 
   submit_and_get_next: () ->
-    data = {eval: '123'}
+    data = {score: '1', feedback: 'Great!'}
+    
     @backend.post('save_grade', data, @ajax_callback)
 
   error: (msg) ->
-    @error_container.html(msg)
+    @error_msg = msg
     @state = state_error
-    @update()
 
   data_loaded: (submission, rubric) ->
-    @submission_container.html(submission)
-    @rubric_container.html(rubric)
+    @submission = submission
+    @rubric = rubric
     @state = state_grading
-    @update()
 
   no_more: () ->
+    @submission = null
+    @rubric = null
+    @message = 'Nothing to grade'
     @state = state_no_data
-    @update()
 
-  update: () ->
-    # make button and div state match the state.  Idempotent.
+  render_view: () ->
+    # make the view elements match the state.  Idempotent.
+    show_grading_elements = false
+
+    @message_container.html(@message)
+    @error_container.html(@error_msg)
+
     if @state == state_error
       @set_button_text('Try loading again')
 
     else if @state == state_grading
-      @submission_wrapper.show()
-      @rubric_wrapper.show()
+      @submission_container.html(@submission)
+      @rubric_container.html(@rubric)
+      show_grading_elements = true
       @set_button_text('Submit')
 
     else if @state == state_no_data
-      @submission_wrapper.hide()
-      @rubric_wrapper.hide()
-      @message_container.html('Nothing to grade')
+      @message_container.html(@message)
       @set_button_text('Re-check for submissions')
 
     else
       @error('System got into invalid state ' + @state)
 
+    @submission_wrapper.toggle(show_grading_elements)
+    @rubric_wrapper.toggle(show_grading_elements)
+
+
   clicked: (event) =>
     event.preventDefault()
-    # always clear out errors and messages on transition...
-    @message_container.html('')
-    @error_container.html('')
-
+    
     if @state == state_error
       @get_next_submission()
     else if @state == state_grading
