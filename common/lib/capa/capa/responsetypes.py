@@ -1959,6 +1959,7 @@ class OpenEndedResponse(LoncapaResponse):
                 msg='Invalid grader reply. Please contact the course staff.')
             return oldcmap
 
+
         correctness = 'correct' if correct else 'incorrect'
 
         # TODO: Find out how this is used elsewhere, if any
@@ -2025,6 +2026,10 @@ class OpenEndedResponse(LoncapaResponse):
         # 2) TODO: Is the message actually HTML?
         feedback = score_result['feedback']
 
+        correct=False
+        if score_result['correct']=="True":
+            correct=True
+
         try:
             etree.fromstring(feedback)
         except etree.XMLSyntaxError as err:
@@ -2033,7 +2038,7 @@ class OpenEndedResponse(LoncapaResponse):
             return fail
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
-        return (True, score_result['correct'], score_result['score'], feedback)
+        return (True, correct, score_result['score'], feedback)
 
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
