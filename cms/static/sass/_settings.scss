@@ -170,15 +170,23 @@
       }
 
       .ui-status-input-checkbox ~ label, .ui-status-input-radio ~ label {
+        position: relative;
+        left: -30px;
         display: inline-block;
+        z-index: 100;
         margin: 0 0 0 5px;
+        padding-left: 30px;
         color: $offBlack;
         opacity: 0.50;
         cursor: pointer;
         @include transition(opacity 0.25s ease-in-out);
 
+        &:before {
+          display: inline-block;
+          margin-right: 10px;
+        }
+
         &:after {
-         content: "(Off)";
          display: inline-block;
          margin-left: 10px;
         }
@@ -192,6 +200,7 @@
       .ui-status-indic {
         position: relative;
         top: 2px;
+        z-index: 10;
         display: inline-block;
         height: 15px;
         width: 15px;
@@ -207,7 +216,9 @@
          opacity: 0.99;
 
          &:after {
-          content: "(On)";
+         }
+
+         &:before {
          }
 
          ~ .tip {
@@ -474,13 +485,6 @@
 
     .settings-discussions {
 
-    }
-
-    .settings-discussions-exceptions, .settings-problems-exceptions {
-
-      p, ul {
-        font-size: 15px;
-      }
     }
 
     // states
