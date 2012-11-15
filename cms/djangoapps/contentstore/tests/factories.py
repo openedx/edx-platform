@@ -6,12 +6,19 @@ from uuid import uuid4
 from xmodule.timeparse import stringify_time
 
 
+def XMODULE_COURSE_CREATION(class_to_create, **kwargs): 
+    return XModuleCourseFactory._create(class_to_create, **kwargs)
+
+def XMODULE_ITEM_CREATION(class_to_create, **kwargs):
+    return XModuleItemFactory._create(class_to_create, **kwargs)
+
 class XModuleCourseFactory(Factory):
     """
     Factory for XModule courses.
     """
 
     ABSTRACT_FACTORY = True
+    _creation_function = (XMODULE_COURSE_CREATION,)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -62,6 +69,7 @@ class XModuleItemFactory(Factory):
     """
 
     ABSTRACT_FACTORY = True
+    _creation_function = (XMODULE_ITEM_CREATION,)
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -74,6 +82,7 @@ class XModuleItemFactory(Factory):
 
         store = modulestore('direct')
 
+        # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = store.get_item(parent_location)
         dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 

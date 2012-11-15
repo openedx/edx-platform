@@ -3,3 +3,4 @@ coverage
 nosexcover
 pylint
 pep8
+factory_boy
