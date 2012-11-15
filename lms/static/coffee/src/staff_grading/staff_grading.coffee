@@ -1,11 +1,16 @@
 # wrap everything in a class in case we want to use inside xmodules later
 class StaffGrading
   constructor: ->
-    alert('hi!')
+    @submission_container = $('.submission-container')
+    @rubric_container = $('.rubric-container')
+    @submit_button = $('.submit-button')
+    @mock_backend = true
 
+    @load()
+
+    
   load: ->
     alert('loading')
 
 # for now, just create an instance and load it...
-grading = new StaffGrading
-$(document).ready(grading.load)
+$(document).ready(() -> new StaffGrading)
