@@ -3,11 +3,11 @@ import logging
 
 from lxml import etree
 
-from xmodule.mako_module import MakoModuleDescriptor
-from xmodule.xml_module import XmlDescriptor
-from xmodule.x_module import XModule
-from xmodule.progress import Progress
-from xmodule.exceptions import NotFoundError
+from .mako_module import MakoModuleDescriptor
+from .xml_module import XmlDescriptor
+from .xmodule import XModule
+from .progress import Progress
+from .exceptions import NotFoundError
 from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.common.lib.seq_module")

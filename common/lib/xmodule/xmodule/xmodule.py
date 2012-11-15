@@ -9,10 +9,10 @@ from pprint import pprint
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import Location
-from xmodule.timeparse import parse_time
+from .modulestore import Location
+from .timeparse import parse_time
 
-from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from .contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -133,7 +133,7 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
-class XModule(HTMLSnippet):
+class XModule(Plugin, HTMLSnippet):
     ''' Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -149,6 +149,8 @@ class XModule(HTMLSnippet):
     # the function can also be overridden if the icon class depends on the data
     # in the module
     icon_class = 'other'
+
+    entry_point = "xmodule.v2"
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):

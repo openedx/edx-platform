@@ -1,5 +1,5 @@
-from xmodule.x_module import (XModuleDescriptor, policy_key)
-from xmodule.modulestore import Location
+from .xmodule import (XModuleDescriptor, policy_key)
+from .modulestore import Location
 from lxml import etree
 import json
 import copy

@@ -1,6 +1,6 @@
-from xmodule.x_module import XModule
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.progress import Progress
+from .xmodule import XModule
+from .seq_module import SequenceDescriptor
+from .progress import Progress
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'

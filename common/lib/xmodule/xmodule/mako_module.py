@@ -1,4 +1,4 @@
-from x_module import XModuleDescriptor, DescriptorSystem
+from .xmodule import XModuleDescriptor, DescriptorSystem
 import logging
 
 

@@ -10,6 +10,8 @@ setup(
     },
     requires=[
         'capa',
+        # TODO: This isn't actually forcing an install, for some reason
+        'fs (>= 0.4.0)',
     ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
@@ -35,6 +37,9 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
+        ],
+        'xmodule.v2': [
+            'vertical = xmodule.vertical_module:VerticalModule',
         ]
     }
 )
