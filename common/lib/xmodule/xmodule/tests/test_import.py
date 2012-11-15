@@ -176,6 +176,33 @@ class ImportTestCase(unittest.TestCase):
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertFalse('graceperiod' in chapter_xml.attrib)
 
+    def test_is_pointer_tag(self):
+        """
+        Check that is_pointer_tag works properly.
+        """
+
+        yes = ["""<html url_name="blah"/>""",
+               """<html url_name="blah"></html>""",
+               """<html url_name="blah">    </html>""",
+               """<problem url_name="blah"/>""",
+               """<course org="HogwartsX" course="Mathemagics" url_name="3.14159"/>"""]
+
+        no = ["""<html url_name="blah" also="this"/>""",
+              """<html url_name="blah">some text</html>""",
+               """<problem url_name="blah"><sub>tree</sub></problem>""",
+               """<course org="HogwartsX" course="Mathemagics" url_name="3.14159">
+                     <chapter>3</chapter>
+                  </course>
+               """]
+
+        for xml_str in yes:
+            print "should be True for {0}".format(xml_str)
+            self.assertTrue(is_pointer_tag(etree.fromstring(xml_str)))
+
+        for xml_str in no:
+            print "should be False for {0}".format(xml_str)
+            self.assertFalse(is_pointer_tag(etree.fromstring(xml_str)))
+
     def test_metadata_inherit(self):
         """Make sure that metadata is inherited properly"""
 
@@ -311,3 +338,17 @@ class ImportTestCase(unittest.TestCase):
         system = self.get_system(False)
 
         self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)
+
+    def test_selfassessment_import(self):
+        '''
+        Check to see if definition_from_xml in self_assessment_module.py
+        works properly.  Pulls data from the self_assessment directory in the test data directory.
+        '''
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['self_assessment'])
+
+        sa_id = "edX/sa_test/2012_Fall"
+        location = Location(["i4x", "edX", "sa_test", "selfassessment", "SampleQuestion"])
+        sa_sample = modulestore.get_instance(sa_id, location)
+        #10 attempts is hard coded into SampleQuestion, which is the url_name of a selfassessment xml tag
+        self.assertEqual(sa_sample.metadata['attempts'], '10')

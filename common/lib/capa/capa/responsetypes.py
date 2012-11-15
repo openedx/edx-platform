@@ -81,7 +81,7 @@ class LoncapaResponse(object):
                          by __init__
 
       - check_hint_condition : check to see if the student's answers satisfy a particular
-                         condition for a hint to be displayed
+                               condition for a hint to be displayed
 
       - render_html          : render this Response as HTML (must return XHTML-compliant string)
       - __unicode__          : unicode representation of this Response
@@ -149,6 +149,7 @@ class LoncapaResponse(object):
             # for convenience
             self.answer_id = self.answer_ids[0]
 
+        # map input_id -> maxpoints
         self.maxpoints = dict()
         for inputfield in self.inputfields:
             # By default, each answerfield is worth 1 point
@@ -280,17 +281,14 @@ class LoncapaResponse(object):
         (correctness, npoints, msg) for each answer_id.
 
         Arguments:
-         - student_answers : dict of (answer_id,answer) where answer = student input (string)
-
-         - old_cmap        : previous CorrectMap (may be empty); useful for analyzing or
-                             recording history of responses
+         - student_answers : dict of (answer_id, answer) where answer = student input (string)
         '''
         pass
 
     @abc.abstractmethod
     def get_answers(self):
         '''
-        Return a dict of (answer_id,answer_text) for each answer for this question.
+        Return a dict of (answer_id, answer_text) for each answer for this question.
         '''
         pass
 

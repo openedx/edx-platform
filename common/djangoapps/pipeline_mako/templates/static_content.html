@@ -3,8 +3,7 @@ from staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 %>
 
-<%def name='url(file)'>
-<%
+<%def name='url(file)'><%
 try:
     url = staticfiles_storage.url(file)
 except:

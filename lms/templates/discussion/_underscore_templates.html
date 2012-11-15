@@ -1,3 +1,5 @@
+<%! from django_comment_client.permissions import has_permission %>
+
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
@@ -7,6 +9,7 @@
         <div class="post-status-closed bottom-post-status" style="display: none">
           This thread is closed.
         </div>
+        % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
         <form class="discussion-reply-new" data-id="${'<%- id %>'}">
             <h4>Post a response:</h4>
             <ul class="discussion-errors"></ul>
@@ -15,6 +18,7 @@
                 <a class="discussion-submit-post control-button" href="#">Submit</a>
             </div>
         </form>
+        % endif
     </article>
 </script>
 
@@ -75,6 +79,7 @@
     <div class="discussion-response"></div>
     <ol class="comments">
         <li class="new-comment response-local">
+            % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
                 <div class="comment-body" data-id="${'<%- wmdId %>'}"
@@ -83,6 +88,7 @@
                     <a class="discussion-submit-comment control-button" href="#">Submit</a>
                 </div>
             </form>
+            % endif
         </li>
     </ol>
 </script>

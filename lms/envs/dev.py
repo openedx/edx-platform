@@ -172,3 +172,8 @@ FILE_UPLOAD_HANDLERS = (
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+########################## PEARSON TESTING ###########################
+MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
+PEARSON_TEST_USER = "pearsontest"
+PEARSON_TEST_PASSWORD = "12345"
