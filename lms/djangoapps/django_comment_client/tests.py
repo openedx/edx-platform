@@ -19,7 +19,7 @@ class PermissionsTestCase(TestCase):
 
     def setUp(self):
 
-        self.course_id = "MITx/6.002x/2012_Fall"
+        self.course_id = "edX/toy/2012_Fall"
 
         self.moderator_role = Role.objects.get_or_create(name="Moderator", course_id=self.course_id)[0]
         self.student_role = Role.objects.get_or_create(name="Student", course_id=self.course_id)[0]

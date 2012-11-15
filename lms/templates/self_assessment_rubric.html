@@ -1,0 +1,15 @@
+<div class="assessment">
+    <div class="rubric">
+    <h3>Self-assess your answer with this rubric:</h3>
+    ${rubric}
+    </div>
+
+    % if not read_only:
+    <select name="assessment" class="assessment">
+        %for i in xrange(0,max_score+1):
+            <option value="${i}">${i}</option>
+        %endfor
+    </select>
+    % endif
+
+</div>

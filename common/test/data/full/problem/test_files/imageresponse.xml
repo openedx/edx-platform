@@ -1,0 +1,21 @@
+<problem>
+<text><p>
+Two skiers are on frictionless black diamond ski slopes.
+Hello</p></text>
+
+<imageresponse max="1" loncapaid="11">
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98)"/>
+<text>Click on the image where the top skier will stop momentarily if the top skier starts from rest.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(242,202)-(296,276)"/>
+<text>Click on the image where the lower skier will stop momentarily if the lower skier starts from rest.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98);(242,202)-(296,276)"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98);(242,202)-(296,276)"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98);(242,202)-(296,276)"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<hintgroup showoncorrect="no">
+<text><p>Use conservation of energy.</p></text>
+</hintgroup>
+</imageresponse>
+</problem>
