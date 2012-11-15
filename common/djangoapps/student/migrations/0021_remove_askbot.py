@@ -26,8 +26,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         "Kill the askbot"
-        for column in ASKBOT_AUTH_USER_COLUMNS:
-            db.delete_column('auth_user', column)
+        # For MySQL, we're batching the alters together for performance reasons
+        if db.backend_name == 'mysql':
+            drops = ["drop `{0}`".format(col) for col in ASKBOT_AUTH_USER_COLUMNS]
+            statement = "alter table `auth_user` {0};".format(", ".join(drops))
+            db.execute(statement)
+        else:
+            for column in ASKBOT_AUTH_USER_COLUMNS:
+                db.delete_column('auth_user', column)            
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration: there's no going back to Askbot.")
@@ -95,6 +101,34 @@ class Migration(SchemaMigration):
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'student.testcenteruser': {
+            'Meta': {'object_name': 'TestCenterUser'},
+            'address_1': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
+            'address_2': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
+            'address_3': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
+            'candidate_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
+            'city': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
+            'client_candidate_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'company_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '3', 'db_index': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'extension': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '8', 'blank': 'True'}),
+            'fax': ('django.db.models.fields.CharField', [], {'max_length': '35', 'blank': 'True'}),
+            'fax_country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'blank': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
+            'phone': ('django.db.models.fields.CharField', [], {'max_length': '35'}),
+            'phone_country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'db_index': 'True'}),
+            'postal_code': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '16', 'blank': 'True'}),
+            'salutation': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
+            'state': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '20', 'blank': 'True'}),
+            'suffix': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['auth.User']", 'unique': 'True'}),
+            'user_updated_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'})
         },
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
