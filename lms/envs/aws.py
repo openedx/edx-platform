@@ -19,8 +19,7 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
-# Disable askbot, enable Berkeley forums
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
+# Enable Berkeley forums
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that
@@ -76,9 +75,6 @@ AWS_STORAGE_BUCKET_NAME = 'edxuploads'
 DATABASES = AUTH_TOKENS['DATABASES']
 
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
-
-if 'COURSE_ID' in ENV_TOKENS:
-    ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
 
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = AUTH_TOKENS.get("PEARSON_TEST_PASSWORD")

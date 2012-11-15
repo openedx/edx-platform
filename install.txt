@@ -9,7 +9,6 @@ There is also a script "create-dev-env.sh" that automates these steps.
     mkdir ~/mitx_all
     cd ~/mitx_all
     git clone git@github.com:MITx/mitx.git
-    git clone git@github.com:MITx/askbot-devel 
     hg clone ssh://hg-content@gp.mitx.mit.edu/data 
 
 2) Install OSX dependencies (Mac users only)
@@ -49,8 +48,6 @@ There is also a script "create-dev-env.sh" that automates these steps.
     
     source ~/mitx_all/python/bin/activate
     cd ~/mitx_all
-    pip install -r askbot-devel/askbot_requirements.txt 
-    pip install -r askbot-devel/askbot_requirements_dev.txt 
     pip install -r mitx/pre-requirements.txt 
     pip install -r mitx/requirements.txt 
 
