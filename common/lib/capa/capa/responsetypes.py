@@ -1889,6 +1889,18 @@ class OpenEndedResponse(LoncapaResponse):
         else:
             self.answer = "No answer given."
 
+        #Parse max_score
+        top_score = oeparam.find('max_score')
+        if top_score is not None:
+            try:
+                self.max_score= int(top_score.text)
+            except:
+                self.top_score=1
+        else:
+            self.max_score = 1
+
+        log.debug(self.max_score)
+
     def get_score(self, student_answers):
 
         try:
@@ -1925,7 +1937,11 @@ class OpenEndedResponse(LoncapaResponse):
                         }
 
         #Update contents with student response and student info
-        contents.update({'student_info': json.dumps(student_info), 'student_response': submission})
+        contents.update({
+            'student_info': json.dumps(student_info),
+            'student_response': submission,
+            'max_score' : self.max_score
+            })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
         (error, msg) = qinterface.send_to_queue(header=xheader,
