@@ -22,7 +22,7 @@ class StaffGradingBackend
       response =
         success: true
         submission: 'submission! ' + @mock_cnt
-        rubric: 'A rubric!' + @mock_cnt
+        rubric: 'A rubric! ' + @mock_cnt
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
@@ -68,7 +68,8 @@ class StaffGrading
     @rubric_container = $('.rubric-container')
     @submission_wrapper = $('.submission-wrapper')
     @rubric_wrapper = $('.rubric-wrapper')
-    @button = $('.submit-button')
+    @feedback_area = $('.feedback-area')
+    @submit_button = $('.submit-button')        
     
     # model state
     @state = state_no_data
@@ -77,11 +78,12 @@ class StaffGrading
     @error_msg = ''
     @message = ''
 
-    @feedback = null
     @score = null
 
     # action handlers
-    @button.click @clicked
+    @submit_button.click @submit
+    @correct_button.click () => @score = 1
+    @incorrect_button.click () => @score = 0
 
     # render intial state
     @render_view()
@@ -91,7 +93,7 @@ class StaffGrading
 
 
   set_button_text: (text) ->
-    @button.prop('value', text)
+    @submit_button.prop('value', text)
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -112,7 +114,7 @@ class StaffGrading
     @backend.post('get_next', {}, @ajax_callback)
 
   submit_and_get_next: () ->
-    data = {score: '1', feedback: 'Great!'}
+    data = {score: @score, feedback: @feedback_area.val()}
     
     @backend.post('save_grade', data, @ajax_callback)
 
@@ -123,6 +125,8 @@ class StaffGrading
   data_loaded: (submission, rubric) ->
     @submission = submission
     @rubric = rubric
+    @feedback_area.val('')
+    @score = null
     @state = state_grading
 
   no_more: () ->
@@ -158,7 +162,7 @@ class StaffGrading
     @rubric_wrapper.toggle(show_grading_elements)
 
 
-  clicked: (event) =>
+  submit: (event) =>
     event.preventDefault()
     
     if @state == state_error
