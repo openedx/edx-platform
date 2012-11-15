@@ -1,0 +1,47 @@
+@mixin blue-button {
+  display: block;
+  height: 35px;
+  padding: 0 15px;
+  border-radius: 3px;
+  border: 1px solid #2d81ad;
+  @include linear-gradient(top, #6dccf1, #38a8e5);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover {
+    border-color: #297095;
+    @include linear-gradient(top, #4fbbe4, #2090d0);
+  }
+}
+
+.collaborate_module {
+	float: right;
+	
+	
+	.find_collaborator {
+	    @include blue-button;
+	    font-size: 13px;
+		z-index: 25; // To make the collaborate-status show up below
+		position: relative; // To make the z-index work
+	}
+	
+	.collaborate-status {
+		//Displays below the .find_collaborator, like a little dropdown menu
+	    font-size: 12px;
+		
+		display: block;
+		height: 22px;
+	    border-radius: 3px;
+		background-color: #10242E;		
+		color: #fff;
+		margin: -10px 10px;
+	    padding: 12px 15px 0px;
+		z-index: 20;
+		position: relative;
+		
+	}
+}
