@@ -89,8 +89,22 @@ def template_jasmine_runner(lib)
     phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
     common_js_root = File.expand_path("common/static/js")
     common_coffee_root = File.expand_path("common/static/coffee/src")
-    js_specs = Dir["#{lib}/**/js/spec/**/*.js"].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
-    js_source = Dir["#{lib}/**/*.js"].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)} - js_specs
+
+    # Get arrays of spec and source files, ordered by how deep they are nested below the library
+    # (and then alphabetically) and expanded from a relative to an absolute path
+    spec_glob = File.join("#{lib}", "**", "spec", "**", "*.js")
+    src_glob = File.join("#{lib}", "**", "src", "**", "*.js")
+    js_specs = Dir[spec_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
+    js_source = Dir[src_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
+
+    # helper file
+    helper_coffee = "#{REPO_ROOT}/lms/static/coffee/spec/helper.coffee"
+    if File.exists?(helper_coffee)
+        sh("coffee -c #{helper_coffee}")
+        # Add the compiled helper to the beginning of the specs array
+        js_specs.unshift("#{REPO_ROOT}/lms/static/coffee/spec/helper.js")
+    end
+
     template = ERB.new(File.read("#{lib}/jasmine_test_runner.html.erb"))
     template_output = "#{lib}/jasmine_test_runner.html"
     File.open(template_output, 'w') do |f|
