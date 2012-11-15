@@ -2001,7 +2001,6 @@ class OpenEndedResponse(LoncapaResponse):
             valid_score_msg: Flag indicating valid score_msg format (Boolean)
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
-            msg:             Message from grader to display to student (string)
         """
         fail = (False, False, 0, '')
         try:
@@ -2014,26 +2013,23 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['correct', 'score', 'msg', 'feedback']:
+        for tag in ['correct', 'score','feedback']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
-                          " tags: 'correct', 'score', 'msg', 'feedback")
+                          " tags: 'correct', 'score', 'feedback")
                 return fail
 
         # Next, we need to check that the contents of the external grader message
         #   is safe for the LMS.
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
-        msg = score_result['msg']
         feedback = score_result['feedback']
 
         try:
-            etree.fromstring(msg)
             etree.fromstring(feedback)
         except etree.XMLSyntaxError as err:
             log.error("Unable to parse external grader message as valid"
-                      " Msg: score_msg['msg']=%r "
-                      "\n Feedback : score_result['feedback'] = %r", msg, feedback)
+                      "\n Feedback : score_result['feedback'] = %r",feedback)
             return fail
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
