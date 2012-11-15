@@ -14,7 +14,7 @@ class VerticalModule(XModule):
     @register_view('student_view')
     def get_html(self):
         return render_template('vert_module.html', {
-            'items': [child.render() for child in self.children]
+            'items': [self.render_child(child) for child in self.children]
         })
 
     def get_progress(self):
