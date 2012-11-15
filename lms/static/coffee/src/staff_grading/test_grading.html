@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
 <title></title>
- <script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript" src="staff_grading.js"></script>
 </head>
 
@@ -9,11 +9,23 @@
 <div class="staff-grading" data-ajax_url="/some_url/">
 <h1>Staff grading</h1>
 
-<div class="error-container"></div>
-  
-<div class="submission-container"></div>
+<div class="error-container">
+</div>
 
-<div class="rubric-container"></div>
+<div class="message-container">
+</div>
+
+<section class="submission-wrapper">
+<h3>Submission</h3>
+<div class="submission-container">
+</div>
+</section>
+
+<section class="rubric-wrapper">
+<h3>Rubric</h3>
+<div class="rubric-container">
+</div>
+</section>
 
 <div class="submission">
 <input type="button" value="Submit" class="submit-button" name="show"/>

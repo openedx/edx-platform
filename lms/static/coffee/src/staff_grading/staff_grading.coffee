@@ -61,11 +61,17 @@ class StaffGrading
     @backend = backend
 
     @error_container = $('.error-container')
+    @message_container = $('.message-container')
     @submission_container = $('.submission-container')
     @rubric_container = $('.rubric-container')
+    @submission_wrapper = $('.submission-wrapper')
+    @rubric_wrapper = $('.rubric-wrapper')
     @button = $('.submit-button')
     @button.click @clicked
     @state = state_no_data
+
+    @submission_wrapper.hide()
+    @rubric_wrapper.hide()
 
     @get_next_submission()
 
@@ -102,26 +108,35 @@ class StaffGrading
     @update()
 
   no_more: () ->
-    @submission_container.html('')
-    @rubric_container.html('')
     @state = state_no_data
     @update()
 
   update: () ->
-    # make button state and actions right
+    # make button and div state match the state.  Idempotent.
     if @state == state_error
       @set_button_text('Try loading again')
+
     else if @state == state_grading
+      @submission_wrapper.show()
+      @rubric_wrapper.show()
       @set_button_text('Submit')
+
     else if @state == state_no_data
+      @submission_wrapper.hide()
+      @rubric_wrapper.hide()
+      @message_container.html('Nothing to grade')
       @set_button_text('Re-check for submissions')
+
     else
       @error('System got into invalid state ' + @state)
 
   clicked: (event) =>
     event.preventDefault()
+    # always clear out errors and messages on transition...
+    @message_container.html('')
+    @error_container.html('')
+
     if @state == state_error
-      @error_container.html('')
       @get_next_submission()
     else if @state == state_grading
       @submit_and_get_next()
@@ -130,8 +145,6 @@ class StaffGrading
     else
       @error('System got into invalid state ' + @state)
   
-
-
 
 # for now, just create an instance and load it...
 mock_backend = true
