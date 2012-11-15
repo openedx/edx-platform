@@ -12,6 +12,7 @@ setup(
         'capa',
         # TODO: This isn't actually forcing an install, for some reason
         'fs (>= 0.4.0)',
+        'mako',
     ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points

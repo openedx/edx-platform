@@ -2,6 +2,7 @@ import logging
 import pkg_resources
 import yaml
 import os
+import inspect
 
 from functools import partial
 from lxml import etree
@@ -133,6 +134,12 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
+def register_view(view_name):
+    def wrapper(fn):
+        setattr(fn, 'view_name', view_name)
+        return fn
+    return wrapper
+
 class XModule(Plugin, HTMLSnippet):
     ''' Implements a generic learning module.
 
@@ -180,7 +187,13 @@ class XModule(Plugin, HTMLSnippet):
         self.student_state = student_state
 
     def render(self, view_name):
-        return "RENDER OF %s" % view_name
+        for method_name, method_fn in inspect.getmembers(self, lambda m: inspect.ismethod(m)):
+            if getattr(method_fn, 'view_name', None) is not None:
+                return method_fn()
+
+    @property
+    def children(self):
+        return self.runtime.children
 
     @property
     def display_name(self):

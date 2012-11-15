@@ -1,6 +1,7 @@
-from .xmodule import XModule
+from .xmodule import XModule, register_view
 from .seq_module import SequenceDescriptor
 from .progress import Progress
+from .module_resources import render_template
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -10,12 +11,10 @@ class_priority = ['video', 'problem']
 class VerticalModule(XModule):
     ''' Layout module for laying out submodules vertically.'''
 
+    @register_view('student_view')
     def get_html(self):
-        if self.contents is None:
-            self.contents = [child.get_html() for child in self.get_display_items()]
-
-        return self.system.render_template('vert_module.html', {
-            'items': self.contents
+        return render_template('vert_module.html', {
+            'items': [child.render() for child in self.children]
         })
 
     def get_progress(self):
