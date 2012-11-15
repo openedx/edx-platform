@@ -60,11 +60,7 @@ function initHTMLEditor($editor, $prev) {
     // Example content CSS (should be your site CSS)
     content_css : "/static/css/html-editor.css",
     width: '100%',
-    height: '400px',
-    setup : function(ed) {
-      ed.onChange.add(onHTMLEditorUpdate);
-      ed.onKeyUp.add(onHTMLEditorUpdate);
-    }
+    height: '400px'
   });
 
 }

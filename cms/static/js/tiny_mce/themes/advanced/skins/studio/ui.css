@@ -63,16 +63,18 @@
 
 /* ListBox */
 .studioSkin .mceListBox {
-  background: #fff;
+  background: -webkit-linear-gradient(top, #dbe5ef, #cfdce9);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   padding: 3px;
   margin-right: 4px;
 }
+.studioSkin .mceListBox:hover {
+  background: -webkit-linear-gradient(top, #e6eff8, #d9e8f6);
+}
 .studioSkin .mceListBox, .studioSkin .mceListBox a {display:block}
 .studioSkin .mceListBox .mceText {padding-left:4px; width:70px; text-align:left; font-size:11px; height:20px; line-height:20px; overflow:hidden}
 .studioSkin .mceListBox .mceOpen {width:9px; height:20px; background:url(../../img/studio-icons.png) -741px 0; margin-right:2px;}
-.studioSkin table.mceListBoxEnabled:hover .mceText, .studioSkin .mceListBoxHover .mceText, .studioSkin .mceListBoxSelected .mceText {background:#FFF}
-.studioSkin table.mceListBoxEnabled:hover .mceOpen, .studioSkin .mceListBoxHover .mceOpen, .studioSkin .mceListBoxSelected .mceOpen {background-color: rgba(255, 255, 255, .5);}
 .studioSkin .mceListBoxDisabled a.mceText {color:gray; background-color:transparent;}
 .studioSkin .mceListBoxMenu {overflow:auto; overflow-x:hidden}
 .studioSkin .mceOldBoxModel .mceListBox .mceText {height:22px}
