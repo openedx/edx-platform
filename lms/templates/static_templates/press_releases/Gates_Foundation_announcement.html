@@ -1,0 +1,77 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>TITLE</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>TITLE</h1>
+    <hr class="horizontal-divider">
+      <article>
+        <h2>SUBTITLE</h2>
+
+        <p><strong>LOCATION &ndash; November 12, 2012</strong> &mdash; THE_CONTENT </p>
+
+        <h2>About edX</h2>
+
+        <p>edX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions the founders are creating a new online-learning experience. Anant Agarwal, former Director of MIT's Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning—both on-campus and worldwide.  edX is based in Cambridge, Massachusetts and is governed by MIT and Harvard.</p>
+
+        <h2>About Harvard University</h2>
+
+        <p>Harvard University is devoted to excellence in teaching, learning and research, and to developing leaders in many disciplines who make a difference globally.  Harvard Faculty are engaged with teaching and research to push the boundaries of human knowledge. The University has twelve degree-granting Schools in addition to the Radcliffe Institute for Advanced Study.</p>
+
+        <p>Established in 1636, Harvard is the oldest institution of higher education in the United States. The University, which is based in Cambridge and Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, including undergraduate, graduate and professional students. Harvard has more than 360,000 alumni around the world.</p>
+
+        <h2>About MIT</h2>
+        <p>The Massachusetts Institute of Technology — a coeducational, privately endowed research university founded in 1861 — is dedicated to advancing knowledge and educating students in science, technology and other areas of scholarship that will best serve the nation and the world in the 21st century. The Institute has close to 1,000 faculty and 10,000 undergraduate and graduate students. It is organized into five Schools: Architecture and Urban Planning; Engineering; Humanities, Arts, and Social Sciences; Sloan School of Management; and Science.</p>
+
+        <p>MIT's commitment to innovation has led to a host of scientific breakthroughs and technological advances. Achievements of the Institute's faculty and graduates have included the first chemical synthesis of penicillin and vitamin A, the development of inertial guidance systems, modern technologies for artificial limbs and the magnetic core memory that made possible the development of digital computers. Seventy-eight alumni, faculty, researchers and staff have won Nobel Prizes.</p>
+
+        <p>Current areas of research and education include neuroscience and the study of the brain and mind, bioengineering, cancer, energy, the environment and sustainable development, information sciences and technology, new media, financial technology and entrepreneurship.</p>
+
+        <h2>About the University of California, Berkeley</h2>
+
+        <p>The University of California, Berkeley is the world's premier public university with a mission to excel in teaching, research and public service. This longstanding mission has led to the university's distinguished record of Nobel-level scholarship, constant innovation, a concern for the betterment of our world, and consistently high rankings of its schools and departments. The campus offers superior, high value education for extraordinarily talented students from all walks of life; operational excellence and a commitment to the competitiveness and prosperity of California and the nation. </p>
+
+        <p>The University of California was chartered in 1868 and its flagship campus in Berkeley, on San Francisco Bay, was envisioned as a &ldquo;City of Learning.&rdquo; Today, there are more than 1,500 fulltime and 500 part-time faculty members dispersed among more than 130 academic departments and more than 80 interdisciplinary research units. Twenty-two Nobel Prizes have been garnered by faculty and 28 by UC Berkeley alumni. There are 9 Nobel Laureates, 32 MacArthur Fellows, and 4 Pulitzer Prize winners among the current faculty.</p>
+
+        <h2>About The University of Texas System</h2>
+
+        <p>Educating students, providing care for patients, conducting groundbreaking research and serving the needs of Texans and the nation for more than 130 years, The University of Texas System is one of the largest public university systems in the United States, with nine academic universities and six health science centers. Student enrollment exceeded 215,000 in the 2011 academic year. The UT System confers more than one-third of the state's undergraduate degrees and educates nearly three-fourths of the state's health care professionals annually. The UT System has an annual operating budget of $13.1 billion (FY 2012) including $2.3 billion in sponsored programs funded by federal, state, local and private sources. With roughly 87,000 employees, the UT System is one of the largest employers in the state. www.utsystem.edu</p>
+
+      <section class="contact">
+        <p><strong>edX Contact: </strong>Dan O’Connell</p>
+        <p>oconnell@edx.org</p>
+        <p>617-480-6585</p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">11 - 12 - 2012</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=The+University+of+Texas+System+joins+Harvard,+MIT+and+UC+Berkeley+in+not-for-profit+online+learning+collaborative:+http://www.edx.org/press/gates-foundation-announcement" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=The%20University%20of%20Texas%20System%20joins%20Harvard,%20MIT%20and%20UC%20Berkeley%20in%20not-for-profit%20online%20learning%20collaborative.…http://edx.org/press/gates-foundation-announcement" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/gates-foundation-announcement" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+
+      </section>
+    </article>
+  </section>
+</section>
