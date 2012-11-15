@@ -152,64 +152,32 @@ class XModule(Plugin, HTMLSnippet):
 
     entry_point = "xmodule.v2"
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
+    def __init__(self, runtime, content, course_settings, user_preferences, student_state, *args, **kwargs):
         '''
         Construct a new xmodule
 
-        system: A ModuleSystem allowing access to external resources
+        runtime: A ModuleSystem allowing access to external resources
 
-        location: Something Location-like that identifies this xmodule
+        content: A dictionary containing the data that the content author
+            created to define this module instance
 
-        definition: A dictionary containing 'data' and 'children'. Both are
-        optional
+        course_settings: A dictionary containing the data that describes how the module
+            should operate
 
-            'data': is JSON-like (string, dictionary, list, bool, or None,
-                optionally nested).
+        user_preferences: A dictionary containing the data that describes the
+            global preferences for this user about this module type
 
-                This defines all of the data necessary for a problem to display
-                that is intrinsic to the problem.  It should not include any
-                data that would vary between two courses using the same problem
-                (due dates, grading policy, randomization, etc.)
-
-            'children': is a list of Location-like values for child modules that
-                this module depends on
-
-        descriptor: the XModuleDescriptor that this module is an instance of.
-            TODO (vshnayder): remove the definition parameter and location--they
-            can come from the descriptor.
-
-        instance_state: A string of serialized json that contains the state of
-                this module for current student accessing the system, or None if
-                no state has been saved
-
-        shared_state: A string of serialized json that contains the state that
-            is shared between this module and any modules of the same type with
-            the same shared_state_key. This state is only shared per-student,
-            not across different students
+        student_state: A dictionary containing the data that a student has
+            entered for this module
 
         kwargs: Optional arguments. Subclasses should always accept kwargs and
             pass them to the parent class constructor.
-
-            Current known uses of kwargs:
-
-                metadata: SCAFFOLDING - This dictionary will be split into
-                    several different types of metadata in the future (course
-                    policy, modification history, etc).  A dictionary containing
-                    data that specifies information that is particular to a
-                    problem in the context of a course
         '''
-        self.system = system
-        self.location = Location(location)
-        self.definition = definition
-        self.descriptor = descriptor
-        self.instance_state = instance_state
-        self.shared_state = shared_state
-        self.id = self.location.url()
-        self.url_name = self.location.name
-        self.category = self.location.category
-        self.metadata = kwargs.get('metadata', {})
-        self._loaded_children = None
+        self.runtime = runtime
+        self.content = content
+        self.course_settings = course_settings
+        self.user_preferences = user_preferences
+        self.student_state = student_state
 
     @property
     def display_name(self):
@@ -219,9 +187,6 @@ class XModule(Plugin, HTMLSnippet):
         '''
         return self.metadata.get('display_name',
                                  self.url_name.replace('_', ' '))
-
-    def __unicode__(self):
-        return '<x_module(id={0})>'.format(self.id)
 
     def get_children(self):
         '''
