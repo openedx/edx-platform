@@ -41,7 +41,7 @@
   }
 
   h2 {
-    margin: 30px 40px;
+    margin: 30px 0;
     color: #646464;
     font-size: 19px;
     font-weight: 300;
@@ -226,6 +226,7 @@
   }
 
   .editor {
+    position: relative;
     background: $blue;
     padding: 20px;
 

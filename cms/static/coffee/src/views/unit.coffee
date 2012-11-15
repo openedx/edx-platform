@@ -115,7 +115,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$componentItem.append($componentActions)
     @$componentItem.hide()
     @$newComponentItem.before(@$componentItem)
-    @$componentItem.slideDown(200)
+    @$componentItem.show()
     $modalCover.fadeIn(200)
     $modalCover.bind('click', @closeEditor)
 
