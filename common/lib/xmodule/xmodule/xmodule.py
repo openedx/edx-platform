@@ -179,6 +179,9 @@ class XModule(Plugin, HTMLSnippet):
         self.user_preferences = user_preferences
         self.student_state = student_state
 
+    def render(self, view_name):
+        return "RENDER OF %s" % view_name
+
     @property
     def display_name(self):
         '''
