@@ -125,7 +125,7 @@ def get_logger_config(log_dir,
                 'level': 'DEBUG',
                 'class': 'logging.handlers.HTTPHandler',
                 'host':'127.0.0.1:14141', 
-                'url':'/logger',
+                'url':'/an_evt',
             }
         })
     else:
