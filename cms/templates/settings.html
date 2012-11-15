@@ -26,6 +26,7 @@
       $gradeBar = $('.grade-bar');
       gradeThresholds = [100, 80, 70];
       $('.settings-page-menu a').bind('click', showSettingsTab);
+      $('.settings-extra header').bind('click', showSettingsExtras);
       $body.on('mousedown', '.drag-bar', startDragBar);
       $('.new-grade-button').bind('click', addNewGrade);
       $body.on('click', '.remove-button', removeGrade);
@@ -50,6 +51,12 @@
       $('.settings-' + $(this).attr('data-section')).show();
       $('.settings-page-menu .is-shown').removeClass('is-shown');
       $(e.target).addClass('is-shown');
+    }
+
+    function showSettingsExtras(e) {
+      e.preventDefault();
+      $(this).toggleClass('active');
+      $(this).siblings.toggleClass('is-shown');
     }
 
     function startDragBar(e) {
@@ -115,21 +122,21 @@
                 <span class="detail">The nuts and bolts of your course</span>
               </header>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-name-input">Course Name:</label>
                 <div class="field">
                   <input type="text" class="long" id="course-name-input">
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-organization-input">Organization:</label>
                 <div class="field">
                   <input type="text" class="long" id="course-organization-input">
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-number-input">Course Number:</label>
                 <div class="field">
                   <div class="input">
@@ -138,7 +145,7 @@
                   </div>
                 </div>
               </div>
-            </section><!-- settings-details-basic -->
+            </section><!-- .settings-details-basic -->
 
             <hr class="divide" />
 
@@ -148,7 +155,7 @@
                 <span class="detail">Important steps and segments of your your course</span>
               </header>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-start-date-input">Course Start Date:</label>
                 <div class="field">
                   <div class="input">
@@ -158,7 +165,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-end-date-input">Course End Date:</label>
                 <div class="field">
                   <div class="input">
@@ -168,7 +175,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <h4 class="label">Milestones:</h4>
 
                 <div class="field enum">
@@ -206,7 +213,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-syllabus-input">Course Syllabus</label>
                 <div class="field">
                   <div class="input input-existing">
@@ -237,7 +244,7 @@
                 <span class="detail">Information for perspective students</span>
               </header>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-overview">Course Overview:</label>
                 <div class="field">
                   <textarea class="long tall" input="course-overview"></textarea>
@@ -245,7 +252,7 @@
                 </div>      
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-shortdescription">Course Statement:</label>
                 <div class="field">
                   <textarea class="long" id="course-shortdescription"></textarea>
@@ -253,7 +260,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-introduction-video">Introduction Video:</label>
                 <div class="field">
                   <div class="input input-existing">
@@ -285,7 +292,7 @@
                 <span class="detail">Expectations of the students taking this course</span>
               </header>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-requirements">Requirements:</label>
                 <div class="field">
                   <textarea class="long tall" id="course-requirements"></textarea>  
@@ -293,7 +300,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <label for="course-effort">Hours of Effort per Week:</label>
                 <div class="field">
                   <input type="text" class="short" id="course-effort">
@@ -301,7 +308,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <h4 class="label">Textbooks:</h4>
 
                 <div class="field enum">
@@ -340,7 +347,7 @@
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row row-col2">
                 <h4 class="label">Prerequisites:</h4>
 
                 <div class="field enum">
@@ -387,7 +394,7 @@
                 <span class="detail">Other helpful information about the course</span>
               </header>
 
-              <div class="row">
+              <div class="row row-col2">
                 <h4 class="label">FAQs:</h4>
 
                 <div class="field enum">
@@ -441,21 +448,21 @@
               <div class="field enum">
                 <ul class="input-list course-faculty-list">
                   <li class="input input-existing multi course-faculty-list-item">
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-firstname-input">Faculty First Name:</label>
                       <div class="field">
                         <input type="text" class="long" id="course-faculty-firstname-input">
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-lastname-input">Faculty Last Name:</label>
                       <div class="field">
                         <input type="text" class="long" id="course-faculty-lastname-input">
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-photo-input">Faculty Photo</label>
                       <div class="field">
                         <div class="input">
@@ -478,7 +485,7 @@
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-bio-input">Faculty Bio:</label>
                       <div class="field">
                         <textarea class="long tall" id="course-faculty-bio-input"></textarea>
@@ -490,21 +497,21 @@
                   </li>
 
                   <li class="input multi course-faculty-list-item">
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-firstname-input">Faculty First Name:</label>
                       <div class="field">
                         <input type="text" class="long" id="course-faculty-firstname-input">
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-lastname-input">Faculty Last Name:</label>
                       <div class="field">
                         <input type="text" class="long" id="course-faculty-lastname-input">
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-photo-input">Faculty Photo</label>
                       <div class="field">
                         <div class="input">
@@ -527,7 +534,7 @@
                       </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-col2">
                       <label for="course-faculty-bio-input">Faculty Bio:</label>
                       <div class="field">
                         <textarea class="long tall" id="course-faculty-bio-input"></textarea>
@@ -553,11 +560,312 @@
           <section class="settings-problems">
             <h2 class="title">Problems</h2>
 
+            <section class="settings-problems-general">
+              <header>
+                <h3>General Settings</h3>
+                <span class="detail">Course-wide settings for all problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-showanswer" id="problems-general-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-general-showanswer"></div>
+                    <label for="problems-general-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-showanswer" id="problems-general-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-general-showanswer"></div>
+                    <label for="problems-general-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-general-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-general-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-general -->
+
+            <section class="settings-problems-lessonexercises settings-extras">
+              <header>
+                <h3>Lesson Exercises</h3>
+                <span class="detail">In-lesson question &amp; problem specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-showanswer"></div>
+                    <label for="problems-lessonexercises-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-showanswer"></div>
+                    <label for="problems-lessonexercises-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-lessonexercises-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-lessonexercises-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-lessonexercises -->
+
+            <section class="settings-problems-labs settings-extras">
+              <header>
+                <h3>Labs</h3>
+                <span class="detail">Exploratory assignment-specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-showanswer" id="problems-labs-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-showanswer"></div>
+                    <label for="problems-labs-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-showanswer" id="problems-labs-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-showanswer"></div>
+                    <label for="problems-labs-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-labs-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-labs-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-labs -->
+
+            <section class="settings-problems-exams settings-extras">
+              <header>
+                <h3>Exams</h3>
+                <span class="detail">Mid-term and final exam-specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-always" value="Aways">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-showanswer" id="problems-exams-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-showanswer"></div>
+                    <label for="problems-exams-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-showanswer" id="problems-exams-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-showanswer"></div>
+                    <label for="problems-exams-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-exams-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-exams-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-exams -->
+
+            <section class="settings-problems-exceptions">
+
+            </section><!-- .settings-problems-exceptions -->
           </section><!-- .settings-problems -->
 
           <section class="settings-discussions">
             <h2 class="title">Discussions</h2>
             
+            <section class="settings-discussions-general">
+              <header>
+                <h3>General Settings</h3>
+                <span class="detail">Course-wide settings for online discussion</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Anonymous Discussions:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-anonymous" id="discussions-anonymous-allow" value="Allow">
+                    <div class="ui-status-indic ui-status-indic-discussions-anonymous-allow"></div>
+                    <label for="discussions-anonymous-allow">Allow</label>
+                    <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
+                  </div>
+
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="discussions-anonymous" id="discussions-anonymous-dontallow" value="Do Not Allow">
+                    <div class="ui-status-indic ui-status-indic-discussions-anonymous-dontallow"></div>
+                    <label for="discussions-anonymous-dontallow">Do not allow</label>
+                    <span class="tip tip-stacked"><strong>Posting anonymously is not allowed</strong>. Any previous anonymous posts <strong>will be reverted to non-anonymous</strong></span>
+                  </div>
+              </div>
+            </section><!-- .settings-discussions-general -->
+
+            <section class="settings-discussions-exceptions">
+              <header>
+                <h3>Discussion Settings Elsewhere</h3>
+                <span class="detail">More specific settings for particular discussions</span>
+              </header>
+
+              <p>The following discussions have had their settings specified elsewhere and will follow those rules.</p>
+
+              <ul class="settings-discussions-exceptions-list">
+                Discussion
+              </ul>
+            </section><!-- .settings-discussions-exceptions -->
           </section><!-- .settings-discussions -->
         </div>
       </article>

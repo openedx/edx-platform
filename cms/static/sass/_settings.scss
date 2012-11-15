@@ -152,6 +152,74 @@
       font-size: 13px;
     }
 
+    .field.ui-status {
+
+      > .input {
+        display: block !important;
+        margin-bottom: 15px;
+      }
+
+      .ui-status-input-checkbox, .ui-status-input-radio {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+      label {
+        cursor: pointer;
+      }
+
+      .ui-status-input-checkbox ~ label, .ui-status-input-radio ~ label {
+        display: inline-block;
+        margin: 0 0 0 5px;
+        color: $offBlack;
+        opacity: 0.50;
+        cursor: pointer;
+        @include transition(opacity 0.25s ease-in-out);
+
+        &:after {
+         content: "(Off)";
+         display: inline-block;
+         margin-left: 10px;
+        }
+
+        ~ .tip {
+         margin-top: 0;
+         @include transition(color 0.25s ease-in-out);
+        }
+      }
+
+      .ui-status-indic {
+        position: relative;
+        top: 2px;
+        display: inline-block;
+        height: 15px;
+        width: 15px;
+        border: 2px;
+        background: $offBlack;
+        opacity: 0.50;
+        @include border-radius(50px);
+        @include box-sizing(border-box);
+        @include transition(opacity 0.25s ease-in-out);
+      }
+
+      .ui-status-input-checkbox:checked ~ label, .ui-status-input-radio:checked ~ label {
+         opacity: 0.99;
+
+         &:after {
+          content: "(On)";
+         }
+
+         ~ .tip {
+          color: $darkGrey;
+         }
+      }
+
+      .ui-status-input-checkbox:checked ~ .ui-status-indic, .ui-status-input-radio:checked ~ .ui-status-indic {
+        opacity: 0.99;
+      }
+    }
+
     .tip {
       color: $mediumGrey;
       font-size: 13px;
@@ -174,7 +242,6 @@
       > label, .label {
         display: inline-block;
         vertical-align: top;
-        width: 200px;
       }
 
       // tips
@@ -191,7 +258,7 @@
       // structural field, not semantic fields per se
       .field {
         display: inline-block;
-        width: 400px;
+        width: 100%;
 
         > input, > textarea, .input {
           display: inline-block;
@@ -248,7 +315,6 @@
             .group {
               float: left;
               margin-right: 20px;
-              width: 170px;
 
               &:nth-child(2) {
                 margin-right: 0;
@@ -281,6 +347,26 @@
 
         // enumerated inputs
         &.enum {
+        }
+      }
+      
+      // layout - aligned label/field pairs 
+      &.row-col2 {
+
+        > label, .label {
+          width: 200px;
+        }
+
+        .field {
+          width: 400px;
+        }
+
+        &.multi-inline {
+          @include clearfix;
+
+          .group {
+            width: 170px;
+          }  
         }
       }
     }
@@ -325,7 +411,6 @@
         background: tint($blue, 80%);
       }
     }
-
 
     // specific sections
     .settings-details {
@@ -379,10 +464,23 @@
 
     .settings-problems {
 
+      > section {
+
+        &.is-shown {
+          display: block;
+        }
+      }
     }
 
     .settings-discussions {
-      
+
+    }
+
+    .settings-discussions-exceptions, .settings-problems-exceptions {
+
+      p, ul {
+        font-size: 15px;
+      }
     }
 
     // states
@@ -390,6 +488,27 @@
       color: $blue;
       @include transition(color 1s ease-in-out);
     }
+
+    // extras/abbreviations
+    // .settings-extras {
+
+    //   > header {
+    //     cursor: pointer;
+
+    //     &.active {
+
+    //     }
+    //   }
+      
+    //    > div {
+    //     display: none;
+    //     @include transition(display 0.25s ease-in-out);
+
+    //     &.is-shown {
+    //       display: block;
+    //     }
+    //    }
+    // }
 
     // misc
     .divide {
