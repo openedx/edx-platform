@@ -70,7 +70,6 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    ASKBOT_ROOT / "askbot" / "skins",
 ]
 STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
@@ -100,8 +99,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a
-    # functioning cache -- it relies on caching to load its settings in places.
+    # This is the cache used for most things. 
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -130,7 +128,7 @@ MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
-############################ FILE UPLOADS (ASKBOT) #############################
+############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
