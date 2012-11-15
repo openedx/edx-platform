@@ -10,7 +10,6 @@ import sys
 
 from datetime import timedelta
 from lxml import etree
-from lxml.html import rewrite_links
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
@@ -30,15 +29,17 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 def only_one(lst, default="", process=lambda x: x):
     """
     If lst is empty, returns default
-    If lst has a single element, applies process to that element and returns it
-    Otherwise, raises an exeception
+
+    If lst has a single element, applies process to that element and returns it.
+
+    Otherwise, raises an exception.
     """
     if len(lst) == 0:
         return default
     elif len(lst) == 1:
         return process(lst[0])
     else:
-        raise Exception('Malformed XML')
+        raise Exception('Malformed XML: expected at most one element in list.')
 
 
 def parse_timedelta(time_str):
@@ -119,6 +120,8 @@ class CapaModule(XModule):
             self.max_attempts = int(self.max_attempts)
 
         self.show_answer = self.metadata.get('showanswer', 'closed')
+
+        self.force_save_button = self.metadata.get('force_save_button', 'false')
 
         if self.show_answer == "":
             self.show_answer = "closed"
@@ -290,11 +293,11 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1: 
+        if self.max_attempts is None or self.attempts < self.max_attempts-1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
-            check_button = "Final Check" 
+            check_button = "Final Check"
 
         reset_button = True
         save_button = True
@@ -320,9 +323,10 @@ class CapaModule(XModule):
         if not self.lcp.done:
             reset_button = False
 
-        # We don't need a "save" button if infinite number of attempts and
-        # non-randomized
-        if self.max_attempts is None and self.rerandomize != "always":
+        # We may not need a "save" button if infinite number of attempts and
+        # non-randomized. The problem author can force it. It's a bit weird for
+        # randomization to control this; should perhaps be cleaned up.
+        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
@@ -341,17 +345,6 @@ class CapaModule(XModule):
         if encapsulate:
             html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
-
-        # cdodge: OK, we have to do two rounds of url reference subsitutions
-        # one which uses the 'asset library' that is served by the contentstore and the
-        # more global /static/ filesystem based static content.
-        # NOTE: rewrite_content_links is defined in XModule
-        # This is a bit unfortunate and I'm sure we'll try to considate this into
-        # a one step process.
-        try:
-            html = rewrite_links(html, self.rewrite_content_links)
-        except:
-            logging.error('error rewriting links in {0}'.format(html))
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html, self.metadata['data_dir'])
@@ -527,26 +520,20 @@ class CapaModule(XModule):
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
             current_time = datetime.datetime.now()
-            prev_submit_time = self.lcp.get_recentmost_queuetime() 
+            prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback 
+                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
             lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
         except StudentInputError as inst:
-            # TODO (vshnayder): why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
         except Exception, err:
-            # TODO: why is this line here?
-            #self.lcp = LoncapaProblem(self.definition['data'],
-            #                          id=lcp_id, state=old_state, system=self.system)
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
@@ -678,10 +665,10 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super(CapaDescriptor, self).__init__(*args, **kwargs)
-        
+
         weight_string = self.metadata.get('weight', None)
         if weight_string:
             self.weight = float(weight_string)

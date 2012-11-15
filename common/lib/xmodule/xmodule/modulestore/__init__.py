@@ -377,6 +377,7 @@ class ModuleStore(object):
         return courses
 
 
+
 class ModuleStoreBase(ModuleStore):
     '''
     Implement interface functionality that can be shared.

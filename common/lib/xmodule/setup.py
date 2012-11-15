@@ -26,8 +26,9 @@ setup(
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
-            "problemset = xmodule.vertical_module:VerticalDescriptor",
+            "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
+            "selfassessment = xmodule.self_assessment_module:SelfAssessmentDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
@@ -35,6 +36,10 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
+            "course_info = xmodule.html_module:CourseInfoDescriptor",
+            "static_tab = xmodule.html_module:StaticTabDescriptor",
+            "custom_tag_template = xmodule.raw_module:RawDescriptor",
+            "about = xmodule.html_module:AboutDescriptor"
         ]
     }
 )

@@ -2,6 +2,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
+from xmodule.modulestore.django import modulestore
 
 
 class CustomTagModule(XModule):
@@ -40,8 +41,7 @@ class CustomTagDescriptor(RawDescriptor):
     module_class = CustomTagModule
     template_dir_name = 'customtag'
 
-    @staticmethod
-    def render_template(system, xml_data):
+    def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
         xmltree = etree.fromstring(xml_data)
         if 'impl' in xmltree.attrib:
@@ -57,15 +57,23 @@ class CustomTagDescriptor(RawDescriptor):
                                 .format(location))
 
         params = dict(xmltree.items())
-        with system.resources_fs.open('custom_tags/{name}'
-                                   .format(name=template_name)) as template:
-            return Template(template.read()).render(**params)
+
+        # cdodge: look up the template as a module
+        template_loc = self.location._replace(category='custom_tag_template', name=template_name)
+
+        template_module = modulestore().get_item(template_loc)
+        template_module_data = template_module.definition['data']
+        template = Template(template_module_data)
+        return template.render(**params)
 
 
     def __init__(self, system, definition, **kwargs):
         '''Render and save the template for this descriptor instance'''
         super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
-        self.rendered_html = self.render_template(system, definition['data'])
+
+    @property
+    def rendered_html(self):
+        return self.render_template(self.system, self.definition['data'])
 
     def export_to_file(self):
         """

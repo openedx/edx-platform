@@ -35,6 +35,7 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
 }
+ENABLE_JASMINE = False
 
 # needed to use lms student app
 GENERATE_RANDOM_USER_CREDENTIALS = False
@@ -68,9 +69,7 @@ MAKO_TEMPLATES['main'] = [
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
     MAKO_TEMPLATES['lms.' + namespace] = template_dirs
 
-TEMPLATE_DIRS = (
-    PROJECT_ROOT / "templates",
-)
+TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
 MITX_ROOT_URL = ''
 
@@ -87,10 +86,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 LMS_BASE = None
-
-################################# Jasmine ###################################
-JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
-
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
@@ -289,7 +284,4 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
-
-    # For testing
-    'django_jasmine',
 )

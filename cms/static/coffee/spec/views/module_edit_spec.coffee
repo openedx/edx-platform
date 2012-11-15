@@ -1,81 +1,74 @@
 describe "CMS.Views.ModuleEdit", ->
   beforeEach ->
-    @stubModule = jasmine.createSpyObj("Module", ["editUrl", "loadModule"])
-    spyOn($.fn, "load")
+    @stubModule = jasmine.createSpy("CMS.Models.Module")
+    @stubModule.id = 'stub-id'
+
+
     setFixtures """
-      <div id="module-edit">
-        <a href="#" class="save-update">save</a>
-        <a href="#" class="cancel">cancel</a>
-        <ol>
-          <li>
-            <a href="#" class="module-edit" data-id="i4x://mitx/course/html/module" data-type="html">submodule</a>
-          </li>
-        </ol>
+    <li class="component" id="stub-id">
+      <div class="component-editor">
+        <div class="module-editor">
+          ${editor}
+        </div>
+        <a href="#" class="save-button">Save</a>
+        <a href="#" class="cancel-button">Cancel</a>
       </div>
-      """ #"
+      <div class="component-actions">
+        <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
+        <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>  
+      </div>
+      <a href="#" class="drag-handle"></a>
+      <section class="xmodule_display xmodule_stub" data-type="StubModule">
+        <div id="stub-module-content"/>
+      </section>
+    </li>
+    """
+    spyOn($.fn, 'load').andReturn(@moduleData)
+
+    @moduleEdit = new CMS.Views.ModuleEdit(
+      el: $(".component")
+      model: @stubModule
+      onDelete: jasmine.createSpy()
+    )
     CMS.unbind()
 
-  describe "defaults", ->
-    it "set the correct tagName", ->
-      expect(new CMS.Views.ModuleEdit(model: @stubModule).tagName).toEqual("section")
+  describe "class definition", ->
+    it "sets the correct tagName", ->
+      expect(@moduleEdit.tagName).toEqual("li")
 
-    it "set the correct className", ->
-      expect(new CMS.Views.ModuleEdit(model: @stubModule).className).toEqual("edit-pane")
+    it "sets the correct className", ->
+      expect(@moduleEdit.className).toEqual("component")
 
-  describe "view creation", ->
-    beforeEach ->
-      @stubModule.editUrl.andReturn("/edit_item?id=stub_module")
-      new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
+  describe "methods", ->
+    describe "initialize", ->
+      beforeEach ->
+        spyOn(CMS.Views.ModuleEdit.prototype, 'render')
+        @moduleEdit = new CMS.Views.ModuleEdit(
+          el: $(".component")
+          model: @stubModule
+          onDelete: jasmine.createSpy()
+        )
 
-    it "load the edit via ajax and pass to the model", ->
-      expect($.fn.load).toHaveBeenCalledWith("/edit_item?id=stub_module", jasmine.any(Function))
-      if $.fn.load.mostRecentCall
-        $.fn.load.mostRecentCall.args[1]()
-        expect(@stubModule.loadModule).toHaveBeenCalledWith($("#module-edit").get(0))
+      it "renders the module editor", ->
+        expect(@moduleEdit.render).toHaveBeenCalled()
 
-  describe "save", ->
-    beforeEach ->
-      @stubJqXHR = jasmine.createSpy("stubJqXHR")
-      @stubJqXHR.success = jasmine.createSpy("stubJqXHR.success").andReturn(@stubJqXHR)
-      @stubJqXHR.error = jasmine.createSpy("stubJqXHR.error").andReturn(@stubJqXHR)
-      @stubModule.save = jasmine.createSpy("stubModule.save").andReturn(@stubJqXHR)
-      new CMS.Views.ModuleEdit(el: $(".module-edit"), model: @stubModule)
-      spyOn(window, "alert")
-      $(".save-update").click()
+    describe "render", ->
+      beforeEach ->
+        spyOn(@moduleEdit, 'loadDisplay')
+        spyOn(@moduleEdit, 'delegateEvents')
+        @moduleEdit.render()
 
-    it "call save on the model", ->
-      expect(@stubModule.save).toHaveBeenCalled()
+      it "loads the module preview and editor via ajax on the view element", ->
+        expect(@moduleEdit.$el.load).toHaveBeenCalledWith("/preview_component/#{@moduleEdit.model.id}", jasmine.any(Function))
+        @moduleEdit.$el.load.mostRecentCall.args[1]()
+        expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
+        expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
 
-    it "alert user on success", ->
-      @stubJqXHR.success.mostRecentCall.args[0]()
-      expect(window.alert).toHaveBeenCalledWith("Your changes have been saved.")
+    describe "loadDisplay", ->
+      beforeEach ->
+        spyOn(XModule, 'loadModule')
+        @moduleEdit.loadDisplay()
 
-    it "alert user on error", ->
-      @stubJqXHR.error.mostRecentCall.args[0]()
-      expect(window.alert).toHaveBeenCalledWith("There was an error saving your changes. Please try again.")
-
-  describe "cancel", ->
-    beforeEach ->
-      spyOn(CMS, "popView")
-      @view = new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
-      $(".cancel").click()
-
-    it "pop current view from viewStack", ->
-      expect(CMS.popView).toHaveBeenCalled()
-
-  describe "editSubmodule", ->
-    beforeEach ->
-      @view = new CMS.Views.ModuleEdit(el: $("#module-edit"), model: @stubModule)
-      spyOn(CMS, "pushView")
-      spyOn(CMS.Views, "ModuleEdit")
-        .andReturn(@view = jasmine.createSpy("Views.ModuleEdit"))
-      spyOn(CMS.Models, "Module")
-        .andReturn(@model = jasmine.createSpy("Models.Module"))
-      $(".module-edit").click()
-
-    it "push another module editing view into viewStack", ->
-      expect(CMS.pushView).toHaveBeenCalledWith @view
-      expect(CMS.Views.ModuleEdit).toHaveBeenCalledWith model: @model
-      expect(CMS.Models.Module).toHaveBeenCalledWith
-        id: "i4x://mitx/course/html/module"
-        type: "html"
+      it "loads the .xmodule-display inside the module editor", ->
+        expect(XModule.loadModule).toHaveBeenCalled()
+        expect(XModule.loadModule.mostRecentCall.args[0]).toBe($('.xmodule_display'))

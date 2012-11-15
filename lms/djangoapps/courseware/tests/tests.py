@@ -247,18 +247,50 @@ class PageLoader(ActivateLoginTestCase):
         all_ok = True
         for descriptor in modstore.get_items(
                 Location(None, None, None, None, None)):
+
             n += 1
             print "Checking ", descriptor.location.url()
-            #print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('jump_to',
-                                   kwargs={'course_id': course_id,
-                                           'location': descriptor.location.url()}))
-            msg = str(resp.status_code)
 
-            if resp.status_code != 302:
-                msg = "ERROR " + msg
-                all_ok = False
-                num_bad += 1
+            # We have ancillary course information now as modules and we can't simply use 'jump_to' to view them
+            if descriptor.location.category == 'about':
+                resp = self.client.get(reverse('about_course', kwargs={'course_id': course_id}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1
+            elif descriptor.location.category == 'static_tab':
+                resp = self.client.get(reverse('static_tab', kwargs={'course_id': course_id, 'tab_slug' : descriptor.location.name}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1    
+            elif descriptor.location.category == 'course_info':
+                resp = self.client.get(reverse('info', kwargs={'course_id': course_id}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1  
+            else:
+                #print descriptor.__class__, descriptor.location
+                resp = self.client.get(reverse('jump_to',
+                                       kwargs={'course_id': course_id,
+                                               'location': descriptor.location.url()}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 302:
+                    # cdodge: we're adding 'custom_tag_template' which is the Mako template used to render
+                    # the custom tag. We can't 'jump-to' this module. Unfortunately, we also can't test render
+                    # it easily
+                    if descriptor.location.category not in ['custom_tag_template'] or resp.status_code != 404:
+                        msg = "ERROR " + msg
+                        all_ok = False
+                        num_bad += 1
             print msg
             self.assertTrue(all_ok)  # fail fast
 

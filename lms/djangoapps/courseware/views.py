@@ -217,6 +217,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
         chapter_descriptor = course.get_child_by_url_name(chapter)
@@ -347,8 +348,8 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'course': course,
-                                            'staff_access': staff_access,})
+    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
+            'course': course, 'staff_access': staff_access})
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -363,7 +364,7 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(course, tab)
+    contents = tabs.get_static_tab_contents(request, None, course, tab)
     if contents is None:
         raise Http404
 
@@ -413,7 +414,7 @@ def course_about(request, course_id):
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     return render_to_response('portal/course_about.html',
-                              {'course': course,
+                              { 'course': course,
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link' : show_courseware_link})

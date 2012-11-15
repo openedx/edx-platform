@@ -14,12 +14,13 @@ from path import path
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
-NOSE_ARGS = ['--cover-erase', '--with-xunit', '--with-xcoverage', '--cover-html', '--cover-inclusive']
-for app in os.listdir(PROJECT_ROOT / 'djangoapps'):
-    NOSE_ARGS += ['--cover-package', app]
+NOSE_ARGS = ['--with-xunit']
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
+
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
@@ -98,3 +99,10 @@ CACHES = {
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+################### Make tests faster
+#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)

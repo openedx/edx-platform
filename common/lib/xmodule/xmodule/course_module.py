@@ -30,13 +30,13 @@ class CourseDescriptor(SequenceDescriptor):
             self.book_url = book_url
             self.table_of_contents = self._get_toc_from_s3()
             self.start_page = int(self.table_of_contents[0].attrib['page'])
-            
+
             # The last page should be the last element in the table of contents,
             # but it may be nested. So recurse all the way down the last element
             last_el = self.table_of_contents[-1]
             while last_el.getchildren():
                 last_el = last_el[-1]
-            
+
             self.end_page = int(last_el.attrib['page'])
 
         @property
@@ -94,6 +94,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.enrollment_start = self._try_parse_time("enrollment_start")
         self.enrollment_end = self._try_parse_time("enrollment_end")
+        self.end = self._try_parse_time("end")
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -237,6 +238,16 @@ class CourseDescriptor(SequenceDescriptor):
 
         return definition
 
+    def has_ended(self):
+        """
+        Returns True if the current time is after the specified course end date.
+        Returns False if there is no end date specified.
+        """
+        if self.end is None:
+            return False
+
+        return time.gmtime() > self.end
+
     def has_started(self):
         return time.gmtime() > self.start
 
@@ -254,6 +265,10 @@ class CourseDescriptor(SequenceDescriptor):
         Return the tabs config, as a python object, or None if not specified.
         """
         return self.metadata.get('tabs')
+
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
 
     @property
     def show_calculator(self):
@@ -346,7 +361,12 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        return time.strftime("%b %d, %Y", self.start)
+        displayed_start = self._try_parse_time('advertised_start') or self.start
+        return time.strftime("%b %d, %Y", displayed_start)
+
+    @property
+    def end_date_text(self):
+        return time.strftime("%b %d, %Y", self.end)
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
@@ -375,11 +395,36 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('discussion_link', None)
 
     @property
+    def forum_posts_allowed(self):
+        try:
+            blackout_periods = [(parse_time(start), parse_time(end))
+                                for start, end
+                                in self.metadata.get('discussion_blackouts', [])]
+            now = time.gmtime()
+            for start, end in blackout_periods:
+                if start <= now <= end:
+                    return False
+        except:
+            log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
+        
+        return True
+
+    @property
     def hide_progress_tab(self):
         """TODO: same as above, intended to let internal CS50 hide the progress tab
         until we get grade integration set up."""
         # Explicit comparison to True because we always want to return a bool.
         return self.metadata.get('hide_progress_tab') == True
+
+    @property
+    def end_of_course_survey_url(self):
+        """
+        Pull from policy.  Once we have our own survey module set up, can change this to point to an automatically
+        created survey for each class.
+
+        Returns None if no url specified.
+        """
+        return self.metadata.get('end_of_course_survey_url')
 
     @property
     def title(self):
@@ -392,5 +437,6 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+
 
 

@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 from lxml import etree
-from lxml.html import rewrite_links
 from path import path
 
 from .x_module import XModule
@@ -29,14 +28,7 @@ class HtmlModule(XModule):
     js_module_name = "HTMLModule"
     
     def get_html(self):
-        # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        _html = self.html
-        try:
-            _html = rewrite_links(_html, self.rewrite_content_links)
-        except:
-            logging.error('error rewriting links on the following HTML content: {0}'.format(_html))
-
-        return _html
+        return self.html
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -178,3 +170,25 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
+
+
+class AboutDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "about"
+
+class StaticTabDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "statictab"
+
+class CourseInfoDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "courseinfo"

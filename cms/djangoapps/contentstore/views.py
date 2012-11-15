@@ -66,7 +66,10 @@ log = logging.getLogger(__name__)
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential']
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
 def _modulestore(location):
@@ -287,6 +290,7 @@ def edit_unit(request, location):
     # TODO (cpennington): If we share units between courses,
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
+
     containing_subsection_locs = modulestore().get_parent_locations(location)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
 
@@ -499,7 +503,8 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     )
     module.get_html = replace_static_urls(
         module.get_html,
-        module.metadata.get('data_dir', module.location.course)
+        module.metadata.get('data_dir', module.location.course),
+        course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None])
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
@@ -580,8 +585,11 @@ def save_item(request):
     if request.POST.get('data') is not None:
         data = request.POST['data']
         store.update_item(item_location, data)
-        
-    if request.POST.get('children') is not None:
+       
+    # cdodge: note calling request.POST.get('children') will return None if children is an empty array
+    # so it lead to a bug whereby the last component to be deleted in the UI was not actually
+    # deleting the children object from the children collection
+    if 'children' in request.POST and request.POST['children'] is not None:
         children = request.POST['children']
         store.update_children(item_location, children)
 
@@ -688,7 +696,9 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
-    _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    if new_item.location.category not in DETACHED_CATEGORIES:
+        _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -872,6 +882,24 @@ def edit_static(request, org, course, coursename):
 def settings(request, org, course, coursename):
     return render_to_response('settings.html', {})
 
+def edit_tabs(request, org, course, coursename):
+    location = ['i4x', org, course, 'course', coursename]    
+    course_item = modulestore().get_item(location)
+    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    static_tabs = modulestore('direct').get_items(static_tabs_loc)
+
+    components = [
+        static_tab.location.url()
+        for static_tab
+        in static_tabs
+    ]
+
+    return render_to_response('edit-tabs.html', {
+        'active_tab': 'pages',
+        'context_course':course_item, 
+        'components': components
+        })
 
 def not_found(request):
     return render_to_response('error.html', {'error': '404'})
@@ -977,6 +1005,17 @@ def create_new_course(request):
     # set a default start date to now
     new_course.metadata['start'] = stringify_time(time.gmtime())
 
+    # set up the default tabs
+    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    # at least a list populated with the minimal times
+    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    new_course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
+        {"type": "discussion", "name": "Discussion"},
+        {"type": "wiki", "name": "Wiki"},
+        {"type": "progress", "name": "Progress"}]
+
     modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
 
     create_all_course_groups(request.user, new_course.location)
@@ -1001,7 +1040,8 @@ def import_course(request, org, course, name):
 
         data_root = path(settings.GITHUB_REPO_ROOT)
 
-        course_dir = data_root / "{0}-{1}-{2}".format(org, course, name)
+        course_subdir = "{0}-{1}-{2}".format(org, course, name)
+        course_dir = data_root / course_subdir
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
@@ -1036,18 +1076,8 @@ def import_course(request, org, course, name):
             for fname in os.listdir(r):
                 shutil.move(r/fname, course_dir)
 
-        with open(course_dir / 'course.xml', 'r') as course_file:
-            course_data = etree.parse(course_file, parser=edx_xml_parser)
-            course_data_root = course_data.getroot()
-            course_data_root.set('org', org)
-            course_data_root.set('course', course)
-            course_data_root.set('url_name', name)
-
-        with open(course_dir / 'course.xml', 'w') as course_file:
-            course_data.write(course_file)
-
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-            [course_dir], load_error_modules=False, static_content_store=contentstore())
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
 
         # we can blow this away when we're done importing.
         shutil.rmtree(course_dir)

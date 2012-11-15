@@ -216,7 +216,9 @@ class @Problem
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
           else
-            @$("#answer_#{key}, #solution_#{key}").html(value)
+            answer = @$("#answer_#{key}, #solution_#{key}")
+            answer.html(value)
+            Collapsible.setCollapsibles(answer)
 
         # TODO remove the above once everything is extracted into its own
         # inputtype functions.

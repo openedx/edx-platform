@@ -30,6 +30,7 @@ from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
+ENABLE_JASMINE = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -160,7 +161,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4*1000*1000 # 4 MB
-MAX_FILEUPLOADS_PER_INPUT = 10
+MAX_FILEUPLOADS_PER_INPUT = 20
 
 # FIXME:
 # We should have separate S3 staged URLs in case we need to make changes to
@@ -446,15 +447,12 @@ PIPELINE_JS = {
         'source_filenames': module_js,
         'output_filename': 'js/lms-modules.js',
     },
-    'spec': {
-        'source_filenames': sorted(rooted_glob(PROJECT_ROOT / 'static/', 'coffee/spec/**/*.coffee')),
-        'output_filename': 'js/lms-spec.js'
-    },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js'
-    }
+    },
 }
+
 
 PIPELINE_DISABLE_WRAPPER = True
 
@@ -539,9 +537,6 @@ INSTALLED_APPS = (
     'wiki.plugins.links',
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
-
-    # For testing
-    'django_jasmine',
 
     # Discussion
     'django_comment_client',
