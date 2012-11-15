@@ -102,7 +102,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
-<<<<<<< HEAD
         'student.testcenteruser': {
             'Meta': {'object_name': 'TestCenterUser'},
             'address_1': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -131,8 +130,6 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['auth.User']", 'unique': 'True'}),
             'user_updated_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'})
         },
-=======
->>>>>>> add migration to remove askbot columns
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
