@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import logging
 
+from courseware.courses import get_course_by_id
 
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
@@ -23,6 +24,12 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
+        course = get_course_by_id(self.course_id)
+        if self.name == "Student" and \
+           (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
+           (not course.forum_posts_allowed):
+           return False
+        
         return self.permissions.filter(name=permission).exists()
 
 

@@ -23,7 +23,7 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
-# IMPORTANT: With this enabled, the server must always be behind a proxy that 
+# IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
 # a user can fool our server into thinking it was an https connection.
 # See https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
@@ -60,6 +60,7 @@ COURSE_LISTINGS = ENV_TOKENS.get('COURSE_LISTINGS', {})
 SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
 COMMENTS_SERVICE_URL = ENV_TOKENS.get("COMMENTS_SERVICE_URL",'')
 COMMENTS_SERVICE_KEY = ENV_TOKENS.get("COMMENTS_SERVICE_KEY",'')
+CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
@@ -79,3 +80,5 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 if 'COURSE_ID' in ENV_TOKENS:
     ASKBOT_URL = "courses/{0}/discussions/".format(ENV_TOKENS['COURSE_ID'])
 
+PEARSON_TEST_USER = "pearsontest"
+PEARSON_TEST_PASSWORD = AUTH_TOKENS.get("PEARSON_TEST_PASSWORD")

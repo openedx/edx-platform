@@ -28,4 +28,8 @@ cms/static/sass/*.css
 lms/lib/comment_client/python
 nosetests.xml
 cover_html/
+<<<<<<< HEAD
 /.redcar
+=======
+.idea/
+>>>>>>> master
