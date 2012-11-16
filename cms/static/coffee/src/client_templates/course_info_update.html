@@ -1,0 +1,28 @@
+<li>
+	<!-- FIXME what style should we use for initially hidden? --> <!-- TODO decide whether this should use codemirror -->
+	<form class="new-update-form">
+		<div class="row">
+			<label class="inline-label">Date:</label>
+			<!-- TODO replace w/ date widget and actual date (problem is that persisted version is "Month day" not an actual date obj -->
+			<input type="text" id="date-entry"
+				value="<%= updateModel.get('date') %>"></input>
+		</div>
+		<div class="row">
+			<textarea class="new-update-content text-editor"><%= updateModel.get('content') %></textarea>
+		</div>
+		<div class="row">
+			<!-- cid rather than id b/c new ones have cid's not id's -->
+			<a href="#" class="save-button" name="<%= updateModel.cid %>">Save</a>
+			<a href="#" class="cancel-button" name="<%= updateModel.cid %>">Cancel</a>
+		</div>
+	</form>
+	<h2>
+		<span class="calendar-icon"></span><span id="date-display"><%=
+			updateModel.get('date') %></span>
+	</h2>
+	<div class="update-contents"><%= updateModel.get('content') %></div>
+	<div class="row">
+		<a href="#" class="edit-button" name="<%- updateModel.cid %>">Edit</a>
+		<a href="#" class="delete-button" name="<%- updateModel.cid %>"">Delete</a>
+	</div>
+</li>
