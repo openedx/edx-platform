@@ -4,5 +4,5 @@
 
 <div class="collaborate_module">
 	<a class="find_collaborator" href="#" onclick="window.open('http://127.0.0.1:3000/pair/${collaborate_room | urllib.quote}', 'collaborate_window', 'width=780, height=590'); return false;">Collaborate on ${collaborate_room | h}</a>
-	<span class="collaborate-status">Connecting...</span>
+	<span class="collaborate-status" data-collaborate-room="${collaborate_room | h}">Connecting...</span>
 </div>

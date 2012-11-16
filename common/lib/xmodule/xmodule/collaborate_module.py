@@ -7,11 +7,10 @@ from xmodule.raw_module import RawDescriptor
 import json
 
 class CollaborateModule(XModule):
-    # js = {'coffee':
-    #         [resource_string(__name__, 'js/src/time.coffee'),
-    #         resource_string(__name__, 'js/src/discussion/display.coffee')]
-    #     }
-    # js_module_name = "FindCollaborators"
+    js = {'coffee':
+            [resource_string(__name__, 'js/src/collaborate/display.coffee')]
+        }
+    js_module_name = "FindCollaborator"
     def get_html(self):
         context = {
             'collaborate_room': self.collaborate_room,
