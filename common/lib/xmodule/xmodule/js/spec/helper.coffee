@@ -23,9 +23,9 @@ jasmine.stubRequests = ->
     else if settings.url.match /.+\/problem_get$/
       settings.success html: readFixtures('problem_content.html')
     else if settings.url == '/calculate' ||
-      settings.url.match(/modx\/.+\/goto_position$/) ||
+      settings.url.match(/.+\/goto_position$/) ||
       settings.url.match(/event$/) ||
-      settings.url.match(/modx\/.+\/problem_(check|reset|show|save)$/)
+      settings.url.match(/.+\/problem_(check|reset|show|save)$/)
       # do nothing
     else
       throw "External request attempted for #{settings.url}, which is not defined."
