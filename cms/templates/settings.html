@@ -125,14 +125,18 @@
               <div class="row row-col2">
                 <label for="course-name-input">Course Name:</label>
                 <div class="field">
-                  <input type="text" class="long" id="course-name-input">
+                  <div class="input">
+                    <input type="text" class="long" id="course-name-input">
+                  </div>
                 </div>
               </div>
 
               <div class="row row-col2">
                 <label for="course-organization-input">Organization:</label>
                 <div class="field">
-                  <input type="text" class="long" id="course-organization-input">
+                  <div class="input">
+                    <input type="text" class="long" id="course-organization-input">                    
+                  </div>
                 </div>
               </div>
 
@@ -247,16 +251,20 @@
               <div class="row row-col2">
                 <label for="course-overview">Course Overview:</label>
                 <div class="field">
-                  <textarea class="long tall" input="course-overview"></textarea>
-                  <span class="tip tip-stacked">Detailed summary of concepts and lessons covered</span>
+                  <div class="input">
+                    <textarea class="long tall" input="course-overview"></textarea>
+                    <span class="tip tip-stacked">Detailed summary of concepts and lessons covered</span>
+                  </div>
                 </div>      
               </div>
 
               <div class="row row-col2">
                 <label for="course-shortdescription">Course Statement:</label>
                 <div class="field">
-                  <textarea class="long" id="course-shortdescription"></textarea>
-                  <span class="tip tip-stacked">1-2 sentences used to introduce your class to perspective students</span>
+                  <div class="input">
+                    <textarea class="long" id="course-shortdescription"></textarea>
+                    <span class="tip tip-stacked">1-2 sentences used to introduce your class to perspective students</span>
+                  </div>
                 </div>
               </div>
 
@@ -295,16 +303,20 @@
               <div class="row row-col2">
                 <label for="course-requirements">Requirements:</label>
                 <div class="field">
-                  <textarea class="long tall" id="course-requirements"></textarea>  
-                  <span class="tip tip-stacked">Supplies, software, and set-up that students will need</span>      
+                  <div class="input">
+                    <textarea class="long tall" id="course-requirements"></textarea>  
+                    <span class="tip tip-stacked">Supplies, software, and set-up that students will need</span>     
+                  </div>
                 </div>
               </div>
 
               <div class="row row-col2">
                 <label for="course-effort">Hours of Effort per Week:</label>
                 <div class="field">
-                  <input type="text" class="short" id="course-effort">
-                  <span class="tip tip-inline">Time students should spend on all course work</span>
+                  <div class="input">
+                    <input type="text" class="short" id="course-effort">
+                    <span class="tip tip-inline">Time students should spend on all course work</span>
+                  </div>
                 </div>
               </div>
 
@@ -538,8 +550,10 @@
                       <div class="row row-col2">
                         <label for="course-faculty-bio-input">Faculty Bio:</label>
                         <div class="field">
-                          <textarea class="long tall" id="course-faculty-bio-input"></textarea>
-                          <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                          <div clas="input">
+                            <textarea class="long tall" id="course-faculty-bio-input"></textarea>
+                            <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                          </div>
                         </div>      
                       </div>
                     </li>
@@ -557,7 +571,7 @@
           <section class="settings-grading">
             <h2 class="title">Grading</h2>
 
-            <section class="settings-grading-ranges">
+            <section class="settings-grading-range">
               <header>
                 <h3>Overall Grade Range</h3>
                 <span class="detail">Course grade ranges and their values</span>
@@ -608,62 +622,154 @@
               </div>
             </section>
 
-            <section class="settings-grading-assignments">
+            <section class="settings-grading-general">
               <header>
-                <h3>Assignments</h3>
-                <span class="detail">Course grade ranges and their values</span>
+                <h3>General Grading</h3>
+                <span class="detail">Deadlines and Requirements</span>
               </header>
 
+              <div class="row row-col2">
+                <label for="course-grading-graceperiod">General Assignment Deadline:</label>
 
+                <div class="field">
+                  <div class="input">
+                    <input type="text" id="course-grading-graceperiod">
+                    <span class="tip tip-stacked">The standard time of day assignments are due by</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-graceperiod">Deadline Grace Period:</label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="course-grading-graceperiod">
+                    <span class="tip tip-inline">e.g. +5 minutes</span>
+                  </div>
+                </div>
+              </div>
             </section>
 
-            <section class="settings-grading-assignments">
+            <section class="settings-grading-lessonexercises">
               <header>
-                <h3>Assignments</h3>
-                <span class="detail">Course grade ranges and their values</span>
+                <h3>Lesson Exercises</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
               </header>
 
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-gradeweight">Weight of Total Grade:</label>
 
-            </section>
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short" id="course-grading-lessonexercises-gradeweight">
+                    <span class="tip tip-inline">e.g. 25%</span>                
+                  </div>
+                </div>
+              </div>
 
-            <section>
-              <div class="row">
-                <label>Grace Period:</label>
-                <input type="text" class="grace-period">
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignments">
+                    <span class="tip tip-inline">total exercises assigned</span>                
+                  </div>
+                </div>
               </div>
-            </section>
-            <section>
-              <h3>Homework</h3>
-              <div class="row">
-                <label>Minimum Count:</label>
-                <input type="text" class="minimum-count-input short">
-              </div>
-              <div class="row">
-                <label>Drop Count:</label>
-                <input type="text" class="drop-count-input short">
-              </div>
-              <div class="row">
-                <label>Weight:</label>
-                <input type="text" class="weight-input short">
-              </div>
-            </section>
-            <section>
-              <h3>Lab</h3>
-              <div class="row">
-                <label>Minimum Count:</label>
-                <input type="text" class="minimum-count-input short">
-              </div>
-              <div class="row">
-                <label>Drop Count:</label>
-                <input type="text" class="drop-count-input short">
-              </div>
-              <div class="row">
-                <label>Weight:</label>
-                <input type="text" class="weight-input short">
+
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total exercises that won't be graded</span>               
+                  </div>
+                </div>
               </div>
             </section>
 
+            <section class="settings-grading-labs">
+              <header>
+                <h3>Labs</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
+              </header>
 
+              <div class="row row-col2">
+                <label for="course-grading-labs-gradeweight">Weight of Total Grade:</label>
+
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short course-grading-gradeweight" id="course-grading-labs-gradeweight">
+                    <span class="tip tip-inline">e.g. 25%</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-labs-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short course-grading-totalassignments" id="course-grading-labs-totalassignments">
+                    <span class="tip tip-inline">total labs assigned</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-labs-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short course-grading-labs-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total labs that won't be graded</span>               
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-grading-exams">
+              <header>
+                <h3>Exams</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-gradeweight">Weight of Total Grade:</label>
+
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short course-grading-gradeweight" id="course-grading-exams-gradeweight">
+                    <span class="tip tip-inline">e.g. 50%</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short course-grading-totalassignments" id="course-grading-exams-totalassignments">
+                    <span class="tip tip-inline">total exams held</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short course-grading-exams-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total exams that won't be graded</span>               
+                  </div>
+                </div>
+              </div>
+            </section>
           </section><!-- .settings-grading -->
 
           <section class="settings-problems">

@@ -467,6 +467,13 @@
 
     .settings-grading {
 
+
+      .course-grading-gradeweight, .course-grading-totalassignments, .course-grading-totalassignmentsdroppable {
+
+        input {
+          width: 73px;
+        }
+      }
     }
 
     .settings-handouts {
