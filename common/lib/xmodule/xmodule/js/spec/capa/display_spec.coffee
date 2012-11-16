@@ -16,7 +16,7 @@ describe 'Problem', ->
 
     # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
-    loadFixtures 'xmodule.html'
+ 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
