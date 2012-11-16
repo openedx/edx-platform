@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from certificates.models import certificate_status_for_student
+from certificates.models import CertificateStatuses
 from django.contrib.auth.models import User
 from optparse import make_option
 from django.conf import settings
@@ -37,6 +38,15 @@ class Command(BaseCommand):
             help='Only generate for COURSE_ID'),
         )
 
+    def _ended_courses(self):
+        for course_id in [course  # all courses in COURSE_LISTINGS
+                for sub in settings.COURSE_LISTINGS
+                    for course in settings.COURSE_LISTINGS[sub]]:
+            course_loc = CourseDescriptor.id_to_location(course_id)
+            course = modulestore().get_instance(course_id, course_loc)
+            if course.has_ended():
+                yield course_id
+
     def handle(self, *args, **options):
 
         # Find all courses that have ended
@@ -44,15 +54,7 @@ class Command(BaseCommand):
         if options['course']:
             ended_courses = [options['course']]
         else:
-            ended_courses = []
-            for course_id in [course  # all courses in COURSE_LISTINGS
-                    for sub in settings.COURSE_LISTINGS
-                        for course in settings.COURSE_LISTINGS[sub]]:
-
-                course_loc = CourseDescriptor.id_to_location(course_id)
-                course = modulestore().get_instance(course_id, course_loc)
-                if course.has_ended():
-                    ended_courses.append(course_id)
+            ended_courses = self._ended_courses()
 
         total_enrolled = {}
         cert_statuses = {}
@@ -66,12 +68,14 @@ class Command(BaseCommand):
                             "groups").order_by('username')
             total_enrolled[course_id] = enrolled_students.count()
 
+            cert_statuses = [attr # all possible certificate statuses
+                    for attr in dir(CertificateStatuses())
+                       if not callable(attr) and not attr.startswith("__")]
+
             # tally up certificate statuses for every student
             # enrolled in the course
-            cert_statuses[course_id] = Counter(
-                    [certificate_status_for_student(
-                        student, course_id)['status']
-                            for student in enrolled_students])
+            cert_statuses = {status:GeneratedCertificate.objects.filter(course_id__exact=course_id, status=status).count() for status in cert_statuses}
+
 
         # all states we have seen far all courses
         status_headings = set(
