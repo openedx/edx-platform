@@ -13,14 +13,16 @@ describe 'Problem', ->
 
     # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
+    loadFixtures 'xmodule.html'
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
       callback()
 
   describe 'constructor', ->
-    beforeEach ->
-      @problem = new Problem ("
+
+    it 'set the element from html', ->
+      @problem999 = new Problem ("
         <section class='xmodule_display xmodule_CapaModule' data-type='Problem'>
           <section id='problem_999' 
                    class='problems-wrapper' 
@@ -28,16 +30,18 @@ describe 'Problem', ->
                    data-url='/problem/quiz/'>
           </section>
         </section>
-        ")
+        ")      
+      expect(@problem999.element_id).toBe 'problem_999'
 
-    it 'set the element', ->
-      expect(@problem.element_id).toBe 'problem_999'
+    it 'set the element from loadFixtures', ->
+      @problem101 = new Problem($('.xmodule_display'))
+      expect(@problem101.element_id).toBe 'problem_101'
 
   describe 'bind', ->
     beforeEach ->
       spyOn window, 'update_schematics'
       MathJax.Hub.getAllJax.andReturn [@stubbedJax]
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
 
     it 'set mathjax typeset', ->
       expect(MathJax.Hub.Queue).toHaveBeenCalled()
@@ -71,7 +75,7 @@ describe 'Problem', ->
 
   describe 'render', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @bind = @problem.bind
       spyOn @problem, 'bind'
 
@@ -99,7 +103,7 @@ describe 'Problem', ->
 
   describe 'check', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
@@ -132,7 +136,7 @@ describe 'Problem', ->
 
   describe 'reset', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
 
     it 'log the problem_reset event', ->
       @problem.answers = 'foo=1&bar=2'
@@ -152,7 +156,7 @@ describe 'Problem', ->
 
   describe 'show', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.el.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
     describe 'when the answer has not yet shown', ->
@@ -231,7 +235,7 @@ describe 'Problem', ->
 
   describe 'save', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_save event', ->
@@ -251,7 +255,7 @@ describe 'Problem', ->
 
   describe 'refreshMath', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       $('#input_example_1').val 'E=mc^2'
       @problem.refreshMath target: $('#input_example_1').get(0)
 
@@ -261,7 +265,7 @@ describe 'Problem', ->
 
   describe 'updateMathML', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
@@ -281,7 +285,7 @@ describe 'Problem', ->
 
   describe 'refreshAnswers', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.el.html '''
         <textarea class="CodeMirror" />
         <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
