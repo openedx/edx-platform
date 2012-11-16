@@ -12,7 +12,9 @@ LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             dev_env=True,
-                            debug=True)
+                            debug=True,
+                            local_loglevel='ERROR',
+                            console_loglevel='ERROR')
 
 PIPELINE_JS['js-test-source'] = {
     'source_filenames': sum([

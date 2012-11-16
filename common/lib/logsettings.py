@@ -3,6 +3,7 @@ import platform
 import sys
 from logging.handlers import SysLogHandler
 
+LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
 def get_logger_config(log_dir,
                       logging_env="no_env",
@@ -11,7 +12,8 @@ def get_logger_config(log_dir,
                       dev_env=False,
                       syslog_addr=None,
                       debug=False,
-                      local_loglevel='INFO'):
+                      local_loglevel='INFO',
+                      console_loglevel=None):
 
     """
 
@@ -30,8 +32,11 @@ def get_logger_config(log_dir,
     """
 
     # Revert to INFO if an invalid string is passed in
-    if local_loglevel not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+    if local_loglevel not in LOG_LEVELS:
         local_loglevel = 'INFO'
+
+    if console_loglevel is None or console_loglevel not in LOG_LEVELS:
+        console_loglevel = 'DEBUG' if debug else 'INFO'
 
     hostname = platform.node().split(".")[0]
     syslog_format = ("[%(name)s][env:{logging_env}] %(levelname)s "
@@ -55,7 +60,7 @@ def get_logger_config(log_dir,
         },
         'handlers': {
             'console': {
-                'level': 'DEBUG' if debug else 'INFO',
+                'level': console_loglevel,
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
                 'stream': sys.stdout,
