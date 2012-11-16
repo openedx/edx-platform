@@ -455,6 +455,13 @@ class XMLModuleStore(ModuleStoreBase):
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
                     module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    # VS[compat]:
+                    # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                    # from the course policy
+                    if category == "static_tab":
+                        for tab in course_descriptor.tabs or []:
+                            if tab.get('url_slug') == slug:
+                                module.metadata['display_name'] = tab['name']            
                     module.metadata['data_dir'] = course_dir
                     self.modules[course_descriptor.id][module.location] = module   
                 except Exception, e:
