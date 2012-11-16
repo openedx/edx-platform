@@ -8,25 +8,43 @@ describe 'Problem', ->
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
 
+    # Load this function from spec/helper.coffee
+    # Note that if your test fails with a message like:
+    # 'External request attempted for blah, which is not defined.'
+    # this msg is coming from the stubRequests function else clause.
+    jasmine.stubRequests()
+
+    # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
+ 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
       callback()
-    jasmine.stubRequests()
 
   describe 'constructor', ->
-    beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
 
-    it 'set the element', ->
-      expect(@problem.el).toBe '#problem_1'
+    it 'set the element from html', ->
+      @problem999 = new Problem ("
+        <section class='xmodule_display xmodule_CapaModule' data-type='Problem'>
+          <section id='problem_999' 
+                   class='problems-wrapper' 
+                   data-problem-id='i4x://edX/999/problem/Quiz' 
+                   data-url='/problem/quiz/'>
+          </section>
+        </section>
+        ")      
+      expect(@problem999.element_id).toBe 'problem_999'
+
+    it 'set the element from loadFixtures', ->
+      @problem1 = new Problem($('.xmodule_display'))
+      expect(@problem1.element_id).toBe 'problem_1'
 
   describe 'bind', ->
     beforeEach ->
       spyOn window, 'update_schematics'
       MathJax.Hub.getAllJax.andReturn [@stubbedJax]
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
 
     it 'set mathjax typeset', ->
       expect(MathJax.Hub.Queue).toHaveBeenCalled()
@@ -38,7 +56,7 @@ describe 'Problem', ->
       expect($('section.action input:button')).toHandleWith 'click', @problem.refreshAnswers
 
     it 'bind the check button', ->
-      expect($('section.action input.check')).toHandleWith 'click', @problem.check
+      expect($('section.action input.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the reset button', ->
       expect($('section.action input.reset')).toHandleWith 'click', @problem.reset
@@ -60,7 +78,7 @@ describe 'Problem', ->
 
   describe 'render', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @bind = @problem.bind
       spyOn @problem, 'bind'
 
@@ -86,9 +104,13 @@ describe 'Problem', ->
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
 
+  describe 'check_fd', ->
+    xit 'should have specs written for this functionality', ->
+      expect(false)
+
   describe 'check', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_check event', ->
@@ -98,30 +120,34 @@ describe 'Problem', ->
     it 'submit the answer for check', ->
       spyOn $, 'postWithPrefix'
       @problem.check()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_check', 'foo=1&bar=2', jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_check',
+          'foo=1&bar=2', jasmine.any(Function)
 
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'correct', contents: 'Correct!')
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+          callback(success: 'correct', contents: 'Correct!')
         @problem.check()
         expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'incorrect', contents: 'Correct!')
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+          callback(success: 'incorrect', contents: 'Incorrect!')
         @problem.check()
-        expect(@problem.el.html()).toEqual 'Correct!'
+        expect(@problem.el.html()).toEqual 'Incorrect!'
 
     describe 'when the response is undetermined', ->
       it 'alert the response', ->
         spyOn window, 'alert'
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> callback(success: 'Number Only!')
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+          callback(success: 'Number Only!')
         @problem.check()
         expect(window.alert).toHaveBeenCalledWith 'Number Only!'
 
   describe 'reset', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
 
     it 'log the problem_reset event', ->
       @problem.answers = 'foo=1&bar=2'
@@ -131,7 +157,8 @@ describe 'Problem', ->
     it 'POST to the problem reset page', ->
       spyOn $, 'postWithPrefix'
       @problem.reset()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_reset', { id: 1 }, jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_reset', 
+          { id: 'i4x://edX/101/problem/Problem1' }, jasmine.any(Function)
 
     it 'render the returned content', ->
       spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
@@ -141,7 +168,7 @@ describe 'Problem', ->
 
   describe 'show', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.el.prepend '<div id="answer_1_1" /><div id="answer_1_2" />'
 
     describe 'when the answer has not yet shown', ->
@@ -150,12 +177,14 @@ describe 'Problem', ->
 
       it 'log the problem_show event', ->
         @problem.show()
-        expect(Logger.log).toHaveBeenCalledWith 'problem_show', problem: 1
+        expect(Logger.log).toHaveBeenCalledWith 'problem_show', 
+            problem: 'i4x://edX/101/problem/Problem1'
 
       it 'fetch the answers', ->
         spyOn $, 'postWithPrefix'
         @problem.show()
-        expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_show', jasmine.any(Function)
+        expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_show',
+            jasmine.any(Function)
 
       it 'show the answers', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
@@ -220,7 +249,7 @@ describe 'Problem', ->
 
   describe 'save', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.answers = 'foo=1&bar=2'
 
     it 'log the problem_save event', ->
@@ -230,7 +259,8 @@ describe 'Problem', ->
     it 'POST to save problem', ->
       spyOn $, 'postWithPrefix'
       @problem.save()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/problem_save', 'foo=1&bar=2', jasmine.any(Function)
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_save', 
+          'foo=1&bar=2', jasmine.any(Function)
 
     it 'alert to the user', ->
       spyOn window, 'alert'
@@ -240,7 +270,7 @@ describe 'Problem', ->
 
   describe 'refreshMath', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       $('#input_example_1').val 'E=mc^2'
       @problem.refreshMath target: $('#input_example_1').get(0)
 
@@ -250,7 +280,7 @@ describe 'Problem', ->
 
   describe 'updateMathML', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @stubbedJax.root.toMathML.andReturn '<MathML>'
 
     describe 'when there is no exception', ->
@@ -270,7 +300,7 @@ describe 'Problem', ->
 
   describe 'refreshAnswers', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem($('.xmodule_display'))
       @problem.el.html '''
         <textarea class="CodeMirror" />
         <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
@@ -293,3 +323,6 @@ describe 'Problem', ->
     it 'serialize all answers', ->
       @problem.refreshAnswers()
       expect(@problem.answers).toEqual "input_1_1=one&input_1_2=two"
+
+
+
