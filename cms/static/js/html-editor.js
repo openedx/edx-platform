@@ -32,9 +32,8 @@ function initHTMLEditor($editor, $prev) {
             title : 'Add Asset',
             image : '/static/img/visual-editor-image-icon.png',
             onclick : function() {
-              ed.focus();
-              ed.selection.setContent('This should open the studio asset picker.');
               $assetWidget = $($('#asset-library-widget').html());
+              $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
               $body.append($assetWidget);
             }
         });
@@ -49,6 +48,13 @@ function initHTMLEditor($editor, $prev) {
   });
 
   $editor.find('.save-button, .cancel-button').bind('click', updatePreview);
+}
+
+function insertAsset(e) {
+  $assetWidget.remove();
+  var editor = e.data.editor;
+  editor.focus();
+  editor.selection.setContent($(this).attr('data-markup'));
 }
 
 function convertVisualToHTML() {

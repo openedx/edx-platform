@@ -111,9 +111,19 @@
 
   &.widget {
     position: absolute;
+    left: 50%;
     width: 900px;
     margin-left: -450px;
     z-index: 99999;
+
+    .thumb-col {
+      width: 50px;
+    }
+
+    .thumb {
+      width: 50px;
+      max-height: 50px;
+    }
   }
 
   table {
@@ -168,6 +178,14 @@
       width: 250px;
     }
 
+    .insert-col {
+      width: 80px;
+    }
+
+    .insert-asset-button {
+      @include blue-button;
+    }
+
     .embeddable-xml-input {
       @include box-shadow(none);
       width: 100%;
@@ -176,6 +194,7 @@
     .thumb {
       width: 100px;
       max-height: 80px;
+      overflow: hidden;
 
       img {
         width: 100%;
