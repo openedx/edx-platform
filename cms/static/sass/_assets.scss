@@ -108,13 +108,44 @@
 
 .asset-library {
   @include clearfix;
+  display: block;
 
   &.widget {
     position: absolute;
     left: 50%;
-    width: 900px;
-    margin-left: -450px;
     z-index: 99999;
+    width: 900px;
+    padding: 20px;
+    margin-left: -450px;
+    border-radius: 3px;
+    background: $lightGrey;
+
+    header {
+      height: 40px;
+      margin-bottom: 20px;
+    }
+
+    .close-button {
+      @include white-button;
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border-radius: 29px;
+      text-align: center;
+
+      .close-icon {
+        margin-top: 8px;
+      }
+    }
+
+    .search {
+      width: 400px;
+      height: 38px;
+      padding-left: 36px;
+      background-color: #fff;
+      background-position: 12px 10px;
+      font-size: 14px;
+    }
 
     .thumb-col {
       width: 50px;
@@ -123,6 +154,13 @@
     .thumb {
       width: 50px;
       max-height: 50px;
+    }
+
+    .upload-button {
+      @include blue-button;
+      float: right;
+      padding: 8px 30px 10px;
+      font-size: 12px;
     }
   }
 
