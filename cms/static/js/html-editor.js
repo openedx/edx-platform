@@ -11,11 +11,10 @@ function initHTMLEditor($editor, $prev) {
 
   // there's a race condition here. wait a bit, then init tiny
   setTimeout(function() {
-    $editor.find('.edit-box.tinymce').tinymce({
+    $visualEditor = $editor.find('.edit-box.tinymce').tinymce({
       script_url : '/static/js/tiny_mce/tiny_mce.js',
       theme : "advanced",
-      skin: 'studio',
-      plugins : "autolink,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+      skin: 'studio',      
       
       // we may want to add "styleselect" when we collect all styles used throught the lms
       theme_advanced_buttons1 : "formatselect,bold,italic,underline,bullist,numlist,outdent,indent,blockquote,studio.asset,link,unlink",
@@ -50,13 +49,13 @@ function initHTMLEditor($editor, $prev) {
 }
 
 function convertVisualToHTML() {
-  htmlEditor.setValue($('.edit-box', visualEditor).html());
+  htmlEditor.setValue($visualEditor.html());
 }
 
 function convertHTMLToVisual() {
-  $('.edit-box', visualEditor).html(htmlEditor.getValue());
+  $visualEditor.html(htmlEditor.getValue());
 }
 
 function updatePreview() {
-  $htmlPreview.html($('.edit-box', visualEditor).html());
+  $htmlPreview.html($visualEditor.html());
 }
