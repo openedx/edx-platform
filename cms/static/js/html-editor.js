@@ -59,3 +59,4 @@ function convertHTMLToVisual() {
 function updatePreview() {
   $htmlPreview.html($visualEditor.html());
 }
+
