@@ -13,94 +13,7 @@
     font-size: 12px;
   }
 
-  .asset-library {
-    @include clearfix;
-
-    table {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      border: 1px solid #c5cad4;
-
-      td,
-      th {
-        padding: 10px 20px;
-        text-align: left;
-        vertical-align: middle;
-      }
-
-      thead th {
-        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-        background-color: #ced2db;
-        font-size: 12px;
-        font-weight: 700;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-      }
-
-      tbody {
-        background: #fff;
-
-        tr {
-          border-top: 1px solid #c5cad4;
-
-          &:first-child {
-            border-top: none;
-          }
-        }
-
-        .name-col {
-          font-size: 14px;
-        }
-
-        .date-col {
-          font-size: 12px;
-        }
-      }
-
-      .thumb-col {
-        width: 100px;
-      }
-
-      .date-col {
-        width: 220px;
-      }
-
-      .embed-col {
-        width: 250px;
-      }
-
-      .embeddable-xml-input {
-        @include box-shadow(none);
-        width: 100%;
-      }
-
-      .thumb {
-        width: 100px;
-        max-height: 80px;
-
-        img {
-          width: 100%;
-        }
-      }
-    }
-
-    .pagination {
-      float: right;
-      margin: 15px 10px;
-
-      ol, li {
-        display: inline;
-      }
-
-      a {
-        display: inline-block;
-        height: 25px;
-        padding: 0 4px;
-        text-align: center;
-        line-height: 25px;
-      }
-    }
-  }
-    .show-xml {
+  .show-xml {
     @include blue-button;
   }
 }
@@ -191,4 +104,99 @@
 		display: none;
 		margin-bottom: 100px;
 	}
+}
+
+.asset-library {
+  @include clearfix;
+
+  &.widget {
+    position: absolute;
+    width: 900px;
+    margin-left: -450px;
+    z-index: 99999;
+  }
+
+  table {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    border: 1px solid #c5cad4;
+
+    td,
+    th {
+      padding: 10px 20px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    thead th {
+      @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+      background-color: #ced2db;
+      font-size: 12px;
+      font-weight: 700;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+    }
+
+    tbody {
+      background: #fff;
+
+      tr {
+        border-top: 1px solid #c5cad4;
+
+        &:first-child {
+          border-top: none;
+        }
+      }
+
+      .name-col {
+        font-size: 14px;
+      }
+
+      .date-col {
+        font-size: 12px;
+      }
+    }
+
+    .thumb-col {
+      width: 100px;
+    }
+
+    .date-col {
+      width: 220px;
+    }
+
+    .embed-col {
+      width: 250px;
+    }
+
+    .embeddable-xml-input {
+      @include box-shadow(none);
+      width: 100%;
+    }
+
+    .thumb {
+      width: 100px;
+      max-height: 80px;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  .pagination {
+    float: right;
+    margin: 15px 10px;
+
+    ol, li {
+      display: inline;
+    }
+
+    a {
+      display: inline-block;
+      height: 25px;
+      padding: 0 4px;
+      text-align: center;
+      line-height: 25px;
+    }
+  }
 }

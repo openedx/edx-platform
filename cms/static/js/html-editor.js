@@ -2,6 +2,7 @@ var $body;
 var $htmlPreview;
 var $htmlEditor;
 var $visualEditor;
+var $assetWidget;
 var visualEditor;
 var htmlEditor;
 
@@ -33,6 +34,8 @@ function initHTMLEditor($editor, $prev) {
             onclick : function() {
               ed.focus();
               ed.selection.setContent('This should open the studio asset picker.');
+              $assetWidget = $($('#asset-library-widget').html());
+              $body.append($assetWidget);
             }
         });
       }

@@ -23,7 +23,7 @@
       switch($(this).attr('data-tab')) {
         case 'simple':
           currentEditor = simpleEditor;
-          $(simpleEditor.getWrapperElement()).show();          
+          $(simpleEditor.getWrapperElement()).show();
           $(xmlEditor.getWrapperElement()).hide();
           $(simpleEditor).focus();
           break;
@@ -52,6 +52,85 @@
   <script src="/static/js/html-editor.js"></script>
   <script src="/static/js/tiny_mce/tiny_mce.js"></script>
   <script src="/static/js/tiny_mce/jquery.tinymce.js"></script>
+
+  <script type="text/template" id="asset-library-widget">
+    <article class="asset-library widget">
+      <table>
+        <thead>
+          <tr>
+            <th class="thumb-col"></th>
+            <th class="name-col">Name</th>
+            <th class="date-col">Date Added</th>
+            <th class="embed-col">Embed</th>
+          </tr>
+        </thead>
+        <tbody id="asset_table_body">
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">asset name</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              date
+            </td>
+            <td class="embed-col">
+              <input type="text" class="embeddable-xml-input" value='<img src="#"/>'>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">asset name</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              date
+            </td>
+            <td class="embed-col">
+              <input type="text" class="embeddable-xml-input" value='<img src="#"/>'>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">asset name</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              date
+            </td>
+            <td class="embed-col">
+              <input type="text" class="embeddable-xml-input" value='<img src="#"/>'>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <nav class="pagination wip-box">
+        Page: 
+        <ol class="pages">
+          <li>1</li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+        </ol>
+        <a href="#" class="next">»</a>
+      </nav>
+    </article>
+  </script>
 
   <script type="text/template" id="simple-editor-cheatsheet">
     <article class="simple-editor-cheatsheet">
@@ -112,7 +191,7 @@
   <script type="text/template" id="component-actions">
     <div class="component-actions">
       <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
-      <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>  
+      <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>
     </div>
     <a href="#" class="drag-handle"></a>
   </script>
@@ -355,7 +434,7 @@
                   </li>
                 </ol>
               </li>
-            </ol>            
+            </ol>
           </div>
         </div>
       </div>
