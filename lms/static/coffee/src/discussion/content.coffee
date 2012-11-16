@@ -78,7 +78,8 @@ if Backbone?
         if @getContent(id)
           @getContent(id).updateInfo(info)
       $.extend @contentInfos, infos
-
+    
+    
   class @Thread extends @Content
     urlMappers:
       'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
@@ -119,7 +120,13 @@ if Backbone?
       else
         @get("body")
 
-    display_title: ->
+    display_tigetCommentsCount: ->
+      count = 0
+      @get('comments').each (comment) ->
+        count += comment.getCommentsCount() + 1
+      count
+
+  class @Comments extends Backbtle: ->
       if @has("highlighted_title")
         String(@get("highlighted_title")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
       else
@@ -134,6 +141,7 @@ if Backbone?
 
     created_at_time: ->
       new Date(@get("created_at")).getTime()
+      
 
   class @Comment extends @Content
     urlMappers:

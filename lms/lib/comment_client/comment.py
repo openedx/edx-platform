@@ -10,7 +10,7 @@ class Comment(models.Model):
         'id', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'endorsed', 'parent_id', 'thread_id', 'username', 'votes', 'user_id',
         'closed', 'created_at', 'updated_at', 'depth', 'at_position_list',
-        'type', 'commentable_id',
+        'type', 'commentable_id', 'abuse_flaggers', 'spoiler_flaggers'
     ]
 
     updatable_fields = [
