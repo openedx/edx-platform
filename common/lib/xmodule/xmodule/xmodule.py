@@ -159,6 +159,7 @@ class XModule(Plugin):
         for method_name, method_fn in inspect.getmembers(self, lambda m: inspect.ismethod(m)):
             if getattr(method_fn, 'view_name', None) is not None:
                 return method_fn
+        raise MissingXModuleView(self.__class__, view_name)
 
     @property
     def children(self):
