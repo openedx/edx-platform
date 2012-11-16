@@ -159,6 +159,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
                 module.metadata['hide_progress_tab'] = True
 
+                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which 
+                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS, 
+                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that - 
+                # if there is *any* tabs - then there at least needs to be some predefined ones
+                if module.tabs is None or len(module.tabs) == 0:
+                    module.tabs = [{"type": "courseware"}, 
+                        {"type": "course_info", "name": "Course Info"}, 
+                        {"type": "discussion", "name": "Discussion"},
+                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+
                 # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
                 # so let's make sure we import in case there are no other references to it in the modules
                 verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
