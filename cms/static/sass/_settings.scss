@@ -522,185 +522,185 @@
 
 
 
-  // h3 {
-  //   margin-bottom: 30px;
-  //   font-size: 15px;
-  //   font-weight: 700;
-  //   color: $blue;
-  // }
+  h3 {
+    margin-bottom: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $blue;
+  }
 
-  // .grade-controls {
-  //   @include clearfix;
-  // }
+  .grade-controls {
+    @include clearfix;
+  }
 
-  // .new-grade-button {
-  //   position: relative;
-  //   float: left;
-  //   display: block;
-  //   width: 29px;
-  //   height: 29px;
-  //   margin: 4px 10px 0 0;
-  //   border-radius: 20px;
-  //   border: 1px solid $darkGrey;
-  //   @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-  //   background-color: #d1dae3;
-  //   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-  //   color: #6d788b;
+  .new-grade-button {
+    position: relative;
+    float: left;
+    display: block;
+    width: 29px;
+    height: 29px;
+    margin: 4px 10px 0 0;
+    border-radius: 20px;
+    border: 1px solid $darkGrey;
+    @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+    background-color: #d1dae3;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+    color: #6d788b;
 
-  //   .plus-icon {
-  //     position: absolute;
-  //     top: 50%;
-  //     left: 50%;
-  //     margin-left: -6px;
-  //     margin-top: -6px;
-  //   }
-  // }
+    .plus-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -6px;
+      margin-top: -6px;
+    }
+  }
 
-  // .grade-slider {
-  //   float: left;
-  //   width: 560px;
-  //   height: 60px;
+  .grade-slider {
+    float: left;
+    width: 560px;
+    height: 60px;
 
-  //   .grade-bar {
-  //     position: relative;
-  //     width: 100%;
-  //     height: 40px;
-  //     background: $lightGrey;
+    .grade-bar {
+      position: relative;
+      width: 100%;
+      height: 40px;
+      background: $lightGrey;
 
-  //     .increments {
-  //       position: relative;
+      .increments {
+        position: relative;
 
-  //       li {
-  //         position: absolute;
-  //         top: 42px;
-  //         width: 30px;
-  //         margin-left: -15px;
-  //         font-size: 9px;
-  //         text-align: center;
+        li {
+          position: absolute;
+          top: 42px;
+          width: 30px;
+          margin-left: -15px;
+          font-size: 9px;
+          text-align: center;
 
-  //         &.increment-0 {
-  //           left: 0;
-  //         }
+          &.increment-0 {
+            left: 0;
+          }
 
-  //         &.increment-10 {
-  //           left: 10%;
-  //         }
+          &.increment-10 {
+            left: 10%;
+          }
 
-  //         &.increment-20 {
-  //           left: 20%;
-  //         }
+          &.increment-20 {
+            left: 20%;
+          }
 
-  //         &.increment-30 {
-  //           left: 30%;
-  //         }
+          &.increment-30 {
+            left: 30%;
+          }
 
-  //         &.increment-40 {
-  //           left: 40%;
-  //         }
+          &.increment-40 {
+            left: 40%;
+          }
 
-  //         &.increment-50 {
-  //           left: 50%;
-  //         }
+          &.increment-50 {
+            left: 50%;
+          }
 
-  //         &.increment-60 {
-  //           left: 60%;
-  //         }
+          &.increment-60 {
+            left: 60%;
+          }
 
-  //         &.increment-70 {
-  //           left: 70%;
-  //         }
+          &.increment-70 {
+            left: 70%;
+          }
 
-  //         &.increment-80 {
-  //           left: 80%;
-  //         }
+          &.increment-80 {
+            left: 80%;
+          }
 
-  //         &.increment-90 {
-  //           left: 90%;
-  //         }
+          &.increment-90 {
+            left: 90%;
+          }
 
-  //         &.increment-100 {
-  //           left: 100%;
-  //         }
-  //       }
-  //     }
+          &.increment-100 {
+            left: 100%;
+          }
+        }
+      }
 
-  //     .grades {
-  //       position: relative;
+      .grades {
+        position: relative;
 
-  //       li {
-  //         position: absolute;
-  //         top: 0;
-  //         height: 40px;     
-  //         text-align: right;
+        li {
+          position: absolute;
+          top: 0;
+          height: 40px;     
+          text-align: right;
 
-  //         &:hover,
-  //         &.is-dragging {
-  //           .remove-button {
-  //             display: block;
-  //           }
-  //         }
+          &:hover,
+          &.is-dragging {
+            .remove-button {
+              display: block;
+            }
+          }
 
-  //         .remove-button {
-  //           display: none;
-  //           position: absolute;
-  //           top: -17px;
-  //           right: 1px;
-  //           height: 17px;
-  //           font-size: 10px;
-  //         }
+          .remove-button {
+            display: none;
+            position: absolute;
+            top: -17px;
+            right: 1px;
+            height: 17px;
+            font-size: 10px;
+          }
 
-  //         &:nth-child(1) {
-  //           background: #4fe696;
-  //         }
+          &:nth-child(1) {
+            background: #4fe696;
+          }
 
-  //         &:nth-child(2) {
-  //           background: #ffdf7e;
-  //         }
+          &:nth-child(2) {
+            background: #ffdf7e;
+          }
 
-  //         &:nth-child(3) {
-  //           background: #ffb657;
-  //         }
+          &:nth-child(3) {
+            background: #ffb657;
+          }
 
-  //         &:nth-child(4) {
-  //           background: #fb336c;
-  //         }
+          &:nth-child(4) {
+            background: #fb336c;
+          }
 
-  //         &:nth-child(5) {
-  //           background: #ef54a1;
-  //         }
+          &:nth-child(5) {
+            background: #ef54a1;
+          }
 
-  //         .letter-grade {
-  //           display: block;
-  //           margin: 7px 5px 0 0;
-  //           font-size: 14px;
-  //           font-weight: 700;
-  //           line-height: 14px;
-  //         }
+          .letter-grade {
+            display: block;
+            margin: 7px 5px 0 0;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 14px;
+          }
 
-  //         .range {
-  //           display: block;
-  //           margin-right: 5px;
-  //           font-size: 9px;
-  //           line-height: 12px;
-  //         }
+          .range {
+            display: block;
+            margin-right: 5px;
+            font-size: 9px;
+            line-height: 12px;
+          }
 
-  //         .drag-bar {
-  //           position: absolute;
-  //           top: 0;
-  //           right: -1px;
-  //           height: 40px;
-  //           width: 2px;
-  //           background-color: #fff;
-  //           cursor: ew-resize;
-  //           @include transition(none);
+          .drag-bar {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 40px;
+            width: 2px;
+            background-color: #fff;
+            cursor: ew-resize;
+            @include transition(none);
 
-  //           &:hover {
-  //             width: 4px;
-  //             right: -2px;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+            &:hover {
+              width: 4px;
+              right: -2px;
+            }
+          }
+        }
+      }
+    }
+  }
 }
