@@ -132,34 +132,35 @@ class Reschedule(Policy):
         ]
 
         settings = dict(tree.settings)
-        if 'start_date' in policy:
+        if 'start_date' in settings:
             settings['start_date'] = settings['start_date'] + delta
 
         return tree._replace(settings=settings, children=children)
 
-# class AppendModule(QueryPolicy):
-#     """
-#     This module will append a policy after each module matching the query.
-#     Any keys in policy_to_copy will be copied from the usage node that
-#     matches the query.
-#     """
+if 0:
+    class AppendModule(QueryPolicy):
+        """
+        This module will append a policy after each module matching the query.
+        Any keys in policy_to_copy will be copied from the usage node that
+        matches the query.
+        """
 
-#     def __init__(self, query, source, policy_to_copy=None, *args, **kwargs):
-#         super(AppendModule, self).__init__(query, *args, **kwargs)
-#         self.policy_to_copy = policy_to_copy if policy_to_copy is not None else []
-#         self.source = source
+        def __init__(self, query, source, policy_to_copy=None, *args, **kwargs):
+            super(AppendModule, self).__init__(query, *args, **kwargs)
+            self.policy_to_copy = policy_to_copy if policy_to_copy is not None else []
+            self.source = source
 
-#     def update(usage):
-#         """
-#         Return a list of usages to replace the returned usage with
-#         """
-#         to_insert = Usage.create_usage(self.source)
-#         policy = dict(to_insert.policy)
-#         for key in self.policy_to_copy:
-#             if key in usage:
-#                 policy[key] = usage[key]
+        def update(usage):
+            """
+            Return a list of usages to replace the returned usage with
+            """
+            to_insert = Usage.create_usage(self.source)
+            policy = dict(to_insert.policy)
+            for key in self.policy_to_copy:
+                if key in usage:
+                    policy[key] = usage[key]
 
-#         return [usage, to_insert._replace(policy=policy)] 
+            return [usage, to_insert._replace(policy=policy)] 
 
 
 
