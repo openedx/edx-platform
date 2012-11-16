@@ -4,16 +4,18 @@ setup(
     name="XModule",
     version="0.1",
     packages=find_packages(exclude=["tests"]),
-    install_requires=['distribute'],
+    install_requires=[
+        'distribute',
+        'capa',
+        'fs >=0.4.0',
+        'mako',
+        'pyyaml',
+        'lxml',
+        'requests',
+    ],
     package_data={
         'xmodule': ['js/module/*']
     },
-    requires=[
-        'capa',
-        # TODO: This isn't actually forcing an install, for some reason
-        'fs (>= 0.4.0)',
-        'mako',
-    ],
 
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
