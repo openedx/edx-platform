@@ -8,20 +8,30 @@ describe 'Problem', ->
     MathJax.Hub.getAllJax.andReturn [@stubbedJax]
     window.update_schematics = ->
 
-    jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
+    # load this function from spec/helper.coffee
+    jasmine.stubRequests()
+
+    # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
       callback()
-    jasmine.stubRequests()
 
   describe 'constructor', ->
     beforeEach ->
-      @problem = new Problem 1, "problem_1", "/problem/url/"
+      @problem = new Problem ("
+        <section class='xmodule_display xmodule_CapaModule' data-type='Problem'>
+          <section id='problem_999' 
+                   class='problems-wrapper' 
+                   data-problem-id='i4x://edX/999/problem/Quiz' 
+                   data-url='/problem/quiz/'>
+          </section>
+        </section>
+        ")
 
     it 'set the element', ->
-      expect(@problem.el).toBe '#problem_1'
+      expect(@problem.element_id).toBe 'problem_999'
 
   describe 'bind', ->
     beforeEach ->
