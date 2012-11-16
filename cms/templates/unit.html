@@ -12,10 +12,45 @@
         state: '${unit_state}'
       })
     });
+
+    $body = $('body');
+    $body.on('click', '.editor-tabs .tab', setEditorTab);
+
+    function setEditorTab(e) {
+      e.preventDefault();
+      $('.editor-tabs .current').removeClass('current');
+      $(this).addClass('current');
+      switch($(this).attr('data-tab')) {
+        case 'simple':
+          currentEditor = simpleEditor;
+          $(simpleEditor.getWrapperElement()).show();          
+          $(xmlEditor.getWrapperElement()).hide();
+          $(simpleEditor).focus();
+          break;
+        case 'xml':
+          currentEditor = xmlEditor;
+          $(simpleEditor.getWrapperElement()).hide();
+          $(xmlEditor.getWrapperElement()).show();
+          $(xmlEditor).focus();
+          break;
+        case 'visual':
+          $('table.mceToolbar').show();
+          $(htmlEditor.getWrapperElement()).hide();
+          convertHTMLToVisual();
+          break;
+        case 'html':
+          $('table.mceToolbar').hide();
+          $(htmlEditor.getWrapperElement()).show();
+          convertVisualToHTML();
+          break;
+      }
+      onSimpleEditorUpdate();
+    }
   </script>
 
   <script src="/static/js/speed-editor.js"></script>
   <script src="/static/js/html-editor.js"></script>
+  <script src="/static/js/tiny_mce/tiny_mce.js"></script>
   <script src="/static/js/tiny_mce/jquery.tinymce.js"></script>
 
   <script type="text/template" id="simple-editor-cheatsheet">
@@ -94,8 +129,8 @@
             <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span class="problem-editor-icon dropdown"></span></a></li>
           </ul>
           <ul class="editor-tabs">
-            <li><a href="#" class="simple-tab tab current">Simple</a></li>
-            <li><a href="#" class="xml-tab tab">XML</a></li>
+            <li><a href="#" class="simple-tab tab current" data-tab="simple">Simple</a></li>
+            <li><a href="#" class="xml-tab tab" data-tab="xml">XML</a></li>
             <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
           </ul>
         </div>
@@ -147,8 +182,13 @@
 
   <script type="text/template" id="html-editor">
     <div class="html-editor editor">
+      <ul class="editor-tabs">
+        <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
+        <li><a href="#" class="html-tab tab" data-tab="html">HTML</a></li>
+      </ul>
       <div class="row">
         <textarea class="edit-box tinymce"></textarea>
+        <textarea class="html-box"></textarea>
       </div>      
       <div class="row">
         <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>

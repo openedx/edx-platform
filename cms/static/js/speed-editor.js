@@ -11,9 +11,7 @@ var commandDown;
 
 
 (function() {
-  $body = $('body');
   $body.on('click', '.editor-bar a', onEditorButton);
-  $body.on('click', '.editor-tabs .tab', setEditorTab);
   $body.on('click', '.cheatsheet-toggle', toggleCheatsheet);
   $body.on('click', '.problem-settings-button', toggleProblemSettings);
   $(document).bind('keyup', onKeyboard);
@@ -80,24 +78,6 @@ function toggleCheatsheet(e) {
   setTimeout(function() {
     $cheatsheet.toggleClass('shown');
   }, 10);
-}
-
-function setEditorTab(e) {
-  e.preventDefault();
-  $('.editor-tabs .current').removeClass('current');
-  $(this).addClass('current');
-  if($(this).hasClass('simple-tab')) {
-    currentEditor = simpleEditor;
-    $(simpleEditor.getWrapperElement()).show();          
-    $(xmlEditor.getWrapperElement()).hide();
-    $(simpleEditor).focus();
-  } else {
-    currentEditor = xmlEditor;
-    $(simpleEditor.getWrapperElement()).hide();
-    $(xmlEditor.getWrapperElement()).show();
-    $(xmlEditor).focus();
-  }
-  onSimpleEditorUpdate();
 }
 
 function setFocus(e) {

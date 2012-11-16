@@ -83,6 +83,10 @@
         .component-actions {
           display: none;
         }
+
+        .html-preview {
+          display: none;
+        }
       }
 
       &.component-placeholder {
@@ -372,6 +376,55 @@
       border-top: none;
       background: #fff;
       color: #3c3c3c;
+    }
+  }
+
+  .html-editor {
+    .row {
+      position: relative;
+    }
+
+    textarea {
+      display: none;
+    }
+
+    .CodeMirror {
+      display: none;
+      position: absolute;
+      top: 47px;
+      width: 100%;
+      height: 378px;
+      @include box-sizing(border-box);
+    }
+
+    .editor-tabs {
+      position: absolute;
+      top: 31px;
+      right: 30px;
+      z-index: 99;
+
+      li {
+        float: left;
+      }
+
+      .tab {
+        display: block;
+        height: 24px;
+        padding: 7px 20px 3px;
+        margin-left: 7px;
+        border: 1px solid #a5aaaf;          
+        border-radius: 3px 3px 0 0;
+        @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
+        background-color: #e5ecf3;
+        font-size: 13px;
+        color: #3c3c3c;
+        box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+
+        &.current {
+          background: #fff;
+          border-bottom-color: #fff;
+        }
+      }
     }
   }
 

@@ -1,5 +1,9 @@
 .studioSkin * {
   -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
 }
 
 /* Reset */
@@ -26,6 +30,10 @@
 .studioSkin table.mceToolbar, .studioSkin tr.mceFirst .mceToolbar tr td, .studioSkin tr.mceLast .mceToolbar tr td {border:0; margin:0; padding:0;}
 .studioSkin td.mceToolbar {
   background: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
+  background: -moz-linear-gradient(top, #d4dee8, #c9d5e2);
+  background: -ms-linear-gradient(top, #d4dee8, #c9d5e2);
+  background: -o-linear-gradient(top, #d4dee8, #c9d5e2);
+  background: linear-gradient(top, #d4dee8, #c9d5e2);
   border: 1px solid #3c3c3c;
   border-bottom-color: #a5aaaf;
   border-radius: 3px 3px 0 0;
@@ -64,6 +72,10 @@
 /* ListBox */
 .studioSkin .mceListBox {
   background: -webkit-linear-gradient(top, #dbe5ef, #cfdce9);
+  background: -moz-linear-gradient(top, #dbe5ef, #cfdce9);
+  background: -ms-linear-gradient(top, #dbe5ef, #cfdce9);
+  background: -o-linear-gradient(top, #dbe5ef, #cfdce9);
+  background: linear-gradient(top, #dbe5ef, #cfdce9);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(0, 0, 0, 0.2);
   border-radius: 2px;
   padding: 3px;
@@ -71,6 +83,10 @@
 }
 .studioSkin .mceListBox:hover {
   background: -webkit-linear-gradient(top, #e6eff8, #d9e8f6);
+  background: -moz-linear-gradient(top, #e6eff8, #d9e8f6);
+  background: -ms-linear-gradient(top, #e6eff8, #d9e8f6);
+  background: -o-linear-gradient(top, #e6eff8, #d9e8f6);
+  background: linear-gradient(top, #e6eff8, #d9e8f6);
 }
 .studioSkin .mceListBox, .studioSkin .mceListBox a {display:block}
 .studioSkin .mceListBox .mceText {padding-left:4px; width:70px; text-align:left; font-size:11px; height:20px; line-height:20px; overflow:hidden}

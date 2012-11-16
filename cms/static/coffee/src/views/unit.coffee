@@ -96,6 +96,7 @@ class CMS.Views.UnitEdit extends Backbone.View
         initProblemEditors(@$editor, $preview)
       when 'html'
         @$editor = $($('#html-editor').html())
+        $preview = $('<div class="html-preview"></div>')
         initHTMLEditor(@$editor, $preview)
       when 'discussion'
         @$editor = $($('#discussion-editor').html())
@@ -109,8 +110,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     $componentActions = $($('#component-actions').html())
 
     @$componentItem.append(@$editor)
-    if $preview
-      @$componentItem.append($preview)
+    @$componentItem.append($preview)
 
     @$componentItem.append($componentActions)
     @$componentItem.hide()
