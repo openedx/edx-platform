@@ -75,7 +75,6 @@ class Command(BaseCommand):
             cert_data[course_id].update(
                     {status['status']: status['dcount']
                                         for status in tallies})
-            print cert_data
 
         # all states we have seen far all courses
         status_headings = set(
