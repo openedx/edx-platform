@@ -1,12 +1,11 @@
 from django.core.management.base import BaseCommand
-from certificates.models import certificate_status_for_student
-from certificates.models import CertificateStatuses
+from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
 from optparse import make_option
 from django.conf import settings
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
-from collections import Counter
+from django.db.models import Count
 
 
 class Command(BaseCommand):
@@ -56,8 +55,7 @@ class Command(BaseCommand):
         else:
             ended_courses = self._ended_courses()
 
-        total_enrolled = {}
-        cert_statuses = {}
+        cert_data = {}
 
         for course_id in ended_courses:
 
@@ -66,34 +64,35 @@ class Command(BaseCommand):
             enrolled_students = User.objects.filter(
                     courseenrollment__course_id=course_id).prefetch_related(
                             "groups").order_by('username')
-            total_enrolled[course_id] = enrolled_students.count()
+            unavailable_count = enrolled_students.count() - \
+                    GeneratedCertificate.objects.filter(
+                            course_id__exact=course_id).count()
+            cert_data[course_id] = {'enrolled': enrolled_students.count()}
+            cert_data[course_id].update({'unavailable': unavailable_count})
 
-            cert_statuses = [attr # all possible certificate statuses
-                    for attr in dir(CertificateStatuses())
-                       if not callable(attr) and not attr.startswith("__")]
-
-            # tally up certificate statuses for every student
-            # enrolled in the course
-            cert_statuses = {status:GeneratedCertificate.objects.filter(course_id__exact=course_id, status=status).count() for status in cert_statuses}
-
+            tallies = GeneratedCertificate.objects.values(
+                    'status').annotate(dcount=Count('status'))
+            cert_data[course_id].update(
+                    {status['status']: status['dcount']
+                                        for status in tallies})
+            print cert_data
 
         # all states we have seen far all courses
         status_headings = set(
-                [status for course in cert_statuses
-                    for status in cert_statuses[course]])
+                [status for course in cert_data
+                    for status in cert_data[course]])
 
         # print the heading for the report
-        print "{0:>20}{1:>10}".format("course ID", "enrolled"),
+        print "{:>20}".format("course ID"),
         print ' '.join(["{:>12}".format(heading)
                             for heading in status_headings])
 
         # print the report
-        for course_id in total_enrolled:
-            print "{0:>20}{1:>10}".format(
-                    course_id[0:18], total_enrolled[course_id]),
+        for course_id in cert_data:
+            print "{0:>20}".format(course_id[0:18]),
             for heading in status_headings:
-                if heading in cert_statuses[course_id]:
-                    print "{:>12}".format(cert_statuses[course_id][heading]),
+                if heading in cert_data[course_id]:
+                    print "{:>12}".format(cert_data[course_id][heading]),
                 else:
                     print " " * 12,
             print
