@@ -6,6 +6,11 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
+
   <script type="text/javascript">
     var $body;
     var $gradeBar;
@@ -30,6 +35,8 @@
       $body.on('mousedown', '.drag-bar', startDragBar);
       $('.new-grade-button').bind('click', addNewGrade);
       $body.on('click', '.remove-button', removeGrade);
+
+      $('.set-date').datepicker();
     })();
 
     function addNewGrade(e) {
@@ -187,7 +194,7 @@
                     <li class="input input-existing multi multi-inline course-milestone-list-item">
                       <div class="group">
                         <label for="course-milestone-1-date-input">Milestone Date</label>
-                        <input type="text" id="course-milestone-1-date-input" class="course-milestone-date-input date hasDatepicker" placeholder="MM/DD/YYYY">
+                        <input type="text" id="course-milestone-1-date-input" class="course-milestone-date-input date set-date" placeholder="MM/DD/YYYY">
                       </div>
 
                       <div class="group">
@@ -201,7 +208,7 @@
                     <li class="input multi multi-inline course-milestone-list-item">
                       <div class="group">
                         <label for="course-milestone-2-date-input">Milestone Date</label>
-                        <input type="text" class="course-milestone-date-input date hasDatepicker" id="course-milestone-2-date-input" placeholder="MM/DD/YYYY">
+                        <input type="text" class="course-milestone-date-input date set-date" id="course-milestone-2-date-input" placeholder="MM/DD/YYYY">
                       </div>
 
                       <div class="group">
