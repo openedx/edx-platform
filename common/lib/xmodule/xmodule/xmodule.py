@@ -130,6 +130,8 @@ class XModule(Plugin):
         self.user_preferences = user_preferences
         self.student_state = student_state
 
+        self._view_name = None
+
     @staticmethod
     def render(module, view_name):
         """
@@ -140,10 +142,10 @@ class XModule(Plugin):
         """
         # Make children use the appropriate render context
         try:
-            setattr(module, 'view_name', view_name)
+            module._view_name = view_name
             return module.find_view(view_name)()
         finally:
-            delattr(module, 'view_name')
+            module._view_name = None
 
     def render_child(self, child, view_name=None):
         """
@@ -151,12 +153,12 @@ class XModule(Plugin):
         render the same view on the child that is currently being rendered on the parent
         """
         if view_name is None:
-            view_name = getattr(self, 'view_name')
+            view_name = self._view_name
 
         return XModule.render(child, view_name)
 
     def find_view(self, view_name):
-        for method_name, method_fn in inspect.getmembers(self, lambda m: inspect.ismethod(m)):
+        for method_name, method_fn in inspect.getmembers(self, inspect.ismethod):
             if getattr(method_fn, 'view_name', None) is not None:
                 return method_fn
         raise MissingXModuleView(self.__class__, view_name)
