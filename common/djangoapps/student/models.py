@@ -3,6 +3,8 @@ Models for Student Information
 
 Replication Notes
 
+TODO: Update this to be consistent with reality  (no portal servers, no more askbot)
+
 In our live deployment, we intend to run in a scenario where there is a pool of
 Portal servers that hold the canoncial user information and that user
 information is replicated to slave Course server pools. Each Course has a set of

@@ -98,6 +98,19 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
+import re
+day_pattern = re.compile('\s\d+,\s')
+multimonth_pattern = re.compile('\s?\-\s?\S+\s')
+
+def get_date_for_press(publish_date):
+    import datetime
+    # strip off extra months, and just use the first:
+    date = re.sub(multimonth_pattern, ", ", publish_date)
+    if re.search(day_pattern, date):
+        date = datetime.datetime.strptime(date, "%B %d, %Y") 
+    else: 
+        date = datetime.datetime.strptime(date, "%B, %Y") 
+    return date
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
@@ -110,6 +123,7 @@ def press(request):
             json_articles = json.loads(content)
         cache.set("student_press_json_articles", json_articles)
     articles = [Article(**article) for article in json_articles]
+    articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
 

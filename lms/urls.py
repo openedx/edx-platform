@@ -249,12 +249,12 @@ if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
-
 if settings.ENABLE_JASMINE:
+    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
+
+if settings.DEBUG:
     ## Jasmine and admin
-    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),
-                    url(r'^admin/', include(admin.site.urls)),
-                    )
+    urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
