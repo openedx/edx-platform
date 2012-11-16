@@ -23,7 +23,6 @@ import os
 import tempfile
 from xmodule.static_content import write_module_styles, write_module_js
 
-import djcelery
 from path import path
 
 from .discussionsettings import *
@@ -31,6 +30,7 @@ from .discussionsettings import *
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
+
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -339,7 +339,7 @@ TEMPLATE_LOADERS = (
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -538,8 +538,9 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
-    # Discussion
-    'django_comment_client',
+    # For testing
+    'django.contrib.admin',   # only used in DEBUG mode
 
-    'django.contrib.admin',
+    # Discussion forums
+    'django_comment_client',
 )

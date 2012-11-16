@@ -1,0 +1,31 @@
+<problem display_name="S2E2: Hydrogen Combustion">
+<text>
+    
+<p>Gaseous hydrogen can be reacted with gaseous oxygen in the presence of a flame to produce water vapor according to the following reaction:</p>
+        [mathjax] \text{ a } \text{H}_{2 } + \text{ b }\text{O}_{2 } = \text{ c }\text{H}_{2 }\text{O }[/mathjax]
+<p>Balance the equation i.e., specify the values of <i> a, b, </i> and <i>c</i>. Use the lowest whole number coefficients.</p>
+    
+<p>a =</p>
+    <numericalresponse answer="2">
+        <responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance" />
+        <textline correct_answer="2" math="1" />
+    </numericalresponse>    
+    
+    
+<p>b = 
+    <numericalresponse answer="1">
+        <responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance" />
+        <textline math="1" />
+    </numericalresponse> </p>
+    
+<p>c =
+    <numericalresponse answer="2">
+        <responseparam type="tolerance" default="1%" name="tol" description="Numerical Tolerance" />
+        <textline math="1" />
+    </numericalresponse> </p>
+
+    
+</text>
+</problem>
+
+

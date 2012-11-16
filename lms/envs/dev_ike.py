@@ -43,7 +43,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 fo
 
 INSTALLED_APPS = tuple([ app for app in INSTALLED_APPS if not app.startswith('debug_toolbar') ])
 MIDDLEWARE_CLASSES = tuple([ mcl for mcl in MIDDLEWARE_CLASSES if not mcl.startswith('debug_toolbar') ])
-#TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('askbot') ])
 #TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('mitxmako') ])
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',

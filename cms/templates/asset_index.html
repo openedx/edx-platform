@@ -28,7 +28,7 @@
         {{uploadDate}}
       </td>
       <td class="embed-col">
-        <input type="text" class="embeddable-xml-input" value='<img src="{{url}}"/>'>
+        <input type="text" class="embeddable-xml-input" value='{{url}}'>
       </td>
     </tr>
   </script>
@@ -47,7 +47,7 @@
               <th class="thumb-col"></th>
               <th class="name-col">Name</th>
               <th class="date-col">Date Added</th>
-              <th class="embed-col">Embed</th>
+              <th class="embed-col">URL</th>
             </tr>
           </thead>
           <tbody id="asset_table_body">
@@ -68,7 +68,7 @@
                 ${asset['uploadDate']}
               </td>
               <td class="embed-col">
-                <input type="text" class="embeddable-xml-input" value='<img src="${asset['url']}"/>'>
+                <input type="text" class="embeddable-xml-input" value='${asset['url']}'>
               </td>
             </tr>
           % endfor
