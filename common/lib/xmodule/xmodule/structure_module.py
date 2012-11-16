@@ -8,11 +8,11 @@ class Usage(namedtuple('Usage', 'id source settings children')):
 
     @classmethod
     def create_usage(cls, source):
-        xmodule = xmodule.get_module(source)
+        #module = xmodule.get_module(source)
         return Usage(
-            uuid(),
-            xmodule.id,
-            xmodule.course_settings,
+            "UUID",
+            "Foo",
+            {},
             [],
         )
 
@@ -31,6 +31,9 @@ def load_usage(usage_tree):
     settings: default settings values set by the source xmodule
     children: child usages
     """
+    if usage_tree is None:
+        return None
+
     usage_tree['children'] = [load_usage(child) for child in usage_tree['children']]
     return Usage(**usage_tree)
 
@@ -44,5 +47,5 @@ class StructureModule(XModule):
     @property
     def usage_tree(self):
         if self._usage_tree is None:
-            self._usage_tree = load_usage(self.content['usage_tree'])
+            self._usage_tree = load_usage(self.content.get('usage_tree', None))
         return self._usage_tree

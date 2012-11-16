@@ -3,8 +3,6 @@ import logging
 
 from lxml import etree
 
-from .mako_module import MakoModuleDescriptor
-from .xml_module import XmlDescriptor
 from .xmodule import XModule
 from .progress import Progress
 from .exceptions import NotFoundError
@@ -109,31 +107,4 @@ class SequenceModule(XModule):
             if c in child_classes:
                 new_class = c
         return new_class
-
-
-class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
-    mako_template = 'widgets/sequence-edit.html'
-    module_class = SequenceModule
-
-    stores_state = True # For remembering where in the sequence the student is
-
-    template_dir_name = 'sequence'
-
-    @classmethod
-    def definition_from_xml(cls, xml_object, system):
-        children = []
-        for child in xml_object:
-            try:
-                children.append(system.process_xml(etree.tostring(child)).location.url())
-            except:
-                log.exception("Unable to load child when parsing Sequence. Continuing...")
-                continue
-        return {'children': children}
-
-    def definition_to_xml(self, resource_fs):
-        xml_object = etree.Element('sequential')
-        for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
-        return xml_object
 

@@ -1,5 +1,4 @@
 from .xmodule import XModule, register_view
-from .seq_module import SequenceDescriptor
 from .progress import Progress
 from .module_resources import render_template
 
@@ -31,7 +30,3 @@ class VerticalModule(XModule):
             if c in child_classes:
                 new_class = c
         return new_class
-
-
-class VerticalDescriptor(SequenceDescriptor):
-    module_class = VerticalModule
