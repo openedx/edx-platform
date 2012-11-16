@@ -1,42 +1,43 @@
 # ======== Instructor views =============================================================================
 
 import csv
-import itertools
-import json
+#import itertools
+#import json
 import logging
 import os
 import urllib
 
 import track.views
 
-from functools import partial
+#from functools import partial
 from collections import defaultdict
 
 from django.conf import settings
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
+#from django.core.context_processors import csrf
+#from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+#from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+# from django.shortcuts import redirect
+from mitxmako.shortcuts import render_to_response #, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
-from courseware.courses import (get_course_with_access, get_courses_by_university)
+from courseware.courses import get_course_with_access #, get_courses_by_university)
 from psychometrics import psychoanalyze
-from student.models import UserProfile
+#from student.models import UserProfile
 
-from student.models import UserTestGroup, CourseEnrollment
-from util.cache import cache, cache_if_anonymous
+from student.models import CourseEnrollment
+# from util.cache import cache, cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from django_comment_client.models import Role
 
 log = logging.getLogger("mitx.courseware")
 
@@ -204,6 +205,55 @@ def instructor_dashboard(request, course_id):
             track.views.server_track(request, 'remove-staff %s' % user, {}, page='idashboard')
 
     #----------------------------------------
+    # forum administration
+  
+
+    elif action == 'List course forum administrators':
+        pass
+    
+    elif action == 'Remove forum admin':
+        uname = request.POST['forumadmin']
+        msg += _update_forum_role_membership(uname, course_id, 'Administrator', 'remove')
+        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Administrator', course_id), 
+                                 {}, page='idashboard')
+
+    elif action == 'Add forum admin':
+        uname = request.POST['forumadmin']
+        msg += _update_forum_role_membership(uname, course_id, 'Administrator', 'add')
+        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Administrator', course_id), 
+                                 {}, page='idashboard')
+
+    elif action == 'List course forum moderators':
+        pass
+    
+    elif action == 'Remove forum moderator':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course_id, 'Moderator', 'remove')
+        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Moderator', course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'Add forum moderator':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course_id, 'Moderator', 'add')
+        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Moderator', course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'List course forum community TAs':
+        pass
+    
+    elif action == 'Remove forum community TA':
+        uname = request.POST['forumcommunityta']
+        msg += _update_forum_role_membership(uname, course_id, 'Community TA', 'remove')
+        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Community TA', course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'Add forum community TA':
+        uname = request.POST['forumcommunityta']
+        msg += _update_forum_role_membership(uname, course_id, 'Community TA', 'add')
+        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Community TA', course_id), 
+                                 {}, page='idashboard')
+
+    #----------------------------------------
     # psychometrics
 
     elif action == 'Generate Histogram and IRT Plot':
@@ -214,6 +264,8 @@ def instructor_dashboard(request, course_id):
 
     if idash_mode=='Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
+
+
 
     #----------------------------------------
     # context for rendering
@@ -232,6 +284,29 @@ def instructor_dashboard(request, course_id):
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
+def _update_forum_role_membership(uname, course_id, rolename, add_or_remove):
+    '''
+    
+    
+    returns message status to append to displayed message
+    '''
+    msg = ''
+    try:
+        user = User.objects.get(username=uname)
+    except User.DoesNotExist:
+        return '<font color="red">Error: unknown username "%s"</font>' % uname
+    
+    if user is not None:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+        log.debug('rolename=%s' % rolename)
+        if (add_or_remove == 'remove'):
+            user.roles.remove(role)
+            msg += '<font color="green">Removed %s from %s forum role = %s</font>' % (user, rolename)
+        else:
+            user.roles.add(role)
+            msg += '<font color="green">Added %s to %s forum role = %s</font>' % (user, rolename)
+    return msg
+    
 
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
     '''
