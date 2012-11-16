@@ -41,6 +41,10 @@ setup(
         ],
         'xmodule.v2': [
             'vertical = xmodule.vertical_module:VerticalModule',
+            'course = xmodule.course_module:CourseModule',
+        ],
+        'policy.v1': [
+            'cascade = xmodule.course_module:CascadeKeys',
         ]
     }
 )
