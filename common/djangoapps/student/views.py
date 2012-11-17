@@ -129,6 +129,9 @@ def press(request):
     return render_to_response('static_templates/press.html', {'articles': articles})
 
 
+def unique_id_for_user(user):
+    return sha1(user.username).hexdigest()
+
 def process_survey_link(survey_link, user):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
@@ -136,8 +139,7 @@ def process_survey_link(survey_link, user):
     """
     to_replace = '{UNIQUE_ID}'
     if to_replace in survey_link:
-        unique_id = sha1(user.username)
-        return survey_link.replace(to_replace, unique_id)
+        return survey_link.replace(to_replace, unique_id_for_user(user))
 
     return survey_link
 
@@ -150,6 +152,7 @@ def cert_info(user, course):
     'status': one of 'generating', 'ready', 'notpassing', 'processing'
     'show_download_url': bool
     'download_url': url, only present if show_download_url is True
+    'show_disabled_download_button': bool -- true if state is 'generating'
     'show_survey_button': bool
     'survey_url': url, only if show_survey_button is True
     'grade': if status is not 'processing'
@@ -165,7 +168,10 @@ def _cert_info(user, course, cert_status):
     """
     default_status = 'processing'
     if cert_status is None:
-        return {'status': default_status}
+        return {'status': default_status,
+                'show_disabled_download_button': False,
+                'show_download_url': False,
+                'show_survey_button': False}
 
     # simplify the status for the template using this lookup table
     template_state = {
@@ -178,9 +184,10 @@ def _cert_info(user, course, cert_status):
     status = template_state.get(cert_status['status'], default_status)
 
     d = {'status': status,
-         'show_download_url': status in ('generating', 'ready'),}
+         'show_download_url': status == 'ready',
+         'show_disabled_download_button': status == 'generating',}
 
-    if (status in ('generating', 'ready', 'not-available') and
+    if (status in ('generating', 'ready', 'notpassing') and
         course.end_of_course_survey_url is not None):
         d.update({
          'show_survey_button': True,
@@ -188,10 +195,10 @@ def _cert_info(user, course, cert_status):
     else:
         d['show_survey_button'] = False
 
-    if template_state == 'ready':
+    if status == 'ready':
         d['download_url'] = cert_status['download_url']
 
-    if template_state in 'generating', 'ready', 'notpassing':
+    if status in ('generating', 'ready', 'notpassing'):
         d['grade'] = cert_status['grade']
 
     return d
