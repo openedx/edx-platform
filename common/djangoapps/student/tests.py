@@ -6,11 +6,14 @@ Replace this with more appropriate tests for your application.
 """
 import logging
 from datetime import datetime
+from hashlib import sha1
 
 from django.test import TestCase
+from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 
 from .models import User, UserProfile, CourseEnrollment, replicate_user, USER_FIELDS_TO_COPY
+import .views
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
@@ -55,7 +58,7 @@ class ReplicationTest(TestCase):
         # This hasattr lameness is here because we don't want this test to be
         # triggered when we're being run by CMS tests (Askbot doesn't exist
         # there, so the test will fail).
-        # 
+        #
         # seen_response_count isn't a field we care about, so it shouldn't have
         # been copied over.
         if hasattr(portal_user, 'seen_response_count'):
@@ -74,7 +77,7 @@ class ReplicationTest(TestCase):
 
         # During this entire time, the user data should never have made it over
         # to COURSE_2
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
 
@@ -108,19 +111,19 @@ class ReplicationTest(TestCase):
         # Grab all the copies we expect
         course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
         self.assertEquals(portal_user, course_user)
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
 
         course_enrollment = CourseEnrollment.objects.using(COURSE_1).get(id=portal_enrollment.id)
         self.assertEquals(portal_enrollment, course_enrollment)
-        self.assertRaises(CourseEnrollment.DoesNotExist, 
+        self.assertRaises(CourseEnrollment.DoesNotExist,
                           CourseEnrollment.objects.using(COURSE_2).get,
                           id=portal_enrollment.id)
 
         course_user_profile = UserProfile.objects.using(COURSE_1).get(id=portal_user_profile.id)
         self.assertEquals(portal_user_profile, course_user_profile)
-        self.assertRaises(UserProfile.DoesNotExist, 
+        self.assertRaises(UserProfile.DoesNotExist,
                           UserProfile.objects.using(COURSE_2).get,
                           id=portal_user_profile.id)
 
@@ -174,30 +177,44 @@ class ReplicationTest(TestCase):
         portal_user.save()
         portal_user_profile.gender = 'm'
         portal_user_profile.save()
-      
-        # Grab all the copies we expect, and make sure it doesn't end up in 
+
+        # Grab all the copies we expect, and make sure it doesn't end up in
         # places we don't expect.
         course_user = User.objects.using(COURSE_1).get(id=portal_user.id)
         self.assertEquals(portal_user, course_user)
-        self.assertRaises(User.DoesNotExist, 
+        self.assertRaises(User.DoesNotExist,
                           User.objects.using(COURSE_2).get,
                           id=portal_user.id)
 
         course_enrollment = CourseEnrollment.objects.using(COURSE_1).get(id=portal_enrollment.id)
         self.assertEquals(portal_enrollment, course_enrollment)
-        self.assertRaises(CourseEnrollment.DoesNotExist, 
+        self.assertRaises(CourseEnrollment.DoesNotExist,
                           CourseEnrollment.objects.using(COURSE_2).get,
                           id=portal_enrollment.id)
 
         course_user_profile = UserProfile.objects.using(COURSE_1).get(id=portal_user_profile.id)
         self.assertEquals(portal_user_profile, course_user_profile)
-        self.assertRaises(UserProfile.DoesNotExist, 
+        self.assertRaises(UserProfile.DoesNotExist,
                           UserProfile.objects.using(COURSE_2).get,
                           id=portal_user_profile.id)
 
 
+class CourseEndingTest(TestCase):
+    """Test things related to course endings: certificates, surveys, etc"""
 
+    def test_process_survey_link(self):
+        username = "fred"
+        id = sha1(username)
+        link1 = "http://www.mysurvey.com"
+        self.assertEqual(process_survey_link(link1), link1)
+        link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=id)
+        self.assertEqual(views.process_survey_link(link2), link2_expected)
 
+    def test_cert_info(self):
+        user = Mock(username="fred")
+        survey_url = "http://a_survey.com"
+        course = Mock(end_of_course_survey_url=survey_url)
+        cert_status = None
 
-
-
+        self.assertEqual(views._cert_info(user, course, None), {'status': 'processing'})
