@@ -39,6 +39,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from datetime import date
 from collections import namedtuple
+from hashlib import sha1
+
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
@@ -107,9 +109,9 @@ def get_date_for_press(publish_date):
     # strip off extra months, and just use the first:
     date = re.sub(multimonth_pattern, ", ", publish_date)
     if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y") 
-    else: 
-        date = datetime.datetime.strptime(date, "%B, %Y") 
+        date = datetime.datetime.strptime(date, "%B %d, %Y")
+    else:
+        date = datetime.datetime.strptime(date, "%B, %Y")
     return date
 
 def press(request):
@@ -126,6 +128,73 @@ def press(request):
     articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
+
+def process_survey_link(survey_link, user):
+    """
+    If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    """
+    to_replace = '{UNIQUE_ID}'
+    if to_replace in survey_link:
+        unique_id = sha1(user.username)
+        return survey_link.replace(to_replace, unique_id)
+
+    return survey_link
+
+
+def cert_info(user, course):
+    """
+    Get the certificate info needed to render the dashboard section for the given
+    student and course.  Returns a dictionary with keys:
+
+    'status': one of 'generating', 'ready', 'notpassing', 'processing'
+    'show_download_url': bool
+    'download_url': url, only present if show_download_url is True
+    'show_survey_button': bool
+    'survey_url': url, only if show_survey_button is True
+    'grade': if status is not 'processing'
+    """
+    if not course.has_ended():
+        return {}
+
+    return _cert_info(user, course, certificate_status_for_student(user, course.id))
+
+def _cert_info(user, course, cert_status):
+    """
+    Implements the logic for cert_info -- split out for testing.
+    """
+    default_status = 'processing'
+    if cert_status is None:
+        return {'status': default_status}
+
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.regenerating: 'generating',
+        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.notpassing: 'notpassing',
+        }
+
+    status = template_state.get(cert_status['status'], default_status)
+
+    d = {'status': status,
+         'show_download_url': status in ('generating', 'ready'),}
+
+    if (status in ('generating', 'ready', 'not-available') and
+        course.end_of_course_survey_url is not None):
+        d.update({
+         'show_survey_button': True,
+         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+    else:
+        d['show_survey_button'] = False
+
+    if template_state == 'ready':
+        d['download_url'] = cert_status['download_url']
+
+    if template_state in 'generating', 'ready', 'notpassing':
+        d['grade'] = cert_status['grade']
+
+    return d
 
 @login_required
 @ensure_csrf_cookie
@@ -163,7 +232,7 @@ def dashboard(request):
     # TODO: workaround to not have to zip courses and certificates in the template
     # since before there is a migration to certificates
     if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
-        cert_statuses = { course.id: certificate_status_for_student(request.user, course.id) for course in courses}
+        cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
     else:
         cert_statuses = {}
 
