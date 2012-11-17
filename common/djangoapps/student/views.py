@@ -28,7 +28,7 @@ from django.core.cache import cache
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
-                            CourseEnrollment)
+                            CourseEnrollment, unique_id_for_user)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -39,7 +39,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from datetime import date
 from collections import namedtuple
-from hashlib import sha1
 
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
@@ -128,9 +127,6 @@ def press(request):
     articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
-
-def unique_id_for_user(user):
-    return sha1(user.username).hexdigest()
 
 def process_survey_link(survey_link, user):
     """

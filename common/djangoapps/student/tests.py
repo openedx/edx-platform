@@ -12,8 +12,10 @@ from django.test import TestCase
 from mock import patch, Mock
 from nose.plugins.skip import SkipTest
 
-from .models import User, UserProfile, CourseEnrollment, replicate_user, USER_FIELDS_TO_COPY
-from .views import process_survey_link, _cert_info, unique_id_for_user
+from .models import (User, UserProfile, CourseEnrollment,
+                     replicate_user, USER_FIELDS_TO_COPY,
+                     unique_id_for_user)
+from .views import process_survey_link, _cert_info
 
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
