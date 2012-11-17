@@ -236,12 +236,7 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    # TODO: workaround to not have to zip courses and certificates in the template
-    # since before there is a migration to certificates
-    if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
-        cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
-    else:
-        cert_statuses = {}
+    cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
 
     context = {'courses': courses,
                'message': message,
