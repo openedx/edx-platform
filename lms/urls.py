@@ -10,6 +10,9 @@ if settings.DEBUG:
     admin.autodiscover()
 
 urlpatterns = ('',
+    # certificate view
+
+    url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"), # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
 
@@ -25,6 +28,11 @@ urlpatterns = ('',
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
+
+    url(r'^testcenter/login$', 'student.views.test_center_login'),
+
+    # url(r'^testcenter/login$', 'student.test_center_views.login'),
+    # url(r'^testcenter/logout$', 'student.test_center_views.logout'),
 
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'), # TODO: Is this used anymore? What is STATIC_GRAB?
@@ -240,15 +248,6 @@ if settings.COURSEWARE_ENABLED:
 if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
-
-if settings.ASKBOT_ENABLED:
-    urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
-                    url(r'^settings/', include('askbot.deps.livesettings.urls')), \
-                    url(r'^followit/', include('followit.urls')), \
-#                       url(r'^robots.txt$', include('robots.urls')),
-                              )
-
-
 
 if settings.DEBUG:
     ## Jasmine and admin

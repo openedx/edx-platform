@@ -19,22 +19,12 @@
   <%static:css group='ie-fixes'/>
   <![endif]-->
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
+  <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-    <script type="text/javascript"> 
-
-      var _gaq = _gaq || []; 
-      _gaq.push(['_setAccount', 'UA-35248639-1']); 
-      _gaq.push(['_trackPageview']); 
-
-      (function() { 
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; 
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; 
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); 
-      })(); 
-
-    </script> 
+  <%include file="google_analytics.html" />
   % endif
+
 </head>
 
 <body class="<%block name='bodyclass'/>">

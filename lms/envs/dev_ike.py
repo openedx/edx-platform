@@ -14,7 +14,6 @@ import socket
 
 WIKI_ENABLED = False
 MITX_FEATURES['ENABLE_TEXTBOOK'] = False
-MITX_FEATURES['ENABLE_DISCUSSION'] = False
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = True	  # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = False
@@ -44,7 +43,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')	# django 1.4 fo
 
 INSTALLED_APPS = tuple([ app for app in INSTALLED_APPS if not app.startswith('debug_toolbar') ])
 MIDDLEWARE_CLASSES = tuple([ mcl for mcl in MIDDLEWARE_CLASSES if not mcl.startswith('debug_toolbar') ])
-#TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('askbot') ])
 #TEMPLATE_LOADERS = tuple([ app for app in TEMPLATE_LOADERS if not app.startswith('mitxmako') ])
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',

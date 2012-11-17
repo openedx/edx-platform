@@ -39,8 +39,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a
-    # functioning cache -- it relies on caching to load its settings in places.
+    # This is the cache used for most things. 
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -159,7 +158,7 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
-############################ FILE UPLOADS (ASKBOT) #############################
+############################ FILE UPLOADS (for discussion forums) #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
@@ -173,3 +172,8 @@ FILE_UPLOAD_HANDLERS = (
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+########################## PEARSON TESTING ###########################
+MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
+PEARSON_TEST_USER = "pearsontest"
+PEARSON_TEST_PASSWORD = "12345"

@@ -9,8 +9,6 @@
 .AppleDouble
 database.sqlite
 courseware/static/js/mathjax/*
-db.newaskbot
-db.oldaskbot
 flushdb.sh
 build
 .coverage
@@ -28,3 +26,4 @@ cms/static/sass/*.css
 lms/lib/comment_client/python
 nosetests.xml
 cover_html/
+.idea/

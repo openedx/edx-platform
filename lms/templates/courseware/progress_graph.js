@@ -90,7 +90,7 @@ $(function () {
   ticks += [ [overviewBarX, "Total"] ]
   tickIndex += 1 + sectionSpacer
   
-  totalScore = math.floor(grade_summary['percent'] * 100) / 100 #We floor it to the nearest percent, 80.9 won't show up like a 90 (an A)
+  totalScore = grade_summary['percent']
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
   
   

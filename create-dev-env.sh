@@ -72,12 +72,6 @@ clone_repos() {
         git clone git@github.com:MITx/mitx.git
     fi
 
-    if [[ ! -d "$BASE/mitx/askbot/.git" ]]; then
-        output "Cloning askbot as a submodule of mitx"
-        cd "$BASE/mitx"
-        git submodule update --init
-    fi
-
     # By default, dev environments start with a copy of 6.002x
     cd "$BASE"
     mkdir -p "$BASE/data"
@@ -105,7 +99,7 @@ NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
-APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor coffeescript graphviz graphviz-dev"
+APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor nodejs npm graphviz graphviz-dev mysql-server libmysqlclient-dev"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -192,8 +186,12 @@ case `uname -s` in
         case $distro in
             maya|lisa|natty|oneiric|precise|quantal)
                 output "Installing ubuntu requirements"
+                sudo apt-get install python-software-properties
+                sudo add-apt-repository ppa:chris-lea/node.js
                 sudo apt-get -y update
-                sudo apt-get -y install $APT_PKGS
+                # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
+                sudo DEBIAN_FRONTEND=noninteractive apt-get -y install $APT_PKGS
+                sudo npm install coffee-script
                 clone_repos
                 ;;
             *)
@@ -330,9 +328,6 @@ pip install -r mitx/pre-requirements.txt
 output "Installing MITx requirements"
 cd mitx
 pip install -r requirements.txt
-output "Installing askbot requirements"
-pip install -r askbot/askbot_requirements.txt
-pip install -r askbot/askbot_requirements_dev.txt
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true

@@ -32,6 +32,7 @@ class VideoModule(XModule):
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
+        self.track = self._get_track(xmltree)
 
         if instance_state is not None:
             state = json.loads(instance_state)
@@ -40,13 +41,25 @@ class VideoModule(XModule):
 
     def _get_source(self, xmltree):
         # find the first valid source
-        source = None
-        for element in xmltree.findall('source'):
+        return self._get_first_external(xmltree, 'source')
+        
+    def _get_track(self, xmltree):
+        # find the first valid track
+        return self._get_first_external(xmltree, 'track')
+        
+    def _get_first_external(self, xmltree, tag):
+        """
+        Will return the first valid element
+        of the given tag.
+        'valid' means has a non-empty 'src' attribute
+        """
+        result = None
+        for element in xmltree.findall(tag):
             src = element.get('src')
             if src:
-                source = src
+                result = src
                 break
-        return source
+        return result
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -85,6 +98,7 @@ class VideoModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'source': self.source,
+            'track' : self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],

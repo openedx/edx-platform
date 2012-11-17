@@ -2,9 +2,18 @@
 Tests of input types.
 
 TODO:
+- refactor: so much repetive code (have factory methods that build xml elements directly, etc)
+
+- test error cases
+
+- check rendering -- e.g. msg should appear in the rendered output.  If possible, test that
+  templates are escaping things properly.
+
+  
 - test unicode in values, parameters, etc.
 - test various html escapes
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
+
 """
 
 from lxml import etree
@@ -46,6 +55,19 @@ class OptionInputTest(unittest.TestCase):
 
         self.assertEqual(context, expected)
 
+    def test_option_parsing(self):
+        f = inputtypes.OptionInput.parse_options
+        def check(input, options):
+            """Take list of options, confirm that output is in the silly doubled format"""
+            expected = [(o, o) for o in options]
+            self.assertEqual(f(input), expected)
+
+        check("('a','b')", ['a', 'b'])
+        check("('a', 'b')", ['a', 'b'])
+        check("('a b','b')", ['a b', 'b'])
+        check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
+
+
 class ChoiceGroupTest(unittest.TestCase):
     '''
     Test choice groups, radio groups, and checkbox groups
@@ -73,6 +95,7 @@ class ChoiceGroupTest(unittest.TestCase):
         expected = {'id': 'sky_input',
                     'value': 'foil3',
                     'status': 'answered',
+                    'msg': '',
                     'input_type': expected_input_type,
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
@@ -119,12 +142,13 @@ class JavascriptInputTest(unittest.TestCase):
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
+                    'status': 'unanswered',
+                    'msg': '',
+                    'value': '3',
                     'params': params,
                     'display_file': display_file,
                     'display_class': display_class,
-                    'problem_state': problem_state,
-                    'value': '3',
-                    'evaluation': '',}
+                    'problem_state': problem_state,}
 
         self.assertEqual(context, expected)
 
@@ -204,9 +228,6 @@ class FileSubmissionTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        escapedict = {'"': '&quot;'}
-        esc = lambda s: saxutils.escape(s, escapedict)
-
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
@@ -220,8 +241,8 @@ class FileSubmissionTest(unittest.TestCase):
                    'msg': input_class.submitted_msg,
                    'value': 'BumbleBee.py',
                    'queue_len': '3',
-                   'allowed_files': esc('["runme.py", "nooooo.rb", "ohai.java"]'),
-                   'required_files': esc('["cookies.py"]')}
+                   'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
+                   'required_files': '["cookies.py"]'}
 
         self.assertEqual(context, expected)
 
@@ -255,14 +276,15 @@ class CodeInputTest(unittest.TestCase):
                  'status': 'incomplete',
                  'feedback' : {'message': '3'}, }
 
-        the_input = lookup_tag('codeinput')(test_system, element, state)
+        input_class = lookup_tag('codeinput')
+        the_input = input_class(test_system, element, state)
 
         context = the_input._get_render_context()
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
                    'status': 'queued',
-                   'msg': 'Submitted to grader.',
+                   'msg': input_class.submitted_msg,
                    'mode': mode,
                    'linenumbers': linenumbers,
                    'rows': rows,
@@ -311,8 +333,9 @@ class SchematicTest(unittest.TestCase):
 
         expected = {'id': 'prob_1_2',
                     'value': value,
-                    'initial_value': initial_value,
                     'status': 'unsubmitted',
+                    'msg': '',
+                    'initial_value': initial_value,
                     'width': width,
                     'height': height,
                     'parts': parts,
@@ -476,6 +499,7 @@ class ChemicalEquationTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': 'H2OYeah',
                     'status': 'unanswered',
+                    'msg': '',
                     'size': size,
                     'previewer': '/static/js/capa/chemical_equation_preview.js',
                     }

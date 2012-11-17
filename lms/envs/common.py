@@ -27,15 +27,12 @@ import hashlib
 from collections import defaultdict
 import socket
 
-import djcelery
 from path import path
 
-from .askbotsettings import * # this is where LIVESETTINGS_OPTIONS comes from
 from .discussionsettings import *
 
 ################################### FEATURES ###################################
 COURSEWARE_ENABLED = True
-ASKBOT_ENABLED = False
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
@@ -69,7 +66,6 @@ MITX_FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK' : True,
-    'ENABLE_DISCUSSION' : False,
     'ENABLE_DISCUSSION_SERVICE': True,
 
     'ENABLE_PSYCHOMETRICS': False,	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
@@ -102,14 +98,11 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
-ASKBOT_ROOT = REPO_ROOT / "askbot"
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
 sys.path.append(REPO_ROOT)
-sys.path.append(ASKBOT_ROOT)
-sys.path.append(ASKBOT_ROOT / "askbot" / "deps")
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
@@ -156,10 +149,8 @@ TEMPLATE_DIRS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-    'askbot.context.application_settings',
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
-    'askbot.user_messages.context_processors.user_messages',#must be before auth
     'django.contrib.auth.context_processors.auth', #this is required for admin
     'django.core.context_processors.csrf', #necessary for csrf protection
 
@@ -270,7 +261,6 @@ STATIC_ROOT = ENV_ROOT / "staticfiles"
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
-    PROJECT_ROOT / "askbot" / "skins",
 ]
 if os.path.isdir(DATA_DIR):
     # Add the full course repo if there is no static directory
@@ -316,35 +306,6 @@ ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 # in the global settings.py
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60 # 10 years
 
-################################### ASKBOT #####################################
-LIVESETTINGS_OPTIONS['MITX_ROOT_URL'] = MITX_ROOT_URL
-skin_settings = LIVESETTINGS_OPTIONS[1]['SETTINGS']['GENERAL_SKIN_SETTINGS']
-skin_settings['SITE_FAVICON'] = unicode(MITX_ROOT_URL) + skin_settings['SITE_FAVICON']
-skin_settings['SITE_LOGO_URL'] = unicode(MITX_ROOT_URL) +  skin_settings['SITE_LOGO_URL']
-skin_settings['LOCAL_LOGIN_ICON'] = unicode(MITX_ROOT_URL) + skin_settings['LOCAL_LOGIN_ICON']
-LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LOGIN_PROVIDERS']['WORDPRESS_SITE_ICON']
-LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL'] = unicode(MITX_ROOT_URL) + LIVESETTINGS_OPTIONS[1]['SETTINGS']['LICENSE_SETTINGS']['LICENSE_LOGO_URL']
-
-# ASKBOT_EXTRA_SKINS_DIR = ASKBOT_ROOT / "askbot" / "skins"
-ASKBOT_EXTRA_SKINS_DIR =  PROJECT_ROOT / "askbot" / "skins"
-ASKBOT_ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
-ASKBOT_MAX_UPLOAD_FILE_SIZE = 1024 * 1024 # result in bytes
-
-CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
-CACHE_PREFIX = SITE_ID
-ASKBOT_URL = 'discussion/'
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/'
-LOGIN_URL = MITX_ROOT_URL + '/'
-
-ALLOW_UNICODE_SLUGS = False
-ASKBOT_USE_STACKEXCHANGE_URLS = False # mimic url scheme of stackexchange
-ASKBOT_CSS_DEVEL = True
-
-# Celery Settings
-BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
-CELERY_ALWAYS_EAGER = True
-djcelery.setup_loader()
-
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
@@ -380,8 +341,6 @@ TEMPLATE_LOADERS = (
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
 
-    #'askbot.skins.loaders.filesystem_load_template_source',
-    # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -400,13 +359,7 @@ MIDDLEWARE_CLASSES = (
 
     'course_wiki.course_nav.Middleware',
 
-    'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
-    'askbot.middleware.forum_mode.ForumModeMiddleware',
-    'askbot.middleware.cancel.CancelActionMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
-    'askbot.middleware.view_log.ViewLogMiddleware',
-    'askbot.middleware.spaceless.SpacelessMiddleware',
-    # 'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
@@ -641,19 +594,8 @@ INSTALLED_APPS = (
 
     # For testing
     'django_jasmine',
+    'django.contrib.admin',   # only used in DEBUG mode
 
-    # Discussion
+    # Discussion forums
     'django_comment_client',
-
-    # For Askbot
-    'django.contrib.sitemaps',
-    'django.contrib.admin',
-    'django_countries',
-    'djcelery',
-    'djkombu',
-    'askbot',
-    'askbot.deps.livesettings',
-    'followit',
-    'keyedcache',
-    'robots'
 )

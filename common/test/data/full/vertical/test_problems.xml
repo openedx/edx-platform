@@ -1,0 +1,20 @@
+<vertical display_name="Test problems">
+<problem url_name="test_files:numericalresponse_demo"/>
+<problem url_name="test_files:choiceresponse_checkbox"/>
+<problem url_name="test_files:choiceresponse_radio"/>
+<problem url_name="test_files:coderesponse"/>
+<problem url_name="test_files:coderesponse_externalresponseformat"/>
+<problem url_name="test_files:formularesponse_with_hint"/>
+<problem url_name="test_files:imageresponse"/>
+<problem url_name="test_files:javascriptresponse"/>
+<problem url_name="test_files:multi_bare"/>
+<problem url_name="test_files:multichoice"/>
+<problem url_name="test_files:multiplechoicelresponse_demo"/>
+<problem url_name="test_files:numericalresponse_demo"/>
+<problem url_name="test_files:optionresponse"/>
+<problem url_name="test_files:stringresponse_with_hint"/>
+<problem url_name="test_files:symbolicresponse"/>
+<problem url_name="test_files:truefalse"/>
+<problem url_name="test_files:chemicalequationresponse"/>
+<problem url_name="test_files:filesubmission"/>
+</vertical>
