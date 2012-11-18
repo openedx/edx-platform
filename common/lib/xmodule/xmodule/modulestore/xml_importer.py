@@ -126,7 +126,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
         if static_content_store is not None:
             import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
-                target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location)
+                target_location_namespace if target_location_namespace is not None else  course_location)
 
         for module in module_store.modules[course_id].itervalues():
 
