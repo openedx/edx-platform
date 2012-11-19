@@ -82,3 +82,64 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 "2","u2","Fred Weasley","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0.0","0.0"
 '''
         self.assertEqual(body, expected_body, msg)
+        
+
+@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
+class TestInstructorDashboardForumAdmin(ct.PageLoader):
+    '''
+    Check for change in forum admin role memberships
+    '''
+
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+        courses = modulestore().get_courses()
+
+        def find_course(name):
+            """Assumes the course is present"""
+            return [c for c in courses if c.location.course==name][0]
+
+        self.full = find_course("full")
+        self.toy = find_course("toy")
+
+        # Create two accounts
+        self.student = 'view@test.com'
+        self.instructor = 'view2@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.create_account('u2', self.instructor, self.password)
+        self.activate_user(self.student)
+        self.activate_user(self.instructor)
+
+        group_name = _course_staff_group_name(self.toy.location)
+        g = Group.objects.create(name=group_name)
+        g.user_set.add(ct.user(self.instructor))
+
+        self.logout()
+        self.login(self.instructor, self.password)
+        self.enroll(self.toy)
+
+    def test_add_forum_admin(self):
+        print "running test_add_forum_admin"
+        course = self.toy
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+#        msg = "url = %s\n" % url
+        response = self.client.post(url, {'action': 'Add forum admin',
+                                          'forumadmin': 'u1'})
+#        msg += "instructor dashboard download csv grades: response = '%s'\n" % response
+#
+#        self.assertEqual(response['Content-Type'],'text/csv',msg)
+#
+#        cdisp = response['Content-Disposition'].replace('TT_2012','2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
+#        msg += "cdisp = '%s'\n" % cdisp
+#        self.assertEqual(cdisp,'attachment; filename=grades_edX/toy/2012_Fall.csv',msg)
+#
+#        body = response.content.replace('\r','')
+#        msg += "body = '%s'\n" % body
+
+# need to make sure the roles actually exist.  They don't seem to yet....        
+   # <p><font color="red">Error: unknown rolename "Administrator"</font></p>
+
+#        print response
+#        context = response.context
+#        self.assertTrue(context.contains("Added %s to %s forum role = %s" % ('u1', course.id, 'Administrator')))
+        
