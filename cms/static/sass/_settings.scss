@@ -148,6 +148,11 @@
       }
     }
 
+    .input-default {
+      color: $darkGrey;
+      background: $lightGrey;
+    }
+
     ::-webkit-input-placeholder {
       color: $mediumGrey;
       font-size: 13px;

@@ -1069,8 +1069,82 @@
                     <label for="discussions-anonymous-dontallow">Do not allow</label>
                     <span class="tip tip-stacked"><strong>Posting anonymously is not allowed</strong>. Any previous anonymous posts <strong>will be reverted to non-anonymous</strong></span>
                   </div>
+                </div>
               </div>
             </section><!-- .settings-discussions-general -->
+
+            <section class="settings-discussions-categories">
+              <div class="row row-col2">
+                <h4 class="label">Discussion Categories</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-discussions-categories-list">
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-1-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-1-name-input" placeholder="" value="General" disabled="disabled">
+                      </div>
+                    </li>
+                    
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-2-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-2-name-input" placeholder="" value="Feedback" disabled="disabled">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-3-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-3-name-input" placeholder="" value="Troubleshooting" disabled="disabled">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-4-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-4-name-input" placeholder="" value="Study Groups">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-5-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-5-name-input" placeholder="" value="Lectures">
+                      </div>
+
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                    </li>
+
+                    <li class="input course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-6-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-6-name-input" placeholder="">
+                      </div>
+
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-discussions-categories-item add-categories-data">
+                    <span class="plus-icon"></span>New Discussion Category
+                  </a>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Create Discussion Categories per Unit</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-categories-perunit" id="discussions-categories-perunit-allow" value="Allow" disabled="disabled">
+                    <div class="ui-status-indic ui-status-indic-discussions-categories-perunit-allow"></div>
+                    <label for="discussions-categories-perunit-allow">Allow</label>
+                    <span class="tip tip-stacked">This option is automatically set currently</span>
+                  </div>
+                </div>
+              </div>
+            </section>
           </section><!-- .settings-discussions -->
         </div>
       </article>
