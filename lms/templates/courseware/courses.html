@@ -1,6 +1,6 @@
-<%inherit file="main.html" />
+<%inherit file="../main.html" />
 
-<%namespace name='static' file='static_content.html'/>
+<%namespace name='static' file='../static_content.html'/>
 
 <%block name="title"><title>Courses</title></%block>
 
@@ -22,17 +22,17 @@
     <section class="courses">
       <section class='university-column'>
         %for course in universities['MITx']:
-          <%include file="course.html" args="course=course" />
+          <%include file="../course.html" args="course=course" />
         %endfor
       </section>
       <section class='university-column'>
         %for course in universities['HarvardX']:
-          <%include file="course.html" args="course=course" />
+          <%include file="../course.html" args="course=course" />
         %endfor
       </section>
       <section class='university-column last'>
         %for course in universities['BerkeleyX']:
-          <%include file="course.html" args="course=course" />
+          <%include file="../course.html" args="course=course" />
         %endfor
       </section>
     </section>
