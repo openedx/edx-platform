@@ -467,6 +467,18 @@
 
         .new-course-faculty-item {
         }
+
+        .current-faculty-photo {
+          height: 115px;
+          width: 115px;
+          overflow: hidden;
+
+          img {
+            display: block;
+            min-height: 100%;
+            max-width: 100%;
+          }
+        }
       }
     }
 
