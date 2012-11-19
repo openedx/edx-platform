@@ -80,7 +80,8 @@ footer {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+textarea {
     padding: 6px 8px 8px;
     @include box-sizing(border-box);
     border: 1px solid #b0b6c2;
