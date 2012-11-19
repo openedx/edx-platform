@@ -105,7 +105,7 @@ class StaffGrading
       
       input = """
               <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
-              """
+              """       # "  fix broken parsing in emacs
       @score_selection_container.append(label + input)
 
     # And now hook up an event handler again
@@ -222,7 +222,7 @@ class StaffGrading
   
 
 # for now, just create an instance and load it...
-mock_backend = true
+mock_backend = false
 ajax_url = $('.staff-grading').data('ajax_url')
 backend = new StaffGradingBackend(ajax_url, mock_backend)
 
