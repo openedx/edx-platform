@@ -1,0 +1,742 @@
+.settings {
+  .settings-overview {
+    @extend .window;
+    @include clearfix;
+    display: table;
+    width: 100%;
+
+    // layout
+    .sidebar {
+      display: table-cell;
+      float: none;
+      width: 20%;
+      padding: 30px 0 30px 20px;
+      @include border-radius(3px 0 0 3px);
+      background: $lightGrey;      
+    }
+
+    .main-column {
+      display: table-cell;
+      float: none;
+      width: 80%;
+      padding: 30px 40px 30px 60px;
+    }
+
+    .settings-page-menu {
+      a {
+        display: block;
+        padding-left: 20px;
+        line-height: 52px;
+
+        &.is-shown {
+          background: #fff;
+          @include border-radius(5px 0 0 5px);
+        }
+      }
+    }
+
+    .settings-page-section {
+      > .alert {
+        display: none;
+
+        &.is-shown {
+          display: block;
+        }
+      }
+
+      > section {
+        display: none;
+        margin-bottom: 40px;
+
+        &.is-shown {
+          display: block;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        > .title {
+          margin-bottom: 30px;
+          font-size: 28px;
+          font-weight: 300;
+          color: $blue;
+        }
+
+        > section {
+          margin-bottom: 100px;
+          @include clearfix;
+
+          header {
+            @include clearfix;
+            border-bottom: 1px solid $mediumGrey;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+
+            h3 {
+              color: $darkGrey;
+              float: left;
+
+              margin: 0 40px 0 0;
+              text-transform: uppercase;
+            }
+
+            .detail {
+              float: right;
+              marign-top: 3px;
+              color: $mediumGrey;
+              font-size: 13px;
+            }
+          }
+
+          &:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+          }
+        }
+      }
+    }
+
+    // form basics
+    label, .label {
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 400;
+
+      &.check-label {
+        display: inline;
+        margin-left: 10px;
+      }
+
+      &.ranges {
+        margin-bottom: 20px;
+      }
+    }
+
+    input, textarea {
+      @include transition(all 1s ease-in-out);
+      @include box-sizing(border-box);
+      font-size: 15px;
+
+      &.long {
+        width: 100%;
+      }
+
+      &.tall {
+        height: 200px;
+      }
+
+      &.short {
+        width: 25%;
+      }
+
+      &.date {
+
+      }
+
+      &:focus {
+        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
+        border-color: $blue;
+        outline: 0;
+      }
+
+      &:disabled {
+        color: $darkGrey;
+        background: $lightGrey;
+      }
+    }
+
+    .input-default {
+      color: $darkGrey;
+      background: $lightGrey;
+    }
+
+    ::-webkit-input-placeholder {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+    :-moz-placeholder {  
+      color: $mediumGrey;  
+      font-size: 13px;
+    }
+
+    .field.ui-status {
+
+      > .input {
+        display: block !important;
+        margin-bottom: 15px;
+      }
+
+      .ui-status-input-checkbox, .ui-status-input-radio {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+      label {
+        cursor: pointer;
+      }
+
+      .ui-status-input-checkbox ~ label, .ui-status-input-radio ~ label {
+        position: relative;
+        left: -30px;
+        display: inline-block;
+        z-index: 100;
+        margin: 0 0 0 5px;
+        padding-left: 30px;
+        color: $offBlack;
+        opacity: 0.50;
+        cursor: pointer;
+        @include transition(opacity 0.25s ease-in-out);
+
+        &:before {
+          display: inline-block;
+          margin-right: 10px;
+        }
+
+        &:after {
+         display: inline-block;
+         margin-left: 10px;
+        }
+
+        ~ .tip {
+         margin-top: 0;
+         @include transition(color 0.25s ease-in-out);
+        }
+      }
+
+      .ui-status-indic {
+        position: relative;
+        top: 2px;
+        z-index: 10;
+        display: inline-block;
+        height: 15px;
+        width: 15px;
+        border: 2px;
+        background: $offBlack;
+        opacity: 0.50;
+        @include border-radius(50px);
+        @include box-sizing(border-box);
+        @include transition(opacity 0.25s ease-in-out);
+      }
+
+      .ui-status-input-checkbox:checked ~ label, .ui-status-input-radio:checked ~ label {
+         opacity: 0.99;
+
+         &:after {
+         }
+
+         &:before {
+         }
+
+         ~ .tip {
+          color: $darkGrey;
+         }
+      }
+
+      .ui-status-input-checkbox:checked ~ .ui-status-indic, .ui-status-input-radio:checked ~ .ui-status-indic {
+        opacity: 0.99;
+      }
+    }
+
+    .tip {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+
+
+    // form layouts
+    .row {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid $lightGrey;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      // structural labels, not semantic labels per se
+      > label, .label {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      // tips
+      .tip-inline {
+        display: inline-block;
+        margin-left: 10px;
+      }
+
+      .tip-stacked {
+        display: block;
+        margin-top: 10px;
+      }
+
+      // structural field, not semantic fields per se
+      .field {
+        display: inline-block;
+        width: 100%;
+
+        > input, > textarea, .input {
+          display: inline-block;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .group {
+            input, textarea {
+              margin-bottom: 5px;
+            }
+
+            .label, label {
+              font-size: 13px;
+            }
+          }
+
+          // multi-field
+          &.multi {
+            display: block;
+            background: tint($lightGrey, 50%);
+            padding: 15px;
+            @include border-radius(4px);
+            @include box-sizing(border-box);
+
+            .group {
+              margin-bottom: 10px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              input, .input, textarea {
+
+              }
+            }
+          }
+
+          // multi stacked
+          &.multi-stacked {
+            
+            .group {
+              input, .input, textarea {
+                width: 100%;
+              }
+            }
+          }
+
+          // multi-field inline
+          &.multi-inline {
+            @include clearfix;
+
+            .group {
+              float: left;
+              margin-right: 20px;
+
+              &:nth-child(2) {
+                margin-right: 0;
+              }
+
+              .input, input, textarea {
+                width: 100%;
+              }
+            }
+
+            .remove-item {
+              float: right;
+            }       
+          }
+        }
+
+        // input-list
+        .input-list {
+
+          .input {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dotted $lightGrey;
+
+            &:last-child {
+              border: 0;
+            }
+          }
+        }
+
+        // enumerated inputs
+        &.enum {
+        }
+      }
+      
+      // layout - aligned label/field pairs 
+      &.row-col2 {
+
+        > label, .label {
+          width: 200px;
+        }
+
+        .field {
+          width: 400px;
+        }
+
+        &.multi-inline {
+          @include clearfix;
+
+          .group {
+            width: 170px;
+          }  
+        }
+      }
+    }
+
+    // editing controls - adding
+    .new-item, .replace-item {
+      clear: both;
+      display: block;
+      margin-top: 10px;
+      padding-bottom: 10px;
+      @include grey-button;
+      @include box-sizing(border-box);
+    }
+
+
+    // editing controls - removing
+    .remove-item {
+      clear: both;
+      display: block;
+      opacity: 0.75;
+      font-size: 13px;
+      text-align: right;
+      @include transition(opacity 0.25s ease-in-out);
+
+
+      &:hover {
+        color: $blue;
+        opacity: 0.99;
+      }
+    }
+
+    // editing controls - preview
+    .input-existing {
+      display: block !important;
+
+      .current {
+        width: 100%;
+        margin: 10px 0;
+        padding: 15px;
+        @include box-sizing(border-box);
+        @include border-radius(5px);
+        background: tint($blue, 80%);
+      }
+    }
+
+    // specific sections
+    .settings-details {
+
+    }
+
+    .settings-faculty {
+
+      .settings-faculty-members {
+
+        > header {
+          display: none;
+        }
+
+        .field .multi {
+          display: block;
+          margin-bottom: 40px;
+          padding: 20px;
+          background: tint($lightGrey, 50%);
+          @include border-radius(4px);
+          @include box-sizing(border-box);
+        }
+
+        .course-faculty-list-item {
+
+          .row {
+
+            &:nth-child(4) {
+              padding-bottom: 0;
+              border-bottom: none;
+            }
+          }
+        }
+
+        #course-faculty-bio-input {
+          margin-bottom: 0;
+        }
+
+        .new-course-faculty-item {
+        }
+
+        .current-faculty-photo {
+          height: 115px;
+          width: 115px;
+          overflow: hidden;
+
+          img {
+            display: block;
+            min-height: 100%;
+            max-width: 100%;
+          }
+        }
+      }
+    }
+
+    .settings-grading {
+
+
+      .course-grading-gradeweight, .course-grading-totalassignments, .course-grading-totalassignmentsdroppable {
+
+        input {
+          width: 73px;
+        }
+      }
+    }
+
+    .settings-handouts {
+
+    }
+
+    .settings-problems {
+
+      > section {
+
+        &.is-shown {
+          display: block;
+        }
+      }
+    }
+
+    .settings-discussions {
+
+    }
+
+    // states
+    label.is-focused {
+      color: $blue;
+      @include transition(color 1s ease-in-out);
+    }
+
+    // extras/abbreviations
+    // .settings-extras {
+
+    //   > header {
+    //     cursor: pointer;
+
+    //     &.active {
+
+    //     }
+    //   }
+      
+    //    > div {
+    //     display: none;
+    //     @include transition(display 0.25s ease-in-out);
+
+    //     &.is-shown {
+    //       display: block;
+    //     }
+    //    }
+    // }
+
+    // misc
+    .divide {
+      display: none;
+    }
+  }
+
+
+
+  h3 {
+    margin-bottom: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $blue;
+  }
+
+  .grade-controls {
+    @include clearfix;
+  }
+
+  .new-grade-button {
+    position: relative;
+    float: left;
+    display: block;
+    width: 29px;
+    height: 29px;
+    margin: 4px 10px 0 0;
+    border-radius: 20px;
+    border: 1px solid $darkGrey;
+    @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+    background-color: #d1dae3;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+    color: #6d788b;
+
+    .plus-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -6px;
+      margin-top: -6px;
+    }
+  }
+
+  .grade-slider {
+    float: right;
+    width: 95%;
+    height: 80px;
+
+    .grade-bar {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      background: $lightGrey;
+
+      .increments {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 52px;
+          width: 30px;
+          margin-left: -15px;
+          font-size: 9px;
+          text-align: center;
+
+          &.increment-0 {
+            left: 0;
+          }
+
+          &.increment-10 {
+            left: 10%;
+          }
+
+          &.increment-20 {
+            left: 20%;
+          }
+
+          &.increment-30 {
+            left: 30%;
+          }
+
+          &.increment-40 {
+            left: 40%;
+          }
+
+          &.increment-50 {
+            left: 50%;
+          }
+
+          &.increment-60 {
+            left: 60%;
+          }
+
+          &.increment-70 {
+            left: 70%;
+          }
+
+          &.increment-80 {
+            left: 80%;
+          }
+
+          &.increment-90 {
+            left: 90%;
+          }
+
+          &.increment-100 {
+            left: 100%;
+          }
+        }
+      }
+
+      .grades {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 0;
+          height: 50px;     
+          text-align: right;
+
+          &:hover,
+          &.is-dragging {
+            .remove-button {
+              display: block;
+            }
+          }
+
+          &.is-dragging {
+
+
+          }
+
+          .remove-button {
+            display: none;
+            position: absolute;
+            top: -17px;
+            right: 1px;
+            height: 17px;
+            font-size: 10px;
+          }
+
+          &:nth-child(1) {
+            background: #4fe696;
+          }
+
+          &:nth-child(2) {
+            background: #ffdf7e;
+          }
+
+          &:nth-child(3) {
+            background: #ffb657;
+          }
+
+          &:nth-child(4) {
+            background: #fb336c;
+          }
+
+          &:nth-child(5) {
+            background: #ef54a1;
+          }
+
+          .letter-grade {
+            display: block;
+            margin: 10px 15px 0 0;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 14px;
+          }
+
+          .range {
+            display: block;
+            margin-right: 15px;
+            font-size: 10px;
+            line-height: 12px;
+          }
+
+          .drag-bar {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 50px;
+            width: 2px;
+            background-color: #fff;
+            @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+
+            cursor: ew-resize;
+            @include transition(none);
+
+            &:hover {
+              width: 6px;
+              right: -2px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1167 @@
+<%inherit file="base.html" />
+<%block name="bodyclass">settings</%block>
+<%block name="title">Settings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
+  
+  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_settings.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+    
+        var settingsModel = new CMS.Models.Settings.CourseSettings({
+            courseLocation: new CMS.Models.Location('${context_course.location}',{parse:true}),
+            details: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
+        });
+        
+        var editor = new CMS.Views.CourseInfoEdit({
+            el: $('.main-wrapper'),
+            model : settingsModel)
+        });
+        
+        editor.render();
+    });
+      
+    // TODO move most of this into view handlers
+    var $body;
+    var $gradeBar;
+    var $draggingBar;
+    var barOrigin;
+    var barWidth;
+    var gradeThresholds;
+    var GRADES = ['A', 'B', 'C', 'D', 'E'];
+
+    $(" :input, textarea").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
+    });
+
+    (function() {
+      $body = $('body');
+      $gradeBar = $('.grade-bar');
+      gradeThresholds = [100, 80, 70];
+      $('.settings-extra header').bind('click', showSettingsExtras);
+      $body.on('mousedown', '.drag-bar', startDragBar);
+      $('.new-grade-button').bind('click', addNewGrade);
+      $body.on('click', '.remove-button', removeGrade);
+
+      $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
+    })();
+
+    function addNewGrade(e) {
+      e.preventDefault();
+      var $newGradeBar = $('<li style="width: 10%;"><span class="letter-grade" contenteditable>' + GRADES[$('.grades li').length] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
+      $('.grades').append($newGradeBar);
+    }
+
+    function removeGrade(e) {
+      e.preventDefault();
+      var index = $(this).closest('li').index();
+      gradeThresholds.splice(index, 1);
+      $(this).closest('li').remove();
+    }
+
+
+    function showSettingsExtras(e) {
+      e.preventDefault();
+      $(this).toggleClass('active');
+      $(this).siblings.toggleClass('is-shown');
+    }
+
+    function startDragBar(e) {
+      e.preventDefault();
+      barOrigin = $gradeBar.offset().left;
+      barWidth = $gradeBar.width();
+      $draggingBar = $(e.target).closest('li').addClass('is-dragging');
+      $body.bind('mousemove', moveBar);
+      $body.bind('mouseup', stopDragBar);
+    }
+
+    function moveBar(e) {
+      var barIndex = $draggingBar.index();
+      var min = gradeThresholds[barIndex + 1] || 0;
+      var max = gradeThresholds[barIndex - 1] || 100;
+      var percentage = Math.min(Math.max((e.pageX - barOrigin) / barWidth * 100, min), max);
+      $draggingBar.css('width', percentage + '%');
+      gradeThresholds[$draggingBar.index()] = Math.round(percentage);
+      renderGradeRanges();
+    }
+
+    function stopDragBar(e) {
+      $draggingBar.removeClass('is-dragging');
+      $body.unbind('mousemove', moveBar);
+      $body.unbind('mouseup', stopDragBar);
+    }
+
+    function renderGradeRanges() {
+      $('.range').each(function(i) {
+        var min = gradeThresholds[i + 1] + 1 || 0;
+        var max = gradeThresholds[i];
+        $(this).text(min + '-' + max);
+      });
+    }
+  </script>
+</%block>
+
+<%block name="content">
+  <!-- -->
+  <div class="main-wrapper">
+    <div class="inner-wrapper">      
+      <h1>Settings</h1>
+      <article class="settings-overview">
+        <div class="sidebar">
+          <nav class="settings-page-menu">
+            <ul>
+              <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
+              <li><a href="#" data-section="faculty">Faculty</a></li>
+              <li><a href="#" data-section="grading">Grading</a></li>
+              <li><a href="#" data-section="problems">Problems</a></li>
+              <li><a href="#" data-section="discussions">Discussions</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="settings-page-section main-column">
+
+          <section class="settings-details is-shown">
+            <h2 class="title">Course Details</h2>
+
+            <section class="settings-details-basic">
+              <header>
+                <h3>Basic Information</h3>
+                <span class="detail">The nuts and bolts of your course</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-name-input">Course Name:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="long" id="course-name-input" disabled="disabled">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-organization-input">Organization:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="long" id="course-organization-input" disabled="disabled">      
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-number-input">Course Number:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="course-number-input" disabled="disabled">
+                    <span class="tip tip-inline">e.g. 101x</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-details-basic -->
+
+            <hr class="divide" />
+
+            <section class="settings-details-schedule">
+              <header>
+                <h3>Course Schedule</h3>
+                <span class="detail">Important steps and segments of your your course</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-start-date-input">Course Start Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="start-date date set-date" id="course-start-date-input" placeholder="MM/DD/YYYY">
+                    <span class="tip tip-inline">First day the class begins</span>          
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-end-date-input">Course End Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="end-date date set-date" id="course-end-date-input" placeholder="MM/DD/YYYY">
+                    <span class="tip tip-inline">Last day the class begins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Milestones:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-milestone-list">
+                    <li class="input input-existing multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-1-date-input">Milestone Date</label>
+                        <input type="text" id="course-milestone-1-date-input" class="course-milestone-date-input date set-date" placeholder="MM/DD/YYYY">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-milestone-1-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-1-name-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-milestone-data"><span class="delete-icon"></span> Delete Milestone</a>
+                    </li>
+
+                    <li class="input multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-2-date-input">Milestone Date</label>
+                        <input type="text" class="course-milestone-date-input date set-date" id="course-milestone-2-date-input" placeholder="MM/DD/YYYY">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-milestone-2-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-2-name-input">
+                      </div>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-milestone-item add-milestone-data">
+                    <span class="plus-icon"></span>New Course Milestone
+                  </a>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-syllabus-input">Course Syllabus</label>
+                <div class="field">
+                  <div class="input input-existing">
+                    <div class=" current current-course-syllabus">
+                      <span class="pdf doc-filename">CS184x_syllabus.pdf</span>
+                    </div>
+
+                    <a href="#" class="remove-item remove-course-syllabus remove-doc-data"><span class="delete-icon"></span> Delete Syllabus</a>
+
+                    <span class="tip tip-inline">PDF formatting preferred</span>          
+                  </div>
+
+                  <div class="input">
+                    <a href="#" class="new-item new-course-syllabus add-syllabus-data" id="course-syllabus-input">
+                      <span class="upload-icon"></span>Upload Syllabus
+                    </a>
+                    <span class="tip tip-inline">PDF formatting preferred</span>          
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-details-schedule -->
+
+            <hr class="divide" />
+
+            <section class="setting-details-marketing">
+              <header>
+                <h3>Introducing Your Course</h3>
+                <span class="detail">Information for perspective students</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-overview">Course Overview:</label>
+                <div class="field">
+                  <div class="input">
+                    <textarea class="long tall" input="course-overview"></textarea>
+                    <span class="tip tip-stacked">Detailed summary of concepts and lessons covered</span>
+                  </div>
+                </div>      
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-shortdescription">Course Statement:</label>
+                <div class="field">
+                  <div class="input">
+                    <textarea class="long" id="course-shortdescription"></textarea>
+                    <span class="tip tip-stacked">1-2 sentences used to introduce your class to perspective students</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-introduction-video">Introduction Video:</label>
+                <div class="field">
+                  <div class="input input-existing">
+                    <div class=" current current-course-introduction-video">
+                      <iframe width="400" height="225" src="http://www.youtube.com/embed/6F0pR-ANmXY" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Video</a>
+                  </div>
+
+                  <div class="input">
+                    <a href="#" class="new-item new-course-introduction-video add-video-data" id="course-introduction-video">
+                      <span class="upload-icon"></span>Upload Video
+                    </a>
+                    <span class="tip tip-inline">Video restrictions go here</span>          
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-details-marketing -->
+
+            <hr class="divide" />
+
+            <section class="settings-details-requirements">
+              <header>
+                <h3>Requirements</h3>
+                <span class="detail">Expectations of the students taking this course</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-requirements">Requirements:</label>
+                <div class="field">
+                  <div class="input">
+                    <textarea class="long tall" id="course-requirements"></textarea>  
+                    <span class="tip tip-stacked">Supplies, software, and set-up that students will need</span>     
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-effort">Hours of Effort per Week:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="course-effort" placeholder="HH:MM">
+                    <span class="tip tip-inline">Time students should spend on all course work</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Textbooks:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-textbooks-list">
+                    <li class="input input-existing multi multi-stacked course-textbooks-list-item">
+                      <div class="group">
+                        <label for="course-textbooks-1-name-input">Textbook Name</label>
+                        <input type="text" class="course-textbooks-name-input" id="course-textbooks-1-name-input" placeholder="">
+                      </div>
+
+                      <div class="group optional">
+                        <label for="course-textbooks-1-link-input">Textbook Link</label>
+                        <input type="text" class="course-textbooks-link-input" id="course-textbooks-1-link-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-textbooks-data"><span class="delete-icon"></span> Delete Textbook</a>
+                    </li>
+                    
+                    <li class="input multi multi-stacked course-textbooks-list-item">
+                      <div class="group">
+                        <label for="course-textbooks-2-name-input">Textbook Name</label>
+                        <input type="text" class="course-textbooks-name-input" id="course-textbooks-2-name-input">
+                      </div>
+
+                      <div class="group optional">
+                        <label for="course-textbooks-2-link-input">Textbook Link</label>
+                        <input type="text" class="course-textbooks-link-input" id="course-textbooks-2-link-input">
+                      </div>
+
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-textbooks-item add-textbooks-data">
+                    <span class="plus-icon"></span>New Textbook
+                  </a>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Prerequisites:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-prerequisites-list">
+                    <li class="input input-existing multi multi-stacked course-prerequisites-list-item">
+                      <div class="group">
+                        <label for="course-prerequisites-1-name-input">Prerequisite</label>
+                        <input type="text" class="course-prerequisites-name-input" id="course-prerequisites-1-name-input">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-prerequisites-1-link-input">Prerequisite Link</label>
+                        <input type="text" class="course-prerequisites-link-input" id="course-prerequisites-1-link-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-prerequisite-data"><span class="delete-icon"></span> Delete Prerequisite</a>
+                    </li>
+                    
+                    <li class="input multi multi-stacked course-prerequisites-list-item">
+                      <div class="group">
+                        <label for="course-prerequisites-2-name-input">Prerequisite</label>
+                        <input type="text" class="course-prerequisites-name-input" id="course-prerequisites-2-name-input">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-prerequisites-2-link-input">Prerequisite Link</label>
+                        <input type="text" class="course-prerequisites-link-input" id="course-prerequisites-2-link-input">
+                      </div>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-prerequisite-item add-prerequisite-data">
+                    <span class="plus-icon"></span>New Prerequisite
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <hr class="divide" />
+
+            <section class="settings-details-more">
+              <header>
+                <h3>More Information</h3>
+                <span class="detail">Other helpful information about the course</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">FAQs:</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-faq-list">
+                    <li class="input multi multi-stacked course-faq-list-item">
+                      <div class="group">
+                        <label for="course-faq-1-question-input">Question</label>
+                        <input type="text" class="long course-faq-question-input" id="course-faq-1-question-input">
+                      </div>
+
+                      <div class="group optional">
+                        <label for="course-faq-1-answer-input">Answer</label>
+                        <textarea class="long tall course-faq-answer-input" id="course-faq-1-answer-input"></textarea>
+                      </div>
+
+                      <a href="#" class="remove-item remove-faq-data"><span class="delete-icon"></span> Delete Question &amp; Answer</a>
+                    </li>
+                    
+                    <li class="input multi multi-stacked course-faq-list-item">
+                      <div class="group">
+                        <label for="course-faq-2-question-input">Question</label>
+                        <input type="text" class="long course-faq-question-input" id="course-faq-2-question-input">
+                      </div>
+
+                      <div class="group optional">
+                        <label for="course-faq-2-answer-input">Answer</label>
+                        <textarea class="long tall course-faq-answer-input" id="course-faq-2-answer-input"></textarea>
+                      </div>
+
+                      <a href="#" class="remove-item remove-faq-data"><span class="delete-icon"></span> Delete Question &amp; Answer</a>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-faq-item add-faq-data">
+                    <span class="plus-icon"></span>New Question &amp; Answer
+                  </a>
+                </div>
+              </div>
+            </section>
+          </section><!-- .settings-details -->
+
+          <section class="settings-faculty">
+            <h2 class="title">Faculty</h2>
+
+            <section class="settings-faculty-members">
+              <header>
+                <h3>Faculty Members</h3>
+                <span class="detail">Individuals instructing and help with this course</span>
+              </header>
+
+              <div class="row">
+                <div class="field enum">
+                  <ul class="input-list course-faculty-list">
+                    <li class="input input-existing multi course-faculty-list-item">
+                      <div class="row row-col2">
+                        <label for="course-faculty-firstname-input">Faculty First Name:</label>
+                        <div class="field">
+                          <input type="text" class="long" id="course-faculty-firstname-input">
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-lastname-input">Faculty Last Name:</label>
+                        <div class="field">
+                          <input type="text" class="long" id="course-faculty-lastname-input">
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-photo-input">Faculty Photo</label>
+                        <div class="field">
+                          <div class="input">
+                            <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                              <span class="upload-icon"></span>Upload Faculty Photo
+                            </a>
+                            <span class="tip tip-inline">Max size: 30KB</span>          
+                          </div>
+
+                          <div class="input input-existing">
+                            <div class=" current current-faculty-photo">
+                              <img src="http://dummyimage.com/800x600/4d494d/686a82.gif&text=faculty+photo" alt="Faculty Photo" />
+                            </div>
+
+                            <a href="#" class="remove-item remove-faculty-photo remove-video-data"><span class="delete-icon"></span> Delete Faculty Photo</a>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-bio-input">Faculty Bio:</label>
+                        <div class="field">
+                          <textarea class="long tall" id="course-faculty-bio-input"></textarea>
+                          <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                        </div>      
+                      </div>
+
+                      <a href="#" class="remove-item remove-faculty-data"><span class="delete-icon"></span> Delete Faculty Member</a>
+                    </li>
+
+                    <li class="input multi course-faculty-list-item">
+                      <div class="row row-col2">
+                        <label for="course-faculty-firstname-input">Faculty First Name:</label>
+                        <div class="field">
+                          <input type="text" class="long" id="course-faculty-firstname-input">
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-lastname-input">Faculty Last Name:</label>
+                        <div class="field">
+                          <input type="text" class="long" id="course-faculty-lastname-input">
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-photo-input">Faculty Photo</label>
+                        <div class="field">
+                          <div class="input">
+                            <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                              <span class="upload-icon"></span>Upload Faculty Photo
+                            </a>
+                            <span class="tip tip-inline">Max size: 30KB</span>          
+                          </div>
+
+                          <div class="input input-existing">
+                            <div class=" current current-course-faculty-photo">
+
+                            </div>
+
+                            <a href="#" class="replace-item replace-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
+                              <span class="upload-icon"></span>Upload Faculty Photo
+                            </a>
+                            <span class="tip tip-inline">Max size: 30KB</span>          
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row row-col2">
+                        <label for="course-faculty-bio-input">Faculty Bio:</label>
+                        <div class="field">
+                          <div clas="input">
+                            <textarea class="long tall" id="course-faculty-bio-input"></textarea>
+                            <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                          </div>
+                        </div>      
+                      </div>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-faculty-item add-faculty-data">
+                    <span class="plus-icon"></span>New Faculty Member
+                  </a>
+                </div>
+              </div>
+            </section>
+
+          </section><!-- .settings-staff -->
+
+          <section class="settings-grading">
+            <h2 class="title">Grading</h2>
+
+            <section class="settings-grading-range">
+              <header>
+                <h3>Overall Grade Range</h3>
+                <span class="detail">Course grade ranges and their values</span>
+              </header>
+
+              <div class="row">
+                
+                <div class="grade-controls">
+                  <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                  <div class="grade-slider">
+                    <div class="grade-bar">
+                      <ol class="increments">
+                        <li class="increment-0">0</li>
+                        <li class="increment-10">10</li>
+                        <li class="increment-20">20</li>
+                        <li class="increment-30">30</li>
+                        <li class="increment-40">40</li>
+                        <li class="increment-50">50</li>
+                        <li class="increment-60">60</li>
+                        <li class="increment-70">70</li>
+                        <li class="increment-80">80</li>
+                        <li class="increment-90">90</li>
+                        <li class="increment-100">100</li>
+                      </ol>
+                      <ol class="grades">
+                        <li class="bar-a" style="width: 100%;">
+                          <span class="letter-grade" contenteditable>A</span>
+                          <span class="range">81-100</span>
+                          <a href="#" class="remove-button">remove</a>
+                        </li>
+                        <li class="bar-b" style="width: 80%;">
+                          <span class="letter-grade" contenteditable>B</span>
+                          <span class="range">71-80</span>
+                          <a href="#" class="drag-bar"></a>
+                          <a href="#" class="remove-button">remove</a>
+                        </li>
+                        <li class="bar-c" style="width: 70%;">
+                          <span class="letter-grade" contenteditable>C</span>
+                          <span class="range">0-70</span>
+                          <a href="#" class="drag-bar"></a>
+                          <a href="#" class="remove-button">remove</a>
+                        </li>
+                        <li class="bar-fail" style="width: 50%;">
+                          <span class="letter-grade" contenteditable>F</span>
+                          <span class="range">0-50</span>
+                          <a href="#" class="drag-bar"></a>
+                          <a href="#" class="remove-button">remove</a>
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <section class="settings-grading-general">
+              <header>
+                <h3>General Grading</h3>
+                <span class="detail">Deadlines and Requirements</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-graceperiod">General Assignment Deadline:</label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" id="course-grading-duetime" placeholder="HH:MM">
+                    <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours)</span>
+                    <span class="tip tip-stacked"><a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-graceperiod">Deadline Grace Period:</label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="course-grading-graceperiod">
+                    <span class="tip tip-inline">e.g. +5 minutes</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-grading-lessonexercises">
+              <header>
+                <h3>Lesson Exercises</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-gradeweight">Weight of Total Grade:</label>
+
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short" id="course-grading-lessonexercises-gradeweight">
+                    <span class="tip tip-inline">e.g. 25%</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignments">
+                    <span class="tip tip-inline">total exercises assigned</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-lessonexercises-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total exercises that won't be graded</span>               
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-grading-labs">
+              <header>
+                <h3>Labs</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-labs-gradeweight">Weight of Total Grade:</label>
+
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short course-grading-gradeweight" id="course-grading-labs-gradeweight">
+                    <span class="tip tip-inline">e.g. 25%</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-labs-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short course-grading-totalassignments" id="course-grading-labs-totalassignments">
+                    <span class="tip tip-inline">total labs assigned</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-labs-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short course-grading-labs-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total labs that won't be graded</span>               
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-grading-exams">
+              <header>
+                <h3>Exams</h3>
+                <span class="detail">Grading in-lesson question &amp; problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-gradeweight">Weight of Total Grade:</label>
+
+                <div class="field">
+                  <div class="input course-grading-gradeweight">
+                    <input type="text" class="short course-grading-gradeweight" id="course-grading-exams-gradeweight">
+                    <span class="tip tip-inline">e.g. 50%</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-totalassignments">Total Number:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignments">
+                    <input type="text" class="short course-grading-totalassignments" id="course-grading-exams-totalassignments">
+                    <span class="tip tip-inline">total exams held</span>                
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-grading-exams-totalassignmentsdroppable">Number of Droppable:</label>
+
+                <div class="field">
+                  <div class="input course-grading-totalassignmentsdroppable">
+                    <input type="text" class="short course-grading-exams-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
+                    <span class="tip tip-inline">total exams that won't be graded</span>               
+                  </div>
+                </div>
+              </div>
+            </section>
+          </section><!-- .settings-grading -->
+
+          <section class="settings-problems">
+            <h2 class="title">Problems</h2>
+
+            <section class="settings-problems-general">
+              <header>
+                <h3>General Settings</h3>
+                <span class="detail">Course-wide settings for all problems</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-randomization" id="problems-general-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-general-randomization"></div>
+                    <label for="problems-general-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-showanswer" id="problems-general-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-general-showanswer"></div>
+                    <label for="problems-general-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-general-showanswer" id="problems-general-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-general-showanswer"></div>
+                    <label for="problems-general-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-general-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-general-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-general -->
+
+            <section class="settings-problems-lessonexercises settings-extras">
+              <header>
+                <h3>Lesson Exercises</h3>
+                <span class="detail">In-lesson question &amp; problem specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-randomization"></div>
+                    <label for="problems-lessonexercises-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-showanswer"></div>
+                    <label for="problems-lessonexercises-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-lessonexercises-showanswer"></div>
+                    <label for="problems-lessonexercises-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-lessonexercises-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-lessonexercises-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-lessonexercises -->
+
+            <section class="settings-problems-labs settings-extras">
+              <header>
+                <h3>Labs</h3>
+                <span class="detail">Exploratory assignment-specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-randomization" id="problems-labs-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-randomization"></div>
+                    <label for="problems-labs-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-showanswer" id="problems-labs-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-showanswer"></div>
+                    <label for="problems-labs-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-labs-showanswer" id="problems-labs-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-labs-showanswer"></div>
+                    <label for="problems-labs-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-labs-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-labs-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-labs -->
+
+            <section class="settings-problems-exams settings-extras">
+              <header>
+                <h3>Exams</h3>
+                <span class="detail">Mid-term and final exam-specific rules</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Problem Randomization:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-always" value="Aways">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-always">Always</label>
+                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-never">Never</label>
+                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-randomization" id="problems-exams-randomization-perstudent" value="Per Student">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-randomization"></div>
+                    <label for="problems-exams-randomization-perstudent">Per Student</label>
+                    <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Show Answers:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-showanswer" id="problems-exams-showanswer-always" value="Always">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-showanswer"></div>
+                    <label for="problems-exams-showanswer-always">Always</label>
+                    <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                  </div>
+
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="problems-exams-showanswer" id="problems-exams-showanswer-never" value="Never">
+                    <div class="ui-status-indic ui-status-indic-problems-exams-showanswer"></div>
+                    <label for="problems-exams-showanswer-never">Never</label>
+                    <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="problems-exams-attempts">Number of Attempts: </label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short" id="problems-exams-attempts" placeholder="0 or higher" value="0">
+                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-problems-exams -->
+          </section><!-- .settings-problems -->
+
+          <section class="settings-discussions">
+            <h2 class="title">Discussions</h2>
+            
+            <section class="settings-discussions-general">
+              <header>
+                <h3>General Settings</h3>
+                <span class="detail">Course-wide settings for online discussion</span>
+              </header>
+
+              <div class="row row-col2">
+                <h4 class="label">Anonymous Discussions:</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-anonymous" id="discussions-anonymous-allow" value="Allow">
+                    <div class="ui-status-indic ui-status-indic-discussions-anonymous-allow"></div>
+                    <label for="discussions-anonymous-allow">Allow</label>
+                    <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
+                  </div>
+
+                  <div class="input">
+                    <input checked="checked" type="radio" class="ui-status-input ui-status-input-radio" name="discussions-anonymous" id="discussions-anonymous-dontallow" value="Do Not Allow">
+                    <div class="ui-status-indic ui-status-indic-discussions-anonymous-dontallow"></div>
+                    <label for="discussions-anonymous-dontallow">Do not allow</label>
+                    <span class="tip tip-stacked"><strong>Posting anonymously is not allowed</strong>. Any previous anonymous posts <strong>will be reverted to non-anonymous</strong></span>
+                  </div>
+                </div>
+              </div>
+            </section><!-- .settings-discussions-general -->
+
+            <section class="settings-discussions-categories">
+              <div class="row row-col2">
+                <h4 class="label">Discussion Categories</h4>
+
+                <div class="field enum">
+                  <ul class="input-list course-discussions-categories-list">
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-1-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-1-name-input" placeholder="" value="General" disabled="disabled">
+                      </div>
+                    </li>
+                    
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-2-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-2-name-input" placeholder="" value="Feedback" disabled="disabled">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-3-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-3-name-input" placeholder="" value="Troubleshooting" disabled="disabled">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-4-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-4-name-input" placeholder="" value="Study Groups">
+                      </div>
+                    </li>
+
+                    <li class="input input-existing course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-5-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-5-name-input" placeholder="" value="Lectures">
+                      </div>
+
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                    </li>
+
+                    <li class="input course-discussions-categories-list-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-6-name-input">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-6-name-input" placeholder="">
+                      </div>
+
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                    </li>
+                  </ul>
+
+                  <a href="#" class="new-item new-course-discussions-categories-item add-categories-data">
+                    <span class="plus-icon"></span>New Discussion Category
+                  </a>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <h4 class="label">Create Discussion Categories per Unit</h4>
+
+                <div class="field ui-status">
+                  <div class="input">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-categories-perunit" id="discussions-categories-perunit-allow" value="Allow" disabled="disabled">
+                    <div class="ui-status-indic ui-status-indic-discussions-categories-perunit-allow"></div>
+                    <label for="discussions-categories-perunit-allow">Allow</label>
+                    <span class="tip tip-stacked">This option is automatically set currently</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </section><!-- .settings-discussions -->
+        </div>
+      </article>
+    </div>
+  </div>
+</%block>
