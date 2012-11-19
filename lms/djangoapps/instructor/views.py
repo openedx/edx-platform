@@ -90,7 +90,7 @@ def instructor_dashboard(request, course_id):
         try:
             group = Group.objects.get(name=staffgrp)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)		# create the group
+            group = Group(name=staffgrp)     # create the group
             group.save()
         return group
 
@@ -380,7 +380,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
-    if get_grades:
+    if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))

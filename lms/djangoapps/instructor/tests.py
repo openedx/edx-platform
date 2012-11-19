@@ -33,12 +33,8 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
 
-        def find_course(name):
-            """Assumes the course is present"""
-            return [c for c in courses if c.location.course==name][0]
-
-        self.full = find_course("full")
-        self.toy = find_course("toy")
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -49,9 +45,12 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        group_name = _course_staff_group_name(self.toy.location)
-        g = Group.objects.create(name=group_name)
-        g.user_set.add(ct.user(self.instructor))
+        def make_instructor(course):
+            group_name = _course_staff_group_name(course.location)
+            g = Group.objects.create(name=group_name)
+            g.user_set.add(ct.user(self.instructor))
+
+        make_instructor(self.toy)
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -67,9 +66,9 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 
         self.assertEqual(response['Content-Type'],'text/csv',msg)
 
-        cdisp = response['Content-Disposition'].replace('TT_2012','2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
-        msg += "cdisp = '{0}'\n".format(cdisp)
-        self.assertEqual(cdisp,'attachment; filename=grades_edX/toy/2012_Fall.csv',msg)
+        cdisp = response['Content-Disposition']
+        msg += "Content-Disposition = '%s'\n" % cdisp
+        self.assertEqual(cdisp, 'attachment; filename=grades_{0}.csv'.format(course.id), msg)
 
         body = response.content.replace('\r','')
         msg += "body = '{0}'\n".format(body)
@@ -77,6 +76,8 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
         expected_body = '''"ID","Username","Full Name","edX email","External email","HW 01","HW 02","HW 03","HW 04","HW 05","HW 06","HW 07","HW 08","HW 09","HW 10","HW 11","HW 12","HW Avg","Lab 01","Lab 02","Lab 03","Lab 04","Lab 05","Lab 06","Lab 07","Lab 08","Lab 09","Lab 10","Lab 11","Lab 12","Lab Avg","Midterm","Final"
 "2","u2","Fred Weasley","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0.0","0.0"
 '''
+        # All the not-actually-in-the-course hw and labs come from the
+        # default grading policy string in graders.py
         self.assertEqual(body, expected_body, msg)
         
 FORUM_ROLES = [ FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA ]

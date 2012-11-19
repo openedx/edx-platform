@@ -288,14 +288,10 @@ class TestNavigation(PageLoader):
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
-
-        self.full = find_course("edX/full/6.002_Spring_2012")
-        self.toy = find_course("edX/toy/2012_Fall")
+        # Assume courses are there
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -346,14 +342,9 @@ class TestViewAuth(PageLoader):
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
-
-        self.full = find_course("edX/full/6.002_Spring_2012")
-        self.toy = find_course("edX/toy/2012_Fall")
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
