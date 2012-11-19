@@ -213,11 +213,9 @@
       .ui-status-indic {
         z-index: 10;
         display: inline-block;
-        height: 15px;
-        width: 15px;
-        border: 2px;
+        height: 30px;
+        width: 20px;
         opacity: 0.50;
-        @include box-sizing(border-box);
         @include transition(opacity 0.25s ease-in-out);
       }
 
@@ -244,7 +242,7 @@
       }
 
       .ui-status-input-checkbox input:checked ~ .ui-status-indic, .ui-status-input-radio input:checked ~ .ui-status-indic {
-        background: transparent url('/static/img/.png') 0 0 no-repeat;
+        background: transparent url('../images/correct-icon.png') 0 0 no-repeat;
         opacity: 0.99;
       }
 
