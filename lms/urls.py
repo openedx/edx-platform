@@ -232,6 +232,10 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.enroll_students', name='enroll_students'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'instructor.views.staff_grading', name='staff_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
+            'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
+            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
