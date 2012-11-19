@@ -141,6 +141,11 @@
         border-color: $blue;
         outline: 0;
       }
+
+      &:disabled {
+        color: $darkGrey;
+        background: $lightGrey;
+      }
     }
 
     ::-webkit-input-placeholder {
@@ -564,14 +569,14 @@
   }
 
   .grade-slider {
-    float: left;
-    width: 560px;
-    height: 60px;
+    float: right;
+    width: 95%;
+    height: 80px;
 
     .grade-bar {
       position: relative;
       width: 100%;
-      height: 40px;
+      height: 50px;
       background: $lightGrey;
 
       .increments {
@@ -579,7 +584,7 @@
 
         li {
           position: absolute;
-          top: 42px;
+          top: 52px;
           width: 30px;
           margin-left: -15px;
           font-size: 9px;
@@ -637,7 +642,7 @@
         li {
           position: absolute;
           top: 0;
-          height: 40px;     
+          height: 50px;     
           text-align: right;
 
           &:hover,
@@ -645,6 +650,11 @@
             .remove-button {
               display: block;
             }
+          }
+
+          &.is-dragging {
+
+
           }
 
           .remove-button {
@@ -678,16 +688,16 @@
 
           .letter-grade {
             display: block;
-            margin: 7px 5px 0 0;
-            font-size: 14px;
+            margin: 10px 15px 0 0;
+            font-size: 16px;
             font-weight: 700;
             line-height: 14px;
           }
 
           .range {
             display: block;
-            margin-right: 5px;
-            font-size: 9px;
+            margin-right: 15px;
+            font-size: 10px;
             line-height: 12px;
           }
 
@@ -695,14 +705,16 @@
             position: absolute;
             top: 0;
             right: -1px;
-            height: 40px;
+            height: 50px;
             width: 2px;
             background-color: #fff;
+            @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+
             cursor: ew-resize;
             @include transition(none);
 
             &:hover {
-              width: 4px;
+              width: 6px;
               right: -2px;
             }
           }

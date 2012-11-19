@@ -36,7 +36,7 @@
       $('.new-grade-button').bind('click', addNewGrade);
       $body.on('click', '.remove-button', removeGrade);
 
-      $('.set-date').datepicker();
+      $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
     })();
 
     function addNewGrade(e) {
@@ -133,7 +133,7 @@
                 <label for="course-name-input">Course Name:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="long" id="course-name-input">
+                    <input type="text" class="long" id="course-name-input" disabled="disabled">
                   </div>
                 </div>
               </div>
@@ -142,7 +142,7 @@
                 <label for="course-organization-input">Organization:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="long" id="course-organization-input">                    
+                    <input type="text" class="long" id="course-organization-input" disabled="disabled">      
                   </div>
                 </div>
               </div>
@@ -151,7 +151,7 @@
                 <label for="course-number-input">Course Number:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-number-input">
+                    <input type="text" class="short" id="course-number-input" disabled="disabled">
                     <span class="tip tip-inline">e.g. 101x</span>
                   </div>
                 </div>
@@ -170,7 +170,7 @@
                 <label for="course-start-date-input">Course Start Date:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="date" id="course-start-date-input">
+                    <input type="text" class="start-date date set-date" id="course-start-date-input" placeholder="MM/DD/YYYY">
                     <span class="tip tip-inline">First day the class begins</span>          
                   </div>
                 </div>
@@ -180,7 +180,7 @@
                 <label for="course-end-date-input">Course End Date:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="date" id="course-end-date-input">
+                    <input type="text" class="end-date date set-date" id="course-end-date-input" placeholder="MM/DD/YYYY">
                     <span class="tip tip-inline">Last day the class begins</span>
                   </div>
                 </div>
@@ -280,7 +280,6 @@
                 <div class="field">
                   <div class="input input-existing">
                     <div class=" current current-course-introduction-video">
-
                     </div>
 
                     <a href="#" class="replace-item replace-course-introduction-video add-video-data" id="course-introduction-video">
@@ -618,6 +617,12 @@
                         <li class="bar-c" style="width: 70%;">
                           <span class="letter-grade" contenteditable>C</span>
                           <span class="range">0-70</span>
+                          <a href="#" class="drag-bar"></a>
+                          <a href="#" class="remove-button">remove</a>
+                        </li>
+                        <li class="bar-fail" style="width: 50%;">
+                          <span class="letter-grade" contenteditable>F</span>
+                          <span class="range">0-50</span>
                           <a href="#" class="drag-bar"></a>
                           <a href="#" class="remove-button">remove</a>
                         </li>
