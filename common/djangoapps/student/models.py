@@ -201,9 +201,10 @@ def unique_id_for_user(user):
     Currently happens to be implemented as a sha1 hash of the username
     (and thus assumes that usernames don't change).
     """
-    return sha1(user.username).hexdigest()
-
-
+    # Using the user id as the salt because it's sort of random, and is already
+    # in the db.
+    salt = str(user.id)
+    return sha1(salt + user.username).hexdigest()
 
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
