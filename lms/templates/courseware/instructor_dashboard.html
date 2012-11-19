@@ -56,8 +56,8 @@ function goto( mode)
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
           %endif
-          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> ]
-          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Admin')}">Forum Admin</a> ]
+          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
+          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> ]
     </h2>
 
   <div style="text-align:right" id="djangopid">${djangopid}</div>
@@ -150,16 +150,16 @@ function goto( mode)
   %if instructor_access or forum_admin_access:
     <p>
     <input type="submit" name="action" value="List course forum moderators">
-    <p>
-    <input type="text" name="forummoderator"> <input type="submit" name="action" value="Remove forum moderator">
-    <input type="submit" name="action" value="Add forum moderator">
-    <hr width="40%" style="align:left">
-    <p>
     <input type="submit" name="action" value="List course forum community TAs">
     <p>
-    <input type="text" name="forumcommunityta"> <input type="submit" name="action" value="Remove forum community TA">
+    <input type="text" name="forummoderator"> 
+    <input type="submit" name="action" value="Remove forum moderator">
+    <input type="submit" name="action" value="Add forum moderator">
+    <input type="submit" name="action" value="Remove forum community TA">
     <input type="submit" name="action" value="Add forum community TA">
     <hr width="40%" style="align:left">
+  %else:
+  <p>User requires forum administrator privileges to perform administration tasks.  See instructor.</p>
   %endif
 %endif
 

@@ -43,6 +43,11 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+FORUM_ROLE_ADMINISTRATOR = 'Administrator'
+FORUM_ROLE_MODERATOR = 'Moderator'
+FORUM_ROLE_COMMUNITY_TA = 'Community TA'
+FORUM_ROLE_ADD = 'add'
+FORUM_ROLE_REMOVE = 'remove'
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -208,9 +213,8 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # forum administration
   
-
     elif action == 'List course forum administrators':
-        rolename = 'Administrator'
+        rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
@@ -218,50 +222,50 @@ def instructor_dashboard(request, course_id):
     
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
-        msg += _update_forum_role_membership(uname, course_id, 'Administrator', 'remove')
-        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Administrator', course_id), 
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
                                  {}, page='idashboard')
 
     elif action == 'Add forum admin':
         uname = request.POST['forumadmin']
-        msg += _update_forum_role_membership(uname, course_id, 'Administrator', 'add')
-        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Administrator', course_id), 
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
                                  {}, page='idashboard')
 
     elif action == 'List course forum moderators':
-        rolename = 'Moderator'
+        rolename = FORUM_ROLE_MODERATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
     
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
-        msg += _update_forum_role_membership(uname, course_id, 'Moderator', 'remove')
-        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Moderator', course_id), 
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id), 
                                  {}, page='idashboard')
     
     elif action == 'Add forum moderator':
         uname = request.POST['forummoderator']
-        msg += _update_forum_role_membership(uname, course_id, 'Moderator', 'add')
-        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Moderator', course_id), 
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id), 
                                  {}, page='idashboard')
     
     elif action == 'List course forum community TAs':
-        rolename = 'Community TA'
+        rolename = FORUM_ROLE_COMMUNITY_TA
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
     
     elif action == 'Remove forum community TA':
-        uname = request.POST['forumcommunityta']
-        msg += _update_forum_role_membership(uname, course_id, 'Community TA', 'remove')
-        track.views.server_track(request, '%s %s as %s for %s' % ('remove', uname, 'Community TA', course_id), 
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
                                  {}, page='idashboard')
     
     elif action == 'Add forum community TA':
-        uname = request.POST['forumcommunityta']
-        msg += _update_forum_role_membership(uname, course_id, 'Community TA', 'add')
-        track.views.server_track(request, '%s %s as %s for %s' % ('add', uname, 'Community TA', course_id), 
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course_id, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
+        track.views.server_track(request, '%s %s as %s for %s' % (FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
                                  {}, page='idashboard')
 
     #----------------------------------------
@@ -296,39 +300,69 @@ def instructor_dashboard(request, course_id):
     return render_to_response('courseware/instructor_dashboard.html', context)
 
 def _list_course_forum_members(course_id, rolename, datatable):
-    ''' TODO
+    ''' 
+    Fills in datatable with forum membership information, for a given role,
+    so that it will be displayed on instructor dashboard.
+    
+      course_ID = course's ID string
+      rolename = one of "Administrator", "Moderator", "Community TA"
+    
+    Returns message status string to append to displayed message, if role is unknown.
     '''
-    role = Role.objects.get(name=rolename, course_id=course_id)
-    uset = role.users.all()
+    # make sure datatable is set up properly for display first, before checking for errors
+    datatable['header'] = ['Username', 'Full name', 'Roles']
+    datatable['title'] = 'List of Forum %ss in course %s' % (rolename, course_id)
+    datatable['data'] = [];
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return '<font color="red">Error: unknown rolename "%s"</font>' % rolename
+    uset = role.users.all().order_by('username')
     msg = 'Role = %s' % rolename
     log.debug('role=%s' % rolename)
-    datatable['header'] = ['Username', 'Full name', 'Roles']
-    datatable['data'] = [[x.username, x.profile.name, ', '.join([r.name for r in x.roles.all()])] for x in uset]
-    datatable['title'] = 'List of Forum %s in course %s' % (rolename, course_id)
+    datatable['data'] = [[x.username, x.profile.name, ', '.join([r.name for r in x.roles.filter(course_id=course_id).order_by('name')])] for x in uset]
     return msg
 
 
 def _update_forum_role_membership(uname, course_id, rolename, add_or_remove):
     '''
+    Supports adding a user to a course's forum role
     
-    
-    returns message status to append to displayed message
+      uname = username string for user
+      course_ID = course's ID string
+      rolename = one of "Administrator", "Moderator", "Community TA"
+      add_or_remove = one of "add" or "remove"
+      
+    Returns message status string to append to displayed message,  Status is returned if user 
+    or role is unknown, or if entry already exists when adding, or if entry doesn't exist when removing.
     '''
-    msg = ''
+    # check that username and rolename are valid:
     try:
         user = User.objects.get(username=uname)
     except User.DoesNotExist:
         return '<font color="red">Error: unknown username "%s"</font>' % uname
-    
-    if user is not None:
+    try:
         role = Role.objects.get(name=rolename, course_id=course_id)
-        log.debug('rolename=%s' % rolename)
-        if (add_or_remove == 'remove'):
+    except Role.DoesNotExist:
+        return '<font color="red">Error: unknown rolename "%s"</font>' % rolename
+
+    # check whether role already has the specified user:
+    alreadyexists = role.users.filter(username=uname).exists()
+    msg = ''
+    log.debug('rolename=%s' % rolename)
+    if (add_or_remove == FORUM_ROLE_REMOVE):
+        if (not alreadyexists):
+            msg ='<font color="red">Error: user %s does not have rolename "%s", cannot remove</font>' % (uname, rolename)
+        else: 
             user.roles.remove(role)
-            msg += '<font color="green">Removed %s from %s forum role = %s</font>' % (user, course_id, rolename)
-        else:
+            msg = '<font color="green">Removed %s from %s forum role = %s</font>' % (user, course_id, rolename)
+    else:
+        if (alreadyexists):
+            msg = '<font color="red">Error: user %s already has rolename "%s", cannot add</font>' % (uname, rolename)
+        else: 
             user.roles.add(role)
-            msg += '<font color="green">Added %s to %s forum role = %s</font>' % (user, course_id, rolename)
+            msg = '<font color="green">Added %s to %s forum role = %s</font>' % (user, course_id, rolename)
+
     return msg
     
 
