@@ -159,54 +159,43 @@
         %>
         % if course.has_ended() and cert_status:
             <%
-            passing_grade = False
-            cert_button = False
-            survey_button = False
-            if cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
+            if cert_status['status'] == 'generating':
                 status_css_class = 'course-status-certrendering'
-                cert_button = True
-                survey_button = True
-                passing_grade = True
-            elif cert_status['status'] == CertificateStatuses.downloadable:
+            elif cert_status['status'] == 'ready':
                 status_css_class = 'course-status-certavailable'
-                cert_button = True
-                survey_button = True
-                passing_grade = True
-            elif cert_status['status'] == CertificateStatuses.notpassing:
+            elif cert_status['status'] == 'notpassing':
                 status_css_class = 'course-status-certnotavailable'
-                survey_button = True
             else:
-                # This is primarily the 'unavailable' state, but also 'error', 'deleted', etc.
                 status_css_class = 'course-status-processing'
-
-            if survey_button and not course.end_of_course_survey_url:
-                survey_button = False
             %>
             <div class="message message-status ${status_css_class} is-shown">
 
-            % if cert_status['status'] == CertificateStatuses.unavailable:
-              <p class="message-copy">Final course details are being wrapped up at this time.
-              Your final standing will be available shortly.</p>
-            % elif passing_grade:
-              <p class="message-copy">You have received a grade of
-                        <span class="grade-value">${cert_status['grade']}</span>
-              in this course.</p>
-            % elif cert_status['status'] == CertificateStatuses.notpassing:
-              <p class="message-copy">You did not complete the necessary requirements for completion of this course. 
-              </p>
+            % if cert_status['status'] == 'processing':
+                  <p class="message-copy">Final course details are being wrapped up at
+                  this time. Your final standing will be available shortly.</p>
+            % elif cert_status['status'] in ('generating', 'ready'):
+                  <p class="message-copy">You have received a grade of
+                            <span class="grade-value">${cert_status['grade']}</span>
+                            in this course.</p>
+            % elif cert_status['status'] == 'notpassing':
+                  <p class="message-copy">You did not complete the necessary requirements for
+                     completion of this course.</p>
             % endif
-            % if cert_button or survey_button:
+              
+            % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
               <ul class="actions">
-                % if cert_button and cert_status['status'] in [CertificateStatuses.generating, CertificateStatuses.regenerating]:
-                  <li class="action"><span class="btn disabled" href="">Your Certificate is Generating</span></li>
-                % elif cert_button and cert_status['status'] == CertificateStatuses.downloadable:
+                % if cert_status['show_disabled_download_button']:
+                  <li class="action"><span class="btn disabled" href="">
+                      Your Certificate is Generating</span></li>
+                % elif cert_status['show_download_url']:
                   <li class="action">
                   <a class="btn" href="${cert_status['download_url']}"
                      title="This link will open/download a PDF document">
                      Download Your PDF Certificate</a></li>
                 % endif
-                % if survey_button:
-                  <li class="action"><a class="cta" href="${course.end_of_course_survey_url}">
+                     
+                % if cert_status['show_survey_button']:
+                  <li class="action"><a class="cta" href="${cert_status['survey_url']}">
                          Complete our course feedback survey</a></li>
                 % endif
               </ul>
