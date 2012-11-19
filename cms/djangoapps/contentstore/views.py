@@ -1,5 +1,6 @@
 from .utils import get_course_location_for_item, get_lms_link_for_item, \
     compute_unit_state, get_date_display, UnitState
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, \
     create_all_course_groups, get_user_by_email, add_user_to_course_group, \
@@ -42,8 +43,7 @@ import shutil
 import sys
 import tarfile
 import time
-from contentstore.course_info_model import get_course_updates,\
-    update_course_updates, delete_course_update
+from contentstore import course_info_model
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -924,7 +924,7 @@ def course_info(request, org, course, name, provided_id=None):
         'active_tab': 'courseinfo-tab',
         'context_course': course_module,
         'url_base' : "/" + org + "/" + course + "/",
-        'course_updates' : json.dumps(get_course_updates(location))
+        'course_updates' : json.dumps(course_info_model.get_course_updates(location))
     })
         
 @expect_json
@@ -947,14 +947,14 @@ def course_info_updates(request, org, course, provided_id=None):
         real_method = request.method
         
     if request.method == 'GET':
-        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
+        return HttpResponse(json.dumps(course_info_model.get_course_updates(location)), mimetype="application/json")
     elif real_method == 'POST':
         # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
-        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+        return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'PUT':
-        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+        return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
-        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+        return HttpResponse(json.dumps(course_info_model.delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
 
 @login_required
 @ensure_csrf_cookie
