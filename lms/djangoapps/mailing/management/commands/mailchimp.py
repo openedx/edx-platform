@@ -1,19 +1,21 @@
 import logging
 from optparse import make_option
+from hashlib import sha1
 
 from django.core.management.base import BaseCommand, CommandError
 
 from mailsnake import MailSnake
 
 from student.models import UserProfile
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore.django import modulestore
-from courseware.grades import grade
+# from xmodule.course_module import CourseDescriptor
+# from xmodule.modulestore.django import modulestore
 
 
 BATCH_SIZE = 2000
 
 log = logging.getLogger('edx.mailchimp')
+
+FIELD_TYPES = {'UNIQUE_ID': 'text'}
 
 
 class Command(BaseCommand):
@@ -87,15 +89,17 @@ def connect_mailchimp(key, list_id, course_id):
 
 
 def get_student_data(course_id, students):
-    store = modulestore()
-    course_loc = CourseDescriptor.id_to_location(course_id)
-    course = store.get_instance(course_id, course_loc)
+    # store = modulestore()
+    # course_loc = CourseDescriptor.id_to_location(course_id)
+    # course = store.get_instance(course_id, course_loc)
 
     grades = []
     for student in students:
         student_email = student.user.email
         entry = {'EMAIL': student_email,
                  'FULLNAME': student.name.title()}
+
+        entry['UNIQUE_ID'] = sha1(student.user.username).hexdigest()
 
         # student_grade = grade(student.user, None, course)
         # for g in student_grade['section_breakdown']:
@@ -150,10 +154,11 @@ def update_merge_tags(mailchimp, list_id, data):
 
         # add extra tags if not present
         if name not in mc_names and tag not in ['EMAIL', 'FULLNAME']:
+            ftype = FIELD_TYPES.get(name, 'number')
             result = mailchimp.listMergeVarAdd(id=list_id,
                                                tag=tag,
                                                name=name,
-                                               options={'field_type':'number',
+                                               options={'field_type': ftype,
                                                         'public': False})
             log.debug(result)
 
