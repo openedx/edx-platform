@@ -112,7 +112,7 @@ class StaffGrading
       if response.submission
         @data_loaded(response.submission, response.rubric)
       else
-        @no_more()
+        @no_more(response.message)
     else
       @error(response.error)
 
@@ -137,10 +137,10 @@ class StaffGrading
     @score = null
     @state = state_grading
 
-  no_more: () ->
+  no_more: (message) ->
     @submission = null
     @rubric = null
-    @message = 'Nothing to grade'
+    @message = message
     @state = state_no_data
 
   render_view: () ->
