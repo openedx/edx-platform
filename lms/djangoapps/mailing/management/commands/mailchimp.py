@@ -1,12 +1,11 @@
 import logging
 from optparse import make_option
-from hashlib import sha1
 
 from django.core.management.base import BaseCommand, CommandError
 
 from mailsnake import MailSnake
 
-from student.models import UserProfile
+from student.models import UserProfile, unique_id_for_user
 # from xmodule.course_module import CourseDescriptor
 # from xmodule.modulestore.django import modulestore
 
@@ -99,7 +98,7 @@ def get_student_data(course_id, students):
         entry = {'EMAIL': student_email,
                  'FULLNAME': student.name.title()}
 
-        entry['UNIQUE_ID'] = sha1(student.user.username).hexdigest()
+        entry['UNIQUE_ID'] = unique_id_for_user(student.user)
 
         # student_grade = grade(student.user, None, course)
         # for g in student_grade['section_breakdown']:
