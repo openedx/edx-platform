@@ -40,9 +40,8 @@
       if(event) {
         clearInterval(carouselTimer);
         carouselTimer = setInterval(nextCarouselPage, carouselDelay);
-        carouselIndex = $(this).closest('li').index();
         transitionSpeed = 250;
-        $pageToShow = $('.news-carousel .page').eq($(this).closest('li').index());
+        $pageToShow = $('.news-carousel .page').eq(index);
         $(this).addClass('current');
       } else {
         transitionSpeed = 750;
