@@ -211,10 +211,11 @@
       }
 
       .ui-status-indic {
+        background: transparent url('../images/correct-icon.png') 0 0 no-repeat;
         z-index: 10;
         display: inline-block;
-        height: 30px;
-        width: 20px;
+        height: 20px;
+        width: 30px;
         opacity: 0.50;
         @include transition(opacity 0.25s ease-in-out);
       }
@@ -464,6 +465,7 @@
 
         .remove-doc-data {
           display: inline-block;
+          margin-top: 0;
           width: 150px;
         }
       }
