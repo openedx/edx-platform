@@ -21,6 +21,25 @@ log = logging.getLogger("mitx.courseware")
 class GradingServiceError(Exception):
     pass
 
+
+class MockStaffGradingService(object):
+    """
+    A simple mockup of a staff grading service, testing.
+    """
+    def __init__(self):
+        self.cnt = 0
+
+    def get_next(self, course_id):
+        self.cnt += 1
+        return json.dumps({'success': True,
+                           'submission_id': self.cnt,
+                           'submission': 'Test submission {cnt}'.format(cnt=self.cnt),
+                           'rubric': 'A rubric'})
+
+    def save_grade(self, course_id, submission_id, score, feedback):
+        return self.get_next(course_id)
+
+
 class StaffGradingService(object):
     """
     Interface to staff grading backend.
@@ -30,20 +49,20 @@ class StaffGradingService(object):
         # TODO: add auth
         self.session = requests.session()
 
-    def get_next(course_id):
+    def get_next(self, course_id):
         """
         Get the next thing to grade.  Returns json, or raises GradingServiceError
         if there's a problem.
         """
         try:
-            r = self.session.get(url + 'get_next')
+            r = self.session.get(self.url + 'get_next')
         except requests.exceptions.ConnectionError as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
 
-    def save_grade(course_id, submission_id, score, feedback):
+    def save_grade(self, course_id, submission_id, score, feedback):
         """
         Save a grade.
 
@@ -52,15 +71,15 @@ class StaffGradingService(object):
         Returns json, or raises GradingServiceError if there's a problem.
         """
         try:
-            r = self.session.get(url + 'save_grade')
+            r = self.session.get(self.url + 'save_grade')
         except requests.exceptions.ConnectionError as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
 
-_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL)
-
+#_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL)
+_service = MockStaffGradingService()
 
 def _err_response(msg):
     """

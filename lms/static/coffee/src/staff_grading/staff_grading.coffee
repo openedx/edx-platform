@@ -24,6 +24,7 @@ class StaffGradingBackend
         success: true
         submission: 'submission! ' + @mock_cnt
         rubric: 'A rubric! ' + @mock_cnt
+        submission_id: @mock_cnt
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
@@ -31,6 +32,7 @@ class StaffGradingBackend
         success: true
         submission: 'another submission! ' + @mock_cnt
         rubric: 'A rubric!' + @mock_cnt
+        submission_id: @mock_cnt
     else
       response =
         success: false
@@ -74,6 +76,7 @@ class StaffGrading
     
     # model state
     @state = state_no_data
+    @submission_id = null
     @submission = ''
     @rubric = ''
     @error_msg = ''
@@ -110,7 +113,7 @@ class StaffGrading
     
     if response.success
       if response.submission
-        @data_loaded(response.submission, response.rubric)
+        @data_loaded(response.submission, response.rubric, response.submission_id)
       else
         @no_more(response.message)
     else
@@ -122,7 +125,10 @@ class StaffGrading
     @backend.post('get_next', {}, @ajax_callback)
 
   submit_and_get_next: () ->
-    data = {score: @score, feedback: @feedback_area.val()}
+    data =
+      score: @score
+      feedback: @feedback_area.val()
+      submission_id: @submission_id
     
     @backend.post('save_grade', data, @ajax_callback)
 
@@ -130,9 +136,10 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (submission, rubric) ->
+  data_loaded: (submission, rubric, submission_id) ->
     @submission = submission
     @rubric = rubric
+    @submission_id = submission_id
     @feedback_area.val('')
     @score = null
     @state = state_grading
@@ -140,6 +147,7 @@ class StaffGrading
   no_more: (message) ->
     @submission = null
     @rubric = null
+    @submission_id = null
     @message = message
     @state = state_no_data
 
@@ -196,7 +204,7 @@ class StaffGrading
   
 
 # for now, just create an instance and load it...
-mock_backend = true
+mock_backend = false
 ajax_url = $('.staff-grading').data('ajax_url')
 backend = new StaffGradingBackend(ajax_url, mock_backend)
 

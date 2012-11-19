@@ -8,15 +8,24 @@ Notes for running by hand:
 django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/instructor
 """
 
+import courseware.tests.tests as ct
+
+import json
+
+from nose import SkipTest
+from mock import patch, Mock
+
 from override_settings import override_settings
 
-from django.contrib.auth.models import \
-    Group # Need access to internal func to put users in the right group
+# Need access to internal func to put users in the right group
+from django.contrib.auth.models import Group
+
 from django.core.urlresolvers import reverse
 from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, \
     FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
 from django_comment_client.utils import has_forum_access
 
+from instructor import staff_grading_service
 from courseware.access import _course_staff_group_name
 import courseware.tests.tests as ct
 from xmodule.modulestore.django import modulestore
@@ -79,7 +88,7 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 '''
         self.assertEqual(body, expected_body, msg)
 
-        
+
 FORUM_ROLES = [ FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA ]
 FORUM_ADMIN_ACTION_SUFFIX = { FORUM_ROLE_ADMINISTRATOR : 'admin', FORUM_ROLE_MODERATOR : 'moderator', FORUM_ROLE_COMMUNITY_TA : 'community TA'}
 FORUM_ADMIN_USER = { FORUM_ROLE_ADMINISTRATOR : 'forumadmin', FORUM_ROLE_MODERATOR : 'forummoderator', FORUM_ROLE_COMMUNITY_TA : 'forummoderator'}
@@ -91,6 +100,8 @@ def action_name(operation, rolename):
         return '{0} forum {1}'.format(operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
 
 
+_mock_service = staff_grading_service.MockStaffGradingService()
+
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
 class TestInstructorDashboardForumAdmin(ct.PageLoader):
     '''
@@ -101,8 +112,15 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
 
+<<<<<<< HEAD
         self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
         self.toy = modulestore().get_course("edX/toy/2012_Fall")
+=======
+
+
+        self.course_id = "edX/toy/2012_Fall"
+        self.toy = modulestore().get_course(self.course_id)
+>>>>>>> Refactor testing code, hook up frontend.
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -122,7 +140,7 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         self.enroll(self.toy)
 
 
-    
+
     def initialize_roles(self, course_id):
         self.admin_role = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=course_id)[0]
         self.moderator_role = Role.objects.get_or_create(name=FORUM_ROLE_MODERATOR, course_id=course_id)[0]
@@ -220,7 +238,7 @@ class TestStaffGradingService(ct.PageLoader):
     '''
 
 
-    
+
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
@@ -240,7 +258,6 @@ class TestStaffGradingService(ct.PageLoader):
         Make sure only staff have access.
         """
         self.login(self.student, self.password)
-        self.enroll(self.toy)
 
         # both get and post should return 404
         for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
@@ -248,3 +265,32 @@ class TestStaffGradingService(ct.PageLoader):
             self.check_for_get_code(404, url)
             self.check_for_post_code(404, url)
 
+<<<<<<< HEAD
+=======
+
+    @patch.object(staff_grading_service, '_service', _mock_service)
+    def test_get_next(self):
+        self.login(self.instructor, self.password)
+
+        url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
+
+        r = self.check_for_get_code(200, url)
+        d = json.loads(r.content)
+        self.assertTrue(d['success'])
+        self.assertEquals(d['submission_id'], _mock_service.cnt)
+
+
+    @patch.object(staff_grading_service, '_service', _mock_service)
+    def test_save_grade(self):
+        self.login(self.instructor, self.password)
+
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
+
+        data = {'score': '12', 'feedback': 'great!', 'submission_id': '123'}
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertTrue(d['success'], str(d))
+        self.assertEquals(d['submission_id'], _mock_service.cnt)
+
+
+>>>>>>> Refactor testing code, hook up frontend.
