@@ -1,18 +1,16 @@
-from fs.errors import ResourceNotFoundError
-import logging
-import json
+from cStringIO import StringIO
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
-import requests
-import time
-from cStringIO import StringIO
-
-from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.xml_module import XmlDescriptor
 from xmodule.timeparse import parse_time, stringify_time
-from xmodule.graders import grader_from_conf
+from xmodule.util.decorators import lazyproperty
+import json
+import logging
+import requests
+import time
+
 
 log = logging.getLogger(__name__)
 
