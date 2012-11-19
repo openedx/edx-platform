@@ -279,10 +279,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         shared_module.state = module.get_shared_state()
         shared_module.save()
 
-
     return module
 
-# TODO (vshnayder): Rename this?  It's very confusing.
+
 def get_or_create_student_module(course_id, user, descriptor, student_module_cache, module=None):
     """
     Returns the StudentModule specific to this module for this student,
@@ -483,7 +482,7 @@ def modx_dispatch(request, dispatch, location, course_id):
         student_module_cache,
         instance
     )
-    shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
+    shared_module = get_or_create_shared_student_module(course_id, request.user, instance, student_module_cache)
 
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
