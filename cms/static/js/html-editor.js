@@ -33,6 +33,7 @@ function initHTMLEditor($editor, $prev) {
             image : '/static/img/visual-editor-image-icon.png',
             onclick : function() {
               $assetWidget = $($('#asset-library-widget').html());
+              $modalCover.css('z-index', '99999');
               $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
               $body.append($assetWidget);
             }
@@ -47,11 +48,17 @@ function initHTMLEditor($editor, $prev) {
     lineNumbers: true
   });
 
+  $(htmlEditor.getWrapperElement()).hide();
+  $(htmlEditor.getWrapperElement()).bind('click', function() {
+    $(htmlEditor).focus();
+  });
+
   $editor.find('.save-button, .cancel-button').bind('click', updatePreview);
 }
 
 function insertAsset(e) {
   $assetWidget.remove();
+  $modalCover.css('z-index', '1000');
   var editor = e.data.editor;
   editor.focus();
   editor.selection.setContent($(this).attr('data-markup'));
@@ -68,4 +75,3 @@ function convertHTMLToVisual() {
 function updatePreview() {
   $htmlPreview.html($visualEditor.html());
 }
-

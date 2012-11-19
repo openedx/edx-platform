@@ -20,12 +20,14 @@
       e.preventDefault();
       $('.editor-tabs .current').removeClass('current');
       $(this).addClass('current');
+      console.log($(this).attr('data-tab'));
       switch($(this).attr('data-tab')) {
         case 'simple':
           currentEditor = simpleEditor;
           $(simpleEditor.getWrapperElement()).show();
           $(xmlEditor.getWrapperElement()).hide();
           $(simpleEditor).focus();
+          onSimpleEditorUpdate();
           break;
         case 'xml':
           currentEditor = xmlEditor;
@@ -34,17 +36,19 @@
           $(xmlEditor).focus();
           break;
         case 'visual':
+          currentEditor = visualEditor;
+          convertHTMLToVisual();
           $('table.mceToolbar').show();
           $(htmlEditor.getWrapperElement()).hide();
-          convertHTMLToVisual();
           break;
         case 'html':
+          currentEditor = htmlEditor;
+          convertVisualToHTML();
           $('table.mceToolbar').hide();
           $(htmlEditor.getWrapperElement()).show();
-          convertVisualToHTML();
+          $(htmlEditor).focus();
           break;
-      }
-      onSimpleEditorUpdate();
+      }      
     }
   </script>
 
@@ -59,8 +63,8 @@
         <span class="close-icon"></span>
       </a>
       <header>
-        <input type="text" class="search">
         <a href="#" class="upload-button">Upload New File</a>
+        <input type="text" class="search">
       </header>
       <table>
         <thead>
@@ -72,6 +76,125 @@
           </tr>
         </thead>
         <tbody id="asset_table_body">
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
           <tr data-id="id">
             <td class="thumb-col">
               <div class="thumb">

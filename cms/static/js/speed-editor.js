@@ -17,14 +17,13 @@ var commandDown;
   $(document).bind('keyup', onKeyboard);
 })();
 
-
 function initProblemEditors($editor, $prev) {
   $currentEditor = $editor;
   simpleEditor = CodeMirror.fromTextArea($editor.find('.edit-box')[0], {
     lineWrapping: true,
     extraKeys: {
       'Ctrl-N': newUnit,
-      'Ctrl-H': makeHeader,          
+      'Ctrl-H': makeHeader,
       'Ctrl-V': makeVideo,
       'Ctrl-M': makeMultipleChoice,
       'Ctrl-C': makeCheckboxes,

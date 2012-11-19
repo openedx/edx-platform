@@ -115,18 +115,20 @@
     left: 50%;
     z-index: 99999;
     width: 900px;
-    padding: 20px;
     margin-left: -450px;
     border-radius: 3px;
     background: $lightGrey;
 
     header {
-      height: 40px;
-      margin-bottom: 20px;
+      @include clearfix;
+      padding: 25px 25px 30px;
     }
 
     .close-button {
       @include white-button;
+      position: absolute;
+      top: 15px;
+      right: 15px;
       width: 29px;
       height: 29px;
       padding: 0;
@@ -139,11 +141,13 @@
     }
 
     .search {
-      width: 400px;
-      height: 38px;
+      float: left;      
+      width: 350px;
+      height: 34px;
       padding-left: 36px;
+      margin-top: 2px;
       background-color: #fff;
-      background-position: 12px 10px;
+      background-position: 12px 8px;
       font-size: 14px;
     }
 
@@ -158,16 +162,39 @@
 
     .upload-button {
       @include blue-button;
-      float: right;
-      padding: 8px 30px 10px;
+      float: left;
+      padding: 6px 20px 8px;
+      margin-right: 20px;
       font-size: 12px;
+    }
+
+    table {
+      border: none;
+    }
+
+    tbody {
+      display: block;
+      width: 900px;
+      height: 550px;
+      background: #fff;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    tr {
+      display: table;
+      width: 900px;
+    }
+
+    td,
+    th {
+      padding: 5px 20px;
     }
   }
 
   table {
     width: 100%;
-    border-radius: 3px 3px 0 0;
-    border: 1px solid #c5cad4;
+    border: 1px solid $mediumGrey;
 
     td,
     th {
@@ -178,16 +205,18 @@
 
     thead th {
       @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+      padding: 6px 20px 7px;
       background-color: #ced2db;
       font-size: 12px;
       font-weight: 700;
       text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
     }
 
-    tbody {
+    tbody {      
       background: #fff;
 
       tr {
+        width: 890px;
         border-top: 1px solid #c5cad4;
 
         &:first-child {
@@ -222,6 +251,7 @@
 
     .insert-asset-button {
       @include blue-button;
+      font-size: 12px;
     }
 
     .embeddable-xml-input {
