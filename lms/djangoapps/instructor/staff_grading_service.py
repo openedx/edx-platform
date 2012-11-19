@@ -34,9 +34,10 @@ class MockStaffGradingService(object):
         return json.dumps({'success': True,
                            'submission_id': self.cnt,
                            'submission': 'Test submission {cnt}'.format(cnt=self.cnt),
+                           'max_score': 2 + self.cnt % 3,
                            'rubric': 'A rubric'})
 
-    def save_grade(self, course_id, submission_id, score, feedback):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback):
         return self.get_next(course_id)
 
 
@@ -62,16 +63,23 @@ class StaffGradingService(object):
 
         return r.text
 
-    def save_grade(self, course_id, submission_id, score, feedback):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback):
         """
-        Save a grade.
+        Save a score and feedback for a submission.
 
-        TODO: what is data?
+        Returns json dict with keys
+           'success': bool
+           'error': error msg, if something went wrong.
 
-        Returns json, or raises GradingServiceError if there's a problem.
+        Raises GradingServiceError if there's a problem connecting.
         """
         try:
-            r = self.session.get(self.url + 'save_grade')
+            data = {'course_id': course_id,
+                    'submission_id': submission_id,
+                    'score': score,
+                    'feedback': feedback,
+                    'grader_id': grader}
+            r = self.session.post(self.url + 'save_grade')
         except requests.exceptions.ConnectionError as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
@@ -163,7 +171,11 @@ def save_grade(request, course_id):
     p = request.POST
 
     try:
-        result_json = _service.save_grade(course_id, p['submission_id'], p['score'], p['feedback'])
+        result_json = _service.save_grade(course_id,
+                                          request.user.id,
+                                          p['submission_id'],
+                                          p['score'],
+                                          p['feedback'])
     except GradingServiceError:
         log.exception("Error saving grade")
         return _err_response('Could not connect to grading service')

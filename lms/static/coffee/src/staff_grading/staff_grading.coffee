@@ -18,21 +18,19 @@ class StaffGradingBackend
 
   mock: (cmd, data) ->
     # Return a mock response to cmd and data
-    @mock_cnt++
     if cmd == 'get_next'
+      @mock_cnt++
       response =
         success: true
         submission: 'submission! ' + @mock_cnt
         rubric: 'A rubric! ' + @mock_cnt
         submission_id: @mock_cnt
+        max_score: 2 + @mock_cnt % 3
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
-        success: true
-        submission: 'another submission! ' + @mock_cnt
-        rubric: 'A rubric!' + @mock_cnt
-        submission_id: @mock_cnt
+        @mock('get_next', {})
     else
       response =
         success: false
@@ -72,6 +70,7 @@ class StaffGrading
     @submission_wrapper = $('.submission-wrapper')
     @rubric_wrapper = $('.rubric-wrapper')
     @feedback_area = $('.feedback-area')
+    @score_selection_container = $('.score-selection-container')        
     @submit_button = $('.submit-button')        
     
     # model state
@@ -81,15 +80,12 @@ class StaffGrading
     @rubric = ''
     @error_msg = ''
     @message = ''
+    @max_score = 0
 
     @score = null
 
     # action handlers
     @submit_button.click @submit
-    # TODO: hook up an event to the input changing, which updates
-    # @score  (instead of the individual hacks)
-    $('#correct-radio').click @graded_callback
-    $('#incorrect-radio').click @graded_callback
 
     # render intial state
     @render_view()
@@ -97,6 +93,24 @@ class StaffGrading
     # send initial request automatically
     @get_next_submission()
 
+
+  setup_score_selection: =>
+    # first, get rid of all the old inputs, if any.
+    @score_selection_container.html('')
+
+    # Now create new labels and inputs for each possible score.
+    for score in [1..@max_score]
+      id = 'score-' + score
+      label = """<label for="#{id}">#{score}</label>"""
+      
+      input = """
+              <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
+              """
+      @score_selection_container.append(label + input)
+
+    # And now hook up an event handler again
+    $("input[name='score-selection']").change @graded_callback
+    
 
   set_button_text: (text) =>
     @submit_button.attr('value', text)
@@ -113,7 +127,7 @@ class StaffGrading
     
     if response.success
       if response.submission
-        @data_loaded(response.submission, response.rubric, response.submission_id)
+        @data_loaded(response.submission, response.rubric, response.submission_id, response.max_score)
       else
         @no_more(response.message)
     else
@@ -136,11 +150,12 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (submission, rubric, submission_id) ->
+  data_loaded: (submission, rubric, submission_id, max_score) ->
     @submission = submission
     @rubric = rubric
     @submission_id = submission_id
     @feedback_area.val('')
+    @max_score = max_score
     @score = null
     @state = state_grading
 
@@ -149,6 +164,8 @@ class StaffGrading
     @rubric = null
     @submission_id = null
     @message = message
+    @score = null
+    @max_score = 0
     @state = state_no_data
 
   render_view: () ->
@@ -157,6 +174,9 @@ class StaffGrading
     show_submit_button = true
 
     @message_container.html(@message)
+    if @backend.mock_backend
+      @message_container.append("<p>NOTE: Mocking backend.</p>")
+    
     @error_container.html(@error_msg)
 
     if @state == state_error
@@ -170,10 +190,8 @@ class StaffGrading
       # no submit button until user picks grade.
       show_submit_button = false
 
-      # TODO: clean up with proper input-related logic
-      $('#correct-radio')[0].checked = false
-      $('#incorrect-radio')[0].checked = false
-
+      @setup_score_selection()
+      
     else if @state == state_graded
       show_grading_elements = true
       @set_button_text('Submit')
@@ -204,7 +222,7 @@ class StaffGrading
   
 
 # for now, just create an instance and load it...
-mock_backend = false
+mock_backend = true
 ajax_url = $('.staff-grading').data('ajax_url')
 backend = new StaffGradingBackend(ajax_url, mock_backend)
 

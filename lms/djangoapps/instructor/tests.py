@@ -112,15 +112,9 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
 
-<<<<<<< HEAD
-        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
-=======
-
 
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
->>>>>>> Refactor testing code, hook up frontend.
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -236,9 +230,6 @@ class TestStaffGradingService(ct.PageLoader):
     access control and error handling logic -- all the actual work is on the
     backend.
     '''
-
-
-
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
@@ -265,8 +256,6 @@ class TestStaffGradingService(ct.PageLoader):
             self.check_for_get_code(404, url)
             self.check_for_post_code(404, url)
 
-<<<<<<< HEAD
-=======
 
     @patch.object(staff_grading_service, '_service', _mock_service)
     def test_get_next(self):
@@ -286,11 +275,12 @@ class TestStaffGradingService(ct.PageLoader):
 
         url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
 
-        data = {'score': '12', 'feedback': 'great!', 'submission_id': '123'}
+        data = {'score': '12',
+                'feedback': 'great!',
+                'submission_id': '123'}
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
         self.assertEquals(d['submission_id'], _mock_service.cnt)
 
 
->>>>>>> Refactor testing code, hook up frontend.
