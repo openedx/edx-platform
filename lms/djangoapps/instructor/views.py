@@ -46,6 +46,7 @@ template_imports = {'urllib': urllib}
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
@@ -209,7 +210,11 @@ def instructor_dashboard(request, course_id):
   
 
     elif action == 'List course forum administrators':
-        pass
+        rolename = 'Administrator'
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
+        
     
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
@@ -224,7 +229,10 @@ def instructor_dashboard(request, course_id):
                                  {}, page='idashboard')
 
     elif action == 'List course forum moderators':
-        pass
+        rolename = 'Moderator'
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
     
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
@@ -239,7 +247,10 @@ def instructor_dashboard(request, course_id):
                                  {}, page='idashboard')
     
     elif action == 'List course forum community TAs':
-        pass
+        rolename = 'Community TA'
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-%s' % rolename, {}, page='idashboard')
     
     elif action == 'Remove forum community TA':
         uname = request.POST['forumcommunityta']
@@ -284,6 +295,19 @@ def instructor_dashboard(request, course_id):
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
+def _list_course_forum_members(course_id, rolename, datatable):
+    ''' TODO
+    '''
+    role = Role.objects.get(name=rolename, course_id=course_id)
+    uset = role.users.all()
+    msg = 'Role = %s' % rolename
+    log.debug('role=%s' % rolename)
+    datatable['header'] = ['Username', 'Full name', 'Roles']
+    datatable['data'] = [[x.username, x.profile.name, ', '.join([r.name for r in x.roles.all()])] for x in uset]
+    datatable['title'] = 'List of Forum %s in course %s' % (rolename, course_id)
+    return msg
+
+
 def _update_forum_role_membership(uname, course_id, rolename, add_or_remove):
     '''
     
@@ -301,10 +325,10 @@ def _update_forum_role_membership(uname, course_id, rolename, add_or_remove):
         log.debug('rolename=%s' % rolename)
         if (add_or_remove == 'remove'):
             user.roles.remove(role)
-            msg += '<font color="green">Removed %s from %s forum role = %s</font>' % (user, rolename)
+            msg += '<font color="green">Removed %s from %s forum role = %s</font>' % (user, course_id, rolename)
         else:
             user.roles.add(role)
-            msg += '<font color="green">Added %s to %s forum role = %s</font>' % (user, rolename)
+            msg += '<font color="green">Added %s to %s forum role = %s</font>' % (user, course_id, rolename)
     return msg
     
 
