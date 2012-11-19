@@ -171,7 +171,18 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="start-date date set-date" id="course-start-date-input" placeholder="MM/DD/YYYY">
-                    <span class="tip tip-inline">First day the class begins</span>          
+                    <span class="tip tip-inline">First day the course begins</span>          
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-start-date-input">Course Start Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="error start-date date set-date" id="course-start-date-input" placeholder="MM/DD/YYYY" value="12/25/2014">
+                    <span class="tip tip-inline">First day the course begins</span> 
+                    <span class="message-error">The start date of the course cannot be after the end date of the course</span>      
                   </div>
                 </div>
               </div>
@@ -181,7 +192,18 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="end-date date set-date" id="course-end-date-input" placeholder="MM/DD/YYYY">
-                    <span class="tip tip-inline">Last day the class begins</span>
+                    <span class="tip tip-inline">Last day the course begins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
+                <label for="course-end-date-input">Course End Date:</label>
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="error end-date date set-date" id="course-end-date-input" placeholder="MM/DD/YYYY"  value="12/25/2014">
+                    <span class="tip tip-inline">Last day the course begins</span>
+                    <span class="message-error">The end date of the course cannot be before the start date of the course</span>
                   </div>
                 </div>
               </div>
@@ -195,6 +217,36 @@
                       <div class="group">
                         <label for="course-milestone-1-date-input">Milestone Date</label>
                         <input type="text" id="course-milestone-1-date-input" class="course-milestone-date-input date set-date" placeholder="MM/DD/YYYY">
+                      </div>
+
+                      <div class="group">
+                        <label for="course-milestone-1-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-1-name-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-milestone-data"><span class="delete-icon"></span> Delete Milestone</a>
+                    </li>
+
+                    <li class="input input-existing multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-1-date-input">Milestone Date</label>
+                        <input type="text" id="course-milestone-1-date-input" class="error course-milestone-date-input date set-date" placeholder="MM/DD/YYYY" value="12/25/2014">
+                        <span class="message-error">A milestone date cannot be after the end of a course</span>
+                      </div>
+
+                      <div class="group">
+                        <label for="course-milestone-1-name-input">Milestone Name</label>
+                        <input type="text" class="course-milestone-name-input" id="course-milestone-1-name-input">
+                      </div>
+
+                      <a href="#" class="remove-item remove-milestone-data"><span class="delete-icon"></span> Delete Milestone</a>
+                    </li>
+
+                    <li class="input input-existing multi multi-inline course-milestone-list-item">
+                      <div class="group">
+                        <label for="course-milestone-1-date-input">Milestone Date</label>
+                        <input type="text" id="course-milestone-1-date-input" class="error course-milestone-date-input date set-date" placeholder="MM/DD/YYYY" value="12/25/2011">
+                        <span class="message-error">A milestone date cannot be before the start of a course</span>
                       </div>
 
                       <div class="group">
@@ -233,8 +285,6 @@
                     </div>
 
                     <a href="#" class="remove-item remove-course-syllabus remove-doc-data"><span class="delete-icon"></span> Delete Syllabus</a>
-
-                    <span class="tip tip-inline">PDF formatting preferred</span>          
                   </div>
 
                   <div class="input">
@@ -259,7 +309,7 @@
                 <label for="course-overview">Course Overview:</label>
                 <div class="field">
                   <div class="input">
-                    <textarea class="long tall" input="course-overview"></textarea>
+                    <textarea class="long" id="course-overview"></textarea>
                     <span class="tip tip-stacked">Detailed summary of concepts and lessons covered</span>
                   </div>
                 </div>      
@@ -280,7 +330,7 @@
                 <div class="field">
                   <div class="input input-existing">
                     <div class=" current current-course-introduction-video">
-                      <iframe width="400" height="225" src="http://www.youtube.com/embed/6F0pR-ANmXY" frameborder="0" allowfullscreen></iframe>
+                      <iframe width="370" height="208" src="http://www.youtube.com/embed/6F0pR-ANmXY" frameborder="0" allowfullscreen></iframe>
                     </div>
 
                     <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Video</a>
@@ -482,13 +532,6 @@
                       <div class="row row-col2">
                         <label for="course-faculty-photo-input">Faculty Photo</label>
                         <div class="field">
-                          <div class="input">
-                            <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
-                              <span class="upload-icon"></span>Upload Faculty Photo
-                            </a>
-                            <span class="tip tip-inline">Max size: 30KB</span>          
-                          </div>
-
                           <div class="input input-existing">
                             <div class=" current current-faculty-photo">
                               <img src="http://dummyimage.com/800x600/4d494d/686a82.gif&text=faculty+photo" alt="Faculty Photo" />
@@ -530,17 +573,6 @@
                         <div class="field">
                           <div class="input">
                             <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
-                              <span class="upload-icon"></span>Upload Faculty Photo
-                            </a>
-                            <span class="tip tip-inline">Max size: 30KB</span>          
-                          </div>
-
-                          <div class="input input-existing">
-                            <div class=" current current-course-faculty-photo">
-
-                            </div>
-
-                            <a href="#" class="replace-item replace-faculty-photo add-faculty-photo-data" id="course-faculty-photo-input">
                               <span class="upload-icon"></span>Upload Faculty Photo
                             </a>
                             <span class="tip tip-inline">Max size: 30KB</span>          
@@ -640,8 +672,8 @@
 
                 <div class="field">
                   <div class="input">
-                    <input type="text" id="course-grading-duetime" placeholder="HH:MM">
-                    <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours)</span>
+                    <input type="text" class="short" id="course-grading-duetime" placeholder="HH:MM">
+                    <span class="tip tip-inline">Boston, MA Local Time (UTC/GMT -5 hours)</span>
                     <span class="tip tip-stacked"><a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
                   </div>
                 </div>
@@ -1105,6 +1137,8 @@
                       <div class="group">
                         <label for="course-discussions-categories-4-name-input">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-4-name-input" placeholder="" value="Study Groups">
+
+                        <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
                       </div>
                     </li>
 
@@ -1114,7 +1148,7 @@
                         <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-5-name-input" placeholder="" value="Lectures">
                       </div>
 
-                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
                     </li>
 
                     <li class="input course-discussions-categories-list-item">
@@ -1123,7 +1157,7 @@
                         <input type="text" class="course-discussions-categories-name-input" id="course-discussions-categories-6-name-input" placeholder="">
                       </div>
 
-                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Discussion Category</a>
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
                     </li>
                   </ul>
 
@@ -1134,11 +1168,11 @@
               </div>
 
               <div class="row row-col2">
-                <h4 class="label">Create Discussion Categories per Unit</h4>
+                <h4 class="label">Create Discussion <br />Categories for Each <br />Course Unit</h4>
 
                 <div class="field ui-status">
                   <div class="input">
-                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-categories-perunit" id="discussions-categories-perunit-allow" value="Allow" disabled="disabled">
+                    <input type="radio" class="ui-status-input ui-status-input-radio" name="discussions-categories-perunit" id="discussions-categories-perunit-allow" value="Create" disabled="disabled" checked="checked">
                     <div class="ui-status-indic ui-status-indic-discussions-categories-perunit-allow"></div>
                     <label for="discussions-categories-perunit-allow">Allow</label>
                     <span class="tip tip-stacked">This option is automatically set currently</span>
