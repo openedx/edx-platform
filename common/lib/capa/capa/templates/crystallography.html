@@ -2,7 +2,6 @@
      <div id="holder" style="width:${width};height:${height}"></div>
     <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
     <div class="script_placeholder" data-src="/static/js/sylvester.js"></div>
-    <div class="script_placeholder" data-src="/static/js/underscore-min.js"></div>
     <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
 
 
@@ -19,7 +18,7 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
+  <input type="text" class="crystalography_problem_input" name="input_${id}" id="input_${id}" value="${value|h}"
    % if size:
    size="${size}"
    % endif
