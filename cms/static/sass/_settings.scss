@@ -122,6 +122,7 @@
 
       &.long {
         width: 100%;
+        min-width: 400px;
       }
 
       &.tall {
@@ -144,8 +145,9 @@
       }
 
       &:disabled {
-        color: $darkGrey;
-        background: $lightGrey;
+        border-color: $mediumGrey;
+        color: $mediumGrey;
+        background: #fff;
       }
     }
 
@@ -170,7 +172,7 @@
         margin-bottom: 15px;
       }
 
-      .ui-status-input-checkbox, .ui-status-input-radio {
+      .ui-status-input-checkbox input, .ui-status-input-radio input {
         position: absolute;
         top: -9999px;
         left: -9999px;
@@ -180,7 +182,7 @@
         cursor: pointer;
       }
 
-      .ui-status-input-checkbox ~ label, .ui-status-input-radio ~ label {
+      .ui-status-input-checkbox input ~ label, .ui-status-input-radio input ~ label {
         position: relative;
         left: -30px;
         display: inline-block;
@@ -209,21 +211,25 @@
       }
 
       .ui-status-indic {
-        position: relative;
-        top: 2px;
         z-index: 10;
         display: inline-block;
         height: 15px;
         width: 15px;
         border: 2px;
-        background: $offBlack;
         opacity: 0.50;
-        @include border-radius(50px);
         @include box-sizing(border-box);
         @include transition(opacity 0.25s ease-in-out);
       }
 
-      .ui-status-input-checkbox:checked ~ label, .ui-status-input-radio:checked ~ label {
+      .ss-check {
+        color: $green;
+      }
+
+      .ss-delete {
+        color: $red;
+      }
+
+      .ui-status-input-checkbox input:checked ~ label, .ui-status-input-radio input:checked ~ label {
          opacity: 0.99;
 
          &:after {
@@ -237,8 +243,18 @@
          }
       }
 
-      .ui-status-input-checkbox:checked ~ .ui-status-indic, .ui-status-input-radio:checked ~ .ui-status-indic {
+      .ui-status-input-checkbox input:checked ~ .ui-status-indic, .ui-status-input-radio input:checked ~ .ui-status-indic {
+        background: transparent url('/static/img/.png') 0 0 no-repeat;
         opacity: 0.99;
+      }
+
+      // disabled 
+      .ui-status-input-checkbox input:disabled, .ui-status-input-radio input:disabled {
+        color: $mediumGrey;
+      }
+
+      .ui-status-input-checkbox input:disabled ~ .ui-status-indic, .ui-status-input-radio input:disabled ~ .ui-status-indic {
+        color: $mediumGrey;
       }
     }
 
@@ -309,6 +325,7 @@
 
             .group {
               margin-bottom: 10px;
+              max-width: 175px;
 
               &:last-child {
                 margin-bottom: 0;
@@ -316,6 +333,10 @@
 
               input, .input, textarea {
 
+              }
+
+              .tip-stacked {
+                margin-top: 0;
               }
             }
           }
@@ -325,7 +346,8 @@
             
             .group {
               input, .input, textarea {
-                width: 100%;
+                min-width: 370px;
+                width: 370px;
               }
             }
           }
@@ -408,6 +430,7 @@
     .remove-item {
       clear: both;
       display: block;
+      margin-top: 10px;
       opacity: 0.75;
       font-size: 13px;
       text-align: right;
@@ -430,7 +453,21 @@
         padding: 10px;
         @include box-sizing(border-box);
         @include border-radius(5px);
+        font-size: 14px;
         background: tint($lightGrey, 50%);
+        @include clearfix();
+      
+        .doc-filename {
+          display: inline-block;
+          width: 220px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .remove-doc-data {
+          display: inline-block;
+          width: 150px;
+        }
       }
     }
 
@@ -479,14 +516,15 @@
         }
 
         .current-faculty-photo {
-          height: 115px;
-          width: 115px;
           overflow: hidden;
+          padding: 0;
 
           img {
             display: block;
-            min-height: 100%;
-            max-width: 100%;
+            @include box-shadow(0 1px 3px rgba(0,0,0,0.1));
+            padding: 10px;
+            border: 2px solid $mediumGrey;
+            background: #fff;
           }
         }
       }
@@ -578,6 +616,12 @@
     // misc
     .divide {
       display: none;
+    }
+
+    i.ss-icon {
+      position: relative;
+      top: 1px;
+      margin-right: 5px;
     }
   }
 
