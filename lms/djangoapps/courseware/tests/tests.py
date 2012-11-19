@@ -221,8 +221,7 @@ class PageLoader(ActivateLoginTestCase):
 
     def check_for_get_code(self, code, url):
         """
-        Check that we got the expected code.  Hacks around our broken 404
-        handling.
+        Check that we got the expected code when accessing url via GET.
         """
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, code,
@@ -230,6 +229,17 @@ class PageLoader(ActivateLoginTestCase):
                          .format(resp.status_code, url, code))
 
 
+    def check_for_post_code(self, code, url, data={}):
+        """
+        Check that we got the expected code when accessing url via POST.
+        """
+        resp = self.client.post(url, data)
+        self.assertEqual(resp.status_code, code,
+                         "got code {0} for url '{1}'. Expected code {2}"
+                         .format(resp.status_code, url, code))
+
+
+        
     def check_pages_load(self, course_name, data_dir, modstore):
         """Make all locations in course load"""
         print "Checking course {0} in {1}".format(course_name, data_dir)

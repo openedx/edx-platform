@@ -31,7 +31,6 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
         self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
         self.toy = modulestore().get_course("edX/toy/2012_Fall")
@@ -79,6 +78,7 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 "2","u2","Fred Weasley","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0.0","0.0"
 '''
         self.assertEqual(body, expected_body, msg)
+
         
 FORUM_ROLES = [ FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA ]
 FORUM_ADMIN_ACTION_SUFFIX = { FORUM_ROLE_ADMINISTRATOR : 'admin', FORUM_ROLE_MODERATOR : 'moderator', FORUM_ROLE_COMMUNITY_TA : 'community TA'}
@@ -90,22 +90,19 @@ def action_name(operation, rolename):
     else:
         return '{0} forum {1}'.format(operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
 
+
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
 class TestInstructorDashboardForumAdmin(ct.PageLoader):
     '''
     Check for change in forum admin role memberships
     '''
-    
+
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
 
-        def find_course(name):
-            """Assumes the course is present"""
-            return [c for c in courses if c.location.course==name][0]
-
-        self.full = find_course("full")
-        self.toy = find_course("toy")
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -124,6 +121,8 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         self.login(self.instructor, self.password)
         self.enroll(self.toy)
 
+
+    
     def initialize_roles(self, course_id):
         self.admin_role = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=course_id)[0]
         self.moderator_role = Role.objects.get_or_create(name=FORUM_ROLE_MODERATOR, course_id=course_id)[0]
@@ -210,3 +209,42 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
             added_roles.sort()
             roles = ', '.join(added_roles)
             self.assertTrue(response.content.find('<td>{0}</td>'.format(roles))>=0, 'not finding roles "{0}"'.format(roles))
+
+
+@override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
+class TestStaffGradingService(ct.PageLoader):
+    '''
+    Check that staff grading service proxy works.  Basically just checking the
+    access control and error handling logic -- all the actual work is on the
+    backend.
+    '''
+
+
+    
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+
+        self.course_id = "edX/toy/2012_Fall"
+        self.toy = modulestore().get_course(self.course_id)
+        def make_instructor(course):
+            group_name = _course_staff_group_name(course.location)
+            g = Group.objects.create(name=group_name)
+            g.user_set.add(ct.user(self.instructor))
+
+        make_instructor(self.toy)
+
+        self.logout()
+
+    def test_access(self):
+        """
+        Make sure only staff have access.
+        """
+        self.login(self.student, self.password)
+        self.enroll(self.toy)
+
+        # both get and post should return 404
+        for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
+            url = reverse(view_name, kwargs={'course_id': self.course_id})
+            self.check_for_get_code(404, url)
+            self.check_for_post_code(404, url)
+
