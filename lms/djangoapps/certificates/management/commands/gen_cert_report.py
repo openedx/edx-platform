@@ -70,8 +70,9 @@ class Command(BaseCommand):
             cert_data[course_id] = {'enrolled': enrolled_students.count()}
             cert_data[course_id].update({'unavailable': unavailable_count})
 
-            tallies = GeneratedCertificate.objects.values(
-                    'status').annotate(dcount=Count('status'))
+            tallies = GeneratedCertificate.objects.filter(
+                        course_id__exact=course_id).values('status').annotate(
+                            dcount=Count('status'))
             cert_data[course_id].update(
                     {status['status']: status['dcount']
                                         for status in tallies})
