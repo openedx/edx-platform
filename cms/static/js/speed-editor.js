@@ -84,6 +84,7 @@ function setFocus(e) {
 }
 
 function onSimpleEditorUpdate() {
+  console.log('update');
   updatePreview();
   updateXML();
 }

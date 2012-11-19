@@ -20,7 +20,6 @@
       e.preventDefault();
       $('.editor-tabs .current').removeClass('current');
       $(this).addClass('current');
-      console.log($(this).attr('data-tab'));
       switch($(this).attr('data-tab')) {
         case 'simple':
           currentEditor = simpleEditor;
@@ -34,6 +33,7 @@
           $(simpleEditor.getWrapperElement()).hide();
           $(xmlEditor.getWrapperElement()).show();
           $(xmlEditor).focus();
+          xmlEditor.refresh();
           break;
         case 'visual':
           currentEditor = visualEditor;
@@ -43,10 +43,11 @@
           break;
         case 'html':
           currentEditor = htmlEditor;
-          convertVisualToHTML();
           $('table.mceToolbar').hide();
           $(htmlEditor.getWrapperElement()).show();
           $(htmlEditor).focus();
+          convertVisualToHTML();
+          htmlEditor.refresh();
           break;
       }      
     }
@@ -62,16 +63,33 @@
       <a href="#" class="close-button">
         <span class="close-icon"></span>
       </a>
+
+      <div class="upload-form">
+        <h1>Upload New File</h1>
+        <p class="file-name"></p>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="embeddable">
+          <label>Embeddable XML:</label>
+          <input type="text" class="embeddable-xml-input" value="&lt;img src=&quot;&quot;/&gt;">
+        </div>
+        <form class="file-chooser" action="/Giannattasio/313/course/Photoshop_for_Monkeys/upload_asset" method="post" enctype="multipart/form-data">
+          <a href="#" class="choose-file-button">Choose File</a>
+          <input type="file" class="file-input" name="file">
+        </form>
+      </div>
+
       <header>
         <a href="#" class="upload-button">Upload New File</a>
         <input type="text" class="search">
       </header>
-      <table>
+      <table class="library-list">
         <thead>
           <tr>
             <th class="thumb-col"></th>
-            <th class="name-col">Name</th>
-            <th class="date-col">Date Added</th>
+            <th class="name-col"><a href="#">Name <span class="sort-icon down"></span></a></th>
+            <th class="date-col"><a href="#">Date Added</a></th>
             <th class="insert-col"></th>
           </tr>
         </thead>

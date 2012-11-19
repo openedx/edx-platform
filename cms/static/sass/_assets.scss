@@ -111,7 +111,8 @@
   display: block;
 
   &.widget {
-    position: absolute;
+    position: fixed;
+    top: 40px;
     left: 50%;
     z-index: 99999;
     width: 900px;
@@ -190,6 +191,14 @@
     th {
       padding: 5px 20px;
     }
+
+    th a {
+      color: #3c3c3c;
+    }
+
+    .upload-form {
+      display: none;
+    }
   }
 
   table {
@@ -246,7 +255,7 @@
     }
 
     .insert-col {
-      width: 80px;
+      width: 100px;
     }
 
     .insert-asset-button {

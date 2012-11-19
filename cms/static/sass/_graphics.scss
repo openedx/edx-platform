@@ -317,7 +317,18 @@
 	background: url(../img/problem-settings-icon.png) no-repeat;
 }
 
+.sort-icon {
+	font-size: 7px;
+	vertical-align: middle;
 
+	&.down:before {
+		content: '▼';
+	}
+
+	&.up:before {
+		content: '▲';
+	}
+}
 
 
 

@@ -384,15 +384,14 @@
       position: relative;
     }
 
-    textarea {
-      display: none;
-    }
-
     .CodeMirror {
+      display: none;
       position: absolute;
       top: 47px;
       width: 100%;
       height: 378px;
+      background: #fff;
+      color: #3c3c3c;
       @include box-sizing(border-box);
     }
 

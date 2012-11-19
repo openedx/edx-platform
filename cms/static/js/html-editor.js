@@ -33,6 +33,9 @@ function initHTMLEditor($editor, $prev) {
             image : '/static/img/visual-editor-image-icon.png',
             onclick : function() {
               $assetWidget = $($('#asset-library-widget').html());
+              $assetWidget.find('.close-button').bind('click', closeAssetWidget);
+              $modalCover.unbind('click');
+              $modalCover.bind('click', closeAssetWidget);
               $modalCover.css('z-index', '99999');
               $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
               $body.append($assetWidget);
@@ -41,30 +44,30 @@ function initHTMLEditor($editor, $prev) {
       }
     });
   }, 100);
-
+  
   htmlEditor = CodeMirror.fromTextArea($editor.find('.html-box')[0], {
     lineWrapping: true,
     mode: 'text/html',
     lineNumbers: true
   });
 
-  $(htmlEditor.getWrapperElement()).hide();
-  $(htmlEditor.getWrapperElement()).bind('click', function() {
-    $(htmlEditor).focus();
-  });
-
-  $editor.find('.save-button, .cancel-button').bind('click', updatePreview);
+  $editor.find('.save-button, .cancel-button').bind('click', updateHTMLPreview);
 }
 
 function insertAsset(e) {
-  $assetWidget.remove();
-  $modalCover.css('z-index', '1000');
+  closeAssetWidget();
   var editor = e.data.editor;
   editor.focus();
   editor.selection.setContent($(this).attr('data-markup'));
 }
 
+function closeAssetWidget(e) {
+  $assetWidget.remove();
+  $modalCover.css('z-index', '1000');
+}
+
 function convertVisualToHTML() {
+  console.log('convert');
   htmlEditor.setValue($visualEditor.html());
 }
 
@@ -72,6 +75,10 @@ function convertHTMLToVisual() {
   $visualEditor.html(htmlEditor.getValue());
 }
 
-function updatePreview() {
-  $htmlPreview.html($visualEditor.html());
+function updateHTMLPreview() {
+  if(currentEditor == htmlEditor) {
+    $htmlPreview.html(htmlEditor.getValue());
+  } else {
+    $htmlPreview.html($visualEditor.html());
+  }
 }
