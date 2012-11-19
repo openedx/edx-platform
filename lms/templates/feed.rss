@@ -13,7 +13,7 @@
     <updated>2012-11-12T14:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/gates-foundation-announcement')}"/>
     <title>edX and Massachusetts Community Colleges join in Gates-Funded educational initiative</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/mass_seal_240x180.png')}&quot; /&gt;
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/mass_seal_240x180.png')}&quot; /&gt;
          &lt;p&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
