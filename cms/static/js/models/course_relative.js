@@ -1,7 +1,7 @@
 CMS.Models.Location = Backbone.Models.extend({
 	defaults: {
 		tag: "",
-		name: "",
+		org: "",
 		course: "",
 		category: "",
 		name: ""
@@ -9,7 +9,7 @@ CMS.Models.Location = Backbone.Models.extend({
 	toUrl: function(overrides) {
 		return
 			(overrides['tag'] ? overrides['tag'] : this.get('tag')) + "://" +
-			(overrides['name'] ? overrides['name'] : this.get('name')) + "/" +
+			(overrides['org'] ? overrides['org'] : this.get('org')) + "/" +
 			(overrides['course'] ? overrides['course'] : this.get('course')) + "/" +
 			(overrides['category'] ? overrides['category'] : this.get('category')) + "/" +
 			(overrides['name'] ? overrides['name'] : this.get('name')) + "/";

@@ -8,6 +8,19 @@ CMS.Models.Settings.CourseSettings = Backbone.Model.extend({
 		grading: null,
 		problems: null,
 		discussions: null
+	},
+
+	retrieve: function(submodel, callback) {
+		if (this.get(submodel)) callback();
+		else switch (submodel) {
+		case 'details':
+			this.set('details', new CMS.Models.Settings.CourseDetails({location: this.get('courseLocation')})).fetch({
+				success : callback
+			});
+			break;
+
+		default:
+			break;
+		}
 	}
-	// write getters which get the relevant sub model from the server if not already loaded
 })
