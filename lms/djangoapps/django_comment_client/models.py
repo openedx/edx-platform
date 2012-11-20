@@ -4,6 +4,11 @@ import logging
 
 from courseware.courses import get_course_by_id
 
+FORUM_ROLE_ADMINISTRATOR = 'Administrator'
+FORUM_ROLE_MODERATOR = 'Moderator'
+FORUM_ROLE_COMMUNITY_TA = 'Community TA'
+FORUM_ROLE_STUDENT = 'Student'
+
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
     users = models.ManyToManyField(User, related_name="roles")
@@ -28,7 +33,7 @@ class Role(models.Model):
         if self.name == "Student" and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):
-           return False
+            return False
         
         return self.permissions.filter(name=permission).exists()
 

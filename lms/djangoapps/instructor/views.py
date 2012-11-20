@@ -27,26 +27,16 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
-from django_comment_client.models import Role
+from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from django_comment_client.utils import has_forum_access
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
-# TODO: move these to views for forum role
-FORUM_ROLE_ADMINISTRATOR = 'Administrator'
-FORUM_ROLE_MODERATOR = 'Moderator'
-FORUM_ROLE_COMMUNITY_TA = 'Community TA'
+# internal commands for managing forum roles:
 FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
-
-def has_forum_access(uname, course_id, rolename):
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-    except Role.DoesNotExist:
-        return False
-    return role.users.filter(username=uname).exists()
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -56,7 +46,9 @@ def instructor_dashboard(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
+    
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
+
     msg = ''
     #msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
 
@@ -212,7 +204,7 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # forum administration
   
-    elif action == 'List course forum administrators':
+    elif action == 'List course forum admins':
         rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
@@ -352,16 +344,16 @@ def _update_forum_role_membership(uname, course_id, rolename, add_or_remove):
     log.debug('rolename=%s' % rolename)
     if (add_or_remove == FORUM_ROLE_REMOVE):
         if (not alreadyexists):
-            msg ='<font color="red">Error: user %s does not have rolename "%s", cannot remove</font>' % (uname, rolename)
+            msg ='<font color="red">Error: user "%s" does not have rolename "%s", cannot remove</font>' % (uname, rolename)
         else: 
             user.roles.remove(role)
-            msg = '<font color="green">Removed %s from %s forum role = %s</font>' % (user, course_id, rolename)
+            msg = '<font color="green">Removed "%s" from "%s" forum role = "%s"</font>' % (user, course_id, rolename)
     else:
         if (alreadyexists):
-            msg = '<font color="red">Error: user %s already has rolename "%s", cannot add</font>' % (uname, rolename)
+            msg = '<font color="red">Error: user "%s" already has rolename "%s", cannot add</font>' % (uname, rolename)
         else: 
             user.roles.add(role)
-            msg = '<font color="green">Added %s to %s forum role = %s</font>' % (user, course_id, rolename)
+            msg = '<font color="green">Added "%s" to "%s" forum role = "%s"</font>' % (user, course_id, rolename)
 
     return msg
     

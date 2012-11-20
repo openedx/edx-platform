@@ -8,21 +8,20 @@ Notes for running by hand:
 django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/instructor
 """
 
-import courseware.tests.tests as ct
-
-from nose import SkipTest
-from mock import patch, Mock
-from override_settings import override_settings
-
-# Need access to internal func to put users in the right group
 from courseware.access import _course_staff_group_name
-from django.contrib.auth.models import User, Group
-from django.conf import settings
+from django.contrib.auth.models import \
+    Group # Need access to internal func to put users in the right group
 from django.core.urlresolvers import reverse
-
+from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, \
+    FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from django_comment_client.utils import has_forum_access
+from override_settings import override_settings
+from xmodule.modulestore.django import modulestore
+import courseware.tests.tests as ct
 import xmodule.modulestore.django
 
-from xmodule.modulestore.django import modulestore
+
+
 
 
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
@@ -83,13 +82,22 @@ class TestInstructorDashboardGradeDownloadCSV(ct.PageLoader):
 '''
         self.assertEqual(body, expected_body, msg)
         
+FORUM_ROLES = [ FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA ]
+FORUM_ADMIN_ACTION_SUFFIX = { FORUM_ROLE_ADMINISTRATOR : 'admin', FORUM_ROLE_MODERATOR : 'moderator', FORUM_ROLE_COMMUNITY_TA : 'community TA'}
+FORUM_ADMIN_USER = { FORUM_ROLE_ADMINISTRATOR : 'forumadmin', FORUM_ROLE_MODERATOR : 'forummoderator', FORUM_ROLE_COMMUNITY_TA : 'forummoderator'}
+
+def action_name(operation, rolename):
+    if operation == 'List':
+        return '%s course forum %ss' % (operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
+    else:
+        return '%s forum %s' % (operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
 
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
 class TestInstructorDashboardForumAdmin(ct.PageLoader):
     '''
     Check for change in forum admin role memberships
     '''
-
+    
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
@@ -118,28 +126,84 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         self.login(self.instructor, self.password)
         self.enroll(self.toy)
 
-    def test_add_forum_admin(self):
-        print "running test_add_forum_admin"
+    def initialize_roles(self, course_id):
+        self.admin_role = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=course_id)[0]
+        self.moderator_role = Role.objects.get_or_create(name=FORUM_ROLE_MODERATOR, course_id=course_id)[0]
+        self.community_ta_role = Role.objects.get_or_create(name=FORUM_ROLE_COMMUNITY_TA, course_id=course_id)[0]
+
+    def test_add_forum_admin_users_for_unknown_user(self):
+        print "running test_add_forum_admin_users_for_unknown_user"
         course = self.toy
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-#        msg = "url = %s\n" % url
-        response = self.client.post(url, {'action': 'Add forum admin',
-                                          'forumadmin': 'u1'})
-#        msg += "instructor dashboard download csv grades: response = '%s'\n" % response
-#
-#        self.assertEqual(response['Content-Type'],'text/csv',msg)
-#
-#        cdisp = response['Content-Disposition'].replace('TT_2012','2012')  # jenkins course_id is TT_2012_Fall instead of 2012_Fall?
-#        msg += "cdisp = '%s'\n" % cdisp
-#        self.assertEqual(cdisp,'attachment; filename=grades_edX/toy/2012_Fall.csv',msg)
-#
-#        body = response.content.replace('\r','')
-#        msg += "body = '%s'\n" % body
+        username = 'unknown'
+        for action in ['Add', 'Remove']:
+            for rolename in FORUM_ROLES:
+                response = self.client.post(url, {'action': action_name(action, rolename), FORUM_ADMIN_USER[rolename]: username})
+                self.assertTrue(response.content.find('Error: unknown username "%s"' % username)>=0)
 
-# need to make sure the roles actually exist.  They don't seem to yet....        
-   # <p><font color="red">Error: unknown rolename "Administrator"</font></p>
+    def test_add_forum_admin_users_for_missing_roles(self):
+        print "test_add_forum_admin_users_for_missing_roles"
+        course = self.toy
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        for action in ['Add', 'Remove']:
+            for rolename in FORUM_ROLES:
+                response = self.client.post(url, {'action': action_name(action, rolename), FORUM_ADMIN_USER[rolename]: username})
+                self.assertTrue(response.content.find('Error: unknown rolename "%s"' % rolename)>=0)
 
-#        print response
-#        context = response.context
-#        self.assertTrue(context.contains("Added %s to %s forum role = %s" % ('u1', course.id, 'Administrator')))
-        
+    def test_remove_forum_admin_users_for_missing_users(self):
+        print "test_remove_forum_admin_users_for_missing_users"
+        course = self.toy
+        self.initialize_roles(course.id)
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        action = 'Remove'
+        for rolename in FORUM_ROLES:
+            response = self.client.post(url, {'action': action_name(action, rolename), FORUM_ADMIN_USER[rolename]: username})
+            self.assertTrue(response.content.find('Error: user "%s" does not have rolename "%s"' % (username, rolename))>=0)
+
+    def test_add_and_remove_forum_admin_users(self):
+        print "test_add_and_remove_forum_admin_users"
+        course = self.toy
+        self.initialize_roles(course.id)
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        for rolename in FORUM_ROLES:
+            response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+            self.assertTrue(response.content.find('Added "%s" to "%s" forum role = "%s"' % (username, course.id, rolename))>=0)
+            self.assertTrue(has_forum_access(username, course.id, rolename))
+            response = self.client.post(url, {'action': action_name('Remove', rolename), FORUM_ADMIN_USER[rolename]: username})
+            self.assertTrue(response.content.find('Removed "%s" from "%s" forum role = "%s"' % (username, course.id, rolename))>=0)
+            self.assertFalse(has_forum_access(username, course.id, rolename))
+
+    def test_add_and_readd_forum_admin_users(self):
+        print "test_add_and_readd_forum_admin_users"
+        course = self.toy
+        self.initialize_roles(course.id)
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        for rolename in FORUM_ROLES:
+            # perform an add, and follow with a second identical add:
+            self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+            response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+            self.assertTrue(response.content.find('Error: user "%s" already has rolename "%s", cannot add' % (username, rolename))>=0)
+            self.assertTrue(has_forum_access(username, course.id, rolename))
+
+    def test_list_forum_admin_users(self):
+        print "test_list_forum_admin_users"
+        course = self.toy
+        self.initialize_roles(course.id)
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        added_roles = []
+        for rolename in FORUM_ROLES:
+            response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+            response = self.client.post(url, {'action': action_name('List', rolename), FORUM_ADMIN_USER[rolename]: username})
+            for header in ['Username', 'Full name', 'Roles']:
+                self.assertTrue(response.content.find('<th>%s</th>' % header)>0)
+            self.assertTrue(response.content.find('<td>%s</td>' % username)>=0)
+            # concatenate all roles for user, in sorted order:
+            added_roles.append(rolename)
+            added_roles.sort()
+            roles = ', '.join(added_roles)
+            self.assertTrue(response.content.find('<td>%s</td>' % roles)>=0)
