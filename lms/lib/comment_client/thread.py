@@ -71,10 +71,19 @@ class Thread(models.Model):
                             'user_id': kwargs.get('user_id'),
                             'mark_as_read': kwargs.get('mark_as_read', True),
                          }
-
-        # user_id may be none, in which case it shouldn't be part of the
-        # request.
-        request_params = strip_none(request_params)
-
-        response = perform_request('get', url, request_params)
-        self.update_attributes(**response)
+ 
+        
+    def flagAbuse(self, user, voteable, value):
+        if voteable.type == 'thread':
+            url = _url_for_flag_abuse_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_vote_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only vote / unvote for threads or comments")
+        params = {'user_id': user.id, 'value': value}
+        request = perform_request('put', url, params)
+        voteable.update_attributes(request)          
+        
+def _url_for_flag_abuse_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/abuse_flags".format(prefix=settings.PREFIX, thread_id=thread_id)      
+       
