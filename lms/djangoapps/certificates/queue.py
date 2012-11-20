@@ -240,7 +240,7 @@ class XQueueCertInterface(object):
                 cert.save()
             else:
                 cert_status = status.notpassing
-
+                cert.grade = grade['percent']
                 cert.status = cert_status
                 cert.user = student
                 cert.course_id = course_id
