@@ -352,7 +352,7 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read',
+        'read', "abuse_flaggers", "spoiler_flaggers"
     ]
 
     if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):

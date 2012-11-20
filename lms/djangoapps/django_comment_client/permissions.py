@@ -85,6 +85,7 @@ VIEW_PERMISSIONS = {
     'vote_for_comment'  :       [['vote', 'is_open']],
     'undo_vote_for_comment':    [['unvote', 'is_open']],
     'vote_for_thread'   :       [['vote', 'is_open']],
+    'flag_abuse_for_thread':    [['vote', 'is_open']],
     'undo_vote_for_thread':     [['unvote', 'is_open']],
     'follow_thread'     :       ['follow_thread'],
     'follow_commentable':       ['follow_commentable'],

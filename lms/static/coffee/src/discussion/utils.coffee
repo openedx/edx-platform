@@ -48,6 +48,7 @@ class @DiscussionUtil
       update_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/update"
       create_comment          : "/courses/#{$$course_id}/discussion/threads/#{param}/reply"
       delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
+      flagAbuse_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/flagAbuse"
       upvote_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
       undo_vote_for_thread    : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"

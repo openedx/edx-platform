@@ -136,7 +136,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_create_comment.html')
+        return ajax_content_response(request, course_id,comment.to_dict(), 'discussion/ajax_create_comment.html')
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
@@ -233,6 +233,15 @@ def vote_for_thread(request, course_id, thread_id, value):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
+@require_POST
+@login_required
+@permitted
+def flag_abuse_for_thread(request, course_id, thread_id, value):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.flagAbuse(thread, value)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
 @require_POST

@@ -3,6 +3,8 @@ if Backbone?
 
     events:
       "click .discussion-vote": "toggleVote"
+      "click .discussion-flag-abuse": "toggleFlagAbuse"
+      "click .discussion-flag-spoiler": "toggleFlagSpoiler"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
       "click .action-delete": "delete"
@@ -57,6 +59,20 @@ if Backbone?
       else
         @vote()
 
+    toggleFlagAbuse: (event) ->
+      event.preventDefault()
+      if window.user in @model.get("abuse_flaggers")
+        @unFlagAbuse()
+      else
+        @flagAbuse()
+
+    toggleFlagSpoiler: (event) ->
+      event.preventDefault()
+      if window.user in @model.abuse_flaggers
+         @unFlagAbuse()
+      else
+        @flagAbuse()
+
     toggleFollowing: (event) ->
       $elem = $(event.target)
       url = null
@@ -82,7 +98,28 @@ if Backbone?
           if textStatus == 'success'
             @model.set(response, {silent: true})
 
+    flagAbuse: ->
+      url = @model.urlFor("flagAbuse")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-flag-abuse")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response, {silent: true})
+
     unvote: ->
+      window.user.unvote(@model)
+      url = @model.urlFor("unvote")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-vote")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response, {silent: true})
+
+    unFlagAbuse: ->
       window.user.unvote(@model)
       url = @model.urlFor("unvote")
       DiscussionUtil.safeAjax
