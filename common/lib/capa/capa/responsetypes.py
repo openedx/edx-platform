@@ -1845,9 +1845,10 @@ class OpenEndedResponse(LoncapaResponse):
 
         #Look for tag named openendedparam that encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
-        self._parse_openendedresponse_xml(oeparam)
+        prompt=self.xml.find('prompt')
+        self._parse_openendedresponse_xml(oeparam,prompt)
 
-    def _parse_openendedresponse_xml(self,oeparam):
+    def _parse_openendedresponse_xml(self,oeparam,prompt):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
@@ -1857,6 +1858,16 @@ class OpenEndedResponse(LoncapaResponse):
             self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
+
+        #Modify code from stringify_children in xmodule.  Didn't import directly in order to avoid capa depending
+        #on xmodule (seems to be avoided in code)
+        prompt_parts=[prompt.text]
+        [prompt_parts.append((etree.tostring(p, with_tail=True))) for p in prompt.getchildren()]
+        prompt_string=' '.join(prompt_parts)
+
+        #Strip html tags from prompt.  This may need to be removed in order to display prompt to instructors properly.
+        prompt_string=re.sub('<[^<]+?>', '', prompt_string)
+
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
 
@@ -1867,7 +1878,8 @@ class OpenEndedResponse(LoncapaResponse):
             org,course,type,name=location.split("/")
             grader_payload.update({
                 'location' : location,
-                'course_id' : "{0}/{1}".format(org,course)
+                'course_id' : "{0}/{1}".format(org,course),
+                'prompt' : prompt_string
             })
             grader_payload=json.dumps(grader_payload)
         except Exception as err:
