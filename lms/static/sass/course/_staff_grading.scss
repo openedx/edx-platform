@@ -1,0 +1,29 @@
+div.staff-grading {
+    textarea.feedback-area {
+        height: 100px;
+        margin: 20px;
+    }
+
+    div {
+        margin: 10px;
+    }
+
+    label {
+        margin: 10px;
+        padding: 5px;
+        display: inline-block;
+        min-width: 50px;
+        background-color: #CCC;
+        text-size: 1.5em;
+    }
+    
+    /* Toggled State */
+    input[type=radio]:checked + label {
+        background: #666;
+        color: white;
+    }
+
+    input[name='score-selection'] {
+        display: none;
+    }
+}

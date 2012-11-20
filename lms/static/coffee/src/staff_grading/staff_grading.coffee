@@ -96,7 +96,7 @@ class StaffGrading
 
   setup_score_selection: =>
     # first, get rid of all the old inputs, if any.
-    @score_selection_container.html('')
+    @score_selection_container.html('Choose score: ')
 
     # Now create new labels and inputs for each possible score.
     for score in [1..@max_score]
@@ -106,7 +106,7 @@ class StaffGrading
       input = """
               <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
               """       # "  fix broken parsing in emacs
-      @score_selection_container.append(label + input)
+      @score_selection_container.append(input + label)
 
     # And now hook up an event handler again
     $("input[name='score-selection']").change @graded_callback
