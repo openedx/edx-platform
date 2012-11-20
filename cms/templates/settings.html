@@ -167,7 +167,7 @@
             <section class="settings-details-schedule">
               <header>
                 <h3>Course Schedule</h3>
-                <span class="detail">Important steps and segments of your your course</span>
+                <span class="detail">Important steps and segments of your course</span>
               </header>
 
               <div class="row row-col2">
@@ -460,8 +460,8 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short" id="course-grading-duetime" placeholder="HH:MM">
-                    <span class="tip tip-inline">Boston, MA Local Time (UTC/GMT -5 hours)</span>
-                    <span class="tip tip-stacked"><a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
+                    <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours).<br />
+                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
                   </div>
                 </div>
               </div>
@@ -478,122 +478,114 @@
               </div>
             </section>
 
-            <section class="settings-grading-lessonexercises">
+            <section class="setting-grading-assignment-types">
               <header>
-                <h3>Lesson Exercises</h3>
-                <span class="detail">Grading in-lesson question &amp; problems</span>
+                <h3>Assignment Types</h3>
               </header>
 
-              <div class="row row-col2">
-                <label for="course-grading-lessonexercises-gradeweight">Weight of Total Grade:</label>
+              <div class="row">
+                <div class="field enum">
+                  <ul class="input-list course-grading-assignment-list">
+                    <li class="input input-existing multi course-grading-assignment-list-item">
+                      <div class="row row-col2">
+                        <label for="course-grading-1-gradeweight">Assignment Type Name:</label>
 
-                <div class="field">
-                  <div class="input course-grading-gradeweight">
-                    <input type="text" class="short" id="course-grading-lessonexercises-gradeweight">
-                    <span class="tip tip-inline">e.g. 25%</span>                
-                  </div>
-                </div>
-              </div>
+                        <div class="field">
+                          <div class="input course-grading-assignment-name">
+                            <input type="text" class="long" id="course-grading-assignment-1-gradeweight">
+                            <span class="tip tip-stacked">e.g. Homework, Labs, Midterm Exams, Final Exam</span>
+                          </div>
+                        </div>
+                      </div>  
 
-              <div class="row row-col2">
-                <label for="course-grading-lessonexercises-totalassignments">Total Number:</label>
+                      <div class="row row-col2">
+                        <label for="course-grading-1-gradeweight">Weight of Total Grade:</label>
 
-                <div class="field">
-                  <div class="input course-grading-totalassignments">
-                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignments">
-                    <span class="tip tip-inline">total exercises assigned</span>                
-                  </div>
-                </div>
-              </div>
+                        <div class="field">
+                          <div class="input course-grading-gradeweight">
+                            <input type="text" class="short" id="course-grading-assignment-1-gradeweight">
+                            <span class="tip tip-inline">e.g. 25%</span>                
+                          </div>
+                        </div>
+                      </div>
 
-              <div class="row row-col2">
-                <label for="course-grading-lessonexercises-totalassignmentsdroppable">Number of Droppable:</label>
+                      <div class="row row-col2">
+                        <label for="course-grading-assignment-1-totalassignments">Total Number:</label>
 
-                <div class="field">
-                  <div class="input course-grading-totalassignmentsdroppable">
-                    <input type="text" class="short" id="course-grading-lessonexercises-totalassignmentsdroppable">
-                    <span class="tip tip-inline">total exercises that won't be graded</span>               
-                  </div>
-                </div>
-              </div>
-            </section>
+                        <div class="field">
+                          <div class="input course-grading-totalassignments">
+                            <input type="text" class="short" id="course-grading-assignment-1-totalassignments">
+                            <span class="tip tip-inline">total exercises assigned</span>                
+                          </div>
+                        </div>
+                      </div>
 
-            <section class="settings-grading-labs">
-              <header>
-                <h3>Labs</h3>
-                <span class="detail">Grading in-lesson question &amp; problems</span>
-              </header>
+                      <div class="row row-col2">
+                        <label for="course-grading-assignment-1-totalassignmentsdroppable">Number of Droppable:</label>
 
-              <div class="row row-col2">
-                <label for="course-grading-labs-gradeweight">Weight of Total Grade:</label>
+                        <div class="field">
+                          <div class="input course-grading-totalassignmentsdroppable">
+                            <input type="text" class="short" id="course-grading-assignment-1-totalassignmentsdroppable">
+                            <span class="tip tip-inline">total exercises that won't be graded</span>               
+                          </div>
+                        </div>
+                      </div>
 
-                <div class="field">
-                  <div class="input course-grading-gradeweight">
-                    <input type="text" class="short course-grading-gradeweight" id="course-grading-labs-gradeweight">
-                    <span class="tip tip-inline">e.g. 25%</span>                
-                  </div>
-                </div>
-              </div>
+                      <a href="#" class="remove-item remove-grading-data"><span class="delete-icon"></span> Delete Assignment Type</a>
+                    </li>
 
-              <div class="row row-col2">
-                <label for="course-grading-labs-totalassignments">Total Number:</label>
+                    <li class="input input-existing multi course-grading-assignment-list-item">
+                      <div class="row row-col2">
+                        <label for="course-grading-2-gradeweight">Assignment Type Name:</label>
 
-                <div class="field">
-                  <div class="input course-grading-totalassignments">
-                    <input type="text" class="short course-grading-totalassignments" id="course-grading-labs-totalassignments">
-                    <span class="tip tip-inline">total labs assigned</span>                
-                  </div>
-                </div>
-              </div>
+                        <div class="field">
+                          <div class="input course-grading-assignment-name">
+                            <input type="text" class="long" id="course-grading-assignment-2-gradeweight">
+                            <span class="tip tip-stacked">e.g. Homework, Labs, Midterm Exams, Final Exam</span>
+                          </div>
+                        </div>
+                      </div>  
 
-              <div class="row row-col2">
-                <label for="course-grading-labs-totalassignmentsdroppable">Number of Droppable:</label>
+                      <div class="row row-col2">
+                        <label for="course-grading-2-gradeweight">Weight of Total Grade:</label>
 
-                <div class="field">
-                  <div class="input course-grading-totalassignmentsdroppable">
-                    <input type="text" class="short course-grading-labs-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
-                    <span class="tip tip-inline">total labs that won't be graded</span>               
-                  </div>
-                </div>
-              </div>
-            </section>
+                        <div class="field">
+                          <div class="input course-grading-gradeweight">
+                            <input type="text" class="short" id="course-grading-assignment-2-gradeweight">
+                            <span class="tip tip-inline">e.g. 25%</span>                
+                          </div>
+                        </div>
+                      </div>
 
-            <section class="settings-grading-exams">
-              <header>
-                <h3>Exams</h3>
-                <span class="detail">Grading in-lesson question &amp; problems</span>
-              </header>
+                      <div class="row row-col2">
+                        <label for="course-grading-assignment-2-totalassignments">Total Number:</label>
 
-              <div class="row row-col2">
-                <label for="course-grading-exams-gradeweight">Weight of Total Grade:</label>
+                        <div class="field">
+                          <div class="input course-grading-totalassignments">
+                            <input type="text" class="short" id="course-grading-assignment-2-totalassignments">
+                            <span class="tip tip-inline">total exercises assigned</span>                
+                          </div>
+                        </div>
+                      </div>
 
-                <div class="field">
-                  <div class="input course-grading-gradeweight">
-                    <input type="text" class="short course-grading-gradeweight" id="course-grading-exams-gradeweight">
-                    <span class="tip tip-inline">e.g. 50%</span>                
-                  </div>
-                </div>
-              </div>
+                      <div class="row row-col2">
+                        <label for="course-grading-assignment-2-totalassignmentsdroppable">Number of Droppable:</label>
 
-              <div class="row row-col2">
-                <label for="course-grading-exams-totalassignments">Total Number:</label>
+                        <div class="field">
+                          <div class="input course-grading-totalassignmentsdroppable">
+                            <input type="text" class="short" id="course-grading-assignment-2-totalassignmentsdroppable">
+                            <span class="tip tip-inline">total exercises that won't be graded</span>               
+                          </div>
+                        </div>
+                      </div>
 
-                <div class="field">
-                  <div class="input course-grading-totalassignments">
-                    <input type="text" class="short course-grading-totalassignments" id="course-grading-exams-totalassignments">
-                    <span class="tip tip-inline">total exams held</span>                
-                  </div>
-                </div>
-              </div>
+                      <a href="#" class="remove-item remove-grading-data"><span class="delete-icon"></span> Delete Assignment Type</a>
+                    </li>
+                  </ul>
 
-              <div class="row row-col2">
-                <label for="course-grading-exams-totalassignmentsdroppable">Number of Droppable:</label>
-
-                <div class="field">
-                  <div class="input course-grading-totalassignmentsdroppable">
-                    <input type="text" class="short course-grading-exams-totalassignmentsdroppable" id="course-grading-labs-totalassignmentsdroppable">
-                    <span class="tip tip-inline">total exams that won't be graded</span>               
-                  </div>
+                  <a href="#" class="new-item new-course-grading-item add-grading-data">
+                    <span class="plus-icon"></span>New Assignment Type
+                  </a>
                 </div>
               </div>
             </section>
@@ -677,10 +669,9 @@
               </div>
             </section><!-- .settings-problems-general -->
 
-            <section class="settings-problems-lessonexercises settings-extras">
+            <section class="settings-problems--assignment-1 settings-extras">
               <header>
-                <h3>Lesson Exercises</h3>
-                <span class="detail">In-lesson question &amp; problem specific rules</span>
+                <h3>[Assignment Type Name]</h3>
               </header>
 
               <div class="row row-col2">
@@ -688,28 +679,28 @@
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-always" value="Always">
+                    <input checked="checked" type="radio" name="problems--assignment-1-randomization" id="problems--assignment-1-randomization-always" value="Always">
                     
                     <div class="copy">
-                      <label for="problems-lessonexercises-randomization-always">Always</label>
+                      <label for="problems--assignment-1-randomization-always">Always</label>
                       <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>                    
                     </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-never" value="Never">
+                    <input type="radio" name="problems-assignment-1-randomization" id="problems-assignment-1-randomization-never" value="Never">
                     
                     <div class="copy">
-                      <label for="problems-lessonexercises-randomization-never">Never</label>
+                      <label for="problems-assignment-1-randomization-never">Never</label>
                       <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
                     </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="problems-lessonexercises-randomization" id="problems-lessonexercises-randomization-perstudent" value="Per Student">
+                    <input type="radio" name="problems-assignment-1-randomization" id="problems-assignment-1-randomization-perstudent" value="Per Student">
                     
                     <div class="copy">
-                      <label for="problems-lessonexercises-randomization-perstudent">Per Student</label>
+                      <label for="problems-assignment-1-randomization-perstudent">Per Student</label>
                       <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
                     </div>
                   </div>
@@ -721,19 +712,19 @@
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-always" value="Always">
+                    <input checked="checked" type="radio" name="problems-assignment-1-showanswer" id="problems-assignment-1-showanswer-always" value="Always">
                     
                     <div class="copy">
-                      <label for="problems-lessonexercises-showanswer-always">Always</label>
+                      <label for="problems-assignment-1-showanswer-always">Always</label>
                       <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
                     </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="problems-lessonexercises-showanswer" id="problems-lessonexercises-showanswer-never" value="Never">
+                    <input type="radio" name="problems-assignment-1-showanswer" id="problems-assignment-1-showanswer-never" value="Never">
 
                     <div class="copy">
-                      <label for="problems-lessonexercises-showanswer-never">Never</label>
+                      <label for="problems-assignment-1-showanswer-never">Never</label>
                       <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
                     </div>
                   </div>
@@ -741,166 +732,16 @@
               </div>
 
               <div class="row row-col2">
-                <label for="problems-lessonexercises-attempts">Number of Attempts: </label>
+                <label for="problems-assignment-1-attempts">Number of Attempts: </label>
 
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="problems-lessonexercises-attempts" placeholder="0 or higher" value="0">
+                    <input type="text" class="short" id="problems-assignment-1-attempts" placeholder="0 or higher" value="0">
                     <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
                   </div>
                 </div>
               </div>
-            </section><!-- .settings-problems-lessonexercises -->
-
-            <section class="settings-problems-labs settings-extras">
-              <header>
-                <h3>Labs</h3>
-                <span class="detail">Exploratory assignment-specific rules</span>
-              </header>
-
-              <div class="row row-col2">
-                <h4 class="label">Problem Randomization:</h4>
-
-                <div class="field">
-                  <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-labs-randomization" id="problems-labs-randomization-always" value="Always">
-                    
-                    <div class="copy">
-                      <label for="problems-labs-randomization-always">Always</label>
-                      <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-labs-randomization" id="problems-labs-randomization-never" value="Never">
-
-                    <div class="copy">
-                      <label for="problems-labs-randomization-never">Never</label>
-                      <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-labs-randomization" id="problems-labs-randomization-perstudent" value="Per Student">
-
-                    <div class="copy">
-                      <label for="problems-labs-randomization-perstudent">Per Student</label>
-                      <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                <h4 class="label">Show Answers:</h4>
-
-                <div class="field">
-                  <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-labs-showanswer" id="problems-labs-showanswer-always" value="Always">
-
-                    <div class="copy">
-                      <label for="problems-labs-showanswer-always">Always</label>
-                      <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-labs-showanswer" id="problems-labs-showanswer-never" value="Never">
-
-                    <div class="copy">
-                      <label for="problems-labs-showanswer-never">Never</label>
-                      <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                <label for="problems-labs-attempts">Number of Attempts: </label>
-
-                <div class="field">
-                  <div class="input">
-                    <input type="text" class="short" id="problems-labs-attempts" placeholder="0 or higher" value="0">
-                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
-                  </div>
-                </div>
-              </div>
-            </section><!-- .settings-problems-labs -->
-
-            <section class="settings-problems-exams settings-extras">
-              <header>
-                <h3>Exams</h3>
-                <span class="detail">Mid-term and final exam-specific rules</span>
-              </header>
-
-              <div class="row row-col2">
-                <h4 class="label">Problem Randomization:</h4>
-
-                <div class="field">
-                  <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-exams-randomization" id="problems-exams-randomization-always" value="Aways">
-
-                    <div class="copy">
-                      <label for="problems-exams-randomization-always">Always</label>
-                      <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-exams-randomization" id="problems-exams-randomization-never" value="Never">
-
-                    <div class="copy">
-                      <label for="problems-exams-randomization-never">Never</label>
-                      <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-exams-randomization" id="problems-exams-randomization-perstudent" value="Per Student">
-
-                    <div class="copy">
-                      <label for="problems-exams-randomization-perstudent">Per Student</label>
-                      <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                <h4 class="label">Show Answers:</h4>
-
-                <div class="field">
-                  <div class="input input-radio">
-                    <input checked="checked" type="radio" name="problems-exams-showanswer" id="problems-exams-showanswer-always" value="Always">
-
-                    <div class="copy">
-                      <label for="problems-exams-showanswer-always">Always</label>
-                      <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
-                    </div>
-                  </div>
-
-                  <div class="input input-radio">
-                    <input type="radio" name="problems-exams-showanswer" id="problems-exams-showanswer-never" value="Never">
-
-                    <div class="copy">
-                      <label for="problems-exams-showanswer-never">Never</label>
-                      <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                <label for="problems-exams-attempts">Number of Attempts: </label>
-
-                <div class="field">
-                  <div class="input">
-                    <input type="text" class="short" id="problems-exams-attempts" placeholder="0 or higher" value="0">
-                    <span class="tip tip-inline">To set infinite atttempts, use "0"</span>
-                  </div>
-                </div>
-              </div>
-            </section><!-- .settings-problems-exams -->
+            </section><!-- .settings-problems-assignment-1 -->
           </section><!-- .settings-problems -->
 
           <section class="settings-discussions">

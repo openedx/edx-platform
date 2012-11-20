@@ -83,7 +83,7 @@
 
             .detail {
               float: right;
-              marign-top: 3px;
+              margin-top: 3px;
               color: $mediumGrey;
               font-size: 13px;
             }
@@ -231,7 +231,7 @@
           &.multi {
             display: block;
             background: tint($lightGrey, 50%);
-            padding: 15px;
+            padding: 20px 15px;
             @include border-radius(4px);
             @include box-sizing(border-box);
 
@@ -297,6 +297,9 @@
 
             &:last-child {
               border: 0;
+            }
+
+            .row {
             }
           }
         }
@@ -481,9 +484,15 @@
     .settings-grading {
 
 
-      .course-grading-gradeweight, .course-grading-totalassignments, .course-grading-totalassignmentsdroppable {
+      .input-list {
+        .row {
 
-        input {
+          .input {
+            &:last-child {
+              margin-bottom: 0;
+              padding-bottom: 0;
+            }
+          }
         }
       }
     }
