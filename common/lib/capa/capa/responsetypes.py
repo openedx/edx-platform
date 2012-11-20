@@ -1846,9 +1846,25 @@ class OpenEndedResponse(LoncapaResponse):
         #Look for tag named openendedparam that encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
         prompt=self.xml.find('prompt')
+        rubric=self.xml.find('rubric')
         self._parse_openendedresponse_xml(oeparam,prompt)
 
-    def _parse_openendedresponse_xml(self,oeparam,prompt):
+    def stringify_children(self,node,strip_tags=True):
+        """
+        Modify code from stringify_children in xmodule.  Didn't import directly in order to avoid capa depending
+        on xmodule (seems to be avoided in code)
+        """
+        parts=[node.text]
+        [parts.append((etree.tostring(p, with_tail=True))) for p in node.getchildren()]
+        node_string=' '.join(parts)
+
+        #Strip html tags from prompt.  This may need to be removed in order to display prompt to instructors properly.
+        if strip_tags:
+            node_string=re.sub('<[^<]+?>', '', node_string)
+
+        return node_string
+
+    def _parse_openendedresponse_xml(self,oeparam,prompt,rubric):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
@@ -1858,15 +1874,8 @@ class OpenEndedResponse(LoncapaResponse):
             self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
-
-        #Modify code from stringify_children in xmodule.  Didn't import directly in order to avoid capa depending
-        #on xmodule (seems to be avoided in code)
-        prompt_parts=[prompt.text]
-        [prompt_parts.append((etree.tostring(p, with_tail=True))) for p in prompt.getchildren()]
-        prompt_string=' '.join(prompt_parts)
-
-        #Strip html tags from prompt.  This may need to be removed in order to display prompt to instructors properly.
-        prompt_string=re.sub('<[^<]+?>', '', prompt_string)
+        prompt_string=self.stringify_children(prompt)
+        rubric_string=self.stringify_children(rubric)
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
@@ -1879,7 +1888,8 @@ class OpenEndedResponse(LoncapaResponse):
             grader_payload.update({
                 'location' : location,
                 'course_id' : "{0}/{1}".format(org,course),
-                'prompt' : prompt_string
+                'prompt' : prompt_string,
+                'rubric' : rubric_string,
             })
             grader_payload=json.dumps(grader_payload)
         except Exception as err:
