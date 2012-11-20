@@ -99,7 +99,7 @@ class StaffGrading
     @score_selection_container.html('Choose score: ')
 
     # Now create new labels and inputs for each possible score.
-    for score in [1..@max_score]
+    for score in [0..@max_score]
       id = 'score-' + score
       label = """<label for="#{id}">#{score}</label>"""
       
