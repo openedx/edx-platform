@@ -149,11 +149,14 @@ def _cert_info(user, course, cert_status):
     Implements the logic for cert_info -- split out for testing.
     """
     default_status = 'processing'
+
+    default_info = {'status': default_status,
+                    'show_disabled_download_button': False,
+                    'show_download_url': False,
+                    'show_survey_button': False}
+
     if cert_status is None:
-        return {'status': default_status,
-                'show_disabled_download_button': False,
-                'show_download_url': False,
-                'show_survey_button': False}
+        return default_info
 
     # simplify the status for the template using this lookup table
     template_state = {
@@ -178,10 +181,21 @@ def _cert_info(user, course, cert_status):
         d['show_survey_button'] = False
 
     if status == 'ready':
-        d['download_url'] = cert_status['download_url']
+        if 'download_url' not in cert_status:
+            log.warning("User %s has a downloadable cert for %s, but no download url",
+                        user.username, course.id)
+            return default_status
+        else:
+            d['download_url'] = cert_status['download_url']
 
     if status in ('generating', 'ready', 'notpassing'):
-        d['grade'] = cert_status['grade']
+        if 'grade' not in cert_status:
+            # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
+            # who need to be regraded (we weren't tracking 'notpassing' at first).
+            # We can add a log.warning here once we think it shouldn't happen.
+            return default_status
+        else:
+            d['grade'] = cert_status['grade']
 
     return d
 
