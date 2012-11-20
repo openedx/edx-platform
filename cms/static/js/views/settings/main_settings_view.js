@@ -16,9 +16,9 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 		this.subviews[this.currentTab] = this.createSubview();
 			
 		// fill in fields
-		this.$el.find("#course-name-input").val(this.model.get('courseLocation').get('name'));
-		this.$el.find("#course-organization-input").val(this.model.get('courseLocation').get('org'));
-		this.$el.find("#course-number-input").val(this.model.get('courseLocation').get('course'));
+		this.$el.find("#course-name").val(this.model.get('courseLocation').get('name'));
+		this.$el.find("#course-organization").val(this.model.get('courseLocation').get('org'));
+		this.$el.find("#course-number").val(this.model.get('courseLocation').get('course'));
 		this.render();
 	},
 	
@@ -75,24 +75,24 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		"blur input" : "updateModel"
 	},
 	render: function() {
-		if (this.model.has('start_date')) this.$el.find('#course-start-date-input').datepicker('setDate', this.model.get('start_date'));
-		if (this.model.has('end_date')) this.$el.find('#course-end-date-input').datepicker('setDate', this.model.get('end_date'));
-		if (this.model.has('enrollment_start')) this.$el.find('#course-enrollment-start-input').datepicker('setDate', this.model.get('enrollment_start'));
-		if (this.model.has('enrollment_end')) this.$el.find('#course-enrollment-end-input').datepicker('setDate', this.model.get('enrollment_end'));
+		if (this.model.has('start_date')) this.$el.find('#course-start-date').datepicker('setDate', this.model.get('start_date'));
+		if (this.model.has('end_date')) this.$el.find('#course-end-date').datepicker('setDate', this.model.get('end_date'));
+		if (this.model.has('enrollment_start')) this.$el.find('#course-enrollment-start').datepicker('setDate', this.model.get('enrollment_start'));
+		if (this.model.has('enrollment_end')) this.$el.find('#course-enrollment-end').datepicker('setDate', this.model.get('enrollment_end'));
 	},
 	updateModel: function(event) {
 		// figure out which field
 		switch (event.currentTarget.id) {
-		case 'course-start-date-input':
+		case 'course-start-date':
 			this.model.set('start_date', $(event.currentTarget).datepicker('getDate'));
 			break;
-		case 'course-end-date-input':
+		case 'course-end-date':
 			this.model.set('end_date', $(event.currentTarget).datepicker('getDate'));
 			break;
-		case 'course-enrollment-start-date-input':
+		case 'course-enrollment-start-date':
 			this.model.set('enrollment_start', $(event.currentTarget).datepicker('getDate'));
 			break;
-		case 'course-enrollment-end-date-input':
+		case 'course-enrollment-end-date':
 			this.model.set('enrollment_end', $(event.currentTarget).datepicker('getDate'));
 			break;
 

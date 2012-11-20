@@ -83,7 +83,7 @@
 
             .detail {
               float: right;
-              marign-top: 3px;
+              margin-top: 3px;
               color: $mediumGrey;
               font-size: 13px;
             }
@@ -151,6 +151,11 @@
       }
     }
 
+    input[type="checkbox"], input[type="radio"] {
+
+    }
+
+
     .input-default input, .input-default textarea {
       color: $mediumGrey;
       background: $lightGrey;
@@ -163,98 +168,6 @@
     :-moz-placeholder {  
       color: $mediumGrey;  
       font-size: 13px;
-    }
-
-    .field.ui-status {
-
-      > .input {
-        display: block !important;
-        margin-bottom: 15px;
-      }
-
-      .ui-status-input-checkbox input, .ui-status-input-radio input {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-      }
-
-      label {
-        cursor: pointer;
-      }
-
-      .ui-status-input-checkbox input ~ label, .ui-status-input-radio input ~ label {
-        position: relative;
-        left: -30px;
-        display: inline-block;
-        z-index: 100;
-        margin: 0 0 0 5px;
-        padding-left: 30px;
-        color: $offBlack;
-        opacity: 0.50;
-        cursor: pointer;
-        @include transition(opacity 0.25s ease-in-out);
-
-        &:before {
-          display: inline-block;
-          margin-right: 10px;
-        }
-
-        &:after {
-         display: inline-block;
-         margin-left: 10px;
-        }
-
-        ~ .tip {
-         margin-top: 0;
-         @include transition(color 0.25s ease-in-out);
-        }
-      }
-
-      .ui-status-indic {
-        background: transparent url('../images/correct-icon.png') 0 0 no-repeat;
-        z-index: 10;
-        display: inline-block;
-        height: 20px;
-        width: 30px;
-        opacity: 0.50;
-        @include transition(opacity 0.25s ease-in-out);
-      }
-
-      .ss-check {
-        color: $green;
-      }
-
-      .ss-delete {
-        color: $red;
-      }
-
-      .ui-status-input-checkbox input:checked ~ label, .ui-status-input-radio input:checked ~ label {
-         opacity: 0.99;
-
-         &:after {
-         }
-
-         &:before {
-         }
-
-         ~ .tip {
-          color: $darkGrey;
-         }
-      }
-
-      .ui-status-input-checkbox input:checked ~ .ui-status-indic, .ui-status-input-radio input:checked ~ .ui-status-indic {
-        background: transparent url('../images/correct-icon.png') 0 0 no-repeat;
-        opacity: 0.99;
-      }
-
-      // disabled 
-      .ui-status-input-checkbox input:disabled, .ui-status-input-radio input:disabled {
-        color: $mediumGrey;
-      }
-
-      .ui-status-input-checkbox input:disabled ~ .ui-status-indic, .ui-status-input-radio input:disabled ~ .ui-status-indic {
-        color: $mediumGrey;
-      }
     }
 
     .tip {
@@ -318,7 +231,7 @@
           &.multi {
             display: block;
             background: tint($lightGrey, 50%);
-            padding: 15px;
+            padding: 20px 15px;
             @include border-radius(4px);
             @include box-sizing(border-box);
 
@@ -385,7 +298,46 @@
             &:last-child {
               border: 0;
             }
+
+            .row {
+            }
           }
+        }
+
+        //radio buttons and checkboxes
+        .input-radio {
+          @include clearfix();
+
+          input {
+            display: block;
+            float: left;
+            margin-right: 10px;
+          }
+
+          .copy {
+            position: relative;
+            top: -5px;
+            float: left;
+            width: 350px;
+          }
+
+          label {
+            display: block;
+            margin-bottom: 0;
+          }
+
+          .tip {
+            display: block;
+            margin-top: 0;
+          }
+
+          .message-error {
+
+          }
+        }
+
+        .input-checkbox {
+          
         }
 
         // enumerated inputs
@@ -405,7 +357,7 @@
         }
 
         &.multi-inline {
-          @include clearfix;
+          @include clearfix();
 
           .group {
             width: 170px;
@@ -516,7 +468,6 @@
         }
 
         .current-faculty-photo {
-          overflow: hidden;
           padding: 0;
 
           img {
@@ -532,10 +483,24 @@
 
     .settings-grading {
 
+      .course-grading-assignment-list-item {
 
-      .course-grading-gradeweight, .course-grading-totalassignments, .course-grading-totalassignmentsdroppable {
+        .row:nth-child(4) {
+          border: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
 
-        input {
+      .input-list {
+        .row {
+
+          .input {
+            &:last-child {
+              margin-bottom: 0;
+              padding-bottom: 0;
+            }
+          }
         }
       }
     }
@@ -556,7 +521,7 @@
 
     .settings-discussions {
 
-      .settings-discussions-categories .course-discussions-categories-list-item {
+      .course-discussions-categories-list-item {
 
         label {
           display: none;
