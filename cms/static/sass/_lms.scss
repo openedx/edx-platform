@@ -14,17 +14,31 @@
     line-height: 1.6;
   }
 
+  h1 {
+    float: none;
+  }
+
   h2 {
     color: #646464;
     font-size: 19px;
     font-weight: 300;
     letter-spacing: 1px;
     margin-bottom: 15px;
+    margin-left: 0;
     text-transform: uppercase;
   }
 
   h3 {
     font-size: 19px;
+    font-weight: 400;
+  }
+
+  h4 {
+    background: none;
+    padding: 0;
+    border: none;
+    @include box-shadow(none);
+    font-size: 16px;
     font-weight: 400;
   }
 

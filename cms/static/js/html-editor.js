@@ -3,6 +3,7 @@ var $htmlPreview;
 var $htmlEditor;
 var $visualEditor;
 var $assetWidget;
+var $linkDialog;
 var visualEditor;
 var htmlEditor;
 
@@ -18,7 +19,7 @@ function initHTMLEditor($editor, $prev) {
       skin: 'studio',      
       
       // we may want to add "styleselect" when we collect all styles used throughout the lms
-      theme_advanced_buttons1 : "formatselect,bold,italic,underline,bullist,numlist,outdent,indent,blockquote,studio.asset,link,unlink",
+      theme_advanced_buttons1 : "formatselect,bold,italic,underline,studio.asset,bullist,numlist,outdent,indent,blockquote,link,unlink",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
@@ -42,6 +43,20 @@ function initHTMLEditor($editor, $prev) {
               $body.append($assetWidget);
             }
         });
+        ed.addButton('studio.link', {
+            title : 'Add Link',
+            image : '/static/img/visual-editor-image-icon.png',
+            onclick : function() {
+              $linkDialog = $($('#tiny-link-dialog').html());
+              $modalCover.unbind('click');
+              $modalCover.bind('click', closeLinkDialog);
+              $modalCover.css('z-index', '99999');
+              // $('.upload-button', $assetWidget).bind('click', uploadFromWidget);
+              // $('.close-button', $assetWidget).bind('click', closeAssetWidget);
+              // $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
+              $body.append($linkDialog);
+            }
+        });
       }
     });
   }, 100);
@@ -53,6 +68,10 @@ function initHTMLEditor($editor, $prev) {
   });
 
   $editor.find('.save-button, .cancel-button').bind('click', updateHTMLPreview);
+}
+
+function closeLinkDialog(e) {
+
 }
 
 function uploadFromWidget(e) {

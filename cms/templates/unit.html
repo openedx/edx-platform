@@ -58,12 +58,25 @@
   <script src="/static/js/tiny_mce/tiny_mce.js"></script>
   <script src="/static/js/tiny_mce/jquery.tinymce.js"></script>
 
+  <script type="text/template" id="tiny-link-dialog">
+    <article class="tiny-link-dialog">
+      <a href="#" class="close-button">
+        <span class="close-icon"></span>
+      </a>
+      <h1>Link to</h1>
+      <form class="link-to">
+        <input type="text" class="link-to-input">
+        <a href="#" class="browse-button">Browse Courseware</a>
+        <input type="submit" value="Add Link">
+      </form>
+    </article>
+  </script>
+
   <script type="text/template" id="asset-library-widget">
     <article class="asset-library widget">
       <a href="#" class="close-button">
         <span class="close-icon"></span>
       </a>
-
       <div class="upload-form upload-modal">
         <h1>Upload New File</h1>
         <p class="file-name"></p>

@@ -40,15 +40,6 @@
     }
   }
 
-  // h2 {
-  //   margin: 30px 0;
-  //   color: #646464;
-  //   font-size: 19px;
-  //   font-weight: 300;
-  //   letter-spacing: 1px;
-  //   text-transform: uppercase;
-  // }
-
   .components {
     > li {
       position: relative;
@@ -801,5 +792,28 @@
   code {
     padding: 0;
     background: none;
+  }
+}
+
+.tiny-link-dialog {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  z-index: 99999;
+  width: 600px;
+  margin-left: -300px;
+  background: #fff;
+
+  .close-button {
+    @include white-button;
+    position: absolute;
+    top: 0;
+    right: 15px;
+    width: 29px;
+    height: 29px;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    line-height: 29px;
+    text-align: center;
   }
 }
