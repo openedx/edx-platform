@@ -483,6 +483,14 @@
 
     .settings-grading {
 
+      .course-grading-assignment-list-item {
+
+        .row:nth-child(4) {
+          border: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
 
       .input-list {
         .row {
