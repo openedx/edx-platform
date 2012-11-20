@@ -2052,7 +2052,7 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['correct', 'score','feedback']:
+        for tag in ['score','feedback']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
                           " tags: 'correct', 'score', 'feedback")
@@ -2064,8 +2064,10 @@ class OpenEndedResponse(LoncapaResponse):
         # 2) TODO: Is the message actually HTML?
         feedback = score_result['feedback']
 
-        correct=False
-        if score_result['correct']=="True":
+        score_ratio=int(score_result['score'])/self.max_score
+
+        correct=FALSE
+        if score_ratio>=.66:
             correct=True
 
         try:
