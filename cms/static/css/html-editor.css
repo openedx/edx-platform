@@ -33,6 +33,11 @@ h2 {
   text-transform: uppercase;
 }
 
+h3 {
+  font-size: 19px;
+  font-weight: 400;
+}
+
 code {  
   margin: 0 2px;
   padding: 0px 5px;

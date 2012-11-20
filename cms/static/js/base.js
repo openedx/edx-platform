@@ -463,11 +463,25 @@ function displayFinishedUpload(xhr) {
     }
 
     var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .embeddable-xml-input').val('<img src="' + xhr.getResponseHeader('asset_url') + '"/>');
+    var extension = resp.url.match(/\.([0-9a-z]+)(?:[\?#]|$)/i);
+    var embedMarkup;
+    switch(extension[1]) {
+        case 'png':
+        case 'jpg':
+        case 'jpeg':
+        case 'gif':
+            embedMarkup = '<img src="' + xhr.getResponseHeader('asset_url') + '" />';
+            break;
+        default:
+            embedMarkup = '<a href="' + xhr.getResponseHeader('asset_url') + '">' + resp.displayname + '</a>';
+            break;
+    }
+    $('.upload-modal .embeddable-xml-input').val(embedMarkup);
+    $('.asset-library.widget .insert-asset-button').attr('data-markup', embedMarkup);
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);
-    $('.upload-modal .choose-file-button').html('Load Another File').show();
+    $('.upload-modal .choose-file-button').html('Load Another File').addClass('another').show();
     $('.upload-modal .progress-fill').width('100%');
 
     // see if this id already exists, if so, then user must have updated an existing piece of content

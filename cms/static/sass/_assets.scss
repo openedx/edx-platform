@@ -37,6 +37,12 @@
 		@include blue-button;
 		padding: 10px 82px 12px;
 		font-size: 17px;
+
+    &.another {
+      @include white-button;
+      padding: 6px 22px 8px;
+      font-size: 13px;
+    }
 	}
 
 	.progress-bar {
@@ -149,7 +155,7 @@
       margin-top: 2px;
       background-color: #fff;
       background-position: 12px 8px;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .thumb-col {
@@ -198,6 +204,21 @@
 
     .upload-form {
       display: none;
+      width: auto !important;
+      margin: 60px 30px 80px !important;
+      text-align: center;
+
+      h1 {
+        float: none;
+        font-size: 34px;
+        font-weight: 300;
+        text-align: center;
+      }
+
+      .insert-asset-button {
+        padding: 8px 40px 10px;
+        font-size: 17px;
+      }
     }
   }
 
@@ -258,11 +279,6 @@
       width: 100px;
     }
 
-    .insert-asset-button {
-      @include blue-button;
-      font-size: 12px;
-    }
-
     .embeddable-xml-input {
       @include box-shadow(none);
       width: 100%;
@@ -277,6 +293,11 @@
         width: 100%;
       }
     }
+  }
+
+  .insert-asset-button {
+    @include blue-button;
+    font-size: 12px;
   }
 
   .pagination {

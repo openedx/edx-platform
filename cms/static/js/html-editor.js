@@ -17,13 +17,13 @@ function initHTMLEditor($editor, $prev) {
       theme : "advanced",
       skin: 'studio',      
       
-      // we may want to add "styleselect" when we collect all styles used throught the lms
+      // we may want to add "styleselect" when we collect all styles used throughout the lms
       theme_advanced_buttons1 : "formatselect,bold,italic,underline,bullist,numlist,outdent,indent,blockquote,studio.asset,link,unlink",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
       theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,code,h2,h3,h4,h5,h6,blockquote",
+      theme_advanced_blockformats : "p,code,h2,h3,blockquote",
       content_css : "/static/css/html-editor.css",
       width: '100%',
       height: '400px',
@@ -32,11 +32,12 @@ function initHTMLEditor($editor, $prev) {
             title : 'Add Asset',
             image : '/static/img/visual-editor-image-icon.png',
             onclick : function() {
-              $assetWidget = $($('#asset-library-widget').html());
-              $assetWidget.find('.close-button').bind('click', closeAssetWidget);
+              $assetWidget = $($('#asset-library-widget').html());              
               $modalCover.unbind('click');
               $modalCover.bind('click', closeAssetWidget);
               $modalCover.css('z-index', '99999');
+              $('.upload-button', $assetWidget).bind('click', uploadFromWidget);
+              $('.close-button', $assetWidget).bind('click', closeAssetWidget);
               $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
               $body.append($assetWidget);
             }
@@ -52,6 +53,28 @@ function initHTMLEditor($editor, $prev) {
   });
 
   $editor.find('.save-button, .cancel-button').bind('click', updateHTMLPreview);
+}
+
+function uploadFromWidget(e) {
+  $('.library', $assetWidget).hide();
+  $('.upload-form', $assetWidget).show();
+  $('.choose-file-button', $assetWidget).bind('click', function(e) {
+      e.preventDefault();
+      $('.file-input', $assetWidget).click();
+      $('.file-input', $assetWidget).bind('change', startUpload);
+  });
+}
+
+function startUploadFromWidget(e) {
+  $('.upload-modal h1').html('Uploading…');
+  $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
+  $('.upload-modal .file-chooser').ajaxSubmit({
+      beforeSend: resetUploadBar,
+      uploadProgress: showUploadFeedback,
+      complete: displayFinishedUpload
+  });
+  $('.upload-modal .choose-file-button').hide();
+  $('.upload-modal .progress-bar').removeClass('loaded').show();
 }
 
 function insertAsset(e) {
