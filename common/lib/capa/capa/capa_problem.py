@@ -72,7 +72,7 @@ global_context = {'random': random,
                   'miller': chem.miller}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam","openendedrubric"]
 
 log = logging.getLogger('mitx.' + __name__)
 

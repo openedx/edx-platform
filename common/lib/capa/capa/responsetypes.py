@@ -1846,8 +1846,8 @@ class OpenEndedResponse(LoncapaResponse):
         #Look for tag named openendedparam that encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
         prompt=self.xml.find('prompt')
-        rubric=self.xml.find('rubric')
-        self._parse_openendedresponse_xml(oeparam,prompt)
+        rubric=self.xml.find('openendedrubric')
+        self._parse_openendedresponse_xml(oeparam,prompt,rubric)
 
     def stringify_children(self,node,strip_tags=True):
         """
