@@ -8,8 +8,7 @@ import requests
 import sys
 
 from django.conf import settings
-from django.http import Http404
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from courseware.access import has_access
 from util.json_request import expect_json
@@ -29,7 +28,7 @@ class MockStaffGradingService(object):
     def __init__(self):
         self.cnt = 0
 
-    def get_next(self, course_id):
+    def get_next(self, course_id, grader_id):
         self.cnt += 1
         return json.dumps({'success': True,
                            'submission_id': self.cnt,
@@ -47,16 +46,20 @@ class StaffGradingService(object):
     """
     def __init__(self, url):
         self.url = url
+        self.get_next_url = url + '/get_next_submission/'
+        self.save_grade_url = url + '/save_grade/'
         # TODO: add auth
         self.session = requests.session()
 
-    def get_next(self, course_id):
+    def get_next(self, course_id, grader_id):
         """
         Get the next thing to grade.  Returns json, or raises GradingServiceError
         if there's a problem.
         """
         try:
-            r = self.session.get(self.url + 'get_next')
+            r = self.session.get(self.get_next_url,
+                                 params={'course_id': course_id,
+                                         'grader_id': grader_id})
         except requests.exceptions.ConnectionError as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
@@ -78,22 +81,24 @@ class StaffGradingService(object):
                     'submission_id': submission_id,
                     'score': score,
                     'feedback': feedback,
-                    'grader_id': grader}
-            r = self.session.post(self.url + 'save_grade')
+                    'grader_id': grader_id}
+            
+            r = self.session.post(self.save_grade_url, data=data)
         except requests.exceptions.ConnectionError as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
 
-#_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL)
-_service = MockStaffGradingService()
+_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL)
+#_service = MockStaffGradingService()
 
 def _err_response(msg):
     """
     Return a HttpResponse with a json dump with success=False, and the given error message.
     """
-    return HttpResponse(json.dumps({'success': False, 'error': msg}))
+    return HttpResponse(json.dumps({'success': False, 'error': msg}),
+                        mimetype="application/json")
 
 
 def _check_access(user, course_id):
@@ -129,16 +134,17 @@ def get_next(request, course_id):
     """
     _check_access(request.user, course_id)
 
-    return HttpResponse(_get_next(course_id))
+    return HttpResponse(_get_next(course_id, request.user.id),
+                        mimetype="application/json")
 
 
-def _get_next(course_id):
+def _get_next(course_id, grader_id):
     """
     Implementation of get_next (also called from save_grade) -- returns a json string
     """
 
     try:
-        return _service.get_next(course_id)
+        return _service.get_next(course_id, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service")
         return json.dumps({'success': False, 'error': 'Could not connect to grading service'})
@@ -168,11 +174,12 @@ def save_grade(request, course_id):
         if k not in request.POST.keys():
             return _err_response('Missing required key {0}'.format(k))
 
+    grader_id = request.user.id
     p = request.POST
 
     try:
         result_json = _service.save_grade(course_id,
-                                          request.user.id,
+                                          grader_id,
                                           p['submission_id'],
                                           p['score'],
                                           p['feedback'])
@@ -183,6 +190,7 @@ def save_grade(request, course_id):
     try:
         result = json.loads(result_json)
     except ValueError:
+        log.exception("save_grade returned broken json: %s", result_json)
         return _err_response('Grading service returned mal-formatted data.')
 
     if not result.get('success', False):
@@ -190,5 +198,6 @@ def save_grade(request, course_id):
         return _err_response('Grading service failed')
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.
-    return HttpResponse(_get_next(course_id))
+    return HttpResponse(_get_next(course_id, grader_id),
+                        mimetype="application/json")
 
