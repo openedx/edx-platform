@@ -88,7 +88,7 @@ class Plugin(object):
 
 def register_view(view_name):
     def wrapper(fn):
-        setattr(fn, 'view_name', view_name)
+        fn.view_name = view_name
         return fn
     return wrapper
 
@@ -133,21 +133,26 @@ class XModule(Plugin):
         self._view_name = None
 
     @staticmethod
-    def render(module, view_name):
+    def render(module, view_name, context):
         """
         Render the specified view from the supplied module
 
-        view_name: The string name of the view to render
         module: The XModule to render
+
+        view_name: The string name of the view to render
+
+        context: Data parent XModules make available to their children
+        during rendering.
+
         """
         # Make children use the appropriate render context
         try:
             module._view_name = view_name
-            return module.find_view(view_name)()
+            return module.find_view(view_name)(context)
         finally:
             module._view_name = None
 
-    def render_child(self, child, view_name=None):
+    def render_child(self, child, view_name=None, context=None):
         """
         Render a view on a child module. If view_name isn't supplied,
         render the same view on the child that is currently being rendered on the parent
@@ -155,11 +160,11 @@ class XModule(Plugin):
         if view_name is None:
             view_name = self._view_name
 
-        return XModule.render(child, view_name)
+        return XModule.render(child, view_name, context or {})
 
     def find_view(self, view_name):
         for method_name, method_fn in inspect.getmembers(self, inspect.ismethod):
-            if getattr(method_fn, 'view_name', None) is not None:
+            if getattr(method_fn, 'view_name', None) == view_name:
                 return method_fn
         raise MissingXModuleView(self.__class__, view_name)
 
