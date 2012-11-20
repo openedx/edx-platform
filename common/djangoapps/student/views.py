@@ -184,7 +184,7 @@ def _cert_info(user, course, cert_status):
         if 'download_url' not in cert_status:
             log.warning("User %s has a downloadable cert for %s, but no download url",
                         user.username, course.id)
-            return default_status
+            return default_info
         else:
             d['download_url'] = cert_status['download_url']
 
@@ -193,7 +193,7 @@ def _cert_info(user, course, cert_status):
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
-            return default_status
+            return default_info
         else:
             d['grade'] = cert_status['grade']
 
