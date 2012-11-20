@@ -1,37 +1,27 @@
 # ======== Instructor views =============================================================================
 
 import csv
-#import itertools
-#import json
 import logging
 import os
 import urllib
 
 import track.views
 
-#from functools import partial
 from collections import defaultdict
 
 from django.conf import settings
-#from django.core.context_processors import csrf
-#from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
-#from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-# from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response #, render_to_string
-#from django.views.decorators.csrf import ensure_csrf_cookie
+from mitxmako.shortcuts import render_to_response
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
-from courseware.courses import get_course_with_access #, get_courses_by_university)
+from courseware.courses import get_course_with_access 
 from psychometrics import psychoanalyze
-#from student.models import UserProfile
 
 from student.models import CourseEnrollment
-# from util.cache import cache, cache_if_anonymous
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -43,11 +33,20 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+# TODO: move these to views for forum role
 FORUM_ROLE_ADMINISTRATOR = 'Administrator'
 FORUM_ROLE_MODERATOR = 'Moderator'
 FORUM_ROLE_COMMUNITY_TA = 'Community TA'
 FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
+
+def has_forum_access(uname, course_id, rolename):
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return False
+    return role.users.filter(username=uname).exists()
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -57,7 +56,7 @@ def instructor_dashboard(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
-
+    forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
     msg = ''
     #msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
 
@@ -288,6 +287,7 @@ def instructor_dashboard(request, course_id):
                'staff_access': True,
                'admin_access': request.user.is_staff,
                'instructor_access': instructor_access,
+               'forum_admin_access': forum_admin_access,
                'datatable': datatable,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
