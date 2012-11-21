@@ -16,12 +16,13 @@ def section_to_fraction(distance):
     to fraction. Return inverted fraction
 
     """
+    # import ipdb; ipdb.set_trace()
     if np.isnan(distance):  # plane || to axis (or contains axis)
         print distance, 0
         # return inverted fration to a == nan == 1/0  => 0 / 1
         return fr.Fraction(0, 1)
-    elif distance == 0:  # plane goes through origin
-        return fr.Fraction(1, 1)  # ERROR, need shift of coordinates
+    elif math.fabs(distance) <= 0.05:  # plane goes through origin, 0.02 - UI delta
+        return fr.Fraction(1 if distance >= 0 else -1, 1)  # ERROR, need shift of coordinates
     else:
         # limit_denominator to closest nicest fraction
         # import ipdb; ipdb.set_trace()
@@ -51,7 +52,7 @@ def sub_miller(sections):
     # output = '(' + ''.join(map(str, map(decimal.Decimal, miller))) + ')'
     # import ipdb; ipdb.set_trace()
     output = '(' + ','.join(map(str, map(decimal.Decimal, miller))) + ')'
-    print 'Miller indices:', output
+    # print 'Miller indices:', output
     return output
 
 
@@ -252,9 +253,17 @@ class Test_Crystallography_Miller(unittest.TestCase):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
         self.assertTrue(grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
 
+    def test_24(self):
+        user_input = '{"lattice": "bcc", "points": [["0.66", "0.00", "0.00"], ["0.00", "0.66", "0.00"], ["0.00", "0.00", "0.66"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(3,3,3)', 'lattice': 'bcc'}))
+
+    def test_25(self):
+        user_input = u'{"lattice":"","points":[["0.00","0.00","0.01"],["1.00","1.00","0.01"],["0.00","1.00","1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,-1,1)', 'lattice': ''}))
+
     def test_wrong_lattice(self):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
-        self.assertFalse(grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'fcc'}))
+        self.assertFalse(grade(user_input, {'miller': '(3,3,3)', 'lattice': 'fcc'}))
 
 
 def suite():
