@@ -2055,7 +2055,7 @@ class OpenEndedResponse(LoncapaResponse):
         for tag in ['score','feedback']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
-                          " tags: 'correct', 'score', 'feedback")
+                          " tags: 'score', 'feedback")
                 return fail
 
         # Next, we need to check that the contents of the external grader message
