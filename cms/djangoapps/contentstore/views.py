@@ -44,6 +44,8 @@ import sys
 import tarfile
 import time
 from contentstore import course_info_model
+from models.settings.course_details import CourseDetails
+from models.settings.course_details import CourseDetailsEncoder
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -871,9 +873,6 @@ def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
 
-def settings(request, org, course, coursename):
-    return render_to_response('settings.html', {})
-
 def edit_tabs(request, org, course, coursename):
     location = ['i4x', org, course, 'course', coursename]    
     course_item = modulestore().get_item(location)
@@ -949,12 +948,57 @@ def course_info_updates(request, org, course, provided_id=None):
     if request.method == 'GET':
         return HttpResponse(json.dumps(course_info_model.get_course_updates(location)), mimetype="application/json")
     elif real_method == 'POST':
-        # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
         return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'PUT':
         return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
-    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+    elif real_method == 'DELETE':  
         return HttpResponse(json.dumps(course_info_model.delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+
+@login_required
+@ensure_csrf_cookie
+def get_course_settings(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    
+    return render_to_response('settings.html', {
+        'active_tab': 'settings-tab', 
+        'context_course': course_module,
+        'course_details' : json.dumps(CourseDetails.fetch(location), cls=CourseDetailsEncoder) 
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_settings_updates(request, org, course, name, section):
+    """
+    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    section: one of details, faculty, grading, problems, discussions
+    """
+    if section == 'details':
+        manager = CourseDetails
+    else: return
+    
+    if request.method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course',name])), cls=CourseDetailsEncoder), 
+                            mimetype="application/json")
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseDetailsEncoder), 
+                            mimetype="application/json")
+
 
 @login_required
 @ensure_csrf_cookie

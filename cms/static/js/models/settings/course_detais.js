@@ -1,8 +1,8 @@
 CMS.Models.Settings.CourseDetails = Backbone.Models.extend({
 	defaults: {
-		location : null,	# a Location model, required
-		start_date: null,	# maps to 'start'
-		end_date: null,		# maps to 'end'
+		location : null,	// the course's Location model, required
+		start_date: null,	// maps to 'start'
+		end_date: null,		// maps to 'end'
 		enrollment_start: null,
 		enrollment_end: null,
 		syllabus: null,
@@ -19,6 +19,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Models.extend({
 	},
 	
 	urlRoot: function() {
-		// TODO impl
+		var location = this.get('location');
+		return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/details';
 	}
 });

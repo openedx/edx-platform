@@ -28,8 +28,14 @@
             el: $('.main-wrapper'),
             model : settingsModel)
         });
-      $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
         
+        $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
+        
+	    $(":input, textarea").focus(function() {
+	      $("label[for='" + this.id + "']").addClass("is-focused");
+	    }).blur(function() {
+	      $("label").removeClass("is-focused");
+	    });
         editor.render();
     });
       
@@ -42,11 +48,6 @@
     var gradeThresholds;
     var GRADES = ['A', 'B', 'C', 'D', 'E'];
 
-    $(" :input, textarea").focus(function() {
-      $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
-    });
 
     (function() {
       $body = $('body');
@@ -146,7 +147,7 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="long" id="course-name" value="[Course Name]" disabled="disabled">
-                    <span class="tip tip-stacked">This is used in <a href="[COURSE_SUMMARY_URL]">your course URL</a>, and cannot be changed</span>
+                    <span class="tip tip-stacked">This is used in <a href="${get_lms_link_for_item(context_course.location,True)}">your course URL</a>, and cannot be changed</span>
                   </div>
                 </div>
               </div>
@@ -225,8 +226,8 @@
                 <label for="course-syllabus">Course Syllabus</label>
                 <div class="field">
                   <div class="input input-existing">
-                    <div class=" current current-course-syllabus">
-                      <span class="doc-filename"><a href="[link to file]".pdf> <i class="ss-icon ss-standard">&#x1F4C4;</i>CS184x_syllabus.pdf</a></span>
+                    <div class="current current-course-syllabus">
+                      <span class="doc-filename"></span>
 
                       <a href="#" class="remove-item remove-course-syllabus remove-doc-data" id="course-syllabus"><span class="delete-icon"></span> Delete Syllabus</a>
                     </div>
@@ -255,7 +256,7 @@
                 <div class="field">
                   <div class="input">
                     <textarea class="long tall edit-box tinymce" id="course-overview"></textarea>
-                    <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a href="[COURSE_SUMMARY_URL]">your course summary page</a></span>
+                    <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a href="${get_lms_link_for_item(context_course.location,True)}">your course summary page</a></span>
                   </div>
                 </div>      
               </div>
@@ -264,8 +265,8 @@
                 <label for="course-introduction-video">Introduction Video:</label>
                 <div class="field">
                   <div class="input input-existing">
-                    <div class=" current current-course-introduction-video">
-                      <iframe width="380" height="215" src="http://www.youtube.com/embed/6F0pR-ANmXY" frameborder="0" allowfullscreen></iframe>
+                    <div class="current current-course-introduction-video">
+                      <iframe width="380" height="215" src="" frameborder="0" allowfullscreen></iframe>
 
                       <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Video</a>
                     </div>
