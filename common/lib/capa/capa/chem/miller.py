@@ -252,6 +252,10 @@ class Test_Crystallography_Miller(unittest.TestCase):
         user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
         self.assertTrue(grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
 
+    def test_wrong_lattice(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertFalse(grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'fcc'}))
+
 
 def suite():
 
