@@ -1,12 +1,9 @@
-# 1) Calculate miller indices by points coordinates
-# 2) Grader for miller indeces and lattice type
-
-
 import numpy as np
 import math
 import fractions as fr
 import decimal
 import unittest
+import json
 
 
 def lcm(a, b):
@@ -27,7 +24,8 @@ def section_to_fraction(distance):
         return fr.Fraction(1, 1)  # ERROR, need shift of coordinates
     else:
         # limit_denominator to closest nicest fraction
-        fract = fr.Fraction(distance).limit_denominator()  # 5 / 2 : numerator / denominator
+        # import ipdb; ipdb.set_trace()
+        fract = fr.Fraction(distance).limit_denominator(10)  # 5 / 2 : numerator / denominator
         print 'Distance', distance, 'Inverted fraction', fract
         # return inverted fraction
         return fr.Fraction(fract.denominator, fract.numerator)
@@ -50,7 +48,9 @@ def sub_miller(sections):
 
     # import ipdb; ipdb.set_trace()
     # nice output:
-    output = '(' + ''.join(map(str, map(decimal.Decimal, miller))) + ')'
+    # output = '(' + ''.join(map(str, map(decimal.Decimal, miller))) + ')'
+    # import ipdb; ipdb.set_trace()
+    output = '(' + ','.join(map(str, map(decimal.Decimal, miller))) + ')'
     print 'Miller indices:', output
     return output
 
@@ -59,11 +59,11 @@ def miller(points):
     """Calculate miller indices of plane
     """
 
-    print "\nCalculating miller indices:"
-    print 'Points:\n', points
+    # print "\nCalculating miller indices:"
+    # print 'Points:\n', points
     # calculate normal to plane
     N = np.cross(points[1] - points[0], points[2] - points[0])
-    print "Normal:", N
+    # print "Normal:", N
 
     # origin
     O = np.array([0, 0, 0])
@@ -116,73 +116,146 @@ def miller(points):
     return sub_miller(sections)
 
 
-class Test_Crystallography_Grader(unittest.TestCase):
+def grade(user_input, correct_answer):
+    '''
+    Format:
+    user_input: {"lattice":"sc","points":[["0.77","0.00","1.00"],["0.78","1.00","0.00"],["0.00","1.00","0.72"]]}
+    "lattice" is one of: "", "sc", "bcc", "fcc"
+    correct_answer: {'miller': '(00-1)', 'lattice': 'bcc'}
+    '''
+    def negative(s):
+        # import ipdb; ipdb.set_trace()
+        output = ''
+        i = 1
+        while i in range(1, len(s) - 1):
+            if s[i] in (',', ' '):
+                output += s[i]
+            elif s[i] not in ('-', '0'):
+                output += '-' + s[i]
+            elif s[i] == '0':
+                output += s[i]
+            else:
+                i += 1
+                output += s[i]
+            i += 1
+            # import ipdb; ipdb.set_trace()
+        return '(' + output + ')'
+
+    user_answer = json.loads(user_input)
+
+    if user_answer['lattice'] != correct_answer['lattice']:
+        return False
+
+    points = [map(float, p) for p in user_answer['points']]
+    points = [np.array(point) for point in points]
+    # import ipdb; ipdb.set_trace()
+    print miller(points), (correct_answer['miller'].replace(' ', ''), negative(correct_answer['miller']).replace(' ', ''))
+
+    if miller(points) in (correct_answer['miller'].replace(' ', ''), negative(correct_answer['miller']).replace(' ', '')):
+        return True
+
+    return False
+
+
+class Test_Crystallography_Miller(unittest.TestCase):
     ''' test crystallography grade function '''
 
     def test_1(self):
-        x = np.array([0.5, 0, 0])
-        y = np.array([0, 0.5, 0])
-        z = np.array([0, 0, 0.5])
-        self.assertEqual(miller(np.array([x, y, z])), '(222)')
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"], ["0.00", "0.00", "0.50"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_2(self):
-        x = np.array([1, 0, 0])
-        y = np.array([0, 1, 0])
-        z = np.array([0, 0, 1])
-        self.assertEqual(miller(np.array([x, y, z])), '(111)')
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,1,1)', 'lattice': 'bcc'}))
 
     def test_3(self):
-        x = np.array([1, 0.5, 1])
-        y = np.array([1, 1, 0.5])
-        z = np.array([0.5, 1, 1])
-        self.assertEqual(miller(np.array([x, y, z])), '(222)')
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.50", "1.00"], ["1.00", "1.00", "0.50"], ["0.50", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_4(self):
-        x = np.array([1. / 3, 1., 0])
-        y = np.array([0, 2. / 3., 0])
-        z = np.array([0, 1, 1. / 3])
-        self.assertEqual(miller(np.array([x, y, z])), '(-33-3)')
+        user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.664", "0.00"], ["0.00", "1.00", "0.33"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(-3, 3, -3)', 'lattice': 'bcc'}))
 
     def test_5(self):
-        x = np.array([1. / 3, 1., 0])
-        y = np.array([0, 1. / 3., 0])
-        z = np.array([0, 1, 1. / 3])
-        self.assertEqual(miller(np.array([x, y, z])), '(-63-6)')
+        user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.33", "0.00"], ["0.00", "1.00", "0.33"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(-6,3,-6)', 'lattice': 'bcc'}))
 
     def test_6(self):
-        x = np.array([0, 1. / 4., 0])
-        y = np.array([1. / 4, 0, 0])
-        z = np.array([0, 0, 1. / 4])
-        self.assertEqual(miller(np.array([x, y, z])), '(444)')
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.25", "0.00"], ["0.25", "0.00", "0.00"], ["0.00", "0.00", "0.25"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(4,4,4)', 'lattice': 'bcc'}))
 
     def test_7(self):  # goes throug origin
-        x = np.array([0, 1., 0])
-        y = np.array([1., 0, 0])
-        z = np.array([0.5, 1., 0])
-        self.assertEqual(miller(np.array([x, y, z])), '(00-1)')
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "0.00", "0.00"], ["0.50", "1.00", "0.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,0,-1)', 'lattice': 'bcc'}))
 
     def test_8(self):
-        x = np.array([0, 1., 0.5])
-        y = np.array([1., 0, 0.5])
-        z = np.array([0.5, 1., 0.5])
-        self.assertEqual(miller(np.array([x, y, z])), '(002)')
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.50"], ["1.00", "0.00", "0.50"], ["0.50", "1.00", "0.50"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,0,2)', 'lattice': 'bcc'}))
 
     def test_9(self):
-        x = np.array([0, 1. / 4., 0])
-        y = np.array([1. / 4, 0, 0])
-        z = np.array([0, 0, 1. / 4])
-        self.assertEqual(miller(np.array([x, y, z])), '(444)')
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "1.00", "1.00"], ["1.00", "0.00", "0.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,1,0)', 'lattice': 'bcc'}))
 
     def test_10(self):
-        x = np.array([0, 1. / 4., 0])
-        y = np.array([1. / 4, 0, 0])
-        z = np.array([0, 0, 1. / 4])
-        self.assertEqual(miller(np.array([x, y, z])), '(444)')
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "0.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+
+    def test_11(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "0.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,1,2)', 'lattice': 'bcc'}))
+
+    def test_12(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["0.00", "0.00", "0.50"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,1,-2)', 'lattice': 'bcc'}))
+
+    def test_13(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.50", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(2,0,1)', 'lattice': 'bcc'}))
+
+    def test_14(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "0.00", "1.00"], ["0.50", "1.00", "0.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(2,-1,0)', 'lattice': 'bcc'}))
+
+    def test_15(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+
+    def test_16(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+
+    def test_17(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "1.00"], ["1.00", "1.00", "0.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(-1,1,1)', 'lattice': 'bcc'}))
+
+    def test_18(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+
+    def test_19(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(-1,1,0)', 'lattice': 'bcc'}))
+
+    def test_20(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(1,0,1)', 'lattice': 'bcc'}))
+
+    def test_21(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(-1,0,1)', 'lattice': 'bcc'}))
+
+    def test_22(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,1,1)', 'lattice': 'bcc'}))
+
+    def test_23(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
 
 
 def suite():
 
-    testcases = [Test_Crystallography_Grader]
+    testcases = [Test_Crystallography_Miller]
     suites = []
     for testcase in testcases:
         suites.append(unittest.TestLoader().loadTestsFromTestCase(testcase))
@@ -190,4 +263,3 @@ def suite():
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(suite())
-
