@@ -2066,7 +2066,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         score_ratio=int(score_result['score'])/self.max_score
 
-        correct=FALSE
+        correct=False
         if score_ratio>=.66:
             correct=True
 
