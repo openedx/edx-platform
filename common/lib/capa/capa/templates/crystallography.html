@@ -1,7 +1,13 @@
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="crystalography_problem" style="width:${width};height:${height}"></div>
 
-    <select class="input_lattice"></select>
+    <div class="input_lattice">
+        Type: <select></select>
+    </div>
+    <div class="intersection_type">
+        Triangle: <input type="radio" value="triangle" />
+        Full: <input type ="radio" value="full" />
+    </div>
 
     <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
     <div class="script_placeholder" data-src="/static/js/sylvester.js"></div>
