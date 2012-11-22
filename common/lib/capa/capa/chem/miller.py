@@ -257,8 +257,8 @@ def grade(user_input, correct_answer):
     points = [round0_25(point) for point in points]
 
     points = [np.array(point) for point in points]
-    print miller(points), (correct_answer['miller'].replace(' ', ''),
-        negative(correct_answer['miller']).replace(' ', ''))
+    # print miller(points), (correct_answer['miller'].replace(' ', ''),
+    #     negative(correct_answer['miller']).replace(' ', ''))
 
     if miller(points) in (correct_answer['miller'].replace(' ', ''), negative(correct_answer['miller']).replace(' ', '')):
         return True
