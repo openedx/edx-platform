@@ -19,19 +19,8 @@
         <div class="incorrect" id="status_${id}">
     % endif
 
-    % if hidden:
-        <div style="display:none;" name="${hidden}" inputid="input_${id}"></div>
-    % endif
 
-    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
-        % if size:
-            size="${size}"
-        % endif
-
-        % if hidden:
-            style="display:none;"
-        % endif
-    />
+    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
 
     <p class="status">
         % if status == 'unsubmitted':

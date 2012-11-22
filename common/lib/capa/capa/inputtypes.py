@@ -671,17 +671,14 @@ class Crystallography(InputTypeBase):
         """
         Note: height, width are required.
         """
-        return [Attribute('size', None),
-                Attribute('height'),
+        return [Attribute('height'),
                 Attribute('width'),
-
-                # can probably be removed (textline should prob be always-hidden)
-                Attribute('hidden', ''),
                 ]
 
 registry.register(Crystallography)
 
 # -------------------------------------------------------------------------
+
 
 class VseprInput(InputTypeBase):
     """
