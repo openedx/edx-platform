@@ -1,0 +1,69 @@
+.components li {
+  font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #3c3c3c;
+
+  a {
+    color: #1d9dd9;
+    text-decoration: none;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  h1 {
+    float: none;
+  }
+
+  h2 {
+    color: #646464;
+    font-size: 19px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    margin-left: 0;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-size: 19px;
+    font-weight: 400;
+  }
+
+  h4 {
+    background: none;
+    padding: 0;
+    border: none;
+    @include box-shadow(none);
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  code {  
+    margin: 0 2px;
+    padding: 0px 5px;
+    border-radius: 3px;
+    border: 1px solid #eaeaea;
+    white-space: nowrap;
+    font-family: Monaco, monospace;
+    font-size: 14px;
+    background-color: #f8f8f8;
+  }
+
+  p + h2, ul + h2, ol + h2, p + h3 {
+    margin-top: 40px;
+  }
+
+  p + p, ul + p, ol + p {
+    margin-top: 20px;
+  }
+
+  p {
+    color: #3c3c3c;
+    font: normal 1em/1.6em;
+    margin: 0px;
+  }
+}
