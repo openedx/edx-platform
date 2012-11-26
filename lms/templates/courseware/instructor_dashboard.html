@@ -57,7 +57,11 @@ function goto( mode)
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
-          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> ]
+          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a>
+          %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
+             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
+          %endif
+	  ]
     </h2>
 
   <div style="text-align:right" id="djangopid">${djangopid}</div>
@@ -164,6 +168,18 @@ function goto( mode)
 %endif
 
     </form>
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Analytics'):
+   <table>
+     % for r in analytics_json:
+     <tr>
+       <td>${r['day']}</td><td>${r['student_count']}</td>
+     </tr>
+     % endfor
+   </table>
+
+%endif
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Psychometrics') is None:

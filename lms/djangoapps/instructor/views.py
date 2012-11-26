@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
+import requests
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
@@ -266,8 +267,16 @@ def instructor_dashboard(request, course_id):
     if idash_mode=='Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
+    #----------------------------------------
+    # analytics
 
+    analytics_json = None
 
+    if idash_mode == 'Analytics':
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_daily_activity?sid=2")
+        #analytics_html = req.text
+        analytics_json = req.json
+    
     #----------------------------------------
     # context for rendering
     context = {'course': course,
@@ -282,6 +291,7 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
+               'analytics_json' : analytics_json,
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)

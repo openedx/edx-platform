@@ -21,6 +21,8 @@ MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
 MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
+
 
 
 WIKI_ENABLED = True
@@ -177,3 +179,8 @@ PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.for
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = "12345"
+
+########################## ANALYTICS TESTING ########################
+
+ANALYTICS_SERVER_URL = "http://127.0.0.1:14141/"
+

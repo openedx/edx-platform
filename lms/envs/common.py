@@ -81,6 +81,9 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
     'AUTH_USE_OPENID_PROVIDER': False,
+
+    # analytics experiments
+    'ENABLE_INSTRUCTOR_ANALYTICS' : False,
 }
 
 # Used for A/B testing
