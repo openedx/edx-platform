@@ -45,14 +45,14 @@ class StaffGradingService(object):
     """
     Interface to staff grading backend.
     """
-    def __init__(self, url, username, password):
-        self.username = username
-        self.password = password
-        self.url = url
+    def __init__(self, config):
+        self.username = config['username']
+        self.password = config['password']
+        self.url = config['url']
 
-        self.login_url = url + '/login/'
-        self.get_next_url = url + '/get_next_submission/'
-        self.save_grade_url = url + '/save_grade/'
+        self.login_url = self.url + '/login/'
+        self.get_next_url = self.url + '/get_next_submission/'
+        self.save_grade_url = self.url + '/save_grade/'
 
         # TODO: add auth
         self.session = requests.session()
@@ -140,10 +140,7 @@ class StaffGradingService(object):
 
         return r.text
 
-_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL,
-                               settings.STAFF_GRADING_BACKEND_USERNAME,
-                               settings.STAFF_GRADING_BACKEND_PASSWORD,
-                               )
+_service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
 #_service = MockStaffGradingService()
 
 def _err_response(msg):
