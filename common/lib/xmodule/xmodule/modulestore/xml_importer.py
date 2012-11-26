@@ -88,7 +88,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
 
 def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None, validate_only=False):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -109,10 +109,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
         course_dirs=course_dirs,
         load_error_modules=load_error_modules
     )
-
-    if validate_only:
-        perform_xlint(data_dir, course_dirs, module_store)
-        return module_store, []
 
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
     # to enumerate the entire collection of course modules. It will be left as a TBD to implement that
@@ -243,9 +239,18 @@ def validate_data_source_paths(data_dir, course_dir):
     return err_cnt, warn_cnt
 
 
-def perform_xlint(data_dir, course_dirs,module_store):
+def perform_xlint(data_dir, course_dirs, 
+                    default_class='xmodule.raw_module.RawDescriptor',
+                    load_error_modules=True):
     err_cnt = 0
     warn_cnt = 0
+
+    module_store = XMLModuleStore(
+        data_dir,
+        default_class=default_class,
+        course_dirs=course_dirs,
+        load_error_modules=load_error_modules
+    )
 
     # check all data source path information
     for course_dir in course_dirs:
