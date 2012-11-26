@@ -101,6 +101,8 @@ urlpatterns = ('',
         {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
     url(r'^press/cengage-to-provide-book-content$', 'static_template_view.views.render',
         {'template': 'press_releases/Cengage_to_provide_book_content.html'}, name="press/cengage-to-provide-book-content"),
+    url(r'^press/gates-foundation-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/Gates_Foundation_announcement.html'}, name="press/gates-foundation-announcement"),
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
@@ -248,15 +250,6 @@ if settings.COURSEWARE_ENABLED:
 if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
-
-if settings.ASKBOT_ENABLED:
-    urlpatterns += (url(r'^%s' % settings.ASKBOT_URL, include('askbot.urls')), \
-                    url(r'^settings/', include('askbot.deps.livesettings.urls')), \
-                    url(r'^followit/', include('followit.urls')), \
-#                       url(r'^robots.txt$', include('robots.urls')),
-                              )
-
-
 
 if settings.DEBUG:
     ## Jasmine and admin

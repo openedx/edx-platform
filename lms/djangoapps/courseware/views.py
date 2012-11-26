@@ -1,9 +1,5 @@
-import csv
-import json
 import logging
 import urllib
-import itertools
-import StringIO
 
 from functools import partial
 
@@ -12,7 +8,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -25,15 +21,11 @@ from courseware.courses import (get_course_with_access, get_courses_by_universit
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
-from student.models import UserProfile
-
-from multicourse import multicourse_settings
 
 from django_comment_client.utils import get_discussion_title
 
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
@@ -78,7 +70,7 @@ def courses(request):
     '''
     universities = get_courses_by_university(request.user,
                                              domain=request.META.get('HTTP_HOST'))
-    return render_to_response("courses.html", {'universities': universities})
+    return render_to_response("courseware/courses.html", {'universities': universities})
 
 
 def render_accordion(request, course, chapter, section):
@@ -97,7 +89,7 @@ def render_accordion(request, course, chapter, section):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
-    return render_to_string('accordion.html', context)
+    return render_to_string('courseware/accordion.html', context)
 
 
 def get_current_child(xmodule):
@@ -407,7 +399,7 @@ def course_about(request, course_id):
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
-    return render_to_response('portal/course_about.html',
+    return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
@@ -449,7 +441,7 @@ def render_notifications(request, course, notifications):
         'get_discussion_title': partial(get_discussion_title, request=request, course=course),
         'course': course,
     }
-    return render_to_string('notifications.html', context)
+    return render_to_string('courseware/notifications.html', context)
 
 @login_required
 def news(request, course_id):
@@ -462,7 +454,7 @@ def news(request, course_id):
         'content': render_notifications(request, course, notifications),
     }
 
-    return render_to_response('news.html', context)
+    return render_to_response('courseware/news.html', context)
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

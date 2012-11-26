@@ -35,7 +35,7 @@ end
 
 def django_admin(system, env, command, *args)
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
 def report_dir_path(dir)
@@ -53,8 +53,7 @@ default_options = {
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -q --upgrade -r local-requirements.txt')
-    sh('git submodule update --init')
+    sh('pip install -q --upgrade --no-deps -r local-requirements.txt')
 end
 
 task :clean_test_files do

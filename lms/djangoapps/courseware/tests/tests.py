@@ -698,7 +698,7 @@ class TestCourseGrader(PageLoader):
         
     def check_grade_percent(self, percent):
         grade_summary = self.get_grade_summary()
-        self.assertEqual(grade_summary['percent'], percent)
+        self.assertEqual(percent, grade_summary['percent'])
     
     def submit_question_answer(self, problem_url_name, responses):
         """

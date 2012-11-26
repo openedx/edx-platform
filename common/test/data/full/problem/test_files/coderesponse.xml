@@ -1,0 +1,33 @@
+<problem>
+<text>
+<h2>Code response</h2>
+
+<p>
+</p>
+
+<text>
+Write a program to compute the square of a number
+  <coderesponse tests="repeat:2,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <codeparam>
+      <initial_display>def square(x):</initial_display>
+      <answer_display>answer</answer_display>
+      <grader_payload>grader stuff</grader_payload>
+    </codeparam>
+  </coderesponse>
+</text>
+
+<text>
+Write a program to compute the square of a number
+  <coderesponse tests="repeat:2,generate">
+    <textbox rows="10" cols="70"  mode="python"/>
+    <codeparam>
+      <initial_display>def square(x):</initial_display>
+      <answer_display>answer</answer_display>
+      <grader_payload>grader stuff</grader_payload>
+    </codeparam>
+  </coderesponse>
+</text>
+
+</text>
+</problem>

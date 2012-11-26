@@ -1,0 +1,64 @@
+<problem>
+    <text>
+<p>Metallothermic production of zirconium (Zr) would involve the reaction of sodium (Na) with zirconium tetrachloride (ZrCl<sub>4</sub>).</p>
+
+<p><b>(a)</b> Write a balanced chemical equation.</p>
+
+<!-- chemformularesponse 
+[mathjax]  \text{a ZrCl}_{4 } + \text{ b }\text{Na} -> \text{ c }\text{NaCl } + \text{ d } \text{Zr} [/mathjax]
+ratio of (a, b, c, d) = (1, 4, 4, 1)
+-->
+
+    <customresponse>
+        <chemicalequationinput size="50"/>
+<answer type="loncapa/python">
+
+if chemcalc.chemical_equations_equal(submission[0], 'ZrCl4 + 4 Na -&gt; 4 NaCl + Zr'):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+
+</answer>
+    </customresponse>
+
+<p><b>(b)</b> Write the balanced chemical equation using lowest whole numbers.</p>
+
+<!-- chemformularesponse
+as above, with (a, b, c, d) = (1, 4, 4, 1)
+-->
+
+    <customresponse>
+        <chemicalequationinput size="50"/>
+<answer type="loncapa/python">
+
+if chemcalc.chemical_equations_equal(submission[0], 'ZrCl4 + 4 Na -&gt; 4 NaCl + Zr', exact=True):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+
+</answer>
+    </customresponse>
+
+
+
+<p><b>(c)</b> Calculate the amount of zirconium produced (in kg) if a reactor were charged with 111 kg [mathjaxinline]\text{ZrCl}_4[/mathjaxinline] and 11.1 kg [mathjaxinline]\text{Na}[/mathjaxinline].
+    <numericalresponse answer="11.0">
+        <responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance" />
+        <textline math="1" />
+    </numericalresponse> </p>
+<br/>
+<solution>
+    <p><b>SOLUTION:</b></p>
+    <p><b>(b)</b>[mathjax] \text{ZrCl}_{4 } + \mathbf{4 }\text{Na} = \mathbf{4 }\text{NaCl } + \mathbf{1 } \text{Zr} [/mathjax] </p>
+    <p><b>(c)</b></p> 
+    <p>[mathjaxinline]111\text{kg ZrCl}_4 = 111000/[91.22 + (4 \times 35.45)] = 476 \text{ moles ZrCl}_4[/mathjaxinline] </p>
+    <p>[mathjaxinline]11.1\text{ kg Na} = 11100/22.99 = 483\text{ moles C}[/mathjaxinline]</p>
+    <p>stoichiometry of reaction further dictates that on a molar basis there needs to be 4 x amount of [mathjaxinline]\text{Na}[/mathjaxinline] as there is [mathjaxinline]\text{ZrCl}_4[/mathjaxinline], but calculations show there to be a shortfall of [mathjaxinline]\text{Na}[/mathjaxinline] </p>
+    <p>[mathjaxinline]\therefore[/mathjaxinline] reaction yield is contrained by [mathjaxinline]\text{Na}[/mathjaxinline] present </p>
+    <p>stoichiometry of reaction further dictates that if [mathjaxinline]\text{Na}[/mathjaxinline] controls the yield, then the amount of [mathjaxinline]\text{Zr}[/mathjaxinline] produced = 1/4 x molar quantity of [mathjaxinline]\text{Na}[/mathjaxinline] = 1/4 x 483 moles = 121 </p>
+    [mathjaxinline]121 \text{ moles Zr} \times 91.22\text{ g / mol } \mathbf{= 11.0 \text{ kg Zr} }[/mathjaxinline]<br/>
+</solution>
+</text>
+</problem>
+
+

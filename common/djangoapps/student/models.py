@@ -3,6 +3,8 @@ Models for Student Information
 
 Replication Notes
 
+TODO: Update this to be consistent with reality  (no portal servers, no more askbot)
+
 In our live deployment, we intend to run in a scenario where there is a pool of
 Portal servers that hold the canoncial user information and that user
 information is replicated to slave Course server pools. Each Course has a set of
@@ -34,9 +36,11 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in mitx/common/djangoapps/student/migrations/
 """
 from datetime import datetime
+from hashlib import sha1
 import json
 import logging
 import uuid
+
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -123,9 +127,9 @@ class UserProfile(models.Model):
         self.meta = json.dumps(js)
 
 class TestCenterUser(models.Model):
-    """This is our representation of the User for in-person testing, and 
+    """This is our representation of the User for in-person testing, and
     specifically for Pearson at this point. A few things to note:
-    
+
     * Pearson only supports Latin-1, so we have to make sure that the data we
       capture here will work with that encoding.
     * While we have a lot of this demographic data in UserProfile, it's much
@@ -133,9 +137,9 @@ class TestCenterUser(models.Model):
       UserProfile, but we'll need to have a step where people who are signing
       up re-enter their demographic data into the fields we specify.
     * Users are only created here if they register to take an exam in person.
-    
+
     The field names and lengths are modeled on the conventions and constraints
-    of Pearson's data import system, including oddities such as suffix having 
+    of Pearson's data import system, including oddities such as suffix having
     a limit of 255 while last_name only gets 50.
     """
     # Our own record keeping...
@@ -146,21 +150,21 @@ class TestCenterUser(models.Model):
     # and is something Pearson needs to know to manage updates. Unlike
     # updated_at, this will not get incremented when we do a batch data import.
     user_updated_at = models.DateTimeField(db_index=True)
-    
+
     # Unique ID given to us for this User by the Testing Center. It's null when
     # we first create the User entry, and is assigned by Pearson later.
     candidate_id = models.IntegerField(null=True, db_index=True)
-    
+
     # Unique ID we assign our user for a the Test Center.
     client_candidate_id = models.CharField(max_length=50, db_index=True)
-    
+
     # Name
     first_name = models.CharField(max_length=30, db_index=True)
     last_name = models.CharField(max_length=50, db_index=True)
     middle_name = models.CharField(max_length=30, blank=True)
     suffix = models.CharField(max_length=255, blank=True)
     salutation = models.CharField(max_length=50, blank=True)
-    
+
     # Address
     address_1 = models.CharField(max_length=40)
     address_2 = models.CharField(max_length=40, blank=True)
@@ -173,7 +177,7 @@ class TestCenterUser(models.Model):
     postal_code = models.CharField(max_length=16, blank=True, db_index=True)
     # country is a ISO 3166-1 alpha-3 country code (e.g. "USA", "CAN", "MNG")
     country = models.CharField(max_length=3, db_index=True)
-    
+
     # Phone
     phone = models.CharField(max_length=35)
     extension = models.CharField(max_length=8, blank=True, db_index=True)
@@ -181,13 +185,27 @@ class TestCenterUser(models.Model):
     fax = models.CharField(max_length=35, blank=True)
     # fax_country_code required *if* fax is present.
     fax_country_code = models.CharField(max_length=3, blank=True)
-    
+
     # Company
     company_name = models.CharField(max_length=50, blank=True)
-    
+
     @property
     def email(self):
         return self.user.email
+
+def unique_id_for_user(user):
+    """
+    Return a unique id for a user, suitable for inserting into
+    e.g. personalized survey links.
+
+    Currently happens to be implemented as a sha1 hash of the username
+    (and thus assumes that usernames don't change).
+    """
+    # Using the user id as the salt because it's sort of random, and is already
+    # in the db.
+    salt = str(user.id)
+    return sha1(salt + user.username).hexdigest()
+
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
@@ -361,10 +379,10 @@ def replicate_user_save(sender, **kwargs):
 
 # @receiver(post_save, sender=CourseEnrollment)
 def replicate_enrollment_save(sender, **kwargs):
-    """This is called when a Student enrolls in a course. It has to do the 
+    """This is called when a Student enrolls in a course. It has to do the
     following:
 
-    1. Make sure the User is copied into the Course DB. It may already exist 
+    1. Make sure the User is copied into the Course DB. It may already exist
        (someone deleting and re-adding a course). This has to happen first or
        the foreign key constraint breaks.
     2. Replicate the CourseEnrollment.
@@ -408,9 +426,9 @@ USER_FIELDS_TO_COPY = ["id", "username", "first_name", "last_name", "email",
 
 def replicate_user(portal_user, course_db_name):
     """Replicate a User to the correct Course DB. This is more complicated than
-    it should be because Askbot extends the auth_user table and adds its own 
+    it should be because Askbot extends the auth_user table and adds its own
     fields. So we need to only push changes to the standard fields and leave
-    the rest alone so that Askbot changes at the Course DB level don't get 
+    the rest alone so that Askbot changes at the Course DB level don't get
     overridden.
     """
     try:
@@ -455,7 +473,7 @@ def is_valid_course_id(course_id):
     """Right now, the only database that's not a course database is 'default'.
     I had nicer checking in here originally -- it would scan the courses that
     were in the system and only let you choose that. But it was annoying to run
-    tests with, since we don't have course data for some for our course test 
+    tests with, since we don't have course data for some for our course test
     databases. Hence the lazy version.
     """
     return course_id != 'default'
