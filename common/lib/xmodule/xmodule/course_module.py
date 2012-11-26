@@ -150,6 +150,10 @@ class CourseDescriptor(SequenceDescriptor):
         return self._grading_policy['GRADE_CUTOFFS']
 
     @property
+    def lowest_passing_grade(self):
+        return min(self._grading_policy['GRADE_CUTOFFS'].values())
+
+    @property
     def tabs(self):
         """
         Return the tabs config, as a python object, or None if not specified.
@@ -292,7 +296,7 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-        
+
         return True
 
     @property
