@@ -1,4 +1,8 @@
 from collections import defaultdict
+import logging
+import time
+import urllib
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -7,15 +11,11 @@ from django.utils import simplejson
 from django_comment_client.models import Role
 from django_comment_client.permissions import check_permissions_by_view
 from mitxmako import middleware
+import pystache_custom as pystache
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
-import logging
-import pystache_custom as pystache
-import time
-import urllib
-
-
 
 
 # TODO these should be cached via django's caching rather than in-memory globals
@@ -133,8 +133,6 @@ def initialize_discussion_info(course):
         return
 
     course_id = course.id
-    # url_course_id = course_id.replace('/', '_').replace('.', '_')
-
     all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}
