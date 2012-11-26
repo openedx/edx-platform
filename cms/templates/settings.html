@@ -18,7 +18,7 @@
     var barOrigin;
     var barWidth;
     var gradeThresholds;
-    var GRADES = ['A', 'B', 'C', 'D', 'E'];
+    var GRADES = ['A', 'B', 'C', 'D', 'F'];
 
     $(" :input, textarea").focus(function() {
       $("label[for='" + this.id + "']").addClass("is-focused");
@@ -29,20 +29,41 @@
     (function() {
       $body = $('body');
       $gradeBar = $('.grade-bar');
-      gradeThresholds = [100, 80, 70];
+      // gradeThresholds = [100, 50];
+      setThresholds();
       $('.settings-page-menu a').bind('click', showSettingsTab);
       $('.settings-extra header').bind('click', showSettingsExtras);
       $body.on('mousedown', '.drag-bar', startDragBar);
       $('.new-grade-button').bind('click', addNewGrade);
       $body.on('click', '.remove-button', removeGrade);
+      renderGradeRanges();
 
       $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
     })();
 
+    function setThresholds() {
+      gradeThresholds = [];
+      $('.grades li').each(function(i) {
+        gradeThresholds.push(parseInt($(this)[0].style.width));
+      });
+    }
+
     function addNewGrade(e) {
       e.preventDefault();
-      var $newGradeBar = $('<li style="width: 10%;"><span class="letter-grade" contenteditable>' + GRADES[$('.grades li').length] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
-      $('.grades').append($newGradeBar);
+      var $grades = $('.grades');
+      var gradeLength = $('li', $grades).length;
+      if(gradeLength > 4) {
+        return;
+      }
+      var $newGradeBar = $('<li><span class="letter-grade" contenteditable>' + GRADES[gradeLength - 1] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
+      var failBarWidth = parseFloat($('.bar-fail', $grades)[0].style.width);
+      var lastBarWidth = parseFloat($('li', $grades).eq(gradeLength - 2)[0].style.width);
+      var targetWidth = failBarWidth + ((lastBarWidth - failBarWidth) / 2);
+      $newGradeBar.css('width', targetWidth + '%');
+      $('.bar-fail', $grades).before($newGradeBar);
+      setGrades();
+      setThresholds();
+      renderGradeRanges();
     }
 
     function removeGrade(e) {
@@ -50,6 +71,23 @@
       var index = $(this).closest('li').index();
       gradeThresholds.splice(index, 1);
       $(this).closest('li').remove();
+      setGrades();
+      setThresholds();
+      renderGradeRanges();
+    }
+
+    function setGrades() {
+      var $gradeBars = $('.grades li');
+      var barCount = $gradeBars.length;
+      if(barCount <= 2) {
+        $gradeBars.eq(0).find('.letter-grade').html('Pass');
+        $('.bar-fail').find('.letter-grade').html('Fail');
+      } else {
+        $gradeBars.each(function(i) {
+          $('.letter-grade', this).html(GRADES[i]);
+        });
+        $('.bar-fail').find('.letter-grade').html('F');
+      }
     }
 
     function showSettingsTab(e) {
@@ -121,7 +159,7 @@
         </div>
         <div class="settings-page-section main-column">
 
-          <section class="settings-details is-shown">
+          <section class="settings-details">
             <h2 class="title">Course Details</h2>
 
             <section class="settings-details-basic">
@@ -388,7 +426,7 @@
 
           </section><!-- .settings-staff -->
 
-          <section class="settings-grading">
+          <section class="settings-grading is-shown">
             <h2 class="title">Grading</h2>
 
             <section class="settings-grading-range">
@@ -418,27 +456,13 @@
                       </ol>
                       <ol class="grades">
                         <li class="bar-a" style="width: 100%;">
-                          <span class="letter-grade" contenteditable>A</span>
-                          <span class="range">90-100</span>
-                          <a href="#" class="remove-button">remove</a>
-                        </li>
-                        <li class="bar-b" style="width: 80%;">
-                          <span class="letter-grade" contenteditable>B</span>
-                          <span class="range">80-89</span>
-                          <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
-                        </li>
-                        <li class="bar-c" style="width: 70%;">
-                          <span class="letter-grade" contenteditable>C</span>
-                          <span class="range">70-79</span>
-                          <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
+                          <span class="letter-grade" contenteditable>Pass</span>
+                          <span class="range"></span>
                         </li>
                         <li class="bar-fail" style="width: 50%;">
-                          <span class="letter-grade" contenteditable>F</span>
-                          <span class="range">0-69</span>
+                          <span class="letter-grade" contenteditable>Fail</span>
+                          <span class="range"></span>
                           <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
                         </li>
                       </ol>
                     </div>

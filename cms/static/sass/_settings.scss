@@ -755,11 +755,12 @@
           }
 
           &:nth-child(4) {
-            background: #fb336c;
+            background: #ef54a1;
           }
 
-          &:nth-child(5) {
-            background: #ef54a1;
+          &:nth-child(5),
+          &.bar-fail {
+            background: #fb336c;
           }
 
           .letter-grade {
