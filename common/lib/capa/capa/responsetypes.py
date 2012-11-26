@@ -1718,23 +1718,33 @@ class ImageResponse(LoncapaResponse):
     which produces an [x,y] coordinate pair.  The click is correct if it falls
     within a region specified.  This region is a union of rectangles.
 
-    Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.  That
-    doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
-    should contain one or more <imageinput> stanzas. Each <imageinput> should specify
-    a rectangle(s) or region(s), given as an attribute, defining the correct answer.
+    Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.
+    That doesn't make sense to me (Ike).  Instead, let's have it such that
+    <imageresponse> should contain one or more <imageinput> stanzas.
+    Each <imageinput> should specify a rectangle(s) or region(s), given as an
+    attribute, defining the correct answer.
 
-    Rectangle(s) are more prioritized over regions due to simplicity and backward compatibility.
-    In this example regions will be ignored:
-    <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"  rectangle="(10,10)-(20,30);(12,12)-(40,60)" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+    Rectangle(s) are more prioritized over regions due to simplicity and
+    backward compatibility. In this example regions will be ignored:
+    <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"
+    rectangle="(10,10)-(20,30);(12,12)-(40,60)"
+    regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
 
-    Regions is list of lists [region1, region2, region3, ...] where regionN is ordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+    Regions is list of lists [region1, region2, region3, ...] where regionN
+    is ordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
     """
     snippets = [{'snippet': '''<imageresponse>
-      <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
-      <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
-      <imageinput src="image3.jpg" width="210" height="130" rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
-      <imageinput src="image4.jpg" width="811" height="610"  rectangle="(10,10)-(20,30);(12,12)-(40,60)" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
-      <imageinput src="image5.jpg" width="200" height="200" regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]' />
+      <imageinput src="image1.jpg" width="200" height="100"
+      rectangle="(10,10)-(20,30)" />
+      <imageinput src="image2.jpg" width="210" height="130"
+      rectangle="(12,12)-(40,60)" />
+      <imageinput src="image3.jpg" width="210" height="130"
+      rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
+      <imageinput src="image4.jpg" width="811" height="610"
+      rectangle="(10,10)-(20,30);(12,12)-(40,60)"
+      regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+      <imageinput src="image5.jpg" width="200" height="200"
+      regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]' />
     </imageresponse>'''}]
 
     response_tag = 'imageresponse'
@@ -1748,8 +1758,9 @@ class ImageResponse(LoncapaResponse):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
 
-        for aid in self.answer_ids:	 # loop through IDs of <imageinput> fields in our stanza
-            given = student_answers[aid]	 # this should be a string of the form '[x,y]'
+        for aid in self.answer_ids:	 # loop through IDs of <imageinput>
+        #  fields in our stanza
+            given = student_answers[aid]  # this should be a string of the form '[x,y]'
 
             correct_map.set(aid, 'incorrect')
             if not given:  # No answer to parse. Mark as incorrect and move on
