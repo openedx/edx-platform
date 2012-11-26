@@ -7,6 +7,7 @@ import time
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.cache import cache, get_cache, InvalidCacheBackendError
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
@@ -323,8 +324,45 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
+def _local_cache():
+    """
+    Return the django cache for local caching (named 'local'),
+    or the default django cache if 'local' doesn't exist
+    """
+    try:
+        return get_cache('local')
+    except InvalidCacheBackendError:
+        return cache
+
+
 def _does_course_group_name_exist(name):
-    return len(Group.objects.filter(name=name)) > 0
+    """
+    Return True if the group named `name` exists
+    """
+    cache = _local_cache()
+    cache_key = 'groupname.exists.%s' % name
+    exists = cache.get(cache_key)
+    if exists is None:
+        # Store group existance for 1 hour
+        exists = len(Group.objects.filter(name=name))
+        cache.set(cache_key, exists, 60 * 60)
+
+    return exists
+
+
+def _cached_user_group_names(user):
+    """
+    Return the list of group names a particular user is in
+    """
+    cache = _local_cache()
+    cache_key = 'users.groups.%s' % user
+    groups = cache.get(cache_key)
+    if groups is None:
+        # Store group lists for 1 hour
+        groups = [g.name for g in user.groups.all()]
+        cache.set(cache_key, groups, 60 * 60)
+
+    return groups
 
 
 def _course_staff_group_name(location, course_context=None):
@@ -420,7 +458,7 @@ def _has_access_to_location(user, location, access_level, course_context):
         return True
 
     # If not global staff, is the user in the Auth group for this class?
-    user_groups = [g.name for g in user.groups.all()]
+    user_groups = _cached_user_group_names(user)
 
     if access_level == 'staff':
         staff_group = _course_staff_group_name(location, course_context)
@@ -464,3 +502,4 @@ def _has_staff_access_to_descriptor(user, descriptor, course_context=None):
     descriptor: something that has a location attribute
     """
     return _has_staff_access_to_location(user, descriptor.location, course_context)
+
