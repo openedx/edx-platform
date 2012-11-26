@@ -159,6 +159,10 @@
 
     }
 
+    input:disabled + .copy > label, input:disabled + .label {
+      color: $mediumGrey;
+    }
+
 
     .input-default input, .input-default textarea {
       color: $mediumGrey;
