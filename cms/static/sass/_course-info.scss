@@ -1,31 +1,28 @@
-body.updates {
-	h2 {
-		margin-bottom: 24px;
-		font-size: 22px;
-		font-weight: 300;
-	}
-}
-
 .course-updates {
 	padding: 30px 40px;
 
 	li {
-		padding: 24px 0 32px;
+		padding: 34px 0 42px;
 		border-top: 1px solid #cbd1db;
 	}
 
-	h3 {
+	h2 {
 		margin-bottom: 18px;
 		font-size: 14px;
 		font-weight: 700;
+		line-height: 30px;
 		color: #646464;
 		letter-spacing: 1px;
 		text-transform: uppercase;
 	}
 
-	.update-contents {
-		padding-left: 30px;
+	h3 {
+		margin: 34px 0 11px;
+		font-size: 16px;
+		font-weight: 700;
+	}
 
+	.update-contents {
 		p {
 			font-size: 14px;
 			line-height: 18px;
@@ -37,7 +34,7 @@ body.updates {
 	}
 
 	.new-update-button {
-		@include grey-button;
+		@include blue-button;
 		display: block;
 		text-align: center;
 		padding: 12px 0;
@@ -50,6 +47,25 @@ body.updates {
 
 		textarea {
 			height: 180px;
+		}
+	}
+
+	.post-actions {
+		float: right;
+
+		.edit-button,
+		.delete-button{
+			float: left;
+			@include white-button;
+	    padding: 3px 10px 4px;
+	    margin-left: 7px;
+	    font-size: 12px;
+	    font-weight: 400;
+
+	    .edit-icon,
+	    .delete-icon {
+	      margin-right: 4px;
+	    }
 		}
 	}
 }

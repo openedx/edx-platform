@@ -35,7 +35,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         window.templateLoader.loadRemoteTemplate("course_info_update",
         	// TODO Where should the template reside? how to use the static.url to create the path?
             "/static/coffee/src/client_templates/course_info_update.html",
-            function (raw_template) { 
+            function (raw_template) {
+                console.log(raw_template);
         		self.template = _.template(raw_template);
         		self.render();
         }
@@ -63,16 +64,16 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         
         var newForm = this.template({ updateModel : newModel });
         var updateEle = this.$el.find("#course-update-list");
-        $(updateEle).append(newForm);
-        $(newForm).find(".new-update-form").show();
+        $(updateEle).prepend(newForm);
+        $(newForm).find(".new-update-form").slideDown(150);
     },
     
     onSave: function(event) {
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.contentEntry(event).val() });
         // push change to display, hide the editor, submit the change
-        $(this.dateDisplay(event)).val(targetModel.get('date'));
-        $(this.contentDisplay(event)).val(targetModel.get('content'));
+        $(this.dateDisplay(event)).html(targetModel.get('date'));
+        $(this.contentDisplay(event)).html(targetModel.get('content'));
         $(this.editor(event)).hide();
         
         targetModel.save();
@@ -82,12 +83,12 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
-        $(this.dateEntry(event)).val(targetModel.get('date'));
-        $(this.contentEntry(event)).val(targetModel.get('content'));
+        $(this.dateEntry(event)).html(targetModel.get('date'));
+        $(this.contentEntry(event)).html(targetModel.get('content'));
     },
     
     onEdit: function(event) {
-        $(this.editor(event)).show();
+        $(this.editor(event)).slideDown(150);
     },
         
     onDelete: function(event) {

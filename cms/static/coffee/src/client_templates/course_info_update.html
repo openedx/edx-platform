@@ -16,13 +16,15 @@
 			<a href="#" class="cancel-button" name="<%= updateModel.cid %>">Cancel</a>
 		</div>
 	</form>
-	<h2>
-		<span class="calendar-icon"></span><span id="date-display"><%=
-			updateModel.get('date') %></span>
-	</h2>
-	<div class="update-contents"><%= updateModel.get('content') %></div>
-	<div class="row">
-		<a href="#" class="edit-button" name="<%- updateModel.cid %>">Edit</a>
-		<a href="#" class="delete-button" name="<%- updateModel.cid %>"">Delete</a>
+	<div class="preview">
+		<div class="post-actions">
+			<a href="#" class="edit-button" name="<%- updateModel.cid %>"><span class="edit-icon"></span>Edit</a>
+			<a href="#" class="delete-button" name="<%- updateModel.cid %>"><span class="delete-icon"></span>Delete</a>
+		</div>
+		<h2>
+			<span class="calendar-icon"></span><span id="date-display"><%=
+				updateModel.get('date') %></span>
+		</h2>
+		<div class="update-contents"><%= updateModel.get('content') %></div>
 	</div>
 </li>
