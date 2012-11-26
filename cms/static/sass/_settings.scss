@@ -135,7 +135,11 @@
       }
 
       &.date {
+        display: block !important;
+      }
 
+      &.time {
+        display: block !important;
       }
 
       &:focus {

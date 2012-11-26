@@ -177,13 +177,13 @@
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date" id="course-start-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date set-date picker datepair" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">First day the course begins</span>          
                     </div>
 
                     <div class="group">
                       <label for="course-end-date">End Date</label>
-                      <input type="text" class="start-date date set-date" id="course-end-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="end-date date set-date picker datepair" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">Last day the course is active</span>          
                     </div>
                   </div>
@@ -197,13 +197,13 @@
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-enrollment-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date set-date picker datepair" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
                       <span class="tip tip-stacked">First day students can enroll</span>          
                     </div>
 
                     <div class="group">
                       <label for="course-enrollment-end-date">End Date</label>
-                      <input type="text" class="start-date date set-date" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date set-date picker datepair" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
                       <span class="tip tip-stacked">Last day students can enroll</span>          
                     </div>
                   </div>
@@ -458,10 +458,11 @@
                 <label for="course-grading-deadline">General Assignment Deadline:</label>
 
                 <div class="field">
-                  <div class="input">
-                    <input type="text" class="short" id="course-grading-deadline" placeholder="HH:MM">
+                  <div class="input picker datepair">
+                    <input type="text" class="short time" id="course-grading-deadline" value="" placeholder="HH:MM">
                     <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours).<br />
-                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
+                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a>
+                    </span>
                   </div>
                 </div>
               </div>
