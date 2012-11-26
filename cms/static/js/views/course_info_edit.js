@@ -36,10 +36,9 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         	// TODO Where should the template reside? how to use the static.url to create the path?
             "/static/coffee/src/client_templates/course_info_update.html",
             function (raw_template) {
-                console.log(raw_template);
         		self.template = _.template(raw_template);
-        		self.render();
-        }
+        		self.render();                
+            }
         );
     },
         
@@ -65,7 +64,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var newForm = this.template({ updateModel : newModel });
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend(newForm);
-        $(newForm).find(".new-update-form").slideDown(150);
+        $(newForm).find(".new-update-form").show();
     },
     
     onSave: function(event) {
