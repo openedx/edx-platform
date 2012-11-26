@@ -1724,14 +1724,15 @@ class ImageResponse(LoncapaResponse):
     Each <imageinput> should specify a rectangle(s) or region(s), given as an
     attribute, defining the correct answer.
 
-    Rectangle(s) are more prioritized over regions due to simplicity and
-    backward compatibility. In this example regions will be ignored:
     <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"
     rectangle="(10,10)-(20,30);(12,12)-(40,60)"
     regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
 
     Regions is list of lists [region1, region2, region3, ...] where regionN
     is ordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+
+    Returns:
+        True, if click is inside any region or rectangle. Otherwise False.
     """
     snippets = [{'snippet': '''<imageresponse>
       <imageinput src="image1.jpg" width="200" height="100"
@@ -1792,13 +1793,12 @@ class ImageResponse(LoncapaResponse):
                     if (llx <= gx <= urx) and (lly <= gy <= ury):
                         correct_map.set(aid, 'correct')
                         break
-            else:  # rectangles are more prioretized for same id
-                if regions[aid]:
-                    parsed_region = json.loads(regions[aid])
-                    for region in parsed_region:
-                        if Polygon(region).contains(Point(gx, gy)):
-                            correct_map.set(aid, 'correct')
-                            break
+            if regions[aid]:
+                parsed_region = json.loads(regions[aid])
+                for region in parsed_region:
+                    if Polygon(region).contains(Point(gx, gy)):
+                        correct_map.set(aid, 'correct')
+                        break
         return correct_map
 
     def get_answers(self):
