@@ -243,16 +243,13 @@
             %>
             <div class="message message-status ${status_css_class} is-shown">
 
-            % if cert_status['status'] == 'processing':
+            % if cert_status['status'] in ('processing', 'generating'):
                   <p class="message-copy">Final course details are being wrapped up at
                   this time. Your final standing will be available shortly.</p>
-            % elif cert_status['status'] in ('generating', 'ready'):
-                  <p class="message-copy">You have received a grade of
-                            <span class="grade-value">${cert_status['grade']}</span>
-                            in this course.</p>
-            % elif cert_status['status'] == 'notpassing':
-                  <p class="message-copy">You did not complete the necessary requirements for
-                     completion of this course.</p>
+            % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
+                  <p class="message-copy">Your final grade:
+                            <span class="grade-value">${cert_status['grade']}</span>,
+                            grade required for certificate: ${course.lowest_passing_grade()}.</p>
             % endif
 
             % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
