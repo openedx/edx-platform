@@ -105,6 +105,8 @@ COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 ################################# Staff grading config  #####################
 
 STAFF_GRADING_BACKEND_URL = "http://127.0.0.1:3033/staff_grading"
+STAFF_GRADING_BACKEND_USERNAME = "lms"
+STAFF_GRADING_BACKEND_PASSWORD = "abcd"
 
 
 ################################ LMS Migration #################################

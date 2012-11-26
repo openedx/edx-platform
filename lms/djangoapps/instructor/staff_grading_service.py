@@ -5,6 +5,7 @@ This module provides views that proxy to the staff grading backend service.
 import json
 import logging
 import requests
+from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
 from django.conf import settings
@@ -44,23 +45,70 @@ class StaffGradingService(object):
     """
     Interface to staff grading backend.
     """
-    def __init__(self, url):
+    def __init__(self, url, username, password):
+        self.username = username
+        self.password = password
         self.url = url
+
+        self.login_url = url + '/login/'
         self.get_next_url = url + '/get_next_submission/'
         self.save_grade_url = url + '/save_grade/'
+
         # TODO: add auth
         self.session = requests.session()
+
+
+    def _login(self):
+        """
+        Log into the staff grading service.
+
+        Raises requests.exceptions.HTTPError if something goes wrong.
+
+        Returns the decoded json dict of the response.
+        """
+        response = self.session.post(self.login_url,
+                                     {'username': self.username,
+                                      'password': self.password,})
+
+        response.raise_for_status()
+
+        return response.json
+
+
+    def _try_with_login(self, operation):
+        """
+        Call operation(), which should return a requests response object.  If
+        the response status code is 302, call _login() and try the operation
+        again.  NOTE: use requests.get(..., allow_redirects=False) to have
+        requests not auto-follow redirects.
+
+        Returns the result of operation().  Does not catch exceptions.
+        """
+        response = operation()
+        if response.status_code == 302:
+            # redirect means we aren't logged in
+            r = self._login()
+            if r and not r.get('success'):
+                log.warning("Couldn't log into staff_grading backend. Response: %s",
+                            r)
+            # try again
+            return operation()
+
+        return response
+
 
     def get_next(self, course_id, grader_id):
         """
         Get the next thing to grade.  Returns json, or raises GradingServiceError
         if there's a problem.
         """
+        op = lambda: self.session.get(self.get_next_url,
+                                      allow_redirects=False,
+                                      params={'course_id': course_id,
+                                              'grader_id': grader_id})
         try:
-            r = self.session.get(self.get_next_url,
-                                 params={'course_id': course_id,
-                                         'grader_id': grader_id})
-        except requests.exceptions.ConnectionError as err:
+            r = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
@@ -82,15 +130,20 @@ class StaffGradingService(object):
                     'score': score,
                     'feedback': feedback,
                     'grader_id': grader_id}
-            
-            r = self.session.post(self.save_grade_url, data=data)
-        except requests.exceptions.ConnectionError as err:
+
+            op = lambda: self.session.post(self.save_grade_url, data=data,
+                                           allow_redirects=False)
+            r = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
 
-_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL)
+_service = StaffGradingService(settings.STAFF_GRADING_BACKEND_URL,
+                               settings.STAFF_GRADING_BACKEND_USERNAME,
+                               settings.STAFF_GRADING_BACKEND_PASSWORD,
+                               )
 #_service = MockStaffGradingService()
 
 def _err_response(msg):

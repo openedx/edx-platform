@@ -325,6 +325,8 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ################################# Staff grading config  #####################
 
 STAFF_GRADING_BACKEND_URL = None
+STAFF_GRADING_BACKEND_USERNAME = None
+STAFF_GRADING_BACKEND_PASSWORD = None
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
