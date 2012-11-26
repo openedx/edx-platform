@@ -496,11 +496,20 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
-    module.get_html = wrap_xmodule(
-        module.get_html,
-        module,
-        "xmodule_display.html",
-    )
+    # cdodge: Special case 
+    if module.location.category == 'static_tab':
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_tab_display.html",
+        )
+    else:        
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_display.html",
+        )
+
     module.get_html = replace_static_urls(
         module.get_html,
         module.metadata.get('data_dir', module.location.course),
