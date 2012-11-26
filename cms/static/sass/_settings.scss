@@ -588,6 +588,14 @@
       top: 1px;
       margin-right: 5px;
     }
+
+    .well {
+      padding: 20px;
+      background: $lightGrey;
+      border: 1px solid $mediumGrey;
+      @include border-radius(4px);
+      @include box-shadow(0 1px 1px rgba(0,0,0,0.05) inset)
+    }
   }
 
 
@@ -601,6 +609,7 @@
 
   .grade-controls {
     @include clearfix;
+    width: 642px;
   }
 
   .new-grade-button {
@@ -609,7 +618,7 @@
     display: block;
     width: 29px;
     height: 29px;
-    margin: 4px 10px 0 0;
+    margin: 10px 20px 0 0;
     border-radius: 20px;
     border: 1px solid $darkGrey;
     @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
@@ -627,9 +636,9 @@
   }
 
   .grade-slider {
-    float: right;
-    width: 95%;
-    height: 80px;
+    float: left;
+    width: 580px;
+    margin-bottom: 10px;
 
     .grade-bar {
       position: relative;
@@ -702,6 +711,7 @@
           top: 0;
           height: 50px;     
           text-align: right;
+          @include border-radius(2px);
 
           &:hover,
           &.is-dragging {
