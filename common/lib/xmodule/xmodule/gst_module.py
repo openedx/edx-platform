@@ -97,45 +97,46 @@ class GSTDescriptor(RawDescriptor):
     module_class = GSTModule
     template_dir_name = 'gst'
 
-    # @classmethod
-    # def definition_from_xml(cls, xml_object, system):
-    #     """
-    #     Pull out the data into dictionary.
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """
+        Pull out the data into dictionary.
 
-    #     Returns:
-    #     {
-    #     'def1': 'def1-some-html',
-    #     'def2': 'def2-some-html'
-    #     }
-    #     """
-    #     import ipdb; ipdb.set_trace()
-    #     children = []
-    #     for child in xml_object:
-    #         try:
-    #             children.append(system.process_xml(etree.tostring(child)).location.url())
-    #         except:
-    #             log.exception("Unable to load child when parsing GST. Continuing...")
-    #             continue
-    #     return {'children': children}
+        Returns:
+        {
+        'def1': 'def1-some-html',
+        'def2': 'def2-some-html'
+        }
+        """
+        import ipdb; ipdb.set_trace()
+        children = []
+        for child in xml_object:
+            try:
+                children.append(system.process_xml(etree.tostring(child)).location.url())
+            except:
+                log.exception("Unable to load child when parsing GST. Continuing...")
+                continue
+        return {'children': children}
 
-    # def definition_to_xml(self, resource_fs):
-    #     '''Return an xml element representing this definition.'''
-    #     import ipdb; ipdb.set_trace()
-    #     xml_object = etree.Element('gst')
+    def definition_to_xml(self, resource_fs):
+        '''Return an xml element representing this definition.'''
+        import ipdb; ipdb.set_trace()
+        xml_object = etree.Element('gst')
 
-    #     def add_child(k):
-    #         # child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
-    #         child_str = child.export_to_xml(resource_fs)
-    #         child_node = etree.fromstring(child_str)
-    #         xml_object.append(child_node)
+        def add_child(k):
+            # child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = child.export_to_xml(resource_fs)
+            child_node = etree.fromstring(child_str)
+            xml_object.append(child_node)
 
-    #     for child in self.get_children():
-    #         add_child(child)
+        for child in self.get_children():
+            add_child(child)
 
-    #     return xml_object
+        return xml_object
 
 
-    # def __init__(self, system, definition, **kwargs):
-    #     '''Render and save the template for this descriptor instance'''
-    #     super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
-    #     self.rendered_html = self.render_template(system, definition['data'])
+    def __init__(self, system, definition, **kwargs):
+        '''Render and save the template for this descriptor instance'''
+        import ipdb; ipdb.set_trace()
+        super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
+        self.rendered_html = self.render_template(system, definition['data'])
