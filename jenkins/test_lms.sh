@@ -12,8 +12,8 @@ export PYTHONIOENCODING=UTF-8
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
 
 pip install -q -r pre-requirements.txt
+pip install -q -r test-requirements.txt
 yes w | pip install -q -r requirements.txt
-[ ! -d askbot ] || pip install -q -r askbot/askbot_requirements.txt
 
 rake clobber
 TESTS_FAILED=0
