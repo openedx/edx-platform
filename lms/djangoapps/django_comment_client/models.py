@@ -1,8 +1,14 @@
-from django.db import models
-from django.contrib.auth.models import User
 import logging
 
+from django.db import models
+from django.contrib.auth.models import User
+
 from courseware.courses import get_course_by_id
+
+FORUM_ROLE_ADMINISTRATOR = 'Administrator'
+FORUM_ROLE_MODERATOR = 'Moderator'
+FORUM_ROLE_COMMUNITY_TA = 'Community TA'
+FORUM_ROLE_STUDENT = 'Student'
 
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)
@@ -15,8 +21,8 @@ class Role(models.Model):
     def inherit_permissions(self, role): # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
         if role.course_id and role.course_id != self.course_id:
-            logging.warning("%s cannot inheret permissions from %s due to course_id inconsistency" % 
-                            (self, role))
+            logging.warning("{0} cannot inherit permissions from {1} due to course_id inconsistency", \
+                            self, role)
         for per in role.permissions.all():
             self.add_permission(per)
 
@@ -25,10 +31,10 @@ class Role(models.Model):
 
     def has_permission(self, permission):
         course = get_course_by_id(self.course_id)
-        if self.name == "Student" and \
+        if self.name == FORUM_ROLE_STUDENT and \
            (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
            (not course.forum_posts_allowed):
-           return False
+            return False
         
         return self.permissions.filter(name=permission).exists()
 
