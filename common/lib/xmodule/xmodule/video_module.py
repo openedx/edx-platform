@@ -6,6 +6,9 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.modulestore.mongo import MongoModuleStore
+from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +96,13 @@ class VideoModule(XModule):
         return self.youtube
 
     def get_html(self):
+        if isinstance(modulestore(), MongoModuleStore) :
+            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
+        else:
+            # VS[compat]
+            # cdodge: filesystem static content support.
+            caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
+
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
             'id': self.location.html_id(),
@@ -102,6 +112,7 @@ class VideoModule(XModule):
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],
+            'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions
         })
 

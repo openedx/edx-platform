@@ -10,7 +10,7 @@ class @VideoCaption extends Subview
       .bind('DOMMouseScroll', @onMovement)
 
   captionURL: ->
-    "/static/#{@captionDataDir}/subs/#{@youtubeId}.srt.sjson"
+    "#{@captionAssetPath}#{@youtubeId}.srt.sjson"
 
   render: ->
     # TODO: make it so you can have a video with no captions.
