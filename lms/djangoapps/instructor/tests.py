@@ -167,7 +167,7 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         course = self.toy
         self.initialize_roles(course.id)
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        username = 'u1'
+        username = 'u2'
         for rolename in FORUM_ROLES:
             response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
             self.assertTrue(response.content.find('Added "%s" to "%s" forum role = "%s"' % (username, course.id, rolename))>=0)
@@ -181,7 +181,7 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
         course = self.toy
         self.initialize_roles(course.id)
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        username = 'u1'
+        username = 'u2'
         for rolename in FORUM_ROLES:
             # perform an add, and follow with a second identical add:
             self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
@@ -189,15 +189,27 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
             self.assertTrue(response.content.find('Error: user "%s" already has rolename "%s", cannot add' % (username, rolename))>=0)
             self.assertTrue(has_forum_access(username, course.id, rolename))
 
+    def test_add_nonstaff_forum_admin_users(self):
+        print "test_add_and_readd_forum_admin_users"
+        course = self.toy
+        self.initialize_roles(course.id)
+        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
+        username = 'u1'
+        rolename = FORUM_ROLE_ADMINISTRATOR
+        response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+        self.assertTrue(response.content.find('Error: user "%s" should first be added as staff' % username)>=0)
+
     def test_list_forum_admin_users(self):
         print "test_list_forum_admin_users"
         course = self.toy
         self.initialize_roles(course.id)
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        username = 'u1'
-        added_roles = []
+        username = 'u2'
+        added_roles = ['Student']  # u2 is already added as a student to the discussion forums
+        self.assertTrue(has_forum_access(username, course.id, 'Student'))
         for rolename in FORUM_ROLES:
             response = self.client.post(url, {'action': action_name('Add', rolename), FORUM_ADMIN_USER[rolename]: username})
+            self.assertTrue(has_forum_access(username, course.id, rolename))
             response = self.client.post(url, {'action': action_name('List', rolename), FORUM_ADMIN_USER[rolename]: username})
             for header in ['Username', 'Full name', 'Roles']:
                 self.assertTrue(response.content.find('<th>%s</th>' % header)>0)
@@ -206,4 +218,4 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
             added_roles.append(rolename)
             added_roles.sort()
             roles = ', '.join(added_roles)
-            self.assertTrue(response.content.find('<td>%s</td>' % roles)>=0)
+            self.assertTrue(response.content.find('<td>%s</td>' % roles)>=0, 'not finding roles "%s"' % roles)
