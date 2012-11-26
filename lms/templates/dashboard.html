@@ -248,9 +248,12 @@
                   this time. Your final standing will be available shortly.</p>
             % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
                   <p class="message-copy">Your final grade:
-                            <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>,
-                            grade required for certificate: <span class="grade-value">
-                              ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.</p>
+                  <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+                  % if cert_status['status'] == 'notpassing':
+                     Grade required for a certificate: <span class="grade-value">
+                       ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+                  % endif
+                  </p>
             % endif
 
             % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
