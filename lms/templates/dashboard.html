@@ -246,7 +246,7 @@
             % if cert_status['status'] in ('processing', 'generating'):
                   <p class="message-copy">Final course details are being wrapped up at
                   this time. Your final standing will be available shortly.</p>
-            % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
+            % elif cert_status['status'] in ('ready', 'notpassing'):
                   <p class="message-copy">Your final grade:
                             <span class="grade-value">${cert_status['grade']}</span>,
                             grade required for certificate: ${course.lowest_passing_grade}.</p>
