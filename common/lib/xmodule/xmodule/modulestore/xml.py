@@ -303,7 +303,7 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
@@ -337,7 +337,7 @@ class XMLModuleStore(ModuleStoreBase):
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "Error loading course policy from {0}".format(policy_path)
+            msg = "ERROR: loading course policy from {0}".format(policy_path)
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
@@ -465,7 +465,8 @@ class XMLModuleStore(ModuleStoreBase):
                     module.metadata['data_dir'] = course_dir
                     self.modules[course_descriptor.id][module.location] = module   
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))          
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                    system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
         """
