@@ -20,23 +20,21 @@
     <div>
       <h1>Static Tabs</h1>
     </div>
-    <div class="main-column">
- 	   <article class="unit-body window">
-		    <div class="tab-list">
-			    <ol class='components'>
-            % for id in components:
-            <li class="component" data-id="${id}"/>
-            % endfor
-                     
-            <li class="new-component-item">
-              <a href="#" class="new-component-button new-tab">
-                <span class="plus-icon"></span>New Tab
-              </a>
-			    	</li>
-			    </ol>      
-		    </div>
-		</article>
-    </div>
+    <article class="unit-body window">
+      <div class="tab-list">
+        <ol class='components'>
+          % for id in components:
+          <li class="component" data-id="${id}"/>
+          % endfor
+                   
+          <li class="new-component-item">
+            <a href="#" class="new-component-button new-tab">
+              <span class="plus-icon"></span>New Tab
+            </a>
+          </li>
+        </ol>      
+      </div>
+    </article>
   </div>
 </div>
 </%block>
