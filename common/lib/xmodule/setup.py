@@ -36,6 +36,7 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
+            "gst = xmodule.gst_module:GSTDescriptor",
         ]
     }
 )
