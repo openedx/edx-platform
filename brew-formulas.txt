@@ -9,3 +9,4 @@ node
 graphviz
 mysql
 geos
+mongodb
