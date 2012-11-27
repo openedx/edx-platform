@@ -93,7 +93,7 @@ def update_course_updates(location, update, passed_id=None):
             date_element = etree.SubElement(element, "h2")
             date_element.text = update['date']
             if new_html_parsed is not None:
-                element[1] = new_html_parsed
+                element.append(new_html_parsed)
             else:
                 date_element.tail = update['content']
         
