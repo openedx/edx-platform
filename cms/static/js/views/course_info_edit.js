@@ -53,6 +53,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
               $(updateEle).append(newEle);
           });
           this.$el.find(".new-update-form").hide();
+          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d' });
           return this;
     },
     
@@ -64,7 +65,14 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var newForm = this.template({ updateModel : newModel });
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend(newForm);
-        $(newForm).find(".new-update-form").show();
+
+
+        // TODO: remove the id on the datepicker field
+        // this is causing conflicts with the datepicker widget
+
+
+        $('.date').datepicker('destroy');
+        $('.date').datepicker({ 'dateFormat': 'MM d' });
     },
     
     onSave: function(event) {
