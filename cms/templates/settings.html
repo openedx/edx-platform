@@ -219,33 +219,33 @@ from contentstore import utils
               <div class="row row-col2">
                 <h4 class="label">Course Dates:</h4>
                 
-                <div class="field">
+                <div class="field datepair">
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date picker datepair" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                      <input type="text" class="start-date date" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">First day the course begins</span>          
                     </div>
 
-                    <div class="group picker datepair">
+                    <div class="group">
                       <label for="course-start-time">Start Time</label>
-                      <input type="text" class="short time" id="course-start-time" value="" placeholder="HH:MM">
+                      <input type="text" class="time" id="course-start-time" value="" placeholder="HH:MM">
                       <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
                     </div>
                   </div>
                 </div>
 
-                <div class="field field-additional">
+                <div class="field field-additional datepair">
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-end-date">End Date</label>
-                      <input type="text" class="end-date date set-date picker datepair" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                      <input type="text" class="end-date date" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">Last day the course is active</span>          
                     </div>
 
-                    <div class="group picker datepair">
+                    <div class="group">
                       <label for="course-end-time">End Time</label>
-                      <input type="text" class="short time" id="course-end-time" value="" placeholder="HH:MM">
+                      <input type="text" class="time" id="course-end-time" value="" placeholder="HH:MM">
                       <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
                     </div>
                   </div>
@@ -255,33 +255,33 @@ from contentstore import utils
               <div class="row row-col2">
                 <h4 class="label">Enrollment Dates:</h4>
                 
-                <div class="field">
+                <div class="field datepair">
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-enrollment-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date picker datepair" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
                       <span class="tip tip-stacked">First day students can enroll</span>          
                     </div>
 
-                    <div class="group picker datepair">
+                    <div class="group">
                       <label for="course-enrollment-start-time">Start Time</label>
-                      <input type="text" class="short time" id="course-enrollment-start-time" value="" placeholder="HH:MM">
+                      <input type="text" class="time" id="course-enrollment-start-time" value="" placeholder="HH:MM">
                       <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
                     </div>
                   </div>
                 </div>
 
-                <div class="field field-additional">
+                <div class="field field-additional datepair">
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-enrollment-end-date">Start Date</label>
-                      <input type="text" class="start-end date set-date picker datepair" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-end date" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
                       <span class="tip tip-stacked">First day students can enroll</span>          
                     </div>
 
-                    <div class="group picker datepair">
+                    <div class="group">
                       <label for="course-enrollment-end-time">End Time</label>
-                      <input type="text" class="short time" id="course-enrollment-end-time" value="" placeholder="HH:MM">
+                      <input type="text" class="time" id="course-enrollment-end-time" value="" placeholder="HH:MM">
                       <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
                     </div>
                   </div>
@@ -361,7 +361,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short time" id="course-effort" placeholder="HH:MM">
-                    <span class="tip tip-inline">Time students should spend on all course work</span>
+                    <span class="tip tip-stacked">Time students should spend on all course work</span>
                   </div>
                 </div>
               </div>
@@ -521,9 +521,9 @@ from contentstore import utils
               <div class="row row-col2">
                 <label for="course-grading-deadline">General Assignment Deadline:</label>
 
-                <div class="field">
-                  <div class="input picker datepair">
-                    <input type="text" class="short time" id="course-grading-deadline" value="" placeholder="HH:MM">
+                <div class="field datepicker">
+                  <div class="input">
+                    <input type="text" class="time" id="course-grading-deadline" value="" placeholder="HH:MM">
                     <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours).<br />
                       <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a>
                     </span>
@@ -537,7 +537,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
-                    <span class="tip tip-inline">leeway on due dates</span>
+                    <span class="tip tip-stacked">leeway on due dates</span>
                   </div>
                 </div>
               </div>
