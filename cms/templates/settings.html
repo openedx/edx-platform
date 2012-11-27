@@ -3,6 +3,10 @@
 <%block name="title">Settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
+<%!
+from contentstore import utils 
+%>
+
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
@@ -24,9 +28,9 @@
             details: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
         });
         
-        var editor = new CMS.Views.CourseInfoEdit({
+        var editor = new CMS.Views.Settings.Main({
             el: $('.main-wrapper'),
-            model : settingsModel)
+            model : settingsModel
         });
         
         $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
@@ -147,7 +151,7 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="long" id="course-name" value="[Course Name]" disabled="disabled">
-                    <span class="tip tip-stacked">This is used in <a href="${get_lms_link_for_item(context_course.location,True)}">your course URL</a>, and cannot be changed</span>
+                    <span class="tip tip-stacked">This is used in <a href="${utils.get_lms_link_for_item(context_course.location, True)}">your course URL</a>, and cannot be changed</span>
                   </div>
                 </div>
               </div>
@@ -157,7 +161,7 @@
                 <div class="field">
                   <div class="input">
                     <input type="text" class="long" id="course-organization" value="[Course Organization]" disabled="disabled">
-                    <span class="tip tip-stacked">This is used in <a href="${get_lms_link_for_item(context_course.location,True)}">your course URL</a>, and cannot be changed</span>     
+                    <span class="tip tip-stacked">This is used in <a href="${utils.get_lms_link_for_item(context_course.location, True)}">your course URL</a>, and cannot be changed</span>     
                   </div>
                 </div>
               </div>
@@ -168,7 +172,7 @@
                   <div class="input">
                     <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
                     <span class="tip tip-inline">e.g. 101x</span>
-                    <span class="tip tip-stacked">This is used in <a href="${get_lms_link_for_item(context_course.location,True)}">your course URL</a>, and cannot be changed</span>
+                    <span class="tip tip-stacked">This is used in <a href="${utils.get_lms_link_for_item(context_course.location, True)}">your course URL</a>, and cannot be changed</span>
                   </div>
                 </div>
               </div>
@@ -256,7 +260,7 @@
                 <div class="field">
                   <div class="input">
                     <textarea class="long tall edit-box tinymce" id="course-overview"></textarea>
-                    <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a href="${get_lms_link_for_item(context_course.location,True)}">your course summary page</a></span>
+                    <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a href="${utils.get_lms_link_for_item(context_course.location, True)}">your course summary page</a></span>
                   </div>
                 </div>      
               </div>

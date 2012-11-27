@@ -90,10 +90,6 @@ class CourseDescriptor(SequenceDescriptor):
             log.critical(msg)
             system.error_tracker(msg)
 
-        self.enrollment_start = self._try_parse_time("enrollment_start")
-        self.enrollment_end = self._try_parse_time("enrollment_end")
-        self.end = self._try_parse_time("end")
-
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
 
@@ -249,6 +245,30 @@ class CourseDescriptor(SequenceDescriptor):
     def has_started(self):
         return time.gmtime() > self.start
 
+    @property
+    def end(self):
+        return self._try_parse_time("end")
+    @end.setter
+    def end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['end'] = stringify_time(value)
+    @property
+    def enrollment_start(self):
+        return self._try_parse_time("enrollment_start")
+        
+    @enrollment_start.setter
+    def enrollment_start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_start'] = stringify_time(value)
+    @property
+    def enrollment_end(self):        
+        return self._try_parse_time("enrollment_end")
+        
+    @enrollment_end.setter
+    def enrollment_end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_end'] = stringify_time(value)
+        
     @property
     def grader(self):
         return self._grading_policy['GRADER']

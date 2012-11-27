@@ -1,4 +1,4 @@
-CMS.Models.Location = Backbone.Models.extend({
+CMS.Models.Location = Backbone.Model.extend({
 	defaults: {
 		tag: "",
 		org: "",
@@ -14,29 +14,29 @@ CMS.Models.Location = Backbone.Models.extend({
 			(overrides['category'] ? overrides['category'] : this.get('category')) + "/" +
 			(overrides['name'] ? overrides['name'] : this.get('name')) + "/";
 	},
-	_tagPattern = /[^:]+/g,
-	_fieldPattern = new RegExp('[^/]+','g'),
+	_tagPattern : /[^:]+/g,
+	_fieldPattern : new RegExp('[^/]+','g'),
 	
 	parse: function(payload) {
-		if (payload instanceof Array) {
+		if (_.isArray(payload)) {
 			return {
 				tag: payload[0],
-				name: payload[1],
+				org: payload[1],
 				course: payload[2],
 				category: payload[3],
 				name: payload[4]
 			}
 		}
-		else if (payload instanceof String) {
+		else if (_.isString(payload)) {
 			var foundTag = this._tagPattern.exec(payload);
 			if (foundTag) {
-				this._fieldPattern.lastIndex = this._tagPattern.lastIndex;
+				this._fieldPattern.lastIndex = this._tagPattern.lastIndex + 1; // skip over the colon
 				return {
-					tag: foundTag,
-					name: this._fieldPattern.exec(payload),
-					course: this._fieldPattern.exec(payload),
-					category: this._fieldPattern.exec(payload),
-					name: this._fieldPattern.exec(payload)
+					tag: foundTag[0],
+					org: this._fieldPattern.exec(payload)[0],
+					course: this._fieldPattern.exec(payload)[0],
+					category: this._fieldPattern.exec(payload)[0],
+					name: this._fieldPattern.exec(payload)[0]
 				}
 			}
 			else return null;
@@ -47,13 +47,13 @@ CMS.Models.Location = Backbone.Models.extend({
 	}
 });
 
-CMS.Models.CourseRelative = Backbone.Models.extend({
+CMS.Models.CourseRelative = Backbone.Model.extend({
 	defaults: {
 		course_location : null, // must never be null, but here to doc the field
 		idx : null	// the index making it unique in the containing collection (no implied sort)
 	}
 });
 
-CMS.Models.CourseRelativeCollection = Backbone.Collections.extend({
-	model : CourseRelative
+CMS.Models.CourseRelativeCollection = Backbone.Collection.extend({
+	model : CMS.Models.CourseRelative
 });

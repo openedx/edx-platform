@@ -10,10 +10,11 @@ from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import Location
-from xmodule.timeparse import parse_time
+from xmodule.timeparse import parse_time, stringify_time
 
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 from xmodule.modulestore.exceptions import ItemNotFoundError
+import time
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -481,6 +482,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             return None
         return self._try_parse_time('start')
 
+    @start.setter
+    def start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['start'] = stringify_time(value)
+        
     @property
     def own_metadata(self):
         """

@@ -1,3 +1,4 @@
+if (!CMS.Models['Settings']) CMS.Models.Settings = new Object();
 CMS.Models.Settings.CourseSettings = Backbone.Model.extend({
 	// a container for the models representing the n possible tabbed states
 	defaults: {
