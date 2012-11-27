@@ -140,6 +140,8 @@
 
       &.time {
         display: block !important;
+        width: 75px !important;
+        min-width: 75px !important;
       }
 
       &:focus {
@@ -371,6 +373,10 @@
             width: 170px;
           }  
         }
+      }
+
+      .field-additional {
+        margin-left: 204px;       
       }
     }
 

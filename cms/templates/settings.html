@@ -219,10 +219,26 @@
                       <span class="tip tip-stacked">First day the course begins</span>          
                     </div>
 
+                    <div class="group picker datepair">
+                      <label for="course-start-time">Start Time</label>
+                      <input type="text" class="short time" id="course-start-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field field-additional">
+                  <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-end-date">End Date</label>
                       <input type="text" class="end-date date set-date picker datepair" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">Last day the course is active</span>          
+                    </div>
+
+                    <div class="group picker datepair">
+                      <label for="course-end-time">End Time</label>
+                      <input type="text" class="short time" id="course-end-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
                     </div>
                   </div>
                 </div>
@@ -239,10 +255,26 @@
                       <span class="tip tip-stacked">First day students can enroll</span>          
                     </div>
 
+                    <div class="group picker datepair">
+                      <label for="course-enrollment-start-time">Start Time</label>
+                      <input type="text" class="short time" id="course-enrollment-start-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field field-additional">
+                  <div class="input multi multi-inline">
                     <div class="group">
-                      <label for="course-enrollment-end-date">End Date</label>
-                      <input type="text" class="start-date date set-date picker datepair" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
-                      <span class="tip tip-stacked">Last day students can enroll</span>          
+                      <label for="course-enrollment-end-date">Start Date</label>
+                      <input type="text" class="start-end date set-date picker datepair" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
+                      <span class="tip tip-stacked">First day students can enroll</span>          
+                    </div>
+
+                    <div class="group picker datepair">
+                      <label for="course-enrollment-end-time">End Time</label>
+                      <input type="text" class="short time" id="course-enrollment-end-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
                     </div>
                   </div>
                 </div>
@@ -320,7 +352,7 @@
                 <label for="course-effort">Hours of Effort per Week:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-effort" placeholder="HH:MM">
+                    <input type="text" class="short time" id="course-effort" placeholder="HH:MM">
                     <span class="tip tip-inline">Time students should spend on all course work</span>
                   </div>
                 </div>
@@ -496,7 +528,7 @@
 
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
+                    <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
                     <span class="tip tip-inline">leeway on due dates</span>
                   </div>
                 </div>
