@@ -18,4 +18,23 @@ Hello</p></text>
 <text><p>Use conservation of energy.</p></text>
 </hintgroup>
 </imageresponse>
+
+
+<imageresponse max="1" loncapaid="12">
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98)" regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"/>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" rectangle="(490,11)-(556,98)" regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"/>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"/>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" regions="[[[10,10], [20,10], [20, 30]]]"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" regions="[[10,10], [30,30], [15, 15]]"/>
+<imageinput src="/static/Physics801/Figures/Skier-conservation of energy.jpg" width="560" height="388" regions="[[10,10], [30,30], [30, 15], [15, 30]]"/>
+<text>Click on either of the two positions as discussed previously.</text>
+<hintgroup showoncorrect="no">
+<text><p>Use conservation of energy.</p></text>
+</hintgroup>
+</imageresponse>
+
+
 </problem>
