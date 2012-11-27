@@ -1758,9 +1758,10 @@ class ImageResponse(LoncapaResponse):
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
-
+        # import ipdb; ipdb.set_trace()
         for aid in self.answer_ids:	 # loop through IDs of <imageinput>
         #  fields in our stanza
+            # import ipdb; ipdb.set_trace()
             given = student_answers[aid]  # this should be a string of the form '[x,y]'
 
             correct_map.set(aid, 'incorrect')
@@ -1795,10 +1796,16 @@ class ImageResponse(LoncapaResponse):
                         break
             if regions[aid]:
                 parsed_region = json.loads(regions[aid])
-                for region in parsed_region:
-                    if Polygon(region).contains(Point(gx, gy)):
-                        correct_map.set(aid, 'correct')
-                        break
+                if parsed_region:
+                    if type(parsed_region[0][0]) != list:
+                        # we have [[1,2],[3,4],[5,6] - single region
+                        # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]
+                        # or [[[1,2],[3,4],[5,6]] - multiple regions syntax
+                        parsed_region = [parsed_region]
+                    for region in parsed_region:
+                        if Polygon(region).contains(Point(gx, gy)):
+                            correct_map.set(aid, 'correct')
+                            break
         return correct_map
 
     def get_answers(self):
