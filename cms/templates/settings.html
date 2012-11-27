@@ -33,13 +33,6 @@ from contentstore import utils
             model : settingsModel
         });
         
-        $('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
-        
-	    $(":input, textarea").focus(function() {
-	      $("label[for='" + this.id + "']").addClass("is-focused");
-	    }).blur(function() {
-	      $("label").removeClass("is-focused");
-	    });
         editor.render();
     });
       
@@ -51,13 +44,6 @@ from contentstore import utils
     var barWidth;
     var gradeThresholds;
     var GRADES = ['A', 'B', 'C', 'D', 'F'];
-
-	// FIXME move into view class
-    $(" :input, textarea").focus(function() {
-      $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
-    });
 
     (function() {
       $body = $('body');

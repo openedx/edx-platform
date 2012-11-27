@@ -20,6 +20,12 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 		this.$el.find("#course-name").val(this.model.get('courseLocation').get('name'));
 		this.$el.find("#course-organization").val(this.model.get('courseLocation').get('org'));
 		this.$el.find("#course-number").val(this.model.get('courseLocation').get('course'));
+		this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
+		this.$el.find(":input, textarea").focus(function() {
+	      $("label[for='" + this.id + "']").addClass("is-focused");
+	    }).blur(function() {
+	      $("label").removeClass("is-focused");
+	    });
 		this.render();
 	},
 	
