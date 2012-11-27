@@ -216,20 +216,20 @@ from contentstore import utils
                 <span class="detail">Important steps and segments of your course</span>
               </header>
 
-              <div class="row row-col2 datepair">
+              <div class="row row-col2">
                 <h4 class="label">Course Dates:</h4>
                 
                 <div class="field">
                   <div class="input multi multi-inline"  id="course-start">
                     <div class="group">
                       <label for="course-start-date">Start Date</label>
-                      <input type="text" class="start-date date start" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
+                      <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">First day the course begins</span>          
                     </div>
 
                     <div class="group">
                       <label for="course-start-time">Start Time</label>
-                      <input type="text" class="time start" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off">
+                      <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off">
                       <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
                     </div>
                   </div>
@@ -252,7 +252,7 @@ from contentstore import utils
                 </div>
               </div>
 
-              <div class="row row-col2 datepair">
+              <div class="row row-col2">
                 <h4 class="label">Enrollment Dates:</h4>
                 
                 <div class="field">

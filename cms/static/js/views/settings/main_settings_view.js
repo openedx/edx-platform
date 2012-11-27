@@ -126,13 +126,16 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		var div = this.$el.find(elementName);
 		var datefield = $(div).find(".date");
 		var timefield = $(div).find(".time");
-		var savefield = function(event) { 
+		var savefield = function() { 
 			cacheModel.save(fieldName, new Date(datefield.datepicker('getDate').getTime() 
 					+ timefield.timepicker("getSecondsFromMidnight") * 1000)); 
 		};
 		
+		// instrument as date and time pickers
+		timefield.timepicker();
+		
 		// FIXME being called 2x on each change. Was trapping datepicker onSelect b4 but change to datepair broke that
-		datefield.on('change', savefield);
+		datefield.datepicker({ onSelect : savefield });
 		timefield.on('changeTime', savefield);
 		
 		datefield.datepicker('setDate', this.model.get(fieldName));
