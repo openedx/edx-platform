@@ -23,7 +23,7 @@ import abc
 import os
 import subprocess
 import xml.sax.saxutils as saxutils
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Point, MultiPoint
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -1796,16 +1796,20 @@ class ImageResponse(LoncapaResponse):
                         break
             # import ipdb; ipdb.set_trace()
             if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
-                import ipdb; ipdb.set_trace()
+                # import ipdb; ipdb.set_trace()
                 parsed_region = json.loads(regions[aid])
                 if parsed_region:
                     if type(parsed_region[0][0]) != list:
-                        # we have [[1,2],[3,4],[5,6] - single region
-                        # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]
-                        # or [[[1,2],[3,4],[5,6]] - multiple regions syntax
+                        # we have [[1,2],[3,4],[5,6]] - single region
+                        # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
+                        # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
                         parsed_region = [parsed_region]
+                        # if aid =='1_3_6':
+                            # import ipdb; ipdb.set_trace()
                     for region in parsed_region:
-                        if Polygon(region).contains(Point(gx, gy)):
+                        polygon = MultiPoint(region).convex_hull
+                        if (polygon.type == 'Polygon' and
+                                polygon.contains(Point(gx, gy))):
                             correct_map.set(aid, 'correct')
                             break
         return correct_map
