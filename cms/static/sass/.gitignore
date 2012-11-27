@@ -1,3 +1,4 @@
 *.css
 descriptor
 module
+/bourbon

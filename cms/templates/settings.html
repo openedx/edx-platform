@@ -50,24 +50,51 @@ from contentstore import utils
     var barOrigin;
     var barWidth;
     var gradeThresholds;
-    var GRADES = ['A', 'B', 'C', 'D', 'E'];
+    var GRADES = ['A', 'B', 'C', 'D', 'F'];
 
+	// FIXME move into view class
+    $(" :input, textarea").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
+    });
 
     (function() {
       $body = $('body');
       $gradeBar = $('.grade-bar');
-      gradeThresholds = [100, 80, 70];
+      // gradeThresholds = [100, 50];
+      setThresholds();
       $('.settings-extra header').bind('click', showSettingsExtras);
       $body.on('mousedown', '.drag-bar', startDragBar);
       $('.new-grade-button').bind('click', addNewGrade);
       $body.on('click', '.remove-button', removeGrade);
+      renderGradeRanges();
 
     })();
 
+    function setThresholds() {
+      gradeThresholds = [];
+      $('.grades li').each(function(i) {
+        gradeThresholds.push(parseInt($(this)[0].style.width));
+      });
+    }
+
     function addNewGrade(e) {
       e.preventDefault();
-      var $newGradeBar = $('<li style="width: 10%;"><span class="letter-grade" contenteditable>' + GRADES[$('.grades li').length] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
-      $('.grades').append($newGradeBar);
+      var $grades = $('.grades');
+      var gradeLength = $('li', $grades).length;
+      if(gradeLength > 4) {
+        return;
+      }
+      var $newGradeBar = $('<li><span class="letter-grade" contenteditable>' + GRADES[gradeLength - 1] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
+      var failBarWidth = parseFloat($('.bar-fail', $grades)[0].style.width);
+      var lastBarWidth = parseFloat($('li', $grades).eq(gradeLength - 2)[0].style.width);
+      var targetWidth = failBarWidth + ((lastBarWidth - failBarWidth) / 2);
+      $newGradeBar.css('width', targetWidth + '%');
+      $('.bar-fail', $grades).before($newGradeBar);
+      setGrades();
+      setThresholds();
+      renderGradeRanges();
     }
 
     function removeGrade(e) {
@@ -75,6 +102,23 @@ from contentstore import utils
       var index = $(this).closest('li').index();
       gradeThresholds.splice(index, 1);
       $(this).closest('li').remove();
+      setGrades();
+      setThresholds();
+      renderGradeRanges();
+    }
+
+    function setGrades() {
+      var $gradeBars = $('.grades li');
+      var barCount = $gradeBars.length;
+      if(barCount <= 2) {
+        $gradeBars.eq(0).find('.letter-grade').html('Pass');
+        $('.bar-fail').find('.letter-grade').html('Fail');
+      } else {
+        $gradeBars.each(function(i) {
+          $('.letter-grade', this).html(GRADES[i]);
+        });
+        $('.bar-fail').find('.letter-grade').html('F');
+      }
     }
 
     function showSettingsExtras(e) {
@@ -167,7 +211,7 @@ from contentstore import utils
               </div>
 
               <div class="row row-col2">
-                <label for="course-number-input">Course Number:</label>
+                <label for="course-number">Course Number:</label>
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
@@ -193,14 +237,30 @@ from contentstore import utils
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date" id="course-start-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date set-date picker datepair" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">First day the course begins</span>          
                     </div>
 
+                    <div class="group picker datepair">
+                      <label for="course-start-time">Start Time</label>
+                      <input type="text" class="short time" id="course-start-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field field-additional">
+                  <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-end-date">End Date</label>
-                      <input type="text" class="start-date date set-date" id="course-end-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="end-date date set-date picker datepair" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off">
                       <span class="tip tip-stacked">Last day the course is active</span>          
+                    </div>
+
+                    <div class="group picker datepair">
+                      <label for="course-end-time">End Time</label>
+                      <input type="text" class="short time" id="course-end-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>          
                     </div>
                   </div>
                 </div>
@@ -213,14 +273,30 @@ from contentstore import utils
                   <div class="input multi multi-inline">
                     <div class="group">
                       <label for="course-enrollment-start-date">Start Date</label>
-                      <input type="text" class="start-date date set-date" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
+                      <input type="text" class="start-date date set-date picker datepair" id="course-enrollment-start-date" placeholder="MM/DD/YYYY">
                       <span class="tip tip-stacked">First day students can enroll</span>          
                     </div>
 
+                    <div class="group picker datepair">
+                      <label for="course-enrollment-start-time">Start Time</label>
+                      <input type="text" class="short time" id="course-enrollment-start-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field field-additional">
+                  <div class="input multi multi-inline">
                     <div class="group">
-                      <label for="course-enrollment-end-date">End Date</label>
-                      <input type="text" class="start-date date set-date" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
-                      <span class="tip tip-stacked">Last day students can enroll</span>          
+                      <label for="course-enrollment-end-date">Start Date</label>
+                      <input type="text" class="start-end date set-date picker datepair" id="course-enrollment-end-date" placeholder="MM/DD/YYYY">
+                      <span class="tip tip-stacked">First day students can enroll</span>          
+                    </div>
+
+                    <div class="group picker datepair">
+                      <label for="course-enrollment-end-time">End Time</label>
+                      <input type="text" class="short time" id="course-enrollment-end-time" value="" placeholder="HH:MM">
+                      <span class="tip tip-stacked">(UTC/GMT -5 hours)</span>           
                     </div>
                   </div>
                 </div>
@@ -298,7 +374,7 @@ from contentstore import utils
                 <label for="course-effort">Hours of Effort per Week:</label>
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-effort" placeholder="HH:MM">
+                    <input type="text" class="short time" id="course-effort" placeholder="HH:MM">
                     <span class="tip tip-inline">Time students should spend on all course work</span>
                   </div>
                 </div>
@@ -415,7 +491,7 @@ from contentstore import utils
 
               <div class="row">
                 
-                <div class="grade-controls course-grading-range">
+                <div class="grade-controls course-grading-range well">
                   <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
                   <div class="grade-slider">
                     <div class="grade-bar">
@@ -434,27 +510,13 @@ from contentstore import utils
                       </ol>
                       <ol class="grades">
                         <li class="bar-a" style="width: 100%;">
-                          <span class="letter-grade" contenteditable>A</span>
-                          <span class="range">81-100</span>
-                          <a href="#" class="remove-button">remove</a>
-                        </li>
-                        <li class="bar-b" style="width: 80%;">
-                          <span class="letter-grade" contenteditable>B</span>
-                          <span class="range">71-80</span>
-                          <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
-                        </li>
-                        <li class="bar-c" style="width: 70%;">
-                          <span class="letter-grade" contenteditable>C</span>
-                          <span class="range">0-70</span>
-                          <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
+                          <span class="letter-grade" contenteditable>Pass</span>
+                          <span class="range"></span>
                         </li>
                         <li class="bar-fail" style="width: 50%;">
-                          <span class="letter-grade" contenteditable>F</span>
-                          <span class="range">0-50</span>
+                          <span class="letter-grade" contenteditable>Fail</span>
+                          <span class="range"></span>
                           <a href="#" class="drag-bar"></a>
-                          <a href="#" class="remove-button">remove</a>
                         </li>
                       </ol>
                     </div>
@@ -474,10 +536,11 @@ from contentstore import utils
                 <label for="course-grading-deadline">General Assignment Deadline:</label>
 
                 <div class="field">
-                  <div class="input">
-                    <input type="text" class="short" id="course-grading-deadline" placeholder="HH:MM">
+                  <div class="input picker datepair">
+                    <input type="text" class="short time" id="course-grading-deadline" value="" placeholder="HH:MM">
                     <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours).<br />
-                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a></span>
+                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -487,7 +550,7 @@ from contentstore import utils
 
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
+                    <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
                     <span class="tip tip-inline">leeway on due dates</span>
                   </div>
                 </div>
@@ -794,56 +857,103 @@ from contentstore import utils
               </div>
 
               <div class="row row-col2">
+                <h4 class="label">Anonymous Discussions:</h4>
+
+                <div class="field">
+                  <div class="input input-radio">
+                    <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="Allow">
+                    
+                    <div class="copy">
+                      <label for="course-discussions-anonymous-allow">Allow</label>
+                      <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
+                    </div>
+                  </div>
+
+                  <div class="input input-radio">
+                    <input disabled="disabled" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="Do Not Allow">
+                    
+                    <div class="copy">
+                      <label for="course-discussions-anonymous-dontallow">Do not allow</label>
+                      <span class="tip tip-stacked">This option is disabled since there are previous discussions that are anonymous.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row row-col2">
                 <h4 class="label">Discussion Categories</h4>
 
                 <div class="field enum">
-                  <ul class="input-list course-discussions-categories-list">
-                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                  <ul class="input-list course-discussions-categories-list sortable">
+                    <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-1-name">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-1-name" placeholder="" value="General" disabled="disabled">
                       </div>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
                     
-                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                    <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-2-name">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-2-name" placeholder="" value="Feedback" disabled="disabled">
                       </div>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
 
-                    <li class="input input-existing input-default course-discussions-categories-list-item">
+                    <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-3-name">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-3-name" placeholder="" value="Troubleshooting" disabled="disabled">
                       </div>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
 
-                    <li class="input input-existing course-discussions-categories-list-item">
+                    <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-4-name">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-4-name" placeholder="" value="Study Groups">
 
                         <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
                       </div>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
 
-                    <li class="input input-existing course-discussions-categories-list-item">
+                    <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-5-name">Category Name: </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-5-name" placeholder="" value="Lectures">
                       </div>
 
                       <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
 
-                    <li class="input course-discussions-categories-list-item">
+                    <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
                         <label for="course-discussions-categories-6-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="">
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="" value="Labs">
                       </div>
 
                       <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+
+                      <a href="#" class="drag-handle"></a>
+                    </li>
+
+                    <li class="input input-existing course-discussions-categories-list-item sortable-item">
+                      <div class="group">
+                        <label for="course-discussions-categories-6-name">Category Name: </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="" value="">
+                      </div>
+
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+
+                      <a href="#" class="drag-handle"></a>
                     </li>
                   </ul>
 
