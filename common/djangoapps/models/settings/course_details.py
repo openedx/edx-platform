@@ -1,11 +1,10 @@
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 import json
 from json.encoder import JSONEncoder
 import time
-from util.converters import time_to_date, jsdate_to_time
+from util.converters import jsdate_to_time, time_to_date
 
 class CourseDetails:
     def __init__(self, location):

@@ -1,11 +1,12 @@
 import time, datetime
 import re
+import calendar
 
 def time_to_date(time_obj):
     """
     Convert a time.time_struct to a true universal time (can pass to js Date constructor)
     """
-    return time.mktime(time_obj) * 1000
+    return calendar.timegm(time_obj) * 1000
 
 def jsdate_to_time(field):
     """
