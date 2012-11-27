@@ -1,10 +1,10 @@
-<li>
+<li name="<%- updateModel.cid %>">
 	<!-- FIXME what style should we use for initially hidden? --> <!-- TODO decide whether this should use codemirror -->
 	<form class="new-update-form">
 		<div class="row">
 			<label class="inline-label">Date:</label>
 			<!-- TODO replace w/ date widget and actual date (problem is that persisted version is "Month day" not an actual date obj -->
-			<input type="text" class="date" id="date-entry" value="<%= updateModel.get('date') %>">
+			<input type="text" class="date" value="<%= updateModel.get('date') %>">
 		</div>
 		<div class="row">
 			<textarea class="new-update-content text-editor"><%= updateModel.get('content') %></textarea>
@@ -21,7 +21,7 @@
 			<a href="#" class="delete-button" name="<%- updateModel.cid %>"><span class="delete-icon"></span>Delete</a>
 		</div>
 		<h2>
-			<span class="calendar-icon"></span><span id="date-display"><%=
+			<span class="calendar-icon"></span><span class="date-display"><%=
 				updateModel.get('date') %></span>
 		</h2>
 		<div class="update-contents"><%= updateModel.get('content') %></div>

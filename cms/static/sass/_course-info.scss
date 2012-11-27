@@ -3,7 +3,20 @@
 
 	li {
 		padding: 34px 0 42px;
-		border-top: 1px solid #cbd1db;
+		border-top: 1px solid #cbd1db;		
+
+		&.editing {
+			position: relative;
+			z-index: 1001;
+			padding: 0;
+			border-top: none;
+			border-radius: 3px;
+			background: #fff;
+
+			.post-preview {
+				display: none;
+			}
+		}
 	}
 
 	h2 {
@@ -44,6 +57,7 @@
 	.new-update-form {
 		@include edit-box;
 		margin-bottom: 24px;
+		border: none;
 
 		textarea {
 			height: 180px;

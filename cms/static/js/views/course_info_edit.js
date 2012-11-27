@@ -53,36 +53,35 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
               $(updateEle).append(newEle);
           });
           this.$el.find(".new-update-form").hide();
-          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d' });
+          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
           return this;
     },
     
     onNew: function(event) {
+        var self = this;
         // create new obj, insert into collection, and render this one ele overriding the hidden attr
         var newModel = new CMS.Models.CourseUpdate();
         this.collection.add(newModel, {at : 0});
         
-        var newForm = this.template({ updateModel : newModel });
+        var $newForm = $(this.template({ updateModel : newModel }));
         var updateEle = this.$el.find("#course-update-list");
-        $(updateEle).prepend(newForm);
+        $(updateEle).prepend($newForm);
+        $newForm.addClass('editing');
 
-
-        // TODO: remove the id on the datepicker field
-        // this is causing conflicts with the datepicker widget
-
+        $modalCover.show();
+        $modalCover.bind('click', function() {
+            self.closeEditor(self);
+        });
 
         $('.date').datepicker('destroy');
-        $('.date').datepicker({ 'dateFormat': 'MM d' });
+        $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
     },
     
     onSave: function(event) {
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.contentEntry(event).val() });
-        // push change to display, hide the editor, submit the change
-        $(this.dateDisplay(event)).html(targetModel.get('date'));
-        $(this.contentDisplay(event)).html(targetModel.get('content'));
-        $(this.editor(event)).hide();
-        
+        // push change to display, hide the editor, submit the change        
+        this.closeEditor(this);
         targetModel.save();
     },
     
@@ -90,14 +89,21 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
-        $(this.dateEntry(event)).html(targetModel.get('date'));
-        $(this.contentEntry(event)).html(targetModel.get('content'));
+        this.closeEditor(this);
     },
     
     onEdit: function(event) {
+        var self = this;
+        this.$currentPost = $(event.target).closest('li');
+        this.$currentPost.addClass('editing');
         $(this.editor(event)).slideDown(150);
+        $modalCover.show();
+        var targetModel = this.eventModel(event);
+        $modalCover.bind('click', function() {
+            self.closeEditor(self);
+        });
     },
-        
+
     onDelete: function(event) {
         // TODO ask for confirmation
         // remove the dom element and delete the model
@@ -108,6 +114,16 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             cacheThis.collection.fetch({success : function() {cacheThis.render();}});
         }
         });
+    },
+
+    closeEditor: function(self) {
+        var targetModel = self.collection.getByCid(self.$currentPost.attr('name'));
+
+        self.$currentPost.removeClass('editing');
+        self.$currentPost.find('.date-display').html(targetModel.get('date'));
+        self.$currentPost.find('.update-contents').html(targetModel.get('content'));
+        self.$currentPost.find('form').hide();
+        $modalCover.hide();
     },
     
     // Dereferencing from events to screen elements    
@@ -127,7 +143,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
     dateEntry: function(event) {
     	var li = $(event.currentTarget).closest("li");
-    	if (li) return $(li).find("#date-entry").first();
+    	if (li) return $(li).find(".date").first();
     },
 
     contentEntry: function(event) {
