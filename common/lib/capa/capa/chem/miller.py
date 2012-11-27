@@ -253,13 +253,15 @@ def grade(user_input, correct_answer):
 
     points = [map(float, p) for p in user_answer['points']]
 
+    if len(points) < 3:
+        return False
+
     # round point to closes 0.05 value
     points = [round0_25(point) for point in points]
 
     points = [np.array(point) for point in points]
     # print miller(points), (correct_answer['miller'].replace(' ', ''),
     #     negative(correct_answer['miller']).replace(' ', ''))
-
     if miller(points) in (correct_answer['miller'].replace(' ', ''), negative(correct_answer['miller']).replace(' ', '')):
         return True
 
@@ -268,6 +270,18 @@ def grade(user_input, correct_answer):
 
 class Test_Crystallography_Miller(unittest.TestCase):
     ''' Tests  for crystallography grade function.'''
+
+    def test_empty_points(self):
+        user_input = '{"lattice": "bcc", "points": []}'
+        self.assertFalse(grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_only_one_point(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"]]}'
+        self.assertFalse(grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_only_two_points(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"]]}'
+        self.assertFalse(grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
 
     def test_1(self):
         user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"], ["0.00", "0.00", "0.50"]]}'
