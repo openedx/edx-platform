@@ -190,6 +190,10 @@ def course_index(request, org, course, name):
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
+@login_required
+@ensure_csrf_cookie
+def edit_assignment(request, location):
+    return render_to_response('edit-assignment.html', {})
 
 @login_required
 def edit_subsection(request, location):

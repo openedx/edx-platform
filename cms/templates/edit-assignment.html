@@ -1,0 +1,49 @@
+<%inherit file="base.html" />
+<%!
+   from time import mktime
+   import dateutil.parser
+   import logging
+   from datetime import datetime
+%>
+
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">assignment</%block>
+<%block name="title">CMS Assignment</%block>
+
+<%namespace name="units" file="widgets/units.html" />
+<%namespace name='static' file='static_content.html'/>
+<%namespace name='datetime' module='datetime'/>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <div class="main-column">
+      <article class="assignment-body window" data-id="">
+        
+        
+
+      </article>
+    </div>
+
+    <div id="policy-to-delete" style="display:none">
+    </div>
+
+</div>
+</%block>
+
+<%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+<script src="${static.url('js/vendor/date.js')}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // expand the due-date area if the values are set
+        if ($('#due_date').val() != '') {
+            var $block = $('.set-date').closest('.due-date-input');
+            $('.set-date').hide();
+            $block.find('.date-setter').show();
+        }
+    })
+</script>
+</%block>
