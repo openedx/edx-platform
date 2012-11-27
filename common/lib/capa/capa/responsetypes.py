@@ -1794,7 +1794,9 @@ class ImageResponse(LoncapaResponse):
                     if (llx <= gx <= urx) and (lly <= gy <= ury):
                         correct_map.set(aid, 'correct')
                         break
-            if regions[aid]:
+            # import ipdb; ipdb.set_trace()
+            if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
+                import ipdb; ipdb.set_trace()
                 parsed_region = json.loads(regions[aid])
                 if parsed_region:
                     if type(parsed_region[0][0]) != list:
