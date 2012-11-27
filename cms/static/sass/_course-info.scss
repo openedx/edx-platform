@@ -1,5 +1,27 @@
+.course-info {
+	h2 {
+		margin-bottom: 24px;
+		font-size: 22px;
+		font-weight: 300;
+	}
+
+	.course-info-wrapper {
+		display: table;
+		width: 100%;
+	}
+
+	.main-column,
+	.course-handouts {
+		float: none;
+		display: table-cell;
+	}
+}
+
 .course-updates {
 	padding: 30px 40px;
+	margin: 0;
+	border-radius: 3px 0 0 3px;
+	border-right-color: $mediumGrey;
 
 	.update-list > li {
 		padding: 34px 0 42px;
@@ -17,38 +39,44 @@
 				display: none;
 			}
 		}
-	}
 
-	h1 {
-		float: none;
-		font-size: 24px;
-		font-weight: 300;
-	}
+		h1 {
+			float: none;
+			font-size: 24px;
+			font-weight: 300;
+		}
 
-	h2 {
-		margin-bottom: 18px;
-		font-size: 14px;
-		font-weight: 700;
-		line-height: 30px;
-		color: #646464;
-		letter-spacing: 1px;
-		text-transform: uppercase;
-	}
+		h2 {
+			margin-bottom: 18px;
+			font-size: 14px;
+			font-weight: 700;
+			line-height: 30px;
+			color: #646464;
+			letter-spacing: 1px;
+			text-transform: uppercase;
+		}
 
-	h3 {
-		margin: 34px 0 11px;
-		font-size: 16px;
-		font-weight: 700;
+		h3 {
+			margin: 34px 0 11px;
+			font-size: 16px;
+			font-weight: 700;
+		}
 	}
 
 	.update-contents {
 		p {
-			font-size: 14px;
-			line-height: 18px;
+			font-size: 16px;
+			line-height: 25px;
 		}
 
 		p + p {
-			margin-top: 18px;
+			margin-top: 25px;
+		}
+
+		.primary {
+			border: 1px solid #ddd;
+			background: #f6f6f6;
+			padding: 20px;
 		}
 	}
 
@@ -92,7 +120,17 @@
 }
 
 .course-handouts {
-	padding: 15px 20px;
+	width: 30%;
+	padding: 20px 25px;
+	margin: 0;
+	border-radius: 0 3px 3px 0;
+	border-left: none;
+	background: $lightGrey;
+
+	h2 {
+		font-size: 18px;
+		font-weight: 700;
+	}
 
 	.new-handout-button {
 		@include grey-button;
