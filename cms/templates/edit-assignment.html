@@ -19,15 +19,103 @@
   <div class="inner-wrapper">
     <div class="main-column">
       <article class="assignment-body window" data-id="">
-        
-        
+
+        <div class="assignment-name-input">
+          <label>Display Name:</label>
+          <input type="text" value="Books & Materials" class="assignment-display-name-input" data-metadata-name="display_name"/>
+        </div>
+
+        <div>
+          <label>Format:</label>
+          <input type="text" value="" class="unit-subtitle" data-metadata-name="format"/>
+        </div>
+
+        <div class="sortable-unit-list">
+          <label>Units:</label>
+
+          <ol class="sortable-unit-list" data-subsection-id="">
+            <li class="leaf unit" data-id="i4x://Harvard/101/vertical/5a30e6b445a741b2a5b9ce0593491f93">
+                <div class="section-item ">
+                  <a href="/edit/i4x://Harvard/101/vertical/5a30e6b445a741b2a5b9ce0593491f93" class="private-item">
+                    <span class="vertical-icon"></span>
+                    <span class="unit-name">Mid Term Section #1</span>
+                  </a>
+
+                  <div class="item-actions">
+                    <a href="#" class="delete-button" data-id="i4x://Harvard/101/vertical/5a30e6b445a741b2a5b9ce0593491f93"><span class="delete-icon"></span></a>
+                    <a href="#" class="drag-handle"></a>
+                  </div>
+                </div>
+              </li>
+
+              <li class="leaf unit" data-id="i4x://Harvard/101/vertical/0345f6177481492cacd8cfa822dfd962">
+                
+                <div class="section-item ">
+                  <a href="/edit/i4x://Harvard/101/vertical/0345f6177481492cacd8cfa822dfd962" class="private-item">
+                    <span class="vertical-icon"></span>
+                    <span class="unit-name">Mid Term Section #2  </span>
+                  </a>
+
+                  <div class="item-actions">
+                    <a href="#" class="delete-button" data-id="i4x://Harvard/101/vertical/0345f6177481492cacd8cfa822dfd962"><span class="delete-icon"></span></a>
+                    <a href="#" class="drag-handle"></a>
+                  </div>
+                </div>
+              </li>
+
+              <li class="leaf unit" data-id="i4x://Harvard/101/vertical/5dd80571fe4c4c2895d30109e5a3baf5">
+                
+                <div class="section-item ">
+                  <a href="/edit/i4x://Harvard/101/vertical/5dd80571fe4c4c2895d30109e5a3baf5" class="private-item">
+                    <span class="vertical-icon"></span>
+                    <span class="unit-name">Mid Term Section #3</span>
+                  </a>
+
+                  <div class="item-actions">
+                    <a href="#" class="delete-button" data-id="i4x://Harvard/101/vertical/5dd80571fe4c4c2895d30109e5a3baf5"><span class="delete-icon"></span></a>
+                    <a href="#" class="drag-handle"></a>
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <a href="#" class="new-unit-item" data-template="i4x://edx/templates/vertical/Empty" data-parent="i4x://Harvard/101/sequential/eff77c9792034ee4b46e695ade4c0bad">
+                  <span class="new-unit-icon"></span>New Unit
+                </a>
+              </li>
+          </ol>
+        </div>
 
       </article>
     </div>
 
-    <div id="policy-to-delete" style="display:none">
+    <div class="sidebar">
+      <div class="unit-settings window">
+        <h4>
+          Subsection Settings
+        </h4>
+        <div class="window-contents">
+          <div class="scheduled-date-input row">
+            <label>Release date:<!-- <span class="description">Determines when this subsection and the units within it will be released publicly.</span>--></label>
+            <div class="datepair" data-language="javascript">
+              <input type="text" id="start_date" name="start_date" value="" placeholder="MM/DD/YYYY" class="date hasDatepicker" size="15" autocomplete="off"> <input type="text" id="start_time" name="start_time" value="" placeholder="HH:MM" class="time ui-timepicker-input" size="10" autocomplete="off">
+            </div>
+          </div>
+          <div class="due-date-input row">
+            <label>Due date:</label> <a href="#" class="set-date">Set a due date</a>
+            <div class="datepair date-setter">
+              <p class="date-description">
+                <input type="text" id="due_date" name="due_date" value="" placeholder="MM/DD/YYYY" class="date hasDatepicker" size="15" autocomplete="off"> <input type="text" id="due_time" name="due_time" value="" placeholder="HH:MM" class="time ui-timepicker-input" size="10" autocomplete="off"> <a href="#" class="remove-date">Remove due date</a>
+              </p>
+            </div>
+          </div>
+          <div class="row unit-actions">
+            <a href="//preview.localhost:8000/courses/Harvard/101/Intro_to_HTML/jump_to/i4x://Harvard/101/sequential/eff77c9792034ee4b46e695ade4c0bad" target="_blank" class="preview-button">Preview Drafts</a>
+          </div>
+        </div>
+      </div>
     </div>
-
+  </div>
 </div>
 </%block>
 
