@@ -67,10 +67,11 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend($newForm);
         $newForm.addClass('editing');
+        this.$currentPost = $newForm.closest('li');
 
         $modalCover.show();
         $modalCover.bind('click', function() {
-            self.closeEditor(self);
+            self.closeEditor(self, true);
         });
 
         $('.date').datepicker('destroy');
@@ -89,7 +90,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
-        this.closeEditor(this);
+        this.closeEditor(this, !targetModel.id);
     },
     
     onEdit: function(event) {
@@ -116,13 +117,21 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         });
     },
 
-    closeEditor: function(self) {
+    closeEditor: function(self, removePost) {
         var targetModel = self.collection.getByCid(self.$currentPost.attr('name'));
 
+        if(removePost) {
+            self.$currentPost.remove();
+        }
+
+        // close the modal and insert the appropriate data
         self.$currentPost.removeClass('editing');
         self.$currentPost.find('.date-display').html(targetModel.get('date'));
+        self.$currentPost.find('.date').val(targetModel.get('date'));
         self.$currentPost.find('.update-contents').html(targetModel.get('content'));
+        self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
         self.$currentPost.find('form').hide();
+        $modalCover.unbind('click');
         $modalCover.hide();
     },
     

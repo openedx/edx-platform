@@ -1,9 +1,9 @@
 .course-updates {
 	padding: 30px 40px;
 
-	li {
+	.update-list > li {
 		padding: 34px 0 42px;
-		border-top: 1px solid #cbd1db;		
+		border-top: 1px solid #cbd1db;
 
 		&.editing {
 			position: relative;
@@ -17,6 +17,12 @@
 				display: none;
 			}
 		}
+	}
+
+	h1 {
+		float: none;
+		font-size: 24px;
+		font-weight: 300;
 	}
 
 	h2 {
@@ -50,13 +56,14 @@
 		@include blue-button;
 		display: block;
 		text-align: center;
-		padding: 12px 0;
+		padding: 18px 0;
 		margin-bottom: 28px;
 	}
 
 	.new-update-form {
 		@include edit-box;
 		margin-bottom: 24px;
+		padding: 30px;
 		border: none;
 
 		textarea {
