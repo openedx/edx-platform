@@ -1726,10 +1726,14 @@ class ImageResponse(LoncapaResponse):
 
     <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"
     rectangle="(10,10)-(20,30);(12,12)-(40,60)"
-    regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+    regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
 
     Regions is list of lists [region1, region2, region3, ...] where regionN
-    is ordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+    is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+    
+    If there is only one region in the list, simpler notation can be used:
+    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly 
+        setting outer list)
 
     Returns:
         True, if click is inside any region or rectangle. Otherwise False.
@@ -1743,9 +1747,9 @@ class ImageResponse(LoncapaResponse):
       rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
       <imageinput src="image4.jpg" width="811" height="610"
       rectangle="(10,10)-(20,30);(12,12)-(40,60)"
-      regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]'/>
+      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
       <imageinput src="image5.jpg" width="200" height="200"
-      regions='[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]' />
+      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
     </imageresponse>'''}]
 
     response_tag = 'imageresponse'
@@ -1758,16 +1762,12 @@ class ImageResponse(LoncapaResponse):
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
-        # import ipdb; ipdb.set_trace()
         for aid in self.answer_ids:	 # loop through IDs of <imageinput>
         #  fields in our stanza
-            # import ipdb; ipdb.set_trace()
             given = student_answers[aid]  # this should be a string of the form '[x,y]'
-
             correct_map.set(aid, 'incorrect')
             if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
-
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not m:
@@ -1794,9 +1794,7 @@ class ImageResponse(LoncapaResponse):
                     if (llx <= gx <= urx) and (lly <= gy <= ury):
                         correct_map.set(aid, 'correct')
                         break
-            # import ipdb; ipdb.set_trace()
             if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
-                # import ipdb; ipdb.set_trace()
                 parsed_region = json.loads(regions[aid])
                 if parsed_region:
                     if type(parsed_region[0][0]) != list:
@@ -1804,8 +1802,6 @@ class ImageResponse(LoncapaResponse):
                         # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
                         # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
                         parsed_region = [parsed_region]
-                        # if aid =='1_3_6':
-                            # import ipdb; ipdb.set_trace()
                     for region in parsed_region:
                         polygon = MultiPoint(region).convex_hull
                         if (polygon.type == 'Polygon' and
