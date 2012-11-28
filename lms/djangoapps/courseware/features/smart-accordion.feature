@@ -8,12 +8,12 @@ Feature: There are courses on the homepage
     And I log in
     Then I verify all the content of each course
 
-  Scenario: Navigate through course edX/edx101/edX_Studio_Reference
-    Given I am registered for course "edX/edx101/edX_Studio_Reference"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course edX/edx101/edX_Studio_Reference
+  #   Given I am registered for course "edX/edx101/edX_Studio_Reference"
+  #   And I log in
+  #   Then I verify all the content of each course
 
-  Scenario: Navigate through course BerkeleyX/CS169.1x/2012_Fall
-    Given I am registered for course "BerkeleyX/CS169.1x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
+  # Scenario: Navigate through course BerkeleyX/CS169.1x/2012_Fall
+  #   Given I am registered for course "BerkeleyX/CS169.1x/2012_Fall"
+  #   And I log in
+  #   Then I verify all the content of each course
