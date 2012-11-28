@@ -160,6 +160,19 @@ class SelfAssessmentModule(XModule):
         self.history[-1]['hint'] = hint
 
 
+    def change_state(self, new_state):
+        """
+        A centralized place for state changes--allows for hooks.  If the
+        current state matches the old state, don't run any hooks.
+        """
+        if self.state == new_state:
+            return
+
+        self.state = new_state
+
+        if self.state == self.DONE:
+            self.attempts += 1
+
     @staticmethod
     def convert_state_to_current_format(old_state):
         """
@@ -376,7 +389,7 @@ class SelfAssessmentModule(XModule):
 
         # add new history element with answer and empty score and hint.
         self.new_history_entry(get['student_answer'])
-        self.state = self.ASSESSING
+        self.change_state(self.ASSESSING)
 
         return {
             'success': True,
@@ -411,11 +424,11 @@ class SelfAssessmentModule(XModule):
         d = {'success': True,}
 
         if score == self.max_score():
-            self.state = self.DONE
+            self.change_state(self.DONE)
             d['message_html'] = self.get_message_html()
             d['allow_reset'] = self._allow_reset()
         else:
-            self.state = self.REQUEST_HINT
+            self.change_state(self.REQUEST_HINT)
             d['hint_html'] = self.get_hint_html()
 
         d['state'] = self.state
@@ -438,10 +451,7 @@ class SelfAssessmentModule(XModule):
             return self.out_of_sync_error(get)
 
         self.record_latest_hint(get['hint'])
-        self.state = self.DONE
-
-        # increment attempts
-        self.attempts = self.attempts + 1
+        self.change_state(self.DONE)
 
         # To the tracking logs!
         event_info = {
@@ -473,7 +483,7 @@ class SelfAssessmentModule(XModule):
                 'success': False,
                 'error': 'Too many attempts.'
             }
-        self.state = self.INITIAL
+        self.change_state(self.INITIAL)
         return {'success': True}
 
 

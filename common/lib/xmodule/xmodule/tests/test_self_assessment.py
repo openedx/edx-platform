@@ -33,7 +33,7 @@ class SelfAssessmentTest(unittest.TestCase):
                                       self.definition, self.descriptor,
                                       state, {}, metadata=self.metadata)
 
-        self.assertEqual(module.get_score(), 0)
+        self.assertEqual(module.get_score()['score'], 0)
 
         self.assertTrue('answer 3' in module.get_html())
         self.assertFalse('answer 2' in module.get_html())
