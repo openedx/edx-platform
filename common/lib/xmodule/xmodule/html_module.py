@@ -123,7 +123,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
             try:
                 with system.resources_fs.open(filepath) as file:
-                    html = file.read()
+                    html = file.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html):
                         msg = "Couldn't parse html in {0}.".format(filepath)
@@ -164,7 +164,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data'])
+            file.write(self.definition['data'].encode('utf-8'))
 
         # write out the relative name
         relname = path(pathname).basename()

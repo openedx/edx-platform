@@ -54,5 +54,5 @@ class Template(MakoTemplate):
         context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
         context_dictionary['django_context'] = context_instance
                 
-        return super(Template, self).render(**context_dictionary)
+        return super(Template, self).render_unicode(**context_dictionary)
         

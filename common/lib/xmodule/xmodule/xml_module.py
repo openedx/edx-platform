@@ -366,7 +366,7 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = self.__class__._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True))
+                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8', xml_declaration=True))
 
             # And return just a pointer with the category and filename.
             record_object = etree.Element(self.category)
