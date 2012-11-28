@@ -597,7 +597,7 @@ function hideToastMessage(e) {
 function addNewSection(e) {
     e.preventDefault();
     var $newSection = $($('#new-section-template').html());
-    $('.new-courseware-section-button').after($newSection);
+    $('.new-courseware-element-nav').after($newSection);
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.new-section-name-save').bind('click', saveNewSection);
     $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
@@ -606,7 +606,7 @@ function addNewSection(e) {
 function addNewAssignment(e) {
     e.preventDefault();
     var $newAssignment = $($('#new-assignment-template').html());
-    $('.new-courseware-assignment-button').after($newAssignment);
+    $('.new-courseware-element-nav').after($newAssignment);
     $newAssignment.find('.new-assignment-name').focus().select();
     $newAssignment.find('.new-assignment-name-save').bind('click', saveNewAssignment);
     $newAssignment.find('.new-assignment-name-cancel').bind('click', cancelNewAssignment);

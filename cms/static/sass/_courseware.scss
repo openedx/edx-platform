@@ -5,15 +5,38 @@ input.courseware-unit-search-input {
 }
 
 .courseware-overview {
-	.new-courseware-section-button {
-		@include grey-button;
-		display: block;
-		text-align: center;
-		padding: 12px 0;
+	
+	.new-courseware-element-nav {
+		margin-bottom: 20px;
+		@include clearfix;
+
+		li {
+			float: left;
+			margin-right: 2%;
+			width: 49%;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		.new-courseware-assignment-button {
+			@include grey-button;
+		}
+
+		.new-courseware-section-button {
+			@include grey-button;
+		}
+
+		.new-courseware-assignment-button, .new-courseware-section-button {
+			display: block;
+			text-align: center;
+			padding: 12px;
+		}
 	}
 }
 
-.courseware-section {
+.courseware-section, .courseware-assignment {
 	position: relative;
 	background: #fff;
 	border: 1px solid $darkGrey;
@@ -185,7 +208,7 @@ input.courseware-unit-search-input {
 		}
 	}
 
-	&.new-section {
+	&.new-section, &.new-assignment {
 		header {
 			height: auto;
 			@include clearfix;
@@ -193,6 +216,10 @@ input.courseware-unit-search-input {
 
 		.expand-collapse-icon {
 			visibility: hidden;
+		}
+
+		.item-details {
+			padding-top: 16px;
 		}
 	}
 }
@@ -212,6 +239,26 @@ input.courseware-unit-search-input {
 
 .new-section-name-cancel,
 .new-subsection-name-cancel {
+	@include white-button;
+	padding: 2px 20px 5px;
+	color: #8891a1 !important;
+}
+
+.new-assignment-name,
+.new-subsection-assignment-name-input {
+	width: 515px;
+}
+
+.new-assignment-name-save,
+.new-subsection-assignment-name-save {
+	@include blue-button;
+	padding: 2px 20px 5px;
+	margin: 0 5px;
+	color: #fff !important;
+}
+
+.new-assignment-name-cancel,
+.new-subsection-assignment-name-cancel {
 	@include white-button;
 	padding: 2px 20px 5px;
 	color: #8891a1 !important;
