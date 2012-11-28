@@ -13,7 +13,11 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
         el: this.$('#course-update-view'),
         collection: this.model.get('updates')
     });
-    // TODO instantiate the handouts view
+
+    new CMS.Views.ClassInfoHandoutsView({
+        el: this.$('#course-handouts-view')
+        // collection: this.model.get('')
+    });
     return this;
   }
 });
@@ -169,4 +173,64 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     }
         
 });
+
+// the handouts view is dumb right now; it needs tied to a model and all that jazz
+CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
+    // collection is CourseUpdateCollection
+    events: {
+        "click .save-button" : "onSave",
+        "click .cancel-button" : "onCancel",
+        "click .edit-button" : "onEdit"
+    },
+
+    initialize: function() {
+        var self = this;
+        window.templateLoader.loadRemoteTemplate("course_info_handouts",
+            "/static/coffee/src/client_templates/course_info_handouts.html",
+            function (raw_template) {
+                self.template = _.template(raw_template);
+                self.render();                
+            }
+        );
+    },
         
+    render: function () {        
+        var updateEle = this.$el;
+        var self = this;
+        this.$el.append($(this.template()));
+        this.$preview = this.$el.find('.handouts-content');
+        this.$form = this.$el.find(".edit-handouts-form");
+        this.$editor = this.$form.find('.handouts-content-editor');
+        this.$form.hide();
+
+        return this;
+    },
+
+    onEdit: function(event) {
+        this.$editor.val(this.$preview.html());
+        this.$form.show();
+        this.$preview.hide();
+        $modalCover.show();
+        $modalCover.bind('click', function() {
+            self.closeEditor(self);
+        });
+    },
+
+    onSave: function(event) {
+        this.$form.hide();
+        this.closeEditor(this);
+    },
+
+    onCancel: function(event) {
+        this.$form.hide();
+        this.closeEditor(this);
+    },
+
+    closeEditor: function(self) {
+        this.$preview.html(this.$editor.val());
+        this.$preview.show();
+        this.$form.hide();
+        $modalCover.unbind('click');
+        $modalCover.hide();
+    }
+});

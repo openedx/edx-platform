@@ -121,7 +121,7 @@
 
 .course-handouts {
 	width: 30%;
-	padding: 20px 25px;
+	padding: 20px 30px;
 	margin: 0;
 	border-radius: 0 3px 3px 0;
 	border-left: none;
@@ -132,21 +132,38 @@
 		font-weight: 700;
 	}
 
-	.new-handout-button {
-		@include grey-button;
-		display: block;
-		text-align: center;
-		padding: 12px 0;
-		margin-bottom: 28px;
+	.edit-button {
+		float: right;
+		@include white-button;
+    padding: 3px 10px 4px;
+    margin-left: 7px;
+    font-size: 12px;
+    font-weight: 400;
+
+    .edit-icon,
+    .delete-icon {
+      margin-right: 4px;
+    }
 	}
 
-	li {
-		margin-bottom: 10px;
+	.handouts-content {
 		font-size: 14px;
 	}
 
-	.new-handout-form {
-		@include edit-box;
-		margin-bottom: 24px;
+	.treeview-handoutsnav li {
+		margin-bottom: 12px;
+	}
+}
+
+.edit-handouts-form {
+	@include edit-box;
+	position: absolute;
+	right: 0;
+	z-index: 10001;
+	width: 800px;
+	padding: 30px;
+
+	textarea {
+		height: 300px;
 	}
 }
