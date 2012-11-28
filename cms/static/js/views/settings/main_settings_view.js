@@ -82,8 +82,7 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		"blur textarea" : "updateModel",
 		'click .remove-course-syllabus' : "removeSyllabus",
 		'click .new-course-syllabus' : 'assetSyllabus',
-		'click .remove-course-introduction-video' : "removeVideo",
-		'click .new-course-introduction-video' : 'assetVideo',
+		'click .remove-course-introduction-video' : "removeVideo"
 	},
 	initialize : function() {
 		// TODO move the html frag to a loaded asset
@@ -110,9 +109,10 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		
 		this.$el.find('#course-overview').val(this.model.get('overview'));
 		
-		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.get('intro_video'));
+		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
 		if (this.model.has('intro_video')) {
 			this.$el.find('.remove-course-introduction-video').show();
+			this.$el.find('#course-introduction-video').val(this.model.getVideoSource());
 		}
 		else this.$el.find('.remove-course-introduction-video').hide();
 		
@@ -158,6 +158,10 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		case 'course-effort':
 			this.model.save('effort', $(event.currentTarget).val());
 			break;
+		case 'course-introduction-video':
+			var previewsource = this.model.save_videosource($(event.currentTarget).val());
+			this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
+			break
 			
 		default:
 			break;
@@ -174,10 +178,11 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 	},
 	
 	removeVideo: function() {
-		if (this.model.has('intro_video'))	this.model.save({'intro_video': null});
-	},
-	
-	assetVideo : function() {
-		// TODO implement
+		if (this.model.has('intro_video')) {
+			this.model.save_videosource(null);
+			this.$el.find(".current-course-introduction-video iframe").attr("src", "");
+			this.$el.find('#course-introduction-video').val("");
+		}
 	}
+	
 });

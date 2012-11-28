@@ -647,8 +647,6 @@ def unpublish_unit(request):
 
     return HttpResponse()
 
-
-
 @login_required
 @expect_json
 def clone_item(request):
@@ -952,11 +950,13 @@ def get_course_settings(request, org, course, name):
         raise PermissionDenied()
     
     course_module = modulestore().get_item(location)
+    course_details = CourseDetails.fetch(location)
     
     return render_to_response('settings.html', {
         'active_tab': 'settings-tab', 
         'context_course': course_module,
-        'course_details' : json.dumps(CourseDetails.fetch(location), cls=CourseDetailsEncoder) 
+        'course_details' : json.dumps(course_details, cls=CourseDetailsEncoder), 
+        'video_editor_html' : preview_component(request, course_details.intro_video_loc)
     })
         
 @expect_json

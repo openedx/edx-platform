@@ -17,6 +17,7 @@ class CourseDetails:
         self.syllabus = None    # a pdf file asset
         self.overview = ""      # html to render as the overview
         self.intro_video = None    # a video pointer
+        self.intro_video_loc = None    # a video pointer
         self.effort = None      # int hours/week
 
     @classmethod
@@ -57,6 +58,7 @@ class CourseDetails:
         temploc = temploc._replace(name='video')
         try:
             course.intro_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.intro_video_loc = temploc
         except ItemNotFoundError:
             pass
         
