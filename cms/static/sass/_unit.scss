@@ -149,12 +149,8 @@
     &:hover {
       border-color: #6696d7;
 
-      .drag-handle,
-      .component-actions a {
-        background-color: $blue;
-      }
-
       .drag-handle {
+        background-color: $blue;
         border-color: $blue;
       }
     }
@@ -174,31 +170,12 @@
 
     .component-actions {
       position: absolute;
-      top: 4px;
-      right: 4px;
+      top: 7px;
+      right: 9px;
       @include transition(opacity .15s);
-    }
 
-    .edit-button,
-    .delete-button {
-      float: left;
-      padding: 3px 10px 4px;
-      margin-left: 3px;
-      border: 1px solid #fff;
-      border-radius: 3px;
-      background: #d1ddec;
-      font-size: 12px;
-      color: #fff;
-      @include transition(all .15s);
-
-      &:hover {
-        background-color: $blue;
-        color: #fff;
-      }
-
-      .edit-icon,
-      .delete-icon {
-        margin-right: 4px;
+      a {
+        color: $darkGrey;
       }
     }
 

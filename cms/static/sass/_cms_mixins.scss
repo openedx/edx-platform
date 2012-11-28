@@ -48,18 +48,18 @@
 }
 
 @mixin white-button {
-	@include button;
-	border: 1px solid $darkGrey;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 60%);
-	background-color: #dfe5eb;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #5d6779;
+  @include button;
+  border: 1px solid $darkGrey;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  background-color: #dfe5eb;
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  color: #778192;
 
-	&:hover {
-		background-color: #f2f6f9;
-		color: #5d6779;
-	}
+  &:hover {
+    background-color: #f2f6f9;
+    color: #778192;
+  }
 }
 
 @mixin orange-button {
