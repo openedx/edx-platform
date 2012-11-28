@@ -63,7 +63,7 @@ input.courseware-unit-search-input {
 		margin-left: 10px;
 	}
 
-	.section-published-date {
+	.section-published-date, .assignment-published-date {
 		position: absolute;
 		top: 19px;
 		right: 90px;
@@ -158,7 +158,7 @@ input.courseware-unit-search-input {
 		color: $blue;
 	}
 
-	.section-name-span {
+	.section-name-span, .assignment-name-span {
 		cursor: pointer;
 		@include transition(color .15s);
 
@@ -167,7 +167,7 @@ input.courseware-unit-search-input {
 		}
 	}
 
-	.section-name-edit {
+	.section-name-edit, .assignment-name-edit {
 		input {
 			font-size: 16px;	
 		}
