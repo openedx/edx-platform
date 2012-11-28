@@ -1,34 +1,8 @@
 from lettuce import world, step
-import re
+from re import sub
 from nose.tools import assert_equals
-
-## imported from lms/djangoapps/courseware/courses.py
-from collections import defaultdict
-from fs.errors import ResourceNotFoundError
-from functools import wraps
-
-from path import path
-from django.conf import settings
-from django.http import Http404
-
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_urls, try_staticfiles_lookup
-from courseware.access import has_access
-## end import
-
-from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 from courses import *
-import os.path
-import sys
-path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
-if not path in sys.path:
-    sys.path.insert(1, path)
-del path
-#from helpers import *
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -57,7 +31,7 @@ def i_verify_all_the_content_of_each_course(step):
         check_for_errors()
 
         # Get the course. E.g. 'MITx/6.002x/2012_Fall'
-        current_course = re.sub('/info','',re.sub('.*/courses/','',world.browser.url))
+        current_course = sub('/info','', sub('.*/courses/', '', world.browser.url))
         validate_course(current_course,ids)
 
         world.browser.find_link_by_text('Courseware').click()
@@ -74,9 +48,13 @@ def browse_course(course_id):
     ## count chapters from xml and page and compare
     chapters = get_courseware_with_tabs(course_id)
     num_chapters = len(chapters)
+
     rendered_chapters = world.browser.find_by_css('#accordion > nav > div')
     num_rendered_chapters = len(rendered_chapters)
-    assert num_chapters == num_rendered_chapters, '%d chapters expected, %d chapters found on page for %s' % (num_chapters, num_rendered_chapters, course_id)
+
+    msg = '%d chapters expected, %d chapters found on page for %s' % (num_chapters, num_rendered_chapters, course_id)
+    logger.debug(msg)
+    assert num_chapters == num_rendered_chapters, msg
 
     chapter_it = 0
 
@@ -95,7 +73,10 @@ def browse_course(course_id):
 
         rendered_sections = world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('li')
         num_rendered_sections = len(rendered_sections)
-        assert num_sections == num_rendered_sections, '%d sections expected, %d sections found on page, iteration number %d on %s' % (num_sections, num_rendered_sections, chapter_it, course_id)
+
+        msg = '%d sections expected, %d sections found on page, %s - %d - %s' %  (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name'])
+        logger.debug(msg)
+        assert num_sections == num_rendered_sections, msg
 
         section_it = 0
 
@@ -123,7 +104,9 @@ def browse_course(course_id):
                 rendered_tabs = 0
                 num_rendered_tabs = 0
 
-            assert num_tabs == num_rendered_tabs ,'%d tabs expected, %d tabs found, iteration number %d, on %s' % (num_tabs,num_rendered_tabs,section_it, course_id)
+            msg = '%d tabs expected, %d tabs found, %s - %d - %s' % (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name'])
+            logger.debug(msg)
+            assert num_tabs == num_rendered_tabs, msg
 
             tab_it = 0
 

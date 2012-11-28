@@ -1,32 +1,10 @@
-from lettuce import * #before, world
-from selenium import *
-#import lettuce_webdriver.webdriver
-import logging
-import nose.tools
-from selenium.webdriver import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-
-## imported from lms/djangoapps/courseware/courses.py
-from collections import defaultdict
-from fs.errors import ResourceNotFoundError
-from functools import wraps
-import logging
-
-from path import path
-from django.conf import settings
-from django.http import Http404
-
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_urls, try_staticfiles_lookup
-from courseware.access import has_access
-## end import
+from courseware.courses import get_course_by_id
+from xmodule import seq_module
 
-from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
-import xmodule
+from logging import getLogger
+logger = getLogger(__name__)
 
 ## support functions
 def get_courses():
@@ -123,7 +101,7 @@ def get_courseware_with_tabs(course_id):
 
     course = get_course_by_id(course_id)
     chapters = [ chapter for chapter in course.get_children() if chapter.metadata.get('hide_from_toc','false').lower() != 'true' ]
-    courseware = [{'chapter_name':c.display_name, 'sections':[{'section_name':s.display_name, 'clickable_tab_count': len(s.get_children()) if (type(s)==xmodule.seq_module.SequenceDescriptor) else 0, 'tab_classes':[t.__class__.__name__ for t in s.get_children() ]} for s in c.get_children() if s.metadata.get('hide_from_toc', 'false').lower() != 'true']} for c in chapters ]
+    courseware = [{'chapter_name':c.display_name, 'sections':[{'section_name':s.display_name, 'clickable_tab_count': len(s.get_children()) if (type(s)==seq_module.SequenceDescriptor) else 0, 'tab_classes':[t.__class__.__name__ for t in s.get_children() ]} for s in c.get_children() if s.metadata.get('hide_from_toc', 'false').lower() != 'true']} for c in chapters ]
 
     return courseware
 
