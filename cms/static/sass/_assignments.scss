@@ -1,0 +1,189 @@
+.assignment {
+
+	.main-wrapper {
+		margin: 40px;
+	}
+}
+
+.assignment-body {
+	padding: 32px 40px;
+	@include clearfix;
+
+	> div {
+		margin-bottom: 40px;
+	}
+
+	input {
+		font-size: 14px;
+	}
+
+	.unit-subtitle {
+		display: block;
+		width: 100%;
+	}
+
+	.sortable-unit-list {
+		ol {
+			@include tree-view;
+		}
+	}
+
+	.policy-list {
+		input[disabled] {
+			border: none;
+			@include box-shadow(none);
+		}
+
+		.policy-list-name {
+			margin-right: 5px;
+			margin-bottom: 10px;
+		}
+
+		.policy-list-value {
+			width: 320px;
+			margin-right: 10px;
+		}
+	}
+
+	.policy-list-element {
+		.save-button,
+		.cancel-button {
+			display: none;
+		}
+
+		.edit-icon {
+			margin-right: 8px;
+		}
+
+		&.editing,
+		&.new-policy-list-element {
+			.policy-list-name,
+			.policy-list-value {
+				border: 1px solid #b0b6c2;
+		    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
+		    background-color: #edf1f5;
+		    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+			}
+		}
+	}
+
+	.new-policy-list-element {
+		padding: 10px 10px 0;
+		margin: 0 -10px 10px;
+		border-radius: 3px;
+		background: $mediumGrey;
+
+		.save-button {
+			@include blue-button;
+			margin-bottom: 10px;
+		}
+
+		.cancel-button {
+			@include white-button;
+		}
+
+		.edit-icon {
+			display: none;
+		}
+
+		.delete-icon {
+			display: none;
+		}
+	}
+
+	.new-policy-item {
+		margin: 10px 0;
+
+		.plus-icon-small {
+			position: relative;
+			top: -1px;
+			vertical-align: middle;
+		}
+	}
+}
+
+.assignment-name-input {
+	label {
+		display: block;
+	}
+
+	input {
+		width: 100%;
+		font-size: 20px;
+	}
+}
+
+.scheduled-date-input,
+.due-date-input {
+	@include clearfix;
+
+	.date-input,
+	.time-input {
+		display: inline-block;
+		width: 100px;
+	}
+
+	.inherits-check {
+		label {
+			font-size: 13px;
+		}
+	}
+
+	.notice {
+		margin-top: 6px;
+		font-size: 11px;
+		color: #999;
+	}
+}
+
+.due-date-input {
+	label {
+		display: inline-block !important;
+		margin-right: 10px;
+	}
+
+	a {
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 31px;
+		text-transform: uppercase;
+	}
+
+	.date-setter {
+		@include clearfix;
+		display: none;
+	}
+
+	.remove-date {
+		display: block;
+	}
+}
+
+.row.visibility {
+	label {
+		display: inline-block !important;
+		margin-right: 10px;
+		line-height: 21px;
+	}
+
+	a {
+		display: inline-block;
+		height: 31px;
+		margin-right: 8px;
+		vertical-align: middle;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 31px;
+		text-transform: uppercase;
+	}
+
+	.large-toggle {
+		width: 41px;
+		background: url(../img/large-toggles.png) no-repeat;
+		background-position: 0 -50px;
+
+		.hidden {
+			background-position: 0 -5px;			
+		}
+	}
+}

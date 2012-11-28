@@ -193,7 +193,9 @@ def course_index(request, org, course, name):
 @login_required
 @ensure_csrf_cookie
 def edit_assignment(request, location):
-    return render_to_response('edit-assignment.html', {})
+    return render_to_response('edit-assignment.html', {
+        
+        })
 
 @login_required
 def edit_subsection(request, location):

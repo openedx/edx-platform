@@ -30,6 +30,17 @@
     </section>
   </script>
 
+  <script type="text/template" id="new-assignment-template">
+    <section class="courseware-assignment branch new-assignment">
+      <header>
+        <a href="#" class="expand-collapse-icon collapse"></a>
+        <div class="assignment-details">
+          <h3 class="assignment-name"><input type="text" value="New Assignment Name" class="new-section-name" /><a href="#" class="new-assignment-name-save" data-parent="${parent_location}" data-template="${new_section_template}">Save</a><a href="#" class="new-assignment-name-cancel">Cancel</a></h3>
+        </div>
+      </header>
+    </section>
+  </script>
+
   <script type="text/template" id="new-subsection-template">
     <li class="branch collapsed">
       <div class="section-item editing">
@@ -75,7 +86,17 @@
       <h1>Courseware</h1>
       <div class="page-actions"></div>
       <article class="courseware-overview" data-course-id="${context_course.location.url()}">
-        <a href="#" class="new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
+        
+        <nav class="new-courseware-element-nav">
+          <ul>
+            <li>
+              <a class="new-courseware-section-button" href="#"><span class="plus-icon"></span> New Section</a></li>
+            <li>
+              <a class="new-courseware-assignment-button" href="#"><span class="plus-icon"></span> New Assignment</a>
+            </li>
+          </ul>
+        </nav>
+
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>

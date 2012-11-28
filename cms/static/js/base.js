@@ -56,6 +56,10 @@ $(document).ready(function() {
     $('.new-courseware-section-button').bind('click', addNewSection);
     $('.delete-section-button').bind('click', deleteSection);
     
+    // add new/delete assignment
+    $('.new-courseware-assignment-button').bind('click', addNewAssignment);
+    $('.delete-assignment-button').bind('click', deleteAssignment);
+
     // add new/delete subsection
     $('.new-subsection-item').bind('click', addNewSubsection);
     $('.delete-subsection-button').bind('click', deleteSubsection);
@@ -408,6 +412,11 @@ function deleteSection(e) {
     _deleteItem($(this).parents('section.branch'));
 }
 
+function deleteAssignment(e) {
+    e.preventDefault();
+    _deleteItem($(this).parents('section.branch'));
+}
+
 function _deleteItem($el) {
      if(!confirm('Are you sure you wish to delete this item. It cannot be reversed!'))
        return;
@@ -594,6 +603,15 @@ function addNewSection(e) {
     $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
 }
 
+function addNewAssignment(e) {
+    e.preventDefault();
+    var $newAssignment = $($('#new-assignment-template').html());
+    $('.new-courseware-assignment-button').after($newAssignment);
+    $newAssignment.find('.new-assignment-name').focus().select();
+    $newAssignment.find('.new-assignment-name-save').bind('click', saveNewAssignment);
+    $newAssignment.find('.new-assignment-name-cancel').bind('click', cancelNewAssignment);
+}
+
 
 function saveNewSection(e) {
     e.preventDefault();
@@ -617,6 +635,30 @@ function saveNewSection(e) {
 function cancelNewSection(e) {
     e.preventDefault();
     $(this).parents('section.new-section').remove();
+}
+
+function saveNewAssignment(e) {
+    e.preventDefault();
+
+    parent = $(this).data('parent');
+    template = $(this).data('template');
+
+    display_name = $(this).prev('.new-assignment-name').val();
+
+    $.post('/clone_item',
+       {'parent_location' : parent,
+           'template' : template,
+           'display_name': display_name,
+           },
+       function(data) {
+            if (data.id != undefined)
+               location.reload();
+       });    
+}
+
+function cancelNewAssignment(e) {
+    e.preventDefault();
+    $(this).parents('section.new-assignment').remove();
 }
 
 
