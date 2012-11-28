@@ -68,6 +68,21 @@ input.courseware-unit-search-input {
 		}
 	}
 
+	.section-gradable-status {
+		position: absolute;
+		top: 25px;
+		right: 330px;
+
+		input[type=checkbox] {
+		   position: absolute;
+		   top: -9999px;
+		   left: -9999px;
+		}
+		label {
+		  cursor: pointer;
+		}
+	}
+
 	.datepair .date,
 	.datepair .time {
 		padding-left: 0;
