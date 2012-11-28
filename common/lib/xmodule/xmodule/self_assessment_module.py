@@ -53,6 +53,8 @@ class SelfAssessmentModule(XModule):
          submissions too.)
     """
 
+    STATE_VERSION = 1
+
     # states
     INITIAL = 'initial'
     ASSESSING = 'assessing'
@@ -103,10 +105,13 @@ class SelfAssessmentModule(XModule):
         else:
             instance_state = {}
 
-        # Note: score responses are on scale from 0 to max_score
-        self.student_answers = instance_state.get('student_answers', [])
-        self.scores = instance_state.get('scores', [])
-        self.hints = instance_state.get('hints', [])
+        instance_state = self.convert_state_to_current_format(instance_state)
+
+        # History is a list of tuples of (answer, score, hint), where hint may be
+        # None for any element, and score and hint can be None for the last (current)
+        # element.
+        # Scores are on scale from 0 to max_score
+        self.history = instance_state.get('history', [])
 
         self.state = instance_state.get('state', 'initial')
 
@@ -122,14 +127,95 @@ class SelfAssessmentModule(XModule):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
+
+    def latest_answer(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('answer')
+
+    def latest_score(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('score')
+
+    def latest_hint(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('hint')
+
+    def new_history_entry(self, answer):
+        self.history.append({'answer': answer})
+
+    def record_latest_score(self, score):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['score'] = score
+
+    def record_latest_hint(self, hint):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['hint'] = hint
+
+
+    @staticmethod
+    def convert_state_to_current_format(old_state):
+        """
+        This module used to use a problematic state representation. This method
+        converts that into the new format.
+
+        Args:
+            old_state: dict of state, as passed in.  May be old.
+
+        Returns:
+            new_state: dict of new state
+        """
+        if old_state.get('version', 0) == SelfAssessmentModule.STATE_VERSION:
+            # already current
+            return old_state
+
+        # for now, there's only one older format.
+
+        new_state = {'version': SelfAssessmentModule.STATE_VERSION}
+
+        def copy_if_present(key):
+            if key in old_state:
+                new_state[key] = old_state[key]
+
+        for to_copy in ['attempts', 'state']:
+            copy_if_present(to_copy)
+
+        # The answers, scores, and hints need to be kept together to avoid them
+        # getting out of sync.
+
+        # NOTE: Since there's only one problem with a few hundred submissions
+        # in production so far, not trying to be smart about matching up hints
+        # and submissions in cases where they got out of sync.
+
+        student_answers = old_state.get('student_answers', [])
+        scores = old_state.get('scores', [])
+        hints = old_state.get('hints', [])
+
+        new_state['history'] = [
+            {'answer': answer,
+             'score': score,
+             'hint': hint}
+             for answer, score, hint in itertools.izip_longest(
+                     student_answers, scores, hints)]
+        return new_state
+
+
     def _allow_reset(self):
         """Can the module be reset?"""
         return self.state == self.DONE and self.attempts < self.max_attempts
 
     def get_html(self):
         #set context variables and render template
-        if self.state != self.INITIAL and self.student_answers:
-            previous_answer = self.student_answers[-1]
+        if self.state != self.INITIAL:
+            latest = self.latest_answer()
+            previous_answer = latest if latest is not None else ''
         else:
             previous_answer = ''
 
@@ -158,9 +244,9 @@ class SelfAssessmentModule(XModule):
         """
         Returns the last score in the list
         """
-        if len(self.scores) > 0:
-            return self.scores[-1]
-        return 0
+        score = self.latest_score()
+        return {'score': score if score is not None else 0,
+                'total': self._max_score}
 
     def get_progress(self):
         '''
@@ -168,7 +254,7 @@ class SelfAssessmentModule(XModule):
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score(), self._max_score)
+                return Progress(self.get_score()['score'], self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
@@ -242,9 +328,10 @@ class SelfAssessmentModule(XModule):
         if self.state in (self.INITIAL, self.ASSESSING):
             return ''
 
-        if self.state == self.DONE and len(self.hints) > 0:
+        if self.state == self.DONE:
             # display the previous hint
-            hint = self.hints[-1]
+            latest = self.latest_hint()
+            hint = latest if latest is not None else ''
         else:
             hint = ''
 
@@ -287,7 +374,8 @@ class SelfAssessmentModule(XModule):
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
 
-        self.student_answers.append(get['student_answer'])
+        # add new history element with answer and empty score and hint.
+        self.new_history_entry(get['student_answer'])
         self.state = self.ASSESSING
 
         return {
@@ -310,18 +398,15 @@ class SelfAssessmentModule(XModule):
         'message_html' only if success is true
         """
 
-        n_answers = len(self.student_answers)
-        n_scores = len(self.scores)
-        if (self.state != self.ASSESSING or n_answers !=  n_scores + 1):
-            msg = "%d answers, %d scores" % (n_answers, n_scores)
-            return self.out_of_sync_error(get, msg)
+        if self.state != self.ASSESSING:
+            return self.out_of_sync_error(get)
 
         try:
             score = int(get['assessment'])
-        except:
+        except ValueError:
             return {'success': False, 'error': "Non-integer score value"}
 
-        self.scores.append(score)
+        self.record_latest_score(score)
 
         d = {'success': True,}
 
@@ -352,7 +437,7 @@ class SelfAssessmentModule(XModule):
             # the same number of hints and answers.
             return self.out_of_sync_error(get)
 
-        self.hints.append(get['hint'].lower())
+        self.record_latest_hint(get['hint'])
         self.state = self.DONE
 
         # increment attempts
@@ -362,9 +447,8 @@ class SelfAssessmentModule(XModule):
         event_info = {
             'selfassessment_id': self.location.url(),
             'state': {
-                'student_answers': self.student_answers,
-                'score': self.scores,
-                'hints': self.hints,
+                'version': self.STATE_VERSION,
+                'history': self.history,
                 }
             }
         self.system.track_function('save_hint', event_info)
@@ -399,12 +483,11 @@ class SelfAssessmentModule(XModule):
         """
 
         state = {
-                 'student_answers': self.student_answers,
-                 'hints': self.hints,
+                 'version': self.STATE_VERSION,
+                 'history': self.history,
                  'state': self.state,
-                 'scores': self.scores,
                  'max_score': self._max_score,
-                 'attempts': self.attempts
+                 'attempts': self.attempts,
         }
         return json.dumps(state)
 
