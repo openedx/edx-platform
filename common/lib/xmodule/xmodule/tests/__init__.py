@@ -19,7 +19,7 @@ import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
 
-i4xs = ModuleSystem(
+test_system = ModuleSystem(
     ajax_url='courses/course_id/modx/a_location',
     track_function=Mock(),
     get_module=Mock(),

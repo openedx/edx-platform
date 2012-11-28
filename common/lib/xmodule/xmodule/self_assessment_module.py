@@ -109,14 +109,12 @@ class SelfAssessmentModule(XModule):
 
         self.state = instance_state.get('state', 'initial')
 
+        self.attempts = instance_state.get('attempts', 0)
+        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
+
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
-
-        self.attempts = instance_state.get('attempts', 0)
-
-        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
 
         self.rubric = definition['rubric']
         self.prompt = definition['prompt']
@@ -149,26 +147,19 @@ class SelfAssessmentModule(XModule):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
         return rewrite_links(html, self.rewrite_content_links)
 
-    def get_score(self):
-        """
-        Returns dict with 'score' key
-        """
-        return {'score': self.get_last_score()}
-
     def max_score(self):
         """
         Return max_score
         """
         return self._max_score
 
-    def get_last_score(self):
+    def get_score(self):
         """
         Returns the last score in the list
         """
-        last_score=0
-        if(len(self.scores)>0):
-            last_score=self.scores[len(self.scores)-1]
-        return last_score
+        if len(self.scores) > 0:
+            return self.scores[-1]
+        return 0
 
     def get_progress(self):
         '''
@@ -176,7 +167,7 @@ class SelfAssessmentModule(XModule):
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_last_score(), self._max_score)
+                return Progress(self.get_score(), self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
