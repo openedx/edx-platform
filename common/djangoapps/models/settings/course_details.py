@@ -5,6 +5,7 @@ import json
 from json.encoder import JSONEncoder
 import time
 from util.converters import jsdate_to_time, time_to_date
+from contentstore.utils import get_modulestore
 
 class CourseDetails:
     def __init__(self, location):
@@ -28,7 +29,7 @@ class CourseDetails:
             
         course = cls(course_location)
         
-        descriptor = modulestore('direct').get_item(course_location)
+        descriptor = get_modulestore(course_location).get_item(course_location)
             
         course.start_date = descriptor.start
         course.end_date = descriptor.end
@@ -37,25 +38,25 @@ class CourseDetails:
         
         temploc = course_location._replace(category='about', name='syllabus')
         try:
-            course.syllabus = modulestore('direct').get_item(temploc).definition['data']
+            course.syllabus = get_modulestore(temploc).get_item(temploc).definition['data']
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='overview')
         try:
-            course.overview = modulestore('direct').get_item(temploc).definition['data']
+            course.overview = get_modulestore(temploc).get_item(temploc).definition['data']
         except ItemNotFoundError:
             pass
         
         temploc = temploc._replace(name='effort')
         try:
-            course.effort = modulestore('direct').get_item(temploc).definition['data']
+            course.effort = get_modulestore(temploc).get_item(temploc).definition['data']
         except ItemNotFoundError:
             pass
         
         temploc = temploc._replace(name='video')
         try:
-            course.intro_video = modulestore('direct').get_item(temploc).definition['data']
+            course.intro_video = get_modulestore(temploc).get_item(temploc).definition['data']
         except ItemNotFoundError:
             pass
         
@@ -69,7 +70,7 @@ class CourseDetails:
         ## TODO make it an error for this to be undefined & for it to not be retrievable from modulestore        
         course_location = jsondict['course_location']
         ## Will probably want to cache the inflight courses because every blur generates an update
-        descriptor = modulestore('direct').get_item(course_location)
+        descriptor = get_modulestore(course_location).get_item(course_location)
         
         dirty = False
         
@@ -110,21 +111,21 @@ class CourseDetails:
             descriptor.enrollment_end = converted
             
         if dirty:
-            modulestore('direct').update_metadata(course_location, descriptor.metadata)
+            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
             
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
         temploc = Location(course_location)._replace(category='about', name='syllabus')
-        modulestore('direct').update_item(temploc, jsondict['syllabus'])
+        get_modulestore(temploc).update_item(temploc, jsondict['syllabus'])
 
         temploc = temploc._replace(name='overview')
-        modulestore('direct').update_item(temploc, jsondict['overview'])
+        get_modulestore(temploc).update_item(temploc, jsondict['overview'])
         
         temploc = temploc._replace(name='effort')
-        modulestore('direct').update_item(temploc, jsondict['effort'])
+        get_modulestore(temploc).update_item(temploc, jsondict['effort'])
         
         temploc = temploc._replace(name='video')
-        modulestore('direct').update_item(temploc, jsondict['intro_video'])
+        get_modulestore(temploc).update_item(temploc, jsondict['intro_video'])
         
                     
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm

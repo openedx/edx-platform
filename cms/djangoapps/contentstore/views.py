@@ -46,34 +46,17 @@ import time
 from contentstore import course_info_model
 from models.settings.course_details import CourseDetails
 from models.settings.course_details import CourseDetailsEncoder
+from contentstore.utils import get_modulestore
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
-
-
-
-
-
-
 
 log = logging.getLogger(__name__)
 
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
-
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-
-
-def _modulestore(location):
-    """
-    Returns the correct modulestore to use for modifying the specified location
-    """
-    if location.category in DIRECT_ONLY_CATEGORIES:
-        return modulestore('direct')
-    else:
-        return modulestore()
 
 
 # ==== Public views ==================================================
@@ -543,7 +526,7 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    store = _modulestore(item_loc)
+    store = get_modulestore(item_loc)
 
 
     # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
@@ -574,7 +557,7 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    store = _modulestore(Location(item_location));
+    store = get_modulestore(Location(item_location));
 
     if request.POST.get('data') is not None:
         data = request.POST['data']
@@ -677,10 +660,10 @@ def clone_item(request):
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = _modulestore(template).get_item(parent_location)
+    parent = get_modulestore(template).get_item(parent_location)
     dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
-    new_item = _modulestore(template).clone_item(template, dest_location)
+    new_item = get_modulestore(template).clone_item(template, dest_location)
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
@@ -689,10 +672,10 @@ def clone_item(request):
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
 
-    _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
+    get_modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
 
     if new_item.location.category not in DETACHED_CATEGORIES:
-        _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+        get_modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
