@@ -46,7 +46,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     )
 
     @$('.component').each((idx, element) =>
-        new CMS.Views.ModuleEdit(
+        new CMS.Views.HTMLModuleEdit(
             el: element,
             onDelete: @deleteComponent,
             model: new CMS.Models.Module(
@@ -82,9 +82,9 @@ class CMS.Views.UnitEdit extends Backbone.View
 
   addNewComponent: (event) =>
     event.preventDefault()
+    type = $(event.currentTarget).data('type')
 
     @$componentItem = $('<li>').addClass('editing')
-    type = $(event.currentTarget).data('type')
 
     switch type
       when 'video'
@@ -95,22 +95,29 @@ class CMS.Views.UnitEdit extends Backbone.View
         $preview = $($('#problem-preview').html())
         initProblemEditors(@$editor, $preview)
       when 'html'
-        @$editor = $($('#html-editor').html())
-        $preview = $('<div class="html-preview"></div>')
-        initHTMLEditor(@$editor, $preview)
+        $editView = $('<li>').addClass('component')
+        @$newComponentItem.before($editView)
+        parent = @$el.data('id')
+        moduleEditor = new CMS.Views.HTMLModuleEdit(
+            el: $editView,
+            onDelete: @deleteComponent,
+            isNew: true,
+            parent: parent,
+            model: new CMS.Models.Module()
+          )
+        moduleEditor.enterEditMode()
+        return
       when 'discussion'
         @$editor = $($('#discussion-editor').html())
         $preview = $($('#discussion-preview').html())        
 
-    @$editor.find('.save-button, .cancel-button').bind('click', =>
-      @$componentItem.removeClass('editing')
-      @closeEditor()
-    )
+    @$editor.find('.cancel-button').bind('click', @closeSpeedEditor)
+    @$editor.find('.save-button').bind('click', @saveSpeedEditor)
 
     $componentActions = $($('#component-actions').html())
 
     @$componentItem.append(@$editor)
-    @$componentItem.append($preview)
+    #@$componentItem.append($preview)
 
     @$componentItem.append($componentActions)
     @$componentItem.hide()
@@ -118,6 +125,25 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$componentItem.show()
     $modalCover.fadeIn(200)
     $modalCover.bind('click', @closeEditor)
+
+  saveSpeedEditor: (event) =>
+    html = getHTMLContent()
+    @$componentItem.remove()
+    @closeEditor()
+    module = new CMS.Views.HTMLModuleEdit(
+      onDelete: @deleteComponent
+      model: new CMS.Models.Module()
+    )
+    @$newComponentItem.before(module.$el)
+    module.cloneTemplate(
+      @$el.data('id'),
+      'i4x://edx/templates/html/Empty',
+      html
+    ) 
+
+  closeSpeedEditor: (event) =>
+    @$componentItem.remove()
+    @closeEditor()   
 
   closeEditor: (event) =>
     @$editor.slideUp(150)

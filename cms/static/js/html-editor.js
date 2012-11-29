@@ -1,15 +1,16 @@
 var $body;
-var $htmlPreview;
 var $htmlEditor;
 var $visualEditor;
 var $assetWidget;
 var $linkDialog;
 var visualEditor;
 var htmlEditor;
+var htmlEditorTargetId;
 
-function initHTMLEditor($editor, $prev) {
+function initHTMLEditor($editor, html) {
   $htmlEditor = $editor;
-  $htmlPreview = $prev;
+  htmlEditorTargetId = null;
+  var _html = html;
 
   // there's a race condition here. wait a bit, then init tiny
   setTimeout(function() {
@@ -59,6 +60,11 @@ function initHTMLEditor($editor, $prev) {
         });
       }
     });
+
+    if(_html != null) {
+      htmlEditor.setValue(_html)
+      convertHTMLToVisual()
+    }
   }, 100);
   
   htmlEditor = CodeMirror.fromTextArea($editor.find('.html-box')[0], {
@@ -67,7 +73,8 @@ function initHTMLEditor($editor, $prev) {
     lineNumbers: true
   });
 
-  $editor.find('.save-button, .cancel-button').bind('click', updateHTMLPreview);
+  $editor.find('.save-button').bind('click', saveHTMLEditor);
+  $editor.find('.cancel-button').bind('click', cancelHTMLEditor);
 }
 
 function closeLinkDialog(e) {
@@ -118,9 +125,25 @@ function convertHTMLToVisual() {
 }
 
 function updateHTMLPreview() {
+  //if(currentEditor == htmlEditor) {
+  //  $htmlPreview.html(htmlEditor.getValue());
+  //} else {
+  //  $htmlPreview.html($visualEditor.html());
+  //}
+}
+
+function getHTMLContent() {
   if(currentEditor == htmlEditor) {
-    $htmlPreview.html(htmlEditor.getValue());
+    return htmlEditor.getValue();
   } else {
-    $htmlPreview.html($visualEditor.html());
-  }
+    return $visualEditor.html();
+  }  
+}
+
+function saveHTMLEditor() {
+
+}
+
+function cancelHTMLEditor() {
+
 }

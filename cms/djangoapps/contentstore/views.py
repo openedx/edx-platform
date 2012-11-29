@@ -677,6 +677,7 @@ def unpublish_unit(request):
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
+    data = request.POST.get('data')
     
     display_name = request.POST.get('display_name')
 
@@ -696,6 +697,11 @@ def clone_item(request):
         new_item.metadata['display_name'] = display_name
 
     _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
+
+    # seed any initial content, if passed by caller
+    logging.debug('data = {0}'.format(data))
+    if data is not None:
+        _modulestore(template).update_item(new_item.location.url(), data)
 
     if new_item.location.category not in DETACHED_CATEGORIES:
         _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
