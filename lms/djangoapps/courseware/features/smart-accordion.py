@@ -74,7 +74,8 @@ def browse_course(course_id):
         rendered_sections = world.browser.find_by_css('#accordion > nav > div')[chapter_it].find_by_tag('li')
         num_rendered_sections = len(rendered_sections)
 
-        msg = '%d sections expected, %d sections found on page, %s - %d - %s' %  (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name'])
+        msg = ('%d sections expected, %d sections found on page, %s - %d - %s' %
+                (num_sections, num_rendered_sections, course_id, chapter_it, chapters[chapter_it]['chapter_name']))
         logger.debug(msg)
         assert num_sections == num_rendered_sections, msg
 
@@ -104,10 +105,12 @@ def browse_course(course_id):
                 rendered_tabs = 0
                 num_rendered_tabs = 0
 
-            msg = '%d tabs expected, %d tabs found, %s - %d - %s' % (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name'])
+            msg = ('%d tabs expected, %d tabs found, %s - %d - %s' % 
+                        (num_tabs, num_rendered_tabs, course_id, section_it, sections[section_it]['section_name']))
             logger.debug(msg)
             assert num_tabs == num_rendered_tabs, msg
 
+            tabs = sections[section_it]['tabs']
             tab_it = 0
 
             ## Iterate the tabs
@@ -116,7 +119,17 @@ def browse_course(course_id):
                 rendered_tabs[tab_it].find_by_tag('a').click()
 
                 ## do something with the tab sections[section_it]
-                check_for_errors()
+                # e = world.browser.find_by_css('section.course-content section')
+                # process_section(e)
+                tab_children = tabs[tab_it]['children_count']
+                tab_class = tabs[tab_it]['class']
+                if tab_children != 0:
+                    rendered_items = world.browser.find_by_css('div#seq_content > section > ol > li > section')
+                    num_rendered_items = len(rendered_items)              
+                    msg = ('%d items expected, %d items found, %s - %d - %s - tab %d' %
+                        (tab_children, num_rendered_items, course_id, section_it, sections[section_it]['section_name'], tab_it))
+                    logger.debug(msg)
+                    assert tab_children == num_rendered_items, msg
 
                 tab_it += 1
 
