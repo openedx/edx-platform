@@ -95,6 +95,7 @@
 
 
 body.discussion {
+  
   .new-post-form-errors {
     display: none;
     background: $error-red;
@@ -1261,8 +1262,8 @@ body.discussion {
   .discussion-article {
     position: relative;
     padding: 40px;
-    min-height: 468px;
-
+    min-height: 468px;         
+    
     a {
       word-wrap: break-word;
     }
@@ -1315,6 +1316,9 @@ body.discussion {
         background-position: 0 0;
       }
     }
+    
+    
+    
   }
 
   .discussion-post {
@@ -2412,3 +2416,11 @@ body.discussion {
 .discussion-user-threads {
   @extend .discussion-module
 }
+
+.flagdiv{
+      font-size: 12px;
+      color: #888;
+      align:right;
+      font-style: italic; 
+      
+    }   
