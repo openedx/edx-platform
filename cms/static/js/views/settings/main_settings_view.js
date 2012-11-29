@@ -87,43 +87,85 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 	initialize : function() {
 		// TODO move the html frag to a loaded asset
 		this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="ss-icon ss-standard">&#x1F4C4;</i><%= filename %></a>');
+		this.errorTemplate = _.template('<span class="message-error"><%= message %></span>');
+		this.model.on('error', this.handleValidationError, this);
 	},
 	
 	render: function() {
-		this.setupDatePicker('#course-start', 'start_date');
-		this.setupDatePicker('#course-end', 'end_date');
-		this.setupDatePicker('#enrollment-start', 'enrollment_start');
-		this.setupDatePicker('#enrollment-end', 'enrollment_end');
+		this.setupDatePicker('start_date')
+		this.setupDatePicker('end_date')
+		this.setupDatePicker('enrollment_start')
+		this.setupDatePicker('enrollment_end')
 		
 		if (this.model.has('syllabus')) {
-			this.$el.find('.current-course-syllabus .doc-filename').html(
+			this.$el.find(this.fieldToSelectorMap['syllabus']).html(
 					this.fileAnchorTemplate({
 						fullpath : this.model.get('syllabus'),
 						filename: 'syllabus'}));
 			this.$el.find('.remove-course-syllabus').show();
 		}
 		else {
-			this.$el.find('.current-course-syllabus .doc-filename').html("");
+			this.$el.find(this.fieldToSelectorMap['syllabus']).html("");
 			this.$el.find('.remove-course-syllabus').hide();
 		}
 		
-		this.$el.find('#course-overview').val(this.model.get('overview'));
+		this.$el.find(this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
 		
 		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
 		if (this.model.has('intro_video')) {
 			this.$el.find('.remove-course-introduction-video').show();
-			this.$el.find('#course-introduction-video').val(this.model.getVideoSource());
+			this.$el.find(this.fieldToSelectorMap['intro_video']).val(this.model.getVideoSource());
 		}
 		else this.$el.find('.remove-course-introduction-video').hide();
 		
-		this.$el.find("#course-effort").val(this.model.get('effort'));
+		this.$el.find(this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 		
 		return this;
 	},
+	fieldToSelectorMap : {
+		'start_date' : "#course-start",
+		'end_date' : '#course-end',
+		'enrollment_start' : '#enrollment-start',
+		'enrollment_end' : '#enrollment-end',
+		'syllabus' : '.current-course-syllabus .doc-filename',
+		'overview' : '#course-overview',
+		'intro_video' : '#course-introduction-video',
+		'effort' : "#course-effort"
+	},
 	
-	setupDatePicker : function(elementName, fieldName) {
+	_cacheValidationErrors : null,
+	handleValidationError : function(model, error) {
+		this._cacheValidationErrors = error;
+		// error is object w/ fields and error strings
+		for (var field in error) {
+			var ele = this.$el.find(this.fieldToSelectorMap[field]); 
+			if ($(ele).is('div')) {
+				// put error on the contained inputs
+				$(ele).find('input, textarea').addClass('error');
+			}
+			else $(ele).addClass('error');
+			$(ele).parent().append(this.errorTemplate({message : error[field]}));
+		}
+	},
+	
+	clearValidationErrors : function() {
+		if (this._cacheValidationErrors == null) return;
+		// error is object w/ fields and error strings
+		for (var field in this._cacheValidationErrors) {
+			var ele = this.$el.find(this.fieldToSelectorMap[field]); 
+			if ($(ele).is('div')) {
+				// put error on the contained inputs
+				$(ele).find('input, textarea').removeClass('error');
+			}
+			else $(ele).removeClass('error');
+			$(ele).nextAll('.message-error').remove();
+		}
+		this._cacheValidationErrors = null;
+	},
+	
+	setupDatePicker : function(fieldName) {
 		var cacheModel = this.model;
-		var div = this.$el.find(elementName);
+		var div = this.$el.find(this.fieldToSelectorMap[fieldName]);
 		var datefield = $(div).find(".date");
 		var timefield = $(div).find(".time");
 		var savefield = function() { 
@@ -143,7 +185,8 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 	},
 	
 	updateModel: function(event) {
-		// figure out which field
+		this.clearValidationErrors();
+
 		switch (event.currentTarget.id) {
 		case 'course-start-date': // handled via onSelect method
 		case 'course-end-date':
@@ -181,7 +224,7 @@ CMS.Views.Settings.Details = Backbone.View.extend({
 		if (this.model.has('intro_video')) {
 			this.model.save_videosource(null);
 			this.$el.find(".current-course-introduction-video iframe").attr("src", "");
-			this.$el.find('#course-introduction-video').val("");
+			this.$el.find(this.fieldToSelectorMap['intro_video']).val("");
 		}
 	}
 	
