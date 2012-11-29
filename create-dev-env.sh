@@ -98,8 +98,9 @@ RUBY_VER="1.9.3"
 NUMPY_VER="1.6.2"
 SCIPY_VER="0.10.1"
 BREW_FILE="$BASE/mitx/brew-formulas.txt"
+APT_REPOS_FILE="$BASE/mitx/apt-repos.txt"
+APT_PKGS_FILE="$BASE/mitx/apt-packages.txt"
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
-APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor nodejs npm graphviz graphviz-dev mysql-server libmysqlclient-dev libgeos-dev"
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -182,16 +183,22 @@ case `uname -s` in
             error "Please install lsb-release."
             exit 1
         }
+
         distro=`lsb_release -cs`
         case $distro in
             maya|lisa|natty|oneiric|precise|quantal)
                 output "Installing ubuntu requirements"
-                sudo apt-get install python-software-properties
-                sudo add-apt-repository ppa:chris-lea/node.js
-                sudo apt-get -y update
+
                 # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
-                sudo DEBIAN_FRONTEND=noninteractive apt-get -y install $APT_PKGS
-                sudo npm install coffee-script
+                export DEBIAN_FRONTEND=noninteractive
+
+                # add repositories
+                cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
+                sudo apt-get -y update
+
+                # install packages listed in APT_PKGS_FILE
+                cat $APT_PKGS_FILE | xargs sudo apt-get -y install
+
                 clone_repos
                 ;;
             *)
@@ -272,7 +279,7 @@ output "Installing rvm and ruby"
 curl -sL get.rvm.io | bash -s -- --version 1.15.7
 source $RUBY_DIR/scripts/rvm
 # skip the intro
-LESS="-E" rvm install $RUBY_VER
+LESS="-E" rvm install $RUBY_VER --with-readline
 output "Installing gem bundler"
 gem install bundler
 output "Installing ruby packages"
