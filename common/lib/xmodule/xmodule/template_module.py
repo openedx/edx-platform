@@ -3,7 +3,7 @@ from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
 from xmodule.modulestore.django import modulestore
-
+import logging
 
 class CustomTagModule(XModule):
     """
@@ -61,7 +61,7 @@ class CustomTagDescriptor(RawDescriptor):
         # cdodge: look up the template as a module
         template_loc = self.location._replace(category='custom_tag_template', name=template_name)
 
-        template_module = modulestore().get_item(template_loc)
+        template_module = modulestore().get_instance(system.course_id, template_loc)
         template_module_data = template_module.definition['data']
         template = Template(template_module_data)
         return template.render(**params)
