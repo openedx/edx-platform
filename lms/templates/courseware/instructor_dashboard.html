@@ -171,13 +171,34 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Analytics'):
-   <table>
-     % for r in analytics_json:
+
+   <p>Number of students enrolled: ${students_enrolled_json['data']['nb_students_enrolled']}
+   </p>
+
+   <p>
+     Students who attempted at least one exercise:
+     <table>
+     <tr><td>Module</td><td>Number of students</td></tr>
+     % for k,v in analytics_json['data'].items():
      <tr>
-       <td>${r['day']}</td><td>${r['student_count']}</td>
+     <td>${k}</td> <td>${v}</td>
      </tr>
      % endfor
-   </table>
+     </table>
+   </p>
+
+   <p>
+     Daily activity:
+     <table>
+     <tr><td>Day</td><td>Number of students</td></tr>
+     % for k,v in daily_activity_json['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+   </p>
+
 
 %endif
 

@@ -271,12 +271,19 @@ def instructor_dashboard(request, course_id):
     # analytics
 
     analytics_json = None
+    students_enrolled_json = None
+    daily_activity_json = None
 
     if idash_mode == 'Analytics':
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_daily_activity?sid=2")
-        #analytics_html = req.text
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerHomework&course_id=%s" % course_id)
         analytics_json = req.json
-    
+
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsEnrolled&course_id=%s" % course_id)
+        students_enrolled_json = req.json
+
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=DailyActivityAnalyzer&from=2012-11-19&to=2012-11-27")
+        daily_activity_json = req.json
+
     #----------------------------------------
     # context for rendering
     context = {'course': course,
@@ -292,6 +299,8 @@ def instructor_dashboard(request, course_id):
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
                'analytics_json' : analytics_json,
+               'students_enrolled_json' : students_enrolled_json,
+               'daily_activity_json' : daily_activity_json,
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
