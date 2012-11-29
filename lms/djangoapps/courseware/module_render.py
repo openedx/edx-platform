@@ -115,7 +115,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_module(user, request, location, student_module_cache, course_id, position=None, not_found_ok = False):
+def get_module(user, request, location, student_module_cache, course_id, position=None, not_found_ok = False, wrap_xmodule_display = True):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -136,7 +136,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
     if possible.  If not possible, return None.
     """
     try:
-        return _get_module(user, request, location, student_module_cache, course_id, position)
+        return _get_module(user, request, location, student_module_cache, course_id, position, wrap_xmodule_display)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -146,7 +146,7 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         log.exception("Error in get_module")
         return None
 
-def _get_module(user, request, location, student_module_cache, course_id, position=None):
+def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display = True):
     """
     Actually implement get_module.  See docstring there for details.
     """
@@ -261,8 +261,13 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         # Make an error module
         return err_descriptor.xmodule_constructor(system)(None, None)
 
+    _get_html = module.get_html
+
+    if wrap_xmodule_display == True:
+        _get_html = wrap_xmodule(module.get_html, module, 'xmodule_display.html')
+
     module.get_html = replace_static_urls(
-        wrap_xmodule(module.get_html, module, 'xmodule_display.html'),
+        _get_html,
         module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
         course_namespace = module.location._replace(category=None, name=None))
 

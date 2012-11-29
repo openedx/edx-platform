@@ -148,7 +148,7 @@ def get_course_about_section(course, section_key):
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
-            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True)
+            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True, wrap_xmodule_display = False)
 
             html = ''
 
@@ -186,15 +186,13 @@ def get_course_info_section(request, cache, course, section_key):
 
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
-    course_module = get_module(request.user, request, loc, cache, course.id)
-
+    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display = False)
     html = ''
 
     if course_module is not None:
         html = course_module.get_html()
 
     return html
-
 
 
 # TODO: Fix this such that these are pulled in as extra course-specific tabs.
@@ -222,7 +220,7 @@ def get_course_syllabus_section(course, section_key):
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
                 return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'])
+                                    course.metadata['data_dir'], course.location)
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
