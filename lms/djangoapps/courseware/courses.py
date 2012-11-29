@@ -220,7 +220,7 @@ def get_course_syllabus_section(course, section_key):
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
                 return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'], course.location)
+                                    course.metadata['data_dir'], course_namespace=course.location)
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
