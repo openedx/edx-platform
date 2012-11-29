@@ -12,10 +12,10 @@
 <%namespace name="units" file="widgets/units.html" />
 
 <%block name="jsextra">
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-<script src="${static.url('js/vendor/date.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
 </%block>
 
 <%block name="header_extras">
@@ -24,7 +24,33 @@
       <header>
         <a href="#" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
-          <h3 class="section-name"><input type="text" value="New Section Name" class="new-section-name" /><a href="#" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}">Save</a><a href="#" class="new-section-name-cancel">Cancel</a></h3>
+          <h3 class="section-name">
+          <form class="section-name-form">
+            <input type="text" value="New Section Name" class="new-section-name" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+          </form>
+        </div>
+      </header>
+    </section>
+  </script>
+
+  <script type="text/template" id="blank-slate-template">
+    <section class="courseware-section branch new-section">
+      <header>
+        <a href="#" class="expand-collapse-icon collapse"></a>
+        <div class="item-details">
+          <h3 class="section-name">
+          <span class="section-name-span">Click here to set the section name</span>
+          <form class="section-name-form">
+            <input type="text" value="New Section Name" class="new-section-name" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+          </form>
+        </div>
+        <div class="item-actions">
+          <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <a href="#" class="drag-handle"></a>
         </div>
       </header>
     </section>
@@ -33,14 +59,14 @@
   <script type="text/template" id="new-subsection-template">
     <li class="branch collapsed">
       <div class="section-item editing">
-        <div>
+        <form class="new-subsection-form">
           <span class="folder-icon"></span>
           <span class="subsection-name">
             <input type="text" value="New Subsection" class="new-subsection-name-input" />
           </span>
-          <a href="#" class="new-subsection-name-save">Save</a>
-          <a href="#" class="new-subsection-name-cancel">Cancel</a>
-        </div>
+          <input type="submit" value="Save" class="new-subsection-name-save" />
+          <input type="button" value="Cancel" class="new-subsection-name-cancel" />
+        </form>
       </div>
       <ol>
         <li>
@@ -83,10 +109,11 @@
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
                 <span class="section-name-span">${section.display_name}</span>
-                <div class="section-name-edit" style="display:none">
+                <form class="section-name-edit" style="display:none">
                   <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
-                  <a href="#" class="save-button edit-section-name-save">Save</a><a href="#" class="cancel-button edit-section-name-cancel">Cancel</a>
-                </div>
+                  <input type="submit" class="save-button edit-section-name-save" value="Save" />
+                  <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
+                </form>
               </h3>
               <div class="section-published-date">
                 <%

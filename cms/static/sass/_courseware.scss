@@ -146,7 +146,7 @@ input.courseware-unit-search-input {
 
 	.section-name-edit {
 		input {
-			font-size: 16px;	
+			font-size: 16px;
 		}
 		
 		.save-button {
@@ -205,7 +205,7 @@ input.courseware-unit-search-input {
 .new-section-name-save,
 .new-subsection-name-save {
 	@include blue-button;
-	padding: 2px 20px 5px;
+	padding: 6px 20px 8px;
 	margin: 0 5px;
 	color: #fff !important;
 }
@@ -213,7 +213,7 @@ input.courseware-unit-search-input {
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
-	padding: 2px 20px 5px;
+	padding: 6px 20px 8px;
 	color: #8891a1 !important;
 }
 
