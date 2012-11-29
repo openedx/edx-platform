@@ -6,6 +6,72 @@
     padding: 12px 0;
   }
 
+  .unit-body {
+    padding: 30px 40px;
+  }
+
+  .components > li {
+    margin: 0;
+    border-radius: 0;
+
+    &.new-component-item {
+      margin-top: 20px;
+    }
+  }
+
+  .component {
+    border: 1px solid $mediumGrey;
+    border-top: none;
+
+    &:first-child {
+      border-top: 1px solid $mediumGrey;
+    }
+
+    &:hover {
+      border: 1px solid $mediumGrey;
+      border-top: none;
+
+      &:first-child {
+        border-top: 1px solid $mediumGrey;
+      }
+
+      .drag-handle {
+        background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+      }
+    }
+
+    .drag-handle {
+      top: 0;
+      right: 0;
+      z-index: 11;
+      width: 35px;
+      border: none;
+      background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+
+      &:hover {
+        background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+      }
+    }
+
+    .component-actions {
+      top: 26px;
+      right: 44px;
+    }
+  }
+
+  .component.editing {
+    .xmodule_display {
+      display: none;
+    }
+  }
+
+  .xmodule_display {
+    padding: 20px 20px 22px;
+    font-size: 24px;
+    font-weight: 300;
+    background: $lightGrey;
+  }
+
   .static-page-item {
     position: relative;    
     margin: 10px 0;

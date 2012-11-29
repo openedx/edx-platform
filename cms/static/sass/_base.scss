@@ -180,6 +180,11 @@ code {
         padding: 20px;
     }
 
+    .details {
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
     h4 {
         padding: 6px 14px;
         border-bottom: 1px solid #cbd1db;
@@ -337,4 +342,29 @@ body.show-wip {
         content: '';
         @extend .spinner-icon;
     }
+}
+
+.new-button {
+    @include grey-button;
+    padding: 20px 0;
+    text-align: center;
+
+    &.big {
+        display: block;
+    }
+}
+
+.edit-button.standard,
+.delete-button.standard {
+  float: left;
+  @include white-button;
+  padding: 3px 10px 4px;
+  margin-left: 7px;
+  font-size: 12px;
+  font-weight: 400;
+
+  .edit-icon,
+  .delete-icon {
+    margin-right: 4px;
+  }
 }
