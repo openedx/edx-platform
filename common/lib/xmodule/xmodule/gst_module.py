@@ -1,6 +1,6 @@
 """
-GST (Graphical-Slider-Tool) module is ungraded xmodule used by students to
-understand functional dependencies
+Graphical slider tool module is ungraded xmodule used by students to
+understand functional dependencies.
 """
 
 # import json
@@ -15,11 +15,12 @@ from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
 from pkg_resources import resource_string
 from xmodule.raw_module import RawDescriptor
+from xmodule.stringify import stringify_children
 
 # log = logging.getLogger("mitx.common.lib.seq_module")
 
 
-class GSTModule(XModule):
+class GraphicalSliderToolModule(XModule):
     ''' Graphical-Slider-Tool Module
     '''
     # js = {'js': [resource_string(__name__, 'js/src/gst/gst.js')]}
@@ -34,92 +35,92 @@ class GSTModule(XModule):
 
         Sample file:
 
-        <gst>
-            <h2> Plot... </h2>
-            <slider name="1" var="a"/>
-            <number name="1" var="a"/>
-            <plot/>
-            <sliders_info>
-            <sliders/>
-            <numbers_info>
-            </numbers_info
-            <plot_info>
-            </plot_info>
-        </gst>
+        <sequential>
+          <vertical>
+            <graphical_slider_tool>
+              <render>
+                Graphic slider tool html. Can include
+                'number', 'slider' and plot tags. They will be replaced
+                by proper number, slider and plot widgets.
+              </render>
+              <configuration>
+                <sliders>
+                  <slider name="1" var="a" range="-100, 1, 100" />
+                </sliders>
+                <numbers>
+                  <number name="1" var="a"/>
+                </numbers>
+                <plot>
+                  <function name="1" y="x^2 + a"/>
+                  <function name="2" y="3*x + b"/>
+                  <!-- xrange and yrange are optional -->
+                  <xrange>-10, 1, 10</xrange>
+                  <!-- xticks and yticks are optional -->
+                  <xticks>1</xticks>
+                  <yticks>1</yticks>
+                </plot>
+                <!-- if some parameter in function is not related to any slider or
+                number, then only error message is displayed.
+                Sliders and numbers are optional. Plot is required.-->
+              </configuration>
+            </graphical_slider_tool>
+          </vertical>
+        </sequential>
         """
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
-        # import ipdb; ipdb.set_trace()
-        # self.rendered = False
 
     def get_html(self):
-        self.render()
+        params = {
+                  'main_html': self.definition['render'].strip(),
+                  'element_id': self.location.html_id(),
+                  'element_class': self.location.category
+                  }
+        self.content = (self.system.render_template(
+                        'graphical_slider_tool.html', params))
         return self.content
 
-    def render(self):
-        # import ipdb; ipdb.set_trace()
-        # if self.rendered:
-            return
-        ## Returns a set of all types of all sub-children
-        # contents = []
-        # # import ipdb; ipdb.set_trace()
-        # for child in self.get_display_items():
-        #     progress = child.get_progress()
-        #     childinfo = {
-        #         'gst': child.get_html(),
-        #         'plot': "\n".join(
-        #             grand_child.display_name.strip()
-        #             for grand_child in child.get_children()
-        #             if 'display_name' in grand_child.metadata
-        #         ),
-        #         # 'progress_status': Progress.to_js_status_str(progress),
-        #         'progress_detail': Progress.to_js_detail_str(progress),
-        #         'type': child.get_icon_class(),
-        #     }
-        #     # if childinfo['title']=='':
-        #         # childinfo['title'] = child.metadata.get('display_name','')
-        #     contents.append(childinfo)
 
-        # params = {'items': contents,
-        #           'element_id': self.location.html_id(),
-        #           'item_id': self.id,
-        #           'position': self.position,
-        #           'tag': self.location.category
-                  # }
-        params= {}
-        self.content = self.system.render_template('gst_module.html', params)
-        # self.rendered = True
-
-
-# class GSTDescriptor(RawDescriptor):
-class GSTDescriptor(MakoModuleDescriptor, XmlDescriptor):
-    mako_template = "widgets/html-edit.html"
-    module_class = GSTModule
-    template_dir_name = 'gst'
+class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
+    module_class = GraphicalSliderToolModule
+    template_dir_name = 'graphical_slider_tool'
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
         Pull out the data into dictionary.
 
+        Args:
+            xml_object: xml from file.
+
         Returns:
-        {
-        'def1': 'def1-some-html',
-        'def2': 'def2-some-html'
-        }
+            dict
         """
-        # import ipdb; ipdb.set_trace()
-        children = []
-        for child in xml_object:
-            try:
-                children.append(system.process_xml(etree.tostring(child)).location.url())
-            except:
-                log.exception("Unable to load child when parsing GST. Continuing...")
-                continue
-        return {'children': children}
+        # check for presense of required tags in xml
+        expected_children_level_0 = ['render', 'configuration']
+        for child in expected_children_level_0:
+            if len(xml_object.xpath(child)) != 1:
+                raise ValueError("Self a\ssessment definition must include \
+                    exactly one '{0}' tag".format(child))
+        expected_children_level_1 = ['plot']
+        for child in expected_children_level_1:
+            if len(xml_object.xpath('configuration')[0].xpath(child)) != 1:
+                raise ValueError("Self a\ssessment definition must include \
+                    exactly one '{0}' tag".format(child))
+        # finished
+
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return stringify_children(xml_object.xpath(k)[0])
+
+        return {
+                    'render': parse('render'),
+                    'configuration': xml_object.xpath('configuration')[0],
+                }
 
     def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
+        '''Return an xml element representing this definition.
+        Not implemented'''
         # import ipdb; ipdb.set_trace()
         xml_object = etree.Element('gst')
 
@@ -133,10 +134,3 @@ class GSTDescriptor(MakoModuleDescriptor, XmlDescriptor):
             add_child(child)
 
         return xml_object
-
-
-    # def __init__(self, system, definition, **kwargs):
-    #     '''Render and save the template for this descriptor instance'''
-    #     # import ipdb; ipdb.set_trace()
-    #     super(GSTDescriptor, self).__init__(system, definition, **kwargs)
-    #     self.rendered_html = self.render_template(system, definition['data'])
