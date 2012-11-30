@@ -1,3 +1,13 @@
-<div align="center" id="element_id" class="element_class">
-${main_html}
+<div align="center" id="${element_id}" class="${element_class}">
+<!-- xidden field to read configuration json from -->
+<div class="${element_class}" id="${element_id}_json" style="hidden"
+data-json="${configuration_json}">
+
+<!-- main xml with marked places for sliders, number and plots -->
+${gst_html}
+
+
+{# widgests  <div class="slider" id="${element_class}_1" data-var="a"></div> #}
+
+
 </div>
