@@ -325,6 +325,9 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ################################# Staff grading config  #####################
 
 STAFF_GRADING_INTERFACE = None
+# Used for testing, debugging
+MOCK_STAFF_GRADING = False
+
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

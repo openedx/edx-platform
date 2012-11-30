@@ -38,7 +38,7 @@ class MockStaffGradingService(object):
                            'rubric': 'A rubric'})
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback):
-        return self.get_next(course_id)
+        return self.get_next(course_id, grader_id)
 
 
 class StaffGradingService(object):
@@ -140,8 +140,28 @@ class StaffGradingService(object):
 
         return r.text
 
-_service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
-#_service = MockStaffGradingService()
+# don't initialize until grading_service() is called--means that just
+# importing this file doesn't create objects that may not have the right config
+_service = None
+
+def grading_service():
+    """
+    Return a staff grading service instance--if settings.MOCK_STAFF_GRADING is True,
+    returns a mock one, otherwise a real one.
+
+    Caches the result, so changing the setting after the first call to this
+    function will have no effect.
+    """
+    global _service
+    if _service is not None:
+        return _service
+
+    if settings.MOCK_STAFF_GRADING:
+        _service = MockStaffGradingService()
+    else:
+        _service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+
+    return _service
 
 def _err_response(msg):
     """
@@ -194,7 +214,7 @@ def _get_next(course_id, grader_id):
     """
 
     try:
-        return _service.get_next(course_id, grader_id)
+        return grading_service().get_next(course_id, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service")
         return json.dumps({'success': False, 'error': 'Could not connect to grading service'})
@@ -228,7 +248,7 @@ def save_grade(request, course_id):
     p = request.POST
 
     try:
-        result_json = _service.save_grade(course_id,
+        result_json = grading_service().save_grade(course_id,
                                           grader_id,
                                           p['submission_id'],
                                           p['score'],

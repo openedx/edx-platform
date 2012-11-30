@@ -233,6 +233,14 @@ class TestStaffGradingService(ct.PageLoader):
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
+        self.student = 'view@test.com'
+        self.instructor = 'view2@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.create_account('u2', self.instructor, self.password)
+        self.activate_user(self.student)
+        self.activate_user(self.instructor)
+        
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         def make_instructor(course):
@@ -241,6 +249,8 @@ class TestStaffGradingService(ct.PageLoader):
             g.user_set.add(ct.user(self.instructor))
 
         make_instructor(self.toy)
+
+        self.mock_service = staff_grading_service.grading_service()
 
         self.logout()
 
@@ -257,7 +267,6 @@ class TestStaffGradingService(ct.PageLoader):
             self.check_for_post_code(404, url)
 
 
-    @patch.object(staff_grading_service, '_service', _mock_service)
     def test_get_next(self):
         self.login(self.instructor, self.password)
 
@@ -266,10 +275,9 @@ class TestStaffGradingService(ct.PageLoader):
         r = self.check_for_get_code(200, url)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
-        self.assertEquals(d['submission_id'], _mock_service.cnt)
+        self.assertEquals(d['submission_id'], self.mock_service.cnt)
 
 
-    @patch.object(staff_grading_service, '_service', _mock_service)
     def test_save_grade(self):
         self.login(self.instructor, self.password)
 
@@ -281,6 +289,6 @@ class TestStaffGradingService(ct.PageLoader):
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
-        self.assertEquals(d['submission_id'], _mock_service.cnt)
+        self.assertEquals(d['submission_id'], self.mock_service.cnt)
 
 

@@ -65,6 +65,10 @@ XQUEUE_INTERFACE = {
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
 
+
+# Don't rely on a real staff grading backend
+MOCK_STAFF_GRADING = True
+
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
 STATICFILES_DIRS = [
@@ -99,7 +103,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
