@@ -2028,6 +2028,46 @@ class OpenEndedResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
+    def _convert_longform_feedback_to_html(response_items):
+        """
+        Take in a dictionary, and return html formatted strings appropriate for sending via xqueue.
+        Input:
+            Dictionary with keys success, feedback, and errors
+        Output:
+            String
+        """
+
+        feedback_item_start='<div class="{feedback_key}">'
+        feedback_item_end='</div>'
+
+        for tag in ['status', 'feedback']:
+            if tag not in response_items:
+                feedback_long=feedback_item_start.format(feedback_key="errors") + "Error getting feedback." + feedback_item_end
+
+        feedback_items=response_items['feedback']
+        try:
+            feedback_items=json.loads(feedback_items)
+        except:
+            pass
+
+        success=response_items['success']
+
+        if success:
+            feedback_long=""
+            for k,v in feedback_items.items():
+                feedback_long+=feedback_item_start.format(feedback_key=k)
+                feedback_long+=str(v)
+                feedback_long+=feedback_item_end
+
+            if len(feedback_items)==0:
+                feedback_long=feedback_item_start.format(feedback_key="feedback") + "No feedback available." + feedback_item_end
+
+        else:
+            feedback_long=feedback_item_start.format(feedback_key="errors") + response_items['feedback']  + feedback_item_end
+
+        return feedback_long
+
+
     def _format_feedback(self, response_items):
         """
         Input:
@@ -2036,11 +2076,10 @@ class OpenEndedResponse(LoncapaResponse):
             Return error message or feedback template
         """
 
+        feedback=self._convert_longform_feedback_to_html(response_items)
+
         if not response_items['success']:
-            return render_to_string("open_ended_error.html", {'errors' : response_items['feedback']})
-
-
-        feedback=response_items['feedback']
+            return render_to_string("open_ended_error.html", {'errors' : feedback})
 
         feedback_template=render_to_string("open_ended_feedback.html",{
             'grader_type' : response_items['grader_type'],
