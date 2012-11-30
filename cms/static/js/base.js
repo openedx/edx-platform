@@ -93,7 +93,7 @@ $(document).ready(function() {
     // section name editing
     $('.section-name').bind('click', editSectionName);
     $('.edit-section-name-cancel').bind('click', cancelEditSectionName);
-    $('.edit-section-name-save').bind('click', saveEditSectionName);
+    // $('.edit-section-name-save').bind('click', saveEditSectionName);
 
     // section date setting
     $('.set-publish-date').bind('click', setSectionScheduleDate);
@@ -585,33 +585,44 @@ function hideToastMessage(e) {
     $(this).closest('.toast-notification').remove();
 }
 
-function addNewSection(e) {
+function addNewSection(e, isTemplate) {
     e.preventDefault();
+
     var $newSection = $($('#new-section-template').html());
+    var $cancelButton = $newSection.find('.new-section-name-cancel');
     $('.new-courseware-section-button').after($newSection);
     $newSection.find('.new-section-name').focus().select();
-    $newSection.find('.new-section-name-save').bind('click', saveNewSection);
-    $newSection.find('.new-section-name-cancel').bind('click', cancelNewSection);
+    $newSection.find('.section-name-form').bind('submit', saveNewSection);
+    $cancelButton.bind('click', cancelNewSection);
+    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+}
+
+function checkForCancel(e) {
+    if(e.which == 27) {
+        $body.unbind('keyup', checkForCancel);
+        e.data.$cancelButton.click();
+    }
 }
 
 
 function saveNewSection(e) {
     e.preventDefault();
 
-    parent = $(this).data('parent');
-    template = $(this).data('template');
+    var $saveButton = $(this).find('.new-section-name-save');
+    var parent = $saveButton.data('parent');
+    var template = $saveButton.data('template');
+    var display_name = $(this).find('.new-section-name').val();
 
-    display_name = $(this).prev('.new-section-name').val();
-
-    $.post('/clone_item',
-       {'parent_location' : parent,
-           'template' : template,
-           'display_name': display_name,
-           },
-       function(data) {
+    $.post('/clone_item', {
+            'parent_location' : parent,
+            'template' : template,
+            'display_name': display_name,
+        },
+        function(data) {
             if (data.id != undefined)
-               location.reload();
-       });    
+                location.reload();
+        }
+    );
 }
 
 function cancelNewSection(e) {
@@ -619,44 +630,44 @@ function cancelNewSection(e) {
     $(this).parents('section.new-section').remove();
 }
 
-
 function addNewCourse(e) {
     e.preventDefault();
     var $newCourse = $($('#new-course-template').html());
+    var $cancelButton = $newCourse.find('.new-course-cancel');
     $('.new-course-button').after($newCourse);
     $newCourse.find('.new-course-name').focus().select();
-    $newCourse.find('.new-course-save').bind('click', saveNewCourse);
-    $newCourse.find('.new-course-cancel').bind('click', cancelNewCourse);
+    $newCourse.find('form').bind('submit', saveNewCourse);
+    $cancelButton.bind('click', cancelNewCourse);
+    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
 }
 
 function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
-
-    template = $(this).data('template');
-
-    org = $newCourse.find('.new-course-org').val();
-    number = $newCourse.find('.new-course-number').val();
-    display_name = $newCourse.find('.new-course-name').val();
+    var template = $(this).find('.new-course-save').data('template');
+    var org = $newCourse.find('.new-course-org').val();
+    var number = $newCourse.find('.new-course-number').val();
+    var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == ''){
         alert('You must specify all fields in order to create a new course.');
         return;
     }
 
-    $.post('/create_new_course',
-       { 'template' : template,
-           'org' : org,
-           'number' : number,
-           'display_name': display_name,
-           },
-       function(data) {
-            if (data.id != undefined)
-               location.reload(); 
-            else if (data.ErrMsg != undefined)
+    $.post('/create_new_course', {
+        'template' : template,
+        'org' : org,
+        'number' : number,
+        'display_name': display_name,
+        },
+        function(data) {
+            if (data.id != undefined) {
+                window.location = '/' + data.id.replace(/.*:\/\//, '');
+            } else if (data.ErrMsg != undefined) {
                 alert(data.ErrMsg);
-       });    
+            }
+        });
 }
 
 function cancelNewCourse(e) {
@@ -672,35 +683,37 @@ function addNewSubsection(e) {
     $section.find('.new-subsection-name-input').focus().select();
 
     var $saveButton = $newSubsection.find('.new-subsection-name-save');
-    $saveButton.bind('click', saveNewSubsection);
+    var $cancelButton = $newSubsection.find('.new-subsection-name-cancel');
 
-    parent = $(this).parents("section.branch").data("id");
+    var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent)
     $saveButton.data('template', $(this).data('template'));
 
-    $newSubsection.find('.new-subsection-name-cancel').bind('click', cancelNewSubsection);
+    $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
+    $cancelButton.bind('click', cancelNewSubsection);
+    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
 }
 
 function saveNewSubsection(e) {
     e.preventDefault();
 
-    parent = $(this).data('parent');
-    template = $(this).data('template');
+    var parent = $(this).find('.new-subsection-name-save').data('parent');
+    var template = $(this).find('.new-subsection-name-save').data('template');
 
+    var display_name = $(this).find('.new-subsection-name-input').val();
 
-    display_name = $(this).prev('.subsection-name').find('.new-subsection-name-input').val()
-
-    $.post('/clone_item',
-       {'parent_location' : parent,
-           'template' : template,
-           'display_name': display_name,
-           },
-       function(data) {
+    $.post('/clone_item', {
+        'parent_location' : parent,
+        'template' : template,
+        'display_name': display_name
+        },
+        function(data) {
             if (data.id != undefined) {
                 location.reload();             
             }
-       });  
+        }
+    );
 }
 
 function cancelNewSubsection(e) {
@@ -710,22 +723,30 @@ function cancelNewSubsection(e) {
 
 function editSectionName(e) {
     e.preventDefault();
-    $(this).children('div.section-name-edit').show();
-    $(this).children('span.section-name-span').hide();   
+    $(this).unbind('click', editSectionName);
+    $(this).children('.section-name-edit').show();
+    $(this).find('.edit-section-name').focus();
+    $(this).children('.section-name-span').hide();
+    $(this).find('.section-name-edit').bind('submit', saveEditSectionName);
+    $(this).find('.edit-section-name-cancel').bind('click', cancelNewSection);
+    $body.bind('keyup', { $cancelButton: $(this).find('.edit-section-name-cancel') }, checkForCancel);
 }
 
 function cancelEditSectionName(e) {
     e.preventDefault();
     $(this).parent().hide();
-    $(this).parent().siblings('span.section-name-span').show();
+    $(this).parent().siblings('.section-name-span').show();
+    $(this).closest('.section-name').bind('click', editSectionName);
     e.stopPropagation();
 }
 
 function saveEditSectionName(e) {
     e.preventDefault();
 
-    id = $(this).closest("section.courseware-section").data("id");
-    display_name = $.trim($(this).prev('.edit-section-name').val());
+    $(this).closest('.section-name').unbind('click', editSectionName);
+
+    var id = $(this).closest('.courseware-section').data('id');
+    var display_name = $.trim($(this).find('.edit-section-name').val());
 
     $(this).closest('.courseware-section .section-name').append($spinner);
     $spinner.show();
@@ -746,10 +767,10 @@ function saveEditSectionName(e) {
     }).success(function()
     {
         $spinner.delay(250).fadeOut(250);
-        $_this.parent().siblings('span.section-name-span').html(display_name);
-        $_this.parent().siblings('span.section-name-span').show();
-        $_this.parent().hide();
-        e.stopPropagation();        
+        $_this.closest('h3').find('.section-name-span').html(display_name).show();
+        $_this.hide();
+        $_this.closest('.section-name').bind('click', editSectionName);
+        e.stopPropagation();
     });
 }
 
