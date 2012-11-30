@@ -151,13 +151,13 @@ input.courseware-unit-search-input {
 		
 		.save-button {
 			@include blue-button;
-			padding: 7px 20px 7px;
+			padding: 10px 20px;
 			margin-right: 5px;
 		}
 
 		.cancel-button {
 			@include white-button;
-			padding: 7px 20px 7px;
+			padding: 10px 20px;
 		}
 	}
 
