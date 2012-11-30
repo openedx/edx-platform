@@ -2037,20 +2037,15 @@ class OpenEndedResponse(LoncapaResponse):
         Output:
             Return success/fail, error message or feedback template
         """
-        tags=['feedback_items','score','grader_type']
 
-        for tag in tags:
-            if tag not in response_items:
-                return False, "Grader response missing required feedback key!"
-
-        if 'errors' in response_items['feedback_items']:
-            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback_items']['errors']})
+        if not response_items['success']:
+            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback']['errors']})
 
 
         feedback_item_start='<div class="{feedback_key}">'
         feedback_item_end='</div>'
         feedback_long=""
-        for k,v in response_items:
+        for k,v in response_items['feedback']:
             feedback_long+=feedback_item_start.format(feedback_key=k)
             feedback_long+=v
             feedback_long+=feedback_item_end
@@ -2089,7 +2084,7 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['score','feedback', 'grader_type']:
+        for tag in ['score','feedback', 'grader_type', 'success', 'errors']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
                           " tags: 'score', 'feedback")
@@ -2100,11 +2095,7 @@ class OpenEndedResponse(LoncapaResponse):
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
 
-        feedback = self._format_feedback({
-            'score' : score_result['score'],
-            'feedback_items' : score_result['feedback'],
-            'grader_type' : score_result['grader_type'],
-        })
+        feedback = self._format_feedback(score_result)
 
         score_ratio=int(score_result['score'])/self.max_score
 
