@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 import time
+from urllib import quote_plus
 from nose.tools import assert_equals
 
 from logging import getLogger
@@ -98,6 +99,15 @@ def log_in(email, password):
 
     # wait for the page to redraw
     assert world.browser.is_element_present_by_css('.content-wrapper', 10)
+
+@world.absorb
+def save_the_html(path='/tmp'):
+    u = world.browser.url
+    html = world.browser.html.encode('ascii', 'ignore')
+    filename = '%s.html' % quote_plus(u)
+    f = open('%s/%s' % (path, filename), 'w')
+    f.write(html)
+    f.close
 
 ###########  DEBUGGING ##############
 @step(u'I save a screenshot to "(.*)"')

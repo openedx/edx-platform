@@ -9,6 +9,7 @@ def i_click_on_view_courseware(step):
 @step('I click on the "([^"]*)" tab$')
 def i_click_on_the_tab(step, tab):
     world.browser.find_link_by_text(tab).first.click()
+    world.save_the_html()
 
 @step('I visit the courseware URL$')
 def i_visit_the_course_info_url(step):

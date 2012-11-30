@@ -2,19 +2,21 @@
   <h2> ${display_name} </h2>
 % endif
 
-<div id="video_${id}" class="video" data-streams="${streams}"
-data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}"
-data-start="${start}" data-end="${end}">
-  <div class="tc-wrapper">
-    <article class="video-wrapper">
-      <section class="video-player">
-        <div id="${id}"></div>
-      </section>
-
-      <section class="video-controls"></section>
-    </article>
+%if settings.MITX_FEATURES['DISPLAY_TOY_COURSES']:
+  <div id="stub_out_video_for_testing"></div>
+%else:
+  <div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}">
+    <div class="tc-wrapper">
+      <article class="video-wrapper">
+        <section class="video-player">
+          <div id="${id}"></div>
+        </section>
+        <section class="video-controls"></section>
+      </article>
+    </div>
   </div>
-</div>
+%endif
+
 % if source:
 <div class="video-sources">
   <p>Download video <a href="${source}">here</a>.</p>
