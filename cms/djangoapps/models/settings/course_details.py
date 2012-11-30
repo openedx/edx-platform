@@ -4,8 +4,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 import json
 from json.encoder import JSONEncoder
 import time
-from util.converters import jsdate_to_time, time_to_date
 from contentstore.utils import get_modulestore
+from util.converters import jsdate_to_time, time_to_date
 
 class CourseDetails:
     def __init__(self, location):

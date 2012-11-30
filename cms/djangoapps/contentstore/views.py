@@ -44,9 +44,9 @@ import sys
 import tarfile
 import time
 from contentstore import course_info_model
-from models.settings.course_details import CourseDetails
-from models.settings.course_details import CourseDetailsEncoder
 from contentstore.utils import get_modulestore
+from cms.djangoapps.models.settings.course_details import CourseDetails,\
+    CourseDetailsEncoder
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
