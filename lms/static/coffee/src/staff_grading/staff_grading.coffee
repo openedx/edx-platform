@@ -26,6 +26,7 @@ class StaffGradingBackend
         rubric: 'A rubric! ' + @mock_cnt
         submission_id: @mock_cnt
         max_score: 2 + @mock_cnt % 3
+        ml_error_info : 'ML error info!' + @mock_cnt
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
@@ -71,7 +72,8 @@ class StaffGrading
     @rubric_wrapper = $('.rubric-wrapper')
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')        
-    @submit_button = $('.submit-button')        
+    @submit_button = $('.submit-button')
+    @ml_error_info_container = $('.ml-error-info-container')
     
     # model state
     @state = state_no_data
@@ -81,6 +83,7 @@ class StaffGrading
     @error_msg = ''
     @message = ''
     @max_score = 0
+    @ml_error_info= ''
 
     @score = null
 
@@ -127,7 +130,7 @@ class StaffGrading
     
     if response.success
       if response.submission
-        @data_loaded(response.submission, response.rubric, response.submission_id, response.max_score)
+        @data_loaded(response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info)
       else
         @no_more(response.message)
     else
@@ -150,18 +153,20 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (submission, rubric, submission_id, max_score) ->
+  data_loaded: (submission, rubric, submission_id, max_score, ml_error_info) ->
     @submission = submission
     @rubric = rubric
     @submission_id = submission_id
     @feedback_area.val('')
     @max_score = max_score
     @score = null
+    @ml_error_info=ml_error_info
     @state = state_grading
 
   no_more: (message) ->
     @submission = null
     @rubric = null
+    @ml_error_info = null
     @submission_id = null
     @message = message
     @score = null
@@ -183,6 +188,7 @@ class StaffGrading
       @set_button_text('Try loading again')
 
     else if @state == state_grading
+      @ml_error_info_container.html(@ml_error_info)
       @submission_container.html(@submission)
       @rubric_container.html(@rubric)
       show_grading_elements = true
@@ -206,6 +212,7 @@ class StaffGrading
     @submit_button.toggle(show_submit_button)
     @submission_wrapper.toggle(show_grading_elements)
     @rubric_wrapper.toggle(show_grading_elements)
+    @ml_error_info_container.toggle(show_grading_elements)
 
 
   submit: (event) =>
