@@ -3,7 +3,8 @@
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
-        <div class = "flagdiv notflagged"><i class="icon"></i>Report Misuse</div>
+        <a href="#" class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+        <i class="icon"></i>Report Misuse</a>
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
         </ol>

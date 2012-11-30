@@ -60,11 +60,12 @@ if Backbone?
         @vote()
 
     toggleFlagAbuse: (event) ->
+      alert('flag')
       event.preventDefault()
       if window.user in @model.get("abuse_flaggers")
-        @unFlagAbuse()
-      else
         @flagAbuse()
+      else
+        @unFlagAbuse()
 
     toggleFlagSpoiler: (event) ->
       event.preventDefault()
