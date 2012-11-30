@@ -16,6 +16,48 @@
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
+
+  <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
+  <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
+  <script src="${static.url('js/vendor/symbolset.ss-standard.js')}"></script>
+  <script src="${static.url('js/vendor/symbolset.ss-symbolicons.js')}"></script>
+
+  <script type="text/javascript">
+    (function() {
+      $body = $('body');  
+      $('.gradable-status .menu-toggle').bind('click', showGradeMenu);
+      $('.gradable-status .menu').bind('click', selectGradeType);
+    })();
+
+    function showGradeMenu(e) {
+
+      $section = $(this).closest('.gradable-status');
+
+      e.preventDefault();
+      $section.toggleClass('is-active');
+    }
+
+    function selectGradeType(e) {
+      e.preventDefault();
+
+      var $section = $(this).closest('.gradable-status');
+      $section.find('.menu li a').removeClass('is-selected');
+
+
+      var $target = $(e.target).addClass('is-selected');
+      var $label = $section.find('.status-label');
+
+      $section.removeClass('is-active');      
+      $label.html($target.html());
+
+      if ($target.hasClass('gradable-status-notgraded')) {
+        $section.removeClass('is-set');
+      }
+      else {
+        $section.addClass('is-set');
+      }
+    }
+  </script>
 </%block>
 
 <%block name="header_extras">
@@ -77,8 +119,6 @@
       </ol>
     </li>
   </script>
-
-
 </%block>
 
 <%block name="content">
@@ -129,11 +169,25 @@
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
               </div>
-              <div class="section-gradable-status">
-                <input type="checkbox" id="section-gradable-status-true">
-                <label for="section-gradable-status-true">Gradable</label>
+              
+              <div class="gradable-status">
+                <h4 class="status-label">Not Graded</h4>
+                
+                <a class="menu-toggle" href="#">
+                  <span class="ss-icon ss-standard">&#x2713;</span>
+                </a>
+                                
+                <ul class="menu">
+                  <li><a class="is-selected" href="#">Homework</a></li>
+                  <li><a href="#">Finger Exercises</a></li>
+                  <li><a href="#">Lab</a></li>
+                  <li><a href="#">Midterm Exam</a></li>
+                  <li><a href="#">Final Exam</a></li>
+                  <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
+                </ul>
               </div>
             </div>
+            
             <div class="item-actions">
               <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
               <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
@@ -149,13 +203,31 @@
               % for subsection in section.get_children():
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
-                  <div>
-                    <a href="#" data-tooltip="Collapse/expand this subsection" class="expand-collapse-icon expand"></a>
+                  <div class="details">
+                    <a href="#"  data-tooltip="Collapse/expand this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                     </a>
                   </div>
+                  
+                  <div class="gradable-status">
+                    <h4 class="status-label">Not Graded</h4>
+                    
+                    <a class="menu-toggle" href="#">
+                      <span class="ss-icon ss-standard">&#x2713;</span>
+                    </a>
+                                    
+                    <ul class="menu">
+                      <li><a class="is-selected" href="#">Homework</a></li>
+                      <li><a href="#">Finger Exercises</a></li>
+                      <li><a href="#">Lab</a></li>
+                      <li><a href="#">Midterm Exam</a></li>
+                      <li><a href="#">Final Exam</a></li>
+                      <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
+                    </ul>
+                  </div>
+                  
                   <div class="item-actions">
                     <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
                     <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
