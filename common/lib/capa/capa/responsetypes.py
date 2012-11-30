@@ -1921,8 +1921,6 @@ class OpenEndedResponse(LoncapaResponse):
         else:
             self.max_score = 1
 
-        log.debug(self.max_score)
-
     def get_score(self, student_answers):
 
         try:

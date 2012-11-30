@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
