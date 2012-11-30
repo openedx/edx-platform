@@ -2039,21 +2039,17 @@ class OpenEndedResponse(LoncapaResponse):
         """
 
         if not response_items['success']:
-            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback']['errors']})
+            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback']})
 
+        problem_areas=response_items['feedback'].count("</div>")
 
-        feedback_item_start='<div class="{feedback_key}">'
-        feedback_item_end='</div>'
-        feedback_long=""
-        for k,v in response_items['feedback']:
-            feedback_long+=feedback_item_start.format(feedback_key=k)
-            feedback_long+=v
-            feedback_long+=feedback_item_end
+        feedback=response_items['feedback']
 
         feedback_template=render_to_string("open_ended_feedback.html",{
             'grader_type' : response_items['grader_type'],
             'score' : response_items['score'],
-            'feedback_long' : feedback_long,
+            'feedback' : feedback,
+            'problem_areas' : problem_areas,
         })
 
         return True, feedback_template
@@ -2084,10 +2080,9 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['score','feedback', 'grader_type', 'success', 'errors']:
+        for tag in ['score', 'feedback', 'grader_type', 'success', 'errors']:
             if tag not in score_result:
-                log.error("External grader message is missing one or more required"
-                          " tags: 'score', 'feedback")
+                log.error("External grader message is missing required tag: {0}".format(tag))
                 return fail
 
         # Next, we need to check that the contents of the external grader message
