@@ -2420,7 +2420,24 @@ body.discussion {
 .flagdiv{
       font-size: 12px;
       color: #888;
-      align:right;
+      float:right;
       font-style: italic; 
-      
-    }   
+      width:100px;
+    }  
+    
+.notflagged .icon
+{
+  display: inline-block; 
+  width: 20px; 
+  height: 30px; 
+  background: transparent url('../images/notflagged.png') no-repeat 0 0; 
+}
+
+.flagged .icon
+{
+  display: inline-block; 
+  width: 20px; 
+  height: 30px; 
+  background: transparent url('../images/flagged.png') no-repeat 0 0; 
+}
+
