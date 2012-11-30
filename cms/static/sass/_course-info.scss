@@ -8,6 +8,7 @@
 	.course-info-wrapper {
 		display: table;
 		width: 100%;
+		clear: both;
 	}
 
 	.main-column,
@@ -15,13 +16,16 @@
 		float: none;
 		display: table-cell;
 	}
+
+	.main-column {
+		border-radius: 3px 0 0 3px;
+		border-right-color: $mediumGrey;
+	}
 }
 
 .course-updates {
 	padding: 30px 40px;
 	margin: 0;
-	border-radius: 3px 0 0 3px;
-	border-right-color: $mediumGrey;
 
 	.update-list > li {
 		padding: 34px 0 42px;
