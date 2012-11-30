@@ -2027,7 +2027,7 @@ class OpenEndedResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
-    def _convert_longform_feedback_to_html(response_items):
+    def _convert_longform_feedback_to_html(self,response_items):
         """
         Take in a dictionary, and return html formatted strings appropriate for sending via xqueue.
         Input:
