@@ -12,8 +12,6 @@ Feature: View the Course Info tab
     And the Course Info tab is active
     And I do not see "! Info section missing !" anywhere on the page
 
-    # This test is currently failing
-    # see: https://www.pivotaltracker.com/projects/614553?classic=true#!/stories/38801223
     Scenario: I cannot get to the course info tab when not logged in
     Given I am not logged in
     And I visit the homepage

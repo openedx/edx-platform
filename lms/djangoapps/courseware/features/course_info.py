@@ -1,6 +1,5 @@
 from lettuce import world, step
 from lettuce.django import django_url
-#from portal.common import *
 
 @step('I am on an info page')
 def i_am_on_an_info_page(step):
