@@ -24,7 +24,6 @@ import os
 import subprocess
 import xml.sax.saxutils as saxutils
 from shapely.geometry import Point, MultiPoint
-from django.template.loader import render_to_string
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -2079,9 +2078,9 @@ class OpenEndedResponse(LoncapaResponse):
         feedback=self._convert_longform_feedback_to_html(response_items)
 
         if not response_items['success']:
-            return render_to_string("open_ended_error.html", {'errors' : feedback})
+            return self.system.render_template("open_ended_error.html", {'errors' : feedback})
 
-        feedback_template=render_to_string("open_ended_feedback.html",{
+        feedback_template=self.system.render_template("open_ended_feedback.html",{
             'grader_type' : response_items['grader_type'],
             'score' : response_items['score'],
             'feedback' : feedback,
