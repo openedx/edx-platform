@@ -3,21 +3,19 @@ Graphical slider tool module is ungraded xmodule used by students to
 understand functional dependencies.
 """
 
-# import json
+import json
 import logging
-
 from lxml import etree
+import xmltodict
+import re
 
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
-from xmodule.progress import Progress
-from xmodule.exceptions import NotFoundError
-from pkg_resources import resource_string
-from xmodule.raw_module import RawDescriptor
 from xmodule.stringify import stringify_children
 
-# log = logging.getLogger("mitx.common.lib.seq_module")
+
+log = logging.getLogger("mitx.common.lib.gst_module")
 
 
 class GraphicalSliderToolModule(XModule):
@@ -71,14 +69,48 @@ class GraphicalSliderToolModule(XModule):
                          instance_state, shared_state, **kwargs)
 
     def get_html(self):
+        self.get_configuration()
+        gst_html = self.substitute_controls(self.definition['render'].strip())
+
         params = {
-                  'main_html': self.definition['render'].strip(),
+                  'gst_html': gst_html,
                   'element_id': self.location.html_id(),
-                  'element_class': self.location.category
+                  'element_class': self.location.category,
+                  'configuration_json': self.configuration_json
                   }
         self.content = (self.system.render_template(
                         'graphical_slider_tool.html', params))
+        # import ipdb; ipdb.set_trace()
         return self.content
+
+    def substitute_controls(self, html_string):
+        """ Substitue control element via their divs.
+        Simple variant: slider and plot controls are not inside any tag.
+        """
+        plot_div = '<div class="${element_class}_plot" id="${element_id}_plot" \
+        style="width: 600px; height: 600px; padding: 0px; position: relative;"> \
+        This is plot</div>'
+        html_string.replace('$plot$', plot_div)
+        vars = [x['@var'] for x in json.loads(self.configuration_json)['root']['sliders']['slider']]
+        for var in vars:
+            m = re.match('$slider\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
+        if m:
+            # Note: we subtract 15 to compensate for the size of the dot on the screen.
+            # (is a 30x30 image--lms/static/green-pointer.png).
+            (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
+        html.replace('$slider' + ' ' + x['@var'])
+        return html_string
+
+    def get_configuration(self):
+        """Parse self.definition['configuration'] and transfer it to javascript
+        via json.
+        """
+        # root added for interface compatibility with xmltodict.parse
+        self.configuration_json = json.dumps(
+                xmltodict.parse('<root>' +
+                stringify_children(self.definition['configuration'])
+                             + '</root>'))
+        return self.configuration_json
 
 
 class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
