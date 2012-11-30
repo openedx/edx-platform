@@ -1,0 +1,16 @@
+<section>
+    <header>Feedback</header>
+    <div class="shortform">
+        <div class="result-output">
+            <p>Score: ${score}</p>
+            % if grader_type=="ML"
+                <p>Number of potential problem areas identified: ${problem_areas}</p>
+            % endif
+        </div>
+    </div>
+    <div class="longform">
+        <div class="result-output">
+            ${feedback_long}
+        </div>
+    </div>
+</section>

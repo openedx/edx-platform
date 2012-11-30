@@ -24,6 +24,7 @@ import os
 import subprocess
 import xml.sax.saxutils as saxutils
 from shapely.geometry import Point, MultiPoint
+from django.template.loader import render_to_string
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -1965,6 +1966,8 @@ class OpenEndedResponse(LoncapaResponse):
             'max_score' : self.max_score
             })
 
+        log.debug(xheader)
+        log.debug(contents)
         # Submit request. When successful, 'msg' is the prior length of the queue
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
@@ -2027,6 +2030,40 @@ class OpenEndedResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
+    def _format_feedback(self, response_items):
+        """
+        Input:
+            Dictionary called feedback.  Must contain keys seen below.
+        Output:
+            Return success/fail, error message or feedback template
+        """
+        tags=['feedback_items','score','grader_type']
+
+        for tag in tags:
+            if tag not in response_items:
+                return False, "Grader response missing required feedback key!"
+
+        if 'errors' in response_items['feedback_items']:
+            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback_items']['errors']})
+
+
+        feedback_item_start='<div class="{feedback_key}">'
+        feedback_item_end='</div>'
+        feedback_long=""
+        for k,v in response_items:
+            feedback_long+=feedback_item_start.format(feedback_key=k)
+            feedback_long+=v
+            feedback_long+=feedback_item_end
+
+        feedback_template=render_to_string("open_ended_feedback.html",{
+            'grader_type' : response_items['grader_type'],
+            'score' : response_items['score'],
+            'feedback_long' : feedback_long,
+        })
+
+        return True, feedback_template
+
+
     def _parse_score_msg(self, score_msg):
         """
          Grader reply is a JSON-dump of the following dict
@@ -2052,7 +2089,7 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['score','feedback']:
+        for tag in ['score','feedback', 'grader_type']:
             if tag not in score_result:
                 log.error("External grader message is missing one or more required"
                           " tags: 'score', 'feedback")
@@ -2062,7 +2099,12 @@ class OpenEndedResponse(LoncapaResponse):
         #   is safe for the LMS.
         # 1) Make sure that the message is valid XML (proper opening/closing tags)
         # 2) TODO: Is the message actually HTML?
-        feedback = score_result['feedback']
+
+        feedback = self._format_feedback({
+            'score' : score_result['score'],
+            'feedback_items' : score_result['feedback'],
+            'grader_type' : score_result['grader_type'],
+        })
 
         score_ratio=int(score_result['score'])/self.max_score
 
