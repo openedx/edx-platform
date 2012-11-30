@@ -1966,8 +1966,6 @@ class OpenEndedResponse(LoncapaResponse):
             'max_score' : self.max_score
             })
 
-        log.debug(xheader)
-        log.debug(contents)
         # Submit request. When successful, 'msg' is the prior length of the queue
         (error, msg) = qinterface.send_to_queue(header=xheader,
             body=json.dumps(contents))
