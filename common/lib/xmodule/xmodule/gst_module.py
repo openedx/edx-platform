@@ -70,12 +70,14 @@ class GraphicalSliderToolModule(XModule):
 
     def get_html(self):
         self.get_configuration()
+        self.html_id = self.location.html_id()
+        self.html_class = self.location.category
         gst_html = self.substitute_controls(self.definition['render'].strip())
-
+        
         params = {
                   'gst_html': gst_html,
-                  'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
+                  'element_id': self.html_id,
+                  'element_class': self.html_class,
                   'configuration_json': self.configuration_json
                   }
         self.content = (self.system.render_template(
@@ -87,18 +89,44 @@ class GraphicalSliderToolModule(XModule):
         """ Substitue control element via their divs.
         Simple variant: slider and plot controls are not inside any tag.
         """
+        #substitute plot
         plot_div = '<div class="${element_class}_plot" id="${element_id}_plot" \
         style="width: 600px; height: 600px; padding: 0px; position: relative;"> \
         This is plot</div>'
-        html_string.replace('$plot$', plot_div)
-        vars = [x['@var'] for x in json.loads(self.configuration_json)['root']['sliders']['slider']]
+        html_string = html_string.replace('$plot$', plot_div)
+
+        # substitute sliders
+        sliders = json.loads(self.configuration_json)['root']['sliders']['slider']
+        if type(sliders) == dict:
+            sliders = [sliders]
+        vars = [x['@var'] for x in sliders]
+
+        slider_div = '<div class="{element_class}_slider" id="{element_id}_{var}" \
+        data-var="{var}">This is slider</div>'
+
         for var in vars:
-            m = re.match('$slider\[([0-9]+),([0-9]+)]', self.value.strip().replace(' ', ''))
-        if m:
-            # Note: we subtract 15 to compensate for the size of the dot on the screen.
-            # (is a 30x30 image--lms/static/green-pointer.png).
-            (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
-        html.replace('$slider' + ' ' + x['@var'])
+            html_string = re.sub(r'\$slider\s+' + var + r'\$',
+                                slider_div.format(element_class=self.html_class,
+                                                  element_id=self.html_id,
+                                                  var=var),
+                                html_string, flags=re.IGNORECASE | re.UNICODE)
+
+        # substitute numbers
+        inputs = json.loads(self.configuration_json)['root']['inputs']['input']
+        if type(inputs) == dict:
+            inputs = [inputs]
+        vars = [x['@var'] for x in inputs]
+
+        input_div = '<div class="{element_class}_input" id="{element_id}_{var}" \
+        data-var="{var}">This is input</div>'
+
+        for var in vars:
+            html_string = re.sub(r'\$input\s+' + var + r'\$',
+                                input_div.format(element_class=self.html_class,
+                                                 element_id=self.html_id,
+                                                 var=var),
+                                html_string, flags=re.IGNORECASE | re.UNICODE)
+        # import ipdb; ipdb.set_trace()
         return html_string
 
     def get_configuration(self):
