@@ -1730,9 +1730,9 @@ class ImageResponse(LoncapaResponse):
 
     Regions is list of lists [region1, region2, region3, ...] where regionN
     is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
-    
+
     If there is only one region in the list, simpler notation can be used:
-    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly 
+    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
         setting outer list)
 
     Returns:
@@ -1817,19 +1817,24 @@ class ImageResponse(LoncapaResponse):
 
 class OpenEndedResponse(LoncapaResponse):
     """
-    Grade student open ended responses using an external queueing server, called 'xqueue'
+    Grade student open ended responses using an external grading system,
+    accessed through the xqueue system.
 
-    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by OpenEndedResponse:
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are
+    needed by OpenEndedResponse:
+
         system.xqueue = { 'interface': XqueueInterface object,
                           'callback_url': Per-StudentModule callback URL
                                           where results are posted (string),
-                          'default_queuename': Default queuename to submit request (string)
                         }
 
     External requests are only submitted for student submission grading
         (i.e. and not for getting reference answers)
+
+    By default, uses the OpenEndedResponse.DEFAULT_QUEUE queue.
     """
 
+    DEFAULT_QUEUE = 'open-ended'
     response_tag = 'openendedresponse'
     allowed_inputfields = ['openendedinput']
     max_inputfields = 1
@@ -1841,7 +1846,7 @@ class OpenEndedResponse(LoncapaResponse):
         xml = self.xml
         # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
-        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
+        self.queue_name = xml.get('queuename', self.DEFAULT_QUEUE)
 
         #Look for tag named openendedparam that encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
@@ -1883,11 +1888,12 @@ class OpenEndedResponse(LoncapaResponse):
         #Update grader payload with student id.  If grader payload not json, error.
         try:
             grader_payload=json.loads(grader_payload)
-            location=self.system.ajax_url.split("://")[1]
-            org,course,type,name=location.split("/")
+            # NOTE: self.system.location is valid because the capa_module
+            # __init__ adds it (easiest way to get problem location into
+            # response types)
             grader_payload.update({
-                'location' : location,
-                'course_id' : "{0}/{1}".format(org,course),
+                'location' : self.system.location,
+                'course_id' : self.system.course_id,
                 'prompt' : prompt_string,
                 'rubric' : rubric_string,
             })
@@ -1996,7 +2002,6 @@ class OpenEndedResponse(LoncapaResponse):
             oldcmap.set(self.answer_id,
                 msg='Invalid grader reply. Please contact the course staff.')
             return oldcmap
-
 
         correctness = 'correct' if correct else 'incorrect'
 

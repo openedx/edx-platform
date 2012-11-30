@@ -225,6 +225,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           replace_urls=replace_urls,
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
+                          course_id=course_id,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
