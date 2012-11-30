@@ -2035,13 +2035,12 @@ class OpenEndedResponse(LoncapaResponse):
         Input:
             Dictionary called feedback.  Must contain keys seen below.
         Output:
-            Return success/fail, error message or feedback template
+            Return error message or feedback template
         """
 
         if not response_items['success']:
-            return True, render_to_string("open_ended_error.html", {'errors' : response_items['feedback']})
+            return render_to_string("open_ended_error.html", {'errors' : response_items['feedback']})
 
-        problem_areas=response_items['feedback'].count("</div>")
 
         feedback=response_items['feedback']
 
@@ -2049,10 +2048,9 @@ class OpenEndedResponse(LoncapaResponse):
             'grader_type' : response_items['grader_type'],
             'score' : response_items['score'],
             'feedback' : feedback,
-            'problem_areas' : problem_areas,
         })
 
-        return True, feedback_template
+        return feedback_template
 
 
     def _parse_score_msg(self, score_msg):
@@ -2080,7 +2078,7 @@ class OpenEndedResponse(LoncapaResponse):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = %s" % score_result)
             return fail
-        for tag in ['score', 'feedback', 'grader_type', 'success', 'errors']:
+        for tag in ['score', 'feedback', 'grader_type', 'success']:
             if tag not in score_result:
                 log.error("External grader message is missing required tag: {0}".format(tag))
                 return fail
@@ -2098,6 +2096,7 @@ class OpenEndedResponse(LoncapaResponse):
         if score_ratio>=.66:
             correct=True
 
+        log.debug(feedback)
         try:
             etree.fromstring(feedback)
         except etree.XMLSyntaxError as err:
