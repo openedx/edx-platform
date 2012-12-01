@@ -30,7 +30,9 @@ class HtmlModule(XModule):
     
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(self.html, self.rewrite_content_links)
+        output = rewrite_links(self.html, self.rewrite_content_links)
+        log.info('  HTMLModule converting markup "{0}" to "{1}"'.format(self.html, output))
+        return output
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):

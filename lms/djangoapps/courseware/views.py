@@ -293,7 +293,6 @@ def index(request, course_id, chapter=None, section=None,
 
     return result
 
-
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
     '''
@@ -318,12 +317,18 @@ def jump_to(request, course_id, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
+    # choose the appropriate view (and provide the necessary args) based on the 
+    # args provided by the redirect.
     # Rely on index to do all error handling and access control.
-    return redirect('courseware_position',
-                    course_id=course_id,
-                    chapter=chapter,
-                    section=section,
-                    position=position)
+    if chapter is None:
+        return redirect('courseware', course_id=course_id)
+    elif section is None:
+        return redirect('courseware_chapter', course_id=course_id, chapter=chapter)
+    elif position is None:
+        return redirect('courseware_section', course_id=course_id, chapter=chapter, section=section)
+    else:
+        return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
+        
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
