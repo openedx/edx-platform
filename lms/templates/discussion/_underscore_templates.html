@@ -3,8 +3,7 @@
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
-        <a href="#" class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
-        <i class="icon"></i>Report Misuse</a>
+        
         <ol class="responses">
             <li class="loading"><div class="loading-animation"></div></li>
         </ol>
@@ -30,6 +29,7 @@
       <header>
           <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote">
             <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
+            
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -44,6 +44,8 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
+<a href="#" class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+        <i class="icon"></i>Report Misuse</a>      
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
