@@ -15,7 +15,7 @@ class Thread(models.Model):
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id',
+        'closed', 'tags', 'user_id', 'commentable_id'
     ]
 
     initializable_fields = updatable_fields
@@ -80,21 +80,24 @@ class Thread(models.Model):
             url = _url_for_vote_comment(voteable.id)
         else:
             raise CommentClientError("Can only vote / unvote for threads or comments")
-        params = {'user_id': user.id, 'value': value}
+        params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
         
     def unFlagAbuse(self, user, voteable, value):
         if voteable.type == 'thread':
-            url = _url_for_flag_abuse_thread(voteable.id)
+            url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
             raise CommentClientError("Can only vote / unvote for threads or comments")
-        params = {'user_id': user.id, 'value': value}
+        params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)          
         
 def _url_for_flag_abuse_thread(thread_id):
     return "{prefix}/threads/{thread_id}/abuse_flags".format(prefix=settings.PREFIX, thread_id=thread_id)      
+       
+def _url_for_unflag_abuse_thread(thread_id):
+    return "{prefix}/threads/{thread_id}/abuse_unflags".format(prefix=settings.PREFIX, thread_id=thread_id)      
        

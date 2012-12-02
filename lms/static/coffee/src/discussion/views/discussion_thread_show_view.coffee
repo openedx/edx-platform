@@ -45,11 +45,11 @@ if Backbone?
         
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers")
-        @$("[thread-flag]").addClass("flagged")  
-        @$("[thread-flag]").removeClass("notflagged")
+        @$("[data-role=thread-flag]").addClass("flagged")  
+        @$("[data-role=thread-flag]").removeClass("notflagged")
       else
-        @$("[thread-flag]").removeClass("flagged")  
-        @$("[thread-flag]").addClass("notflagged")      
+        @$("[data-role=thread-flag]").removeClass("flagged")  
+        @$("[data-role=thread-flag]").addClass("notflagged")      
 
     updateModelDetails: =>
       @renderVoted()
@@ -70,10 +70,11 @@ if Backbone?
 
     toggleFlagAbuse: (event) ->
       event.preventDefault()
-      if window.user in @model.get("abuse_flaggers")
+      if window.user.id in @model.get("abuse_flaggers")
         @unFlagAbuse()
       else
         @flagAbuse()
+      @renderFlagged()
 
 
     toggleFollowing: (event) ->
@@ -102,7 +103,6 @@ if Backbone?
             @model.set(response, {silent: true})
 
     flagAbuse: ->
-      alert('flag abuse')
       url = @model.urlFor("flagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")
@@ -124,7 +124,6 @@ if Backbone?
             @model.set(response, {silent: true})
 
     unFlagAbuse: ->
-      alert('unflag abuse')
       url = @model.urlFor("unFlagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")

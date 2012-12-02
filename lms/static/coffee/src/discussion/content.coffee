@@ -121,7 +121,7 @@ if Backbone?
       @trigger "change", @
 
     unflagAbuse: ->
-      @get("abuse_flaggers").push window.user.get('id')
+      @get("abuse_flaggers").pop window.user.get('id')
       @trigger "change", @
 
     display_body: ->
