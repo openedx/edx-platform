@@ -4,7 +4,6 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "click .discussion-flag-spoiler": "toggleFlagSpoiler"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
       "click .action-delete": "delete"
@@ -26,6 +25,7 @@ if Backbone?
       @delegateEvents()
       @renderDogear()
       @renderVoted()
+      @renderFlagged()
       @renderAttrs()
       @$("span.timeago").timeago()
       @convertMath()
@@ -42,9 +42,18 @@ if Backbone?
         @$("[data-role=discussion-vote]").addClass("is-cast")
       else
         @$("[data-role=discussion-vote]").removeClass("is-cast")
+        
+    renderFlagged: =>
+      if window.user.id in @model.get("abuse_flaggers")
+        @$("[thread-flag]").addClass("flagged")  
+        @$("[thread-flag]").removeClass("notflagged")
+      else
+        @$("[thread-flag]").removeClass("flagged")  
+        @$("[thread-flag]").addClass("notflagged")      
 
     updateModelDetails: =>
       @renderVoted()
+      @renderFlagged()
       @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
 
     convertMath: ->
@@ -60,19 +69,12 @@ if Backbone?
         @vote()
 
     toggleFlagAbuse: (event) ->
-      alert('flag')
       event.preventDefault()
       if window.user in @model.get("abuse_flaggers")
-        @flagAbuse()
-      else
         @unFlagAbuse()
-
-    toggleFlagSpoiler: (event) ->
-      event.preventDefault()
-      if window.user in @model.abuse_flaggers
-         @unFlagAbuse()
       else
         @flagAbuse()
+
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
@@ -100,6 +102,7 @@ if Backbone?
             @model.set(response, {silent: true})
 
     flagAbuse: ->
+      alert('flag abuse')
       url = @model.urlFor("flagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")
@@ -121,10 +124,10 @@ if Backbone?
             @model.set(response, {silent: true})
 
     unFlagAbuse: ->
-      window.user.unvote(@model)
-      url = @model.urlFor("unvote")
+      alert('unflag abuse')
+      url = @model.urlFor("unFlagAbuse")
       DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
+        $elem: @$(".discussion-flag-abuse")
         url: url
         type: "POST"
         success: (response, textStatus) =>

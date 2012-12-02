@@ -244,6 +244,12 @@ def flag_abuse_for_thread(request, course_id, thread_id, value):
     thread.flagAbuse(user,thread, value)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+def un_flag_abuse_for_thread(request, course_id, thread_id, value):
+    user = cc.User.from_django_user(request.user)
+    thread = cc.Thread.find(thread_id)
+    thread.unFlagAbuse(user,thread, value)
+    return JsonResponse(utils.safe_content(thread.to_dict()))
+
 @require_POST
 @login_required
 @permitted

@@ -10,7 +10,7 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'abuse_flaggers', 'spoiler_flaggers'
+        'highlighted_body', 'endorsed', 'read', 'abuse_flaggers'
     ]
 
     updatable_fields = [
@@ -74,6 +74,17 @@ class Thread(models.Model):
  
         
     def flagAbuse(self, user, voteable, value):
+        if voteable.type == 'thread':
+            url = _url_for_flag_abuse_thread(voteable.id)
+        elif voteable.type == 'comment':
+            url = _url_for_vote_comment(voteable.id)
+        else:
+            raise CommentClientError("Can only vote / unvote for threads or comments")
+        params = {'user_id': user.id, 'value': value}
+        request = perform_request('put', url, params)
+        voteable.update_attributes(request)    
+        
+    def unFlagAbuse(self, user, voteable, value):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':

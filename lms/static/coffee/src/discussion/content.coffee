@@ -82,17 +82,18 @@ if Backbone?
     
   class @Thread extends @Content
     urlMappers:
-      'retrieve' : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
-      'reply'    : -> DiscussionUtil.urlFor('create_comment', @id)
-      'flagAbuse': -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
-      'unvote'   : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
-      'upvote'   : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
-      'downvote' : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
-      'close'    : -> DiscussionUtil.urlFor('openclose_thread', @id)
-      'update'   : -> DiscussionUtil.urlFor('update_thread', @id)
-      'delete'   : -> DiscussionUtil.urlFor('delete_thread', @id)
-      'follow'   : -> DiscussionUtil.urlFor('follow_thread', @id)
-      'unfollow' : -> DiscussionUtil.urlFor('unfollow_thread', @id)
+      'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
+      'reply'       : -> DiscussionUtil.urlFor('create_comment', @id)
+      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
+      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
+      'unvote'      : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
+      'upvote'      : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
+      'downvote'    : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
+      'close'       : -> DiscussionUtil.urlFor('openclose_thread', @id)
+      'update'      : -> DiscussionUtil.urlFor('update_thread', @id)
+      'delete'      : -> DiscussionUtil.urlFor('delete_thread', @id)
+      'follow'      : -> DiscussionUtil.urlFor('follow_thread', @id)
+      'unfollow'    : -> DiscussionUtil.urlFor('unfollow_thread', @id)
 
     initialize: ->
       @set('thread', @)
@@ -120,7 +121,7 @@ if Backbone?
       @trigger "change", @
 
     unflagAbuse: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
+      @get("abuse_flaggers").push window.user.get('id')
       @trigger "change", @
 
     display_body: ->

@@ -44,7 +44,7 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-<a href="#" class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+      <a href="#" class="discussion-flag-abuse <% if user in abuse_flaggers %>flagged <%else%> notflagged<%end%> " data-role="thread-flag" data-tooltip="flag">                
         <i class="icon"></i>Report Misuse</a>      
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
