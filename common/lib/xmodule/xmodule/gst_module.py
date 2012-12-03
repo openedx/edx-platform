@@ -13,6 +13,7 @@ from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
+from pkg_resources import resource_string
 
 
 log = logging.getLogger("mitx.common.lib.gst_module")
@@ -21,9 +22,8 @@ log = logging.getLogger("mitx.common.lib.gst_module")
 class GraphicalSliderToolModule(XModule):
     ''' Graphical-Slider-Tool Module
     '''
-    # js = {'js': [resource_string(__name__, 'js/src/gst/gst.js')]}
-    # #css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
-    # js_module_name = "GST"
+    js = {'js': [resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')]}
+    js_module_name = "GraphicalSliderTool"
 
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
@@ -37,30 +37,55 @@ class GraphicalSliderToolModule(XModule):
           <vertical>
             <graphical_slider_tool>
               <render>
-                Graphic slider tool html. Can include
-                'number', 'slider' and plot tags. They will be replaced
-                by proper number, slider and plot widgets.
+                <p>Graphic slider tool html.</p>
+                <p>Can include 'input', 'slider' and 'plot' tags.
+                They will be replaced by proper number, slider and plot
+                widgets. </p>
+                For example: $slider a$, second $slider b$,
+                  number $input a$, and, plot:
+                  $plot$
+
+                  <!-- Sliders, and plot cannot be inside <p> -->
               </render>
               <configuration>
                 <sliders>
-                  <slider name="1" var="a" range="-100, 1, 100" />
+                  <!-- optional: width=100 (in pixels), default is 400,
+                  show_value=[editable, not-editable], default is disabled.-->
+                  <slider var="a" range="-100, 1, 100" />
+                  <slider var="b" range="-1000, 100, 1000" witdh="300"/>
                 </sliders>
-                <numbers>
-                  <number name="1" var="a"/>
-                </numbers>
+                <inputs>
+                  <!-- optional: width=100 (in pixels), readonly=[true|false] -->
+                  <input var="a" initial="1"/>
+                </inputs>
                 <plot>
-                  <function name="1" y="x^2 + a"/>
-                  <function name="2" y="3*x + b"/>
-                  <!-- xrange and yrange are optional -->
-                  <xrange>-10, 1, 10</xrange>
-                  <!-- xticks and yticks are optional -->
-                  <xticks>1</xticks>
-                  <yticks>1</yticks>
+                  <!-- optional: color=[standard web]; line=[true|false], default true;
+                  dot=[true|false], default false; label="string",
+                  style of line =[normal, dashed], default normal,
+                  point size-->
+                  <function y="x^2 + a" />
+                  <function y="3*x + b" color="red"/>
+                  <!-- asymtotes are functions,
+                  optional: name="string" -->
+                  <function y="b" color="red" style="dashed" name="b"/>
+                  <function y="b/2" color="red" style="dashed" name="b/2"/>
+                  <!-- xrange: min, max, yrange is calculated automatically -->
+                  <xrange>-10, 10</xrange>
+                  <!-- optional number of points, default is 300 -->
+                  <numpoints>60</numpoints>
+                  <!-- xticks and yticks are optional: min, step, max -->
+                  <xticks>-9, 1, 9</xticks>
+                  <yticks>-9, 1, 9</yticks>
+                  <!-- xaxis and xaxis are optional -->
+                  <xaxis unit="cm"/>
+                  <yaxis unit="s"/>
                 </plot>
                 <!-- if some parameter in function is not related to any slider or
                 number, then only error message is displayed.
                 Sliders and numbers are optional. Plot is required.-->
               </configuration>
+              <plot_code>
+              </plot_code>
             </graphical_slider_tool>
           </vertical>
         </sequential>
@@ -73,12 +98,13 @@ class GraphicalSliderToolModule(XModule):
         self.html_id = self.location.html_id()
         self.html_class = self.location.category
         gst_html = self.substitute_controls(self.definition['render'].strip())
-        
+        # import ipdb; ipdb.set_trace()
         params = {
                   'gst_html': gst_html,
                   'element_id': self.html_id,
                   'element_class': self.html_class,
-                  'configuration_json': self.configuration_json
+                  'configuration_json': self.configuration_json,
+                  'plot_code': self.definition['plot_code']
                   }
         self.content = (self.system.render_template(
                         'graphical_slider_tool.html', params))
@@ -157,11 +183,12 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
             dict
         """
         # check for presense of required tags in xml
-        expected_children_level_0 = ['render', 'configuration']
+        expected_children_level_0 = ['render', 'configuration', 'plot_code']
         for child in expected_children_level_0:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self a\ssessment definition must include \
                     exactly one '{0}' tag".format(child))
+
         expected_children_level_1 = ['plot']
         for child in expected_children_level_1:
             if len(xml_object.xpath('configuration')[0].xpath(child)) != 1:
@@ -176,6 +203,7 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         return {
                     'render': parse('render'),
                     'configuration': xml_object.xpath('configuration')[0],
+                    'plot_code': parse('plot_code'),
                 }
 
     def definition_to_xml(self, resource_fs):
