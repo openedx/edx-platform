@@ -110,7 +110,13 @@ if Backbone?
         type: "POST"
         success: (response, textStatus) =>
           if textStatus == 'success'
-            @model.set(response, {silent: true})
+            ###
+            note, we have to clone the array in order to trigger a change event
+            that's 5 hours of my life i'll never get back.
+            ###
+            temp_array = _.clone(@model.get('abuse_flaggers'));
+            temp_array.push(window.user.id)
+            @model.set('abuse_flaggers', temp_array)
 
     unvote: ->
       window.user.unvote(@model)
@@ -131,7 +137,9 @@ if Backbone?
         type: "POST"
         success: (response, textStatus) =>
           if textStatus == 'success'
-            @model.set(response, {silent: true})
+            temp_array = _.clone(@model.get('abuse_flaggers'));
+            temp_array.pop(window.user.id)
+            @model.set('abuse_flaggers', temp_array)
 
     edit: (event) ->
       @trigger "thread:edit", event

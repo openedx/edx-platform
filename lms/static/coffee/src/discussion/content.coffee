@@ -117,11 +117,13 @@ if Backbone?
       @trigger "change", @
       
     flagAbuse: ->
-      @get("abuse_flaggers").push window.user.get('id')
+      temp_array = @get("abuse_flaggers")
+      temp_array.push(window.user.get('id'))
+      @set("abuse_flaggers",temp_array)
       @trigger "change", @
 
     unflagAbuse: ->
-      @get("abuse_flaggers").pop window.user.get('id')
+      @get("abuse_flaggers").pop(window.user.get('id'))
       @trigger "change", @
 
     display_body: ->
