@@ -43,7 +43,9 @@ body.no-header {
 	}
 
 	.left {
-		// width: 750px;
+		position: absolute;
+		left: 0;
+		width: 100%;
 	}
 
 	.class-name {
