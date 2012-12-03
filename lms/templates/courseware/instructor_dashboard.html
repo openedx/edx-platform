@@ -33,6 +33,10 @@ table.stat_table td {
 	border-color: #666666;
 	background-color: #ffffff;
 }
+.divScroll {  
+	height: 200px;  
+	overflow: scroll;  
+}  
 
 a.selectedmode { background-color: yellow; }
 
@@ -176,21 +180,25 @@ function goto( mode)
    </p>
 
    <p>
-     Students who attempted at least one exercise:
-     <table>
-     <tr><td>Module</td><td>Number of students</td></tr>
+     <h2>Students who attempted at least one exercise:</h2>
+
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Module</th><th>Number of students</th></tr>
      % for k,v in analytics_json['data'].items():
      <tr>
      <td>${k}</td> <td>${v}</td>
      </tr>
      % endfor
      </table>
+     </div>
+
    </p>
 
    <p>
-     Daily activity:
-     <table>
-     <tr><td>Day</td><td>Number of students</td></tr>
+     <h2>Daily activity:</h2>
+     <table class="stat_table">
+     <tr><th>Day</td><th>Number of students</td></tr>
      % for k,v in daily_activity_json['data'].items():
      <tr>
      <td>${k}</td> <td>${v}</td>
