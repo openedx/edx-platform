@@ -1851,7 +1851,7 @@ class OpenEndedResponse(LoncapaResponse):
         oeparam = self.xml.find('openendedparam')
         prompt = self.xml.find('prompt')
         rubric = self.xml.find('openendedrubric')
-        self._parse(oeparam,prompt,rubric)
+        self._parse(oeparam, prompt, rubric)
 
     def stringify_children(self, node, strip_tags=True):
         """
@@ -1890,7 +1890,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         #Update grader payload with student id.  If grader payload not json, error.
         try:
-            grader_payload=json.loads(grader_payload)
+            grader_payload = json.loads(grader_payload)
             # NOTE: self.system.location is valid because the capa_module
             # __init__ adds it (easiest way to get problem location into
             # response types)
@@ -1900,7 +1900,7 @@ class OpenEndedResponse(LoncapaResponse):
                 'prompt' : prompt_string,
                 'rubric' : rubric_string,
             })
-            grader_payload=json.dumps(grader_payload)
+            grader_payload = json.dumps(grader_payload)
         except Exception as err:
             log.error("Grader payload is not a json object!")
 
@@ -1924,9 +1924,9 @@ class OpenEndedResponse(LoncapaResponse):
         top_score = oeparam.find('max_score')
         if top_score is not None:
             try:
-                self.max_score= int(top_score.text)
+                self.max_score = int(top_score.text)
             except:
-                self.top_score=1
+                self.max_score = 1
         else:
             self.max_score = 1
 
@@ -1992,7 +1992,8 @@ class OpenEndedResponse(LoncapaResponse):
             #   2) Frontend: correctness='incomplete' eventually trickles down
             #      through inputtypes.textbox and .filesubmission to inform the
             #      browser to poll the LMS
-            cmap.set(self.answer_id, queuestate=queuestate, correctness='incomplete', msg=msg)
+            cmap.set(self.answer_id, queuestate=queuestate,
+                     correctness='incomplete', msg=msg)
 
         return cmap
 
@@ -2001,7 +2002,7 @@ class OpenEndedResponse(LoncapaResponse):
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
-                msg='Invalid grader reply. Please contact the course staff.')
+                msg = 'Invalid grader reply. Please contact the course staff.')
             return oldcmap
 
         correctness = 'correct' if correct else 'incorrect'
@@ -2132,11 +2133,11 @@ class OpenEndedResponse(LoncapaResponse):
 
         feedback = self._format_feedback(score_result)
 
-        score_ratio=int(score_result['score'])/self.max_score
 
-        correct=False
-        if score_ratio>=.66:
-            correct=True
+        # HACK: for now, just assume it's correct if you got more than 2/3.
+        # Also assumes that score_result['score'] is an integer.
+        score_ratio = int(score_result['score']) / self.max_score
+        correct = (score_ratio >= 0.66)
 
         log.debug(feedback)
         try:
