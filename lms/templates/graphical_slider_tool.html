@@ -4,7 +4,19 @@
 <div class="${element_class}" id="${element_id}_json" style="hidden"
 data-json="${configuration_json}"></div>
 
+<!-- xidden field to read configuration json from -->
+<div class="${element_class}" id="${element_id}_plot_code" style="hidden"
+data-plot="${plot_code}"></div>
+
 <!-- main xml with marked places for sliders, number and plots -->
 ${gst_html}
 
 </div>
+
+
+<script type="text/javascript">
+//  wil be invoked for every GST section
+  $(document).ready(function() {
+    console.log('Another GST applet is loaded')
+  });
+</script>
