@@ -30,8 +30,10 @@ class HtmlModule(XModule):
     
     def get_html(self):
         # cdodge: perform link substitutions for any references to course static content (e.g. images)
+        input = self.html
         output = rewrite_links(self.html, self.rewrite_content_links)
-        log.info('  HTMLModule converting markup "{0}" to "{1}"'.format(self.html, output))
+#        log.info('  HTMLModule converting markup from "{0}" as  "{1}r"'.format(type(input), input))
+#        log.info('  HTMLModule converting markup to "{0}" as "{1}r"'.format(type(output), output))
         return output
 
     def __init__(self, system, location, definition, descriptor,
@@ -166,7 +168,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data'].encode('utf-8'))
+            file.write(self.definition['data']) # .encode('utf-8'))
 
         # write out the relative name
         relname = path(pathname).basename()

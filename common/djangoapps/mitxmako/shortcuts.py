@@ -42,7 +42,12 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
         context_dictionary.update(context)
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
-    return template.render_unicode(**context_dictionary)
+#    return template.render_unicode(**context_dictionary)
+
+    output = template.render_unicode(**context_dictionary)
+#    log.info('  render_to_string of "{0}" as "{1}r"'.format(type(output), output))
+    return output
+#    return template.render(**context_dictionary)
 
 
 def render_to_response(template_name, dictionary, context_instance=None, namespace='main', **kwargs):

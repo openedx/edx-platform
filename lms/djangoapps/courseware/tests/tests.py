@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger("mitx." + __name__)
+
 import json
 import os
 import time
@@ -20,6 +23,7 @@ from courseware.access import _course_staff_group_name
 from courseware.models import StudentModuleCache
 
 from student.models import Registration
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -279,6 +283,7 @@ class PageLoader(ActivateLoginTestCase):
         print "Checking course {0} in {1}".format(course_name, data_dir)
         default_class='xmodule.hidden_module.HiddenDescriptor'  # 'xmodule.raw_module.RawDescriptor',
         load_error_modules=True
+#        load_error_modules=False
         module_store = XMLModuleStore(
                                       data_dir,
                                       default_class=default_class,
@@ -308,24 +313,40 @@ class PageLoader(ActivateLoginTestCase):
         for descriptor in module_store.modules[course_id].itervalues(): 
             n += 1
             print "Checking ", descriptor.location.url()
+            log.info('Checking the content returned for page %s', descriptor.location.url())
             #print descriptor.__class__, descriptor.location
             resp = self.client.get(reverse('jump_to',
                                    kwargs={'course_id': course_id,
                                            'location': descriptor.location.url()}), follow=True)
             msg = str(resp.status_code)
             if resp.status_code != 200:
-                msg = "ERROR " + msg # + ": " + str(resp.request['PATH_INFO'])
+                msg = "ERROR " + msg  + ": " + descriptor.location.url()
                 all_ok = False
                 num_bad += 1
             elif resp.redirect_chain[0][1] != 302:
-                msg = "ERROR " + msg
+                msg = "ERROR on redirect from " + descriptor.location.url()
                 all_ok = False
                 num_bad += 1
+            content = resp.content
+#            contentlines = content.splitlines()
+            if content.find("this module is temporarily unavailable")>=0:
+                msg = "ERROR unavailable module " 
+                all_ok = False
+                num_bad += 1
+            elif isinstance(descriptor, ErrorDescriptor):
+                msg = "ERROR error descriptor loaded: " 
+                msg = msg + descriptor.definition['data']['error_msg']
+                all_ok = False
+                num_bad += 1
+            log.info('Output the content returned for page %s', descriptor.location.url())
+            log.info('Content returned: %s', content)
             print msg
 #            self.assertTrue(all_ok)  # fail fast
 
         print "{0}/{1} good".format(n - num_bad, n)
-        self.assertTrue(all_ok)
+        log.info( "{0}/{1} good".format(n - num_bad, n))
+#        self.assertTrue(all_ok)
+        self.assertTrue(false)
 
 
 #@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -343,8 +364,8 @@ class TestCoursesLoadTestCase(PageLoader):
     def test_toy_course_loads(self):
         self.check_xml_pages_load('toy', TEST_DATA_DIR, modulestore())
 
-#    def test_full_course_loads(self):
-#        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
+    def test_full_course_loads(self):
+        self.check_xml_pages_load('full', TEST_DATA_DIR, modulestore())
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

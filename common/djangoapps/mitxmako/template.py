@@ -12,6 +12,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import logging
+log = logging.getLogger("mitx." + __name__)
+
 from django.conf import settings
 from mako.template import Template as MakoTemplate
 
@@ -54,5 +57,9 @@ class Template(MakoTemplate):
         context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
         context_dictionary['django_context'] = context_instance
                 
-        return super(Template, self).render_unicode(**context_dictionary)
-        
+#        return super(Template, self).render_unicode(**context_dictionary)
+#        return super(Template, self).render(**context_dictionary)
+ 
+        output = super(Template, self).render(**context_dictionary)
+        log.info('  render_to_string of "{0}" as "{1}"'.format(type(output), output))       
+        return output
