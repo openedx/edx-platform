@@ -15,7 +15,7 @@ from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 class GradingServiceError(Exception):
@@ -54,7 +54,6 @@ class StaffGradingService(object):
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
 
-        # TODO: add auth
         self.session = requests.session()
 
 
@@ -114,6 +113,7 @@ class StaffGradingService(object):
 
         return r.text
 
+    
     def save_grade(self, course_id, grader_id, submission_id, score, feedback):
         """
         Save a score and feedback for a submission.
