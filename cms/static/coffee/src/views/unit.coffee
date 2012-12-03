@@ -51,6 +51,7 @@ class CMS.Views.UnitEdit extends Backbone.View
             onDelete: @deleteComponent,
             model: new CMS.Models.Module(
                 id: $(element).data('id'),
+                course_location: @model.get('course_location')
             )
         )
     )
@@ -101,9 +102,10 @@ class CMS.Views.UnitEdit extends Backbone.View
         moduleEditor = new CMS.Views.HTMLModuleEdit(
             el: $editView,
             onDelete: @deleteComponent,
-            isNew: true,
             parent: parent,
-            model: new CMS.Models.Module()
+            model: new CMS.Models.Module(
+              course_location: @model.get('course_location')
+            )
           )
         moduleEditor.enterEditMode()
         return
@@ -117,7 +119,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     $componentActions = $($('#component-actions').html())
 
     @$componentItem.append(@$editor)
-    #@$componentItem.append($preview)
+    @$componentItem.append($preview)
 
     @$componentItem.append($componentActions)
     @$componentItem.hide()
@@ -132,7 +134,9 @@ class CMS.Views.UnitEdit extends Backbone.View
     @closeEditor()
     module = new CMS.Views.HTMLModuleEdit(
       onDelete: @deleteComponent
-      model: new CMS.Models.Module()
+      model: new CMS.Models.Module(
+        @model.course_location
+      )
     )
     @$newComponentItem.before(module.$el)
     module.cloneTemplate(

@@ -19,7 +19,8 @@ class CMS.Views.HTMLModuleEdit extends CMS.Views.ModuleEdit
 		@$componentItem = $('<li>').addClass('editing')
 		@$editor = $($('#html-editor').html())
 		# initHTMLEditor is in a separate .js file
-		initHTMLEditor(@$editor, html)
+		# id here is the location_id
+		initHTMLEditor(@$editor, html, @model.get('course_location'))
 		@$editor.find('.cancel-button').bind('click', @closeEditor)
 		@$editor.find('.save-button').bind('click', @saveEditor)
 		

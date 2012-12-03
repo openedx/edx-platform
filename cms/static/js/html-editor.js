@@ -7,7 +7,7 @@ var visualEditor;
 var htmlEditor;
 var htmlEditorTargetId;
 
-function initHTMLEditor($editor, html) {
+function initHTMLEditor($editor, html, course_location) {
   $htmlEditor = $editor;
   htmlEditorTargetId = null;
   var _html = html;
@@ -38,10 +38,17 @@ function initHTMLEditor($editor, html) {
               $modalCover.unbind('click');
               $modalCover.bind('click', closeAssetWidget);
               $modalCover.css('z-index', '99999');
-              $('.upload-button', $assetWidget).bind('click', uploadFromWidget);
-              $('.close-button', $assetWidget).bind('click', closeAssetWidget);
-              $('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
+              // $('.upload-button', $assetWidget).bind('click', uploadFromWidget);
+              //$('.close-button', $assetWidget).bind('click', closeAssetWidget);
+              //$('.insert-asset-button', $assetWidget).bind('click', { editor: ed }, insertAsset);
               $body.append($assetWidget);
+              $el = $body.find('.asset-library');
+
+              $moduleEditor = new CMS.Views.AssetWidget({
+                el: $el,
+                model: new Backbone.Model({course_location: course_location}),
+                editor: ed
+              });
             }
         });
         ed.addButton('studio.link', {

@@ -339,6 +339,7 @@ def edit_unit(request, location):
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
         'published_date': published_date,
+        'course_location' : course.location
     })
 
 
@@ -910,6 +911,49 @@ def not_found(request):
 
 def server_error(request):
     return render_to_response('error.html', {'error': '500'})
+
+@login_required
+@ensure_csrf_cookie
+def assets(request, location):
+    """
+    An AJAX handler to return a list of all assets for a course
+    """
+
+    course_location = Location(location)
+
+    if not has_access(request.user, course_location):
+        raise PermissionDenied()
+
+    course_reference = StaticContent.compute_location(course_location.org, 
+        course_location.course, course_location.name)
+    assets = contentstore().get_all_content_for_course(course_reference)
+
+    # sort in reverse upload date order
+    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+
+    # now iterate and put into the format that clients will expect    
+
+    asset_display = []
+    for asset in assets:
+        id = asset['_id']
+        display_info = {}
+        asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
+        display_info['id'] = asset_location.url()
+        display_info['display_name'] = asset['displayname']
+        display_info['upload_date'] = get_date_display(asset['uploadDate'])
+        
+        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        
+        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        _thumbnail_location = asset.get('thumbnail_location', None)
+        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
+        display_info['markup'] = "<img src='{0}' />".format(display_info['url'])
+        asset_display.append(display_info)
+
+    logging.debug("assets = {0}".format(asset_display))
+
+    return HttpResponse(json.dumps(asset_display))
 
 
 @login_required

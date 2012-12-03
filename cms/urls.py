@@ -18,6 +18,9 @@ urlpatterns = ('',
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
 
+    # this is a ajax handler for a list of assets for a course
+    url(r'^assets/(?P<location>.*?)$', 'contentstore.views.assets', name='assets'),
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
