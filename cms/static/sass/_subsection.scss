@@ -137,8 +137,7 @@
 
 	a {
 		font-size: 11px;
-		font-weight: 700;
-		line-height: 31px;
+		font-weight: bold;
 		text-transform: uppercase;
 	}
 
@@ -199,11 +198,11 @@
 			margin: 0;
 			padding: 0;
 			background: transparent;
-			color: $darkGrey;
+			color: $blue;
 			border: none;
-			font-size: 12px;
+			font-size: 11px;
 			font-weight: bold;
-			line-height: 16px;
+			text-transform: uppercase;
 		}
 
 		.menu-toggle {
@@ -221,10 +220,11 @@
 		}
 
 		.menu {
-			z-index: 10;
+			z-index: 1;
 			position: absolute;
 			top: -12px;
 			left: -7px;
+			display: none;
 			width: 100%;
 			margin: 0;
 			padding: 8px 12px;
@@ -246,10 +246,6 @@
 					margin-bottom: 0;
 					padding-bottom: 0;
 					border: none;
-
-					a {
-						color: $darkGrey;
-					}
 				}
 			}
 
@@ -265,11 +261,13 @@
 		&.is-active {
 
 			.menu {
+				z-index: 10000;
+				display: block;
 				opacity: 1.0;
 			}
 
 			.menu-toggle {
-				z-index: 10000;
+				z-index: 1000;
 			}
 		}
 

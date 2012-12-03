@@ -158,11 +158,12 @@ input.courseware-unit-search-input {
 				top: 0;
 				right: 2px;
 				display: none;
-				width: 105px;
-				padding: 10px 20px 10px 10px;
+				width: 100px;
+				padding: 10px 35px 10px 10px;
 				@include border-radius(3px);
 				background: $lightGrey;
 				color: $lightGrey;
+				text-align: right;
 				font-size: 12px;
 				font-weight: bold;
 				line-height: 16px;
@@ -183,7 +184,7 @@ input.courseware-unit-search-input {
 
 			.menu {
 				z-index: 1;
-				display: block;
+				display: none;
 				opacity: 0.0;
 				position: absolute;
 				top: -1px;
@@ -196,6 +197,7 @@ input.courseware-unit-search-input {
 				@include border-radius(4px);
 				@include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
 				@include transition(opacity .15s);
+				@include transition(display .15s);
 
 
 				li {
@@ -228,6 +230,7 @@ input.courseware-unit-search-input {
 
 				.menu {
 					z-index: 1000;
+					display: block;
 					opacity: 1.0;
 				}
 
@@ -317,9 +320,10 @@ input.courseware-unit-search-input {
 						right: -5px;
 						display: none;
 						width: 110px;
-						padding: 5px 20px 5px 10px;
+						padding: 5px 40px 5px 10px;
 						@include border-radius(3px);
 						color: $lightGrey;
+						text-align: right;
 						font-size: 12px;
 						font-weight: bold;
 						line-height: 16px;
@@ -340,7 +344,7 @@ input.courseware-unit-search-input {
 
 					.menu {
 						z-index: 1;
-						display: block;
+						display: none;
 						opacity: 0.0;
 						position: absolute;
 						top: -1px;
@@ -386,6 +390,7 @@ input.courseware-unit-search-input {
 
 						.menu {
 							z-index: 1000;
+							display: block;
 							opacity: 1.0;
 						}
 
