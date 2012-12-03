@@ -200,15 +200,10 @@
 			content: "- draft";
 		}
 
-		.public-item:after {
-			content: "- public";
-		}
-
 		.private-item:after {
 			content: "- private";
 		}
 
-		.public-item,
 		.private-item {
 			color: #a4aab7;
 		}
