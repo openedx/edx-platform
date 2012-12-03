@@ -1844,32 +1844,35 @@ class OpenEndedResponse(LoncapaResponse):
         Configure OpenEndedResponse from XML.
         '''
         xml = self.xml
-        # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.DEFAULT_QUEUE)
 
-        #Look for tag named openendedparam that encapsulates all grader settings
+        # The openendedparam tag encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
-        prompt=self.xml.find('prompt')
-        rubric=self.xml.find('openendedrubric')
-        self._parse_openendedresponse_xml(oeparam,prompt,rubric)
+        prompt = self.xml.find('prompt')
+        rubric = self.xml.find('openendedrubric')
+        self._parse(oeparam,prompt,rubric)
 
-    def stringify_children(self,node,strip_tags=True):
+    def stringify_children(self, node, strip_tags=True):
         """
-        Modify code from stringify_children in xmodule.  Didn't import directly in order to avoid capa depending
-        on xmodule (seems to be avoided in code)
+        Modify code from stringify_children in xmodule.  Didn't import directly
+        in order to avoid capa depending on xmodule (seems to be avoided in
+        code)
         """
         parts=[node.text]
         [parts.append((etree.tostring(p, with_tail=True))) for p in node.getchildren()]
         node_string=' '.join(parts)
 
-        #Strip html tags from prompt.  This may need to be removed in order to display prompt to instructors properly.
+        # Strip html tags from result.  This may need to be removed in order to
+        # display prompt to instructors properly.
+        # TODO: what breaks if this is removed?  The ML code can strip tags
+        # as part of its input filtering.
         if strip_tags:
             node_string=re.sub('<[^<]+?>', '', node_string)
 
         return node_string
 
-    def _parse_openendedresponse_xml(self,oeparam,prompt,rubric):
+    def _parse(self, oeparam, prompt, rubric):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
@@ -1879,8 +1882,8 @@ class OpenEndedResponse(LoncapaResponse):
             self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
-        prompt_string=self.stringify_children(prompt)
-        rubric_string=self.stringify_children(rubric)
+        prompt_string = self.stringify_children(prompt)
+        rubric_string = self.stringify_children(rubric)
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
