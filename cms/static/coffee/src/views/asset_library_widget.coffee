@@ -1,4 +1,5 @@
 class LibraryEntry extends Backbone.Model
+  # declare the basic schema of this model
   defaults:
     id: null
     thumb_url: null
@@ -8,24 +9,31 @@ class LibraryEntry extends Backbone.Model
     markup: null
     mime_type: null
 
+# this is the collection of assets
 class LibraryCollection extends Backbone.Collection
   url: '/assets/'
   model: LibraryEntry
 
   initialize: (course_location) ->
+    # the collection fetch url is /assets/<location
     @url = @url + course_location
 
-
+# this is the main Backbone View which encompasses the entire
+# asset window
 class CMS.Views.AssetWidget extends Backbone.View
   initialize: ->
+    # the editor is passed in by the caller, we need this so we can inject content into it
+    # when we pick the asset to insert
     @editor = @options.editor
 
+    # This subview covers the list of assets
     @library = new CMS.Views.AssetWidget.Library(
       el: @$('.library')
       model: @model
       assetWidget: @
     )
 
+    # this subview covers the upload form
     @uploadForm = new CMS.Views.AssetWidget.UploadForm(
       el: @$('.upload-form')
       model: @model

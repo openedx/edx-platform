@@ -429,3 +429,11 @@ function onKeyboard(e) {
       break;
   }     
 }
+
+function getXMLContent() {
+  return xmlEditor.getValue();
+}
+
+function getMarkdownContent() {
+  return simpleEditor.getValue();
+}

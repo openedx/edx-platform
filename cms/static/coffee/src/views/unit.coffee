@@ -92,9 +92,20 @@ class CMS.Views.UnitEdit extends Backbone.View
         @$editor = $($('#video-editor').html())
         $preview = $($('#video-preview').html())
       when 'problem'
-        @$editor = $($('#problem-editor').html())
-        $preview = $($('#problem-preview').html())
-        initProblemEditors(@$editor, $preview)
+        parent = @$el.data('id')
+        $editView = $('<li>').addClass('component')
+        @$newComponentItem.before($editView)
+        @speedEditor = new CMS.Views.ModuleSpeedEdit(
+          el: $editView
+          onDelete: @deleteComponent
+          parent: parent
+          model: new CMS.Models.Module(
+            course_location: @model.get('course_location')
+          )
+        )
+        @speedEditor.enterEditMode()
+        return
+        
       when 'html'
         $editView = $('<li>').addClass('component')
         @$newComponentItem.before($editView)

@@ -679,6 +679,9 @@ def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
     data = request.POST.get('data')
+    metadata = None
+    if 'metadata' in request.POST and len(request.POST['metadata']) > 0:
+        metadata = json.loads(request.POST.get('metadata'))
     
     display_name = request.POST.get('display_name')
 
@@ -693,6 +696,9 @@ def clone_item(request):
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
 
+    if metadata is not None:
+        new_item.metadata.update(metadata)
+
     # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
@@ -700,7 +706,6 @@ def clone_item(request):
     _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
 
     # seed any initial content, if passed by caller
-    logging.debug('data = {0}'.format(data))
     if data is not None:
         _modulestore(template).update_item(new_item.location.url(), data)
 
@@ -950,9 +955,7 @@ def assets(request, location):
         display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
         display_info['markup'] = "<img src='{0}' />".format(display_info['url'])
         asset_display.append(display_info)
-
-    logging.debug("assets = {0}".format(asset_display))
-
+        
     return HttpResponse(json.dumps(asset_display))
 
 
