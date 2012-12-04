@@ -117,7 +117,7 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-            <a href="#" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
                 <span class="section-name-span">${section.display_name}</span>
@@ -160,8 +160,8 @@
             </div>
             
             <div class="item-actions">
-              <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" class="drag-handle"></a>
+              <a href="#" class="delete-button delete-section-button" data-tooltip="Delete this section"><span class="delete-icon"></span></a>
+              <a href="#" data-tooltip="Sort this section" class="drag-handle"></a>
             </div>
           </header>
           <div class="subsection-list">
@@ -175,7 +175,7 @@
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
                   <div class="details">
-                    <a href="#" class="expand-collapse-icon expand"></a>
+                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
@@ -200,8 +200,8 @@
                   </div>
                   
                   <div class="item-actions">
-                    <a href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                    <a href="#" class="drag-handle"></a>
+                    <a data-tooltip="Delete this subsection" href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
+                    <a data-tooltip="Sort this subsection" href="#" class="drag-handle"></a>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}
