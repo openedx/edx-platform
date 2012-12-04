@@ -61,7 +61,7 @@ h1 {
 .window {
     background: #fff;
     border-radius: 3px;
-    @include box-shadow(0 1px 1px rgba(0, 0, 0, .2));
+    @include box-shadow(0 1px 1px rgba(0,0,0,0.2), 0 0 0 1px rgba(0, 0, 0, 0.1));
 }
 
 .sidebar {
@@ -187,10 +187,6 @@ code {
     .details {
       margin-bottom: 30px;
       font-size: 14px;
-
-      .new-button {
-        margin-right: 30px;
-      }
     }
 
     h4 {

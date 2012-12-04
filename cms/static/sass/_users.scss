@@ -5,21 +5,7 @@
   }
 
   .new-user-button {
-    @include grey-button;
-    margin: 5px 8px;
-    padding: 3px 10px 4px 10px;
-    font-size: 12px;
-
-    .plus-icon {
-      position: relative;
-      top: 1px;
-    }
-  }
-
-  .list-header {
-    @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-    background-color: #ced2db;
-    border-radius: 3px 3px 0 0;
+    margin-bottom: 15px;
   }
 
   .new-user-form {
@@ -55,16 +41,17 @@
 
     .add-button {
       @include blue-button;
+      padding: 6px 20px 8px;
     }
 
     .cancel-button {
       @include white-button;
+      padding: 6px 20px 8px;
     }
   }
 
   .user-list {
     border: 1px solid $mediumGrey;
-    border-top: none;
     background: $lightGrey;
 
     li {
