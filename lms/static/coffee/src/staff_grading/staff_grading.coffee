@@ -18,6 +18,7 @@ class StaffGradingBackend
 
   mock: (cmd, data) ->
     # Return a mock response to cmd and data
+    # TODO: needs (optional?) arg for problem location
     if cmd == 'get_next'
       @mock_cnt++
       response =
@@ -26,12 +27,26 @@ class StaffGradingBackend
         rubric: 'A rubric! ' + @mock_cnt
         submission_id: @mock_cnt
         max_score: 2 + @mock_cnt % 3
-        ml_error_info : 'ML error info!' + @mock_cnt
+        ml_error_info : 'ML accuracy info: ' + @mock_cnt
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
         @mock('get_next', {})
+    else if cmd == 'get_problems'
+      # this one didn't have a name in the LMS--lookup fail
+      p1 = {'location': 'i4x://MITx/3.091x/problem/open_ended_demo',\
+            'name': 'i4x://MITx/3.091x/problem/open_ended_demo',\
+            'num_graded': 10,\
+            'num_to_grade': 90}
+                    
+      p2 = {'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',\
+            'name': 'Open ended demo',\
+            'num_graded': 42,\
+            'num_to_grade': 63}
+                    
+      response =
+        problems: [p1, p2]
     else
       response =
         success: false
