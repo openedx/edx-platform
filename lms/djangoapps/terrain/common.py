@@ -6,9 +6,12 @@ from lettuce.django import django_url
 from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
-import time
 from urllib import quote_plus
 from nose.tools import assert_equals
+from bs4 import BeautifulSoup
+import time
+import re
+import os.path
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -107,6 +110,48 @@ def save_the_html(path='/tmp'):
     filename = '%s.html' % quote_plus(u)
     f = open('%s/%s' % (path, filename), 'w')
     f.write(html)
+    f.close
+
+@world.absorb
+def save_the_course_content(path='/tmp'):
+    html = world.browser.html.encode('ascii', 'ignore')
+    soup = BeautifulSoup(html)
+
+    # get rid of the header, we only want to compare the body
+    # soup.head.decompose()
+
+    # for now, remove the data-id attributes, because they are 
+    # causing mismatches between cms-master and master
+    for item in soup.find_all(attrs={'data-id': re.compile('.*')}):
+        del item['data-id']
+
+    # we also need to remove them from unrendered problems, 
+    # where they are contained in the text of divs instead of
+    # in attributes of tags
+    # Be careful of whether or not it was the last attribute
+    # and needs a trailing space
+    for item in soup.find_all(text=re.compile(' data-id=".*?" ')):
+        s = unicode(item.string)
+        item.string.replace_with(re.sub(' data-id=".*?" ', ' ', s))
+
+    for item in soup.find_all(text=re.compile(' data-id=".*?"')):
+        s = unicode(item.string)
+        item.string.replace_with(re.sub(' data-id=".*?"', ' ', s))
+
+    # prettify the html so it will compare better, with
+    # each HTML tag on its own line
+    output = soup.prettify()
+
+    # use string slicing to grab everything after 'courseware/' in the URL
+    u = world.browser.url
+    section_url = u[u.find('courseware/')+11:] 
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+          
+    filename = '%s.html' % (quote_plus(section_url))
+    f = open('%s/%s' % (path, filename), 'w')
+    f.write(output)
     f.close
 
 ###########  DEBUGGING ##############

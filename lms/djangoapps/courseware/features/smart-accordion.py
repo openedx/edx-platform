@@ -17,6 +17,9 @@ def check_for_errors():
 @step(u'I verify all the content of each course')
 def i_verify_all_the_content_of_each_course(step):
     all_possible_courses = get_courses()
+    logger.debug('Courses found:')
+    for c in all_possible_courses:
+        logger.debug(c.id)
     ids = [c.id for c in all_possible_courses]
 
     # Get a list of all the registered courses
@@ -110,7 +113,7 @@ def browse_course(course_id):
             #logger.debug(msg)
 
             # Save the HTML to a file for later comparison
-            world.save_the_html()
+            world.save_the_course_content('/tmp/%s' % course_id)
 
             assert num_tabs == num_rendered_tabs, msg
 
@@ -146,4 +149,4 @@ def validate_course(current_course, ids):
     try:
         ids.index(current_course)
     except:
-        assert False, "invalid course id"
+        assert False, "invalid course id %s" % current_course
