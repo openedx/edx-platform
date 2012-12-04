@@ -588,6 +588,8 @@ function hideToastMessage(e) {
 function addNewSection(e, isTemplate) {
     e.preventDefault();
 
+    $(e.target).hide();
+
     var $newSection = $($('#new-section-template').html());
     var $cancelButton = $newSection.find('.new-section-name-cancel');
     $('.new-courseware-section-button').after($newSection);
