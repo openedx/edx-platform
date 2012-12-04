@@ -139,7 +139,8 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-            <a href="#" data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
+
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
@@ -198,7 +199,7 @@
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
                   <div class="details">
-                    <a href="#"  data-tooltip="Collapse/expand this subsection" class="expand-collapse-icon expand"></a>
+                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
