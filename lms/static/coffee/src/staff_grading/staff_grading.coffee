@@ -66,10 +66,16 @@ class StaffGrading
     # all the jquery selectors
     @error_container = $('.error-container')
     @message_container = $('.message-container')
+
+    @prompt_container = $('.prompt-container')
+    @prompt_wrapper = $('.prompt-wrapper')
+
     @submission_container = $('.submission-container')
-    @rubric_container = $('.rubric-container')
     @submission_wrapper = $('.submission-wrapper')
+
+    @rubric_container = $('.rubric-container')
     @rubric_wrapper = $('.rubric-wrapper')
+
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')        
     @submit_button = $('.submit-button')
@@ -78,6 +84,7 @@ class StaffGrading
     # model state
     @state = state_no_data
     @submission_id = null
+    @prompt = ''
     @submission = ''
     @rubric = ''
     @error_msg = ''
@@ -130,7 +137,7 @@ class StaffGrading
     
     if response.success
       if response.submission
-        @data_loaded(response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info)
+        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info)
       else
         @no_more(response.message)
     else
@@ -153,7 +160,8 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (submission, rubric, submission_id, max_score, ml_error_info) ->
+  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info) ->
+    @prompt = prompt
     @submission = submission
     @rubric = rubric
     @submission_id = submission_id
@@ -162,8 +170,11 @@ class StaffGrading
     @score = null
     @ml_error_info=ml_error_info
     @state = state_grading
+    if not @max_score?
+      @error("No max score specified for submission.")
 
   no_more: (message) ->
+    @prompt = null
     @submission = null
     @rubric = null
     @ml_error_info = null
@@ -189,6 +200,7 @@ class StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
+      @prompt_container.html(@prompt)
       @submission_container.html(@submission)
       @rubric_container.html(@rubric)
       show_grading_elements = true
@@ -210,6 +222,7 @@ class StaffGrading
       @error('System got into invalid state ' + @state)
 
     @submit_button.toggle(show_submit_button)
+    @prompt_wrapper.toggle(show_grading_elements)
     @submission_wrapper.toggle(show_grading_elements)
     @rubric_wrapper.toggle(show_grading_elements)
     @ml_error_info_container.toggle(show_grading_elements)
