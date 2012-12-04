@@ -281,7 +281,7 @@ def instructor_dashboard(request, course_id):
         req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsEnrolled&course_id=%s" % course_id)
         students_enrolled_json = req.json
 
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=DailyActivityAnalyzer&from=2012-11-19&to=2012-11-27")
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=DailyActivityAnalyzer&from=2012-11-19&to=2012-12-04&course_id=%s" % course_id)
         daily_activity_json = req.json
 
     #----------------------------------------
