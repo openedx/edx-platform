@@ -290,11 +290,11 @@ class PageLoader(ActivateLoginTestCase):
         for descriptor in module_store.modules[course_id].itervalues(): 
             n += 1
             print "Checking ", descriptor.location.url()
-            log.info('Checking the content returned for page %s', descriptor.location.url())
             #print descriptor.__class__, descriptor.location
             resp = self.client.get(reverse('jump_to',
                                    kwargs={'course_id': course_id,
                                            'location': descriptor.location.url()}), follow=True)
+            # check status codes first
             msg = str(resp.status_code)
             if resp.status_code != 200:
                 msg = "ERROR " + msg  + ": " + descriptor.location.url()
@@ -304,6 +304,8 @@ class PageLoader(ActivateLoginTestCase):
                 msg = "ERROR on redirect from " + descriptor.location.url()
                 all_ok = False
                 num_bad += 1
+
+            # check content to make sure there were no rendering failures
             content = resp.content
             if content.find("this module is temporarily unavailable")>=0:
                 msg = "ERROR unavailable module " 
@@ -314,8 +316,6 @@ class PageLoader(ActivateLoginTestCase):
                 msg = msg + descriptor.definition['data']['error_msg']
                 all_ok = False
                 num_bad += 1
-            log.info('Output the content returned for page %s', descriptor.location.url())
-            log.info('Content returned: %s', content)
             print msg
             self.assertTrue(all_ok)  # fail fast
 

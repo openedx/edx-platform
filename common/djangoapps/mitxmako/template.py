@@ -12,9 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import logging
-log = logging.getLogger("mitx." + __name__)
-
 from django.conf import settings
 from mako.template import Template as MakoTemplate
 
