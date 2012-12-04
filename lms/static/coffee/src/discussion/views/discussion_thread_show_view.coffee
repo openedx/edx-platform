@@ -74,7 +74,6 @@ if Backbone?
         @unFlagAbuse()
       else
         @flagAbuse()
-      @renderFlagged()
 
 
     toggleFollowing: (event) ->

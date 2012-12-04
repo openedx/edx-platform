@@ -1,6 +1,11 @@
 if Backbone?
   class @DiscussionContentView extends Backbone.View
 
+  
+    events:
+      "click .discussion-flag-abuse": "toggleFlagAbuse"
+  
+  
     attrRenderer:
       endorsed: (endorsed) ->
         if endorsed
@@ -94,6 +99,7 @@ if Backbone?
 
     setWmdContent: (cls_identifier, text) =>
       DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), cls_identifier, text
+      
 
     initialize: ->
       @initLocal()

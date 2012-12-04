@@ -165,6 +165,7 @@ if Backbone?
       'update': -> DiscussionUtil.urlFor('update_comment', @id)
       'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
 
+
     getCommentsCount: ->
       count = 0
       @get('comments').each (comment) ->

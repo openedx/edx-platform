@@ -5,6 +5,7 @@ if Backbone?
         "click .action-endorse": "toggleEndorse"
         "click .action-delete": "delete"
         "click .action-edit": "edit"
+        "click .discussion-flag-abuse": "toggleFlagAbuse"
 
     $: (selector) ->
         @$el.find(selector)
@@ -70,6 +71,40 @@ if Backbone?
         success: (response, textStatus) =>
           if textStatus == 'success'
             @model.set(response)
+            
+    toggleFlagAbuse: (event) ->
+      event.preventDefault()
+      if window.user.id in @model.get("abuse_flaggers")
+        @unFlagAbuse()
+      else
+        @flagAbuse()
+      
+    flagAbuse: ->
+      url = @model.urlFor("flagAbuse")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-flag-abuse")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            ###
+            note, we have to clone the array in order to trigger a change event
+            ###
+            temp_array = _.clone(@model.get('abuse_flaggers'));
+            temp_array.push(window.user.id)
+            @model.set('abuse_flaggers', temp_array)      
+       
+    unFlagAbuse: ->
+      url = @model.urlFor("unFlagAbuse")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-flag-abuse")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            temp_array = _.clone(@model.get('abuse_flaggers'));
+            temp_array.pop(window.user.id)
+            @model.set('abuse_flaggers', temp_array)            
 
     edit: (event) ->
         @trigger "response:edit", event
