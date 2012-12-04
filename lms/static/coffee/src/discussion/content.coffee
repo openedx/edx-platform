@@ -79,6 +79,16 @@ if Backbone?
           @getContent(id).updateInfo(info)
       $.extend @contentInfos, infos
     
+    flagAbuse: ->
+      temp_array = @get("abuse_flaggers")
+      temp_array.push(window.user.get('id'))
+      @set("abuse_flaggers",temp_array)
+      @trigger "change", @
+
+    unflagAbuse: ->
+      @get("abuse_flaggers").pop(window.user.get('id'))
+      @trigger "change", @
+
     
   class @Thread extends @Content
     urlMappers:
@@ -116,16 +126,6 @@ if Backbone?
       @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
       @trigger "change", @
       
-    flagAbuse: ->
-      temp_array = @get("abuse_flaggers")
-      temp_array.push(window.user.get('id'))
-      @set("abuse_flaggers",temp_array)
-      @trigger "change", @
-
-    unflagAbuse: ->
-      @get("abuse_flaggers").pop(window.user.get('id'))
-      @trigger "change", @
-
     display_body: ->
       if @has("highlighted_body")
         String(@get("highlighted_body")).replace(/<highlight>/g, '<mark>').replace(/<\/highlight>/g, '</mark>')
@@ -164,6 +164,9 @@ if Backbone?
       'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
       'update': -> DiscussionUtil.urlFor('update_comment', @id)
       'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
+      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
+      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
+
 
 
     getCommentsCount: ->

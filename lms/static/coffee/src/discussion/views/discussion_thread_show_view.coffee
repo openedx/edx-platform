@@ -66,19 +66,21 @@ if Backbone?
       if window.user.voted(@model)
         @unvote()
       else
-        @vote()
-
-    toggleFlagAbuse: (event) ->
-      event.preventDefault()
-      if window.user.id in @model.get("abuse_flaggers")
-        @unFlagAbuse()
-      else
-        @flagAbuse()
-
+        @vote()   
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
-      url = null
+      url = nullunFlagAbuse: ->
+      url = @model.urlFor("unFlagAbuse")
+      DiscussionUtil.safeAjax
+        $elem: @$(".discussion-flag-abuse")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            temp_array = _.clone(@model.get('abuse_flaggers'));
+            temp_array.pop(window.user.id)
+            @model.set('abuse_flaggers', temp_array)
       if not @model.get('subscribed')
         @model.follow()
         url = @model.urlFor("follow")
@@ -101,21 +103,6 @@ if Backbone?
           if textStatus == 'success'
             @model.set(response, {silent: true})
 
-    flagAbuse: ->
-      url = @model.urlFor("flagAbuse")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-flag-abuse")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            ###
-            note, we have to clone the array in order to trigger a change event
-            that's 5 hours of my life i'll never get back.
-            ###
-            temp_array = _.clone(@model.get('abuse_flaggers'));
-            temp_array.push(window.user.id)
-            @model.set('abuse_flaggers', temp_array)
 
     unvote: ->
       window.user.unvote(@model)
@@ -128,17 +115,6 @@ if Backbone?
           if textStatus == 'success'
             @model.set(response, {silent: true})
 
-    unFlagAbuse: ->
-      url = @model.urlFor("unFlagAbuse")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-flag-abuse")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            temp_array = _.clone(@model.get('abuse_flaggers'));
-            temp_array.pop(window.user.id)
-            @model.set('abuse_flaggers', temp_array)
 
     edit: (event) ->
       @trigger "thread:edit", event
