@@ -2,10 +2,8 @@ import logging
 log = logging.getLogger("mitx." + __name__)
 
 import json
-import os
 import time
 
-from nose import SkipTest
 from urlparse import urlsplit, urlunsplit
 
 from django.contrib.auth.models import User, Group
@@ -44,26 +42,6 @@ def registration(email):
     '''look up registration object by email'''
     return Registration.objects.get(user__email=email)
 
-
-# A bit of a hack--want mongo modulestore for these tests, until
-# jump_to works with the xmlmodulestore or we have an even better solution
-# NOTE: this means this test requires mongo to be running.
-
-def mongo_store_config(data_dir):
-    return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'xmodule',
-            'collection': 'modulestore',
-            'fs_root': data_dir,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
-        }
-    }
-}
-
 def xml_store_config(data_dir):
     return {
     'default': {
@@ -77,9 +55,6 @@ def xml_store_config(data_dir):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
-
-REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
-REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
@@ -230,44 +205,6 @@ class PageLoader(ActivateLoginTestCase):
     def check_pages_load(self, course_name, data_dir, modstore):
         """Make all locations in course load"""
         print "Checking course {0} in {1}".format(course_name, data_dir)
-        import_from_xml(modstore, data_dir, [course_name])
-
-        # enroll in the course before trying to access pages
-        courses = modstore.get_courses()
-        self.assertEqual(len(courses), 1)
-        course = courses[0]
-        self.enroll(course)
-        course_id = course.id
-
-        n = 0
-        num_bad = 0
-        all_ok = True
-        for descriptor in modstore.get_items(
-                Location(None, None, None, None, None)):
-            n += 1
-            print "Checking ", descriptor.location.url()
-            #print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('jump_to',
-                                   kwargs={'course_id': course_id,
-                                           'location': descriptor.location.url()}), follow=True)
-            msg = str(resp.status_code)
-            if resp.status_code != 200:
-                msg = "ERROR " + msg # + ": " + str(resp.request['PATH_INFO'])
-                all_ok = False
-                num_bad += 1
-            elif resp.redirect_chain[0][1] != 302:
-                msg = "ERROR " + msg
-                all_ok = False
-                num_bad += 1
-            print msg
-#            self.assertTrue(all_ok)  # fail fast
-
-        print "{0}/{1} good".format(n - num_bad, n)
-        self.assertTrue(all_ok)
-
-    def check_xml_pages_load(self, course_name, data_dir, modstore):
-        """Make all locations in course load"""
-        print "Checking course {0} in {1}".format(course_name, data_dir)
         default_class='xmodule.hidden_module.HiddenDescriptor'
         load_error_modules=True
         module_store = XMLModuleStore(
@@ -337,10 +274,10 @@ class TestCoursesLoadTestCase(PageLoader):
         # is there a way to empty the store?
         
     def test_toy_course_loads(self):
-        self.check_xml_pages_load('toy', TEST_DATA_DIR, modulestore())
+        self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
 
     def test_full_course_loads(self):
-        self.check_xml_pages_load('full', TEST_DATA_DIR, modulestore())
+        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -675,35 +612,6 @@ class TestViewAuth(PageLoader):
         # unenroll and try again
         self.unenroll(self.toy)
         self.assertTrue(self.try_enroll(self.toy))
-
-
-@override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
-class RealCoursesLoadTestCase(PageLoader):
-    '''Check that all pages in real courses load properly'''
-
-    def setUp(self):
-        ActivateLoginTestCase.setUp(self)
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def test_real_courses_loads(self):
-        '''See if any real courses are available at the REAL_DATA_DIR.
-        If they are, check them.'''
-
-        # TODO: Disabled test for now..  Fix once things are cleaned up.
-        raise SkipTest
-        # TODO: adjust staticfiles_dirs
-        if not os.path.isdir(REAL_DATA_DIR):
-            # No data present.  Just pass.
-            return
-
-        courses = [course_dir for course_dir in os.listdir(REAL_DATA_DIR)
-                   if os.path.isdir(REAL_DATA_DIR / course_dir)]
-        for course in courses:
-            self.check_pages_load(course, REAL_DATA_DIR, modulestore())
-
-
-    # ========= TODO: check ajax interaction here too?
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCourseGrader(PageLoader):
