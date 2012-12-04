@@ -75,21 +75,8 @@ def xml_store_config(data_dir):
     }
 }
 
-def my_xml_store_config(data_dir):
-    return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': data_dir,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
-
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-# TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
-MY_TEST_DATA_XML_MODULESTORE = my_xml_store_config(TEST_DATA_DIR)
 
 REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
 REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
@@ -281,25 +268,15 @@ class PageLoader(ActivateLoginTestCase):
     def check_xml_pages_load(self, course_name, data_dir, modstore):
         """Make all locations in course load"""
         print "Checking course {0} in {1}".format(course_name, data_dir)
-        default_class='xmodule.hidden_module.HiddenDescriptor'  # 'xmodule.raw_module.RawDescriptor',
+        default_class='xmodule.hidden_module.HiddenDescriptor'
         load_error_modules=True
-#        load_error_modules=False
         module_store = XMLModuleStore(
                                       data_dir,
                                       default_class=default_class,
                                       course_dirs=[course_name],
                                       load_error_modules=load_error_modules,
                                       )
-#        for course_id in module_store.modules.keys():
-#            for module in module_store.modules[course_id].itervalues():
-#
-#            if 'data' in module.definition:
-#                store.update_item(module.location, module.definition['data'])
-#            if 'children' in module.definition:
-#                store.update_children(module.location, module.definition['children'])
-#            # NOTE: It's important to use own_metadata here to avoid writing
-#            # inherited metadata everywhere.
-#            store.update_metadata(module.location, dict(module.own_metadata))
+
        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
@@ -328,7 +305,6 @@ class PageLoader(ActivateLoginTestCase):
                 all_ok = False
                 num_bad += 1
             content = resp.content
-#            contentlines = content.splitlines()
             if content.find("this module is temporarily unavailable")>=0:
                 msg = "ERROR unavailable module " 
                 all_ok = False
@@ -341,16 +317,15 @@ class PageLoader(ActivateLoginTestCase):
             log.info('Output the content returned for page %s', descriptor.location.url())
             log.info('Content returned: %s', content)
             print msg
-#            self.assertTrue(all_ok)  # fail fast
+            self.assertTrue(all_ok)  # fail fast
 
         print "{0}/{1} good".format(n - num_bad, n)
         log.info( "{0}/{1} good".format(n - num_bad, n))
-#        self.assertTrue(all_ok)
-        self.assertTrue(false)
+        self.assertTrue(all_ok)
 
 
-#@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-@override_settings(MODULESTORE=MY_TEST_DATA_XML_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCoursesLoadTestCase(PageLoader):
     '''Check that all pages in test courses load properly'''
 

@@ -12,10 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import logging
-
-log = logging.getLogger("mitx." + __name__)
-
 from django.template import Context
 from django.http import HttpResponse
 

@@ -7,15 +7,14 @@ from lxml import etree
 from lxml.html import rewrite_links
 from path import path
 
-from .x_module import XModule
 from pkg_resources import resource_string
-from .xml_module import XmlDescriptor, name_to_pathname
-from .editing_module import EditingDescriptor
-from .stringify import stringify_children
-from .html_checker import check_html
-from xmodule.modulestore import Location
-
 from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.modulestore import Location
+from xmodule.stringify import stringify_children
+from xmodule.x_module import XModule
+from xmodule.xml_module import XmlDescriptor, name_to_pathname
 
 log = logging.getLogger("mitx.courseware")
 
@@ -164,7 +163,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data']) # .encode('utf-8'))
+            file.write(self.definition['data'].encode('utf-8'))
 
         # write out the relative name
         relname = path(pathname).basename()

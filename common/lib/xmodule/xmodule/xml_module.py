@@ -1,17 +1,17 @@
-from xmodule.x_module import (XModuleDescriptor, policy_key)
-from xmodule.modulestore import Location
-from lxml import etree
 import json
 import copy
 import logging
-import traceback
-from collections import namedtuple
-from fs.errors import ResourceNotFoundError
 import os
 import sys
+from collections import namedtuple
+from lxml import etree
+
+from xmodule.x_module import (XModuleDescriptor, policy_key)
+from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
+# assume all XML files are persisted as utf-8.
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True,
                                  encoding='utf-8')
@@ -207,7 +207,6 @@ class XmlDescriptor(XModuleDescriptor):
 
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
 
-        log.info(' read definition XML: %s', definition_xml)
         definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
         definition = cls.definition_from_xml(definition_xml, system)
