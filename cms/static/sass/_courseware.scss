@@ -1,3 +1,4 @@
+
 input.courseware-unit-search-input {
 	float: left;
 	width: 260px;
@@ -10,7 +11,7 @@ input.courseware-unit-search-input {
 	border-radius: 3px;
 	margin: 15px 0;
 	padding-bottom: 12px;
-	@include box-shadow(0 1px 1px rgba(0, 0, 0, .2));
+	@include box-shadow(0 1px 1px rgba(0,0,0,0.2), 0 0 0 1px rgba(0, 0, 0, 0.1));
 
 	&:first-child {
 		margin-top: 0;
