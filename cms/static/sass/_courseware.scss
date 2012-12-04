@@ -8,6 +8,7 @@ input.courseware-unit-search-input {
 	
 }
 
+
 .courseware-section {
 	position: relative;
 	background: #fff;
@@ -137,6 +138,10 @@ input.courseware-unit-search-input {
 		&:hover {
 			color: $orange;
 		}
+	}
+
+	.section-name-form {
+		margin-bottom: 15px;
 	}
 
 	.section-name-edit {

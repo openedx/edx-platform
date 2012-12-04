@@ -26,7 +26,8 @@ a {
 h1 {
     float: left;
     font-size: 28px;
-    margin: 36px 6px;
+    font-weight: 300;
+    margin: 24px 6px;
 }
 
 .waiting {
@@ -345,8 +346,9 @@ body.show-wip {
 }
 
 .new-button {
-    @include grey-button;
-    padding: 20px 0;
+    @include blue-button;
+    font-size: 13px;
+    padding: 8px 20px 10px;
     text-align: center;
 
     &.big {
