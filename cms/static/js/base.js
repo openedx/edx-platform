@@ -629,11 +629,14 @@ function saveNewSection(e) {
 
 function cancelNewSection(e) {
     e.preventDefault();
+    $('.new-courseware-section-button').show();
     $(this).parents('section.new-section').remove();
 }
 
 function addNewCourse(e) {
     e.preventDefault();
+
+    $(e.target).hide();
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
     $('.new-course-button').after($newCourse);
@@ -674,6 +677,7 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
+    $('.new-course-button').show();
     $(this).parents('section.new-course').remove();
 }
 
