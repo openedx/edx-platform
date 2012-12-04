@@ -44,8 +44,11 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-      <a href="#" class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
-        <i class="icon"></i>Report Misuse</a>      
+        
+      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+      <i class="icon"></i>Report Misuse</div>      
+        
+        
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
@@ -107,7 +110,11 @@
         ${"<% } else {print('<span class=\"anonymous\"><em>anonymous</em></span>');} %>"}
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
-    <div class="response-local"><div class="response-body">${"<%- body %>"}</div></div>
+    <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
+    
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+      <i class="icon"></i>Report Misuse</div>
+    </div>
     <ul class="moderator-actions response-local">
         <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
         <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
@@ -130,6 +137,8 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+      <i class="icon"></i>Report Misuse</div> 
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
