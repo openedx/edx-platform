@@ -1309,8 +1309,6 @@ class CodeResponse(LoncapaResponse):
             # Sanity check on returned points
             if points < 0:
                 points = 0
-            elif points > self.maxpoints[self.answer_id]:
-                points = self.maxpoints[self.answer_id]
             # Queuestate is consumed
             oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
                         msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
