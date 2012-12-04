@@ -3,7 +3,8 @@
   <vertical slug="vertical_66" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
     <problem filename="S1E3_AC_power" slug="S1E3_AC_power" name="S1E3: AC power"/>
     <customtag tag="S1E3" slug="discuss_67" impl="discuss"/>
-    <html slug="html_68"> S1E4 has been removed… </html>
+    <!-- utf-8 characters acceptable, but not HTML entities -->
+    <html slug="html_68"> S1E4 has been removed…</html>
   </vertical>
   <vertical filename="vertical_89" slug="vertical_89" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
   <vertical slug="vertical_94" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">

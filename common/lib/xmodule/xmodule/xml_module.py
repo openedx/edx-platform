@@ -13,7 +13,8 @@ import sys
 log = logging.getLogger(__name__)
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+                                 remove_comments=True, remove_blank_text=True,
+                                 encoding='utf-8')
 
 def name_to_pathname(name):
     """
@@ -206,6 +207,7 @@ class XmlDescriptor(XModuleDescriptor):
 
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
 
+        log.info(' read definition XML: %s', definition_xml)
         definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
         definition = cls.definition_from_xml(definition_xml, system)
@@ -366,7 +368,7 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = self.__class__._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8', xml_declaration=True))
+                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
 
             # And return just a pointer with the category and filename.
             record_object = etree.Element(self.category)
@@ -381,7 +383,7 @@ class XmlDescriptor(XModuleDescriptor):
             record_object.set('org', self.location.org)
             record_object.set('course', self.location.course)
 
-        return etree.tostring(record_object, pretty_print=True)
+        return etree.tostring(record_object, pretty_print=True, encoding='utf-8')
 
     def definition_to_xml(self, resource_fs):
         """
