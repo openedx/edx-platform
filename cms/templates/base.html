@@ -9,6 +9,9 @@
     <%static:css group='base-style'/>
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
+   
     <title><%block name="title"></%block></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
@@ -26,6 +29,9 @@
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js')}"></script>
+    <script src="${static.url('js/vendor/symbolset.ss-standard.js')}"></script>
+    <script src="${static.url('js/vendor/symbolset.ss-symbolicons.js')}"></script>
+
     <%static:js group='main'/>
     <%static:js group='module-js'/>
     <script src="${static.url('js/vendor/jquery.inlineedit.js')}"></script>
@@ -33,6 +39,7 @@
     <script src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
     <script src="${static.url('js/vendor/jquery.tablednd.js')}"></script>
     <script src="${static.url('js/vendor/jquery.form.js')}"></script>
+    <script type="text/javascript" src="${static.url('coffee/src/discussion/tooltip_manager.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript">

@@ -17,11 +17,6 @@
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
 
-  <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
-  <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
-  <script src="${static.url('js/vendor/symbolset.ss-standard.js')}"></script>
-  <script src="${static.url('js/vendor/symbolset.ss-symbolicons.js')}"></script>
-
   <script type="text/javascript">
     (function() {
       $body = $('body');  
@@ -32,7 +27,6 @@
     function showGradeMenu(e) {
 
       $section = $(this).closest('.gradable-status');
-
       e.preventDefault();
       $section.toggleClass('is-active');
     }
@@ -151,8 +145,8 @@
             <div class="gradable-status">
               <h4 class="status-label">Not Graded</h4>
               
-              <a class="menu-toggle" href="#">
-                <span class="ss-icon ss-standard" data-tooltip="Make this gradable">&#x2713;</span>
+              <a data-tooltip="Mark/unmark this section as graded" class="menu-toggle" href="#">
+                <span class="ss-icon ss-standard">&#x2713;</span>
               </a>
                               
               <ul class="menu">
@@ -191,7 +185,7 @@
                   <div class="gradable-status">
                     <h4 class="status-label">Not Graded</h4>
                     
-                    <a class="menu-toggle" href="#">
+                    <a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">
                       <span class="ss-icon ss-standard">&#x2713;</span>
                     </a>
                                     
