@@ -18,11 +18,15 @@ class StaffGradingBackend
 
   mock: (cmd, data) ->
     # Return a mock response to cmd and data
-    # TODO: needs (optional?) arg for problem location
+    # should take a location as an argument
     if cmd == 'get_next'
       @mock_cnt++
       response =
         success: true
+        problem_name: 'Problem 1'
+        num_left: 3
+        num_total: 5
+        prompt: 'This is a fake prompt'
         submission: 'submission! ' + @mock_cnt
         rubric: 'A rubric! ' + @mock_cnt
         submission_id: @mock_cnt
@@ -33,20 +37,18 @@ class StaffGradingBackend
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
         @mock('get_next', {})
-    else if cmd == 'get_problems'
-      # this one didn't have a name in the LMS--lookup fail
-      p1 = {'location': 'i4x://MITx/3.091x/problem/open_ended_demo',\
-            'name': 'i4x://MITx/3.091x/problem/open_ended_demo',\
-            'num_graded': 10,\
-            'num_to_grade': 90}
-                    
-      p2 = {'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',\
-            'name': 'Open ended demo',\
-            'num_graded': 42,\
-            'num_to_grade': 63}
-                    
-      response =
-        problems: [p1, p2]
+    # get_probblem_list
+    # sends in a course_id and a grader_id
+    # should get back a list of problem_ids, problem_names, num_left, num_total
+    else if cmd == 'get_problem_list'
+        response = 
+            success: true
+            problem_list: [
+                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+                    problem_name: "Problem 1", num_left: 3, num_total: 5},
+                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+                    problem_name: "Problem 2", num_left: 1, num_total: 5}
+            ]
     else
       response =
         success: false
