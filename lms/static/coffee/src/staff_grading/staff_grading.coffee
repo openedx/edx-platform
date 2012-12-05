@@ -36,19 +36,20 @@ class StaffGradingBackend
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
-        @mock('get_next', {})
-    # get_probblem_list
+        @mock('get_next', {location})
+    # get_problem_list
     # sends in a course_id and a grader_id
     # should get back a list of problem_ids, problem_names, num_left, num_total
     else if cmd == 'get_problem_list'
-        response = 
-            success: true
-            problem_list: [
-                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
-                    problem_name: "Problem 1", num_left: 3, num_total: 5},
-                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
-                    problem_name: "Problem 2", num_left: 1, num_total: 5}
-            ]
+      @mock_cnt++
+      response = 
+        success: true
+        problem_list: [
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+            problem_name: "Problem 1", num_left: 3, num_total: 5},
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+            problem_name: "Problem 2", num_left: 1, num_total: 5}
+        ]
     else
       response =
         success: false
@@ -79,8 +80,13 @@ class StaffGradingBackend
 class StaffGrading
   constructor: (backend) ->
     @backend = backend
+    @list_view = true
 
     # all the jquery selectors
+
+    @problem_list_container = $('.problem-list-container')
+    @problem_list = $('.problem-list')
+
     @error_container = $('.error-container')
     @message_container = $('.message-container')
 
@@ -108,17 +114,19 @@ class StaffGrading
     @message = ''
     @max_score = 0
     @ml_error_info= ''
+    @location = ''
 
     @score = null
+    @problems = null
 
     # action handlers
     @submit_button.click @submit
 
     # render intial state
-    @render_view()
+    #@render_view()
 
     # send initial request automatically
-    @get_next_submission()
+    @get_problem_list()
 
 
   setup_score_selection: =>
@@ -153,7 +161,9 @@ class StaffGrading
     @message = ''
     
     if response.success
-      if response.submission
+      if response.problem_list
+        @problems = response.problem_list
+      else if response.submission
         @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info)
       else
         @no_more(response.message)
@@ -162,8 +172,13 @@ class StaffGrading
 
     @render_view()
        
-  get_next_submission: () ->
-    @backend.post('get_next', {}, @ajax_callback)
+  get_next_submission: (location) ->
+    @location = location
+    @list_view = false
+    @backend.post('get_next', {location}, @ajax_callback)
+
+  get_problem_list: () ->
+    @backend.post('get_problem_list', {}, @ajax_callback)
 
   submit_and_get_next: () ->
     data =
@@ -202,14 +217,41 @@ class StaffGrading
     @state = state_no_data
 
   render_view: () ->
-    # make the view elements match the state.  Idempotent.
-    show_grading_elements = false
-    show_submit_button = true
-
+    # clear the problem list
+    @problem_list.html('')
     @message_container.html(@message)
+    # only show the grading elements when we are not in list view or the state
+    # is invalid
+    show_grading_elements = !(@list_view || @state == state_error || 
+      @state == state_no_data)
+    @prompt_wrapper.toggle(show_grading_elements)
+    @submission_wrapper.toggle(show_grading_elements)
+    @rubric_wrapper.toggle(show_grading_elements)
+    @ml_error_info_container.toggle(show_grading_elements)
+    @submit_button.hide()
+    
     if @backend.mock_backend
       @message_container.append("<p>NOTE: Mocking backend.</p>")
-    
+    if @list_view
+      @render_list()
+    else
+      @render_problem()
+
+  problem_link:(problem) ->
+    link = $('<a>').attr('href', "javascript:void(0)").append(
+      "#{problem.problem_name} (#{problem.num_left} / #{problem.num_total})")
+        .click =>
+          @get_next_submission problem.location
+
+
+  render_list: () ->
+    for problem in @problems
+      @problem_list.append($('<li>').append(@problem_link(problem)))
+
+  render_problem: () ->
+    # make the view elements match the state.  Idempotent.
+    show_submit_button = true
+
     @error_container.html(@error_msg)
 
     if @state == state_error
@@ -220,7 +262,6 @@ class StaffGrading
       @prompt_container.html(@prompt)
       @submission_container.html(@submission)
       @rubric_container.html(@rubric)
-      show_grading_elements = true
 
       # no submit button until user picks grade.
       show_submit_button = false
@@ -228,7 +269,6 @@ class StaffGrading
       @setup_score_selection()
       
     else if @state == state_graded
-      show_grading_elements = true
       @set_button_text('Submit')
 
     else if @state == state_no_data
@@ -239,21 +279,16 @@ class StaffGrading
       @error('System got into invalid state ' + @state)
 
     @submit_button.toggle(show_submit_button)
-    @prompt_wrapper.toggle(show_grading_elements)
-    @submission_wrapper.toggle(show_grading_elements)
-    @rubric_wrapper.toggle(show_grading_elements)
-    @ml_error_info_container.toggle(show_grading_elements)
-
 
   submit: (event) =>
     event.preventDefault()
     
     if @state == state_error
-      @get_next_submission()
+      @get_next_submission(@location)
     else if @state == state_graded
       @submit_and_get_next()
     else if @state == state_no_data
-      @get_next_submission()
+      @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
   
