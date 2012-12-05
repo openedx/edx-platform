@@ -59,7 +59,7 @@ class StaffGradingBackend
     # sends in a course_id and a grader_id
     # should get back a list of problem_ids, problem_names, num_left, num_total
     else if cmd == 'get_problem_list'
-      @mock_cnt++
+      @mock_cnt = 1
       response = 
         success: true
         problem_list: [
@@ -121,6 +121,8 @@ class StaffGrading
     @score_selection_container = $('.score-selection-container')        
     @submit_button = $('.submit-button')
     @ml_error_info_container = $('.ml-error-info-container')
+
+    @breadcrumbs = $('.breadcrumbs')
     
     # model state
     @state = state_no_data
@@ -246,8 +248,9 @@ class StaffGrading
     @state = state_no_data
 
   render_view: () ->
-    # clear the problem list
+    # clear the problem list and breadcrumbs
     @problem_list.html('')
+    @breadcrumbs.html('')
     @problem_list_container.toggle(@list_view)
     @message_container.html(@message)
     # only show the grading elements when we are not in list view or the state
@@ -283,6 +286,12 @@ class StaffGrading
     show_submit_button = true
 
     @error_container.html(@error_msg)
+    problem_list_link = $('<a>').attr('href', 'javascript:void(0);')
+      .append("Problem List")
+      .click => @get_problem_list()
+
+    # set up the breadcrumbing
+    @breadcrumbs.append(problem_list_link).append(" > #{@prompt_name}")
 
     if @state == state_error
       @set_button_text('Try loading again')
