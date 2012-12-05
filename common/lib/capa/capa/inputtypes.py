@@ -746,8 +746,9 @@ class OpenEndedInput(InputTypeBase):
     tags = ['openendedinput']
 
     # pulled out for testing
-    submitted_msg = ("Submitted.  As soon as your submission is"
-                     " graded, this message will be replaced with the grader's feedback.")
+    submitted_msg = ("Feedback not yet available.  Reload to check again. "
+                     "Once the problem is graded, this message will be "
+                     "replaced with the grader's feedback")
 
     @classmethod
     def get_attributes(cls):

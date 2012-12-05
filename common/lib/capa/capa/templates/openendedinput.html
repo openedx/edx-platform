@@ -13,15 +13,12 @@
     % elif status == 'incorrect':
       <span class="incorrect" id="status_${id}">Incorrect</span>
     % elif status == 'queued':
-      <span class="processing" id="status_${id}">Queued</span>
-      <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
+      <span class="grading" id="status_${id}">Submitted for grading</span>
     % endif
 
     % if hidden:
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
-
-    <p class="debug">${status}</p>
   </div>
 
   <span id="answer_${id}"></span>

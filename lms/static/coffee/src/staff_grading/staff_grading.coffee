@@ -18,7 +18,7 @@ class StaffGradingBackend
 
   mock: (cmd, data) ->
     # Return a mock response to cmd and data
-    # should take a problem id as an argument
+    # TODO: needs (optional?) arg for problem location
     if cmd == 'get_next'
       @mock_cnt++
       response =
@@ -31,7 +31,7 @@ class StaffGradingBackend
         rubric: 'A rubric! ' + @mock_cnt
         submission_id: @mock_cnt
         max_score: 2 + @mock_cnt % 3
-        ml_error_info : 'ML error info!' + @mock_cnt
+        ml_error_info : 'ML accuracy info: ' + @mock_cnt
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
@@ -44,8 +44,10 @@ class StaffGradingBackend
         response = 
             success: true
             problem_list: [
-                {problem_id: 1, problem_name: "Problem 1", num_left: 3, num_total: 5}
-                {problem_id: 2, problem_name: "Problem 2", num_left: 1, num_total: 5}
+                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+                    problem_name: "Problem 1", num_left: 3, num_total: 5},
+                {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+                    problem_name: "Problem 2", num_left: 1, num_total: 5}
             ]
     else
       response =
