@@ -22,3 +22,8 @@ describe "RequireJS", ->
     expect(window.requirejs).not.toBeDefined()
     expect(window.require).not.toBeDefined()
     expect(window.define).not.toBeDefined()
+
+  it "check that the RequireJS has requirejs(), require(), and define() functions as its properties", ->
+    expect(RequireJS.requirejs).toEqual jasmine.any(Function)
+    expect(RequireJS.require).toEqual jasmine.any(Function)
+    expect(RequireJS.define).toEqual jasmine.any(Function)
