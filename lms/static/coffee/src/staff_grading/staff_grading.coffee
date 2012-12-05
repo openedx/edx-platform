@@ -21,22 +21,40 @@ class StaffGradingBackend
     # should take a location as an argument
     if cmd == 'get_next'
       @mock_cnt++
-      response =
-        success: true
-        problem_name: 'Problem 1'
-        num_left: 3
-        num_total: 5
-        prompt: 'This is a fake prompt'
-        submission: 'submission! ' + @mock_cnt
-        rubric: 'A rubric! ' + @mock_cnt
-        submission_id: @mock_cnt
-        max_score: 2 + @mock_cnt % 3
-        ml_error_info : 'ML accuracy info: ' + @mock_cnt
+      switch data.location
+        when 'i4x://MITx/3.091x/problem/open_ended_demo1'
+          response =
+            success: true
+            problem_name: 'Problem 1'
+            num_left: 3
+            num_total: 5
+            prompt: 'This is a fake prompt'
+            submission: 'submission! ' + @mock_cnt
+            rubric: 'A rubric! ' + @mock_cnt
+            submission_id: @mock_cnt
+            max_score: 2 + @mock_cnt % 3
+            ml_error_info : 'ML accuracy info: ' + @mock_cnt
+        when 'i4x://MITx/3.091x/problem/open_ended_demo2'
+          response =
+            success: true
+            problem_name: 'Problem 2'
+            num_left: 2
+            num_total: 5
+            prompt: 'This is a fake second problem'
+            submission: 'This is the best submission ever! ' + @mock_cnt
+            rubric: 'I am a rubric for grading things! ' + @mock_cnt
+            submission_id: @mock_cnt
+            max_score: 2 + @mock_cnt % 3
+            ml_error_info : 'ML accuracy info: ' + @mock_cnt
+        else
+          response = 
+            success: false
+          
 
     else if cmd == 'save_grade'
       console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
-        @mock('get_next', {location})
+        @mock('get_next', {location: data.location})
     # get_problem_list
     # sends in a course_id and a grader_id
     # should get back a list of problem_ids, problem_names, num_left, num_total
@@ -45,9 +63,9 @@ class StaffGradingBackend
       response = 
         success: true
         problem_list: [
-          {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
             problem_name: "Problem 1", num_left: 3, num_total: 5},
-          {location: 'i4x://MITx/3.091x/problem/open_ended_demo', \
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo2', \
             problem_name: "Problem 2", num_left: 1, num_total: 5}
         ]
     else
@@ -178,7 +196,7 @@ class StaffGrading
   get_next_submission: (location) ->
     @location = location
     @list_view = false
-    @backend.post('get_next', {location}, @ajax_callback)
+    @backend.post('get_next', {location: location}, @ajax_callback)
 
   get_problem_list: () ->
     @list_view = true
@@ -189,6 +207,7 @@ class StaffGrading
       score: @score
       feedback: @feedback_area.val()
       submission_id: @submission_id
+      location: @location
     
     @backend.post('save_grade', data, @ajax_callback)
 
@@ -250,7 +269,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_left} / #{problem.num_total})")
+      "#{problem.problem_name} (#{problem.num_left} left out of #{problem.num_total})")
         .click =>
           @get_next_submission problem.location
 
@@ -271,7 +290,7 @@ class StaffGrading
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
       @prompt_container.html(@prompt)
-      @prompt_name_container.html("#{@prompt_name} (#{@num_left} / #{@num_total})")
+      @prompt_name_container.html("#{@prompt_name} <span class='sub-heading'>(#{@num_left} left out of #{@num_total})</span>")
       @submission_container.html(@submission)
       @rubric_container.html(@rubric)
 
