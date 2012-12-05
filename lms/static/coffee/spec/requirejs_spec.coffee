@@ -1,4 +1,4 @@
-describe "RequireJS", ->
+describe "RequireJS namespacing", ->
   beforeEach ->
     @addMatchers
       requirejsTobeUndefined: ->
@@ -23,7 +23,26 @@ describe "RequireJS", ->
     expect(window.require).not.toBeDefined()
     expect(window.define).not.toBeDefined()
 
-  it "check that the RequireJS has requirejs(), require(), and define() functions as its properties", ->
-    expect(RequireJS.requirejs).toEqual jasmine.any(Function)
-    expect(RequireJS.require).toEqual jasmine.any(Function)
-    expect(RequireJS.define).toEqual jasmine.any(Function)
+
+describe "RequireJS module creation", ->
+  inCallback = undefined
+  it "check that we can use RequireJS.define() to create a module", ->
+    runs ->
+      inCallback = false
+      RequireJS.define [], ->
+        inCallback = true
+        module_status: "OK"
+
+
+    waitsFor (->
+      inCallback
+    ), "We should eventually end up in the defined callback", 1000
+    runs ->
+      expects(inCallback).toBeTruthy()
+
+
+
+
+# it('check that we can use RequireJS.require() to get our defined module', function () {
+
+# });
