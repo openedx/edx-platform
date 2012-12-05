@@ -1,51 +1,68 @@
-describe "RequireJS namespacing", ->
-  beforeEach ->
-    @addMatchers
-      requirejsTobeUndefined: ->
-        typeof requirejs is "undefined"
+describe('RequireJS namespacing', function() {
+  beforeEach(function() {
+    this.addMatchers({
+      requirejsTobeUndefined: function() {
+        return (typeof requirejs === 'undefined');
+      },
+      requireTobeUndefined: function() {
+        return (typeof require === 'undefined');
+      },
+      defineTobeUndefined: function() {
+        return (typeof define === 'undefined');
+      },
+    });
+  });
 
-      requireTobeUndefined: ->
-        typeof require is "undefined"
+    it('check that the RequireJS object is present in the global namespace', function() {
+        expect(RequireJS).toEqual(jasmine.any(Object));
+        expect(window.RequireJS).toEqual(jasmine.any(Object));
+    });
 
-      defineTobeUndefined: ->
-        typeof define is "undefined"
+    it('check that requirejs(), require(), and define() are not in the global namespace', function () {
+        expect({}).requirejsTobeUndefined();
+        expect({}).requireTobeUndefined();
+        expect({}).defineTobeUndefined();
 
+        expect(window.requirejs).not.toBeDefined();
+        expect(window.require).not.toBeDefined();
+        expect(window.define).not.toBeDefined();
+    });
+});
 
-  it "check that the RequireJS object is present in the global namespace", ->
-    expect(RequireJS).toEqual jasmine.any(Object)
-    expect(window.RequireJS).toEqual jasmine.any(Object)
+describe('RequireJS module creation', function() {
+    var inDefineCallback, inRequireCallback;
 
-  it "check that requirejs(), require(), and define() are not in the global namespace", ->
-    expect({}).requirejsTobeUndefined()
-    expect({}).requireTobeUndefined()
-    expect({}).defineTobeUndefined()
-    expect(window.requirejs).not.toBeDefined()
-    expect(window.require).not.toBeDefined()
-    expect(window.define).not.toBeDefined()
+    it('check that we can use RequireJS define() and require() a module', function() {
+        runs(function () {
+            inDefineCallback = false;
+            inRequireCallback = false;
 
+            RequireJS.define('test_module', [], function () {
+                inDefineCallback = true;
 
-describe "RequireJS module creation", ->
-  inDefineCallback = undefined
-  inRequireCallback = undefined
-  it "check that we can use RequireJS define() and require() a module", ->
-    runs ->
-      inDefineCallback = false
-      inRequireCallback = false
-      RequireJS.define "test_module", [], ->
-        inDefineCallback = true
-        module_status: "OK"
+                return {
+                    'module_status': 'OK'
+                };
+            });
 
-      RequireJS.require ["test_module"], (test_module) ->
-        inRequireCallback = true
-        expects(test_module.module_status).toBe "OK"
+            RequireJS.require(['test_module'], function (test_module) {
+                inRequireCallback = true;
 
+                expect(test_module.module_status).toBe('OK');
+            });
+        });
 
-    waitsFor (->
-      return false  if (inDefineCallback isnt true) or (inRequireCallback isnt true)
-      true
-    ), "We should eventually end up in the defined callback", 1000
-    runs ->
-      expects(inDefineCallback).toBeTruthy()
-      expects(inRequireCallback).toBeTruthy()
+        waitsFor(function () {
+            if ((inDefineCallback !== true) || (inRequireCallback !== true)) {
+                return false;
+            }
 
+            return true
+        }, 'We should eventually end up in the defined callback', 1000);
 
+        runs(function () {
+            expect(inDefineCallback).toBeTruthy();
+            expect(inRequireCallback).toBeTruthy();
+        });
+    });
+});
