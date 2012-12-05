@@ -46,7 +46,7 @@
       <div class="post-body">${'<%- body %>'}</div>
         
       <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
-      <i class="icon"></i>Report Misuse</div>      
+      <i class="icon"></i><span class="flag-label">Report Misuse</span></div>      
         
         
       ${'<% if (obj.courseware_url) { %>'}
@@ -138,7 +138,7 @@
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
-      <i class="icon"></i></div> 
+      <i class="icon"></i><span class="flag-label">Report Misuse</span></div> 
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
