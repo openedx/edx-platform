@@ -80,7 +80,6 @@ class StaffGradingBackend
 class StaffGrading
   constructor: (backend) ->
     @backend = backend
-    @list_view = true
 
     # all the jquery selectors
 
@@ -90,6 +89,7 @@ class StaffGrading
     @error_container = $('.error-container')
     @message_container = $('.message-container')
 
+    @prompt_name_container = $('.prompt-name')
     @prompt_container = $('.prompt-container')
     @prompt_wrapper = $('.prompt-wrapper')
 
@@ -115,6 +115,9 @@ class StaffGrading
     @max_score = 0
     @ml_error_info= ''
     @location = ''
+    @prompt_name = ''
+    @num_total = 0
+    @num_left = 0
 
     @score = null
     @problems = null
@@ -164,7 +167,7 @@ class StaffGrading
       if response.problem_list
         @problems = response.problem_list
       else if response.submission
-        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info)
+        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info, response.problem_name, response.num_left, response.num_total)
       else
         @no_more(response.message)
     else
@@ -178,6 +181,7 @@ class StaffGrading
     @backend.post('get_next', {location}, @ajax_callback)
 
   get_problem_list: () ->
+    @list_view = true
     @backend.post('get_problem_list', {}, @ajax_callback)
 
   submit_and_get_next: () ->
@@ -192,7 +196,7 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info) ->
+  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info, prompt_name, num_left, num_total) ->
     @prompt = prompt
     @submission = submission
     @rubric = rubric
@@ -201,12 +205,18 @@ class StaffGrading
     @max_score = max_score
     @score = null
     @ml_error_info=ml_error_info
+    @prompt_name = prompt_name
+    @num_left = num_left
+    @num_total = num_total
     @state = state_grading
     if not @max_score?
       @error("No max score specified for submission.")
 
   no_more: (message) ->
     @prompt = null
+    @prompt_name = ''
+    @num_left = 0
+    @num_total = 0
     @submission = null
     @rubric = null
     @ml_error_info = null
@@ -219,6 +229,7 @@ class StaffGrading
   render_view: () ->
     # clear the problem list
     @problem_list.html('')
+    @problem_list_container.toggle(@list_view)
     @message_container.html(@message)
     # only show the grading elements when we are not in list view or the state
     # is invalid
@@ -260,6 +271,7 @@ class StaffGrading
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
       @prompt_container.html(@prompt)
+      @prompt_name_container.html("#{@prompt_name} (#{@num_left} / #{@num_total})")
       @submission_container.html(@submission)
       @rubric_container.html(@rubric)
 
