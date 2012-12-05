@@ -1,10 +1,8 @@
 describe "RequireJS namespacing", ->
   beforeEach ->
 
-    #
-    #         * Jasmine does not provide a way to use the typeof operator. We need
-    #         * to create our own custom matchers so that a TypeError is not thrown.
-    #
+    # Jasmine does not provide a way to use the typeof operator. We need
+    # to create our own custom matchers so that a TypeError is not thrown.
     @addMatchers
       requirejsTobeUndefined: ->
         typeof requirejs is "undefined"
