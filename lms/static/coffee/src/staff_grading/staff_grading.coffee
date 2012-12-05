@@ -18,7 +18,7 @@ class StaffGradingBackend
 
   mock: (cmd, data) ->
     # Return a mock response to cmd and data
-    # TODO: needs (optional?) arg for problem location
+    # should take a location as an argument
     if cmd == 'get_next'
       @mock_cnt++
       response =
