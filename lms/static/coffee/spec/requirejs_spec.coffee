@@ -25,24 +25,27 @@ describe "RequireJS namespacing", ->
 
 
 describe "RequireJS module creation", ->
-  inCallback = undefined
-  it "check that we can use RequireJS.define() to create a module", ->
+  inDefineCallback = undefined
+  inRequireCallback = undefined
+  it "check that we can use RequireJS define() and require() a module", ->
     runs ->
-      inCallback = false
-      RequireJS.define [], ->
-        inCallback = true
+      inDefineCallback = false
+      inRequireCallback = false
+      RequireJS.define "test_module", [], ->
+        inDefineCallback = true
         module_status: "OK"
+
+      RequireJS.require "test_module", (test_module) ->
+        inRequireCallback = true
+        expects(test_module.module_status).toBe "OK"
 
 
     waitsFor (->
-      inCallback
+      return false  if (inDefineCallback isnt true) or (inRequireCallback isnt true)
+      true
     ), "We should eventually end up in the defined callback", 1000
     runs ->
-      expects(inCallback).toBeTruthy()
+      expects(inDefineCallback).toBeTruthy()
+      expects(inRequireCallback).toBeTruthy()
 
 
-
-
-# it('check that we can use RequireJS.require() to get our defined module', function () {
-
-# });
