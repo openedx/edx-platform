@@ -1996,13 +1996,13 @@ class OpenEndedResponse(LoncapaResponse):
             oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
                 msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
-            log.debug('OpenEndedResponse: queuekey %s does not match for answer_id=%s.' %
-                      (queuekey, self.answer_id))
+            log.debug('OpenEndedResponse: queuekey {0} does not match for answer_id={1}.'.format(
+                queuekey, self.answer_id))
 
         return oldcmap
 
     def get_answers(self):
-        anshtml = '<span class="openended-answer"><pre><code>%s</code></pre></span>' % self.answer
+        anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(self.answer)
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
@@ -2089,11 +2089,11 @@ class OpenEndedResponse(LoncapaResponse):
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_msg = %s" % score_msg)
+                      " Received score_msg = {0}".format(score_msg))
             return fail
         if not isinstance(score_result, dict):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_result = %s" % score_result)
+                      " Received score_result = {0}".format(score_result))
             return fail
         for tag in ['score', 'feedback', 'grader_type', 'success']:
             if tag not in score_result:
