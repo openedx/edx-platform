@@ -51,7 +51,7 @@ if Backbone?
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
-        @$(".discussion-flag-abuse .flag-label").html("ReportMisuse")
+        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
 
     updateModelDetails: =>
       @renderVoted()
