@@ -77,9 +77,9 @@ class Thread(models.Model):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
-            url = _url_for_vote_comment(voteable.id)
+            url = _url_for_flag_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
@@ -88,9 +88,9 @@ class Thread(models.Model):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
-            url = _url_for_vote_comment(voteable.id)
+            url = _url_for_unflag_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientError("Can flag/unflag for threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)          

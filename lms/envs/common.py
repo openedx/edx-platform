@@ -46,7 +46,7 @@ MITX_FEATURES = {
     'USE_DJANGO_PIPELINE' : True,
     'DISPLAY_HISTOGRAMS_TO_STAFF' : True,
     'REROUTE_ACTIVATION_EMAIL' : False,		# nonempty string = address for all activation emails
-    'DEBUG_LEVEL' : 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
+    'DEBUG_LEVEL' : 255,				# 0 = lowest level, least verbose, 255 = max level, most verbose
 
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production

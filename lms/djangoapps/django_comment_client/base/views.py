@@ -250,6 +250,18 @@ def un_flag_abuse_for_thread(request, course_id, thread_id, value):
     thread.unFlagAbuse(user,thread, value)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
+def flag_abuse_for_comment(request, course_id, comment_id, value):
+    user = cc.User.from_django_user(request.user)
+    comment = cc.Comment.find(thread_id)
+    comment.flagAbuse(user,comment, value)
+    return JsonResponse(utils.safe_content(comment.to_dict()))
+
+def un_flag_abuse_for_comment(request, course_id, comment_id, value):
+    user = cc.User.from_django_user(request.user)
+    comment = cc.Comment.find(thread_id)
+    comment.unFlagAbuse(user,comment, value)
+    return JsonResponse(utils.safe_content(comment.to_dict()))
+
 @require_POST
 @login_required
 @permitted

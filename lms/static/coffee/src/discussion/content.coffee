@@ -94,8 +94,6 @@ if Backbone?
     urlMappers:
       'retrieve'    : -> DiscussionUtil.urlFor('retrieve_single_thread', @discussion.id, @id)
       'reply'       : -> DiscussionUtil.urlFor('create_comment', @id)
-      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
-      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
       'unvote'      : -> DiscussionUtil.urlFor("undo_vote_for_#{@get('type')}", @id)
       'upvote'      : -> DiscussionUtil.urlFor("upvote_#{@get('type')}", @id)
       'downvote'    : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
@@ -104,6 +102,10 @@ if Backbone?
       'delete'      : -> DiscussionUtil.urlFor('delete_thread', @id)
       'follow'      : -> DiscussionUtil.urlFor('follow_thread', @id)
       'unfollow'    : -> DiscussionUtil.urlFor('unfollow_thread', @id)
+      'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
+      'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
+
+
 
     initialize: ->
       @set('thread', @)
