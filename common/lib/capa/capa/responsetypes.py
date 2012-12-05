@@ -1910,9 +1910,8 @@ class OpenEndedResponse(LoncapaResponse):
         try:
             submission = student_answers[self.answer_id]
         except Exception as err:
-            log.error('Error in OpenEndedResponse %s: cannot get student answer for %s;'
-                      ' student_answers=%s', err, self.answer_id)
-            raise Exception(err)
+            log.error('Error in OpenEndedResponse {0}: cannot get student answer for {1}'.format(err,self.answer_id))
+            raise
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -1958,8 +1957,8 @@ class OpenEndedResponse(LoncapaResponse):
         cmap = CorrectMap()
         if error:
             cmap.set(self.answer_id, queuestate=None,
-                msg='Unable to deliver your submission to grader. (Reason: %s.)'
-                    ' Please try again later.' % msg)
+                msg='Unable to deliver your submission to grader. (Reason: {0}.)'
+                    ' Please try again later.'.format(msg))
         else:
             # Queueing mechanism flags:
             #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
