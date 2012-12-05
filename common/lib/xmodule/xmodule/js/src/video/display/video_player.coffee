@@ -36,6 +36,7 @@ class @VideoPlayer extends Subview
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
     @progressSlider = new VideoProgressSlider el: @$('.slider')
+    @debugger_1
     @player = new YT.Player @video.id,
       playerVars:
         controls: 0
@@ -44,6 +45,8 @@ class @VideoPlayer extends Subview
         showinfo: 0
         enablejsapi: 1
         modestbranding: 1
+        start: 10
+        end: 20
       videoId: @video.youtubeId()
       events:
         onReady: @onReady
