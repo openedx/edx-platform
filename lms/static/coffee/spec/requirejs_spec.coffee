@@ -1,7 +1,14 @@
 describe "RequireJS", ->
   beforeEach ->
-    @addMatchers requirejsTobeUndefined: ->
-      typeof requirejs is "undefined"
+    @addMatchers
+      requirejsTobeUndefined: ->
+        typeof requirejs is "undefined"
+
+      requireTobeUndefined: ->
+        typeof require is "undefined"
+
+      defineTobeUndefined: ->
+        typeof define is "undefined"
 
 
   it "check that the RequireJS object is present in the global namespace", ->
@@ -10,9 +17,8 @@ describe "RequireJS", ->
 
   it "check that requirejs(), require(), and define() are not in the global namespace", ->
     expect({}).requirejsTobeUndefined()
-
-    # expect(require).not.toBeDefined();
-    # expect(define).not.toBeDefined();
+    expect({}).requireTobeUndefined()
+    expect({}).defineTobeUndefined()
     expect(window.requirejs).not.toBeDefined()
     expect(window.require).not.toBeDefined()
     expect(window.define).not.toBeDefined()
