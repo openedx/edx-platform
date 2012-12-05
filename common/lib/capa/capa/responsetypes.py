@@ -1140,7 +1140,7 @@ class CodeResponse(LoncapaResponse):
         else:
             self._parse_coderesponse_xml(codeparam)
 
-    def _parse_coderesponse_xml(self,codeparam):
+    def _parse_coderesponse_xml(self, codeparam):
         '''
         Parse the new CodeResponse XML format. When successful, sets:
             self.initial_display
@@ -1152,17 +1152,9 @@ class CodeResponse(LoncapaResponse):
         grader_payload = grader_payload.text if grader_payload is not None else ''
         self.payload = {'grader_payload': grader_payload}
 
-        answer_display = codeparam.find('answer_display')
-        if answer_display is not None:
-            self.answer = answer_display.text
-        else:
-            self.answer = 'No answer provided.'
-
-        initial_display = codeparam.find('initial_display')
-        if initial_display is not None:
-            self.initial_display = initial_display.text
-        else:
-            self.initial_display = ''
+        self.initial_display = find_with_default(codeparam, 'initial_display', '')
+        self.answer = find_with_default(codeparam, 'answer_display',
+                                        'No answer provided.')
 
     def _parse_externalresponse_xml(self):
         '''
@@ -1890,44 +1882,27 @@ class OpenEndedResponse(LoncapaResponse):
 
         #Update grader payload with student id.  If grader payload not json, error.
         try:
-            grader_payload = json.loads(grader_payload)
+            parsed_grader_payload = json.loads(grader_payload)
             # NOTE: self.system.location is valid because the capa_module
             # __init__ adds it (easiest way to get problem location into
             # response types)
-            grader_payload.update({
+            parsed_grader_payload.update({
                 'location' : self.system.location,
                 'course_id' : self.system.course_id,
                 'prompt' : prompt_string,
                 'rubric' : rubric_string,
             })
-            grader_payload = json.dumps(grader_payload)
+            updated_grader_payload = json.dumps(parsed_grader_payload)
         except Exception as err:
-            log.error("Grader payload is not a json object!")
+            log.exception("Grader payload %r is not a json object!", grader_payload)
 
-        self.payload = {'grader_payload': grader_payload}
+        self.payload = {'grader_payload': updated_grader_payload}
 
-        #Parse initial display
-        initial_display = oeparam.find('initial_display')
-        if initial_display is not None:
-            self.initial_display = initial_display.text
-        else:
-            self.initial_display = ''
-
-        #Parse answer display
-        answer_display = oeparam.find('answer_display')
-        if answer_display is not None:
-            self.answer= answer_display.text
-        else:
-            self.answer = "No answer given."
-
-        #Parse max_score
-        top_score = oeparam.find('max_score')
-        if top_score is not None:
-            try:
-                self.max_score = int(top_score.text)
-            except:
-                self.max_score = 1
-        else:
+        self.initial_display = find_with_default(oeparam, 'initial_display', '')
+        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+        try:
+            self.max_score = int(find_with_default(oeparam, 'max_score', 1))
+        except ValueError:
             self.max_score = 1
 
     def get_score(self, student_answers):
