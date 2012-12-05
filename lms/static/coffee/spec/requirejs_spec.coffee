@@ -35,7 +35,7 @@ describe "RequireJS module creation", ->
         inDefineCallback = true
         module_status: "OK"
 
-      RequireJS.require "test_module", (test_module) ->
+      RequireJS.require ["test_module"], (test_module) ->
         inRequireCallback = true
         expects(test_module.module_status).toBe "OK"
 
