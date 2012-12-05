@@ -99,9 +99,11 @@
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <h1>Courseware</h1>
-      <div class="page-actions"></div>
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
+      <div class="page-actions">
         <a href="#" class="new-button new-courseware-section-button"><span class="plus-icon white"></span> New Section</a>
+        <a href="#" class="collapse-all-button"><span class="collapse-all-icon"></span>Collapse All</a>
+      </div>
+      <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>

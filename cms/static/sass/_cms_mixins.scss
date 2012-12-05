@@ -88,7 +88,28 @@
 
 	&:hover {
 		background-color: #d9e3ee;
-		color: #6d788b;
+	}
+}
+
+@mixin green-button {
+	@include button;
+	border: 1px solid $darkGreen;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $green;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: #fff;
+
+	&:hover {
+		background-color: $brightGreen;
+		color: #fff;
+	}
+
+	&.disabled {
+		border: 1px solid $disabledGreen !important;
+		background: $disabledGreen !important;
+		color: #fff !important;
+		@include box-shadow(none);
 	}
 }
 
