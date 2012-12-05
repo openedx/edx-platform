@@ -1,4 +1,3 @@
-
 input.courseware-unit-search-input {
 	float: left;
 	width: 260px;
@@ -9,9 +8,9 @@ input.courseware-unit-search-input {
 	position: relative;
 	background: #fff;
 	border-radius: 3px;
-	margin-top: 15px;
+	margin: 15px 0;
 	padding-bottom: 12px;
-	@include box-shadow(0 1px 1px rgba(0,0,0,0.2), 0 0 0 1px rgba(0, 0, 0, 0.1));
+	@include box-shadow(0 1px 1px rgba(0, 0, 0, .2));
 
 	&:first-child {
 		margin-top: 0;
@@ -192,17 +191,6 @@ input.courseware-unit-search-input {
 	}
 }
 
-.collapse-all-button {
-	float: right;
-	margin-top: 10px;
-	font-size: 13px;
-	color: $darkGrey;
-
-	.collapse-all-icon {
-		margin-right: 6px;
-	}
-}
-
 .new-section-name,
 .new-subsection-name-input {
 	width: 515px;
@@ -219,7 +207,7 @@ input.courseware-unit-search-input {
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
-	padding: 2px 20px 5px;
+	padding: 4px 20px 7px;
 	color: #8891a1 !important;
 }
 

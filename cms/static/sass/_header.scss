@@ -5,16 +5,16 @@ body.no-header {
 }
 
 @mixin active {
-	color: #3c3c3c;
-	border-bottom: 3px solid $mediumGrey;
+	color: $blue;
+	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+	background-color: rgba(255, 255, 255, .3);
+	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .primary-header {
 	width: 100%;
-	margin-bottom: 25px;
-	border-top: 6px solid $blue;
-	border-bottom: 1px solid $mediumGrey;
-	background: #fff;
+	margin-bottom: 30px;
 
 	&.active-tab-courseware #courseware-tab {
 		@include active;
@@ -48,17 +48,25 @@ body.no-header {
 
 	.class-nav-bar {
 		clear: both;
+		@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+		background-color: rgb(197, 207, 223);
+		@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset, 0 1px 1px rgba(0, 0, 0, 0.1));
 	}
 
 	.class-nav {
-		@include clearfix;
-		border-top: 1px solid $mediumGrey;
+		@include clearfix;		
 
 		a {
 			float: left;
 			display: inline-block;
-			padding: 20px 25px 22px;
+			padding: 15px 25px 17px;
 			font-size: 15px;
+			color: #3c3c3c;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+
+			&:hover {
+				@include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+			}
 		}
 
 		li {
@@ -69,13 +77,16 @@ body.no-header {
 	.class {
 		@include clearfix;
 		font-size: 12px;
-		color: $darkGrey;
+		color: rgb(163, 171, 184);
+		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+		background-color: rgb(47, 53, 63);
+		@include box-shadow(0 -1px 3px rgba(0, 0, 0, 0.6) inset);
 
 		a {
 			display: inline-block;
 			height: 20px;
 			padding: 5px 10px 6px;
-			color: $darkGrey;
+			color: rgb(163, 171, 184);			
 		}
 
 		.home {

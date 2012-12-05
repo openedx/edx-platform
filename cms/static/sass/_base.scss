@@ -6,7 +6,7 @@
 
 body {
     min-width: 980px;
-    background: #eaebed;
+    background: #eaecf3;
     font-size: 16px;
     line-height: 1.6;
     color: #3c3c3c;
@@ -28,7 +28,6 @@ a {
 }
 
 h1 {
-    display: none;
     float: left;
     font-size: 28px;
     font-weight: 300;
@@ -40,7 +39,7 @@ h1 {
 }
 
 .page-actions {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .main-wrapper {
@@ -177,16 +176,17 @@ code {
     padding: 10px 0;
 }
 
+.details {
+    display: none;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
 .window {
     margin-bottom: 20px;
 
     .window-contents {
         padding: 20px;
-    }
-
-    .details {
-      margin-bottom: 30px;
-      font-size: 14px;
     }
 
     h4 {
