@@ -9,7 +9,7 @@ input.courseware-unit-search-input {
 	position: relative;
 	background: #fff;
 	border-radius: 3px;
-	margin: 15px 0;
+	margin-top: 15px;
 	padding-bottom: 12px;
 	@include box-shadow(0 1px 1px rgba(0,0,0,0.2), 0 0 0 1px rgba(0, 0, 0, 0.1));
 
@@ -189,6 +189,17 @@ input.courseware-unit-search-input {
 		.expand-collapse-icon {
 			visibility: hidden;
 		}
+	}
+}
+
+.collapse-all-button {
+	float: right;
+	margin-top: 10px;
+	font-size: 13px;
+	color: $darkGrey;
+
+	.collapse-all-icon {
+		margin-right: 6px;
 	}
 }
 

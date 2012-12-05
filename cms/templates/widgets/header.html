@@ -2,12 +2,28 @@
 
 <% active_tab_class = 'active-tab-' + active_tab if active_tab else '' %>
 <header class="primary-header ${active_tab_class}">
-  <nav class="inner-wrapper">
-    <div class="left">
-      <a href="/"><span class="home-icon"></span></a>
+  <div class="inner-wrapper">
+    <div class="class">
+      <div class="left">        
+        % if context_course:
+          <% ctx_loc = context_course.location %>
+          <a href="/" class="home"><span class="small-home-icon"></span></a> › 
+          <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.display_name}</a> ›
+        % endif
+      </div>
+
+      <div class="right">
+        <span class="username">${ user.username }</span>
+        % if user.is_authenticated():
+           <a href="${reverse('logout')}" class="log-out"><span class="log-out-icon"></span></a>
+        % else:
+           <a href="${reverse('login')}">Log in</a>
+        % endif
+      </div>
+    </div>
+    <nav class="class-nav-bar">
       % if context_course:
       <% ctx_loc = context_course.location %>
-      <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.display_name}</a>
       <ul class="class-nav">
         <li><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='courseware-tab'>Courseware</a></li>
         <li><a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='courseinfo-tab'>Course Info</a></li>
@@ -18,14 +34,6 @@
         <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab'>Import</a></li>
       </ul>
       % endif
-    </div>
-    <div class="right">
-      <span class="username">${ user.username }</span>
-      % if user.is_authenticated():
-         <a href="${reverse('logout')}">Log out</a>
-      % else:
-         <a href="${reverse('login')}">Log in</a>
-      % endif
-    </div>
-  </nav>
+    </nav>
+  </div>
 </header>

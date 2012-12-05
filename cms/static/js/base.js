@@ -43,6 +43,8 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
+    $('.collapse-all-button').bind('click', collapseAll);
+
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
     $('.subsection-display-name-input, .unit-subtitle, .policy-list-name, .policy-list-value').each(function(i) {
@@ -127,6 +129,11 @@ $(document).ready(function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
 });
+
+function collapseAll(e) {
+    $('.branch').addClass('collapsed');
+    $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+}
 
 function editSectionPublishDate(e) {
     e.preventDefault();
@@ -597,11 +604,11 @@ function hideToastMessage(e) {
 function addNewSection(e, isTemplate) {
     e.preventDefault();
 
-    $(e.target).hide();
+    $(e.target).addClass('disabled');
 
     var $newSection = $($('#new-section-template').html());
     var $cancelButton = $newSection.find('.new-section-name-cancel');
-    $('.new-courseware-section-button').after($newSection);
+    $('.courseware-overview').prepend($newSection);
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.section-name-form').bind('submit', saveNewSection);
     $cancelButton.bind('click', cancelNewSection);
@@ -638,7 +645,7 @@ function saveNewSection(e) {
 
 function cancelNewSection(e) {
     e.preventDefault();
-    $('.new-courseware-section-button').show();
+    $('.new-courseware-section-button').removeClass('disabled');
     $(this).parents('section.new-section').remove();
 }
 

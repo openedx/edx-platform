@@ -28,6 +28,7 @@ a {
 }
 
 h1 {
+    display: none;
     float: left;
     font-size: 28px;
     font-weight: 300;
@@ -39,8 +40,7 @@ h1 {
 }
 
 .page-actions {
-    float: right;
-    margin-top: 42px;
+    margin-bottom: 25px;
 }
 
 .main-wrapper {
@@ -349,7 +349,7 @@ body.show-wip {
 }
 
 .new-button {
-    @include blue-button;
+    @include green-button;
     font-size: 13px;
     padding: 8px 20px 10px;
     text-align: center;
