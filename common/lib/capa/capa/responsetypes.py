@@ -1880,15 +1880,15 @@ class OpenEndedResponse(LoncapaResponse):
             # NOTE: self.system.location is valid because the capa_module
             # __init__ adds it (easiest way to get problem location into
             # response types)
-            parsed_grader_payload.update({
-                'location' : self.system.location,
-                'course_id' : self.system.course_id,
-                'prompt' : prompt_string,
-                'rubric' : rubric_string,
-            })
-            updated_grader_payload = json.dumps(parsed_grader_payload)
-        except Exception as err:
+        except ValueError:
             log.exception("Grader payload %r is not a json object!", grader_payload)
+        parsed_grader_payload.update({
+            'location' : self.system.location,
+            'course_id' : self.system.course_id,
+            'prompt' : prompt_string,
+            'rubric' : rubric_string,
+        })
+        updated_grader_payload = json.dumps(parsed_grader_payload)
 
         self.payload = {'grader_payload': updated_grader_payload}
 
@@ -1903,9 +1903,11 @@ class OpenEndedResponse(LoncapaResponse):
 
         try:
             submission = student_answers[self.answer_id]
-        except Exception as err:
-            log.error('Error in OpenEndedResponse {0}: cannot get student answer for {1}'.format(err,self.answer_id))
-            raise
+        except KeyError:
+            msg = ('Cannot get student answer for answer_id: {0}. student_answers {1}'
+                   .format(self.answer_id, student_answers))
+            log.exception(msg)
+            raise LoncapaProblemError(msg)
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -1959,7 +1961,7 @@ class OpenEndedResponse(LoncapaResponse):
             #      the problem has been queued
             #   2) Frontend: correctness='incomplete' eventually trickles down
             #      through inputtypes.textbox and .filesubmission to inform the
-            #      browser to poll the LMS
+            #      browser that the submission is queued (and it could e.g. poll)
             cmap.set(self.answer_id, queuestate=queuestate,
                      correctness='incomplete', msg=msg)
 
@@ -1984,9 +1986,8 @@ class OpenEndedResponse(LoncapaResponse):
             # Sanity check on returned points
             if points < 0:
                 points = 0
-            elif points > self.maxpoints[self.answer_id]:
-                points = self.maxpoints[self.answer_id]
-                # Queuestate is consumed
+
+            # Queuestate is consumed, so reset it to None
             oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
                 msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
