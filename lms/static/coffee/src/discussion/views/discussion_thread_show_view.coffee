@@ -72,7 +72,7 @@ if Backbone?
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
-      url = nullunFlagAbuse: ->
+      url = nullunFollow: ->
       url = @model.urlFor("unFlagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")

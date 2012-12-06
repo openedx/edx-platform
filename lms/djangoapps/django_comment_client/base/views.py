@@ -238,28 +238,28 @@ def vote_for_thread(request, course_id, thread_id, value):
 @require_POST
 @login_required
 @permitted
-def flag_abuse_for_thread(request, course_id, thread_id, value):
+def flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.flagAbuse(user,thread, value)
+    thread.flagAbuse(user,thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
-def un_flag_abuse_for_thread(request, course_id, thread_id, value):
+def un_flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.unFlagAbuse(user,thread, value)
+    thread.unFlagAbuse(user,thread)
     return JsonResponse(utils.safe_content(thread.to_dict()))
 
-def flag_abuse_for_comment(request, course_id, comment_id, value):
+def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(thread_id)
-    comment.flagAbuse(user,comment, value)
+    comment.flagAbuse(user,comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
-def un_flag_abuse_for_comment(request, course_id, comment_id, value):
+def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(thread_id)
-    comment.unFlagAbuse(user,comment, value)
+    comment.unFlagAbuse(user,comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
 @require_POST

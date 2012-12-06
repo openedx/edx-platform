@@ -72,8 +72,14 @@ class Thread(models.Model):
                             'mark_as_read': kwargs.get('mark_as_read', True),
                          }
  
-        
-    def flagAbuse(self, user, voteable, value):
+        # user_id may be none, in which case it shouldn't be part of the
+        # request.
+        request_params = strip_none(request_params)
+
+        response = perform_request('get', url, request_params)
+        self.update_attributes(**response)
+
+    def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
@@ -84,7 +90,7 @@ class Thread(models.Model):
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
         
-    def unFlagAbuse(self, user, voteable, value):
+    def unFlagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':

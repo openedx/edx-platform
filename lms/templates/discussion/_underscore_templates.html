@@ -44,7 +44,7 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-        
+       POST 
       <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
       <i class="icon"></i><span class="flag-label">Report Misuse</span></div>      
         
@@ -111,7 +111,7 @@
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
-    
+    RESPONSE
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
       <i class="icon"></i><span class="flag-label">Report Misuse</span></div>
     </div>
@@ -137,6 +137,7 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
+    COMMENT
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
       <i class="icon"></i><span class="flag-label">Report Misuse</span></div> 
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
