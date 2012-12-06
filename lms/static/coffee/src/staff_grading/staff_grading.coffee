@@ -27,7 +27,8 @@ class StaffGradingBackend
             success: true
             problem_name: 'Problem 1'
             num_graded: 3
-            num_total: 5
+            min_for_ml: 5
+            num_pending: 4
             prompt: '''
             	<h2>S11E3: Metal Bands</h2>
 <p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
@@ -57,7 +58,8 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             success: true
             problem_name: 'Problem 2'
             num_graded: 2
-            num_total: 5
+            min_for_ml: 5
+            num_pending: 4
             prompt: 'This is a fake second problem'
             submission: 'This is the best submission ever! ' + @mock_cnt
             rubric: 'I am a rubric for grading things! ' + @mock_cnt
@@ -74,17 +76,16 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
       response =
         @mock('get_next', {location: data.location})
     # get_problem_list
-    # sends in a course_id and a grader_id
-    # should get back a list of problem_ids, problem_names, num_graded, num_total
+    # should get back a list of problem_ids, problem_names, num_graded, min_for_ml
     else if cmd == 'get_problem_list'
       @mock_cnt = 1
       response = 
         success: true
         problem_list: [
           {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
-            problem_name: "Problem 1", num_graded: 3, num_total: 5},
+            problem_name: "Problem 1", num_graded: 3, num_pending: 5, min_for_ml: 10},
           {location: 'i4x://MITx/3.091x/problem/open_ended_demo2', \
-            problem_name: "Problem 2", num_graded: 1, num_total: 5}
+            problem_name: "Problem 2", num_graded: 1, num_pending: 5, min_for_ml: 10}
         ]
     else
       response =
@@ -140,6 +141,9 @@ class StaffGrading
     @score_selection_container = $('.score-selection-container')        
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
+
+    @problem_meta_info = $('.problem-meta-info-container')
+    @meta_info_wrapper = $('.meta-info-wrapper')
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
@@ -156,8 +160,9 @@ class StaffGrading
     @ml_error_info= ''
     @location = ''
     @prompt_name = ''
-    @num_total = 0
+    @min_for_ml = 0
     @num_graded = 0
+    @num_pending = 0
 
     @score = null
     @problems = null
@@ -207,7 +212,7 @@ class StaffGrading
       if response.problem_list
         @problems = response.problem_list
       else if response.submission
-        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info, response.problem_name, response.num_graded, response.num_total)
+        @data_loaded(response)
       else
         @no_more(response.message)
     else
@@ -237,18 +242,19 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info, prompt_name, num_graded, num_total) ->
-    @prompt = prompt
-    @submission = submission
-    @rubric = rubric
-    @submission_id = submission_id
+  data_loaded: (response) ->
+    @prompt = response.prompt
+    @submission = response.submission
+    @rubric = response.rubric
+    @submission_id = response.submission_id
     @feedback_area.val('')
-    @max_score = max_score
+    @max_score = response.max_score
     @score = null
-    @ml_error_info=ml_error_info
-    @prompt_name = prompt_name
-    @num_graded = num_graded
-    @num_total = num_total
+    @ml_error_info=response.ml_error_info
+    @prompt_name = response.problem_name
+    @num_graded = response.num_graded
+    @min_for_ml = response.min_for_ml
+    @num_pending = response.num_pending
     @state = state_grading
     if not @max_score?
       @error("No max score specified for submission.")
@@ -257,7 +263,7 @@ class StaffGrading
     @prompt = null
     @prompt_name = ''
     @num_graded = 0
-    @num_total = 0
+    @min_for_ml = 0
     @submission = null
     @rubric = null
     @ml_error_info = null
@@ -289,7 +295,7 @@ class StaffGrading
     @submission_wrapper.toggle(show_grading_elements)
     @rubric_wrapper.toggle(show_grading_elements)
     @grading_wrapper.toggle(show_grading_elements)
-    @ml_error_info_container.toggle(show_grading_elements)
+    @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()
     
     if @list_view
@@ -299,7 +305,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_graded} graded out of #{problem.num_total})")
+      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending)")
         .click =>
           @get_next_submission problem.location
 
@@ -333,8 +339,14 @@ class StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
+      meta_list = $("<ul>")
+      meta_list.append("<li><span class='meta-info'>Pending:</span> #{@num_pending}</li>")
+      meta_list.append("<li><span class='meta-info'>Graded:</span> #{@num_graded}</li>")
+      meta_list.append("<li><span class='meta-info'>Needed for ML:</span> #{Math.max(@min_for_ml - @num_graded)}</li>")
+      @problem_meta_info.append(meta_list)
+
       @prompt_container.html(@prompt)
-      @prompt_name_container.html("#{@prompt_name} <span class='sub-heading'>(#{@num_graded} completed out of #{@num_total})</span>")
+      @prompt_name_container.html("#{@prompt_name}")
       @submission_container.html(@make_paragraphs(@submission))
       @rubric_container.html(@rubric)
 
