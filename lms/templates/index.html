@@ -48,7 +48,7 @@
       <h2>Explore free courses from <span class="edx">edX</span> universities</h2>
 
       <section class="university-partners">
-        <ol class="partners">
+        <ol class="partners partners-primary">
           <li class="partner mit">
             <a href="${reverse('university_profile', args=['MITx'])}">
               <img src="${static.url('images/university/mit/mit.png')}" />
@@ -65,7 +65,7 @@
               </div>
             </a>
           </li>
-          <li class="partner">
+          <li class="partner last">
             <a href="${reverse('university_profile', args=['BerkeleyX'])}">
               <img src="${static.url('images/university/berkeley/berkeley.png')}" />
               <div class="name">
@@ -73,11 +73,24 @@
               </div>
             </a>
           </li>
+        </ol>
+
+        <hr />
+
+        <ol class="partners">
           <li class="partner">
             <a href="${reverse('university_profile', args=['UTx'])}">
               <img src="${static.url('images/university/ut/ut-rollover_160x90.png')}" />
               <div class="name">
                 <span>UTx</span>
+              </div>
+            </a>
+          </li>
+          <li class="partner">
+            <a href="${reverse('university_profile', args=['WellesleyX'])}">
+              <img src="${static.url('images/university/wellesley/wellesley-rollover_160x90.png')}" />
+              <div class="name">
+                <span>WellesleyX</span>
               </div>
             </a>
           </li>
@@ -89,7 +102,6 @@
               </div>
             </a>
           </li>
-
         </ol>
       </section>
 
